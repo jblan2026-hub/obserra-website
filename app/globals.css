@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --navy: #061f3b;
   --ink: #eff9ff;
   --blue: #5eb8e6;
@@ -18,6 +18,7 @@ main { overflow: hidden; }
 .brand .product-label { color: var(--gold); font-size: 11px; letter-spacing: .12em; }
 .site-footer img { width: 176px; height: auto; }
 .nav-link { padding: 10px 15px; border: 1px solid #75c2e775; border-radius: 999px; color: #e5f7ff; font-size: 12px; font-weight: 800; text-decoration: none; }
+.masthead-actions { display: flex; align-items: center; gap: 10px; }
 
 .hero { position: relative; isolation: isolate; overflow: hidden; padding: 92px max(5vw, 24px); color: #fff; background-image: linear-gradient(90deg, #031426 0%, #031426ee 38%, #03142695 64%, #03142628 100%), url("/brand/visuals/obserra-academy.png"); background-position: center; background-size: cover; }
 .hero::after { position: absolute; z-index: -1; inset: 0; content: ""; opacity: .42; background-image: linear-gradient(#8fdaff18 1px, transparent 1px), linear-gradient(90deg, #8fdaff18 1px, transparent 1px); background-size: 52px 52px; mask-image: linear-gradient(90deg, #000, transparent); }
@@ -91,3 +92,4 @@ main { overflow: hidden; }
   .certificate-promise { display: block; }
   .certificate-promise span { display: block; margin-top: 6px; }
 }
+
