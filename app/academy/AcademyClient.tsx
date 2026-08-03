@@ -6,6 +6,7 @@ import { courses, type Department } from "./courseData";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const departments: (Department | "All")[] = ["All", "Cyber", "Protection", "Intelligence", "Technologies"];
+const departmentLabels: Record<Department | "All", string> = { All: "All courses", Cyber: "Cyber Defense", Protection: "Protection", Intelligence: "Intelligence", Technologies: "Technology & AI" };
 
 export default function AcademyClient() {
   const [department, setDepartment] = useState<Department | "All">("All");
@@ -28,8 +29,9 @@ export default function AcademyClient() {
 
       <section className="catalog" id="courses">
         <div className="catalog-heading"><div><p className="kicker">Course catalog</p><h2>Choose your training track</h2></div><p>{courses.length} paid courses. Secure checkout and immediate paid access.</p></div>
-        <div className="filters" aria-label="Filter courses by department">{departments.map((item) => <button key={item} className={department === item ? "active" : ""} onClick={() => setDepartment(item)}>{item}</button>)}</div>
-        <div className="course-grid">{visibleCourses.map((course) => <article key={course.id} className="course-card"><span>{course.department}: {course.track}</span><h3>{course.title}</h3><p>{course.description}</p><footer><b>{money.format(course.price)}</b><em>{course.duration}</em></footer><div className="course-card-actions"><a href={`/academy/${course.id}`}>Course details</a><a href={`/api/academy/checkout?course=${course.id}`} onClick={() => track("academy_checkout_started", { course: course.id, source: "course_tile" })}>Purchase</a></div></article>)}</div>
+        <nav className="academy-category-rail" aria-label="Browse Academy categories">{departments.map((item) => { const count = item === "All" ? courses.length : courses.filter((course) => course.department === item).length; return <button key={item} className={department === item ? "active" : ""} onClick={() => setDepartment(item)}><span>{departmentLabels[item]}</span><b>{count}</b></button>; })}</nav>
+        <div className="catalog-results"><p className="kicker">{departmentLabels[department]}</p><strong>{visibleCourses.length} course{visibleCourses.length === 1 ? "" : "s"} available</strong></div>
+        <div className="course-grid">{visibleCourses.map((course) => <article key={course.id} className="course-card"><span>{course.department}: {course.track}</span><h3>{course.title}</h3><p>{course.description}</p><footer><b>{money.format(course.price)}</b><em>{course.duration}</em></footer><div className="course-card-actions"><a href={`/academy/${course.id}`}>Details</a><a href={`/api/academy/checkout?course=${course.id}`} onClick={() => track("academy_checkout_started", { course: course.id, source: "course_tile" })}>Purchase</a></div></article>)}</div>
       </section>
 
       <section className="course-detail" aria-live="polite">
