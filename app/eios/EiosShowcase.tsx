@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import "./eios.css";
+import "./eios-extra.css";
 
 const productViews = [
   { id: "overview", eyebrow: "Executive command view", title: "See what matters. Move with confidence.", copy: "A concise decision surface for enterprise health, material risk, accountable workspaces, and verified outcomes.", image: "/eios/eios-overview-marketing.png", alt: "EIOS executive command visual" },
@@ -41,6 +42,12 @@ const capabilities = [
 
 export default function EiosShowcase() {
   const [selected, setSelected] = useState(productViews[0]);
+  const [selectedCapabilityIndex, setSelectedCapabilityIndex] = useState<number | null>(null);
+  const selectedCapability = selectedCapabilityIndex === null ? null : capabilities[selectedCapabilityIndex];
+  const exploreCapability = (index: number) => {
+    setSelectedCapabilityIndex(index);
+    setSelected(productViews[index % productViews.length]);
+  };
   return <main className="eios-page" onCopy={(event) => event.preventDefault()} onContextMenu={(event) => event.preventDefault()}>
     <header className="eios-nav">
       <a className="eios-brand" href="/"><Image src="/brand/obserra-logo.png" width={250} height={48} alt="Obserra Executive Protection and Intelligence LLC" /><span><b>EIOS</b></span></a>
@@ -57,7 +64,7 @@ export default function EiosShowcase() {
 
     <section className="eios-outcomes" id="outcomes"><div className="section-intro"><p className="eios-eyebrow">THE EIOS DECISION PATH</p><h2>Less dashboard noise.<br />More decisions that move the enterprise forward.</h2></div><div className="outcome-grid">{outcomes.map(([number, title, copy]) => <article key={title}><span>{number}</span><h3>{title}</h3><p>{copy}</p></article>)}</div></section>
 
-    <section className="eios-capabilities" id="capabilities"><div className="section-intro"><p className="eios-eyebrow">FULL ENTERPRISE CAPABILITY SCOPE</p><h2>One operating system.<br />Every critical decision domain.</h2><p>EIOS is designed as an AI-native, secure-by-default enterprise intelligence platform—not a collection of isolated dashboards. It brings governed learning, resilient scale, and accountable execution to each organization&apos;s operating model and priorities.</p></div><div className="capability-grid">{capabilities.map(([title, copy], index) => <article key={title}><span>{String(index + 1).padStart(2, "0")}</span><h3>{title}</h3><p>{copy}</p><em>Explore capability</em></article>)}</div></section>
+    <section className="eios-capabilities" id="capabilities"><div className="section-intro"><p className="eios-eyebrow">FULL ENTERPRISE CAPABILITY SCOPE</p><h2>One operating system.<br />Every critical decision domain.</h2><p>EIOS is designed as an AI-native, secure-by-default enterprise intelligence platform—not a collection of isolated dashboards. It brings governed learning, resilient scale, and accountable execution to each organization&apos;s operating model and priorities.</p></div><div className="capability-grid">{capabilities.map(([title, copy], index) => <button key={title} type="button" className={selectedCapabilityIndex === index ? "capability-card active" : "capability-card"} onClick={() => exploreCapability(index)} aria-expanded={selectedCapabilityIndex === index} aria-controls="capability-detail"><span>{String(index + 1).padStart(2, "0")}</span><h3>{title}</h3><p>{copy}</p><em>Explore capability <b>→</b></em></button>)}</div>{selectedCapability && <div className="capability-detail" id="capability-detail" aria-live="polite"><div><p className="eios-eyebrow">EIOS CAPABILITY {String(selectedCapabilityIndex! + 1).padStart(2, "0")}</p><h3>{selectedCapability[0]}</h3><p>{selectedCapability[1]}</p></div><div className="capability-detail-actions"><button type="button" className="eios-button" onClick={() => document.getElementById("showcase")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Open related product view</button><a className="eios-outline-button" href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`EIOS ${selectedCapability[0]} inquiry`)}`}>Discuss this capability</a></div></div>}</section>
 
     <section className="eios-showcase" id="showcase"><div className="section-intro"><p className="eios-eyebrow">PRODUCT SHOWCASE</p><h2>Enterprise intelligence<br />that makes its case.</h2><p>Explore controlled EIOS demonstration views. Each communicates what leaders need to know without exposing customer environments or proprietary implementation details.</p></div><div className="showcase-layout"><div className="view-selector" role="tablist" aria-label="EIOS product views">{productViews.map((view) => <button key={view.id} role="tab" aria-selected={selected.id === view.id} className={selected.id === view.id ? "active" : ""} onClick={() => setSelected(view)}><small>{view.eyebrow}</small><strong>{view.title}</strong><span>View experience</span></button>)}</div><ProductFrame view={selected} /></div></section>
 

@@ -148,7 +148,7 @@ export default function HomePage() {
           <p className="technology-emphasis">From one critical workflow to a connected operating experience, we turn complex challenges into governed solutions people will want to use.</p>
           <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Technology%20Build%20Inquiry">Discuss your technology build</a>
         </div>
-        <div className="service-signals"><span>AI-native application design</span><span>EIOS-integrated workflows</span><span>Secure data and identity patterns</span><span>Custom portals and dashboards</span><span>Enterprise automation</span><span>Decision intelligence</span></div>
+        <div className="service-signals"><a href="/eios#capabilities">AI-native application design <b>→</b></a><a href="/eios#outcomes">EIOS-integrated workflows <b>→</b></a><a href="/eios#capabilities">Secure data and identity patterns <b>→</b></a><a href="/eios#showcase">Custom portals and dashboards <b>→</b></a><a href="/eios#outcomes">Enterprise automation <b>→</b></a><a href="/eios#showcase">Decision intelligence <b>→</b></a></div>
       </section>
 
       <section className="holographic-showcase">
@@ -162,7 +162,7 @@ export default function HomePage() {
           <a className="holo-node node-five" href="/eios#outcomes">OUTCOME<br /><b>VERIFIED</b></a>
           <p className="holo-instruction">Select a signal to explore the governed decision loop.</p>
         </div>
-        <div className="holo-copy"><p className="home-eyebrow">THE EIOS VISUAL EXPERIENCE</p><h2>Turn complex intelligence into an executive level view.</h2><p>EIOS gives leaders a refined visual way to explore enterprise context, risk, evidence, policy, approvals, and accountable action. It is designed to make important conversations clearer, not to overwhelm people with another dashboard.</p><div className="holo-proof"><span>Executive visual briefings</span><span>Interactive intelligence views</span><span>Governed decision pathways</span></div><a className="home-button" href="/eios">Explore EIOS</a></div>
+        <div className="holo-copy"><p className="home-eyebrow">THE EIOS VISUAL EXPERIENCE</p><h2>Turn complex intelligence into an executive level view.</h2><p>EIOS gives leaders a refined visual way to explore enterprise context, risk, evidence, policy, approvals, and accountable action. It is designed to make important conversations clearer, not to overwhelm people with another dashboard.</p><div className="holo-proof"><a href="/eios#showcase">Executive visual briefings <b>→</b></a><a href="/eios#capabilities">Interactive intelligence views <b>→</b></a><a href="/eios#outcomes">Governed decision pathways <b>→</b></a></div><a className="home-button" href="/eios">Explore EIOS</a></div>
       </section>
 
       <section className="eios-story" aria-labelledby="eios-story-title">
