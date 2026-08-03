@@ -16,6 +16,8 @@ The Stripe webhook endpoint is `https://www.obserrallc.com/api/webhook/stripe`. 
 
 Academy access is granted solely after Stripe verifies a signed webhook. The success page is informational and does not create enrollment. The approved owner email can sign in at `/sign-in` and then access `/admin`; no public route grants owner access.
 
+Protected learning and certificate routes are private, non-indexable, and sent with no-store caching directives. Course content is not provided as a downloadable asset, and protected learner sessions receive a visible watermark. These controls deter redistribution and preserve traceability; no browser-based training product can technically prevent an authorized user from capturing material displayed on their own screen.
+
 ## Verification
 
 ```powershell

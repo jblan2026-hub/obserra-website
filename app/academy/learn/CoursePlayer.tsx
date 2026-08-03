@@ -1,13 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { Course } from "../courseData";
-import { finalAssessment, lessonBrief } from "../courseExperience";
+import type { AssessmentQuestion, LessonBrief } from "../courseExperience";
 import type { CourseProgress } from "../../../lib/academy";
 import "./learning.css";
 import "./brand-overrides.css";
 
-export default function CoursePlayer({ course, initialProgress }: { course: Course; initialProgress: CourseProgress }) {
+export default function CoursePlayer({ course, initialProgress, lessons, assessment, watermark }: {
+  course: Course;
+  initialProgress: CourseProgress;
+  lessons: LessonBrief[];
+  assessment: AssessmentQuestion[];
+  watermark: string;
+}) {
   const [activeLesson, setActiveLesson] = useState(0);
   const [completedLessons, setCompletedLessons] = useState(initialProgress.completedLessons);
   const [checkedAnswer, setCheckedAnswer] = useState<number | null>(null);
@@ -15,8 +21,7 @@ export default function CoursePlayer({ course, initialProgress }: { course: Cour
   const [score, setScore] = useState<number | undefined>(initialProgress.assessmentScore);
   const [certificateId, setCertificateId] = useState(initialProgress.certificateId);
   const [notice, setNotice] = useState("");
-  const lesson = lessonBrief(course.id, activeLesson);
-  const assessment = useMemo(() => finalAssessment(course.id), [course.id]);
+  const lesson: LessonBrief = lessons[activeLesson] ?? null;
   const lessonsComplete = completedLessons.length === course.modules.length;
 
   async function completeLesson() {
@@ -38,7 +43,8 @@ export default function CoursePlayer({ course, initialProgress }: { course: Cour
   }
 
   if (!lesson) return null;
-  return <main className="learning-shell" onCopy={(event) => event.preventDefault()} onContextMenu={(event) => event.preventDefault()}>
+  return <main className="learning-shell" onCopy={(event) => event.preventDefault()} onCut={(event) => event.preventDefault()} onDragStart={(event) => event.preventDefault()} onContextMenu={(event) => event.preventDefault()}>
+    <div className="learner-watermark" aria-hidden="true">{watermark}</div>
     <header className="learning-header"><a href="/academy" className="learning-brand"><img src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" /><b>ACADEMY</b></a><a href="/academy" className="exit-course">Exit course</a></header>
     <section className="learning-top"><div><p className="learning-kicker">Protected learner workspace, {course.department}</p><h1>{course.title}</h1><p>{course.description}</p></div><div className="progress-ring"><strong>{completedLessons.length}/{course.modules.length}</strong><span>lessons complete</span></div></section>
     <div className="learning-layout"><aside className="lesson-nav"><p>Course journey</p>{course.modules.map((module, index) => <button key={module.title} onClick={() => { setActiveLesson(index); setCheckedAnswer(null); }} className={activeLesson === index ? "active" : ""}><span>{completedLessons.includes(index) ? "OK" : String(index + 1).padStart(2, "0")}</span><div><strong>{module.title}</strong><small>{module.format}</small></div></button>)}<button onClick={() => setActiveLesson(course.modules.length)} className={activeLesson === course.modules.length ? "active assessment-nav" : "assessment-nav"} disabled={!lessonsComplete}><span>25</span><div><strong>Final assessment</strong><small>80% required</small></div></button></aside>

@@ -1,6 +1,16 @@
 import { courses } from "./courseData";
 
 export type KnowledgeCheck = { question: string; options: string[]; answer: number; explanation: string };
+export type AssessmentQuestion = Pick<KnowledgeCheck, "question" | "options">;
+export type LessonBrief = {
+  title: string;
+  format: string;
+  focus: string;
+  observe: string;
+  decide: string;
+  act: string;
+  check: KnowledgeCheck;
+};
 
 const principles = [
   ["Pause and establish the decision context before acting.", "Act immediately on the first incomplete signal.", "Treat urgency as proof that a request is legitimate.", "Skip documentation to save time."],
@@ -10,7 +20,7 @@ const principles = [
   ["Escalate the change when risk, impact, or uncertainty exceeds the stated boundary.", "Keep changes local to avoid involving others.", "Make permanent exceptions during urgent work.", "Wait until the next scheduled review regardless of impact."],
 ];
 
-export function lessonBrief(courseId: string, index: number) {
+export function lessonBrief(courseId: string, index: number): LessonBrief | null {
   const course = courses.find((item) => item.id === courseId);
   if (!course) return null;
   const module = course.modules[index];
@@ -46,4 +56,12 @@ export function finalAssessment(courseId: string): KnowledgeCheck[] {
       explanation: "The correct response follows the course method: verify, apply authority, preserve evidence, and communicate the next accountable action.",
     };
   });
+}
+
+/**
+ * The client receives only the question text and choices. Answer keys remain
+ * in the server-only assessment route, which is the authoritative scorer.
+ */
+export function finalAssessmentQuestions(courseId: string): AssessmentQuestion[] {
+  return finalAssessment(courseId).map(({ question, options }) => ({ question, options }));
 }

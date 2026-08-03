@@ -6,7 +6,6 @@ const isProtected = createRouteMatcher([
   "/academy/certificate(.*)",
   "/academy/success(.*)",
   "/admin(.*)",
-  "/api/academy(.*)",
 ]);
 
 const authenticationReady = Boolean(
@@ -37,6 +36,9 @@ function configurationGate(request: NextRequest) {
 
 export default authenticationReady
   ? clerkMiddleware(async (auth, request) => {
+      // Academy route handlers authenticate independently. Keeping checkout
+      // outside middleware lets a signed-out learner receive its deliberate
+      // sign-in redirect instead of Clerk's API 404 response.
       if (isProtected(request)) await auth.protect();
     }, { frontendApiProxy: { enabled: true } })
   : configurationGate;
