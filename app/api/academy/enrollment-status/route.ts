@@ -1,15 +1,11 @@
-import { auth } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { academyStateWithOwnerAccess } from "../../../../lib/academy";
+import { courseForId } from "../../../../lib/academy";
+import { academyAccessCookieName, parseAcademyAccess } from "../../../../lib/academyAccess";
 
 export async function GET(request: Request) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
   const courseId = new URL(request.url).searchParams.get("course") ?? "";
-  try {
-    const state = await academyStateWithOwnerAccess(userId, courseId);
-    return NextResponse.json({ enrolled: Boolean(state.entitlements[courseId]), progress: state.progress[courseId] ?? null });
-  } catch {
-    return NextResponse.json({ error: "Unknown course" }, { status: 400 });
-  }
+  if (!courseForId(courseId)) return NextResponse.json({ error: "Unknown course" }, { status: 400 });
+  const state = parseAcademyAccess((await cookies()).get(academyAccessCookieName)?.value);
+  return NextResponse.json({ enrolled: Boolean(state?.courses[courseId]), progress: state?.progress[courseId] ?? null });
 }

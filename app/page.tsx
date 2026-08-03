@@ -68,7 +68,7 @@ export default function HomePage() {
           <a href="#technologies">Technologies</a>
           <a href="/academy">Academy</a>
           <a href="/about">About</a>
-          <a href="/sign-in" className="home-nav-login">Academy account</a>
+          <a href="/academy" className="home-nav-login">Academy courses</a>
           <a href="#connect" className="home-nav-cta">Talk with Obserra</a>
         </nav>
       </header>
@@ -121,7 +121,7 @@ export default function HomePage() {
           <p className="home-eyebrow">CYBERSECURITY AND RISK ADVISORY</p>
           <h2>Make cyber risk a leadership advantage.</h2>
           <p>From executive cyber leadership and cyber risk assessments to governance, policy design, incident readiness, and board communication, Obserra helps organizations turn security complexity into clear executive action.</p>
-          <a className="home-button" href="#connect">Discuss your cyber priorities</a>
+          <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Cybersecurity%20Inquiry">Discuss your cyber priorities</a>
         </div>
         <div className="service-signals"><span>Cyber risk strategy</span><span>Executive and board briefings</span><span>Incident readiness</span><span>Governance and policy</span><span>Digital exposure reviews</span><span>Security transformation</span></div>
       </section>
@@ -131,7 +131,7 @@ export default function HomePage() {
           <p className="home-eyebrow">PROTECTION AND INTELLIGENCE</p>
           <h2>Protect people, operations, and reputation before risk becomes disruption.</h2>
           <p>Obserra provides executive protection planning, protective intelligence, travel risk support, digital exposure reviews, threat informed advisory, and discreet risk support for leaders and organizations. Every engagement begins with the decisions, people, and assets that matter most.</p>
-          <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Protection%20and%20Intelligence%20Consultation">Discuss your protection priorities</a>
+          <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Protection%20and%20Intelligence%20Inquiry">Request a protection consultation</a>
         </div>
         <div className="engagement-steps">
           <article><span>01</span><h3>Assess what is at stake</h3><p>Clarify the exposure, priority, decision owner, and desired outcome.</p></article>
@@ -146,13 +146,22 @@ export default function HomePage() {
           <h2>Put intelligent technology to work on the business problems holding you back.</h2>
           <p>Obserra designs custom AI-native applications, intelligent workflows, dashboards, and decision experiences around your highest-value problem—not a generic template. Each solution can connect to EIOS as an intelligence and governance layer while respecting data boundaries, confidentiality, identity, and security requirements.</p>
           <p className="technology-emphasis">From one critical workflow to a connected operating experience, we turn complex challenges into governed solutions people will want to use.</p>
-          <a className="home-button" href="mailto:info@obserrallc.com?subject=Custom%20AI%20Native%20Application%20Consultation">Build your application</a>
+          <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Technology%20Build%20Inquiry">Discuss your technology build</a>
         </div>
         <div className="service-signals"><span>AI-native application design</span><span>EIOS-integrated workflows</span><span>Secure data and identity patterns</span><span>Custom portals and dashboards</span><span>Enterprise automation</span><span>Decision intelligence</span></div>
       </section>
 
       <section className="holographic-showcase">
-        <div className="holo-visual" aria-label="Illustration of Obserra EIOS intelligence view"><div className="holo-ring ring-one" /><div className="holo-ring ring-two" /><div className="holo-ring ring-three" /><div className="holo-core"><span>OBSERRA</span><strong>EIOS</strong><small>GOVERNED INTELLIGENCE</small></div><div className="holo-node node-one">RISK<br /><b>CONTEXT</b></div><div className="holo-node node-two">EVIDENCE<br /><b>TRACEABILITY</b></div><div className="holo-node node-three">ACTION<br /><b>ACCOUNTABILITY</b></div></div>
+        <div className="holo-visual" aria-label="Interactive Obserra EIOS decision model">
+          <div className="holo-ring ring-one" /><div className="holo-ring ring-two" /><div className="holo-ring ring-three" /><div className="holo-beam" />
+          <a className="holo-core" href="/eios" aria-label="Explore Obserra EIOS"><span>OBSERRA</span><strong>EIOS</strong><small>GOVERNED INTELLIGENCE</small></a>
+          <a className="holo-node node-one" href="/eios#capabilities">RISK<br /><b>CONTEXT</b></a>
+          <a className="holo-node node-two" href="/eios#capabilities">EVIDENCE<br /><b>TRACEABILITY</b></a>
+          <a className="holo-node node-three" href="/eios#outcomes">ACTION<br /><b>ACCOUNTABILITY</b></a>
+          <a className="holo-node node-four" href="/eios#outcomes">DECISION<br /><b>GOVERNANCE</b></a>
+          <a className="holo-node node-five" href="/eios#outcomes">OUTCOME<br /><b>VERIFIED</b></a>
+          <p className="holo-instruction">Select a signal to explore the governed decision loop.</p>
+        </div>
         <div className="holo-copy"><p className="home-eyebrow">THE EIOS VISUAL EXPERIENCE</p><h2>Turn complex intelligence into an executive level view.</h2><p>EIOS gives leaders a refined visual way to explore enterprise context, risk, evidence, policy, approvals, and accountable action. It is designed to make important conversations clearer, not to overwhelm people with another dashboard.</p><div className="holo-proof"><span>Executive visual briefings</span><span>Interactive intelligence views</span><span>Governed decision pathways</span></div><a className="home-button" href="/eios">Explore EIOS</a></div>
       </section>
 

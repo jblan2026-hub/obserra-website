@@ -9,18 +9,14 @@ const departments: (Department | "All")[] = ["All", "Cyber", "Protection", "Inte
 
 export default function AcademyClient() {
   const [department, setDepartment] = useState<Department | "All">("All");
-  const [selected, setSelected] = useState(courses[0]);
+  const selected = courses[0];
   const visibleCourses = department === "All" ? courses : courses.filter((course) => course.department === department);
-
-  function chooseCourse(id: string) {
-    setSelected(courses.find((item) => item.id === id) ?? courses[0]);
-  }
 
   return (
     <main>
       <header className="masthead">
         <a href="/" className="brand" aria-label="Obserra Executive Protection and Intelligence LLC home"><img src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" /><span className="product-label">ACADEMY</span></a>
-        <div className="masthead-actions"><a href="/sign-in" className="nav-link">Academy account</a><a href="mailto:info@obserrallc.com?subject=Obserra%20Enterprise%20Training" className="nav-link">Enterprise training</a></div>
+        <div className="masthead-actions"><a href="mailto:info@obserrallc.com?subject=Obserra%20Enterprise%20Training" className="nav-link">Enterprise training</a></div>
       </header>
 
       <section className="hero">
@@ -31,14 +27,14 @@ export default function AcademyClient() {
       </section>
 
       <section className="catalog" id="courses">
-        <div className="catalog-heading"><div><p className="kicker">Course catalog</p><h2>Choose your training track</h2></div><p>{courses.length} paid courses. Secure card or ACH checkout.</p></div>
+        <div className="catalog-heading"><div><p className="kicker">Course catalog</p><h2>Choose your training track</h2></div><p>{courses.length} paid courses. Secure checkout and immediate paid access.</p></div>
         <div className="filters" aria-label="Filter courses by department">{departments.map((item) => <button key={item} className={department === item ? "active" : ""} onClick={() => setDepartment(item)}>{item}</button>)}</div>
-        <div className="course-grid">{visibleCourses.map((course) => <button key={course.id} className={selected.id === course.id ? "course-card selected" : "course-card"} onClick={() => chooseCourse(course.id)}><span>{course.department}: {course.track}</span><h3>{course.title}</h3><p>{course.description}</p><footer><b>{money.format(course.price)}</b><em>{course.duration}</em></footer></button>)}</div>
+        <div className="course-grid">{visibleCourses.map((course) => <article key={course.id} className="course-card"><span>{course.department}: {course.track}</span><h3>{course.title}</h3><p>{course.description}</p><footer><b>{money.format(course.price)}</b><em>{course.duration}</em></footer><div className="course-card-actions"><a href={`/academy/${course.id}`}>Course details</a><a href={`/api/academy/checkout?course=${course.id}`} onClick={() => track("academy_checkout_started", { course: course.id, source: "course_tile" })}>Purchase</a></div></article>)}</div>
       </section>
 
       <section className="course-detail" aria-live="polite">
         <div className="detail-copy"><p className="kicker">{selected.department}: {selected.track}</p><h2>{selected.title}</h2><p>{selected.description}</p><p className="audience"><strong>Designed for:</strong> {selected.audience}</p><div className="outcomes">{selected.outcomes.map((outcome) => <span key={outcome}>{outcome}</span>)}</div></div>
-        <aside className="enrollment-card"><span>Paid enrollment</span><strong>{money.format(selected.price)} <small>per learner</small></strong><p>Duration: {selected.duration}. Includes {selected.modules.length} interactive lessons and a final assessment.</p>{selected.stripePaymentLinkId ? <a className="checkout" href={`/api/academy/checkout?course=${selected.id}`} onClick={() => track("academy_checkout_started", { course: selected.id })}>Purchase secure enrollment</a> : <a className="checkout" href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`Academy enrollment request: ${selected.title}`)}`}>Request enrollment</a>}<small>{selected.stripePaymentLinkId ? "Pay securely first. After confirmed payment, create or sign in to your separate Academy account using the same email address to unlock the course." : "This course is being prepared for secure checkout."}</small></aside>
+        <aside className="enrollment-card"><span>Paid enrollment</span><strong>{money.format(selected.price)} <small>per learner</small></strong><p>Duration: {selected.duration}. Includes {selected.modules.length} interactive lessons and a final assessment.</p><a className="checkout" href={`/api/academy/checkout?course=${selected.id}`} onClick={() => track("academy_checkout_started", { course: selected.id })}>Purchase secure enrollment</a><small>Complete secure checkout and return directly to your paid course. No Academy sign-in is required.</small></aside>
       </section>
 
       <section className="curriculum"><p className="kicker">Interactive curriculum</p><h2>What you will complete</h2><ol>{selected.modules.map((module, index) => <li key={module.title}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{module.title}</h3><p>{module.description}</p></div><em>{module.format}<br />{module.duration}</em></li>)}</ol></section>

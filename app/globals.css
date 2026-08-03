@@ -48,6 +48,7 @@ main { overflow: hidden; }
 .course-card footer { display: flex; align-items: center; justify-content: space-between; }
 .course-card b { color: var(--gold); font-size: 20px; }
 .course-card em { color: #b8d8e9; font-size: 13px; font-style: normal; }
+.course-card-actions{display:flex;gap:8px;margin-top:20px}.course-card-actions a{display:inline-flex;flex:1;align-items:center;justify-content:center;border:1px solid #79c9e766;border-radius:7px;padding:10px 8px;color:#dcefff;text-decoration:none;font-size:11px;font-weight:900}.course-card-actions a:last-child{border-color:#f4ba55;background:#f4ba55;color:#071d34}.course-card-actions a:hover,.course-card-actions a:focus-visible{filter:brightness(1.08);outline:2px solid #fff;outline-offset:2px}
 
 .course-detail { display: grid; grid-template-columns: 1.5fr minmax(280px, .7fr); gap: 56px; padding: 82px max(5vw, 24px); background: linear-gradient(120deg, #082e4f, #061a31); color: #fff; }
 .detail-copy { max-width: 750px; }

@@ -1,4 +1,4 @@
-import AcademySuccessClient from "./AcademySuccessClient";
+import { redirect } from "next/navigation";
 
 type SuccessParams = { course?: string; session_id?: string };
 
@@ -6,6 +6,6 @@ export const dynamic = "force-dynamic";
 
 export default async function AcademySuccessPage({ searchParams }: { searchParams: Promise<SuccessParams> }) {
   const params = await searchParams;
-  const authenticationReady = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY);
-  return <AcademySuccessClient params={params} authenticationReady={authenticationReady} />;
+  if (!params.course || !params.session_id) redirect("/academy?enrollment=invalid");
+  redirect(`/api/academy/redeem?course=${encodeURIComponent(params.course)}&session_id=${encodeURIComponent(params.session_id)}`);
 }

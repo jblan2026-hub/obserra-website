@@ -1,26 +1,23 @@
 import { NextResponse } from "next/server";
 import { courseForId } from "../../../../lib/academy";
-import { getStripe } from "../../../../lib/stripe";
+import { getStripe, paymentLinkForCourse } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const course = courseForId(requestUrl.searchParams.get("course") ?? "");
-  const paymentEnrollmentReady = Boolean(
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-    process.env.CLERK_SECRET_KEY &&
-    process.env.STRIPE_SECRET_KEY &&
-    process.env.STRIPE_WEBHOOK_SECRET,
-  );
+  const paymentEnrollmentReady = Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET);
 
-  if (!course?.stripePaymentLinkId || !paymentEnrollmentReady) {
+  if (!course || !paymentEnrollmentReady) {
     return NextResponse.redirect(new URL("/academy?enrollment=not-ready", requestUrl));
   }
 
   try {
     const stripe = getStripe();
-    const paymentLinkItems = await stripe.paymentLinks.listLineItems(course.stripePaymentLinkId, { limit: 100 });
+    const paymentLink = await paymentLinkForCourse(course.id);
+    if (!paymentLink) throw new Error("No active secure checkout is configured for this course");
+    const paymentLinkItems = await stripe.paymentLinks.listLineItems(paymentLink.id, { limit: 100 });
     const lineItems = paymentLinkItems.data.flatMap((item) => {
       const priceId = typeof item.price === "string" ? item.price : item.price?.id;
       return priceId ? [{ price: priceId, quantity: item.quantity ?? 1 }] : [];
@@ -39,8 +36,8 @@ export async function GET(request: Request) {
       mode: "payment",
       line_items: lineItems,
       customer_creation: "always",
-      metadata: { courseId: course.id, enrollmentMode: "post-payment-account-claim" },
-      payment_intent_data: { metadata: { courseId: course.id, enrollmentMode: "post-payment-account-claim" } },
+      metadata: { courseId: course.id, enrollmentMode: "passwordless-paid-access" },
+      payment_intent_data: { metadata: { courseId: course.id, enrollmentMode: "passwordless-paid-access" } },
       success_url: successUrl.toString(),
       cancel_url: cancelUrl.toString(),
     });

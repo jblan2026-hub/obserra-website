@@ -2,8 +2,6 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
 const isProtected = createRouteMatcher([
-  "/academy/learn(.*)",
-  "/academy/certificate(.*)",
   "/admin(.*)",
 ]);
 
