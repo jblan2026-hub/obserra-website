@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     return [{
       source: "/:path*",
       headers: [
-        { key: "Content-Security-Policy", value: "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://*.protect.clerk.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://vitals.vercel-insights.com https://*.clerk.accounts https://*.clerk.dev https://*.clerkstage.dev https://*.protect.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com; frame-ancestors 'none'; form-action 'self' https://buy.stripe.com; upgrade-insecure-requests" },
+        { key: "Content-Security-Policy", value: "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' https://*.clerk.accounts https://*.clerk.dev https://*.clerkstage.dev https://challenges.cloudflare.com https://*.protect.clerk.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://vitals.vercel-insights.com https://*.clerk.accounts https://*.clerk.dev https://*.clerkstage.dev https://*.protect.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com; frame-ancestors 'none'; form-action 'self' https://buy.stripe.com; upgrade-insecure-requests" },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "X-Frame-Options", value: "DENY" },
@@ -27,4 +27,5 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
 
