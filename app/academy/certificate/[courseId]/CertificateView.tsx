@@ -52,7 +52,7 @@ export default function CertificateView({
         <h2>{learnerName}</h2>
         <p className="certificate-copy">has successfully completed the Obserra Academy professional training program of Obserra Executive Protection &amp; Intelligence LLC</p>
         <h3>{courseTitle}</h3>
-        <p className="certificate-copy certificate-copy-strong">Completion required all interactive learning experiences and a final assessment score of 80 percent or higher.</p>
+        <p className="certificate-copy certificate-copy-strong">Completion included all interactive learning experiences and a final assessment score of 80 percent or higher.</p>
 
         <div className="certificate-meta">
           <span>Academy division<strong>{department} Department</strong></span>
@@ -71,7 +71,7 @@ export default function CertificateView({
           <div className="certificate-signature">
             <span className="signature-mark">Dr. Jody Blanchard</span>
             <b>DR. JODY BLANCHARD</b>
-            <small>Founder and Owner · Digitally issued and verified by Obserra Executive Protection &amp; Intelligence LLC</small>
+            <small>Founder and Owner. Digitally issued and verified by Obserra Executive Protection &amp; Intelligence LLC</small>
           </div>
         </div>
 

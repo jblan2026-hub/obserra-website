@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --navy: #061f3b;
   --ink: #eff9ff;
   --blue: #5eb8e6;
@@ -92,8 +92,6 @@ main { overflow: hidden; }
   .certificate-promise { display: block; }
   .certificate-promise span { display: block; margin-top: 6px; }
 }
-
-
 /* The authentication pages stay usable even while a browser extension delays the identity widget. */
 .auth-shell { min-height: 100svh; display: grid; place-items: center; padding: 72px 24px; background: radial-gradient(circle at 16% 12%, #173f69 0, transparent 34%), radial-gradient(circle at 86% 88%, #11566f 0, transparent 36%), #031728; }
 .auth-card { width: min(100%, 510px); padding: 42px; border: 1px solid #7dd6ef3b; border-radius: 24px; background: linear-gradient(150deg, #0b2b45e8, #061a2ee8); box-shadow: 0 28px 80px #0008; color: #e9f6ff; }
@@ -103,4 +101,4 @@ main { overflow: hidden; }
 .auth-help { margin: 24px 0 0; color: #b7d3e5; font-size: 14px; line-height: 1.5; }
 .auth-help a { color: #8ddbf3; text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 560px) { .auth-shell { padding: 32px 16px; } .auth-card { padding: 29px 22px; border-radius: 18px; } }
-
+.masthead{height:88px}.brand img{width:270px}@media(max-width:700px){.masthead{height:78px}.brand img{width:220px}.masthead-actions .nav-link:last-child{display:none}}

@@ -1,4 +1,4 @@
-﻿.obserra-home {
+.obserra-home {
   --navy: #061f3b;
   --ink: #0b2945;
   --blue: #4f9ed3;
@@ -22,7 +22,7 @@
 }
 
 .home-brand { display: flex; align-items: center; color: #fff; text-decoration: none; }
-.home-brand img { display: block; width: 248px; height: auto; }
+.home-brand img { display: block; width: 286px; height: auto; }
 .home-nav nav { display: flex; align-items: center; gap: 25px; }
 .home-nav nav a { color: #d7effc; text-decoration: none; font-size: 12px; font-weight: 800; }
 .home-nav .home-nav-login { padding: 9px 13px; border: 1px solid #75c2e775; border-radius: 999px; color: #e5f7ff; }
@@ -49,7 +49,7 @@
 .home-eyebrow { margin: 0 0 14px; color: #387fa9; font-size: 11px; font-weight: 900; letter-spacing: .14em; }
 .home-hero .home-eyebrow { color: var(--gold); }
 .home-hero h1, .home-intro h2, .home-service h2, .academy-home h2, .home-connect h2 { margin: 0; letter-spacing: -.06em; line-height: .94; }
-.home-hero h1 { font-size: clamp(52px, 7vw, 92px); }
+.home-hero h1 { font-size: clamp(46px, 6vw, 78px); max-width: 760px; overflow-wrap: normal; }
 .home-hero h1 em { font-style: normal; color: #8bd5f7; }
 .hero-copy > p:not(.home-eyebrow) { margin: 27px 0; color: #cde6f5; max-width: 640px; font-size: 19px; line-height: 1.6; }
 .home-actions, .home-connect > div { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
@@ -171,10 +171,10 @@
   .home-nav { height: 70px; }
   .home-nav nav a:not(.home-nav-cta):not(.home-nav-login) { display: none; }
   .home-nav nav { gap: 0; }
-  .home-brand img { width: 202px; }
+  .home-brand img { width: 224px; }
   .home-hero, .home-intro, .division-grid, .home-service, .engagement-panel, .holographic-showcase, .academy-home, .home-connect { padding-left: 24px; padding-right: 24px; }
   .home-hero { padding-top: 75px; padding-bottom: 75px; }
-  .home-hero h1 { font-size: 50px; }
+  .home-hero h1 { font-size: clamp(42px, 12vw, 52px); letter-spacing: -.05em; }
   .division-grid, .track-grid, .service-signals { grid-template-columns: 1fr; }
   .home-actions { display: block; }
   .home-link { display: block; margin-top: 18px; }
@@ -184,6 +184,3 @@
   .holographic-showcase { min-height: auto; padding-top: 80px; padding-bottom: 80px; }
   .holo-visual { min-height: 410px; }.ring-one { width: 300px; height: 300px; }.ring-two { width: 225px; height: 225px; }.ring-three { width: 365px; height: 365px; }.node-one { top: 14%; left: 5%; }.node-two { bottom: 14%; }.node-three { right: 2%; top: 14%; }
 }
-
-
-

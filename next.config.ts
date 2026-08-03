@@ -1,6 +1,4 @@
-﻿import type { NextConfig } from "next";
-
-const existingSite = "https://obserra-integrated-services-1ffw0xbji-obserra.vercel.app";
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async headers() {
@@ -17,17 +15,6 @@ const nextConfig: NextConfig = {
       ],
     }];
   },
-  async rewrites() {
-    return {
-      fallback: [
-        { source: "/:path*", destination: `${existingSite}/:path*` },
-      ],
-    };
-  },
 };
 
 export default nextConfig;
-
-
-
-
