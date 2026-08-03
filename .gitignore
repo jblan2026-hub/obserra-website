@@ -1,5 +1,6 @@
 .vercel
 .env*
+!.env.example
 .next
 node_modules
 /Obserra_*.zip

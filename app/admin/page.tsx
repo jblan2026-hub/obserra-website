@@ -1,8 +1,14 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { courses } from "../academy/courseData";
 import { academyStateFromUser, getAcademyAggregateMetrics, ownerEmailAllowed } from "../../lib/academy";
 import "./admin.css";
+
+export const metadata: Metadata = {
+  title: "Owner Administration",
+  robots: { index: false, follow: false },
+};
 
 export default async function AdminPage() {
   const { userId } = await auth();

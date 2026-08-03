@@ -112,11 +112,21 @@ export async function academyStateWithOwnerAccess(userId: string, courseId: stri
 
 export async function getAcademyAggregateMetrics() {
   const client = await clerkClient();
-  const users = await client.users.getUserList({ limit: 100 });
+  const users = [] as Awaited<ReturnType<typeof client.users.getUserList>>["data"];
+  const pageSize = 100;
+  let offset = 0;
+  let totalCount = 0;
+  do {
+    const page = await client.users.getUserList({ limit: pageSize, offset });
+    users.push(...page.data);
+    totalCount = page.totalCount;
+    offset += page.data.length;
+  } while (offset < totalCount && offset < 10_000);
+
   let enrollments = 0;
   let certificates = 0;
   const coursesByEnrollment = Object.fromEntries(courses.map((course) => [course.id, 0])) as Record<string, number>;
-  for (const user of users.data) {
+  for (const user of users) {
     const state = academyStateFromUser(user);
     for (const courseId of Object.keys(state.entitlements)) {
       enrollments += 1;
@@ -124,5 +134,5 @@ export async function getAcademyAggregateMetrics() {
     }
     certificates += Object.values(state.progress).filter((progress) => progress.certificateId).length;
   }
-  return { learnerAccounts: users.totalCount, enrollments, certificates, coursesByEnrollment, sampledLearners: users.data.length };
+  return { learnerAccounts: totalCount, enrollments, certificates, coursesByEnrollment, sampledLearners: users.length };
 }

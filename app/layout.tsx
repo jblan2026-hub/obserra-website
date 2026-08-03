@@ -8,8 +8,17 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.obserrallc.com"),
   title: { default: "Obserra | Enterprise Intelligence, Cybersecurity & Professional Training", template: "%s | Obserra" },
   description: "Obserra delivers enterprise intelligence, cybersecurity strategy, protective intelligence, and paid professional training.",
+  applicationName: "Obserra",
+  authors: [{ name: "Obserra Executive Protection & Intelligence LLC" }],
+  keywords: ["executive protection", "protective intelligence", "cybersecurity leadership", "enterprise intelligence", "EIOS", "professional training", "AI governance"],
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION },
-  openGraph: { siteName: "Obserra", type: "website", locale: "en_US" },
+  openGraph: {
+    siteName: "Obserra",
+    type: "website",
+    locale: "en_US",
+    images: [{ url: "/brand/visuals/obserra-core.png", width: 1672, height: 941, alt: "Obserra Executive Protection & Intelligence LLC" }],
+  },
+  twitter: { card: "summary_large_image", images: ["/brand/visuals/obserra-core.png"] },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
 };
 
