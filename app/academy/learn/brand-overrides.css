@@ -2,6 +2,9 @@
 .learning-brand img { width: 226px; height: auto; }
 .learning-brand b { color: #f4ba55; font-size: 11px; letter-spacing: .1em; }
 .lesson-stage .video-frame::after { position: absolute; right: 18px; top: 55px; z-index: 2; color: #f4ba5588; content: "PROPERTY OF OBSERRA"; font-size: 9px; font-weight: 900; letter-spacing: .14em; transform: rotate(90deg) translateX(100%); transform-origin: right top; }
+.lesson-stage .video-controls span, .lesson-stage .video-controls b { font-size: 0; }
+.lesson-stage .video-controls span::after { color: #a8d9ed; content: "INTERACTIVE, ASSESSMENT-BACKED COURSE BRIEFING"; font-size: 10px; font-weight: 900; letter-spacing: .1em; }
+.lesson-stage .video-controls b::after { color: #f4ba55; content: "INTERACTIVE MODULE"; font-size: 10px; font-weight: 900; letter-spacing: .1em; }
 .lesson-stage, .assessment-stage { -webkit-user-select: none; user-select: none; }
 
 @media (max-width: 600px) {
