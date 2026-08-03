@@ -25,7 +25,7 @@ export default function AcademyClient() {
       <section className="hero">
         <p className="kicker">Obserra Academy and Obserra Technologies</p>
         <h1>Paid, interactive security training built for decisions that matter.</h1>
-        <p>Choose a self paced course in cybersecurity, protective operations, intelligence, or secure technology governance. Each paid enrollment includes interactive lessons, scenario practice, a final assessment, and an Obserra Certificate of Training upon successful completion.</p>
+        <p>Choose a self-paced course in cybersecurity, protective operations, intelligence, or secure technology governance. Each paid enrollment includes interactive lessons, scenario practice, a final assessment, and an Obserra Certificate of Training upon successful completion.</p>
         <div className="certificate-promise"><strong>Certificate standard</strong><span>Complete every lesson and earn 80 percent or higher on the final assessment to receive your Obserra Certificate of Training.</span></div>
       </section>
 
@@ -37,7 +37,7 @@ export default function AcademyClient() {
 
       <section className="course-detail" aria-live="polite">
         <div className="detail-copy"><p className="kicker">{selected.department}: {selected.track}</p><h2>{selected.title}</h2><p>{selected.description}</p><p className="audience"><strong>Designed for:</strong> {selected.audience}</p><div className="outcomes">{selected.outcomes.map((outcome) => <span key={outcome}>{outcome}</span>)}</div></div>
-        <aside className="enrollment-card"><span>Paid enrollment</span><strong>{money.format(selected.price)} <small>per learner</small></strong><p>Duration: {selected.duration}. Includes {selected.modules.length} interactive lessons and a final assessment.</p>{selected.stripePaymentLinkId ? <a className="checkout" href={`/api/academy/checkout?course=${selected.id}`}>Sign in to buy this course</a> : <a className="checkout" href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`Academy enrollment request: ${selected.title}`)}`}>Request enrollment</a>}<small>{selected.stripePaymentLinkId ? "Sign in first. Use the same email address at checkout. Protected course access activates after Obserra verifies payment." : "This course is being prepared for secure checkout."}</small></aside>
+        <aside className="enrollment-card"><span>Paid enrollment</span><strong>{money.format(selected.price)} <small>per learner</small></strong><p>Duration: {selected.duration}. Includes {selected.modules.length} interactive lessons and a final assessment.</p>{selected.stripePaymentLinkId ? <a className="checkout" href={`/api/academy/checkout?course=${selected.id}`}>Secure checkout — sign in to buy</a> : <a className="checkout" href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`Academy enrollment request: ${selected.title}`)}`}>Request enrollment</a>}<small>{selected.stripePaymentLinkId ? "Sign in first. Use the same email address at checkout. Protected course access activates after Obserra verifies payment." : "This course is being prepared for secure checkout."}</small></aside>
       </section>
 
       <section className="curriculum"><p className="kicker">Interactive curriculum</p><h2>What you will complete</h2><ol>{selected.modules.map((module, index) => <li key={module.title}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{module.title}</h3><p>{module.description}</p></div><em>{module.format}<br />{module.duration}</em></li>)}</ol></section>

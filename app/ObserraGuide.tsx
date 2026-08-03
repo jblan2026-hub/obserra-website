@@ -8,7 +8,8 @@ const welcome: Message = { from: "guide", text: "Welcome to Obserra. I can help 
 
 function answer(question: string): Message {
   const input = question.toLowerCase();
-  if (/course|academy|train|certificate|cyber/.test(input)) return { from: "guide", text: "Obserra Academy offers paid, self paced training in cybersecurity, protective operations, intelligence, and secure technology governance. Learners complete interactive lessons and a final assessment; an Obserra Certificate of Training is issued after successful completion.", href: "/academy", label: "Open Academy" };
+  if (/\beios\b|enterprise intelligence|situation room|governed action|decision intelligence/.test(input)) return { from: "guide", text: "EIOS is Obserra's enterprise intelligence experience for connecting context, evidence, policy, approval, and accountable action. The public product view explains the decision path without exposing customer environments or proprietary implementation detail.", href: "/eios", label: "Explore EIOS" };
+  if (/course|academy|train|certificate|cyber/.test(input)) return { from: "guide", text: "Obserra Academy offers paid, self-paced training in cybersecurity, protective operations, intelligence, and secure technology governance. Learners complete interactive lessons and a final assessment; an Obserra Certificate of Training is issued after successful completion.", href: "/academy", label: "Open Academy" };
   if (/pay|price|buy|checkout|enroll/.test(input)) return { from: "guide", text: "Each Academy course has its own secure checkout. Choose a course to review its format and price, then select Buy this course. Protected learner access is issued only after payment verification.", href: "/academy#courses", label: "Choose a course" };
   if (/protect|executive|travel|threat/.test(input)) return { from: "guide", text: "Obserra provides protective intelligence, travel risk support, executive focused security planning, and risk advisory services.", href: "/#protection", label: "Explore protection" };
   if (/intelligence|osint|exposure|investig/.test(input)) return { from: "guide", text: "Obserra supports decision ready intelligence, lawful digital exposure assessment, protective intelligence, and risk informed executive briefings.", href: "/#protection", label: "Explore Intelligence" };
@@ -20,7 +21,7 @@ export default function ObserraGuide() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([welcome]);
-  const quick = useMemo(() => ["Find a course", "How do certificates work?", "Talk to Obserra", "Cybersecurity services"], []);
+  const quick = useMemo(() => ["Explore EIOS", "Find a course", "How do certificates work?", "Talk to Obserra"], []);
   function submit(event: FormEvent) { event.preventDefault(); const question = input.trim(); if (!question) return; setMessages((items) => [...items, { from: "visitor", text: question }, answer(question)]); setInput(""); }
   function quickAsk(question: string) { setMessages((items) => [...items, { from: "visitor", text: question }, answer(question)]); }
   return <aside className={styles.guide} aria-label="Obserra Guide">
