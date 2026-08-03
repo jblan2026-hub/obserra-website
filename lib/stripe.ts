@@ -48,16 +48,16 @@ export async function provisionCoursePaymentLink(input: {
     name: input.title,
     description: input.description,
     metadata: { obserraCourseId: input.id, department: input.department, level: input.level },
-  });
+  }, { idempotencyKey: `obserra-academy-product-${input.id}` });
   const price = await stripe.prices.create({
     currency: "usd",
     unit_amount: Math.round(input.price * 100),
     product: product.id,
     metadata: { obserraCourseId: input.id },
-  });
+  }, { idempotencyKey: `obserra-academy-price-${input.id}` });
   const link = await stripe.paymentLinks.create({
     line_items: [{ price: price.id, quantity: 1 }],
     metadata: { obserraCourseId: input.id },
-  });
+  }, { idempotencyKey: `obserra-academy-link-${input.id}` });
   return { link, created: true };
 }

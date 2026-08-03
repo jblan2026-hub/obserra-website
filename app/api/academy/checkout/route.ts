@@ -1,8 +1,24 @@
 import { NextResponse } from "next/server";
+import { courses } from "../../../academy/courseData";
 import { courseForId } from "../../../../lib/academy";
-import { getStripe, paymentLinkForCourse } from "../../../../lib/stripe";
+import { getStripe, paymentLinksByCourse, provisionCoursePaymentLink } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
+
+async function paymentLinkForCheckout(course: NonNullable<ReturnType<typeof courseForId>>) {
+  const existing = await paymentLinksByCourse();
+  if (existing.has(course.id)) return existing.get(course.id)!;
+
+  const missing = courses.filter((candidate) => !existing.has(candidate.id));
+  const provisioned = new Map<string, Awaited<ReturnType<typeof provisionCoursePaymentLink>>>();
+  for (let index = 0; index < missing.length; index += 4) {
+    const batch = missing.slice(index, index + 4);
+    const results = await Promise.all(batch.map(async (candidate) => [candidate.id, await provisionCoursePaymentLink(candidate, existing.get(candidate.id))] as const));
+    for (const [courseId, result] of results) provisioned.set(courseId, result);
+  }
+  return provisioned.get(course.id)?.link;
+}
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -15,8 +31,8 @@ export async function GET(request: Request) {
 
   try {
     const stripe = getStripe();
-    const paymentLink = await paymentLinkForCourse(course.id);
-    if (!paymentLink) throw new Error("No active secure checkout is configured for this course");
+    const paymentLink = await paymentLinkForCheckout(course);
+    if (!paymentLink) throw new Error("No secure checkout is configured for this course");
     const paymentLinkItems = await stripe.paymentLinks.listLineItems(paymentLink.id, { limit: 100 });
     const lineItems = paymentLinkItems.data.flatMap((item) => {
       const priceId = typeof item.price === "string" ? item.price : item.price?.id;
