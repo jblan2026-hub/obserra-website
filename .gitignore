@@ -1,0 +1,9 @@
+.vercel
+.env*
+.next
+node_modules
+/Obserra_*.zip
+/Obserra_*.docx
+/Academy_Proprietary_Use_Tags.md
+/EIOS_Proprietary_Tags.md
+/eios-brand.css

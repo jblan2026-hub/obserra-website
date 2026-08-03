@@ -1,0 +1,12 @@
+.certificate-brands { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 28px; }
+.certificate-brands > img { width: 270px; height: auto; }
+.academy-seal { padding: 8px 0 8px 20px; border-left: 1px solid #f4ba5588; text-align: left; }
+.academy-seal span { display: inline-grid; width: 28px; height: 28px; margin-right: 8px; place-items: center; border: 1px solid #f4ba55; border-radius: 50%; color: #f4ba55; font-size: 9px; font-weight: 900; }
+.academy-seal b { display: inline-block; color: #fff; font-size: 13px; letter-spacing: .11em; }
+.academy-seal small { display: block; max-width: 235px; margin-top: 5px; color: #b9d9e9; font-size: 7px; letter-spacing: .075em; line-height: 1.45; }
+
+@media (max-width: 600px) {
+  .certificate-brands { display: block; }
+  .certificate-brands > img { width: 220px; }
+  .academy-seal { display: inline-block; margin-top: 14px; }
+}

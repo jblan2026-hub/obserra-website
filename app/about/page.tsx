@@ -1,0 +1,77 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import "./about.css";
+import "./about-extra.css";
+
+export const metadata: Metadata = {
+  title: "About Obserra | Leadership, Cybersecurity & Intelligence",
+  description: "Meet Dr. Jody Blanchard, founder of Obserra Executive Protection & Intelligence LLC, and explore the leadership experience behind Obserra cybersecurity, intelligence, protection, and training services.",
+};
+
+const recognition = [
+  ["GLOBAL CYBER LEADERSHIP", "Top Global CISO in the World · 2023", "/recognition/top-global-ciso-2023.jpg"],
+  ["GLOBAL CYBER LEADERSHIP", "Top Global CISO in the World · 2024", "/recognition/top-global-ciso-2024.jpg"],
+  ["GLOBAL CYBER LEADERSHIP", "Top Global CISO in the World · 2025", "/recognition/top-global-ciso-2025.jpg"],
+  ["EXECUTIVE COMMUNITY", "A100 Accelerated Winner · 2024", "/recognition/a100-2024.jpg"],
+  ["EXECUTIVE COMMUNITY", "A100 Accelerated Winner · 2026", "/recognition/a100-2026.jpg"],
+];
+
+const expertise = [
+  ["Cybersecurity leadership", "Enterprise cyber strategy, risk governance, resilience, incident readiness, and executive communication."],
+  ["Protective intelligence", "Risk informed support for executives, travel, digital exposure, people, and high consequence decisions."],
+  ["Enterprise intelligence", "Evidence grounded analysis that helps leaders connect context, risk, action, and accountability."],
+  ["Secure technology", "AI native applications, governed workflows, and decision experiences built around the business need."],
+];
+
+const credentials = [
+  ["ADG Verified in Defend", "ADG Defend"],
+  ["ADG Verified in Adopt", "ADG Adopt"],
+  ["ADG Verified in Govern", "ADG Govern"],
+  ["CompTIA SecurityX", "SecurityX"],
+  ["CompTIA Project+", "Project+"],
+  ["Certified Data Privacy Solutions Engineer", "CDPSE"],
+  ["Associate Certified Chief Information Security Officer", "CCISO"],
+  ["EC Council Certified Incident Handler", "ECIH"],
+  ["EC Council Certified Encryption Specialist", "ECES"],
+  ["Computer Hacking Forensic Investigator", "CHFI"],
+  ["Certified Ethical Hacker", "CEH"],
+  ["CompTIA Advanced Security Practitioner", "CASP+"],
+  ["Certification in Risk and Information Systems Control", "CRISC"],
+  ["Certified Information Systems Auditor", "CISA"],
+  ["Certified Information Security Manager", "CISM"],
+  ["Systems Security Certified Practitioner", "SSCP"],
+  ["Certified Information Systems Security Professional", "CISSP"],
+  ["Florida Class C Security Officer License", "Class C"],
+  ["Florida Class D Security Officer License", "Class D"],
+  ["Florida Class G Statewide Firearm License", "Class G"],
+  ["Florida Class DI Security Officer Instructor License", "Class DI"],
+  ["Florida Concealed Weapon or Firearm License", "CCWL"],
+];
+
+export default function AboutPage() {
+  return <main className="about-page">
+    <header className="about-nav"><a href="/" className="about-brand"><Image src="/brand/obserra-logo.png" width={248} height={48} priority alt="Obserra Executive Protection and Intelligence LLC" /></a><nav><a href="/">Home</a><a href="/eios">EIOS</a><a href="/academy">Academy</a><a href="#speaking">Speaking</a><a href="mailto:info@obserrallc.com?subject=Obserra%20Consultation" className="about-nav-cta">Talk with Obserra</a></nav></header>
+
+    <section className="about-hero"><div className="about-grid" /><div><p className="about-kicker">OBSERRA LEADERSHIP</p><h1>Leadership for the decisions that demand more.</h1><p>Obserra Executive Protection &amp; Intelligence LLC is led by Dr. Jody Blanchard, a cybersecurity and intelligence executive whose work brings together enterprise leadership, protective thinking, and practical operational discipline.</p><div className="about-actions"><a href="mailto:info@obserrallc.com?subject=Obserra%20Consultation" className="about-button">Start a conversation <span>→</span></a><a href="/academy" className="about-link">Explore Academy <span>→</span></a></div></div><aside className="about-signal"><span>DR. JODY BLANCHARD</span><strong>Founder &amp; Principal</strong><p>Cybersecurity executive · U.S. Army veteran · intelligence professional · educator · author</p></aside></section>
+
+    <section className="about-profile"><div className="profile-visual profile-photo-frame"><Image className="profile-photo" src="/leadership/dr-jody-blanchard.png" fill sizes="(max-width: 1000px) 100vw, 42vw" priority alt="Dr. Jody Blanchard, founder of Obserra Executive Protection and Intelligence LLC" /><div className="profile-photo-label"><span>DR. JODY BLANCHARD</span><strong>FOUNDER &amp; PRINCIPAL</strong><small>CYBER · SECURITY · INTELLIGENCE</small></div></div><div><p className="about-kicker">FOUNDER PROFILE</p><h2>Experienced in the room where risk becomes a decision.</h2><p>Dr. Blanchard brings senior enterprise cybersecurity leadership together with a background in military intelligence, protective operations, governance, and education. His approach is grounded in accountability, clear communication, and the belief that risk information should help people act with confidence.</p><p>His academic preparation includes doctoral work in organizational leadership, graduate study in information management and cybersecurity, and undergraduate study in criminal justice. He is also the author of <em>Cyber Bullies: A CISO’s Guide to Doing Cybersecurity</em> and <em>Break the System</em>.</p><a className="about-button" href="mailto:info@obserrallc.com?subject=Executive%20Consultation%20with%20Obserra">Discuss an executive engagement <span>→</span></a></div></section>
+
+    <section className="books"><div className="books-heading"><p className="about-kicker">BOOKS BY DR. JODY BLANCHARD</p><h2>Ideas for leaders who need to make security work.</h2><p>Explore Dr. Blanchard’s writing on cybersecurity leadership, risk, and the systems that shape real world outcomes.</p></div><div className="books-grid"><article><div className="book-cover actual-cover"><Image src="/books/cyberbulleys-front.png" fill sizes="(max-width: 650px) 220px, 210px" alt="Cover of CyberBulleys: A CISO's Guide to Doing Cybersecurity by Jody Blanchard" /></div><div><p>CYBERSECURITY LEADERSHIP</p><h3>CyberBulleys: A CISO’s Guide to Doing Cybersecurity</h3><span>By Dr. Jody Blanchard</span><a href="https://www.amazon.com/CyberBulleys-CISOs-Guide-Doing-Cybersecurity/dp/B0DT7L55JG/ref=tmm_hrd_swatch_0?_encoding=UTF8&dib_tag=se&dib=eyJ2IjoiMSJ9.lbBo9OG_7m9OqamlDKL8lcMOH0cC1mhTC0Mf6TSgpyQCmPH6C9UZsoCh6VWMCF54zoWD9EFh3EVtj_Th_rZuUJpqqXatJCahBLQCMEg-giw.CApDX1AMgKNZHlis97LDm55l179wsWv5sdc4feL7Ew0&qid=1785733313&sr=8-2" target="_blank" rel="noreferrer">Buy on Amazon <b>↗</b></a></div></article><article><div className="book-cover actual-cover"><Image src="/books/break-the-system-front.png" fill sizes="(max-width: 650px) 220px, 210px" alt="Cover of Break the System by Jody Blanchard" /></div><div><p>LEADERSHIP &amp; SYSTEMS</p><h3>Break the System</h3><span>By Dr. Jody Blanchard</span><a href="https://www.amazon.com/Break-System-Jody-Blanchard/dp/B0G2Q1CX8R/ref=tmm_hrd_swatch_0?_encoding=UTF8&dib_tag=se&dib=eyJ2IjoiMSJ9.lbBo9OG_7m9OqamlDKL8lcMOH0cC1mhTC0Mf6TSgpyQCmPH6C9UZsoCh6VWMCF54zoWD9EFh3EVtj_Th_rZuUJpqqXatJCahBLQCMEg-giw.CApDX1AMgKNZHlis97LDm55l179wsWv5sdc4feL7Ew0&qid=1785733313&sr=8-1" target="_blank" rel="noreferrer">Buy on Amazon <b>↗</b></a></div></article></div></section>
+
+    <section className="credentials"><div className="credentials-heading"><p className="about-kicker">LICENSES &amp; PROFESSIONAL CREDENTIALS</p><h2>Credentials stated clearly.</h2><p>Each credential is shown with its full name and the acronym you may see in professional settings. Credential identifiers are intentionally not published.</p></div><div className="credentials-grid">{credentials.map(([name, acronym]) => <article key={acronym}><span>{acronym}</span><h3>{name}</h3><p>({acronym})</p></article>)}</div></section>
+
+    <section className="recognition"><div className="recognition-heading"><p className="about-kicker">RECOGNITION &amp; CREDIBILITY</p><h2>Recognized for cybersecurity leadership and industry impact.</h2><p>Obserra carries the credibility of real executive, cyber, security, and intelligence experience into every engagement, training experience, and technology conversation.</p></div><div className="recognition-grid">{recognition.map(([label, award, image], index) => <article key={award}><span>0{index + 1}</span><img src={image} alt={`${award} recognition badge`} /><p>{label}</p><h3>{award}</h3></article>)}</div></section>
+
+    <section className="leadership-media"><div className="leadership-media-heading"><p className="about-kicker">LEADERSHIP IN PRACTICE</p><h2>Recognition, perspective, and public conversation.</h2><p>Selected recognition and speaking moments presented without former or current employer identifiers.</p></div><div className="leadership-media-grid"><article><img src="/leadership/ceh-hall-of-fame-2025.png" alt="Jody Blanchard CEH Hall of Fame Top 100 2025 recognition" /><h3>CEH Hall of Fame · 2025</h3></article><article><img src="/leadership/global-leadership-award-2025.png" alt="Jody Blanchard global leadership award 2025 recognition" /><h3>Global leadership distinction · 2025</h3></article><article><img src="/leadership/technology-talks-no-employer.png" alt="Jody Blanchard technology workforce panel appearance" /><h3>Technology leadership panel</h3></article><article><img src="/leadership/fireside-chat-no-employer.png" alt="Jody Blanchard cybersecurity ROI fireside chat" /><h3>Cybersecurity ROI fireside chat</h3></article></div></section>
+
+    <section className="interview-feature"><div><p className="about-kicker">FEATURED INTERVIEW</p><h2>Cybersecurity leadership in conversation.</h2><p>Watch Dr. Jody Blanchard discuss the thinking, leadership, and practical perspective that inform Obserra’s work.</p><a className="about-outline" href="https://www.youtube.com/watch?v=95IRygw4-NQ" target="_blank" rel="noreferrer">Watch on YouTube <span>↗</span></a></div><div className="interview-frame"><iframe src="https://www.youtube-nocookie.com/embed/95IRygw4-NQ" title="Interview with Dr. Jody Blanchard" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen /></div></section>
+
+    <section className="expertise"><div><p className="about-kicker">THE OBSERRA EXPERTISE</p><h2>Cybersecurity, security, and intelligence are strongest when they work together.</h2></div><div className="expertise-grid">{expertise.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div></section>
+
+    <section className="speaking" id="speaking"><div className="speaking-visual"><p>EXECUTIVE BRIEFING</p><strong>OBSERRA</strong><span>CYBER · SECURITY · INTELLIGENCE</span><div className="speaking-lines"><i /><i /><i /></div></div><div><p className="about-kicker">SPEAKING &amp; EXECUTIVE BRIEFINGS</p><h2>Bring a trusted cyber and intelligence voice into the room.</h2><p>Dr. Blanchard is available for executive briefings, board sessions, leadership offsites, conference keynotes, panels, podcasts, and private learning engagements. Sessions are tailored to the audience and designed to leave people with a practical way to think, decide, and act.</p><div className="speaking-topics"><span>Enterprise cyber leadership</span><span>AI governance and responsible innovation</span><span>Protective intelligence and executive risk</span><span>Board ready cyber risk communication</span><span>Security culture and decision accountability</span><span>Veteran leadership and mission focused teams</span></div><a className="about-button" href="mailto:info@obserrallc.com?subject=Obserra%20Speaking%20Engagement%20Request">Request a speaking engagement <span>→</span></a></div></section>
+
+    <section className="about-cta"><p className="about-kicker">ENGAGE OBSERRA</p><h2>Bring a clearer, more capable response to the work in front of you.</h2><p>Explore EIOS, build a secure technology solution, develop your team through Obserra Academy, or begin a confidential conversation about cybersecurity, protective intelligence, or enterprise risk.</p><div><a className="about-button" href="mailto:info@obserrallc.com?subject=Obserra%20Consultation">Talk with Obserra <span>→</span></a><a className="about-outline" href="/academy">View Academy courses <span>→</span></a></div></section>
+
+    <footer className="about-footer"><Image src="/brand/obserra-logo.png" width={180} height={35} alt="Obserra Executive Protection and Intelligence LLC" /><p>© Obserra Executive Protection &amp; Intelligence LLC. Obserra, EIOS, Academy materials, and related visual and product content are proprietary to Obserra. Unauthorized reproduction, distribution, or use is prohibited.</p></footer>
+  </main>;
+}

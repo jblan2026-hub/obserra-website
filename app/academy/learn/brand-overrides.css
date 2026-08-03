@@ -1,0 +1,10 @@
+.learning-brand { gap: 12px; }
+.learning-brand img { width: 226px; height: auto; }
+.learning-brand b { color: #f4ba55; font-size: 11px; letter-spacing: .1em; }
+.lesson-stage .video-frame::after { position: absolute; right: 18px; top: 55px; z-index: 2; color: #f4ba5588; content: "PROPERTY OF OBSERRA"; font-size: 9px; font-weight: 900; letter-spacing: .14em; transform: rotate(90deg) translateX(100%); transform-origin: right top; }
+.lesson-stage, .assessment-stage { -webkit-user-select: none; user-select: none; }
+
+@media (max-width: 600px) {
+  .learning-brand img { width: 185px; }
+  .learning-brand b { display: none; }
+}
