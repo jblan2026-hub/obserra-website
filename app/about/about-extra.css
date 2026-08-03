@@ -30,9 +30,9 @@
 .about-signal strong { color: #fff; font-size: 25px; line-height: 1.08; letter-spacing: -.035em; }
 .about-signal p { margin: 4px 0 0; color: #badceb; font-size: 14px; line-height: 1.55; }
 
-.about-profile { display: grid; grid-template-columns: minmax(250px, 360px) minmax(0, 1fr); gap: clamp(36px, 7vw, 100px); align-items: start; max-width: 1440px; margin: 0 auto; padding: 104px max(5vw, 24px); }
+.about-profile { display: grid; grid-template-columns: minmax(290px, 340px) minmax(0, 1fr); gap: clamp(36px, 7vw, 100px); align-items: center; max-width: 1440px; margin: 0 auto; padding: 104px max(5vw, 24px); }
 .founder-profile-card { width: 100%; overflow: hidden; border: 1px solid #70c5e666; border-radius: 14px; background: #061a2d; box-shadow: 0 22px 44px #0007; }
-.about-profile .profile-photo-frame { position: relative; display: block; width: 100%; min-height: 0; aspect-ratio: 4 / 5; overflow: hidden; border: 0; border-radius: 0; background: #061524; }
+.about-profile .profile-photo-frame { position: relative; display: block; width: 100%; min-height: 0; aspect-ratio: 1 / 1.16; overflow: hidden; border: 0; border-radius: 0; background: #061524; }
 .about-profile .profile-photo { display: block; width: 100% !important; height: 100% !important; object-fit: cover !important; object-position: center top !important; }
 .profile-photo-label { display: grid; gap: 6px; padding: 18px 20px 20px; border-top: 1px solid #7ecfeb38; background: linear-gradient(145deg, #092e4d, #061626); }
 .profile-photo-label span, .profile-photo-label small { color: #c5e8f6; font-size: 9px; font-weight: 900; letter-spacing: .14em; }
