@@ -2,6 +2,7 @@ import "server-only";
 
 import { clerkClient } from "@clerk/nextjs/server";
 import { courses } from "../app/academy/courseData";
+import { getStripe } from "./stripe";
 
 export type CourseProgress = {
   completedLessons: number[];
@@ -135,4 +136,31 @@ export async function getAcademyAggregateMetrics() {
     certificates += Object.values(state.progress).filter((progress) => progress.certificateId).length;
   }
   return { learnerAccounts: totalCount, enrollments, certificates, coursesByEnrollment, sampledLearners: users.length };
+}
+
+/**
+ * Owner-only reporting summary from Stripe. No payment instruments, billing
+ * addresses, or learner identities are returned to the application UI.
+ */
+export async function getAcademyCommerceMetrics() {
+  try {
+    const stripe = getStripe();
+    let startingAfter: string | undefined;
+    let paidCheckouts = 0;
+    let grossUsdCents = 0;
+    do {
+      const page = await stripe.checkout.sessions.list({ limit: 100, starting_after: startingAfter });
+      for (const session of page.data) {
+        if (session.mode === "payment" && session.payment_status === "paid" && session.currency === "usd") {
+          paidCheckouts += 1;
+          grossUsdCents += session.amount_total ?? 0;
+        }
+      }
+      startingAfter = page.data.at(-1)?.id;
+      if (!page.has_more) break;
+    } while (startingAfter);
+    return { available: true, paidCheckouts, grossUsdCents };
+  } catch {
+    return { available: false, paidCheckouts: 0, grossUsdCents: 0 };
+  }
 }

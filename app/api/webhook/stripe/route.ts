@@ -1,4 +1,3 @@
-import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { courseForId, grantCourseAccess } from "../../../../lib/academy";
@@ -8,13 +7,7 @@ export const runtime = "nodejs";
 
 async function resolveLearnerId(session: Stripe.Checkout.Session) {
   const metadataUserId = session.metadata?.clerkUserId;
-  if (metadataUserId) return metadataUserId;
-
-  const email = session.customer_details?.email?.toLowerCase();
-  if (!email) return undefined;
-  const client = await clerkClient();
-  const users = await client.users.getUserList({ emailAddress: [email], limit: 2 });
-  return users.data.length === 1 ? users.data[0].id : undefined;
+  return metadataUserId || undefined;
 }
 
 async function fulfillPaidSession(session: Stripe.Checkout.Session) {

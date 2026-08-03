@@ -13,9 +13,9 @@ body { margin: 0; background: #03162a; color: var(--ink); font-family: Arial, He
 main { overflow: hidden; }
 .site-proprietary-notice { position: fixed; right: 18px; bottom: 18px; z-index: 40; max-width: min(520px, calc(100vw - 124px)); margin: 0; padding: 7px 10px; border: 1px solid #f4ba5563; border-radius: 5px; background: #020d18e6; color: #f4ca77; font-size: 9px; font-weight: 800; letter-spacing: .06em; line-height: 1.45; pointer-events: none; text-transform: uppercase; }
 
-.masthead { height: 82px; padding: 0 max(5vw, 24px); display: flex; align-items: center; justify-content: space-between; background: #03162a; border-bottom: 1px solid var(--line); }
+.masthead { height: 98px; padding: 0 max(5vw, 24px); display: flex; align-items: center; justify-content: space-between; background: #03162a; border-bottom: 1px solid var(--line); }
 .brand { display: flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; font-weight: 900; letter-spacing: .11em; line-height: 1; }
-.brand img { width: 226px; height: auto; }
+.brand img { width: 310px; height: auto; }
 .brand .product-label { color: var(--gold); font-size: 11px; letter-spacing: .12em; }
 .site-footer img { width: 176px; height: auto; }
 .nav-link { padding: 10px 15px; border: 1px solid #75c2e775; border-radius: 999px; color: #e5f7ff; font-size: 12px; font-weight: 800; text-decoration: none; }
@@ -105,5 +105,5 @@ main { overflow: hidden; }
 .auth-help { margin: 24px 0 0; color: #b7d3e5; font-size: 14px; line-height: 1.5; }
 .auth-help a { color: #8ddbf3; text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 560px) { .auth-shell { padding: 32px 16px; } .auth-card { padding: 29px 22px; border-radius: 18px; } }
-.masthead{height:88px}.brand img{width:270px}@media(max-width:700px){.masthead{height:78px}.brand img{width:220px}.masthead-actions .nav-link:last-child{display:none}}
+.masthead{height:102px}.brand img{width:330px}@media(max-width:700px){.masthead{height:82px}.brand img{width:244px}.masthead-actions .nav-link:last-child{display:none}}
 @media(max-width:700px){.site-proprietary-notice{right:12px;bottom:12px;max-width:calc(100vw - 96px);font-size:8px}}

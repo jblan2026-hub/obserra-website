@@ -68,7 +68,7 @@ export default function HomePage() {
           <a href="#technologies">Technologies</a>
           <a href="/academy">Academy</a>
           <a href="/about">About</a>
-          <a href="/sign-in" className="home-nav-login">Learner sign in</a>
+          <a href="/sign-in" className="home-nav-login">Academy account</a>
           <a href="#connect" className="home-nav-cta">Talk with Obserra</a>
         </nav>
       </header>

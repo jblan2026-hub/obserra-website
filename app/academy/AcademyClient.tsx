@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { track } from "@vercel/analytics";
 import { courses, type Department } from "./courseData";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -19,7 +20,7 @@ export default function AcademyClient() {
     <main>
       <header className="masthead">
         <a href="/" className="brand" aria-label="Obserra Executive Protection and Intelligence LLC home"><img src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" /><span className="product-label">ACADEMY</span></a>
-        <div className="masthead-actions"><a href="/sign-in" className="nav-link">Learner sign in</a><a href="mailto:info@obserrallc.com?subject=Obserra%20Enterprise%20Training" className="nav-link">Enterprise training</a></div>
+        <div className="masthead-actions"><a href="/sign-in" className="nav-link">Academy account</a><a href="mailto:info@obserrallc.com?subject=Obserra%20Enterprise%20Training" className="nav-link">Enterprise training</a></div>
       </header>
 
       <section className="hero">
@@ -37,7 +38,7 @@ export default function AcademyClient() {
 
       <section className="course-detail" aria-live="polite">
         <div className="detail-copy"><p className="kicker">{selected.department}: {selected.track}</p><h2>{selected.title}</h2><p>{selected.description}</p><p className="audience"><strong>Designed for:</strong> {selected.audience}</p><div className="outcomes">{selected.outcomes.map((outcome) => <span key={outcome}>{outcome}</span>)}</div></div>
-        <aside className="enrollment-card"><span>Paid enrollment</span><strong>{money.format(selected.price)} <small>per learner</small></strong><p>Duration: {selected.duration}. Includes {selected.modules.length} interactive lessons and a final assessment.</p>{selected.stripePaymentLinkId ? <a className="checkout" href={`/api/academy/checkout?course=${selected.id}`}>Secure checkout — sign in to buy</a> : <a className="checkout" href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`Academy enrollment request: ${selected.title}`)}`}>Request enrollment</a>}<small>{selected.stripePaymentLinkId ? "Sign in first. Use the same email address at checkout. Protected course access activates after Obserra verifies payment." : "This course is being prepared for secure checkout."}</small></aside>
+        <aside className="enrollment-card"><span>Paid enrollment</span><strong>{money.format(selected.price)} <small>per learner</small></strong><p>Duration: {selected.duration}. Includes {selected.modules.length} interactive lessons and a final assessment.</p>{selected.stripePaymentLinkId ? <a className="checkout" href={`/api/academy/checkout?course=${selected.id}`} onClick={() => track("academy_checkout_started", { course: selected.id })}>Purchase secure enrollment</a> : <a className="checkout" href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`Academy enrollment request: ${selected.title}`)}`}>Request enrollment</a>}<small>{selected.stripePaymentLinkId ? "Pay securely first. After confirmed payment, create or sign in to your separate Academy account using the same email address to unlock the course." : "This course is being prepared for secure checkout."}</small></aside>
       </section>
 
       <section className="curriculum"><p className="kicker">Interactive curriculum</p><h2>What you will complete</h2><ol>{selected.modules.map((module, index) => <li key={module.title}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{module.title}</h3><p>{module.description}</p></div><em>{module.format}<br />{module.duration}</em></li>)}</ol></section>

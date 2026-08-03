@@ -1,4 +1,3 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { courseForId } from "../../../../lib/academy";
 import { getStripe } from "../../../../lib/stripe";
@@ -6,7 +5,6 @@ import { getStripe } from "../../../../lib/stripe";
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
-  const { userId } = await auth();
   const requestUrl = new URL(request.url);
   const course = courseForId(requestUrl.searchParams.get("course") ?? "");
   const paymentEnrollmentReady = Boolean(
@@ -16,17 +14,9 @@ export async function GET(request: Request) {
     process.env.STRIPE_WEBHOOK_SECRET,
   );
 
-  if (!userId) {
-    const signIn = new URL("/sign-in", requestUrl);
-    signIn.searchParams.set("redirect_url", `/api/academy/checkout?course=${encodeURIComponent(course?.id ?? "")}`);
-    return NextResponse.redirect(signIn);
-  }
   if (!course?.stripePaymentLinkId || !paymentEnrollmentReady) {
     return NextResponse.redirect(new URL("/academy?enrollment=not-ready", requestUrl));
   }
-
-  const user = await currentUser();
-  const email = user?.emailAddresses.find((item) => item.id === user.primaryEmailAddressId)?.emailAddress;
 
   try {
     const stripe = getStripe();
@@ -48,10 +38,9 @@ export async function GET(request: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
-      customer_email: email,
-      client_reference_id: userId,
-      metadata: { courseId: course.id, clerkUserId: userId },
-      payment_intent_data: { metadata: { courseId: course.id, clerkUserId: userId } },
+      customer_creation: "always",
+      metadata: { courseId: course.id, enrollmentMode: "post-payment-account-claim" },
+      payment_intent_data: { metadata: { courseId: course.id, enrollmentMode: "post-payment-account-claim" } },
       success_url: successUrl.toString(),
       cancel_url: cancelUrl.toString(),
     });

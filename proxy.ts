@@ -4,7 +4,6 @@ import { NextResponse, type NextRequest } from "next/server";
 const isProtected = createRouteMatcher([
   "/academy/learn(.*)",
   "/academy/certificate(.*)",
-  "/academy/success(.*)",
   "/admin(.*)",
 ]);
 
@@ -40,13 +39,12 @@ export default authenticationReady
       // outside middleware lets a signed-out learner receive its deliberate
       // sign-in redirect instead of Clerk's API 404 response.
       if (isProtected(request)) await auth.protect();
-    }, { frontendApiProxy: { enabled: true } })
+    })
   : configurationGate;
 
 export const config = {
   matcher: [
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     "/(api|trpc)(.*)",
-    "/__clerk/(.*)",
   ],
 };

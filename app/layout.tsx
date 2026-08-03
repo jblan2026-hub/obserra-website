@@ -56,7 +56,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const page = <html lang="en"><body>{children}<aside className="site-proprietary-notice" aria-label="Proprietary material notice">Property of Obserra · Proprietary material · Not for reproduction, distribution, recording, or use without prior written approval.</aside><ObserraGuide /><Analytics /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></body></html>;
   return process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
     <ClerkProvider
-      proxyUrl="/__clerk"
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
       signInFallbackRedirectUrl="/academy"
