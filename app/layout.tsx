@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import ObserraGuide from "./ObserraGuide";
@@ -16,8 +16,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const page = <html lang="en"><body>{children}<ObserraGuide /><Analytics /></body></html>;
   return process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
-    <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up">
+    <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up" signInFallbackRedirectUrl="/academy" signUpFallbackRedirectUrl="/academy">
       {page}
     </ClerkProvider>
   ) : page;
 }
+
+

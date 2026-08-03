@@ -30,7 +30,7 @@ function configurationGate(request: NextRequest) {
 export default authenticationReady
   ? clerkMiddleware(async (auth, request) => {
       if (isProtected(request)) await auth.protect();
-    })
+    }, { frontendApiProxy: { enabled: true } })
   : configurationGate;
 
 export const config = {
