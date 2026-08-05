@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next";
 import ObserraGuide from "./ObserraGuide";
 import CredlyProfileLink from "./CredlyProfileLink";
 import "./globals.css";
+import "./design-system.css";
 import "./brand-consistency.css";
 import "./credential-issuer-marks.css";
 import "./credly-profile-link.css";
