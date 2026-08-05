@@ -1,7 +1,6 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { courseForId } from "../../../../lib/academy";
-import { academyAccessCookieName, accessCookieOptions, newAcademyState, parseAcademyAccess, serializeAcademyAccess } from "../../../../lib/academyAccess";
+import { auth } from "@clerk/nextjs/server";
+import { courseForId, grantCourseAccess } from "../../../../lib/academy";
 import { getStripe } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
@@ -11,21 +10,35 @@ export async function GET(request: Request) {
   const courseId = requestUrl.searchParams.get("course") ?? "";
   const sessionId = requestUrl.searchParams.get("session_id") ?? "";
   const course = courseForId(courseId);
-  if (!course || !sessionId.startsWith("cs_")) return NextResponse.redirect(new URL("/academy?enrollment=invalid", requestUrl));
+
+  if (!course || !sessionId.startsWith("cs_")) {
+    return NextResponse.redirect(new URL("/academy?enrollment=invalid", requestUrl));
+  }
+
+  const { userId } = await auth();
+  if (!userId) {
+    const signInUrl = new URL("/sign-in", requestUrl);
+    signInUrl.searchParams.set("redirect_url", requestUrl.toString());
+    return NextResponse.redirect(signInUrl);
+  }
 
   try {
     const session = await getStripe().checkout.sessions.retrieve(sessionId);
-    if (session.mode !== "payment" || session.status !== "complete" || session.payment_status !== "paid" || session.metadata?.courseId !== courseId) {
-      return NextResponse.redirect(new URL("/academy?enrollment=pending", requestUrl));
+    const validPayment =
+      session.mode === "payment" &&
+      session.status === "complete" &&
+      session.payment_status === "paid" &&
+      session.metadata?.courseId === courseId;
+    const correctLearner = session.metadata?.clerkUserId === userId;
+
+    if (!validPayment || !correctLearner) {
+      return NextResponse.redirect(new URL(`/academy/${courseId}?enrollment=verification-failed`, requestUrl));
     }
-    const cookieStore = await cookies();
-    const state = parseAcademyAccess(cookieStore.get(academyAccessCookieName)?.value) ?? newAcademyState();
-    state.courses[courseId] ??= { paymentReference: session.id, enrolledAt: new Date().toISOString() };
-    state.learnerName = session.customer_details?.name?.trim() || session.customer_details?.email?.trim() || state.learnerName;
-    const response = NextResponse.redirect(new URL(`/academy/learn/${courseId}`, requestUrl));
-    response.cookies.set(academyAccessCookieName, serializeAcademyAccess(state), accessCookieOptions());
-    return response;
-  } catch {
-    return NextResponse.redirect(new URL("/academy?enrollment=verification-unavailable", requestUrl));
+
+    await grantCourseAccess(userId, courseId, session.id);
+    return NextResponse.redirect(new URL(`/academy/learn/${courseId}?enrollment=confirmed`, requestUrl));
+  } catch (error) {
+    console.error("academy enrollment redemption failed", error);
+    return NextResponse.redirect(new URL(`/academy/${courseId}?enrollment=verification-unavailable`, requestUrl));
   }
 }
