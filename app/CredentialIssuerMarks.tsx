@@ -17,16 +17,18 @@ const verifiedBadges = [
   { name: "NCDA", fullName: "NetApp Certified Data Administrator", issuer: "NetApp", badgeId: "e660531d-2431-4bda-8295-2954cfbdbfa3" },
 ];
 
+const ecCouncilVerificationPortal = "https://aspen.eccouncil.org/verify";
+
 const ecCouncilCredentials = [
   { name: "ADG Adopt", fullName: "AI Governance: Adopt", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-ADO-4RQRY6" },
   { name: "ADG Defend", fullName: "AI Governance: Defend", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-DEF-93CTC8" },
   { name: "ADG Govern", fullName: "AI Governance: Govern", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-GOV-9Q8BPK" },
-  { name: "CEH", fullName: "Certified Ethical Hacker" },
-  { name: "CHFI", fullName: "Computer Hacking Forensic Investigator" },
-  { name: "ECIH", fullName: "EC-Council Certified Incident Handler" },
-  { name: "ECES", fullName: "EC-Council Certified Encryption Specialist" },
-  { name: "Associate CCISO", fullName: "Associate Certified Chief Information Security Officer" },
-  { name: "CNDA", fullName: "Certified Network Defense Architect" },
+  { name: "CEH", fullName: "Certified Ethical Hacker", verifyUrl: ecCouncilVerificationPortal },
+  { name: "CHFI", fullName: "Computer Hacking Forensic Investigator", verifyUrl: ecCouncilVerificationPortal },
+  { name: "ECIH", fullName: "EC-Council Certified Incident Handler", verifyUrl: ecCouncilVerificationPortal },
+  { name: "ECES", fullName: "EC-Council Certified Encryption Specialist", verifyUrl: ecCouncilVerificationPortal },
+  { name: "Associate CCISO", fullName: "Associate Certified Chief Information Security Officer", verifyUrl: ecCouncilVerificationPortal },
+  { name: "CNDA", fullName: "Certified Network Defense Architect", verifyUrl: ecCouncilVerificationPortal },
 ];
 
 function loadCredlyEmbedScript() {
@@ -57,7 +59,7 @@ function createVerifiedGallery() {
   heading.innerHTML = `
     <p>VERIFIED EXECUTIVE CREDENTIALS</p>
     <h2 id="verified-credentials-title">Issuer-backed qualifications in cybersecurity, risk, privacy, audit, AI governance, and executive leadership.</h2>
-    <span>Credly credentials use official issuer-hosted embeds. EC-Council credentials are presented in the same gallery, with direct verification links where available.</span>
+    <span>Credly credentials use official issuer-hosted embeds. EC-Council credentials include official verification links.</span>
   `;
 
   const credlyLabel = document.createElement("h3");
@@ -105,20 +107,13 @@ function createVerifiedGallery() {
     detail.className = "verified-credential-detail";
     detail.innerHTML = `<span>EC-Council</span><strong>${credential.name}</strong><p>${credential.fullName}</p>`;
 
-    if (credential.verifyUrl) {
-      const verify = document.createElement("a");
-      verify.href = credential.verifyUrl;
-      verify.target = "_blank";
-      verify.rel = "noreferrer";
-      verify.className = "verified-credential-verify-link";
-      verify.textContent = "Verify credential";
-      detail.appendChild(verify);
-    } else {
-      const status = document.createElement("span");
-      status.className = "verified-credential-supplied-status";
-      status.textContent = "Official badge supplied";
-      detail.appendChild(status);
-    }
+    const verify = document.createElement("a");
+    verify.href = credential.verifyUrl;
+    verify.target = "_blank";
+    verify.rel = "noreferrer";
+    verify.className = "verified-credential-verify-link";
+    verify.textContent = credential.verifyUrl === ecCouncilVerificationPortal ? "Open EC-Council verification" : "Verify credential";
+    detail.appendChild(verify);
 
     card.append(emblem, detail);
     ecGrid.appendChild(card);
