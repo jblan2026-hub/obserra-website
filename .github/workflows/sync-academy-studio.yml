@@ -1,0 +1,54 @@
+name: Sync Obserra Academy Studio
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [academy_catalog_published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: academy-studio-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout website
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.ACADEMY_STUDIO_TOKEN }}
+
+      - name: Checkout Academy Production Studio
+        uses: actions/checkout@v4
+        with:
+          repository: jblan2026-hub/obserra-academy-production-studio
+          ref: main
+          path: academy-studio
+          token: ${{ secrets.ACADEMY_STUDIO_TOKEN }}
+
+      - name: Copy approved Academy catalog
+        run: |
+          test -f academy-studio/catalog/academy-course-catalog.json
+          mkdir -p app/academy/generated
+          cp academy-studio/catalog/academy-course-catalog.json app/academy/generated/studio-catalog.json
+          rm -rf academy-studio
+
+      - name: Validate catalog contract
+        run: |
+          node -e 'const c=require("./app/academy/generated/studio-catalog.json"); if(!Array.isArray(c.courses)) process.exit(1); for(const x of c.courses){if(!x.id||!x.title||!x.duration||!Array.isArray(x.modules)||!x.license||!x.certificate) process.exit(1)}'
+
+      - name: Commit published catalog
+        run: |
+          git config user.name "obserra-academy-bot"
+          git config user.email "academy-bot@obserrallc.com"
+          git add app/academy/generated/studio-catalog.json
+          if git diff --cached --quiet; then
+            echo "Academy catalog is already current"
+          else
+            git commit -m "Publish approved Academy Studio catalog"
+            git push origin main
+          fi
