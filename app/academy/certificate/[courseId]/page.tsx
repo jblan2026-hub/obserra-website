@@ -1,21 +1,38 @@
-import { cookies } from "next/headers";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 import CertificateView from "./CertificateView";
-import { courseForId } from "../../../../lib/academy";
-import { academyAccessCookieName, parseAcademyAccess } from "../../../../lib/academyAccess";
+import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
 
 export default async function CertificatePage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
   const course = courseForId(courseId);
   if (!course) notFound();
 
-  const state = parseAcademyAccess((await cookies()).get(academyAccessCookieName)?.value);
-  if (!state?.courses[courseId]) redirect(`/academy/${courseId}?required=paid-access`);
+  const { userId } = await auth();
+  if (!userId) {
+    redirect(`/sign-in?redirect_url=${encodeURIComponent(`/academy/certificate/${courseId}`)}`);
+  }
+
+  const state = await academyStateWithOwnerAccess(userId, courseId);
+  if (!state.entitlements[courseId]) redirect(`/academy/${courseId}?required=paid-access`);
+
   const progress = state.progress[courseId];
-  if (!progress?.certificateId || !progress.completedAt) redirect(`/academy/learn/${courseId}`);
+  if (!progress?.certificateId || !progress.completedAt || (progress.assessmentScore ?? 0) < 80) {
+    redirect(`/academy/learn/${courseId}`);
+  }
 
-  const name = state.learnerName || "Obserra Academy Learner";
-  const trainingHours = course.duration;
+  const user = await (await clerkClient()).users.getUser(userId);
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+  const learnerName = fullName || user.emailAddresses[0]?.emailAddress || "Obserra Academy Learner";
 
-  return <CertificateView learnerName={name} courseTitle={course.title} department={course.department} trainingHours={trainingHours} completedAt={progress.completedAt} certificateId={progress.certificateId} />;
+  return (
+    <CertificateView
+      learnerName={learnerName}
+      courseTitle={course.title}
+      department={course.department}
+      trainingHours={course.duration}
+      completedAt={progress.completedAt}
+      certificateId={progress.certificateId}
+    />
+  );
 }
