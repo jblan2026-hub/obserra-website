@@ -15,12 +15,13 @@ import {
   Globe2,
   Layers3,
   LockKeyhole,
+  Scale,
   Search,
   ShieldCheck,
   Sparkles,
   Users,
 } from "lucide-react";
-import type { AppCategory, AppStatus } from "./appsData";
+import type { AppCategory, AppStatus, MarketplaceApp } from "./appsData";
 import { appCategories, marketplaceApps } from "./appsData";
 
 const statusOptions: (AppStatus | "All")[] = ["All", "Available", "Pilot", "Coming Soon"];
@@ -48,10 +49,36 @@ const buyingAssurance = [
   [BadgeCheck, "Implementation assurance", "Architecture, onboarding, integration, training, and adoption support from Obserra."],
 ] as const;
 
+const collections = [
+  {
+    title: "Cyber Defense & Resilience",
+    copy: "Prioritize vulnerabilities, coordinate incidents, validate controls, and improve executive cyber visibility.",
+    categories: ["Cybersecurity", "Operations"] as AppCategory[],
+    href: "/apps?category=Cybersecurity",
+  },
+  {
+    title: "Identity & Workforce Assurance",
+    copy: "Strengthen access governance, certification, onboarding, offboarding, and enterprise identity decisions.",
+    categories: ["Identity"] as AppCategory[],
+    href: "/apps?category=Identity",
+  },
+  {
+    title: "Governance, Risk & AI Oversight",
+    copy: "Manage enterprise risk, control evidence, AI governance, policy decisions, and executive assurance.",
+    categories: ["GRC", "AI Governance"] as AppCategory[],
+    href: "/apps?category=GRC",
+  },
+] as const;
+
+function statusClass(status: AppStatus) {
+  return status.toLowerCase().replaceAll(" ", "-");
+}
+
 export default function FortuneMarketplaceClient() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<AppCategory | "All">("All");
   const [status, setStatus] = useState<AppStatus | "All">("All");
+  const [compareSlugs, setCompareSlugs] = useState<string[]>([]);
 
   const featured = marketplaceApps.find((app) => app.slug === "obserra-eios") ?? marketplaceApps[0];
   const featuredSecondary = marketplaceApps.filter((app) => app.slug !== featured.slug).slice(0, 3);
@@ -68,6 +95,19 @@ export default function FortuneMarketplaceClient() {
       return matchesQuery && (category === "All" || app.category === category) && (status === "All" || app.status === status);
     });
   }, [category, query, status]);
+
+  const comparedApps = useMemo(
+    () => compareSlugs.map((slug) => marketplaceApps.find((app) => app.slug === slug)).filter(Boolean) as MarketplaceApp[],
+    [compareSlugs],
+  );
+
+  function toggleCompare(slug: string) {
+    setCompareSlugs((current) => {
+      if (current.includes(slug)) return current.filter((item) => item !== slug);
+      if (current.length >= 3) return [...current.slice(1), slug];
+      return [...current, slug];
+    });
+  }
 
   return (
     <main className="f100-store">
@@ -132,6 +172,30 @@ export default function FortuneMarketplaceClient() {
         ))}
       </section>
 
+      <section className="f100-collections" aria-label="Curated enterprise solution collections">
+        <div className="f100-section-heading">
+          <div>
+            <p className="f100-kicker">CURATED ENTERPRISE COLLECTIONS</p>
+            <h2>Shop by mission, not by product list.</h2>
+            <p>Each collection aligns applications to an executive or operational outcome and creates a more direct procurement path.</p>
+          </div>
+        </div>
+        <div className="f100-collection-grid">
+          {collections.map((collection) => {
+            const matched = marketplaceApps.filter((app) => collection.categories.includes(app.category));
+            return (
+              <article key={collection.title} className="f100-collection-card">
+                <div className="f100-collection-count">{matched.length} solutions</div>
+                <h3>{collection.title}</h3>
+                <p>{collection.copy}</p>
+                <ul>{matched.slice(0, 3).map((app) => <li key={app.slug}>{app.name}</li>)}</ul>
+                <Link href={collection.href}>Explore collection <ArrowRight size={15} /></Link>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
       <section className="f100-featured" aria-label="Featured solutions">
         <div className="f100-section-heading">
           <div><p className="f100-kicker">FEATURED SOLUTIONS</p><h2>Start with the highest impact enterprise capabilities.</h2></div>
@@ -159,7 +223,7 @@ export default function FortuneMarketplaceClient() {
                 <Link href={`/apps/${app.slug}`} key={app.slug}>
                   <div className="f100-app-icon"><Icon size={22} /></div>
                   <div>
-                    <span className={`f100-status ${app.status.toLowerCase().replaceAll(" ", "-")}`}>{statusLabels[app.status]}</span>
+                    <span className={`f100-status ${statusClass(app.status)}`}>{statusLabels[app.status]}</span>
                     <h3>{app.name}</h3>
                     <p>{app.value}</p>
                     <strong>View solution <ChevronRight size={15} /></strong>
@@ -200,15 +264,18 @@ export default function FortuneMarketplaceClient() {
         <div className="f100-catalog-grid">
           {visibleApps.map((app) => {
             const Icon = categoryIcons[app.category] ?? Layers3;
-            const statusClass = app.status.toLowerCase().replaceAll(" ", "-");
+            const selected = compareSlugs.includes(app.slug);
             return (
               <article key={app.slug} className="f100-product-card">
-                <div className="f100-card-topline"><div className="f100-app-icon"><Icon size={22} /></div><span className={`f100-status ${statusClass}`}>{statusLabels[app.status]}</span></div>
+                <div className="f100-card-topline"><div className="f100-app-icon"><Icon size={22} /></div><span className={`f100-status ${statusClass(app.status)}`}>{statusLabels[app.status]}</span></div>
                 <small>{app.category}</small>
                 <h3>{app.name}</h3>
                 <p>{app.value}</p>
                 <ul>{app.features.slice(0, 3).map((feature) => <li key={feature}><Check size={14} /> {feature}</li>)}</ul>
                 <div className="f100-card-meta"><span><Cloud size={14} /> {app.deployment.join(" · ")}</span></div>
+                <button type="button" className={`f100-compare-toggle ${selected ? "active" : ""}`} onClick={() => toggleCompare(app.slug)} aria-pressed={selected}>
+                  <Scale size={15} /> {selected ? "Added to comparison" : "Compare"}
+                </button>
                 <div className="f100-card-actions">
                   <Link href={`/apps/${app.slug}`} className="f100-card-primary">View solution <ArrowRight size={15} /></Link>
                   <Link href={`/contact?interest=application-demo&product=${encodeURIComponent(app.name)}`} className="f100-card-secondary">Request demo</Link>
@@ -227,6 +294,38 @@ export default function FortuneMarketplaceClient() {
           </div>
         )}
       </section>
+
+      {comparedApps.length > 0 && (
+        <section className="f100-comparison" aria-label="Selected product comparison">
+          <div className="f100-section-heading">
+            <div>
+              <p className="f100-kicker">PRODUCT COMPARISON</p>
+              <h2>Compare up to three solutions side by side.</h2>
+              <p>Use this view to prepare an internal buying discussion or an Obserra portfolio consultation.</p>
+            </div>
+            <button type="button" onClick={() => setCompareSlugs([])}>Clear comparison</button>
+          </div>
+          <div className="f100-comparison-grid">
+            {comparedApps.map((app) => (
+              <article key={app.slug}>
+                <span className={`f100-status ${statusClass(app.status)}`}>{statusLabels[app.status]}</span>
+                <small>{app.category}</small>
+                <h3>{app.name}</h3>
+                <p>{app.value}</p>
+                <dl>
+                  <div><dt>Deployment</dt><dd>{app.deployment.join(", ")}</dd></div>
+                  <div><dt>Capabilities</dt><dd>{app.features.slice(0, 4).join("; ")}</dd></div>
+                  <div><dt>Integrations</dt><dd>{app.integrations.slice(0, 4).join(", ")}</dd></div>
+                </dl>
+                <Link href={`/apps/${app.slug}`}>Open product brief <ArrowRight size={15} /></Link>
+              </article>
+            ))}
+          </div>
+          <div className="f100-comparison-actions">
+            <Link href={`/contact?interest=portfolio-comparison&products=${encodeURIComponent(comparedApps.map((app) => app.name).join(", "))}`} className="f100-primary">Request portfolio comparison <ArrowRight size={16} /></Link>
+          </div>
+        </section>
+      )}
 
       <section className="f100-enterprise-cta">
         <div>
