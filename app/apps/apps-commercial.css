@@ -1,0 +1,236 @@
+.apps-buyer-paths,
+.apps-deployment,
+.apps-assurance,
+.apps-commercial-cta {
+  margin: 0;
+  padding: 28px max(5vw, 24px);
+}
+
+.apps-buyer-paths {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.15fr);
+  gap: 18px;
+}
+
+.apps-buyer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.apps-buyer-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 190px;
+  padding: 20px;
+  border: 1px solid var(--apps-line);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(12, 49, 79, 0.96), rgba(6, 27, 46, 0.96));
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.apps-buyer-card:hover,
+.apps-buyer-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: rgba(244, 186, 85, 0.72);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
+}
+
+.apps-buyer-card > span {
+  color: var(--apps-gold);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.apps-buyer-card p {
+  color: #c7e0ef;
+  line-height: 1.6;
+}
+
+.apps-buyer-card strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  color: var(--apps-cyan);
+  font-size: 13px;
+}
+
+.apps-deployment {
+  background: linear-gradient(180deg, rgba(4, 19, 34, 0.97), rgba(7, 29, 49, 0.97));
+}
+
+.apps-deployment-heading {
+  max-width: 920px;
+}
+
+.apps-deployment-heading h2,
+.apps-commercial-cta h2 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.apps-deployment-heading p:last-child,
+.apps-commercial-cta p {
+  color: #c7e0ef;
+  line-height: 1.65;
+}
+
+.apps-deployment-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.apps-deployment-grid article {
+  min-height: 330px;
+  padding: 20px;
+  border: 1px solid var(--apps-line);
+  border-radius: 14px;
+  background: linear-gradient(160deg, #0c3454, #071e33);
+}
+
+.apps-deployment-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  margin-bottom: 18px;
+  border: 1px solid rgba(131, 208, 248, 0.42);
+  border-radius: 12px;
+  background: rgba(17, 72, 112, 0.74);
+  color: var(--apps-gold);
+}
+
+.apps-deployment-grid small {
+  color: #92c9e2;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.apps-deployment-grid h3 {
+  margin: 8px 0 10px;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+.apps-deployment-grid p,
+.apps-deployment-grid li {
+  color: #c4deed;
+  line-height: 1.55;
+}
+
+.apps-deployment-grid ul {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.apps-deployment-grid li::before {
+  margin-right: 8px;
+  color: var(--apps-gold);
+  content: "•";
+}
+
+.apps-assurance {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.apps-assurance article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--apps-line);
+  border-radius: 13px;
+  background: rgba(8, 38, 64, 0.94);
+}
+
+.apps-assurance svg {
+  color: var(--apps-gold);
+}
+
+.apps-assurance strong {
+  color: #f4f9fc;
+}
+
+.apps-assurance p {
+  margin: 6px 0 0;
+  color: #c2dceb;
+  line-height: 1.55;
+}
+
+.apps-commercial-cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  border-top: 1px solid var(--apps-line);
+  background:
+    radial-gradient(circle at 90% 10%, rgba(36, 111, 156, 0.32), transparent 36%),
+    #061a2e;
+}
+
+.apps-commercial-cta .apps-actions {
+  justify-content: flex-end;
+  margin-top: 0;
+}
+
+@media (max-width: 1100px) {
+  .apps-deployment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .apps-assurance {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .apps-buyer-paths,
+  .apps-commercial-cta {
+    grid-template-columns: 1fr;
+  }
+
+  .apps-commercial-cta .apps-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 680px) {
+  .apps-buyer-grid,
+  .apps-deployment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .apps-buyer-paths,
+  .apps-deployment,
+  .apps-assurance,
+  .apps-commercial-cta {
+    padding-inline: 18px;
+  }
+
+  .apps-deployment-grid article,
+  .apps-buyer-card {
+    min-height: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .apps-buyer-card {
+    transition: none;
+  }
+}
