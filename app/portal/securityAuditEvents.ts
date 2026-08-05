@@ -1,5 +1,5 @@
 import type { AuthenticationAssuranceLevel } from "./identitySecurityPolicy";
-import type { PortalPermission, PortalRole } from "./portalAuthorization";
+import type { PortalPermission, PortalRole } from "./accessControl";
 
 export type SecurityAuditOutcome = "success" | "denied" | "challenge" | "error";
 
