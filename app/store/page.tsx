@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import "./store.css";
 
 export const metadata: Metadata = {
   title: "Store | Obserra",
@@ -51,78 +50,96 @@ const commerceControls = [
   ["Customer fulfillment", "Purchases route to the protected portal for launch, licensing, downloads, billing, and support."],
 ];
 
+const primaryButton = "inline-flex min-h-12 items-center justify-center rounded-lg bg-[#f4ba55] px-4 py-3 text-center text-sm font-black text-[#082033] transition hover:bg-[#ffd17a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4ba55] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03101d]";
+const secondaryButton = "inline-flex min-h-12 items-center justify-center rounded-lg border border-[#8bd8fa55] px-4 py-3 text-center text-sm font-black text-[#e9f8ff] transition hover:border-[#8bd8fa99] hover:bg-[#0b2b45] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8bd8fa] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03101d]";
+const eyebrow = "m-0 text-[11px] font-black tracking-[0.12em] text-[#f4ba55]";
+
 export default function StorePage() {
   return (
-    <main className="store-page">
-      <header className="store-nav">
-        <Link href="/" className="store-brand" aria-label="Obserra home">
-          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
+    <main className="min-h-svh bg-[linear-gradient(180deg,#03101d,#061b2d)] font-[Sora,'Avenir_Next',sans-serif] text-[#edf8ff]">
+      <header className="relative z-20 grid gap-4 border-b border-[#6db8d833] bg-[#03101de8] px-4 py-4 backdrop-blur-md md:sticky md:top-0 md:flex md:items-center md:justify-between md:px-[max(5vw,24px)]">
+        <Link href="/" className="flex items-center gap-3 text-[11px] font-black tracking-[0.13em] text-white no-underline" aria-label="Obserra home">
+          <Image className="h-auto w-[min(220px,70vw)] md:w-[260px]" src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
           <span>COMMERCIAL STORE</span>
         </Link>
-        <nav aria-label="Store navigation">
-          <Link href="/apps">Applications</Link>
-          <Link href="/academy">Courses</Link>
-          <Link href="/services">Services</Link>
-          <Link href="/portal">Customer portal</Link>
-          <Link className="store-nav-cta" href="/contact?interest=enterprise-commerce">Enterprise sales</Link>
+        <nav className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center md:gap-3.5" aria-label="Store navigation">
+          {[
+            ["Applications", "/apps"],
+            ["Courses", "/academy"],
+            ["Services", "/services"],
+            ["Customer portal", "/portal"],
+          ].map(([label, href]) => (
+            <Link key={href} href={href} className="flex min-h-11 items-center justify-center rounded-lg border border-[#6db8d833] bg-[#08243c] px-3 py-2.5 text-center text-[13px] font-extrabold text-[#dff3ff] no-underline md:min-h-0 md:border-0 md:bg-transparent md:p-0">
+              {label}
+            </Link>
+          ))}
+          <Link className="col-span-2 flex min-h-11 items-center justify-center rounded-full bg-[#f4ba55] px-4 py-2.5 text-center text-[13px] font-extrabold text-[#082033] no-underline md:col-auto" href="/contact?interest=enterprise-commerce">Enterprise sales</Link>
         </nav>
       </header>
 
-      <section className="store-hero">
+      <section className="grid gap-6 bg-[radial-gradient(circle_at_88%_12%,#1e648b4a,transparent_34%)] px-4 pb-7 pt-11 md:px-[max(5vw,24px)] md:pb-10 md:pt-[72px] xl:grid-cols-[minmax(0,1fr)_minmax(260px,.45fr)]">
         <div>
-          <p className="store-eyebrow">OBSERRA COMMERCIAL PLATFORM</p>
-          <h1>Applications, courses, subscriptions, and executive services in one secure store.</h1>
-          <p>Choose the offering that fits your organization, complete secure checkout where available, and manage access through the Obserra customer portal.</p>
-          <div className="store-actions">
-            <Link className="store-button" href="/apps">Shop applications</Link>
-            <Link className="store-outline" href="/academy">Shop courses</Link>
-            <Link className="store-outline" href="/contact?interest=enterprise-commerce">Request enterprise pricing</Link>
+          <p className={eyebrow}>OBSERRA COMMERCIAL PLATFORM</p>
+          <h1 className="mt-3 max-w-[1050px] text-[clamp(36px,11vw,52px)] font-black leading-[0.98] tracking-[-0.05em] md:text-[clamp(40px,5vw,72px)]">Applications, courses, subscriptions, and executive services in one secure store.</h1>
+          <p className="max-w-4xl text-[17px] leading-[1.65] text-[#b8d5e6]">Choose the offering that fits your organization, complete secure checkout where available, and manage access through the Obserra customer portal.</p>
+          <div className="mt-5 grid gap-3 sm:flex sm:flex-wrap">
+            <Link className={primaryButton} href="/apps">Shop applications</Link>
+            <Link className={secondaryButton} href="/academy">Shop courses</Link>
+            <Link className={secondaryButton} href="/contact?interest=enterprise-commerce">Request enterprise pricing</Link>
           </div>
         </div>
-        <aside>
-          <span>COMMERCE MODEL</span>
-          <strong>Secure, entitlement-based, and expandable</strong>
-          <p>Applications, education, and services use the correct purchase or engagement pathway without exposing unverified pricing, inventory, or customer data.</p>
+        <aside className="self-start rounded-2xl border border-[#6db8d833] bg-[#082a45] p-5 shadow-2xl">
+          <span className={eyebrow}>COMMERCE MODEL</span>
+          <strong className="my-2 block text-xl">Secure, entitlement-based, and expandable</strong>
+          <p className="m-0 leading-[1.65] text-[#b8d5e6]">Applications, education, and services use the correct purchase or engagement pathway without exposing unverified pricing, inventory, or customer data.</p>
         </aside>
       </section>
 
-      <section className="store-kpis" aria-label="Store capabilities">
-        <article><span>APPLICATIONS</span><strong>Subscriptions</strong><p>SaaS, private cloud, hybrid, and on-premises options</p></article>
-        <article><span>COURSES</span><strong>Enrollment</strong><p>Professional learning and certification pathways</p></article>
-        <article><span>SERVICES</span><strong>Proposals</strong><p>Advisory, protection, and enterprise engagements</p></article>
-        <article><span>FULFILLMENT</span><strong>Protected</strong><p>Portal access, licensing, downloads, and billing</p></article>
+      <section className="grid gap-3 px-4 pb-6 sm:grid-cols-2 md:px-[max(5vw,24px)] xl:grid-cols-4" aria-label="Store capabilities">
+        {[
+          ["APPLICATIONS", "Subscriptions", "SaaS, private cloud, hybrid, and on-premises options"],
+          ["COURSES", "Enrollment", "Professional learning and certification pathways"],
+          ["SERVICES", "Proposals", "Advisory, protection, and enterprise engagements"],
+          ["FULFILLMENT", "Protected", "Portal access, licensing, downloads, and billing"],
+        ].map(([label, value, copy]) => (
+          <article key={label} className="rounded-[14px] border border-[#6db8d833] bg-[#08243c] p-[18px]">
+            <span className={eyebrow}>{label}</span>
+            <strong className="my-2 block text-2xl">{value}</strong>
+            <p className="m-0 leading-[1.55] text-[#b8d5e6]">{copy}</p>
+          </article>
+        ))}
       </section>
 
-      <section className="store-section">
-        <div className="store-heading">
-          <div><p className="store-eyebrow">SHOP BY OFFERING</p><h2>Start with one capability and expand across the Obserra platform.</h2></div>
-          <p>Each category routes to its production purchase, enrollment, subscription, or consultation workflow.</p>
+      <section className="px-4 py-8 md:px-[max(5vw,24px)]">
+        <div className="grid items-end gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(260px,.55fr)]">
+          <div><p className={eyebrow}>SHOP BY OFFERING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Start with one capability and expand across the Obserra platform.</h2></div>
+          <p className="m-0 text-[17px] leading-[1.65] text-[#b8d5e6]">Each category routes to its production purchase, enrollment, subscription, or consultation workflow.</p>
         </div>
-        <div className="store-grid">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {categories.map((category) => (
-            <article key={category.title}>
-              <div className="store-card-top"><span>{category.eyebrow}</span><small>{category.status}</small></div>
-              <h3>{category.title}</h3>
-              <p>{category.copy}</p>
-              <Link href={category.href}>{category.action} →</Link>
+            <article key={category.title} className="flex min-h-0 flex-col rounded-[14px] border border-[#6db8d833] bg-[linear-gradient(150deg,#0d3556,#071e33)] p-5 shadow-xl xl:min-h-[300px]">
+              <div className="flex items-start justify-between gap-3"><span className={eyebrow}>{category.eyebrow}</span><small className="text-right text-[#9edfff]">{category.status}</small></div>
+              <h3 className="text-[23px] font-black tracking-[-0.03em]">{category.title}</h3>
+              <p className="m-0 leading-[1.55] text-[#b8d5e6]">{category.copy}</p>
+              <Link className="mt-6 font-black text-[#9edfff] no-underline xl:mt-auto" href={category.href}>{category.action} →</Link>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="store-section store-assurance">
-        <div className="store-heading">
-          <div><p className="store-eyebrow">SECURE COMMERCE</p><h2>Commercial controls built for trusted customer transactions.</h2></div>
-          <p>Payment, subscription, fulfillment, and delivery controls remain fail closed when required services are not configured.</p>
+      <section className="border-y border-[#6db8d833] bg-[#05182a] px-4 py-8 md:px-[max(5vw,24px)]">
+        <div className="grid items-end gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(260px,.55fr)]">
+          <div><p className={eyebrow}>SECURE COMMERCE</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Commercial controls built for trusted customer transactions.</h2></div>
+          <p className="m-0 text-[17px] leading-[1.65] text-[#b8d5e6]">Payment, subscription, fulfillment, and delivery controls remain fail closed when required services are not configured.</p>
         </div>
-        <div className="store-assurance-grid">
-          {commerceControls.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {commerceControls.map(([title, copy]) => <article key={title} className="rounded-[14px] border border-[#6db8d833] bg-[#08243c] p-[18px]"><h3 className="text-[23px] font-black tracking-[-0.03em]">{title}</h3><p className="m-0 leading-[1.55] text-[#b8d5e6]">{copy}</p></article>)}
         </div>
       </section>
 
-      <section className="store-cta">
-        <div><p className="store-eyebrow">ENTERPRISE PURCHASING</p><h2>Need bundled applications, team training, deployment support, or a custom agreement?</h2><p>Obserra can coordinate enterprise pricing, procurement documentation, implementation planning, and controlled deployment.</p></div>
-        <div className="store-actions"><Link className="store-button" href="/contact?interest=enterprise-commerce">Contact enterprise sales</Link><Link className="store-outline" href="/portal">Open customer portal</Link></div>
+      <section className="grid items-center gap-6 bg-[radial-gradient(circle_at_90%_10%,#1e648b3d,transparent_35%),#06192a] px-4 py-10 md:px-[max(5vw,24px)] xl:grid-cols-[minmax(0,1fr)_auto]">
+        <div><p className={eyebrow}>ENTERPRISE PURCHASING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Need bundled applications, team training, deployment support, or a custom agreement?</h2><p className="text-[17px] leading-[1.65] text-[#b8d5e6]">Obserra can coordinate enterprise pricing, procurement documentation, implementation planning, and controlled deployment.</p></div>
+        <div className="grid gap-3 sm:flex sm:flex-wrap xl:justify-end"><Link className={primaryButton} href="/contact?interest=enterprise-commerce">Contact enterprise sales</Link><Link className={secondaryButton} href="/portal">Open customer portal</Link></div>
       </section>
     </main>
   );
