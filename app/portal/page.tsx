@@ -7,6 +7,7 @@ import {
   portalKpis,
   portalQuickActions,
 } from "./portalConfig";
+import { getPortalPlatformServices } from "./portalServices";
 import "./portal.css";
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ const services = [
 
 export default function PortalPage() {
   const modules = getVisiblePortalModules();
+  const platformServices = getPortalPlatformServices();
 
   return (
     <main className="portal-page">
@@ -109,6 +111,48 @@ export default function PortalPage() {
             <ul><li>Role-based access</li><li>Tenant-aware authorization</li><li>Auditable activity</li><li>Secure account recovery</li></ul>
           </article>
         </aside>
+      </section>
+
+      <section className="portal-section" aria-labelledby="platform-services-title">
+        <p className="portal-eyebrow">PORTAL PLATFORM SERVICES</p>
+        <h2 id="platform-services-title">A modular operating layer for customer notifications, tasks, documents, and preferences.</h2>
+        <div className="portal-module-grid">
+          <article className="portal-panel">
+            <div className="portal-panel-head"><div><small>NOTIFICATIONS</small><h2>Customer notices</h2></div></div>
+            <div className="portal-activity">
+              {platformServices.notifications.map((item) => (
+                <article key={item.id}><i /><strong>{item.title}</strong><span>{item.detail}</span>{item.href ? <Link href={item.href}>Open →</Link> : null}</article>
+              ))}
+            </div>
+          </article>
+
+          <article className="portal-panel">
+            <div className="portal-panel-head"><div><small>TASK CENTER</small><h2>Next actions</h2></div></div>
+            <div className="portal-activity">
+              {platformServices.tasks.map((item) => (
+                <article key={item.id}><i /><strong>{item.title}</strong><span>{item.detail}</span>{item.href ? <Link href={item.href}>Open →</Link> : null}</article>
+              ))}
+            </div>
+          </article>
+
+          <article className="portal-panel">
+            <div className="portal-panel-head"><div><small>DOCUMENT CENTER</small><h2>Controlled materials</h2></div></div>
+            <div className="portal-activity">
+              {platformServices.documents.map((item) => (
+                <article key={item.id}><i /><strong>{item.title}</strong><span>{item.detail}</span><Link href={item.href}>Open →</Link></article>
+              ))}
+            </div>
+          </article>
+
+          <article className="portal-panel">
+            <div className="portal-panel-head"><div><small>PREFERENCES</small><h2>Workspace controls</h2></div></div>
+            <div className="portal-activity">
+              {platformServices.preferences.length ? platformServices.preferences.map((item) => (
+                <article key={item.id}><i /><strong>{item.label}</strong><span>{item.description}</span></article>
+              )) : <article><i /><strong>Preferences remain protected</strong><span>Saved layouts and delivery settings will activate with authenticated account services.</span></article>}
+            </div>
+          </article>
+        </div>
       </section>
 
       <section className="portal-grid" aria-label="Customer portal services">
