@@ -42,9 +42,10 @@ export async function GET(request: Request) {
   try {
     const stripe = getStripe();
     const email = await primaryAccountEmail();
-    const successUrl = new URL("/portal", requestUrl);
+    const successUrl = new URL("/portal/applications", requestUrl);
     successUrl.searchParams.set("subscription", "activated");
     successUrl.searchParams.set("app", app.slug);
+    successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
     const cancelUrl = new URL(`/apps/${app.slug}/subscribe`, requestUrl);
     cancelUrl.searchParams.set("checkout", "cancelled");
 
