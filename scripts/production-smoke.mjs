@@ -8,7 +8,7 @@ async function fetchWithTimeout(path, init = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15_000);
   try {
-    return await fetch(`${baseUrl}${path}`, { redirect: "manual", signal: controller.signal, headers: { "user-agent": "ObserraProductionSmoke/2.0" }, ...init });
+    return await fetch(`${baseUrl}${path}`, { redirect: "manual", signal: controller.signal, headers: { "user-agent": "ObserraProductionSmoke/2.1" }, ...init });
   } finally {
     clearTimeout(timer);
   }
@@ -63,6 +63,15 @@ test("homepage image assets resolve", async () => {
     const asset = await fetchWithTimeout(src);
     assert.ok(asset.status >= 200 && asset.status < 400, `Image ${src} returned HTTP ${asset.status}`);
   }
+});
+
+test("design system validation route renders shared primitives and remains non-indexed", async () => {
+  const response = await fetchWithTimeout("/design-system");
+  assert.equal(response.status, 200, `Design system route returned HTTP ${response.status}`);
+  const html = await response.text();
+  assert.match(html, /Obserra Design System V1\.0/i, "Design system heading is missing");
+  assert.match(html, /Enterprise Health Index/i, "KPI primitive is missing");
+  assert.match(html, /name=["']robots["'][^>]*noindex/i, "Design system route must remain non-indexed");
 });
 
 test("Academy catalog exposes discovery and secure enrollment signals", async () => {
