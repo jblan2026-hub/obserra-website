@@ -84,7 +84,7 @@ export default function EiosShowcase() {
         <div className="eios-hero-copy">
           <p className="eios-eyebrow">PROPERTY OF OBSERRA · ENTERPRISE INTELLIGENCE OPERATING SYSTEM</p>
           <h1>
-            From fragmented context
+            From fragmented context in cyber, protection, and risk
             <br />
             to <em>commercially accountable execution.</em>
           </h1>
@@ -112,7 +112,7 @@ export default function EiosShowcase() {
       <section className="eios-proof">
         <p>THE EIOS ADVANTAGE</p>
         <div>
-          <span>Connect fragmented context</span>
+          <span>Connect cyber, protection, and operational context</span>
           <span>Govern authorized action</span>
           <span>Verify outcomes independently</span>
           <span>Measure risk and business value</span>
@@ -149,9 +149,9 @@ export default function EiosShowcase() {
           </h2>
           <p>
             EIOS is designed as an AI-native, secure-by-default enterprise intelligence
-            platform, not a collection of isolated dashboards. It brings governed learning,
-            resilient scale, and accountable execution to each organization&apos;s operating model
-            and priorities.
+            platform, not a collection of isolated dashboards. It supports the same domains Obserra
+            delivers across advisory and operations: cybersecurity, protective intelligence, identity,
+            governance, and enterprise decision accountability.
           </p>
         </div>
 
@@ -251,7 +251,7 @@ export default function EiosShowcase() {
 
       <section className="eios-connect" id="connect">
         <p className="eios-eyebrow">ENGAGE WITH EIOS</p>
-        <h2>Turn enterprise complexity into accountable commercial momentum.</h2>
+        <h2>Turn cybersecurity and risk complexity into accountable execution.</h2>
         <p>
           Start with an enterprise EIOS briefing to align decision priorities, control
           boundaries, integration scope, deployment pathway, and measurable business outcomes

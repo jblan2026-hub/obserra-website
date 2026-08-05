@@ -6,7 +6,18 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/api/", "/academy/learn/", "/academy/certificate/", "/academy/success", "/sign-in", "/sign-up"],
+        disallow: [
+          "/admin",
+          "/api/",
+          "/academy/learn/",
+          "/academy/certificate/",
+          "/academy/success",
+          "/sign-in",
+          "/sign-up",
+          "/*?checkout=*",
+          "/*?session_id=*",
+          "/*?enrollment=*"
+        ],
       },
     ],
     sitemap: "https://www.obserrallc.com/sitemap.xml",

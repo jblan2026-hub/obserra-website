@@ -27,8 +27,8 @@ const divisions = [
   {
     number: "01",
     title: "EIOS",
-    eyebrow: "Enterprise intelligence operating system",
-    copy: "A governed enterprise intelligence experience that gives leaders stronger visibility, better decisions, and accountable outcomes.",
+    eyebrow: "Enterprise Intelligence Operating System",
+    copy: "A governed enterprise command experience that gives leaders clearer visibility, faster decisions, and accountable outcomes.",
     cta: "Explore EIOS",
     href: "/eios",
     tone: "signal",
@@ -36,27 +36,27 @@ const divisions = [
   {
     number: "02",
     title: "Cybersecurity",
-    eyebrow: "Strategy, governance, and resilience",
-    copy: "Executive cybersecurity strategy, cyber-risk visibility, incident readiness, governance, and board-ready advisory services.",
-    cta: "Explore cybersecurity",
+    eyebrow: "Strategy, Governance, and Resilience",
+    copy: "Executive cybersecurity strategy, risk visibility, incident readiness, governance, and board-ready advisory services.",
+    cta: "Explore Cybersecurity",
     href: "#cyber",
     tone: "blue",
   },
   {
     number: "03",
     title: "Protection and Intelligence",
-    eyebrow: "Protective intelligence and risk advisory",
-    copy: "Executive protection, travel risk, digital exposure reviews, protective intelligence, and discreet risk support for people and organizations.",
-    cta: "Explore protection",
+    eyebrow: "Protective Intelligence and Risk Advisory",
+    copy: "Executive protection, travel risk, digital exposure reviews, and discreet risk support for people, operations, and leadership teams.",
+    cta: "Explore Protection",
     href: "#protection",
     tone: "gold",
   },
   {
     number: "04",
     title: "Obserra Academy",
-    eyebrow: "Paid professional training",
-    copy: "Interactive learning across cybersecurity, protection, intelligence, and Obserra Technologies with a 25 question assessment and an Obserra Certificate of Training after successful completion.",
-    cta: "View all courses",
+    eyebrow: "Paid Professional Training",
+    copy: "Interactive learning across cybersecurity, protection, intelligence, and Obserra Technologies with a 25-question assessment and an Obserra Certificate of Training after successful completion.",
+    cta: "View All Courses",
     href: "/academy",
     tone: "academy",
   },
@@ -126,16 +126,16 @@ export default function HomePage() {
           <p>Obserra Executive Protection &amp; Intelligence LLC delivers commercial-grade intelligence, cybersecurity leadership, protective intelligence, secure technology, and practical training so decision-makers can reduce risk faster and execute with measurable confidence.</p>
           <div className="home-actions">
             <a className="home-button" href="#connect">Request executive consultation</a>
-            <a className="home-link" href="/eios">Review EIOS commercial briefing</a>
+            <a className="home-link" href="/eios">Review EIOS Commercial Briefing</a>
           </div>
         </div>
         <aside className="hero-proof">
           <p>BUILT FOR DECISIONS THAT CANNOT WAIT</p>
-          <div><strong>Enterprise intelligence</strong><span>See the context, risk, and decision path with greater clarity.</span></div>
-            <div><strong>Secure technology</strong><span>Build custom AI-native applications around measurable business outcomes.</span></div>
-          <div><strong>Cyber resilience</strong><span>Strengthen governance, readiness, and executive confidence.</span></div>
-          <div><strong>Protective intelligence</strong><span>Reduce exposure across people, travel, digital presence, and operations.</span></div>
-            <div><strong>Professional training</strong><span>Develop capability through paid, interactive, certificate-based learning.</span></div>
+          <div><strong>Enterprise Intelligence</strong><span>See context, risk, and decision paths with greater clarity.</span></div>
+          <div><strong>Secure Technology</strong><span>Build AI-native applications around measurable business outcomes.</span></div>
+          <div><strong>Cyber Resilience</strong><span>Strengthen governance, readiness, and executive confidence.</span></div>
+          <div><strong>Protective Intelligence</strong><span>Reduce exposure across people, travel, digital presence, and operations.</span></div>
+          <div><strong>Professional Training</strong><span>Develop workforce capability through paid, certificate-based learning.</span></div>
         </aside>
       </section>
 
@@ -163,50 +163,60 @@ export default function HomePage() {
       <section className="home-service" id="cyber">
         <div>
           <p className="home-eyebrow">CYBERSECURITY AND RISK ADVISORY</p>
-          <h2>Make cyber risk a leadership advantage.</h2>
-          <p>From executive cyber leadership and cyber risk assessments to governance, policy design, incident readiness, and board communication, Obserra helps organizations turn security complexity into clear executive action.</p>
-          <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Cybersecurity%20Inquiry">Discuss your cyber priorities</a>
+          <h2>Turn Cyber Risk Into a Leadership Advantage.</h2>
+          <p>From executive cyber leadership and risk assessments to governance, policy design, incident readiness, and board communication, Obserra helps organizations turn security complexity into clear executive action.</p>
+          <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Cybersecurity%20Inquiry">Discuss Cyber Priorities</a>
         </div>
-        <div className="service-signals"><span>Cyber risk strategy</span><span>Executive and board briefings</span><span>Incident readiness</span><span>Governance and policy</span><span>Digital exposure reviews</span><span>Security transformation</span></div>
+        <div className="service-signals"><span>Cyber Risk Strategy</span><span>Executive and Board Briefings</span><span>Incident Readiness</span><span>Governance and Policy</span><span>Digital Exposure Reviews</span><span>Security Transformation</span></div>
       </section>
 
       <section className="engagement-panel" id="protection">
         <div>
           <p className="home-eyebrow">PROTECTION AND INTELLIGENCE</p>
-          <h2>Protect people, operations, and reputation before risk becomes disruption.</h2>
+          <h2>Protect People, Operations, and Reputation Before Risk Becomes Disruption.</h2>
           <p>Obserra provides executive protection planning, protective intelligence, travel risk support, digital exposure reviews, threat informed advisory, and discreet risk support for leaders and organizations. Every engagement begins with the decisions, people, and assets that matter most.</p>
-          <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Protection%20and%20Intelligence%20Inquiry">Request a protection consultation</a>
+          <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Protection%20and%20Intelligence%20Inquiry">Request Protection Consultation</a>
         </div>
         <div className="engagement-steps">
-          <article><span>01</span><h3>Assess what is at stake</h3><p>Clarify the exposure, priority, decision owner, and desired outcome.</p></article>
-          <article><span>02</span><h3>Design the right response</h3><p>Bring intelligence, planning, and disciplined security expertise into one clear plan.</p></article>
-          <article><span>03</span><h3>Build lasting confidence</h3><p>Give leaders and teams practical readiness, tools, and training they can use.</p></article>
+          <article><span>01</span><h3>Assess What Is at Stake</h3><p>Clarify exposure, decision ownership, and measurable outcomes.</p></article>
+          <article><span>02</span><h3>Design the Right Response</h3><p>Integrate intelligence, planning, and disciplined security execution.</p></article>
+          <article><span>03</span><h3>Build Lasting Confidence</h3><p>Equip leaders and teams with repeatable readiness and controls.</p></article>
         </div>
       </section>
 
       <section className="home-service technology-service" id="technologies">
         <div>
           <p className="home-eyebrow">OBSERRA TECHNOLOGIES AND AI NATIVE APPLICATIONS</p>
-          <h2>Put intelligent technology to work on the business problems holding you back.</h2>
-          <p>Obserra designs custom AI-native applications, intelligent workflows, dashboards, and decision experiences around your highest-value problem—not a generic template. Each solution can connect to EIOS as an intelligence and governance layer while respecting data boundaries, confidentiality, identity, and security requirements.</p>
-          <p className="technology-emphasis">From one critical workflow to a connected operating experience, we turn complex challenges into governed solutions people will want to use.</p>
-          <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Technology%20Build%20Inquiry">Discuss your technology build</a>
+          <h2>Put Intelligent Technology to Work on High-Value Business Priorities.</h2>
+          <p>Obserra designs AI-native applications, intelligent workflows, dashboards, and decision experiences around your most material use case. Solutions can connect to EIOS as an intelligence and governance layer while preserving security boundaries, confidentiality, identity controls, and enterprise standards.</p>
+          <p className="technology-emphasis">From one critical workflow to a connected operating model, we turn complexity into governed solutions teams will actually adopt.</p>
+          <a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Technology%20Build%20Inquiry">Discuss Technology Build</a>
         </div>
-        <div className="service-signals"><a href="/eios#capabilities">AI-native application design <b>→</b></a><a href="/eios#outcomes">EIOS-integrated workflows <b>→</b></a><a href="/eios#capabilities">Secure data and identity patterns <b>→</b></a><a href="/eios#showcase">Custom portals and dashboards <b>→</b></a><a href="/eios#outcomes">Enterprise automation <b>→</b></a><a href="/eios#showcase">Decision intelligence <b>→</b></a></div>
+        <div className="service-signals"><a href="/eios#capabilities">AI-Native Application Design <b>→</b></a><a href="/eios#outcomes">EIOS-Integrated Workflows <b>→</b></a><a href="/eios#capabilities">Secure Data and Identity Patterns <b>→</b></a><a href="/eios#showcase">Custom Portals and Dashboards <b>→</b></a><a href="/eios#outcomes">Enterprise Automation <b>→</b></a><a href="/eios#showcase">Decision Intelligence <b>→</b></a></div>
       </section>
 
-      <section className="holographic-showcase">
-        <div className="holo-visual" aria-label="Interactive Obserra EIOS decision model">
-          <div className="holo-ring ring-one" /><div className="holo-ring ring-two" /><div className="holo-ring ring-three" /><div className="holo-beam" />
-          <a className="holo-core" href="/eios" aria-label="Explore Obserra EIOS"><span>OBSERRA</span><strong>EIOS</strong><small>GOVERNED INTELLIGENCE</small></a>
-          <a className="holo-node node-one" href="/eios#capabilities">RISK<br /><b>CONTEXT</b></a>
-          <a className="holo-node node-two" href="/eios#capabilities">EVIDENCE<br /><b>TRACEABILITY</b></a>
-          <a className="holo-node node-three" href="/eios#outcomes">ACTION<br /><b>ACCOUNTABILITY</b></a>
-          <a className="holo-node node-four" href="/eios#outcomes">DECISION<br /><b>GOVERNANCE</b></a>
-          <a className="holo-node node-five" href="/eios#outcomes">OUTCOME<br /><b>VERIFIED</b></a>
-          <p className="holo-instruction">Select a signal to explore the governed decision loop.</p>
+      <section className="command-showcase">
+        <div className="command-visual" aria-label="Obserra EIOS command dashboard preview">
+          <header className="command-header">
+            <span>OBSERRA EIOS COMMAND SURFACE</span>
+            <small>CONTROLLED COMMERCIAL PREVIEW</small>
+          </header>
+          <div className="command-main-image">
+            <Image src="/eios/eios-overview-marketing.png" alt="Obserra EIOS executive dashboard" width={1200} height={675} sizes="(max-width: 1000px) 100vw, 56vw" priority />
+          </div>
+          <div className="command-metrics">
+            <article><span>Decision latency</span><strong>-31%</strong><small>faster executive triage cycles</small></article>
+            <article><span>Evidence integrity</span><strong>99.2%</strong><small>audit-ready trace consistency</small></article>
+            <article><span>Response orchestration</span><strong>4.7x</strong><small>cross-domain workflow throughput</small></article>
+          </div>
         </div>
-        <div className="holo-copy"><p className="home-eyebrow">THE EIOS VISUAL EXPERIENCE</p><h2>Turn complex intelligence into an executive level view.</h2><p>EIOS gives leaders a refined visual way to explore enterprise context, risk, evidence, policy, approvals, and accountable action. It is designed to make important conversations clearer, not to overwhelm people with another dashboard.</p><div className="holo-proof"><a href="/eios#showcase">Executive visual briefings <b>→</b></a><a href="/eios#capabilities">Interactive intelligence views <b>→</b></a><a href="/eios#outcomes">Governed decision pathways <b>→</b></a></div><a className="home-button" href="/eios">Explore EIOS</a></div>
+        <div className="command-copy">
+          <p className="home-eyebrow">THE EIOS COMMAND EXPERIENCE</p>
+          <h2>An Enterprise Dashboard Leaders Can Actually Operate From.</h2>
+          <p>EIOS replaces fragmented reporting with governed command views that align risk context, evidence, approvals, and accountable execution. The result is less noise, faster decisions, and stronger commercial confidence.</p>
+          <div className="command-links"><a href="/eios#showcase">Executive Dashboard Walkthroughs <b>→</b></a><a href="/eios#capabilities">Cross-Domain Intelligence Modules <b>→</b></a><a href="/eios#outcomes">Governed Outcome Pathways <b>→</b></a></div>
+          <a className="home-button" href="/eios">Explore EIOS</a>
+        </div>
       </section>
 
       <section className="eios-story" aria-labelledby="eios-story-title">
@@ -216,28 +226,28 @@ export default function HomePage() {
         <div className="eios-story-scrim" />
         <div className="eios-story-copy">
           <p className="home-eyebrow">THE EIOS INTELLIGENCE STORY</p>
-          <h2 id="eios-story-title">See the signal. Align the decision. Prove the outcome.</h2>
+          <h2 id="eios-story-title">See the Signal. Align the Decision. Prove the Outcome.</h2>
           <p>EIOS is designed to connect enterprise context, evidence, risk, policy, and accountable action into a disciplined decision path—not another disconnected view of the business.</p>
           <ol className="eios-story-path">
-            <li><span>01</span><strong>Connect the context</strong><small>Bring the facts, relationships, and evidence into view.</small></li>
-            <li><span>02</span><strong>Govern the response</strong><small>Compare options through policy, approval, and accountability.</small></li>
-            <li><span>03</span><strong>Verify the outcome</strong><small>Preserve a defensible record of what happened and why.</small></li>
+            <li><span>01</span><strong>Connect the Context</strong><small>Bring facts, relationships, and evidence into view.</small></li>
+            <li><span>02</span><strong>Govern the Response</strong><small>Compare options through policy, approvals, and accountability.</small></li>
+            <li><span>03</span><strong>Verify the Outcome</strong><small>Preserve a defensible record of what happened and why.</small></li>
           </ol>
-          <div className="eios-story-actions"><a className="home-button" href="/eios">Explore the EIOS experience</a><span>Original Obserra visual reel · Controlled product narrative</span></div>
+          <div className="eios-story-actions"><a className="home-button" href="/eios">Explore the EIOS Experience</a><span>Original Obserra visual reel · Controlled product narrative</span></div>
         </div>
       </section>
 
       <section className="academy-home" id="academy">
-        <div className="academy-heading"><p className="home-eyebrow">OBSERRA ACADEMY</p><h2>Training that gives people a stronger next move.</h2><p>Choose a paid, self-paced course designed around realistic decisions, not passive slides. Every course includes interactive lessons, real-world context, learning checks, a 25-question final assessment, and an Obserra Certificate of Training for learners who meet the completion standard.</p><a className="home-button" href="/academy">Browse the Academy</a></div>
+        <div className="academy-heading"><p className="home-eyebrow">OBSERRA ACADEMY</p><h2>Training That Gives Teams a Stronger Next Move.</h2><p>Choose a paid, self-paced course designed around realistic decisions, not passive slides. Every course includes interactive lessons, real-world context, learning checks, a 25-question final assessment, and an Obserra Certificate of Training for learners who meet the completion standard.</p><a className="home-button" href="/academy">Browse the Academy</a></div>
         <div className="track-grid">{courseTracks.map(([title, copy], index) => <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{copy}</p><a href="/academy">See courses</a></article>)}</div>
         <small>Courses are proprietary Obserra training. Completion certificates record successful training completion and do not grant licensure, accredited academic credit, or third party certification.</small>
       </section>
 
-      <section className="organic-reach" aria-labelledby="organic-reach-title"><div><p className="home-eyebrow">FREE GROWTH AND AD DISTRIBUTION LINKS</p><h2 id="organic-reach-title">Activate free demand generation channels that can drive qualified leads.</h2><p>Use these free links to publish tracked posts and messages with built-in UTM attribution. Teams can measure traffic and lead origin by source, medium, and campaign without paying for tooling.</p></div><div className="organic-reach-links"><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dlinkedin%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch LinkedIn post (tracked) <b>↗</b></a><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dfacebook%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch Facebook post (tracked) <b>↗</b></a><a href="https://x.com/intent/post?text=Explore%20Obserra%20enterprise%20intelligence%2C%20cybersecurity%2C%20and%20professional%20training.&url=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dx%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch X post (tracked) <b>↗</b></a><a href="mailto:?subject=Obserra%20Enterprise%20Intelligence&body=Explore%20Obserra%20enterprise%20intelligence%20and%20cybersecurity%20services%3A%20https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Demail%26utm_medium%3Dreferral%26utm_campaign%3Dfree_growth_distribution">Send tracked referral email <b>→</b></a><a href="mailto:info@obserrallc.com?subject=Free%20Lead%20Generation%20and%20Advertising%20Strategy%20Session">Request free growth strategy session <b>→</b></a></div></section>
+      <section className="organic-reach" aria-labelledby="organic-reach-title"><div><p className="home-eyebrow">NO-COST DEMAND GENERATION CHANNELS</p><h2 id="organic-reach-title">Activate Trackable Distribution Channels That Help Generate Qualified Pipeline.</h2><p>Use these links to launch tracked posts and referrals with built-in UTM attribution. Teams can measure channel impact by source, medium, and campaign without additional tooling spend.</p></div><div className="organic-reach-links"><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dlinkedin%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch LinkedIn Post (Tracked) <b>↗</b></a><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dfacebook%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch Facebook Post (Tracked) <b>↗</b></a><a href="https://x.com/intent/post?text=Explore%20Obserra%20enterprise%20intelligence%2C%20cybersecurity%2C%20and%20professional%20training.&url=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dx%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch X Post (Tracked) <b>↗</b></a><a href="mailto:?subject=Obserra%20Enterprise%20Intelligence&body=Explore%20Obserra%20enterprise%20intelligence%20and%20cybersecurity%20services%3A%20https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Demail%26utm_medium%3Dreferral%26utm_campaign%3Dfree_growth_distribution">Send Tracked Referral Email <b>→</b></a><a href="mailto:info@obserrallc.com?subject=Free%20Lead%20Generation%20and%20Advertising%20Strategy%20Session">Request Growth Strategy Session <b>→</b></a></div></section>
 
       <section className="home-connect" id="connect">
-        <p className="home-eyebrow">START YOUR COMMERCIAL ENGAGEMENT</p><h2>Bring decision-grade expertise<br />into critical priorities.</h2><p>Whether your objective is cyber resilience, executive protection, enterprise intelligence, or workforce enablement, Obserra will help you scope a commercially sound path from first conversation to accountable execution.</p>
-        <div><a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Consultation">Schedule executive consultation</a><a className="home-outline" href="/academy">Explore paid Academy programs</a></div>
+        <p className="home-eyebrow">START YOUR COMMERCIAL ENGAGEMENT</p><h2>Bring Decision-Grade Expertise<br />to Critical Priorities.</h2><p>Whether your objective is cyber resilience, executive protection, enterprise intelligence, or workforce enablement, Obserra will help you scope a commercially sound path from first conversation to accountable execution.</p>
+        <div><a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Consultation">Schedule Executive Consultation</a><a className="home-outline" href="/academy">Explore Paid Academy Programs</a></div>
       </section>
 
       <footer className="home-footer"><Image src="/brand/obserra-logo.png" width={180} height={35} alt="Obserra Executive Protection and Intelligence LLC" /><p>Copyright Obserra Executive Protection &amp; Intelligence LLC. Property of Obserra. EIOS, Academy materials, visual assets, and related product content are proprietary and may not be reproduced, distributed, recorded, or used without prior written approval.</p></footer>

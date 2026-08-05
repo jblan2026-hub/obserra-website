@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 const engagementTracks = [
   {
     title: "Executive Security Advisory",
-    copy: "Cybersecurity leadership, enterprise risk, governance, and strategic advisory for executive and board stakeholders.",
+    copy: "Cybersecurity leadership, enterprise risk, governance, and executive decision support for senior and board stakeholders.",
     action: "mailto:info@obserrallc.com?subject=Executive%20Security%20Advisory%20Inquiry",
     cta: "Request advisory consultation",
   },
@@ -38,7 +38,7 @@ const engagementTracks = [
   },
   {
     title: "Academy and Workforce Training",
-    copy: "Paid course enrollment, enterprise cohort planning, and professional upskilling programs with completion verification.",
+    copy: "Paid course enrollment, cohort planning, and workforce upskilling tied to cybersecurity, protection, intelligence, and secure technology execution.",
     action: "mailto:info@obserrallc.com?subject=Academy%20Enterprise%20Training%20Inquiry",
     cta: "Discuss training options",
   },
@@ -114,7 +114,7 @@ export default function ContactPage() {
 
       <section className="contact-hero">
         <p className="contact-eyebrow">OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC</p>
-        <h1>Start an enterprise commercial conversation.</h1>
+        <h1>Start a focused conversation on the work you need done.</h1>
         <p>
           Engage Obserra for cybersecurity leadership, protective intelligence, executive protection advisory,
           enterprise risk guidance, AI governance, and productized intelligence solutions including EIOS with commercial delivery discipline.
@@ -155,8 +155,8 @@ export default function ContactPage() {
 
       <section className="contact-confidence">
         <div>
-          <p className="contact-eyebrow">FREE ADVERTISING CONNECTION</p>
-          <h2>Launch free tracked promotion that can generate leads and sales conversations.</h2>
+          <p className="contact-eyebrow">TRACKED DISTRIBUTION LINKS</p>
+          <h2>Launch no-cost tracked promotion to generate qualified conversations.</h2>
           <p>
             Use these no-cost distribution links to publish trackable posts and referrals.
             Each link includes campaign attribution so your team can identify channel performance.

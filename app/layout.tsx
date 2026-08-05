@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Obserra Executive Protection & Intelligence LLC" }],
   creator: "Obserra Executive Protection & Intelligence LLC",
   publisher: "Obserra Executive Protection & Intelligence LLC",
+  abstract: "Enterprise commercial cybersecurity, intelligence, protection, and workforce capability delivery.",
   category: "Professional services and enterprise technology",
   formatDetection: { email: false, address: false, telephone: false },
   manifest: "/manifest.webmanifest",
@@ -45,7 +46,18 @@ export const metadata: Metadata = {
     description: "Enterprise intelligence, cybersecurity, protective intelligence, secure technology, and paid professional training.",
     images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
   },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1
+    }
+  },
   other: {
     copyright: "Copyright Obserra Executive Protection & Intelligence LLC. All rights reserved.",
     rights: "Property of Obserra. Not for reproduction, distribution, recording, or use without prior written approval.",

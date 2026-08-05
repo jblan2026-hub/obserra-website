@@ -66,11 +66,12 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
       <section className="apps-hero">
         <div>
           <p className="apps-eyebrow">OBSERRA ENTERPRISE COMMERCIAL APPLICATIONS</p>
-          <h1>Enterprise-grade software built to reduce risk, accelerate decisions, and strengthen execution.</h1>
+          <h1>Software built for the work we deliver: cybersecurity, protection, intelligence, and governed execution.</h1>
           <p>
-            Evaluate production and pilot-ready Obserra products built for regulated environments,
-            high-consequence operations, and executive accountability. Solutions labeled Coming Soon
-            are roadmap offerings and are not currently purchasable for production deployment.
+            Evaluate Obserra applications that support our core engagements: cyber risk management,
+            protective intelligence, identity and access governance, enterprise command, and workforce
+            readiness. Solutions labeled Coming Soon are roadmap offerings and are not currently
+            purchasable for production deployment.
           </p>
           <div className="apps-actions">
             <a href="mailto:info@obserrallc.com?subject=Request%20Obserra%20Enterprise%20Demo" className="apps-button">Request enterprise demo</a>
@@ -78,9 +79,9 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
           </div>
         </div>
         <aside>
-          <p><BadgeCheck size={16} /> Clear production, pilot, and roadmap status for procurement decisions</p>
+          <p><BadgeCheck size={16} /> Built to support the same cybersecurity and protection outcomes we deliver in advisory engagements</p>
           <p><Sparkles size={16} /> Governed AI capabilities aligned to policy, audit, and risk controls</p>
-          <p><BriefcaseBusiness size={16} /> Enterprise deployment models for private cloud and boundary control</p>
+          <p><BriefcaseBusiness size={16} /> Deployment patterns designed for enterprise security boundaries and regulated operations</p>
         </aside>
       </section>
 
@@ -91,7 +92,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
             aria-label="Search applications"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by product, feature, or value proposition"
+            placeholder="Search by product, workflow, or service line"
           />
         </label>
         <div className="apps-filters">
@@ -127,7 +128,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
       </section>
 
       <section className="apps-results" aria-live="polite">
-        <p>{visibleApps.length} products matched to your commercial evaluation filters</p>
+        <p>{visibleApps.length} products matched to your filters across Obserra delivery domains</p>
         <div className="apps-grid">
           {visibleApps.map((entry, index) => (
             <motion.article
@@ -191,7 +192,7 @@ export function ProductInfoSections({ entry }: { entry: MarketplaceApp }) {
 
       <section className="app-docs">
         <div>
-          <h2>Implementation and governance assets</h2>
+          <h2>Implementation assets aligned to Obserra delivery</h2>
           <ul>
             {entry.documentation.map((item) => (
               <li key={item}>{item}</li>
@@ -212,8 +213,9 @@ export function ProductInfoSections({ entry }: { entry: MarketplaceApp }) {
       <section className="app-screenshot-placeholder">
         <h2>Product visuals and architecture narrative</h2>
         <p>
-          Detailed visuals, implementation diagrams, and technical walkthroughs are provided during
-          qualified enterprise briefings to protect customer confidentiality and maintain product security posture.
+          Detailed visuals, architecture walk-throughs, and deployment models are provided during
+          qualified briefings so teams can map each application to active cybersecurity, intelligence,
+          protection, and governance priorities.
         </p>
         <div className="app-visual-grid">
           {enterpriseVisuals.map((visual) => (
