@@ -1,1 +1,208 @@
-.admin-shell,.admin-denied{min-height:100vh;background:#041629;color:#edf8ff;font-family:Arial,Helvetica,sans-serif}.admin-shell>header{display:flex;align-items:center;justify-content:space-between;padding:20px max(5vw,24px);border-bottom:1px solid #71c7ea40;background:#020d18}.admin-shell>header img,.admin-denied img{width:228px;height:auto}.admin-shell>header span{color:#f4ba55;font-size:11px;font-weight:900;letter-spacing:.12em}.admin-hero,.admin-grid,.admin-section{max-width:1280px;margin:auto;padding-left:max(5vw,24px);padding-right:max(5vw,24px)}.admin-hero{padding-top:76px;padding-bottom:55px;background:linear-gradient(120deg,#07223c,#104261)}.admin-hero p{color:#c3e1f0;max-width:700px}.admin-hero h1{margin:8px 0;font-size:clamp(42px,6vw,74px);letter-spacing:-.06em}.admin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding-top:40px;padding-bottom:24px}.admin-grid article{padding:25px;border:1px solid #75c9ea4d;border-radius:13px;background:#092b49}.admin-grid span,.admin-grid small{display:block;color:#abd3e7;font-size:12px}.admin-grid strong{display:block;margin:10px 0;color:#f4ba55;font-size:48px}.admin-section{padding-top:32px;padding-bottom:36px}.admin-section h2{margin:0 0 16px;font-size:30px}.admin-section>p{max-width:800px;color:#c5e1f0;line-height:1.65}.admin-section a{color:#f4ba55}.admin-course-list{overflow:hidden;border:1px solid #72c8ec4d;border-radius:14px}.admin-course-list article{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px;border-bottom:1px solid #72c8ec36;background:#082640}.admin-course-list article:last-child{border-bottom:0}.admin-course-list span{color:#8bd1ef;font-size:11px;font-weight:900;letter-spacing:.1em}.admin-course-list h3{margin:7px 0;font-size:18px}.admin-course-list p{margin:0;color:#c2deed;font-size:13px}.admin-course-list b,.admin-course-list a{display:block;white-space:nowrap;font-size:12px}.admin-course-list b{color:#75e0b5}.admin-course-list .pending{color:#f4ba55}.admin-course-list a{margin-top:9px;color:#f4ba55}.admin-denied{display:grid;place-items:center;padding:45px;text-align:center}.admin-denied h1{margin:32px 0 10px;font-size:44px}.admin-denied p{max-width:480px;color:#c4e1f0}@media(max-width:700px){.admin-grid{grid-template-columns:1fr}.admin-shell>header span{display:none}.admin-course-list article{display:block}.admin-course-list article>div:last-child{margin-top:18px}}
+.admin-shell,
+.admin-denied {
+  min-height: 100vh;
+  background: #041629;
+  color: #edf8ff;
+  font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
+}
+
+.admin-shell > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px max(5vw, 24px);
+  border-bottom: 1px solid #71c7ea40;
+  background: #020d18;
+}
+
+.admin-shell > header img,
+.admin-denied img {
+  width: min(286px, 44vw);
+  height: auto;
+}
+
+.admin-shell > header span {
+  color: #f4ba55;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.admin-hero,
+.admin-grid,
+.admin-section {
+  max-width: 1320px;
+  margin: auto;
+  padding-left: max(5vw, 24px);
+  padding-right: max(5vw, 24px);
+}
+
+.admin-hero {
+  padding-top: 74px;
+  padding-bottom: 54px;
+  background: linear-gradient(120deg, #07223c, #104261);
+}
+
+.admin-hero p {
+  color: #c3e1f0;
+  max-width: 860px;
+}
+
+.admin-hero h1 {
+  margin: 8px 0;
+  font-size: clamp(40px, 6vw, 70px);
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding-top: 40px;
+  padding-bottom: 24px;
+}
+
+.admin-grid article {
+  padding: 22px;
+  border: 1px solid #75c9ea4d;
+  border-radius: 13px;
+  background: #092b49;
+}
+
+.admin-grid span,
+.admin-grid small {
+  display: block;
+  color: #abd3e7;
+  font-size: 12px;
+}
+
+.admin-grid strong {
+  display: block;
+  margin: 10px 0;
+  color: #f4ba55;
+  font-size: clamp(30px, 4vw, 46px);
+  letter-spacing: -0.04em;
+}
+
+.admin-section {
+  padding-top: 30px;
+  padding-bottom: 36px;
+}
+
+.admin-section h2 {
+  margin: 0 0 14px;
+  font-size: clamp(24px, 3vw, 32px);
+  letter-spacing: -0.03em;
+}
+
+.admin-section > p {
+  max-width: 900px;
+  color: #c5e1f0;
+  line-height: 1.65;
+}
+
+.admin-action-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.admin-action-row a,
+.admin-section a {
+  color: #f4ba55;
+  text-decoration: none;
+}
+
+.admin-action-row a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #75c9ea58;
+  border-radius: 10px;
+  background: #082640;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.admin-course-list {
+  overflow: hidden;
+  border: 1px solid #72c8ec4d;
+  border-radius: 14px;
+}
+
+.admin-course-list article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px;
+  border-bottom: 1px solid #72c8ec36;
+  background: #082640;
+}
+
+.admin-course-list article:last-child {
+  border-bottom: 0;
+}
+
+.admin-course-list span {
+  color: #8bd1ef;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.admin-course-list h3 {
+  margin: 7px 0;
+  font-size: 18px;
+}
+
+.admin-course-list p {
+  margin: 0;
+  color: #c2deed;
+  font-size: 13px;
+}
+
+.admin-course-list b,
+.admin-course-list a {
+  display: block;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.admin-course-list b {
+  color: #75e0b5;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 1024px) {
+  .admin-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-course-list article {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .admin-action-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-shell > header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}

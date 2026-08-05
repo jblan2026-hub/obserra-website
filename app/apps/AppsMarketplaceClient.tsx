@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, BadgeCheck, BriefcaseBusiness, Filter, Search, Sparkles } from "lucide-react";
@@ -41,13 +42,16 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
     <main className="apps-page">
       <header className="apps-nav">
         <a href="/" className="apps-brand" aria-label="Obserra home">
-          <img src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" />
+          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
           <span>APPLICATIONS</span>
         </a>
         <nav aria-label="Applications navigation">
+          <a href="/">Home</a>
           <a href="/services">Services</a>
           <a href="/eios">EIOS</a>
           <a href="/academy">Academy</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
           <a href="mailto:info@obserrallc.com?subject=Obserra%20Applications%20Demo" className="apps-nav-cta">Schedule demo</a>
         </nav>
       </header>
@@ -55,20 +59,21 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
       <section className="apps-hero">
         <div>
           <p className="apps-eyebrow">OBSERRA ENTERPRISE APPLICATION MARKETPLACE</p>
-          <h1>Enterprise applications for cybersecurity, protection, intelligence, and AI governance.</h1>
+          <h1>Enterprise software for cyber risk, executive protection, intelligence, and AI governance.</h1>
           <p>
-            Explore Obserra solutions designed to improve executive decision velocity and operational accountability.
-            Products clearly marked Coming Soon are not currently production-available.
+            Evaluate production and pilot-ready Obserra products built for regulated environments,
+            high-consequence operations, and executive accountability. Solutions labeled Coming Soon
+            are roadmap offerings and are not currently purchasable for production use.
           </p>
           <div className="apps-actions">
-            <a href="mailto:info@obserrallc.com?subject=Request%20Obserra%20Consultation" className="apps-button">Request consultation</a>
-            <a href="mailto:info@obserrallc.com?subject=Obserra%20Applications%20Demo" className="apps-outline">Schedule demo</a>
+            <a href="mailto:info@obserrallc.com?subject=Request%20Obserra%20Enterprise%20Demo" className="apps-button">Request enterprise demo</a>
+            <a href="mailto:info@obserrallc.com?subject=Obserra%20Product%20Advisory%20Call" className="apps-outline">Speak with product advisor</a>
           </div>
         </div>
         <aside>
-          <p><BadgeCheck size={16} /> Production and pilot labels</p>
-          <p><Sparkles size={16} /> AI-powered enterprise platform strategy</p>
-          <p><BriefcaseBusiness size={16} /> Deployment models for enterprise constraints</p>
+          <p><BadgeCheck size={16} /> Clear production, pilot, and roadmap status on every product</p>
+          <p><Sparkles size={16} /> Governed AI capabilities aligned to policy and risk controls</p>
+          <p><BriefcaseBusiness size={16} /> Deployment options for private cloud and enterprise boundaries</p>
         </aside>
       </section>
 
@@ -115,7 +120,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
       </section>
 
       <section className="apps-results" aria-live="polite">
-        <p>{visibleApps.length} applications shown</p>
+        <p>{visibleApps.length} products matched to current filters</p>
         <div className="apps-grid">
           {visibleApps.map((entry, index) => (
             <motion.article
@@ -179,7 +184,7 @@ export function ProductInfoSections({ entry }: { entry: MarketplaceApp }) {
 
       <section className="app-docs">
         <div>
-          <h2>Documentation</h2>
+          <h2>Implementation and governance assets</h2>
           <ul>
             {entry.documentation.map((item) => (
               <li key={item}>{item}</li>
@@ -198,10 +203,13 @@ export function ProductInfoSections({ entry }: { entry: MarketplaceApp }) {
       </section>
 
       <section className="app-screenshot-placeholder">
-        <h2>Product visuals</h2>
-        <p>Screenshots and architecture visuals are provided during qualified product briefings.</p>
+        <h2>Product visuals and architecture narrative</h2>
+        <p>
+          Detailed visuals, implementation diagrams, and technical walkthroughs are provided during
+          qualified enterprise briefings to protect customer confidentiality and product security posture.
+        </p>
         <div aria-hidden="true">
-          <span>SCREENSHOT PLACEHOLDER</span>
+          <span>ENTERPRISE VISUAL BRIEFING AVAILABLE</span>
         </div>
       </section>
     </>

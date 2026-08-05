@@ -8,32 +8,52 @@ export const metadata: Metadata = {
   description:
     "Explore Obserra enterprise applications across cybersecurity, executive protection, intelligence, AI governance, and operational command.",
   alternates: { canonical: "/apps" },
+  keywords: ["enterprise applications", "cybersecurity software", "AI governance software", "obserra apps"],
   openGraph: {
     title: "Obserra Applications Marketplace",
     description:
       "Enterprise software for intelligence, cybersecurity, executive protection, AI governance, and risk operations.",
-    url: "https://www.obserrallc.com/apps"
-  }
+    url: "https://www.obserrallc.com/apps",
+    type: "website",
+    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: "Obserra Applications Marketplace" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Obserra Applications Marketplace",
+    description: "Enterprise applications for cyber, intelligence, governance, and execution.",
+    images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
+  },
 };
 
 export default function AppsPage() {
   const schema = {
     "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "Obserra Enterprise Applications Marketplace",
-    numberOfItems: marketplaceApps.length,
-    itemListElement: marketplaceApps.map((entry, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      item: {
-        "@type": "SoftwareApplication",
-        name: entry.name,
-        applicationCategory: entry.category,
-        description: entry.value,
-        operatingSystem: "Web",
-        url: `https://www.obserrallc.com/apps/${entry.slug}`
+    "@graph": [
+      {
+        "@type": "ItemList",
+        name: "Obserra Enterprise Applications Marketplace",
+        numberOfItems: marketplaceApps.length,
+        itemListElement: marketplaceApps.map((entry, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          item: {
+            "@type": "SoftwareApplication",
+            name: entry.name,
+            applicationCategory: entry.category,
+            description: entry.value,
+            operatingSystem: "Web",
+            url: `https://www.obserrallc.com/apps/${entry.slug}`
+          }
+        }))
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://www.obserrallc.com" },
+          { "@type": "ListItem", position: 2, name: "Applications", item: "https://www.obserrallc.com/apps" }
+        ]
       }
-    }))
+    ]
   };
 
   return (

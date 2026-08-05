@@ -7,6 +7,20 @@ export const metadata: Metadata = {
   description:
     "Obserra Executive Protection & Intelligence LLC delivers enterprise intelligence, cybersecurity leadership, protective intelligence, secure technology, and professional training.",
   alternates: { canonical: "/" },
+  keywords: ["enterprise intelligence", "cybersecurity consulting", "executive protection", "protective intelligence", "professional training"],
+  openGraph: {
+    title: "Obserra | Enterprise Intelligence, Protection, Cybersecurity and Training",
+    description: "Enterprise intelligence, cybersecurity leadership, protective intelligence, secure technology, and paid professional training.",
+    url: "https://www.obserrallc.com",
+    type: "website",
+    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: "Obserra" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Obserra | Enterprise Intelligence, Protection, Cybersecurity and Training",
+    description: "Enterprise intelligence, cybersecurity leadership, protective intelligence, secure technology, and professional training.",
+    images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
+  },
 };
 
 const divisions = [
@@ -56,18 +70,48 @@ const courseTracks = [
 ];
 
 export default function HomePage() {
+  const homeSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://www.obserrallc.com/#webpage",
+        url: "https://www.obserrallc.com",
+        name: "Obserra | Enterprise Intelligence, Protection, Cybersecurity and Training",
+        isPartOf: { "@id": "https://www.obserrallc.com/#website" },
+        about: { "@id": "https://www.obserrallc.com/#organization" },
+        description: "Enterprise intelligence, cybersecurity leadership, protective intelligence, secure technology, and professional training.",
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://www.obserrallc.com",
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <main className="obserra-home">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(homeSchema) }} />
       <header className="home-nav">
         <a href="/" className="home-brand">
           <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt="Obserra Executive Protection and Intelligence LLC" />
         </a>
         <nav aria-label="Primary navigation">
           <a href="#divisions">What we do</a>
+          <a href="/services">Services</a>
           <a href="/eios">EIOS</a>
+          <a href="/apps">Applications</a>
           <a href="#technologies">Technologies</a>
           <a href="/academy">Academy</a>
           <a href="/about">About</a>
+          <a href="/contact">Contact</a>
           <a href="/academy" className="home-nav-login">Academy courses</a>
           <a href="#connect" className="home-nav-cta">Talk with Obserra</a>
         </nav>
@@ -189,7 +233,7 @@ export default function HomePage() {
         <small>Courses are proprietary Obserra training. Completion certificates record successful training completion and do not grant licensure, accredited academic credit, or third party certification.</small>
       </section>
 
-      <section className="organic-reach" aria-labelledby="organic-reach-title"><div><p className="home-eyebrow">SHARE OBSERRA</p><h2 id="organic-reach-title">Help put governed intelligence in front of the right leaders.</h2><p>Use one of these free sharing links to open a prefilled post or message that points to Obserra&apos;s public website. Posting remains under the account holder&apos;s control.</p></div><div className="organic-reach-links"><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.obserrallc.com%2F" target="_blank" rel="noreferrer">Share on LinkedIn <b>↗</b></a><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.obserrallc.com%2F" target="_blank" rel="noreferrer">Share on Facebook <b>↗</b></a><a href="https://x.com/intent/post?text=Explore%20Obserra%20enterprise%20intelligence%2C%20cybersecurity%2C%20and%20professional%20training.&url=https%3A%2F%2Fwww.obserrallc.com%2F" target="_blank" rel="noreferrer">Share on X <b>↗</b></a><a href="mailto:?subject=Obserra%20Enterprise%20Intelligence&body=Explore%20Obserra%3A%20https%3A%2F%2Fwww.obserrallc.com%2F">Share by email <b>→</b></a></div></section>
+      <section className="organic-reach" aria-labelledby="organic-reach-title"><div><p className="home-eyebrow">FREE GROWTH AND AD DISTRIBUTION LINKS</p><h2 id="organic-reach-title">Activate free demand generation channels that can drive qualified leads.</h2><p>Use these free links to publish tracked posts and messages with built-in UTM attribution. Teams can measure traffic and lead origin by source, medium, and campaign without paying for tooling.</p></div><div className="organic-reach-links"><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dlinkedin%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch LinkedIn post (tracked) <b>↗</b></a><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dfacebook%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch Facebook post (tracked) <b>↗</b></a><a href="https://x.com/intent/post?text=Explore%20Obserra%20enterprise%20intelligence%2C%20cybersecurity%2C%20and%20professional%20training.&url=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dx%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch X post (tracked) <b>↗</b></a><a href="mailto:?subject=Obserra%20Enterprise%20Intelligence&body=Explore%20Obserra%20enterprise%20intelligence%20and%20cybersecurity%20services%3A%20https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Demail%26utm_medium%3Dreferral%26utm_campaign%3Dfree_growth_distribution">Send tracked referral email <b>→</b></a><a href="mailto:info@obserrallc.com?subject=Free%20Lead%20Generation%20and%20Advertising%20Strategy%20Session">Request free growth strategy session <b>→</b></a></div></section>
 
       <section className="home-connect" id="connect">
         <p className="home-eyebrow">START WITH THE RIGHT CONVERSATION</p><h2>Bring the right expertise<br />into the room.</h2><p>Whether you are strengthening cyber resilience, protecting leaders and operations, building enterprise intelligence, or developing your team, Obserra is ready to help you turn an important priority into a clear, credible path forward.</p>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ProductInfoSections } from "../AppsMarketplaceClient";
 import { findAppBySlug, marketplaceApps } from "../appsData";
@@ -21,7 +22,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${entry.name} | Obserra Applications`,
     description: entry.value,
-    alternates: { canonical: `/apps/${entry.slug}` }
+    alternates: { canonical: `/apps/${entry.slug}` },
+    openGraph: {
+      title: `${entry.name} | Obserra Applications`,
+      description: entry.value,
+      url: `https://www.obserrallc.com/apps/${entry.slug}`,
+      type: "website",
+      images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: entry.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${entry.name} | Obserra Applications`,
+      description: entry.value,
+      images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
+    },
   };
 }
 
@@ -62,12 +76,17 @@ export default async function AppDetailPage({ params }: Props) {
     <main className="app-detail-page">
       <header className="apps-nav">
         <a href="/" className="apps-brand" aria-label="Obserra home">
-          <img src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" />
+          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
           <span>PRODUCT DETAIL</span>
         </a>
         <nav aria-label="Product navigation">
+          <a href="/">Home</a>
           <a href="/apps">All applications</a>
           <a href="/services">Services</a>
+          <a href="/eios">EIOS</a>
+          <a href="/academy">Academy</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
           <a href="mailto:info@obserrallc.com?subject=Obserra%20Product%20Inquiry" className="apps-nav-cta">Contact sales</a>
         </nav>
       </header>

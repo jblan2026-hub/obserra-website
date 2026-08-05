@@ -3,25 +3,48 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import ObserraGuide from "./ObserraGuide";
 import "./globals.css";
+import "./brand-consistency.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.obserrallc.com"),
   title: { default: "Obserra | Enterprise Intelligence, Cybersecurity & Professional Training", template: "%s | Obserra" },
   description: "Obserra delivers enterprise intelligence, cybersecurity strategy, protective intelligence, and paid professional training.",
+  alternates: {
+    canonical: "/",
+    languages: {
+      "en-US": "https://www.obserrallc.com",
+      "x-default": "https://www.obserrallc.com",
+    },
+  },
   applicationName: "Obserra",
   authors: [{ name: "Obserra Executive Protection & Intelligence LLC" }],
   creator: "Obserra Executive Protection & Intelligence LLC",
   publisher: "Obserra Executive Protection & Intelligence LLC",
   category: "Professional services and enterprise technology",
+  formatDetection: { email: false, address: false, telephone: false },
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [{ url: "/brand/obserra-logo.png", type: "image/png" }],
+    shortcut: ["/brand/obserra-logo.png"],
+    apple: [{ url: "/brand/obserra-logo.png" }],
+  },
   keywords: ["executive protection", "protective intelligence", "cybersecurity leadership", "enterprise intelligence", "EIOS", "professional training", "AI governance"],
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION },
   openGraph: {
     siteName: "Obserra",
     type: "website",
+    url: "https://www.obserrallc.com",
+    title: "Obserra | Enterprise Intelligence, Cybersecurity & Professional Training",
+    description: "Enterprise intelligence, cybersecurity, protective intelligence, secure technology, and paid professional training for high-consequence environments.",
     locale: "en_US",
     images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: "Obserra Executive Protection & Intelligence LLC" }],
   },
-  twitter: { card: "summary_large_image", images: ["/brand/visuals/obserra-eios-intelligence-hero.png"] },
+  twitter: {
+    card: "summary_large_image",
+    title: "Obserra | Enterprise Intelligence, Cybersecurity & Professional Training",
+    description: "Enterprise intelligence, cybersecurity, protective intelligence, secure technology, and paid professional training.",
+    images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
+  },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
   other: {
     copyright: "Copyright Obserra Executive Protection & Intelligence LLC. All rights reserved.",

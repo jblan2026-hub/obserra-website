@@ -1,0 +1,51 @@
+.admin-shell,
+.admin-denied {
+  font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
+}
+
+.admin-shell > header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #020d18de;
+  backdrop-filter: blur(8px);
+}
+
+.admin-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-hero::after {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(#8fdaff12 1px, transparent 1px), linear-gradient(90deg, #8fdaff12 1px, transparent 1px);
+  background-size: 52px 52px;
+  content: "";
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, #0009 16%, transparent 100%);
+}
+
+.admin-grid article,
+.admin-course-list,
+.admin-course-list article,
+.admin-section {
+  box-shadow: 0 14px 30px #0000002c;
+}
+
+.admin-course-list article,
+.admin-section a,
+.admin-grid article {
+  transition: transform 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.admin-grid article:hover,
+.admin-course-list article:hover {
+  transform: translateY(-2px);
+  border-color: #f4ba5566;
+}
+
+.admin-section a:hover,
+.admin-section a:focus-visible {
+  color: #ffd27a;
+}

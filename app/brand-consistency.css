@@ -1,0 +1,114 @@
+:root {
+  --obserra-logo-nav-width: 286px;
+  --obserra-logo-nav-width-mobile: 220px;
+  --obserra-brand-label-color: #f4ba55;
+  --obserra-brand-label-spacing: 0.12em;
+  --obserra-logo-footer-width: 180px;
+  --obserra-brand-frame-bg: linear-gradient(135deg, #ffffff10, #ffffff03);
+  --obserra-brand-frame-border: #7fd0ef38;
+  --obserra-brand-frame-shadow: 0 10px 22px #00000033;
+}
+
+.home-brand,
+.about-brand,
+.apps-brand,
+.brand,
+.eios-brand,
+.learning-brand,
+.academy-course-nav > a:first-child,
+.admin-shell > header {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-brand,
+.about-brand,
+.apps-brand,
+.brand,
+.eios-brand,
+.learning-brand,
+.academy-course-nav > a:first-child {
+  padding: 8px 12px;
+  border: 1px solid var(--obserra-brand-frame-border);
+  border-radius: 12px;
+  background: var(--obserra-brand-frame-bg);
+  box-shadow: var(--obserra-brand-frame-shadow);
+}
+
+.home-nav .home-brand img,
+.apps-nav .apps-brand img,
+.about-nav .about-brand img,
+.masthead .brand img,
+.eios-nav .eios-brand img,
+.admin-shell > header img,
+.admin-denied img,
+.academy-course-nav > a:first-child img {
+  width: min(var(--obserra-logo-nav-width), 44vw) !important;
+  height: auto !important;
+  filter: drop-shadow(0 6px 14px #00000038);
+}
+
+.learning-header .learning-brand img {
+  width: min(var(--obserra-logo-nav-width), 44vw) !important;
+  height: auto !important;
+}
+
+.home-footer img,
+.about-footer img,
+.site-footer img,
+.eios-footer img {
+  width: var(--obserra-logo-footer-width) !important;
+  height: auto !important;
+}
+
+.product-label,
+.apps-brand span,
+.eios-brand b,
+.admin-shell > header span,
+.learning-brand b,
+.about-kicker,
+.home-eyebrow {
+  letter-spacing: var(--obserra-brand-label-spacing);
+}
+
+.apps-brand span,
+.eios-brand b,
+.admin-shell > header span,
+.learning-brand b,
+.product-label,
+.academy-course-nav > a:first-child b {
+  color: var(--obserra-brand-label-color) !important;
+}
+
+.apps-brand span,
+.eios-brand b,
+.admin-shell > header span,
+.learning-brand b,
+.product-label,
+.academy-course-nav > a:first-child b {
+  padding: 4px 8px;
+  border: 1px solid #f4ba5544;
+  border-radius: 999px;
+  background: #f4ba5514;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+@media (max-width: 700px) {
+  .home-nav .home-brand img,
+  .apps-nav .apps-brand img,
+  .about-nav .about-brand img,
+  .masthead .brand img,
+  .eios-nav .eios-brand img,
+  .admin-shell > header img,
+  .admin-denied img,
+  .academy-course-nav > a:first-child img {
+    width: min(var(--obserra-logo-nav-width-mobile), 58vw) !important;
+  }
+
+  .learning-header .learning-brand img {
+    width: min(var(--obserra-logo-nav-width-mobile), 58vw) !important;
+  }
+}

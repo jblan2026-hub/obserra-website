@@ -82,8 +82,13 @@ export async function recordAssessment(userId: string, courseId: string, score: 
 }
 
 export function ownerEmailAllowed(emails: string[]) {
-  const owner = process.env.OBSERRA_OWNER_EMAIL?.trim().toLowerCase();
-  return Boolean(owner && emails.some((email) => email.toLowerCase() === owner));
+  const singleOwner = process.env.OBSERRA_OWNER_EMAIL?.trim().toLowerCase();
+  const ownerList = (process.env.OBSERRA_OWNER_EMAILS ?? "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+  const approvedOwners = new Set<string>(singleOwner ? [singleOwner, ...ownerList] : ownerList);
+  return approvedOwners.size > 0 && emails.some((email) => approvedOwners.has(email.toLowerCase()));
 }
 
 function emailsForUser(user: { emailAddresses: { emailAddress: string }[] }) {
@@ -127,15 +132,20 @@ export async function getAcademyAggregateMetrics() {
   let enrollments = 0;
   let certificates = 0;
   const coursesByEnrollment = Object.fromEntries(courses.map((course) => [course.id, 0])) as Record<string, number>;
+  const coursesByCertificate = Object.fromEntries(courses.map((course) => [course.id, 0])) as Record<string, number>;
   for (const user of users) {
     const state = academyStateFromUser(user);
     for (const courseId of Object.keys(state.entitlements)) {
       enrollments += 1;
       if (courseId in coursesByEnrollment) coursesByEnrollment[courseId] += 1;
     }
-    certificates += Object.values(state.progress).filter((progress) => progress.certificateId).length;
+    for (const [courseId, progress] of Object.entries(state.progress)) {
+      if (!progress.certificateId) continue;
+      certificates += 1;
+      if (courseId in coursesByCertificate) coursesByCertificate[courseId] += 1;
+    }
   }
-  return { learnerAccounts: totalCount, enrollments, certificates, coursesByEnrollment, sampledLearners: users.length };
+  return { learnerAccounts: totalCount, enrollments, certificates, coursesByEnrollment, coursesByCertificate, sampledLearners: users.length };
 }
 
 /**

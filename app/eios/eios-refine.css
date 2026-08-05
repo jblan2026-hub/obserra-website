@@ -1,0 +1,72 @@
+.eios-page {
+  font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
+}
+
+.eios-nav nav a,
+.eios-text-link,
+.eios-button,
+.eios-outline-button {
+  transition: color 0.18s ease, transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.eios-nav nav a:hover,
+.eios-nav nav a:focus-visible,
+.eios-text-link:hover,
+.eios-text-link:focus-visible {
+  color: #f4c66d;
+}
+
+.eios-nav .eios-nav-cta:hover,
+.eios-nav .eios-nav-cta:focus-visible,
+.eios-button:hover,
+.eios-button:focus-visible {
+  background: #ffd27d;
+  transform: translateY(-2px);
+}
+
+.eios-outline-button:hover,
+.eios-outline-button:focus-visible {
+  border-color: #f4ba55;
+  background: #10395d;
+  transform: translateY(-2px);
+}
+
+.eios-proof div span,
+.capability-card,
+.view-selector button,
+.outcome-grid article,
+.product-frame,
+.eios-boundary,
+.eios-connect {
+  box-shadow: 0 14px 30px #0000002b;
+}
+
+.view-selector button:hover,
+.view-selector button:focus-visible,
+.capability-card:hover,
+.capability-card:focus-visible {
+  border-color: #f4ba55;
+  transform: translateY(-3px);
+}
+
+.eios-hero-copy {
+  animation: eiosReveal 0.55s ease-out both;
+}
+
+@keyframes eiosReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eios-hero-copy {
+    animation: none;
+  }
+}

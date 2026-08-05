@@ -1,32 +1,32 @@
 /* Obserra About page: a self-contained, responsive presentation system. */
-.about-page { min-height: 100vh; overflow: hidden; background: #031426; color: #eff9ff; font-family: Arial, Helvetica, sans-serif; }
+.about-page { min-height: 100vh; overflow: hidden; background: #031426; color: #eff9ff; font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif; --about-gold: #f5c35e; --about-gold-soft: #ffd17a; --about-cyan: #86d2ee; }
 .about-page * { box-sizing: border-box; }
 .about-page img { max-width: 100%; }
-.about-nav { position: relative; z-index: 5; display: flex; min-height: 92px; align-items: center; justify-content: space-between; gap: 28px; padding: 18px max(5vw, 24px); border-bottom: 1px solid #7ecdea2e; background: #030e1c; }
+.about-nav { position: relative; z-index: 5; display: flex; min-height: 92px; align-items: center; justify-content: space-between; gap: 28px; padding: 18px max(5vw, 24px); border-bottom: 1px solid #7ecdea2e; background: #030e1ce6; backdrop-filter: blur(6px); }
 .about-brand { display: inline-flex; flex: 0 0 auto; align-items: center; }
 .about-brand img { display: block; width: min(286px, 42vw); height: auto; }
 .about-nav nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 22px; }
 .about-nav nav a { color: #cae6f2; font-size: 13px; font-weight: 800; text-decoration: none; }
-.about-nav nav a:hover, .about-nav nav a:focus-visible { color: #f5c45c; }
-.about-nav .about-nav-cta { padding: 11px 15px; border: 1px solid #f4bd506b; border-radius: 7px; background: #f4ba55; color: #061426; }
-.about-nav .about-nav-cta:hover, .about-nav .about-nav-cta:focus-visible { color: #061426; background: #ffd17a; }
+.about-nav nav a:hover, .about-nav nav a:focus-visible { color: var(--about-gold); }
+.about-nav .about-nav-cta { padding: 11px 15px; border: 1px solid #f4bd506b; border-radius: 7px; background: #f4ba55; color: #061426; transition: transform .16s ease, background .16s ease; }
+.about-nav .about-nav-cta:hover, .about-nav .about-nav-cta:focus-visible { color: #061426; background: var(--about-gold-soft); transform: translateY(-1px); }
 
 .about-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, .55fr); gap: clamp(42px, 9vw, 150px); align-items: end; min-height: 580px; padding: clamp(76px, 11vw, 150px) max(5vw, 24px) clamp(72px, 9vw, 118px); isolation: isolate; background: radial-gradient(circle at 86% 12%, #12729a5c, transparent 24%), radial-gradient(circle at 72% 82%, #d59d3526, transparent 28%), linear-gradient(116deg, #031426 0%, #061b31 55%, #061426 100%); }
 .about-grid { position: absolute; z-index: -1; inset: 0; opacity: .45; background-image: linear-gradient(#8bdcf010 1px, transparent 1px), linear-gradient(90deg, #8bdcf010 1px, transparent 1px); background-size: 48px 48px; mask-image: linear-gradient(90deg, #000, transparent 88%); }
-.about-hero-copy { max-width: 800px; }
+.about-hero-copy { max-width: 800px; animation: aboutReveal .55s ease-out both; }
 .about-kicker { margin: 0 0 14px; color: #f6c35e; font-size: 11px; font-weight: 900; letter-spacing: .16em; line-height: 1.3; text-transform: uppercase; }
 .about-hero h1 { max-width: 780px; margin: 0; color: #fff; font-size: clamp(46px, 6vw, 84px); letter-spacing: -.065em; line-height: .93; }
 .about-hero-copy > p:not(.about-kicker) { max-width: 650px; margin: 28px 0 0; color: #c5e1ed; font-size: 18px; line-height: 1.68; }
 .about-actions { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 34px; }
 .about-button, .about-outline { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 13px 19px; border-radius: 7px; font-size: 13px; font-weight: 900; line-height: 1.2; text-decoration: none; transition: transform .18s ease, background .18s ease; }
-.about-button { border: 1px solid #f5bc58; background: #f5bc58; color: #051426; }
-.about-button:hover, .about-button:focus-visible { background: #ffcf75; transform: translateY(-2px); }
+.about-button { border: 1px solid var(--about-gold); background: var(--about-gold); color: #051426; }
+.about-button:hover, .about-button:focus-visible { background: var(--about-gold-soft); transform: translateY(-2px); }
 .about-link { color: #d7edf8; font-size: 13px; font-weight: 900; text-decoration: none; }
-.about-link:hover, .about-link:focus-visible { color: #f5bc58; }
+.about-link:hover, .about-link:focus-visible { color: var(--about-gold); }
 .about-outline { border: 1px solid #85cde87a; background: #081e33; color: #e8f8ff; }
-.about-outline:hover, .about-outline:focus-visible { border-color: #f5bc58; color: #f5c45c; transform: translateY(-2px); }
-.about-signal { display: grid; gap: 10px; max-width: 360px; padding: 27px; border: 1px solid #80cfee5b; border-radius: 14px; background: linear-gradient(145deg, #0b3151e8, #061728e8); box-shadow: 0 22px 50px #0005; }
-.about-signal span { color: #f5c05a; font-size: 10px; font-weight: 900; letter-spacing: .16em; }
+.about-outline:hover, .about-outline:focus-visible { border-color: var(--about-gold); color: #f5c45c; transform: translateY(-2px); }
+.about-signal { display: grid; gap: 10px; max-width: 360px; padding: 27px; border: 1px solid #80cfee5b; border-radius: 14px; background: linear-gradient(145deg, #0b3151e8, #061728e8); box-shadow: 0 22px 50px #0005; animation: aboutFloat 6.2s ease-in-out infinite; }
+.about-signal span { color: var(--about-gold); font-size: 10px; font-weight: 900; letter-spacing: .16em; }
 .about-signal strong { color: #fff; font-size: 25px; line-height: 1.08; letter-spacing: -.035em; }
 .about-signal p { margin: 4px 0 0; color: #badceb; font-size: 14px; line-height: 1.55; }
 
@@ -112,6 +112,16 @@
 .about-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; padding: 38px max(5vw, 24px); border-top: 1px solid #72c7e733; background: #020c17; }
 .about-footer img { width: 180px; height: auto; }
 .about-footer p { max-width: 720px; margin: 0; color: #93c4da; font-size: 11px; line-height: 1.6; }
+
+@keyframes aboutReveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes aboutFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
 
 @media (max-width: 1100px) {
   .recognition-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }

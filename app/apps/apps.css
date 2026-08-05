@@ -1,13 +1,15 @@
 .apps-page {
-  --apps-bg: #03162a;
-  --apps-surface: #0a2a46;
-  --apps-line: #7bc7e84f;
-  --apps-text: #ecf8ff;
+  --apps-bg: #041220;
+  --apps-surface: #081d31;
+  --apps-line: #79bfe33b;
+  --apps-text: #eaf6ff;
   --apps-gold: #f4ba55;
-  --apps-cyan: #84d6f5;
+  --apps-cyan: #83d0f8;
+  --apps-font: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
   background: var(--apps-bg);
   color: var(--apps-text);
   min-height: 100svh;
+  font-family: var(--apps-font);
 }
 
 .apps-page * {
@@ -15,13 +17,17 @@
 }
 
 .apps-nav {
+  position: sticky;
+  top: 0;
+  z-index: 35;
   height: 86px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 max(5vw, 24px);
-  border-bottom: 1px solid #78c7e247;
-  background: #031629;
+  border-bottom: 1px solid var(--apps-line);
+  background: #03101dd9;
+  backdrop-filter: blur(8px);
 }
 
 .apps-brand {
@@ -51,6 +57,13 @@
   text-decoration: none;
   font-size: 12px;
   font-weight: 800;
+  transition: color 0.16s ease, transform 0.16s ease;
+}
+
+.apps-nav nav a:hover,
+.apps-nav nav a:focus-visible {
+  color: #f4c66d;
+  transform: translateY(-1px);
 }
 
 .apps-nav nav .apps-nav-cta {
@@ -58,6 +71,13 @@
   padding: 10px 14px;
   background: var(--apps-gold);
   color: #0a2035;
+  transition: transform 0.16s ease, background 0.16s ease;
+}
+
+.apps-nav nav .apps-nav-cta:hover,
+.apps-nav nav .apps-nav-cta:focus-visible {
+  background: #ffd17b;
+  transform: translateY(-1px);
 }
 
 .apps-hero {
@@ -67,8 +87,8 @@
   align-items: center;
   padding: 86px max(5vw, 24px) 64px;
   background:
-    radial-gradient(circle at 84% 18%, #2f6f9659 0, transparent 34%),
-    linear-gradient(118deg, #03172b 6%, #072945 58%, #0a2036 100%);
+    radial-gradient(circle at 84% 18%, #1f628959 0, transparent 34%),
+    linear-gradient(118deg, #03111f 6%, #061c30 58%, #0a2036 100%);
 }
 
 .apps-eyebrow {
@@ -115,11 +135,26 @@
 .apps-button {
   background: var(--apps-gold);
   color: #09243a;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.apps-button:hover,
+.apps-button:focus-visible {
+  background: #ffd27b;
+  transform: translateY(-2px);
 }
 
 .apps-outline {
   border: 1px solid #89d5f066;
   color: #e4f6ff;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.apps-outline:hover,
+.apps-outline:focus-visible {
+  border-color: #f4ba55;
+  background: #0d3657;
+  transform: translateY(-2px);
 }
 
 .apps-hero aside {
@@ -239,6 +274,13 @@
   border: 1px solid var(--apps-line);
   border-radius: 12px;
   background: linear-gradient(145deg, #0a2f4f, #051d33);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.apps-grid article:hover {
+  transform: translateY(-5px);
+  border-color: #f4ba5563;
+  box-shadow: 0 18px 32px #00000045;
 }
 
 .apps-grid article header {
@@ -322,12 +364,19 @@
   text-decoration: none;
   font-size: 13px;
   font-weight: 800;
+  transition: color 0.16s ease;
+}
+
+.apps-grid article footer a:hover,
+.apps-grid article footer a:focus-visible {
+  color: #ffd27e;
 }
 
 .app-detail-page {
   background: var(--apps-bg);
   color: var(--apps-text);
   min-height: 100svh;
+  font-family: var(--apps-font);
 }
 
 .app-detail-hero {
@@ -362,6 +411,7 @@
   color: #dbf1ff;
   font-size: 12px;
   font-weight: 700;
+  background: #0b2b48;
 }
 
 .app-detail-grid {
@@ -431,6 +481,17 @@
   margin: 8px 0 0;
   color: #c5dff0;
   font-size: 14px;
+}
+
+.app-docs article a {
+  color: #9adfff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.app-docs article a:hover,
+.app-docs article a:focus-visible {
+  color: #ffd27e;
 }
 
 .app-screenshot-placeholder {

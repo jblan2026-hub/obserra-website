@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import "./certificate.css";
 import "./brand-certificate.css";
 
@@ -37,7 +38,7 @@ export default function CertificateView({
         <div className="certificate-corner certificate-corner-left" />
         <div className="certificate-corner certificate-corner-right" />
         <div className="certificate-brands">
-          <img src="/brand/obserra-logo.png" alt="Obserra Executive Protection & Intelligence LLC" />
+          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection & Intelligence LLC" width={220} height={42} />
           <div className="academy-seal" aria-label="Obserra Academy, a training division of Obserra Executive Protection & Intelligence LLC">
             <span>OA</span>
             <b>OBSERRA ACADEMY</b>
@@ -63,7 +64,7 @@ export default function CertificateView({
         <div className="certificate-authentication">
           <div className="certificate-verification-seal" aria-label="Obserra Executive Protection & Intelligence LLC verified digital seal">
             <div className="certificate-verification-seal-inner">
-              <img src="/brand/obserra-logo.png" alt="Official Obserra Executive Protection & Intelligence LLC logo" />
+              <Image src="/brand/obserra-logo.png" alt="Official Obserra Executive Protection & Intelligence LLC logo" width={96} height={96} />
               <b>VERIFIED</b>
               <small>DIGITAL SEAL</small>
             </div>

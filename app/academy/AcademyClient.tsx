@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { track } from "@vercel/analytics";
+import Image from "next/image";
 import { courses, type Department } from "./courseData";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -16,8 +17,8 @@ export default function AcademyClient() {
   return (
     <main>
       <header className="masthead">
-        <a href="/" className="brand" aria-label="Obserra Executive Protection and Intelligence LLC home"><img src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" /><span className="product-label">ACADEMY</span></a>
-        <div className="masthead-actions"><a href="mailto:info@obserrallc.com?subject=Obserra%20Enterprise%20Training" className="nav-link">Enterprise training</a></div>
+        <a href="/" className="brand" aria-label="Obserra Executive Protection and Intelligence LLC home"><Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} /><span className="product-label">ACADEMY</span></a>
+        <div className="masthead-actions"><a href="/services" className="nav-link">Services</a><a href="/contact" className="nav-link">Contact</a><a href="mailto:info@obserrallc.com?subject=Obserra%20Enterprise%20Training" className="nav-link">Enterprise training</a></div>
       </header>
 
       <section className="hero">
@@ -41,7 +42,7 @@ export default function AcademyClient() {
 
       <section className="curriculum"><p className="kicker">Interactive curriculum</p><h2>What you will complete</h2><ol>{selected.modules.map((module, index) => <li key={module.title}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{module.title}</h3><p>{module.description}</p></div><em>{module.format}<br />{module.duration}</em></li>)}</ol></section>
       <section className="certificate"><div><p className="kicker">Completion recognition</p><h2>Earn an Obserra Certificate of Training.</h2><p>After paid enrollment, learners complete all lessons and pass the final assessment with an 80 percent score or higher. The certificate records successful completion of the named Obserra Academy training course.</p></div><p className="fine-print">An Obserra Certificate of Training is a proprietary course completion record. It is not a state license, occupational authorization, accredited academic credit, or third party professional certification.</p></section>
-      <footer className="site-footer"><img src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" /><p>Obserra Technologies learning product. Proprietary to Obserra Executive Protection &amp; Intelligence LLC. Unauthorized downloading, recording, copying, sharing, distribution, or classroom use is prohibited.</p></footer>
+      <footer className="site-footer"><Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={180} height={35} /><p>Obserra Technologies learning product. Proprietary to Obserra Executive Protection &amp; Intelligence LLC. Unauthorized downloading, recording, copying, sharing, distribution, or classroom use is prohibited.</p></footer>
     </main>
   );
 }

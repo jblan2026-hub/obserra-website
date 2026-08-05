@@ -1,0 +1,107 @@
+.services-page {
+  font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
+}
+
+.services-page .apps-nav {
+  position: sticky;
+  top: 0;
+  z-index: 35;
+  background: #03101dd9;
+  backdrop-filter: blur(8px);
+}
+
+.services-page .apps-nav nav a {
+  transition: color 0.16s ease, transform 0.16s ease;
+}
+
+.services-page .apps-nav nav a:hover,
+.services-page .apps-nav nav a:focus-visible {
+  color: #f4c66d;
+  transform: translateY(-1px);
+}
+
+.services-hero {
+  position: relative;
+  overflow: hidden;
+  padding-top: clamp(72px, 9vw, 104px);
+  padding-bottom: clamp(62px, 8vw, 84px);
+}
+
+.services-hero::after {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(#8fdaff11 1px, transparent 1px),
+    linear-gradient(90deg, #8fdaff11 1px, transparent 1px);
+  background-size: 52px 52px;
+  content: "";
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, #000a 14%, transparent 100%);
+}
+
+.services-hero > div,
+.services-hero > aside {
+  position: relative;
+  z-index: 1;
+}
+
+.services-hero h1 {
+  max-width: 920px;
+}
+
+.services-hero aside p {
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.services-hero aside p:hover {
+  transform: translateY(-2px);
+  border-color: #f4ba556e;
+}
+
+.services-results {
+  padding-top: 34px;
+}
+
+.services-results .apps-grid {
+  gap: 14px;
+}
+
+.services-results .apps-grid article {
+  border-color: #80c8ea59;
+  border-top: 3px solid #5eb7e2;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.services-results .apps-grid article:hover {
+  transform: translateY(-5px);
+  border-color: #f4ba5573;
+  box-shadow: 0 20px 34px #00000045;
+}
+
+.services-results .apps-grid article h2 {
+  color: #f1fbff;
+}
+
+.services-results .apps-grid article p {
+  color: #c4dfee;
+}
+
+.services-results .apps-grid article footer a {
+  color: #9adfff;
+}
+
+.services-results .apps-grid article footer a:hover,
+.services-results .apps-grid article footer a:focus-visible {
+  color: #ffd37f;
+}
+
+.service-icon-wrap {
+  margin-top: 16px;
+  color: #84d6f5;
+}
+
+@media (max-width: 700px) {
+  .services-results .apps-grid {
+    grid-template-columns: 1fr;
+  }
+}
