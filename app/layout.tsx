@@ -7,6 +7,7 @@ import "./design-system.css";
 import "./brand-consistency.css";
 import "./credential-issuer-marks.css";
 import "./credly-profile-link.css";
+import "./global-symbols.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.obserrallc.com"),
