@@ -1,0 +1,273 @@
+.f100-store {
+  --gold: #f3c66d;
+  --cyan: #67d5ff;
+  background:
+    radial-gradient(circle at 78% 7%, rgba(39, 127, 183, .22), transparent 29%),
+    linear-gradient(180deg, #020914 0%, #071625 46%, #020914 100%);
+}
+
+.f100-nav {
+  min-height: 86px;
+  padding-inline: max(5vw, 28px);
+  background: rgba(2, 9, 20, .9);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, .18);
+}
+
+.f100-nav-cta {
+  padding: 13px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(243, 198, 109, .18);
+}
+
+.f100-hero {
+  min-height: 760px;
+  gap: 56px;
+  padding: 104px max(5vw, 28px) 90px;
+  background:
+    linear-gradient(90deg, rgba(2, 9, 20, .98) 0%, rgba(3, 14, 28, .92) 44%, rgba(3, 16, 31, .58) 100%),
+    url('/brand/visuals/obserra-eios-intelligence-hero.png') center right / cover no-repeat;
+}
+
+.f100-hero h1 {
+  max-width: 940px;
+  font-size: clamp(48px, 6.2vw, 86px);
+  line-height: .96;
+}
+
+.f100-hero-lede {
+  max-width: 760px;
+  font-size: 19px;
+}
+
+.f100-primary,
+.f100-secondary {
+  min-height: 52px;
+  padding-inline: 22px;
+  border-radius: 12px;
+}
+
+.f100-primary {
+  box-shadow: 0 14px 36px rgba(243, 198, 109, .22);
+}
+
+.f100-hero-panel {
+  padding: 18px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(16, 45, 72, .9), rgba(5, 19, 35, .96));
+  box-shadow: 0 35px 90px rgba(0, 0, 0, .42);
+  backdrop-filter: blur(18px);
+}
+
+.f100-featured-visual {
+  min-height: 390px;
+  border-radius: 17px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .05);
+}
+
+.f100-featured-meta {
+  padding: 24px 10px 10px;
+}
+
+.f100-featured-meta h2 {
+  font-size: 32px;
+}
+
+.f100-trust-band {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: rgba(133, 184, 217, .16);
+}
+
+.f100-trust-band article {
+  min-height: 138px;
+  padding: 30px max(2.6vw, 22px);
+  background: linear-gradient(145deg, #081a2d, #061321);
+}
+
+.f100-featured,
+.f100-catalog {
+  max-width: 1600px;
+  margin-inline: auto;
+  padding: 92px max(5vw, 28px);
+}
+
+.f100-featured-grid {
+  gap: 24px;
+}
+
+.f100-featured-main {
+  min-height: 620px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #102f50, #06182b);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .3);
+}
+
+.f100-featured-main-copy {
+  padding: 44px;
+}
+
+.f100-featured-main-copy h3 {
+  font-size: 42px;
+}
+
+.f100-featured-stack {
+  gap: 16px;
+}
+
+.f100-featured-stack > a {
+  min-height: 188px;
+  padding: 28px;
+  border-radius: 19px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(103, 213, 255, .12), transparent 34%),
+    linear-gradient(145deg, #0d2946, #06182b);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .22);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.f100-featured-stack > a:hover {
+  transform: translateY(-6px);
+  border-color: rgba(243, 198, 109, .62);
+  box-shadow: 0 28px 65px rgba(0, 0, 0, .34);
+}
+
+.f100-catalog {
+  max-width: none;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(38, 112, 158, .15), transparent 30%),
+    #061321;
+}
+
+.f100-catalog > * {
+  max-width: 1500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.f100-controls {
+  position: sticky;
+  top: 98px;
+  z-index: 20;
+  padding: 16px;
+  border: 1px solid rgba(136, 177, 207, .18);
+  border-radius: 17px;
+  background: rgba(4, 16, 29, .9);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .22);
+  backdrop-filter: blur(18px);
+}
+
+.f100-search,
+.f100-select-group {
+  min-height: 56px;
+  border-radius: 13px;
+  background: rgba(12, 35, 57, .96);
+}
+
+.f100-catalog-grid {
+  gap: 24px;
+  margin-top: 34px;
+}
+
+.f100-product-card {
+  position: relative;
+  min-height: 500px;
+  padding: 30px;
+  border-radius: 24px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(103, 213, 255, .15), transparent 34%),
+    linear-gradient(155deg, #0e304f 0%, #07182a 70%);
+  box-shadow: 0 24px 68px rgba(0, 0, 0, .3);
+}
+
+.f100-product-card::after {
+  position: absolute;
+  right: -54px;
+  bottom: -54px;
+  width: 190px;
+  height: 190px;
+  border: 1px solid rgba(103, 213, 255, .16);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
+
+.f100-product-card:hover {
+  transform: translateY(-9px);
+  border-color: rgba(243, 198, 109, .72);
+  box-shadow: 0 36px 90px rgba(0, 0, 0, .42);
+}
+
+.f100-app-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 15px;
+  background: linear-gradient(145deg, rgba(243, 198, 109, .2), rgba(103, 213, 255, .08));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .04);
+}
+
+.f100-product-card h3 {
+  margin-top: 14px;
+  font-size: 30px;
+}
+
+.f100-product-card > p {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.f100-product-card ul {
+  margin-block: 24px;
+  gap: 11px;
+}
+
+.f100-card-meta {
+  position: relative;
+  z-index: 1;
+  padding: 18px 0;
+}
+
+.f100-card-actions {
+  position: relative;
+  z-index: 1;
+  gap: 11px;
+}
+
+.f100-card-primary,
+.f100-card-secondary {
+  min-height: 48px;
+  border-radius: 11px;
+  font-size: 13px;
+}
+
+.f100-card-primary {
+  box-shadow: 0 10px 28px rgba(243, 198, 109, .17);
+}
+
+.f100-enterprise-cta {
+  max-width: 1500px;
+  margin: 72px auto;
+  padding: 54px;
+  border: 1px solid rgba(136, 177, 207, .2);
+  border-radius: 25px;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(103, 213, 255, .17), transparent 34%),
+    linear-gradient(145deg, #0b2b49, #051525);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .32);
+}
+
+@media (max-width: 1180px) {
+  .f100-hero { min-height: auto; }
+  .f100-trust-band { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .f100-catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .f100-hero { padding-top: 58px; }
+  .f100-hero h1 { font-size: clamp(42px, 12vw, 62px); }
+  .f100-featured-visual { min-height: 250px; }
+  .f100-trust-band,
+  .f100-catalog-grid { grid-template-columns: 1fr; }
+  .f100-controls { position: static; }
+  .f100-product-card { min-height: auto; }
+  .f100-enterprise-cta { margin: 30px 18px 60px; padding: 30px; }
+}
