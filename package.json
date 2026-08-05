@@ -9,7 +9,10 @@
     "test": "node --test",
     "test:production": "node --test scripts/production-smoke.mjs",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
-    "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
+    "sync:apps": "node scripts/sync-final-apps.mjs --dry-run && node scripts/enrich-final-app-commerce.mjs",
+    "sync:courses": "node scripts/sync-final-courses.mjs --dry-run",
+    "publish:apps": "node scripts/sync-final-apps.mjs && node scripts/enrich-final-app-commerce.mjs",
+    "publish:courses": "node scripts/sync-final-courses.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.6.4",
