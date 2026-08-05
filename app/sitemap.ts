@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { courses } from "./academy/courseData";
 import { marketplaceApps } from "./apps/appsData";
 import { eiosCapabilities } from "./eios/capabilities";
+import { serviceCatalog } from "./services/serviceCatalog";
 import { trustPolicies } from "./trust/policies";
 
 const siteUrl = "https://www.obserrallc.com";
@@ -27,6 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
   return [
     ...corePages,
+    ...serviceCatalog.map((service) => ({ url: `${siteUrl}/services/${service.id}`, lastModified, changeFrequency: "monthly" as const, priority: 0.8 })),
     ...eiosCapabilities.map((entry) => ({ url: `${siteUrl}/eios/${entry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.82 })),
     ...marketplaceApps.map((entry) => ({ url: `${siteUrl}/apps/${entry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.75 })),
     ...courses.map((course) => ({ url: `${siteUrl}/academy/${course.id}`, lastModified, changeFrequency: "monthly" as const, priority: 0.7 })),
