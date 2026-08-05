@@ -58,22 +58,22 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
 
       <section className="apps-hero">
         <div>
-          <p className="apps-eyebrow">OBSERRA ENTERPRISE APPLICATION MARKETPLACE</p>
-          <h1>Enterprise software for cyber risk, executive protection, intelligence, and AI governance.</h1>
+          <p className="apps-eyebrow">OBSERRA ENTERPRISE COMMERCIAL APPLICATIONS</p>
+          <h1>Enterprise-grade software built to reduce risk, accelerate decisions, and strengthen execution.</h1>
           <p>
             Evaluate production and pilot-ready Obserra products built for regulated environments,
             high-consequence operations, and executive accountability. Solutions labeled Coming Soon
-            are roadmap offerings and are not currently purchasable for production use.
+            are roadmap offerings and are not currently purchasable for production deployment.
           </p>
           <div className="apps-actions">
             <a href="mailto:info@obserrallc.com?subject=Request%20Obserra%20Enterprise%20Demo" className="apps-button">Request enterprise demo</a>
-            <a href="mailto:info@obserrallc.com?subject=Obserra%20Product%20Advisory%20Call" className="apps-outline">Speak with product advisor</a>
+            <a href="mailto:info@obserrallc.com?subject=Obserra%20Product%20Advisory%20Call" className="apps-outline">Book product advisory call</a>
           </div>
         </div>
         <aside>
-          <p><BadgeCheck size={16} /> Clear production, pilot, and roadmap status on every product</p>
-          <p><Sparkles size={16} /> Governed AI capabilities aligned to policy and risk controls</p>
-          <p><BriefcaseBusiness size={16} /> Deployment options for private cloud and enterprise boundaries</p>
+          <p><BadgeCheck size={16} /> Clear production, pilot, and roadmap status for procurement decisions</p>
+          <p><Sparkles size={16} /> Governed AI capabilities aligned to policy, audit, and risk controls</p>
+          <p><BriefcaseBusiness size={16} /> Enterprise deployment models for private cloud and boundary control</p>
         </aside>
       </section>
 
@@ -120,7 +120,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
       </section>
 
       <section className="apps-results" aria-live="polite">
-        <p>{visibleApps.length} products matched to current filters</p>
+        <p>{visibleApps.length} products matched to your commercial evaluation filters</p>
         <div className="apps-grid">
           {visibleApps.map((entry, index) => (
             <motion.article
@@ -142,7 +142,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
                 ))}
               </ul>
               <footer>
-                <a href={`/apps/${entry.slug}`}>View product page <ArrowRight size={15} /></a>
+                <a href={`/apps/${entry.slug}`}>Open commercial product brief <ArrowRight size={15} /></a>
               </footer>
             </motion.article>
           ))}
@@ -206,7 +206,7 @@ export function ProductInfoSections({ entry }: { entry: MarketplaceApp }) {
         <h2>Product visuals and architecture narrative</h2>
         <p>
           Detailed visuals, implementation diagrams, and technical walkthroughs are provided during
-          qualified enterprise briefings to protect customer confidentiality and product security posture.
+          qualified enterprise briefings to protect customer confidentiality and maintain product security posture.
         </p>
         <div aria-hidden="true">
           <span>ENTERPRISE VISUAL BRIEFING AVAILABLE</span>

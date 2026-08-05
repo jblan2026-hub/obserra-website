@@ -122,11 +122,11 @@ export default function HomePage() {
         <div className="home-grid" />
         <div className="hero-copy">
           <p className="home-eyebrow">VETERAN OWNED · PROPERTY OF OBSERRA</p>
-          <h1>When the stakes are high,<br /><em>make the next move count.</em></h1>
-          <p>Obserra Executive Protection &amp; Intelligence LLC brings enterprise intelligence, cybersecurity leadership, protective intelligence, secure technology, and practical training together—so leaders can turn complex risk into a clear, accountable next move.</p>
+          <h1>When exposure is enterprise-critical,<br /><em>buy clarity that drives action.</em></h1>
+          <p>Obserra Executive Protection &amp; Intelligence LLC delivers commercial-grade intelligence, cybersecurity leadership, protective intelligence, secure technology, and practical training so decision-makers can reduce risk faster and execute with measurable confidence.</p>
           <div className="home-actions">
-            <a className="home-button" href="#connect">Start a confidential conversation</a>
-            <a className="home-link" href="/eios">Discover EIOS</a>
+            <a className="home-button" href="#connect">Request executive consultation</a>
+            <a className="home-link" href="/eios">Review EIOS commercial briefing</a>
           </div>
         </div>
         <aside className="hero-proof">
@@ -140,15 +140,15 @@ export default function HomePage() {
       </section>
 
       <section className="trust-rail" aria-label="Obserra engagement standards">
-        <article><span>01</span><p>EXECUTIVE READY</p><strong>Clear decisions for leaders, boards, and high-consequence operations.</strong></article>
-        <article><span>02</span><p>SECURE BY DESIGN</p><strong>Confidentiality, accountability, and operational discipline from the beginning.</strong></article>
-        <article><span>03</span><p>BUILT TO MOVE</p><strong>Advisory, technology, protection, and training that turn strategy into action.</strong></article>
+        <article><span>01</span><p>COMMERCIAL READY</p><strong>Engagement models built for executive sponsors, operating teams, and procurement stakeholders.</strong></article>
+        <article><span>02</span><p>SECURE BY DESIGN</p><strong>Confidentiality, accountability, and governance discipline integrated from day one.</strong></article>
+        <article><span>03</span><p>OUTCOME DRIVEN</p><strong>Advisory, technology, protection, and training aligned to measurable business and risk outcomes.</strong></article>
       </section>
 
       <section className="home-intro" id="divisions">
         <p className="home-eyebrow">THE OBSERRA ADVANTAGE</p>
-        <h2>One trusted partner across risk, intelligence, protection, technology, and learning.</h2>
-        <p>Obserra is built for executives, organizations, and professionals who need practical expertise, disciplined execution, and solutions that create confident next steps rather than another layer of uncertainty.</p>
+        <h2>One enterprise partner across risk, intelligence, protection, technology, and workforce capability.</h2>
+        <p>Obserra is built for organizations that need commercial-grade delivery, executive accountability, and practical execution that translates strategy into observable operational and financial value.</p>
       </section>
 
       <section className="division-grid">
@@ -236,8 +236,8 @@ export default function HomePage() {
       <section className="organic-reach" aria-labelledby="organic-reach-title"><div><p className="home-eyebrow">FREE GROWTH AND AD DISTRIBUTION LINKS</p><h2 id="organic-reach-title">Activate free demand generation channels that can drive qualified leads.</h2><p>Use these free links to publish tracked posts and messages with built-in UTM attribution. Teams can measure traffic and lead origin by source, medium, and campaign without paying for tooling.</p></div><div className="organic-reach-links"><a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dlinkedin%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch LinkedIn post (tracked) <b>↗</b></a><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dfacebook%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch Facebook post (tracked) <b>↗</b></a><a href="https://x.com/intent/post?text=Explore%20Obserra%20enterprise%20intelligence%2C%20cybersecurity%2C%20and%20professional%20training.&url=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dx%26utm_medium%3Dorganic_social%26utm_campaign%3Dfree_growth_distribution" target="_blank" rel="noreferrer">Launch X post (tracked) <b>↗</b></a><a href="mailto:?subject=Obserra%20Enterprise%20Intelligence&body=Explore%20Obserra%20enterprise%20intelligence%20and%20cybersecurity%20services%3A%20https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Demail%26utm_medium%3Dreferral%26utm_campaign%3Dfree_growth_distribution">Send tracked referral email <b>→</b></a><a href="mailto:info@obserrallc.com?subject=Free%20Lead%20Generation%20and%20Advertising%20Strategy%20Session">Request free growth strategy session <b>→</b></a></div></section>
 
       <section className="home-connect" id="connect">
-        <p className="home-eyebrow">START WITH THE RIGHT CONVERSATION</p><h2>Bring the right expertise<br />into the room.</h2><p>Whether you are strengthening cyber resilience, protecting leaders and operations, building enterprise intelligence, or developing your team, Obserra is ready to help you turn an important priority into a clear, credible path forward.</p>
-        <div><a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Consultation">Schedule a confidential consultation</a><a className="home-outline" href="/academy">Explore Academy courses</a></div>
+        <p className="home-eyebrow">START YOUR COMMERCIAL ENGAGEMENT</p><h2>Bring decision-grade expertise<br />into critical priorities.</h2><p>Whether your objective is cyber resilience, executive protection, enterprise intelligence, or workforce enablement, Obserra will help you scope a commercially sound path from first conversation to accountable execution.</p>
+        <div><a className="home-button" href="mailto:info@obserrallc.com?subject=Obserra%20Consultation">Schedule executive consultation</a><a className="home-outline" href="/academy">Explore paid Academy programs</a></div>
       </section>
 
       <footer className="home-footer"><Image src="/brand/obserra-logo.png" width={180} height={35} alt="Obserra Executive Protection and Intelligence LLC" /><p>Copyright Obserra Executive Protection &amp; Intelligence LLC. Property of Obserra. EIOS, Academy materials, visual assets, and related product content are proprietary and may not be reproduced, distributed, recorded, or used without prior written approval.</p></footer>

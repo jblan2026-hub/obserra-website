@@ -84,16 +84,16 @@ export default function ServicesPage() {
 
       <section className="apps-hero services-hero">
         <div>
-          <p className="apps-eyebrow">ENTERPRISE SERVICES</p>
-          <h1>Enterprise security and intelligence services built for decisions that carry real consequence.</h1>
+          <p className="apps-eyebrow">ENTERPRISE COMMERCIAL SERVICES</p>
+          <h1>Commercial-grade security and intelligence services for high-consequence environments.</h1>
           <p>
             OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC aligns cybersecurity, protective intelligence,
-            executive protection, and governance expertise to help leadership teams reduce uncertainty and execute
-            with confidence under pressure.
+            executive protection, and governance expertise to help leadership teams reduce uncertainty,
+            accelerate decisions, and deliver measurable risk and resilience outcomes.
           </p>
           <div className="apps-actions">
             <a className="apps-button" href="mailto:info@obserrallc.com?subject=Request%20Obserra%20Executive%20Consultation">Request executive consultation</a>
-            <a className="apps-outline" href="mailto:info@obserrallc.com?subject=Schedule%20Obserra%20Scoping%20Session">Book scoped discovery session</a>
+            <a className="apps-outline" href="mailto:info@obserrallc.com?subject=Schedule%20Obserra%20Scoping%20Session">Book commercial scoping session</a>
             <a className="apps-outline" href="mailto:info@obserrallc.com?subject=Free%20Lead%20Generation%20and%20Advertising%20Strategy%20Session">Free growth strategy session</a>
           </div>
         </div>
