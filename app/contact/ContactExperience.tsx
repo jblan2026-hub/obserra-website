@@ -2,7 +2,6 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
-import { useSearchParams } from "next/navigation";
 
 type InquiryCategory =
   | "Executive protection or urgent travel support"
@@ -49,7 +48,6 @@ const interestMap: Record<string, InquiryCategory> = {
 const schedulingUrl = "https://calendly.com/obserra/executive-consultation";
 
 export default function ContactExperience() {
-  const searchParams = useSearchParams();
   const [category, setCategory] = useState<InquiryCategory>("Strategic partnership or general inquiry");
   const [method, setMethod] = useState<ContactMethod>("Email");
   const [urgency, setUrgency] = useState<Urgency>("Standard");
@@ -61,9 +59,9 @@ export default function ContactExperience() {
   const [summary, setSummary] = useState("");
 
   useEffect(() => {
-    const interest = searchParams.get("interest")?.toLowerCase();
+    const interest = new URLSearchParams(window.location.search).get("interest")?.toLowerCase();
     if (interest && interestMap[interest]) setCategory(interestMap[interest]);
-  }, [searchParams]);
+  }, []);
 
   const responseTime = useMemo(() => {
     if (urgency === "Urgent") return "Urgent priority selected. Include a direct phone number and the time-sensitive outcome you need.";
