@@ -19,6 +19,13 @@ const statusToneClass: Record<AppStatus, string> = {
   "Coming Soon": "status-coming"
 };
 
+const enterpriseVisuals = [
+  { src: "/eios/eios-overview-marketing.png", alt: "Executive overview dashboard" },
+  { src: "/eios/eios-situation-room-marketing.png", alt: "Enterprise situation room dashboard" },
+  { src: "/eios/eios-asset-intelligence-marketing.png", alt: "Asset intelligence dashboard" },
+  { src: "/eios/eios-report-center-marketing.png", alt: "Evidence and reporting dashboard" }
+];
+
 export default function AppsMarketplaceClient({ initialCategory = "All" }: Props) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<AppCategory | "All">(initialCategory);
@@ -208,8 +215,13 @@ export function ProductInfoSections({ entry }: { entry: MarketplaceApp }) {
           Detailed visuals, implementation diagrams, and technical walkthroughs are provided during
           qualified enterprise briefings to protect customer confidentiality and maintain product security posture.
         </p>
-        <div aria-hidden="true">
-          <span>ENTERPRISE VISUAL BRIEFING AVAILABLE</span>
+        <div className="app-visual-grid">
+          {enterpriseVisuals.map((visual) => (
+            <figure key={visual.src} className="app-visual-card">
+              <Image src={visual.src} alt={visual.alt} fill sizes="(max-width: 900px) 100vw, 25vw" />
+              <figcaption>{visual.alt}</figcaption>
+            </figure>
+          ))}
         </div>
       </section>
     </>

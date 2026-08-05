@@ -6,7 +6,10 @@
   --apps-gold: #f4ba55;
   --apps-cyan: #83d0f8;
   --apps-font: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
-  background: var(--apps-bg);
+  background:
+    radial-gradient(circle at 92% -6%, #1d638731 0, transparent 38%),
+    radial-gradient(circle at 5% 12%, #1b567726 0, transparent 35%),
+    var(--apps-bg);
   color: var(--apps-text);
   min-height: 100svh;
   font-family: var(--apps-font);
@@ -81,6 +84,7 @@
 }
 
 .apps-hero {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 0.7fr;
   gap: 36px;
@@ -89,6 +93,24 @@
   background:
     radial-gradient(circle at 84% 18%, #1f628959 0, transparent 34%),
     linear-gradient(118deg, #03111f 6%, #061c30 58%, #0a2036 100%);
+  overflow: hidden;
+}
+
+.apps-hero::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background-image:
+    linear-gradient(#8fd7fa12 1px, transparent 1px),
+    linear-gradient(90deg, #8fd7fa12 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(90deg, #000, #0009 58%, transparent);
+  pointer-events: none;
+}
+
+.apps-hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 .apps-eyebrow {
@@ -273,7 +295,7 @@
   padding: 20px;
   border: 1px solid var(--apps-line);
   border-radius: 12px;
-  background: linear-gradient(145deg, #0a2f4f, #051d33);
+  background: linear-gradient(145deg, #0d3556, #071f34);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -502,21 +524,47 @@
   color: #c4deee;
 }
 
-.app-screenshot-placeholder div {
+.app-visual-grid {
+  margin-top: 14px;
   display: grid;
-  min-height: 240px;
-  margin-top: 12px;
-  place-items: center;
-  border: 1px dashed #8bd2f082;
-  border-radius: 10px;
-  background: linear-gradient(145deg, #082946, #051a2d);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.app-screenshot-placeholder span {
-  color: #8abed7;
-  font-size: 12px;
+.app-visual-card {
+  position: relative;
+  min-height: 190px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #86cde952;
+  border-radius: 10px;
+  background: #051a2d;
+  box-shadow: 0 16px 30px #0000003f;
+}
+
+.app-visual-card::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: "";
+  background: linear-gradient(180deg, #03101f10 0%, #03101fa8 90%);
+}
+
+.app-visual-card figcaption {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  padding: 6px 8px;
+  border: 1px solid #8fd7f457;
+  border-radius: 8px;
+  background: #04182bc7;
+  color: #daf0fc;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .app-pricing {
@@ -546,6 +594,10 @@
   .apps-grid,
   .app-detail-grid,
   .app-docs {
+    grid-template-columns: 1fr;
+  }
+
+  .app-visual-grid {
     grid-template-columns: 1fr;
   }
 }

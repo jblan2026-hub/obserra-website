@@ -3,7 +3,8 @@ import EiosShowcase from "./EiosShowcase";
 
 export const metadata: Metadata = {
   title: "EIOS | Governed Enterprise Intelligence and Action | Obserra",
-  description: "EIOS connects enterprise context, helps leaders make evidence-backed decisions, governs authorized action, and independently verifies outcomes.",
+  description:
+    "EIOS connects enterprise context, helps leaders make evidence-backed decisions, governs authorized action, and independently verifies outcomes.",
   alternates: { canonical: "/eios" },
   keywords: ["enterprise intelligence operating system", "governed AI", "decision intelligence", "EIOS"],
   openGraph: {
@@ -11,7 +12,14 @@ export const metadata: Metadata = {
     description: "Connect context, govern decisions, authorize action, and verify enterprise outcomes with EIOS.",
     url: "https://www.obserrallc.com/eios",
     type: "website",
-    images: [{ url: "/eios/eios-overview-marketing.png", width: 1584, height: 889, alt: "Obserra EIOS overview" }],
+    images: [
+      {
+        url: "/eios/eios-overview-marketing.png",
+        width: 1584,
+        height: 889,
+        alt: "Obserra EIOS overview"
+      }
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -32,7 +40,11 @@ export default function EiosPage() {
         operatingSystem: "Web",
         url: "https://www.obserrallc.com/eios",
         description: "A governed enterprise intelligence and execution layer that connects enterprise context, supports evidence-backed decisions, governs authorized action, and verifies outcomes.",
-        provider: { "@type": "Organization", name: "Obserra Executive Protection & Intelligence LLC", url: "https://www.obserrallc.com" },
+        provider: {
+          "@type": "Organization",
+          name: "Obserra Executive Protection & Intelligence LLC",
+          url: "https://www.obserrallc.com"
+        },
       },
       {
         "@type": "WebPage",
@@ -44,10 +56,24 @@ export default function EiosPage() {
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: "https://www.obserrallc.com" },
-          { "@type": "ListItem", position: 2, name: "EIOS", item: "https://www.obserrallc.com/eios" }
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "EIOS",
+            item: "https://www.obserrallc.com/eios"
+          }
         ]
       }
     ]
   };
-  return <><EiosShowcase /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} /></>;
+
+  return (
+    <>
+      <EiosShowcase />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+    </>
+  );
 }
