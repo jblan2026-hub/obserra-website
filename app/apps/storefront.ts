@@ -1,6 +1,18 @@
 import { marketplaceApps, type MarketplaceApp } from "./appsData";
-import storeCatalog from "./store-catalog.json";
+import rawStoreCatalog from "./store-catalog.json";
 
+type GeneratedStoreRecord = {
+  slug: string;
+  name: string;
+  status: string;
+  category: string;
+  version: string;
+  deployment: string[];
+  pricing: string;
+  description: string;
+};
+
+const storeCatalog = rawStoreCatalog as { applications: GeneratedStoreRecord[] };
 const generatedApps: MarketplaceApp[] = storeCatalog.applications.map((entry) => ({
   slug: entry.slug,
   name: entry.name,
