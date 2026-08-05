@@ -9,7 +9,7 @@ import "./applications.css";
 
 export const metadata: Metadata = {
   title: "My Applications | Obserra Customer Portal",
-  description: "Launch, download, purchase, and manage entitled Obserra applications.",
+  description: "Launch, download, purchase, license, and manage entitled Obserra applications.",
   robots: { index: false, follow: false },
 };
 
@@ -37,8 +37,8 @@ export default async function CustomerApplicationsPage() {
 
       <section className="fulfillment-hero">
         <p className="fulfillment-eyebrow">AUTHENTICATED DELIVERY CENTER</p>
-        <h1>Your applications, subscriptions, and deployment actions.</h1>
-        <p>Every launch and download is revalidated against Stripe. Active and trialing subscriptions are permitted; delinquent, canceled, incomplete, expired, or paused subscriptions are denied automatically.</p>
+        <h1>Your applications, subscriptions, license keys, and deployment actions.</h1>
+        <p>Every launch, key request, and download is revalidated against Stripe. Active and trialing subscriptions are permitted; delinquent, canceled, incomplete, expired, or paused subscriptions are denied automatically.</p>
         <div className="fulfillment-kpis">
           <article><span>ACTIVE ENTITLEMENTS</span><strong>{activeCount}</strong></article>
           <article><span>SELLABLE APPLICATIONS</span><strong>{records.length}</strong></article>
@@ -62,6 +62,7 @@ export default async function CustomerApplicationsPage() {
               {entitlement.allowed ? (
                 <>
                   <a className="primary-action" href={`/api/apps/access?app=${app.slug}`}>Launch SaaS</a>
+                  <a href={`/api/apps/license?app=${app.slug}`} target="_blank" rel="noreferrer">Get application key</a>
                   <a href={`/api/apps/download?app=${app.slug}`}>Download release</a>
                   <a href="/api/apps/billing-portal">Manage billing</a>
                 </>
