@@ -1,0 +1,204 @@
+.mission-home {
+  overflow-x: clip;
+}
+
+.mission-hero {
+  min-height: 760px;
+  align-items: center;
+  padding-top: 118px;
+  padding-bottom: 86px;
+}
+
+.mission-hero__copy {
+  max-width: 780px;
+}
+
+.mission-hero__copy h1 {
+  max-width: 760px;
+  font-size: clamp(3.4rem, 6vw, 6.6rem);
+  line-height: .92;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}
+
+.mission-hero__copy > p:not(.obs-eyebrow) {
+  max-width: 700px;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  line-height: 1.72;
+}
+
+.mission-hero__actions {
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.mission-assurance {
+  gap: 10px 18px;
+  margin-top: 28px;
+}
+
+.mission-assurance span {
+  position: relative;
+  padding-left: 14px;
+}
+
+.mission-assurance span::before {
+  position: absolute;
+  left: 0;
+  top: .55em;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--obs-gold-400, #f3bd63);
+  content: "";
+}
+
+.mission-console {
+  align-self: center;
+  min-height: 470px;
+  padding: 26px;
+  border-radius: 24px;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, .38);
+}
+
+.mission-console__top {
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+}
+
+.mission-console__top strong {
+  display: block;
+  margin-top: 6px;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  line-height: 1.12;
+}
+
+.mission-kpis {
+  gap: 14px;
+}
+
+.mission-kpis .obs-kpi {
+  min-height: 162px;
+  padding: 20px;
+}
+
+.mission-kpis .obs-kpi__value {
+  font-size: clamp(2rem, 3vw, 3rem);
+}
+
+.mission-section {
+  padding-top: 92px;
+  padding-bottom: 92px;
+}
+
+.mission-heading h2,
+.mission-platform__copy h2,
+.mission-academy h2,
+.mission-final h2 {
+  font-size: clamp(2.4rem, 4vw, 4.9rem);
+  line-height: .98;
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
+
+.mission-path,
+.mission-domain,
+.mission-proof > article,
+.mission-academy {
+  border-radius: 20px;
+}
+
+.mission-path {
+  min-height: 300px;
+  padding: 28px;
+}
+
+.mission-path h3,
+.mission-domain h3 {
+  font-size: clamp(1.35rem, 2vw, 1.9rem);
+}
+
+.mission-platform {
+  gap: 54px;
+}
+
+.mission-platform__visual {
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 30px 75px rgba(0, 0, 0, .34);
+}
+
+.mission-proof__stats div {
+  min-height: 154px;
+  padding: 22px;
+}
+
+.mission-final {
+  padding-top: 110px;
+  padding-bottom: 110px;
+}
+
+@media (max-width: 1180px) {
+  .mission-hero {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+    padding-top: 96px;
+  }
+
+  .mission-console {
+    max-width: 900px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .mission-hero {
+    padding-top: 84px;
+    padding-bottom: 58px;
+  }
+
+  .mission-hero__copy h1 {
+    font-size: clamp(2.75rem, 13vw, 4.3rem);
+  }
+
+  .mission-hero__actions,
+  .mission-final .mission-hero__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mission-hero__actions a {
+    width: 100%;
+  }
+
+  .mission-console {
+    min-height: auto;
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .mission-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .mission-section {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .mission-path {
+    min-height: auto;
+    padding: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mission-home *,
+  .mission-home *::before,
+  .mission-home *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
