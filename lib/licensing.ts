@@ -26,6 +26,7 @@ export type LicenseRecord = {
   expiresAt?: string;
   renewalAt?: string;
   supportLevel?: string;
+  deploymentModel?: string;
   maintenanceActive: boolean;
   source: "stripe" | "contract" | "manual" | "trial";
   externalReference?: string;
