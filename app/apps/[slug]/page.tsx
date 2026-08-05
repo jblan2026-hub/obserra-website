@@ -9,7 +9,7 @@ import "../apps.css";
 type Props = { params: Promise<{ slug: string }> };
 
 const liveApplicationUrls: Record<string, string> = {
-  "obserra-eios": "https://obserra-eios-dual-mode-module-platform-hvs4w68f1-obserra.vercel.app",
+  "obserra-eios": "https://app.obserrallc.com",
 };
 
 export function generateStaticParams() { return marketplaceApps.map((entry) => ({ slug: entry.slug })); }
