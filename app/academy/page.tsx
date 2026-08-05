@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import AcademyClient from "./AcademyClient";
 import { courses } from "./courseData";
-import "./academy-commercial.css";
-import "./academy-world-class.css";
 
 export const metadata: Metadata = {
   title: "Obserra Academy | Cybersecurity, Intelligence, Protection and AI Training",
