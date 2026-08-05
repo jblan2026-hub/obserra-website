@@ -66,13 +66,14 @@ export async function resolveUnifiedEntitlement(request: UnifiedEntitlementReque
     entitlement,
     license,
     plan: license?.licenseType,
-    deploymentModel: undefined,
+    deploymentModel: license?.deploymentModel,
   });
 
   return {
     ...decision,
     authoritative: repositoryResult.authoritative,
     source: repositoryResult.source,
+    deploymentModel: license?.deploymentModel,
     plan: license?.licenseType,
   };
 }
