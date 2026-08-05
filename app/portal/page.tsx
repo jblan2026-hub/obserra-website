@@ -51,7 +51,7 @@ export default async function PortalPage() {
         <nav aria-label="Portal navigation">
           <Link href="/academy">Academy</Link><Link href="/apps">Applications</Link><Link href="/trust">Trust</Link><Link href="/contact">Contact</Link>
           <Link className="portal-cta" href="/contact?interest=customer-support">Get support</Link>
-          <div className="portal-account-bar" aria-label="Account menu"><UserButton afterSignOutUrl="/" /></div>
+          <div className="portal-account-bar" aria-label="Account menu"><UserButton /></div>
         </nav>
       </header>
 
@@ -63,7 +63,7 @@ export default async function PortalPage() {
           <div className="portal-actions"><Link className="portal-button" href="/academy">Continue to Academy</Link><Link className="portal-outline" href="/contact?interest=customer-support">Open customer support</Link></div>
         </div>
         <aside className="portal-profile" aria-label="Authenticated account summary">
-          <div className="portal-profile-head"><div><span>VERIFIED ACCOUNT</span><strong>{displayName}</strong><p>{primaryEmail}</p></div><UserButton afterSignOutUrl="/" /></div>
+          <div className="portal-profile-head"><div><span>VERIFIED ACCOUNT</span><strong>{displayName}</strong><p>{primaryEmail}</p></div><UserButton /></div>
           <dl><div><dt>Identity</dt><dd>Active</dd></div><div><dt>Portal access</dt><dd>Protected</dd></div><div><dt>Account data</dt><dd>Controlled release</dd></div></dl>
         </aside>
       </section>
@@ -86,7 +86,7 @@ export default async function PortalPage() {
         <div className="portal-section-heading"><div><p className="portal-eyebrow">ACCOUNT SECURITY</p><h2>Manage identity and session controls through your secure account menu.</h2></div><p>Your Clerk account menu supports profile management, authentication methods, multifactor configuration where enabled, and active session controls.</p></div>
         <div className="portal-security">
           <div><h3>Active protections</h3><ul><li>Server-side identity verification</li><li>Protected portal middleware</li><li>Secure session management</li><li>Account-level sign-out</li><li>Canonical host enforcement</li><li>Preview indexing restrictions</li></ul></div>
-          <div><h3>Manage your account</h3><p>Open the account control to review your profile, authentication factors, connected methods, and active sessions.</p><div className="portal-account-control"><UserButton showName afterSignOutUrl="/" /></div></div>
+          <div><h3>Manage your account</h3><p>Open the account control to review your profile, authentication factors, connected methods, and active sessions.</p><div className="portal-account-control"><UserButton showName /></div></div>
         </div>
       </section>
 
