@@ -2,6 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
 const CANONICAL_HOST = "www.obserrallc.com";
+const PROJECT_VERCEL_HOST = "obserra-website-live.vercel.app";
 const PREVIEW_NOINDEX = "noindex, nofollow, noarchive, nosnippet";
 
 const isProtected = createRouteMatcher([
@@ -32,6 +33,7 @@ function canonicalRedirect(request: NextRequest) {
 
   const shouldRedirectToCanonical =
     host === "obserrallc.com" ||
+    host === PROJECT_VERCEL_HOST ||
     (process.env.VERCEL_ENV === "production" && host.endsWith(".vercel.app"));
 
   if (!shouldRedirectToCanonical) {
