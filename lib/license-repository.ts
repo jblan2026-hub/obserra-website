@@ -84,6 +84,7 @@ export class StripeLicenseRepository implements LicenseRepository {
         expiresAt,
         renewalAt,
         supportLevel: subscription.metadata.supportLevel,
+        deploymentModel: subscription.metadata.deploymentModel || "SaaS",
         maintenanceActive: ACTIVE_STATES.has(subscription.status),
         source: "stripe",
         externalReference: typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id,
