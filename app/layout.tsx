@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import ObserraGuide from "./ObserraGuide";
-import CredentialIssuerMarks from "./CredentialIssuerMarks";
 import CredlyProfileLink from "./CredlyProfileLink";
 import "./globals.css";
 import "./brand-consistency.css";
@@ -14,8 +13,7 @@ export const metadata: Metadata = {
     default: "Obserra | Executive Intelligence, Cybersecurity and Protection",
     template: "%s | Obserra",
   },
-  description:
-    "Obserra provides executive cybersecurity advisory, protective intelligence, enterprise applications, and professional training for high-consequence organizations.",
+  description: "Obserra provides executive cybersecurity advisory, protective intelligence, enterprise applications, and professional training for high-consequence organizations.",
   alternates: {
     canonical: "/",
     languages: {
@@ -35,38 +33,21 @@ export const metadata: Metadata = {
     shortcut: ["/brand/obserra-mark.svg"],
     apple: [{ url: "/brand/obserra-logo.png" }],
   },
-  keywords: [
-    "cybersecurity consulting",
-    "executive protection",
-    "protective intelligence",
-    "enterprise intelligence",
-    "AI governance",
-    "cybersecurity training",
-    "Obserra EIOS",
-  ],
+  keywords: ["cybersecurity consulting", "executive protection", "protective intelligence", "enterprise intelligence", "AI governance", "cybersecurity training", "Obserra EIOS"],
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION },
   openGraph: {
     siteName: "Obserra",
     type: "website",
     url: "https://www.obserrallc.com",
     title: "Obserra | Executive Intelligence, Cybersecurity and Protection",
-    description:
-      "Executive cybersecurity advisory, protective intelligence, secure enterprise applications, and professional training.",
+    description: "Executive cybersecurity advisory, protective intelligence, secure enterprise applications, and professional training.",
     locale: "en_US",
-    images: [
-      {
-        url: "/brand/visuals/obserra-eios-intelligence-hero.png",
-        width: 1672,
-        height: 941,
-        alt: "Obserra enterprise intelligence and cybersecurity",
-      },
-    ],
+    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: "Obserra enterprise intelligence and cybersecurity" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Obserra | Executive Intelligence, Cybersecurity and Protection",
-    description:
-      "Executive cybersecurity advisory, protective intelligence, enterprise applications, and professional training.",
+    description: "Executive cybersecurity advisory, protective intelligence, enterprise applications, and professional training.",
     images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
   },
   robots: {
@@ -93,18 +74,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         alternateName: "Obserra",
         url: "https://www.obserrallc.com",
         logo: "https://www.obserrallc.com/brand/obserra-logo.png",
-        description:
-          "Executive cybersecurity advisory, protective intelligence, secure enterprise applications, and professional training.",
+        description: "Executive cybersecurity advisory, protective intelligence, secure enterprise applications, and professional training.",
         email: "info@obserrallc.com",
-        contactPoint: [
-          {
-            "@type": "ContactPoint",
-            contactType: "sales",
-            email: "info@obserrallc.com",
-            availableLanguage: ["en"],
-            areaServed: "US",
-          },
-        ],
+        contactPoint: [{ "@type": "ContactPoint", contactType: "sales", email: "info@obserrallc.com", availableLanguage: ["en"], areaServed: "US" }],
       },
       {
         "@type": "WebSite",
@@ -122,13 +94,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         {children}
         <CredlyProfileLink />
-        <CredentialIssuerMarks />
         <ObserraGuide />
         <Analytics />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </body>
     </html>
   );
