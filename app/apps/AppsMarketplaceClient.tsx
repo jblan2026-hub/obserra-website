@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, BadgeCheck, BriefcaseBusiness, Filter, Search, Sparkles } from "lucide-react";
+import { ArrowRight, BadgeCheck, BriefcaseBusiness, Building2, Cloud, Filter, Landmark, LockKeyhole, Search, Server, ShieldCheck, Sparkles } from "lucide-react";
 import type { AppCategory, AppStatus, MarketplaceApp } from "./appsData";
 import { appCategories, marketplaceApps } from "./appsData";
 
@@ -25,6 +25,44 @@ const enterpriseVisuals = [
   { src: "/eios/eios-situation-room-marketing.png", alt: "Enterprise situation room dashboard" },
   { src: "/eios/eios-asset-intelligence-marketing.png", alt: "Asset intelligence dashboard" },
   { src: "/eios/eios-report-center-marketing.png", alt: "Evidence and reporting dashboard" },
+];
+
+const deploymentEditions = [
+  {
+    icon: Cloud,
+    title: "Obserra Cloud",
+    label: "Enterprise SaaS",
+    copy: "Managed cloud delivery with continuous updates, enterprise SSO, governed tenant isolation, and accelerated time to value.",
+    points: ["Annual subscription", "Automatic updates", "Enterprise identity integration"],
+  },
+  {
+    icon: Building2,
+    title: "Private Cloud",
+    label: "Dedicated environment",
+    copy: "Dedicated deployment in an approved cloud environment with customer-controlled networking, identity, and integration boundaries.",
+    points: ["AWS, Azure, or GCP", "Dedicated tenancy", "Customer-controlled network model"],
+  },
+  {
+    icon: Server,
+    title: "Enterprise On Premises",
+    label: "Customer-hosted",
+    copy: "Customer-controlled deployment for highly regulated, sovereign, disconnected, and air-gapped operating environments.",
+    points: ["Data-center deployment", "Offline or restricted operation", "Enterprise support model"],
+  },
+  {
+    icon: Landmark,
+    title: "Government Edition",
+    label: "Public-sector ready",
+    copy: "Government-oriented deployment and assurance path for agencies, defense organizations, and critical public missions.",
+    points: ["Hardened configuration", "Procurement support", "Mission-specific deployment planning"],
+  },
+];
+
+const buyerPaths = [
+  ["Executive and Board", "Decision intelligence, risk visibility, board reporting, and accountable enterprise action.", "/apps/obserra-eios"],
+  ["CISO and Security", "Cyber risk, control evidence, vulnerability prioritization, and security governance.", "/apps?category=Cybersecurity"],
+  ["AI Governance", "Model inventory, policy oversight, approval workflows, and auditable AI controls.", "/apps/obserra-ai-governance-suite"],
+  ["Protection and Intelligence", "Executive exposure, protective intelligence, travel risk, and threat context.", "/apps/obserra-executive-exposure-monitor"],
 ];
 
 export default function AppsMarketplaceClient({ initialCategory = "All" }: Props) {
@@ -86,7 +124,25 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
           <p><BadgeCheck size={16} /> Commercial use cases aligned to measurable enterprise outcomes</p>
           <p><Sparkles size={16} /> Governed AI capabilities aligned to policy, audit, and risk controls</p>
           <p><BriefcaseBusiness size={16} /> Deployment planning designed for regulated and security-conscious organizations</p>
+          <p><LockKeyhole size={16} /> SaaS, private cloud, on-premises, and government deployment pathways</p>
         </aside>
+      </section>
+
+      <section className="apps-buyer-paths" aria-label="Buyer pathways">
+        <div className="apps-spotlight-heading">
+          <p className="apps-eyebrow">START WITH YOUR BUSINESS PRIORITY</p>
+          <h2>Find the right product family by executive outcome.</h2>
+          <p>Each pathway connects business priorities to available applications, implementation options, and the right next conversation.</p>
+        </div>
+        <div className="apps-buyer-grid">
+          {buyerPaths.map(([title, copy, href]) => (
+            <Link key={title} href={href} className="apps-buyer-card">
+              <span>{title}</span>
+              <p>{copy}</p>
+              <strong>Explore solutions <ArrowRight size={15} /></strong>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="apps-spotlight" aria-label="Flagship applications">
@@ -107,6 +163,35 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
             </Link>
           ))}
         </div>
+      </section>
+
+      <section className="apps-deployment" aria-label="Deployment editions">
+        <div className="apps-deployment-heading">
+          <p className="apps-eyebrow">DEPLOYMENT AND LICENSING</p>
+          <h2>Choose the operating model that fits your security, regulatory, and mission requirements.</h2>
+          <p>Obserra supports cloud, dedicated, customer-hosted, and government-oriented deployment pathways. Final scope, licensing, support, and implementation are confirmed during solution design.</p>
+        </div>
+        <div className="apps-deployment-grid">
+          {deploymentEditions.map(({ icon: Icon, title, label, copy, points }) => (
+            <article key={title}>
+              <div className="apps-deployment-icon"><Icon size={22} /></div>
+              <small>{label}</small>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+              <ul>{points.map((point) => <li key={point}>{point}</li>)}</ul>
+            </article>
+          ))}
+        </div>
+        <div className="apps-actions">
+          <Link href="/contact?interest=enterprise-licensing" className="apps-button">Request enterprise licensing</Link>
+          <Link href="/trust" className="apps-outline">Review security and trust</Link>
+        </div>
+      </section>
+
+      <section className="apps-assurance" aria-label="Commercial assurance">
+        <article><ShieldCheck size={20} /><div><strong>Secure by design</strong><p>Identity, least privilege, auditability, encryption, monitoring, and governed administration are treated as foundational requirements.</p></div></article>
+        <article><BadgeCheck size={20} /><div><strong>Executive and technical depth</strong><p>Board-ready summaries are supported by control-level evidence, implementation detail, and technical exports.</p></div></article>
+        <article><BriefcaseBusiness size={20} /><div><strong>Commercial implementation support</strong><p>Solution design, integration planning, deployment governance, and adoption support are available through Obserra services.</p></div></article>
       </section>
 
       <section className="apps-filter-wrap" aria-label="Filter applications">
@@ -177,6 +262,18 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
             <Link href="/contact?interest=application-demo">Talk with a product advisor</Link>
           </div>
         )}
+      </section>
+
+      <section className="apps-commercial-cta">
+        <div>
+          <p className="apps-eyebrow">ENTERPRISE PROCUREMENT</p>
+          <h2>Compare products, deployment editions, and implementation options with an Obserra product advisor.</h2>
+          <p>Enterprise, government, and custom licensing are scoped around organizational size, deployment model, integrations, assurance requirements, and support needs.</p>
+        </div>
+        <div className="apps-actions">
+          <Link href="/contact?interest=enterprise-quote" className="apps-button">Request enterprise quote</Link>
+          <Link href="/contact?interest=application-demo" className="apps-outline">Schedule product demonstration</Link>
+        </div>
       </section>
     </main>
   );
