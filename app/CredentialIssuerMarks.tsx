@@ -18,18 +18,23 @@ const verifiedBadges = [
 ];
 
 const ecCouncilVerificationPortal = "https://aspen.eccouncil.org/verify";
-
 const ecCouncilCredentials = [
-  { name: "ADG Adopt", fullName: "AI Governance: Adopt", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-ADO-4RQRY6" },
-  { name: "ADG Defend", fullName: "AI Governance: Defend", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-DEF-93CTC8" },
-  { name: "ADG Govern", fullName: "AI Governance: Govern", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-GOV-9Q8BPK" },
-  { name: "CEH", fullName: "Certified Ethical Hacker", verifyUrl: ecCouncilVerificationPortal },
-  { name: "CHFI", fullName: "Computer Hacking Forensic Investigator", verifyUrl: ecCouncilVerificationPortal },
-  { name: "ECIH", fullName: "EC-Council Certified Incident Handler", verifyUrl: ecCouncilVerificationPortal },
-  { name: "ECES", fullName: "EC-Council Certified Encryption Specialist", verifyUrl: ecCouncilVerificationPortal },
-  { name: "Associate CCISO", fullName: "Associate Certified Chief Information Security Officer", verifyUrl: ecCouncilVerificationPortal },
-  { name: "CNDA", fullName: "Certified Network Defense Architect", verifyUrl: ecCouncilVerificationPortal },
+  { name: "ADG Adopt", fullName: "AI Governance: Adopt", image: "/badges/eccouncil/adg-adopt.png", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-ADO-4RQRY6" },
+  { name: "ADG Defend", fullName: "AI Governance: Defend", image: "/badges/eccouncil/adg-defend.png", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-DEF-93CTC8" },
+  { name: "ADG Govern", fullName: "AI Governance: Govern", image: "/badges/eccouncil/adg-govern.png", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-GOV-9Q8BPK" },
+  { name: "CEH", fullName: "Certified Ethical Hacker", image: "/badges/eccouncil/ceh.png", verifyUrl: ecCouncilVerificationPortal },
+  { name: "CHFI", fullName: "Computer Hacking Forensic Investigator", image: "/badges/eccouncil/chfi.png", verifyUrl: ecCouncilVerificationPortal },
+  { name: "ECIH", fullName: "EC-Council Certified Incident Handler", image: "/badges/eccouncil/ecih.png", verifyUrl: ecCouncilVerificationPortal },
+  { name: "ECES", fullName: "EC-Council Certified Encryption Specialist", image: "/badges/eccouncil/eces.png", verifyUrl: ecCouncilVerificationPortal },
+  { name: "Associate CCISO", fullName: "Associate Certified Chief Information Security Officer", image: "/badges/eccouncil/associate-cciso.png", verifyUrl: ecCouncilVerificationPortal },
+  { name: "CNDA", fullName: "Certified Network Defense Architect", image: "/badges/eccouncil/cnda.png", verifyUrl: ecCouncilVerificationPortal },
 ];
+
+function protectArtwork(element: HTMLElement) {
+  element.addEventListener("contextmenu", (event) => event.preventDefault());
+  element.addEventListener("dragstart", (event) => event.preventDefault());
+  element.addEventListener("selectstart", (event) => event.preventDefault());
+}
 
 function loadCredlyEmbedScript() {
   if (document.querySelector<HTMLScriptElement>('script[data-obserra-credly="true"]')) return;
@@ -44,7 +49,6 @@ function createVerifiedGallery() {
   if (document.querySelector("[data-obserra-verified-credentials]")) return;
   const credentialsSection = document.querySelector<HTMLElement>(".credentials");
   if (!credentialsSection) return;
-
   credentialsSection.querySelector(".credentials-grid")?.remove();
   const legacyHeading = credentialsSection.querySelector<HTMLElement>(".credentials-heading");
   if (legacyHeading) legacyHeading.style.display = "none";
@@ -56,30 +60,25 @@ function createVerifiedGallery() {
 
   const heading = document.createElement("div");
   heading.className = "verified-credentials-heading";
-  heading.innerHTML = `
-    <p>VERIFIED EXECUTIVE CREDENTIALS</p>
-    <h2 id="verified-credentials-title">Issuer-backed qualifications in cybersecurity, risk, privacy, audit, AI governance, and executive leadership.</h2>
-    <span>Credly credentials use official issuer-hosted embeds. EC-Council credentials include official verification links.</span>
-  `;
+  heading.innerHTML = `<p>VERIFIED EXECUTIVE CREDENTIALS</p><h2 id="verified-credentials-title">Issuer-backed qualifications in cybersecurity, risk, privacy, audit, AI governance, and executive leadership.</h2><span>Official badge artwork is presented for verification and protected against casual copying. Select Verify Credential to open the issuer's source record.</span>`;
 
   const credlyLabel = document.createElement("h3");
   credlyLabel.className = "verified-credentials-group-title";
   credlyLabel.textContent = "Credly verified credentials";
-
   const credlyGrid = document.createElement("div");
   credlyGrid.className = "verified-credentials-grid";
+
   verifiedBadges.forEach((badge) => {
     const card = document.createElement("article");
     card.className = "verified-credential-card";
     card.dataset.issuer = badge.issuer;
-
     const badgeHost = document.createElement("div");
-    badgeHost.className = "verified-credential-embed";
+    badgeHost.className = "verified-credential-embed protected-credential-artwork";
     badgeHost.dataset.iframeWidth = "150";
     badgeHost.dataset.iframeHeight = "270";
     badgeHost.dataset.shareBadgeId = badge.badgeId;
     badgeHost.dataset.shareBadgeHost = "https://www.credly.com";
-
+    protectArtwork(badgeHost);
     const detail = document.createElement("div");
     detail.className = "verified-credential-detail";
     detail.innerHTML = `<span>${badge.issuer}</span><strong>${badge.name}</strong><p>${badge.fullName}</p>`;
@@ -89,24 +88,43 @@ function createVerifiedGallery() {
 
   const ecLabel = document.createElement("h3");
   ecLabel.className = "verified-credentials-group-title";
-  ecLabel.textContent = "EC-Council credentials";
-
+  ecLabel.textContent = "EC-Council verified credentials";
   const ecGrid = document.createElement("div");
   ecGrid.className = "verified-credentials-grid ec-council-credentials-grid";
+
   ecCouncilCredentials.forEach((credential) => {
     const card = document.createElement("article");
     card.className = "verified-credential-card ec-council-credential-card";
     card.dataset.issuer = "EC-Council";
 
-    const emblem = document.createElement("div");
-    emblem.className = "ec-council-badge-emblem";
-    emblem.setAttribute("aria-hidden", "true");
-    emblem.innerHTML = `<span>EC</span><strong>${credential.name}</strong>`;
+    const artworkLink = document.createElement("a");
+    artworkLink.href = credential.verifyUrl;
+    artworkLink.target = "_blank";
+    artworkLink.rel = "noreferrer";
+    artworkLink.className = "ec-council-badge-artwork protected-credential-artwork";
+    artworkLink.setAttribute("aria-label", `Verify ${credential.name} credential`);
+    protectArtwork(artworkLink);
+
+    const image = document.createElement("img");
+    image.src = credential.image;
+    image.alt = `${credential.name} official EC-Council badge`;
+    image.loading = "lazy";
+    image.draggable = false;
+    image.setAttribute("decoding", "async");
+    image.addEventListener("error", () => {
+      artworkLink.classList.add("badge-artwork-unavailable");
+      artworkLink.textContent = credential.name;
+    });
+    artworkLink.appendChild(image);
+
+    const watermark = document.createElement("span");
+    watermark.className = "credential-artwork-watermark";
+    watermark.textContent = "VERIFIED · OBSERRA";
+    artworkLink.appendChild(watermark);
 
     const detail = document.createElement("div");
     detail.className = "verified-credential-detail";
     detail.innerHTML = `<span>EC-Council</span><strong>${credential.name}</strong><p>${credential.fullName}</p>`;
-
     const verify = document.createElement("a");
     verify.href = credential.verifyUrl;
     verify.target = "_blank";
@@ -114,8 +132,7 @@ function createVerifiedGallery() {
     verify.className = "verified-credential-verify-link";
     verify.textContent = credential.verifyUrl === ecCouncilVerificationPortal ? "Open EC-Council verification" : "Verify credential";
     detail.appendChild(verify);
-
-    card.append(emblem, detail);
+    card.append(artworkLink, detail);
     ecGrid.appendChild(card);
   });
 
