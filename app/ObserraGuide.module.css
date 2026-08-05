@@ -2,137 +2,167 @@
   position: fixed;
   right: 18px;
   bottom: 18px;
-  z-index: 50;
+  z-index: 80;
   display: flex;
+  max-width: min(92vw, 356px);
   flex-direction: column;
   align-items: flex-end;
   gap: 10px;
-  max-width: min(92vw, 360px);
+  font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
 }
 
 .launcher {
   display: inline-flex;
+  min-height: 46px;
   align-items: center;
   justify-content: center;
-  border: 0;
-  background: transparent;
-  padding: 0;
+  gap: 9px;
+  padding: 0 13px 0 5px;
+  border: 1px solid #86cdea66;
+  border-radius: 999px;
+  background: #04182de8;
+  color: #f4faff;
+  box-shadow: 0 14px 30px #020b1570;
+  backdrop-filter: blur(10px);
   cursor: pointer;
-  min-width: 40px;
-  min-height: 40px;
-  filter: drop-shadow(0 8px 16px rgba(3, 22, 42, 0.38));
-  transition: transform 0.16s ease, filter 0.16s ease;
+  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
 }
 
 .launcher:hover,
 .launcher:focus-visible {
-  transform: translateY(-1px);
-  filter: drop-shadow(0 10px 20px rgba(3, 22, 42, 0.48));
+  border-color: #f4ba55;
+  background: #082943;
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.launcher span {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
 }
 
 .launcherMark {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   object-fit: contain;
-  object-position: center;
 }
 
 .panel {
-  width: min(360px, calc(100vw - 24px));
-  border-radius: 18px;
+  width: min(356px, calc(100vw - 24px));
   overflow: hidden;
-  background: #081a2c;
-  border: 1px solid #c7d9e733;
-  box-shadow: 0 24px 60px #03162a77;
+  border: 1px solid #86cdea52;
+  border-radius: 16px;
+  background: #061829;
+  box-shadow: 0 28px 68px #020a147d;
   transform-origin: bottom right;
   animation: guidePop 0.18s ease-out;
-  backdrop-filter: blur(8px);
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
+  min-height: 66px;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  padding: 12px 14px;
-  background: #061f3b;
+  padding: 10px 12px;
+  border-bottom: 1px solid #79c7e73a;
+  background: linear-gradient(120deg, #03111f, #082944);
   color: #fff;
 }
 
 .brand {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 10px;
-  min-width: 0;
 }
 
-.brandMark {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  object-position: center;
+.brandLogo {
+  width: 124px;
+  height: auto;
   flex: 0 0 auto;
+  object-fit: contain;
 }
 
-.header div {
+.brand > div {
   display: grid;
   min-width: 0;
+  padding-left: 10px;
+  border-left: 1px solid #78c5e548;
 }
 
 .header strong {
-  font-size: 15px;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.05;
 }
 
 .header span {
-  font-size: 11px;
-  color: #a9d0e9;
-  white-space: nowrap;
   overflow: hidden;
+  color: #f4c66e;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
   text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .header button {
-  border: 0;
-  background: transparent;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid #86cdea50;
+  border-radius: 50%;
+  background: #0a2b47;
   color: #fff;
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 18px;
+  line-height: 1;
   cursor: pointer;
-  padding: 0;
 }
 
-.panelBody {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 76px;
-  gap: 10px;
-  padding: 10px;
-  background: #f6fafc;
+.header button:hover,
+.header button:focus-visible {
+  border-color: #f4ba55;
+  color: #f4c66e;
+  outline: none;
 }
 
 .messages {
-  max-height: 218px;
-  overflow: auto;
   display: grid;
+  max-height: 230px;
   gap: 8px;
-  padding-right: 2px;
+  overflow-y: auto;
+  padding: 12px;
+  background:
+    linear-gradient(#8ed8f508 1px, transparent 1px),
+    linear-gradient(90deg, #8ed8f508 1px, transparent 1px),
+    #f5f9fc;
+  background-size: 30px 30px;
+  scrollbar-width: thin;
 }
 
 .message {
-  max-width: 100%;
+  max-width: 94%;
   margin: 0;
   padding: 9px 10px;
-  border-radius: 11px;
-  background: #e1eff8;
+  border: 1px solid #bfd8e77a;
+  border-radius: 11px 11px 11px 3px;
+  background: #e8f2f8;
   color: #12344f;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
 .visitor {
   margin-left: auto;
-  background: #061f3b;
+  border-color: #0c395b;
+  border-radius: 11px 11px 3px 11px;
+  background: #082943;
   color: #fff;
 }
 
@@ -140,104 +170,116 @@
   margin: 0;
 }
 
-.message a {
-  display: inline-block;
-  margin-top: 6px;
-  color: #0c527f;
-  font-weight: 800;
-  font-size: 12px;
-}
-
 .messageActions {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .messageActions a {
-  margin-top: 0;
-}
-
-.sideRail {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.sideBubble {
-  width: 68px;
-  min-height: 68px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, #f0b34f, #ffd78f);
-  color: #08203a;
-  display: flex;
+  display: inline-flex;
+  min-height: 28px;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 24px #d2941740;
+  padding: 5px 8px;
+  border: 1px solid #3a71955e;
+  border-radius: 7px;
+  background: #fff;
+  color: #0a527e;
+  font-size: 10px;
+  font-weight: 900;
+  text-decoration: none;
 }
 
-.sideBubble img {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-  object-position: center;
-}
-
-.sideHint {
-  font-size: 11px;
-  line-height: 1.35;
-  color: #527089;
-  text-align: center;
-  padding: 0 2px;
+.messageActions a:hover,
+.messageActions a:focus-visible {
+  border-color: #d49b37;
+  color: #8b5a05;
+  outline: none;
 }
 
 .quick {
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
-  padding: 10px 12px;
-  border-top: 1px solid #d8e5ef;
-  background: #f6fafc;
+  overflow-x: auto;
+  padding: 9px 10px;
+  border-top: 1px solid #d5e3ed;
+  background: #f5f9fc;
+  scrollbar-width: none;
+}
+
+.quick::-webkit-scrollbar {
+  display: none;
 }
 
 .quick button {
-  border: 1px solid #bcd4e5;
-  background: #fff;
+  min-height: 29px;
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border: 1px solid #b9d1e1;
   border-radius: 999px;
-  padding: 5px 8px;
-  color: #174b70;
-  font-size: 11px;
+  background: #fff;
+  color: #164b70;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+.quick button:hover,
+.quick button:focus-visible {
+  border-color: #f4ba55;
+  background: #fff8e9;
+  color: #72500d;
+  outline: none;
 }
 
 .form {
-  display: flex;
-  padding: 10px 12px 12px;
-  border-top: 1px solid #d8e5ef;
-  background: #f6fafc;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px;
+  padding: 8px 10px 10px;
+  border-top: 1px solid #d5e3ed;
+  background: #f5f9fc;
 }
 
 .form input {
+  width: 100%;
   min-width: 0;
-  flex: 1;
-  border: 1px solid #b7cada;
-  border-radius: 8px 0 0 8px;
-  padding: 9px 10px;
-  font-size: 13px;
+  height: 36px;
+  padding: 7px 10px;
+  border: 1px solid #adc6d8;
+  border-radius: 8px;
+  background: #fff;
+  color: #102f49;
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.form input:focus {
+  border-color: #2879aa;
+  box-shadow: 0 0 0 3px #2879aa1f;
 }
 
 .form button {
-  border: 0;
-  border-radius: 0 8px 8px 0;
-  background: #0b4f7c;
-  color: #fff;
-  font-weight: 800;
-  padding: 0 12px;
-  font-size: 12px;
+  min-width: 55px;
+  height: 36px;
+  padding: 0 11px;
+  border: 1px solid #e5ad4e;
+  border-radius: 8px;
+  background: #f4ba55;
+  color: #092238;
+  font-size: 11px;
+  font-weight: 900;
   cursor: pointer;
+}
+
+.form button:hover,
+.form button:focus-visible {
+  background: #ffd17a;
+  outline: none;
 }
 
 .srOnly {
@@ -255,7 +297,7 @@
 @keyframes guidePop {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.96);
+    transform: translateY(8px) scale(0.97);
   }
   to {
     opacity: 1;
@@ -266,34 +308,42 @@
 @media (max-width: 640px) {
   .guide {
     right: 10px;
+    bottom: max(10px, env(safe-area-inset-bottom));
     left: 10px;
-    align-items: stretch;
     max-width: none;
+    align-items: stretch;
   }
 
   .panel {
     width: 100%;
+    max-height: min(70vh, 520px);
   }
 
-  .panelBody {
-    grid-template-columns: 1fr;
-  }
-
-  .sideRail {
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-  }
-
-  .sideHint {
-    display: none;
-  }
-
-  .quick {
-    padding-inline: 10px;
+  .messages {
+    max-height: min(34vh, 230px);
   }
 
   .launcher {
     align-self: flex-end;
+  }
+}
+
+@media (max-width: 380px) {
+  .brandLogo {
+    width: 108px;
+  }
+
+  .brand > div {
+    padding-left: 8px;
+  }
+
+  .header span {
+    max-width: 105px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
   }
 }
