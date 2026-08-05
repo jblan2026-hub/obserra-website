@@ -20,35 +20,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/catalog`, lastModified, changeFrequency: "weekly", priority: 0.85 },
     { url: `${siteUrl}/academy`, lastModified, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteUrl}/academy/enterprise`, lastModified, changeFrequency: "weekly", priority: 0.86 },
+    { url: `${siteUrl}/portal`, lastModified, changeFrequency: "weekly", priority: 0.84 },
     { url: `${siteUrl}/industries`, lastModified, changeFrequency: "monthly", priority: 0.82 },
     { url: `${siteUrl}/resources`, lastModified, changeFrequency: "monthly", priority: 0.82 },
     { url: `${siteUrl}/trust`, lastModified, changeFrequency: "monthly", priority: 0.8 },
   ];
   return [
     ...corePages,
-    ...eiosCapabilities.map((entry) => ({
-      url: `${siteUrl}/eios/${entry.slug}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.82,
-    })),
-    ...marketplaceApps.map((entry) => ({
-      url: `${siteUrl}/apps/${entry.slug}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.75,
-    })),
-    ...courses.map((course) => ({
-      url: `${siteUrl}/academy/${course.id}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    })),
-    ...trustPolicies.map((policy) => ({
-      url: `${siteUrl}/trust/${policy.slug}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.65,
-    })),
+    ...eiosCapabilities.map((entry) => ({ url: `${siteUrl}/eios/${entry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.82 })),
+    ...marketplaceApps.map((entry) => ({ url: `${siteUrl}/apps/${entry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.75 })),
+    ...courses.map((course) => ({ url: `${siteUrl}/academy/${course.id}`, lastModified, changeFrequency: "monthly" as const, priority: 0.7 })),
+    ...trustPolicies.map((policy) => ({ url: `${siteUrl}/trust/${policy.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.65 })),
   ];
 }
