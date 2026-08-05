@@ -5,13 +5,14 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+if (-not $env:OBSERRA_AUTO_GIT_PUSH) { $env:OBSERRA_AUTO_GIT_PUSH = "true" }
 
 function Invoke-ObserraPublish {
     Write-Host "[$(Get-Date -Format s)] Validating and publishing Obserra FINAL releases..."
     Push-Location $RepositoryRoot
     try {
-        node .\scripts\sync-final-apps.mjs $ReleaseRoot
-        Write-Host "[$(Get-Date -Format s)] Publish completed."
+        node .\scripts\sync-final-apps.mjs "$ReleaseRoot"
+        Write-Host "[$(Get-Date -Format s)] Publish completed. GitHub and Vercel will update automatically."
     }
     catch {
         Write-Error "Publish failed: $($_.Exception.Message)"
@@ -21,15 +22,11 @@ function Invoke-ObserraPublish {
     }
 }
 
-if (-not (Test-Path $ReleaseRoot)) {
-    New-Item -ItemType Directory -Force -Path $ReleaseRoot | Out-Null
-}
-if (-not (Test-Path $RepositoryRoot)) {
-    throw "Repository root not found: $RepositoryRoot"
-}
+if (-not (Test-Path $ReleaseRoot)) { New-Item -ItemType Directory -Force -Path $ReleaseRoot | Out-Null }
+if (-not (Test-Path $RepositoryRoot)) { throw "Repository root not found: $RepositoryRoot" }
 
 Write-Host "Obserra Release Publisher is watching: $ReleaseRoot"
-Write-Host "Drop an approved app artifact and release-manifest.json into an app's FINAL folder."
+Write-Host "Drop an approved artifact and release-manifest.json into an application's FINAL folder."
 
 $watcher = New-Object System.IO.FileSystemWatcher
 $watcher.Path = $ReleaseRoot
@@ -47,11 +44,10 @@ $action = {
     Invoke-ObserraPublish
 }
 
-$events = @(
-    Register-ObjectEvent $watcher Created -Action $action,
-    Register-ObjectEvent $watcher Changed -Action $action,
-    Register-ObjectEvent $watcher Renamed -Action $action
-)
+$events = @()
+$events += Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
+$events += Register-ObjectEvent -InputObject $watcher -EventName Changed -Action $action
+$events += Register-ObjectEvent -InputObject $watcher -EventName Renamed -Action $action
 
 Invoke-ObserraPublish
 try {
