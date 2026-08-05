@@ -3,16 +3,43 @@
 import { useState } from "react";
 import { track } from "@vercel/analytics";
 import Image from "next/image";
-import { courses, type Department } from "./courseData";
+import { courses, type CourseLevel, type Department } from "./courseData";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const departments: (Department | "All")[] = ["All", "Cyber", "Protection", "Intelligence", "Technologies"];
-const departmentLabels: Record<Department | "All", string> = { All: "All courses", Cyber: "Cyber Defense", Protection: "Protection", Intelligence: "Intelligence", Technologies: "Technology & AI" };
+const departmentLabels: Record<Department | "All", string> = {
+  All: "All courses",
+  Cyber: "Cybersecurity",
+  Protection: "Travel and Executive Safety",
+  Intelligence: "Intelligence and Leadership",
+  Technologies: "AI and Technology",
+};
+
+const retailCollections = [
+  { key: "All", label: "All", matcher: (level: CourseLevel) => level.length > 0 },
+  { key: "Starter", label: "Starter", matcher: (level: CourseLevel) => level === "Foundation" },
+  { key: "Career Growth", label: "Career Growth", matcher: (level: CourseLevel) => level === "Professional" || level === "Advanced" },
+  { key: "Executive", label: "Executive", matcher: (level: CourseLevel) => level === "Executive Intensive" || level === "CISO Masterclass" },
+] as const;
+
+type RetailCollection = typeof retailCollections[number]["key"];
+
+function levelTag(level: CourseLevel): string {
+  if (level === "Foundation") return "Starter";
+  if (level === "Professional") return "Professional";
+  if (level === "Advanced") return "Advanced";
+  return "Executive";
+}
 
 export default function AcademyClient() {
   const [department, setDepartment] = useState<Department | "All">("All");
+  const [collection, setCollection] = useState<RetailCollection>("All");
   const selected = courses[0];
-  const visibleCourses = department === "All" ? courses : courses.filter((course) => course.department === department);
+  const selectedCollection = retailCollections.find((item) => item.key === collection)!;
+  const visibleCourses = courses
+    .filter((course) => (department === "All" ? true : course.department === department))
+    .filter((course) => selectedCollection.matcher(course.level))
+    .sort((a, b) => a.price - b.price || a.title.localeCompare(b.title));
 
   return (
     <main>
@@ -23,16 +50,17 @@ export default function AcademyClient() {
 
       <section className="hero">
         <p className="kicker">Obserra Academy and Obserra Technologies</p>
-        <h1>Training built around the same cybersecurity, protection, and intelligence work we deliver.</h1>
-        <p>Choose a paid, self-paced program in cybersecurity, protective operations, intelligence, or secure technology governance. Each course is tied to real operational decisions your teams face in risk, resilience, and execution.</p>
+        <h1>Shop practical cybersecurity and intelligence training like a premium course catalog.</h1>
+        <p>Pick a category, compare time and price, and buy in one click. Every course is paid, self-paced, and built from real cybersecurity, protection, intelligence, and secure technology workflows.</p>
         <div className="certificate-promise"><strong>Certificate standard</strong><span>Complete every lesson and earn 80 percent or higher on the final assessment to receive your Obserra Certificate of Training.</span></div>
       </section>
 
       <section className="catalog" id="courses">
         <div className="catalog-heading"><div><p className="kicker">Course catalog</p><h2>Choose the track that matches your mission</h2></div><p>{courses.length} paid courses with secure checkout and immediate learner access.</p></div>
         <nav className="academy-category-rail" aria-label="Browse Academy categories">{departments.map((item) => { const count = item === "All" ? courses.length : courses.filter((course) => course.department === item).length; return <button key={item} className={department === item ? "active" : ""} onClick={() => setDepartment(item)}><span>{departmentLabels[item]}</span><b>{count}</b></button>; })}</nav>
-        <div className="catalog-results"><p className="kicker">{departmentLabels[department]}</p><strong>{visibleCourses.length} course{visibleCourses.length === 1 ? "" : "s"} available</strong></div>
-        <div className="course-grid">{visibleCourses.map((course) => <article key={course.id} className="course-card"><span>{course.department}: {course.track}</span><h3>{course.title}</h3><p>{course.description}</p><footer><b>{money.format(course.price)}</b><em>{course.duration}</em></footer><div className="course-card-actions"><a href={`/academy/${course.id}`}>Details</a><a href={`/api/academy/checkout?course=${course.id}`} onClick={() => track("academy_checkout_started", { course: course.id, source: "course_tile" })}>Purchase</a></div></article>)}</div>
+        <div className="academy-collection-rail" aria-label="Shop collections">{retailCollections.map((item) => { const count = courses.filter((course) => item.matcher(course.level)).length; return <button key={item.key} className={collection === item.key ? "active" : ""} onClick={() => setCollection(item.key)}><span>{item.label}</span><b>{count}</b></button>; })}</div>
+        <div className="catalog-results"><p className="kicker">{departmentLabels[department]} · {collection}</p><strong>{visibleCourses.length} course{visibleCourses.length === 1 ? "" : "s"} available</strong></div>
+        <div className="course-grid">{visibleCourses.map((course) => <article key={course.id} className="course-card"><span>{course.department}: {course.track}</span><h3>{course.title}</h3><p>{course.description}</p><div className="course-retail-meta"><i>{levelTag(course.level)}</i><i>{course.level}</i></div><footer><b>{money.format(course.price)}</b><em>{course.duration}</em></footer><div className="course-card-actions"><a href={`/academy/${course.id}`}>View course</a><a href={`/api/academy/checkout?course=${course.id}`} onClick={() => track("academy_checkout_started", { course: course.id, source: "course_tile" })}>Buy now</a></div></article>)}</div>
       </section>
 
       <section className="course-detail" aria-live="polite">
