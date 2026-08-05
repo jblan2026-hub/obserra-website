@@ -17,6 +17,13 @@ const csp = [
   "upgrade-insecure-requests"
 ].join("; ");
 
+const protectedRouteHeaders = [
+  { key: "Cache-Control", value: "private, no-store, max-age=0, must-revalidate" },
+  { key: "Pragma", value: "no-cache" },
+  { key: "Expires", value: "0" },
+  { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
@@ -41,18 +48,16 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/portal/:path*",
+        headers: protectedRouteHeaders,
+      },
+      {
         source: "/academy/learn/:path*",
-        headers: [
-          { key: "Cache-Control", value: "private, no-store, max-age=0, must-revalidate" },
-          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
-        ],
+        headers: protectedRouteHeaders,
       },
       {
         source: "/academy/certificate/:path*",
-        headers: [
-          { key: "Cache-Control", value: "private, no-store, max-age=0, must-revalidate" },
-          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
-        ],
+        headers: protectedRouteHeaders,
       },
     ];
   },
