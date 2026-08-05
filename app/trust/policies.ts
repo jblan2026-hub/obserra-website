@@ -8,6 +8,17 @@ export type TrustPolicy = {
 
 export const trustPolicies: TrustPolicy[] = [
   {
+    slug: "trust-brief",
+    title: "Enterprise Trust Brief",
+    description: "A concise procurement overview of Obserra security, privacy, governance, and service protections.",
+    summary: "Obserra applies secure-by-design, least-privilege, data-minimization, governed-access, and accountable-delivery principles across services, software, and training.",
+    sections: [
+      { heading: "Security and Governance", points: ["Secure-by-design and secure-by-default practices guide product and service delivery.", "Access is limited by business need, role, and contractual scope.", "Material security events are handled through documented escalation and response processes."] },
+      { heading: "Privacy and Data Handling", points: ["Data collection is limited to service delivery, billing, security, support, and legal obligations.", "Sensitive information should be transferred only through approved governed channels.", "Retention and deletion follow contractual, operational, and legal requirements."] },
+      { heading: "Commercial Assurance", points: ["Scope, responsibilities, deliverables, payment, and service boundaries are documented in governing agreements.", "Academy purchases use secure payment processing and account-based access.", "Enterprise security and procurement questions may be submitted to info@obserrallc.com."] },
+    ],
+  },
+  {
     slug: "privacy-policy",
     title: "Privacy Policy",
     description: "How Obserra collects, uses, and safeguards personal and business information.",
@@ -16,6 +27,47 @@ export const trustPolicies: TrustPolicy[] = [
       { heading: "Data Collected", points: ["Contact details, business details, inquiry information, and service preferences.", "Billing and transaction information for paid services and Academy purchases.", "Website analytics events used for operational performance and conversion measurement."] },
       { heading: "Use of Data", points: ["Responding to inquiries, scheduling consultations, and delivering purchased services.", "Security monitoring, fraud prevention, and compliance with legal obligations.", "Improving product, service, and training quality."] },
       { heading: "Data Rights", points: ["Submit access, correction, or deletion requests by contacting info@obserrallc.com.", "Data requests are handled subject to legal and contractual retention requirements."] },
+    ],
+  },
+  {
+    slug: "responsible-ai-policy",
+    title: "Responsible AI Policy",
+    description: "Principles governing Obserra use of artificial intelligence in products, services, and internal operations.",
+    summary: "AI use must remain governed, explainable, proportionate to risk, and subject to appropriate human oversight.",
+    sections: [
+      { heading: "Governance Principles", points: ["AI use is evaluated for business purpose, data sensitivity, legal obligations, security risk, and potential harm.", "Human review is required for consequential recommendations, approvals, or actions where appropriate.", "AI generated output is treated as decision support and must be validated before material use."] },
+      { heading: "Data and Security", points: ["Sensitive client information is not submitted to unapproved AI services.", "Access, logging, retention, and model usage controls are applied according to risk and contractual requirements.", "Prompt injection, data leakage, model abuse, and unauthorized automation risks are considered in design and operation."] },
+      { heading: "Accountability", points: ["AI recommendations should be traceable to relevant evidence, assumptions, and confidence where practical.", "Users remain accountable for final decisions and authorized actions.", "Suspected AI related security or governance issues should be reported to info@obserrallc.com."] },
+    ],
+  },
+  {
+    slug: "subprocessor-disclosure",
+    title: "Subprocessor Disclosure",
+    description: "Categories of third parties that may support hosting, payments, analytics, communications, and service delivery.",
+    summary: "Obserra uses service providers only where needed for legitimate business operations and applies contractual and access controls appropriate to the service.",
+    sections: [
+      { heading: "Service Provider Categories", points: ["Cloud hosting and application delivery providers.", "Payment processing and transaction service providers.", "Authentication, communications, analytics, monitoring, and support providers."] },
+      { heading: "Governance", points: ["Provider access is limited to the purpose and scope of the service.", "Material providers are evaluated based on security, privacy, operational, and contractual considerations.", "Specific enterprise subprocessor information may be provided during contracting where applicable."] },
+    ],
+  },
+  {
+    slug: "data-retention-and-deletion",
+    title: "Data Retention and Deletion",
+    description: "How Obserra determines retention periods and handles deletion requests.",
+    summary: "Information is retained only as long as needed for service delivery, security, accounting, legal, contractual, or legitimate operational purposes.",
+    sections: [
+      { heading: "Retention", points: ["Account, transaction, service, and support records are retained according to operational and legal need.", "Security logs may be retained for investigation, fraud prevention, audit, and resilience purposes.", "Contractual retention terms supersede general practices where agreed."] },
+      { heading: "Deletion", points: ["Deletion requests may be submitted to info@obserrallc.com.", "Deletion is completed subject to legal holds, accounting requirements, security needs, and contractual obligations.", "Backups may retain deleted information temporarily until normal rotation completes."] },
+    ],
+  },
+  {
+    slug: "security-incident-reporting",
+    title: "Security Incident Reporting",
+    description: "How customers, users, and partners should report suspected security or privacy incidents.",
+    summary: "Prompt reporting enables containment, investigation, communication, and recovery.",
+    sections: [
+      { heading: "Report an Incident", points: ["Send suspected security, privacy, account, payment, or access incidents to info@obserrallc.com.", "Include affected service, date and time, observed behavior, relevant identifiers, and contact information.", "Do not include unnecessary sensitive information in ordinary email."] },
+      { heading: "Response", points: ["Reports are triaged based on severity, scope, customer impact, and legal obligations.", "Obserra may request additional information, preserve evidence, restrict access, or coordinate with affected providers.", "Customer notification obligations follow applicable law and governing agreements."] },
     ],
   },
   {
@@ -100,8 +152,8 @@ export const trustPolicies: TrustPolicy[] = [
     summary: "Obserra supports coordinated disclosure and security-first issue handling.",
     sections: [
       { heading: "How to Report", points: ["Report vulnerabilities to info@obserrallc.com with technical details and reproduction steps.", "Do not publicly disclose vulnerabilities before coordinated review."] },
-      { heading: "Safe Testing Rules", points: ["No data exfiltration, social engineering, or service disruption.", "Testing must remain lawful and narrowly scoped."] },
-      { heading: "Response Process", points: ["Obserra acknowledges reports and coordinates remediation based on severity.", "Validated findings are handled through internal security governance."] },
+      { heading: "Safe Testing Rules", points: ["No data exfiltration, social engineering, denial of service, destructive testing, or access to data that is not yours.", "Testing must remain lawful, narrowly scoped, and limited to publicly accessible systems.", "Stop testing and report immediately if sensitive information is encountered."] },
+      { heading: "Response Process", points: ["Obserra acknowledges reports and coordinates remediation based on severity.", "Validated findings are handled through internal security governance.", "Good faith research does not authorize access beyond applicable law or these safe testing rules."] },
     ],
   },
   {
