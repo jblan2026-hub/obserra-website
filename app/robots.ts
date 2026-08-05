@@ -14,6 +14,9 @@ export default function robots(): MetadataRoute.Robots {
           "/academy/success",
           "/sign-in",
           "/sign-up",
+          "/axionis",
+          "/apps/axionis",
+          "/apps/axionis/",
           "/*?checkout=*",
           "/*?session_id=*",
           "/*?enrollment=*"
@@ -21,6 +24,6 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: "https://www.obserrallc.com/sitemap.xml",
-    host: "https://www.obserrallc.com",
+    host: "www.obserrallc.com",
   };
 }
