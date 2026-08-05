@@ -1,0 +1,62 @@
+{
+  "product": {
+    "slug": "obserra-example",
+    "name": "Obserra Example",
+    "status": "Available",
+    "category": "Intelligence",
+    "description": "A concise, evidence-based description of the product and the business problem it solves.",
+    "features": [
+      "Executive-ready insight",
+      "Governed workflow automation",
+      "Secure multi-tenant delivery"
+    ],
+    "integrations": ["Microsoft Entra ID", "ServiceNow"],
+    "documentation": ["Deployment guide", "Administrator guide", "Release notes"]
+  },
+  "release": {
+    "version": "1.0.0",
+    "artifactFile": "obserra-example-1.0.0.zip"
+  },
+  "delivery": {
+    "deploymentModels": ["SaaS", "Private Cloud"]
+  },
+  "commerce": {
+    "pricing": "From $499 per month",
+    "subscriptionRequired": true
+  },
+  "marketing": {
+    "campaign": "obserra-example-launch",
+    "status": "ready-for-review",
+    "headline": "Turn enterprise signals into governed executive action",
+    "shortDescription": "A short product value proposition suitable for advertising and social media.",
+    "longDescription": "A fuller product narrative for the landing page, campaign briefs, and sales enablement.",
+    "callToAction": "Request a demonstration",
+    "audiences": [
+      "Chief Information Security Officers",
+      "Chief Risk Officers",
+      "Enterprise transformation leaders"
+    ],
+    "keywords": [
+      "enterprise intelligence",
+      "executive decision support",
+      "governed AI"
+    ],
+    "channels": ["linkedin", "google", "microsoft", "x", "email"],
+    "creativeAssets": [
+      "marketing/hero-1600x900.png",
+      "marketing/social-1200x628.png",
+      "marketing/square-1080x1080.png"
+    ],
+    "adCopy": {
+      "linkedin": "Long-form LinkedIn advertisement copy.",
+      "search": "Search advertisement headline and description.",
+      "social": "Short social advertisement copy.",
+      "emailSubject": "Introducing Obserra Example",
+      "emailPreview": "A concise email preview line."
+    },
+    "approvalRequired": true,
+    "approvedBy": null,
+    "approvedAt": null,
+    "claimsReviewed": false
+  }
+}
