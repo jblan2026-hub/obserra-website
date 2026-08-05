@@ -1,41 +1,58 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
+import { useSearchParams } from "next/navigation";
 
 type InquiryCategory =
-  | "Protection or urgent travel need"
+  | "Executive protection or urgent travel support"
   | "Protective intelligence"
   | "Cybersecurity advisory"
-  | "Fractional CISO"
-  | "Obserra application"
-  | "EIOS partner conversation"
-  | "Academy purchase"
+  | "Fractional CISO leadership"
+  | "Obserra application or product demonstration"
+  | "Obserra EIOS executive briefing"
+  | "Academy learner support"
+  | "Enterprise training"
   | "Speaking or executive briefing"
-  | "General partnership";
+  | "Strategic partnership or general inquiry";
 
 type ContactMethod = "Email" | "Phone" | "Either";
-type Urgency = "Immediate (0-4 hours)" | "Today (same business day)" | "This week" | "Standard";
+type Urgency = "Urgent" | "Same business day" | "This week" | "Standard";
 
 const categories: InquiryCategory[] = [
-  "Protection or urgent travel need",
+  "Executive protection or urgent travel support",
   "Protective intelligence",
   "Cybersecurity advisory",
-  "Fractional CISO",
-  "Obserra application",
-  "EIOS partner conversation",
-  "Academy purchase",
+  "Fractional CISO leadership",
+  "Obserra application or product demonstration",
+  "Obserra EIOS executive briefing",
+  "Academy learner support",
+  "Enterprise training",
   "Speaking or executive briefing",
-  "General partnership",
+  "Strategic partnership or general inquiry",
 ];
 
+const interestMap: Record<string, InquiryCategory> = {
+  "enterprise-consultation": "Cybersecurity advisory",
+  "capability-review": "Strategic partnership or general inquiry",
+  "application-demo": "Obserra application or product demonstration",
+  applications: "Obserra application or product demonstration",
+  eios: "Obserra EIOS executive briefing",
+  "eios-demo": "Obserra EIOS executive briefing",
+  protection: "Executive protection or urgent travel support",
+  cybersecurity: "Cybersecurity advisory",
+  "enterprise-training": "Enterprise training",
+  speaking: "Speaking or executive briefing",
+  partnership: "Strategic partnership or general inquiry",
+};
+
 const schedulingUrl = "https://calendly.com/obserra/executive-consultation";
-const securePortalUrl = "https://www.obserrallc.com/contact?portal=requested";
 
 export default function ContactExperience() {
-  const [category, setCategory] = useState<InquiryCategory>(categories[0]);
+  const searchParams = useSearchParams();
+  const [category, setCategory] = useState<InquiryCategory>("Strategic partnership or general inquiry");
   const [method, setMethod] = useState<ContactMethod>("Email");
-  const [urgency, setUrgency] = useState<Urgency>("Today (same business day)");
+  const [urgency, setUrgency] = useState<Urgency>("Standard");
   const [company, setCompany] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -43,61 +60,67 @@ export default function ContactExperience() {
   const [confidential, setConfidential] = useState(false);
   const [summary, setSummary] = useState("");
 
+  useEffect(() => {
+    const interest = searchParams.get("interest")?.toLowerCase();
+    if (interest && interestMap[interest]) setCategory(interestMap[interest]);
+  }, [searchParams]);
+
   const responseTime = useMemo(() => {
-    if (urgency === "Immediate (0-4 hours)") return "Expected response target: within 4 hours for urgent protection or travel-related requests.";
-    if (urgency === "Today (same business day)") return "Expected response target: same business day.";
-    if (urgency === "This week") return "Expected response target: within 1 business day.";
-    return "Expected response target: within 1 business day.";
+    if (urgency === "Urgent") return "Urgent priority selected. Include a direct phone number and the time-sensitive outcome you need.";
+    if (urgency === "Same business day") return "Same-business-day priority selected. Obserra will review availability and respond as promptly as practical.";
+    if (urgency === "This week") return "This-week priority selected. Include your desired decision or meeting date.";
+    return "Standard priority selected. Provide enough context for Obserra to route your inquiry efficiently.";
   }, [urgency]);
 
-  function submitInquiry(event: FormEvent) {
-    event.preventDefault();
-
-    const subject = encodeURIComponent(`Obserra Inquiry | ${category} | ${urgency}`);
-    const body = encodeURIComponent(
+  function buildInquiryBody(includePortalRequest = false) {
+    return encodeURIComponent(
       [
-        `Category: ${category}`,
-        `Urgency: ${urgency}`,
+        `Inquiry category: ${category}`,
+        `Priority: ${urgency}`,
         `Preferred contact method: ${method}`,
         `Confidential inquiry: ${confidential ? "Yes" : "No"}`,
-        `Company: ${company || "Not provided"}`,
-        `Name: ${name || "Not provided"}`,
+        `Secure portal requested: ${includePortalRequest ? "Yes" : "No"}`,
+        `Organization: ${company || "Not provided"}`,
+        `Contact name: ${name || "Not provided"}`,
         `Business email: ${email || "Not provided"}`,
         `Phone: ${phone || "Not provided"}`,
         "",
-        "Inquiry summary:",
+        "Business need and desired outcome:",
         summary || "Not provided",
         "",
-        "Secure file submission policy:",
-        "Do not send sensitive files over email. Request governed portal access for secure document exchange.",
-      ].join("\n")
+        "Please do not send sensitive attachments by ordinary email. Obserra will provide secure exchange instructions when required.",
+      ].join("\n"),
     );
+  }
 
-    track("contact_inquiry_submitted", {
-      category,
-      urgency,
-      method,
-      confidential,
-    });
+  function submitInquiry(event: FormEvent) {
+    event.preventDefault();
+    track("contact_inquiry_submitted", { category, urgency, method, confidential });
+    const subject = encodeURIComponent(`Obserra Inquiry | ${category}`);
+    window.location.href = `mailto:info@obserrallc.com?subject=${subject}&body=${buildInquiryBody()}`;
+  }
 
-    window.location.href = `mailto:info@obserrallc.com?subject=${subject}&body=${body}`;
+  function requestSecurePortal() {
+    track("contact_secure_portal_requested", { category });
+    const subject = encodeURIComponent(`Obserra Secure Exchange Request | ${category}`);
+    window.location.href = `mailto:info@obserrallc.com?subject=${subject}&body=${buildInquiryBody(true)}`;
   }
 
   return (
-    <section className="contact-experience" aria-label="Immediate scheduling and guided inquiry">
+    <section className="contact-experience" aria-label="Schedule or submit an Obserra inquiry">
       <div className="contact-experience-intro">
-        <p className="contact-eyebrow">SCHEDULE OR SUBMIT NOW</p>
-        <h2>Get to the right team immediately.</h2>
+        <p className="contact-eyebrow">BEGIN AN OBSERRA ENGAGEMENT</p>
+        <h2>Connect with the right Obserra capability.</h2>
         <p>
-          Choose a service category, set urgency, and send a structured inquiry in under two minutes.
-          For sensitive information, use the governed secure portal request only.
+          Select the outcome you need, indicate the appropriate priority, and provide enough context for a focused response.
+          Do not include sensitive attachments in ordinary email.
         </p>
       </div>
 
       <div className="contact-experience-grid">
         <article className="contact-card scheduling-card">
-          <h3>Embedded scheduling</h3>
-          <p>Book an executive consultation directly. For emergency protection or travel needs, also send an urgent inquiry below.</p>
+          <h3>Schedule an executive consultation</h3>
+          <p>Reserve time for an initial discussion about cybersecurity, enterprise applications, EIOS, training, or a strategic engagement.</p>
           <a
             className="contact-button"
             href={schedulingUrl}
@@ -105,11 +128,11 @@ export default function ContactExperience() {
             rel="noreferrer"
             onClick={() => track("contact_schedule_clicked", { source: "contact_page" })}
           >
-            Open live scheduling
+            View consultation availability
           </a>
-          <div className="schedule-embed-wrap" aria-label="Scheduling preview">
+          <div className="schedule-embed-wrap" aria-label="Obserra consultation scheduling">
             <iframe
-              title="Obserra scheduling"
+              title="Schedule an Obserra executive consultation"
               src={schedulingUrl}
               loading="lazy"
               referrerPolicy="strict-origin-when-cross-origin"
@@ -118,22 +141,20 @@ export default function ContactExperience() {
         </article>
 
         <article className="contact-card inquiry-card">
-          <h3>Guided inquiry</h3>
+          <h3>Submit a guided inquiry</h3>
           <form onSubmit={submitInquiry} className="contact-form-grid">
             <label>
-              Service category
+              Area of interest
               <select value={category} onChange={(event) => setCategory(event.target.value as InquiryCategory)}>
-                {categories.map((item) => (
-                  <option key={item} value={item}>{item}</option>
-                ))}
+                {categories.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
 
             <label>
-              Urgency level
+              Response priority
               <select value={urgency} onChange={(event) => setUrgency(event.target.value as Urgency)}>
-                <option>Immediate (0-4 hours)</option>
-                <option>Today (same business day)</option>
+                <option>Urgent</option>
+                <option>Same business day</option>
                 <option>This week</option>
                 <option>Standard</option>
               </select>
@@ -149,51 +170,45 @@ export default function ContactExperience() {
             </fieldset>
 
             <label>
-              Company
-              <input type="text" value={company} onChange={(event) => setCompany(event.target.value)} placeholder="Company name" />
+              Organization
+              <input type="text" value={company} onChange={(event) => setCompany(event.target.value)} placeholder="Organization name" />
             </label>
 
             <label>
               Contact name
-              <input type="text" value={name} onChange={(event) => setName(event.target.value)} placeholder="Your full name" />
+              <input type="text" required value={name} onChange={(event) => setName(event.target.value)} placeholder="Your full name" />
             </label>
 
             <label>
               Business email
-              <input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="name@company.com" />
+              <input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="name@organization.com" />
             </label>
 
             <label>
-              Phone
-              <input type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Direct phone" />
+              Direct phone
+              <input type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Phone number" />
             </label>
 
             <label className="form-span-2">
-              Inquiry summary
-              <textarea value={summary} onChange={(event) => setSummary(event.target.value)} rows={4} placeholder="What outcome do you need, by when, and what is at risk?" />
+              Business need and desired outcome
+              <textarea value={summary} onChange={(event) => setSummary(event.target.value)} rows={4} placeholder="Describe the decision, risk, requirement, timing, and outcome you need." />
             </label>
 
             <label className="confidential-toggle form-span-2">
               <input type="checkbox" checked={confidential} onChange={(event) => setConfidential(event.target.checked)} />
-              Mark as confidential inquiry
+              Treat this as a confidential inquiry
             </label>
 
             <p className="response-time form-span-2">{responseTime}</p>
 
             <div className="form-actions form-span-2">
-              <button type="submit" className="contact-button">Send structured inquiry</button>
-              <a
-                className="contact-outline"
-                href={securePortalUrl}
-                onClick={() => track("contact_secure_portal_requested", { category })}
-              >
-                Request secure file portal
-              </a>
+              <button type="submit" className="contact-button">Prepare email inquiry</button>
+              <button type="button" className="contact-outline" onClick={requestSecurePortal}>Request secure exchange</button>
             </div>
           </form>
 
           <p className="secure-note">
-            Secure file submission is only accepted through a governed portal. Do not email attachments containing sensitive data.
+            The form prepares a structured message in your email application. Obserra will provide a governed secure-exchange method when confidential files are required.
           </p>
         </article>
       </div>
