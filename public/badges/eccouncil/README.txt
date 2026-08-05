@@ -1,0 +1,1 @@
+Official EC-Council badge assets used by the verified credentials gallery.
