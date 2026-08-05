@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import FortuneMarketplaceClient from "./FortuneMarketplaceClient";
+import MissionMarketplace from "./MissionMarketplace";
 import { marketplaceApps } from "./appsData";
 import "./apps.css";
 import "./apps-interactions.css";
@@ -7,7 +8,7 @@ import "./apps-commercial.css";
 import "./apps-responsive.css";
 import "./fortune-marketplace.css";
 import "./fortune-marketplace-premium.css";
-import "./fortune-procurement.css";
+import "./mission-marketplace.css";
 
 export const metadata: Metadata = {
   title: "Enterprise Application Marketplace | Obserra",
@@ -71,6 +72,7 @@ export default function AppsPage() {
 
   return (
     <>
+      <MissionMarketplace />
       <FortuneMarketplaceClient />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
     </>
