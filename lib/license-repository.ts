@@ -1,3 +1,4 @@
+import type Stripe from "stripe";
 import { getStripe } from "./stripe";
 import type { LicenseRecord, LicenseType } from "./licensing";
 
@@ -38,7 +39,7 @@ function normalizeLicenseType(value?: string): LicenseType {
   }
 }
 
-function subscriptionRenewalAt(subscription: Awaited<ReturnType<ReturnType<typeof getStripe>["subscriptions"]["retrieve"]>>) {
+export function subscriptionRenewalAt(subscription: Stripe.Subscription): string | undefined {
   const periodEnds = subscription.items.data
     .map((item) => item.current_period_end)
     .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
