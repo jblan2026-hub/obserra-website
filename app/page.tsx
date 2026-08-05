@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import HomeHeader from "./HomeHeader";
 import "./home.css";
+import "./home-commercial.css";
 
 export const metadata: Metadata = {
   title: "Obserra | Executive Intelligence, Cybersecurity and Protection",
