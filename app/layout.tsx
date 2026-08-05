@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import ObserraGuide from "./ObserraGuide";
 import CredentialIssuerMarks from "./CredentialIssuerMarks";
+import CredlyProfileLink from "./CredlyProfileLink";
 import "./globals.css";
 import "./brand-consistency.css";
 import "./credential-issuer-marks.css";
+import "./credly-profile-link.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.obserrallc.com"),
@@ -119,6 +121,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         {children}
+        <CredlyProfileLink />
         <CredentialIssuerMarks />
         <ObserraGuide />
         <Analytics />
