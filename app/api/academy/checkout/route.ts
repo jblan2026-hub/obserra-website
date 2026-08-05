@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { courseForId } from "../../../../lib/academy";
+import { studioCourseForId, studioLicenseMetadata, studioCertificateMetadata } from "../../../../lib/academy-studio";
 import { getStripe } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
@@ -27,6 +28,9 @@ export async function GET(request: Request) {
 
   try {
     const stripe = getStripe();
+    const studioCourse = studioCourseForId(course.id);
+    const license = studioLicenseMetadata(course.id);
+    const certificate = studioCertificateMetadata(course.id);
     const successUrl = new URL("/academy/success", requestUrl);
     successUrl.searchParams.set("course", course.id);
     successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
@@ -38,29 +42,47 @@ export async function GET(request: Request) {
       courseId: course.id,
       clerkUserId: userId,
       enrollmentMode: "authenticated-paid-access",
+      licenseType: license.type,
+      purchaseModel: license.purchaseModel,
+      accessPolicy: license.accessPolicy,
+      transferable: String(license.transferable),
+      certificateIssuer: certificate.issuer,
+      certificateVerification: certificate.verificationMode,
+      courseVersion: studioCourse?.version ?? "website-catalog",
+      studioManaged: String(Boolean(studioCourse)),
     };
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      line_items: [
-        {
+    if (studioCourse?.paymentLink) {
+      const paymentLink = new URL(studioCourse.paymentLink);
+      paymentLink.searchParams.set("client_reference_id", userId);
+      return NextResponse.redirect(paymentLink, { status: 303 });
+    }
+
+    const lineItem = studioCourse?.stripePriceId
+      ? { price: studioCourse.stripePriceId, quantity: 1 }
+      : {
           quantity: 1,
           price_data: {
-            currency: "usd",
-            unit_amount: Math.round(course.price * 100),
+            currency: (studioCourse?.currency ?? "USD").toLowerCase(),
+            unit_amount: Math.round((studioCourse?.price ?? course.price) * 100),
             product_data: {
               name: course.title,
-              description: course.description,
+              description: studioCourse?.description ?? course.description,
               metadata: {
                 obserraCourseId: course.id,
                 department: course.department,
                 level: course.level,
+                licenseType: license.type,
               },
             },
           },
-        },
-      ],
+        };
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: [lineItem],
       customer_creation: "always",
+      client_reference_id: userId,
       metadata,
       payment_intent_data: { metadata },
       success_url: successUrl.toString(),
