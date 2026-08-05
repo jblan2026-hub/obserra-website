@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { courseForId } from "../../../../lib/academy";
+import { courseCommerceForId } from "../../../../lib/course-commerce";
 import { getStripe } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
@@ -21,6 +22,14 @@ export async function GET(request: Request) {
     return NextResponse.redirect(signInUrl);
   }
 
+  const commerce = courseCommerceForId(course.id);
+  if (commerce?.paymentLink) {
+    const paymentUrl = new URL(commerce.paymentLink);
+    paymentUrl.searchParams.set("client_reference_id", userId);
+    paymentUrl.searchParams.set("utm_content", course.id);
+    return NextResponse.redirect(paymentUrl, { status: 303 });
+  }
+
   if (!process.env.STRIPE_WEBHOOK_SECRET) {
     console.warn("academy checkout running without STRIPE_WEBHOOK_SECRET; success redemption remains enabled");
   }
@@ -37,17 +46,17 @@ export async function GET(request: Request) {
     const metadata = {
       courseId: course.id,
       clerkUserId: userId,
-      enrollmentMode: "authenticated-paid-access",
+      enrollmentMode: "one-time-access-until-completion",
+      accessPolicy: commerce?.accessPolicy ?? "until-completion",
     };
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      line_items: [
-        {
+    const lineItem = commerce?.stripePriceId
+      ? { quantity: 1, price: commerce.stripePriceId }
+      : {
           quantity: 1,
           price_data: {
             currency: "usd",
-            unit_amount: Math.round(course.price * 100),
+            unit_amount: Math.round((commerce?.priceUsd ?? course.price) * 100),
             product_data: {
               name: course.title,
               description: course.description,
@@ -55,11 +64,15 @@ export async function GET(request: Request) {
                 obserraCourseId: course.id,
                 department: course.department,
                 level: course.level,
+                accessPolicy: commerce?.accessPolicy ?? "until-completion",
               },
             },
           },
-        },
-      ],
+        };
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: [lineItem],
       customer_creation: "always",
       metadata,
       payment_intent_data: { metadata },
