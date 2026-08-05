@@ -3,16 +3,6 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-const issuerRules: Array<[RegExp, string, string]> = [
-  [/ADG Verified/i, "ADG", "ADG credential issuer"],
-  [/SecurityX|Security\+|Project\+/i, "CompTIA", "CompTIA certification issuer"],
-  [/Certified Data Privacy Solutions Engineer|Certification in Risk and Information Systems Control|Certified Information Systems Auditor|Certified Information Security Manager/i, "ISACA", "ISACA certification issuer"],
-  [/Chief Information Security Officer|Incident Handler|Encryption Specialist|Computer Hacking Forensic Investigator|Certified Ethical Hacker/i, "EC-Council", "EC-Council certification issuer"],
-  [/Advanced Security Practitioner/i, "CompTIA", "CompTIA certification issuer"],
-  [/Systems Security Certified Practitioner|Certified Information Systems Security Professional/i, "ISC2", "ISC2 certification issuer"],
-  [/Florida Class|Florida Concealed/i, "FL", "Florida licensing authority"],
-];
-
 const verifiedBadges = [
   { name: "CISSP", fullName: "Certified Information Systems Security Professional", issuer: "ISC2", badgeId: "b0ed2873-a2c1-475c-b233-9052d587c4bf" },
   { name: "SSCP", fullName: "Systems Security Certified Practitioner", issuer: "ISC2", badgeId: "5214db18-abd0-4e5e-a5c5-a1fd40b6f292" },
@@ -25,6 +15,18 @@ const verifiedBadges = [
   { name: "Security+", fullName: "CompTIA Security+", issuer: "CompTIA", badgeId: "ab52b8b0-62dd-4421-bf3e-cc6b27c02031" },
   { name: "Project+", fullName: "CompTIA Project+", issuer: "CompTIA", badgeId: "8b0ed714-41a3-4f19-82f5-82885617c34c" },
   { name: "NCDA", fullName: "NetApp Certified Data Administrator", issuer: "NetApp", badgeId: "e660531d-2431-4bda-8295-2954cfbdbfa3" },
+];
+
+const ecCouncilCredentials = [
+  { name: "ADG Adopt", fullName: "AI Governance: Adopt", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-ADO-4RQRY6" },
+  { name: "ADG Defend", fullName: "AI Governance: Defend", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-DEF-93CTC8" },
+  { name: "ADG Govern", fullName: "AI Governance: Govern", verifyUrl: "https://aigovernance.eccouncil.org/verify/ADG-GOV-9Q8BPK" },
+  { name: "CEH", fullName: "Certified Ethical Hacker" },
+  { name: "CHFI", fullName: "Computer Hacking Forensic Investigator" },
+  { name: "ECIH", fullName: "EC-Council Certified Incident Handler" },
+  { name: "ECES", fullName: "EC-Council Certified Encryption Specialist" },
+  { name: "Associate CCISO", fullName: "Associate Certified Chief Information Security Officer" },
+  { name: "CNDA", fullName: "Certified Network Defense Architect" },
 ];
 
 function loadCredlyEmbedScript() {
@@ -41,6 +43,10 @@ function createVerifiedGallery() {
   const credentialsSection = document.querySelector<HTMLElement>(".credentials");
   if (!credentialsSection) return;
 
+  credentialsSection.querySelector(".credentials-grid")?.remove();
+  const legacyHeading = credentialsSection.querySelector<HTMLElement>(".credentials-heading");
+  if (legacyHeading) legacyHeading.style.display = "none";
+
   const gallery = document.createElement("section");
   gallery.className = "verified-credentials-gallery";
   gallery.dataset.obserraVerifiedCredentials = "true";
@@ -49,14 +55,17 @@ function createVerifiedGallery() {
   const heading = document.createElement("div");
   heading.className = "verified-credentials-heading";
   heading.innerHTML = `
-    <p>ISSUER-VERIFIED DIGITAL CREDENTIALS</p>
-    <h2 id="verified-credentials-title">Professional credentials verified through Credly.</h2>
-    <span>Each badge below is issued and hosted by its credentialing organization through Credly. Select a badge to review the official verification record.</span>
+    <p>VERIFIED EXECUTIVE CREDENTIALS</p>
+    <h2 id="verified-credentials-title">Issuer-backed qualifications in cybersecurity, risk, privacy, audit, AI governance, and executive leadership.</h2>
+    <span>Credly credentials use official issuer-hosted embeds. EC-Council credentials are presented in the same gallery, with direct verification links where available.</span>
   `;
 
-  const grid = document.createElement("div");
-  grid.className = "verified-credentials-grid";
+  const credlyLabel = document.createElement("h3");
+  credlyLabel.className = "verified-credentials-group-title";
+  credlyLabel.textContent = "Credly verified credentials";
 
+  const credlyGrid = document.createElement("div");
+  credlyGrid.className = "verified-credentials-grid";
   verifiedBadges.forEach((badge) => {
     const card = document.createElement("article");
     card.className = "verified-credential-card";
@@ -71,14 +80,48 @@ function createVerifiedGallery() {
 
     const detail = document.createElement("div");
     detail.className = "verified-credential-detail";
-    detail.innerHTML = `
-      <span>${badge.issuer}</span>
-      <strong>${badge.name}</strong>
-      <p>${badge.fullName}</p>
-    `;
-
+    detail.innerHTML = `<span>${badge.issuer}</span><strong>${badge.name}</strong><p>${badge.fullName}</p>`;
     card.append(badgeHost, detail);
-    grid.appendChild(card);
+    credlyGrid.appendChild(card);
+  });
+
+  const ecLabel = document.createElement("h3");
+  ecLabel.className = "verified-credentials-group-title";
+  ecLabel.textContent = "EC-Council credentials";
+
+  const ecGrid = document.createElement("div");
+  ecGrid.className = "verified-credentials-grid ec-council-credentials-grid";
+  ecCouncilCredentials.forEach((credential) => {
+    const card = document.createElement("article");
+    card.className = "verified-credential-card ec-council-credential-card";
+    card.dataset.issuer = "EC-Council";
+
+    const emblem = document.createElement("div");
+    emblem.className = "ec-council-badge-emblem";
+    emblem.setAttribute("aria-hidden", "true");
+    emblem.innerHTML = `<span>EC</span><strong>${credential.name}</strong>`;
+
+    const detail = document.createElement("div");
+    detail.className = "verified-credential-detail";
+    detail.innerHTML = `<span>EC-Council</span><strong>${credential.name}</strong><p>${credential.fullName}</p>`;
+
+    if (credential.verifyUrl) {
+      const verify = document.createElement("a");
+      verify.href = credential.verifyUrl;
+      verify.target = "_blank";
+      verify.rel = "noreferrer";
+      verify.className = "verified-credential-verify-link";
+      verify.textContent = "Verify credential";
+      detail.appendChild(verify);
+    } else {
+      const status = document.createElement("span");
+      status.className = "verified-credential-supplied-status";
+      status.textContent = "Official badge supplied";
+      detail.appendChild(status);
+    }
+
+    card.append(emblem, detail);
+    ecGrid.appendChild(card);
   });
 
   const profileLink = document.createElement("a");
@@ -88,35 +131,16 @@ function createVerifiedGallery() {
   profileLink.rel = "noreferrer";
   profileLink.textContent = "View the complete verified Credly profile";
 
-  gallery.append(heading, grid, profileLink);
+  gallery.append(heading, credlyLabel, credlyGrid, ecLabel, ecGrid, profileLink);
   credentialsSection.appendChild(gallery);
   loadCredlyEmbedScript();
 }
 
 export default function CredentialIssuerMarks() {
   const pathname = usePathname();
-
   useEffect(() => {
     if (pathname !== "/about") return;
-
-    const cards = Array.from(document.querySelectorAll<HTMLElement>(".credentials-grid article"));
-    cards.forEach((card) => {
-      if (card.querySelector("[data-credential-issuer]")) return;
-      const title = card.querySelector("h3")?.textContent?.trim() ?? "";
-      const match = issuerRules.find(([pattern]) => pattern.test(title));
-      if (!match) return;
-
-      const [, label, accessibleLabel] = match;
-      const mark = document.createElement("span");
-      mark.dataset.credentialIssuer = label;
-      mark.className = "credential-issuer-mark";
-      mark.textContent = label;
-      mark.setAttribute("aria-label", accessibleLabel);
-      card.prepend(mark);
-    });
-
     createVerifiedGallery();
   }, [pathname]);
-
   return null;
 }
