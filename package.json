@@ -6,7 +6,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --test"
+    "test": "node --test",
+    "test:production": "node --test scripts/production-smoke.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.6.4",
