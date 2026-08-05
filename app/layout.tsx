@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import ObserraGuide from "./ObserraGuide";
 import CredlyProfileLink from "./CredlyProfileLink";
 import "./globals.css";
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <CredlyProfileLink />
           <ObserraGuide />
           <Analytics />
+          <SpeedInsights />
           <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
         </body>
       </html>
