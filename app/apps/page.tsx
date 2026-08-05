@@ -7,6 +7,7 @@ import "./apps-commercial.css";
 import "./apps-responsive.css";
 import "./fortune-marketplace.css";
 import "./fortune-marketplace-premium.css";
+import "./fortune-procurement.css";
 
 export const metadata: Metadata = {
   title: "Enterprise Application Marketplace | Obserra",
