@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import "./site-header.css";
 
 const navigation = [
   { label: "Services", href: "/services" },
@@ -14,6 +15,18 @@ const navigation = [
   { label: "Trust", href: "/trust" },
   { label: "About", href: "/about" },
 ];
+
+function ObserraMark() {
+  return (
+    <span className="obs-site-mark" aria-hidden="true">
+      <svg viewBox="0 0 64 64" role="img">
+        <path d="M6 32c7.6-11.2 16.3-16.8 26-16.8S50.4 20.8 58 32c-7.6 11.2-16.3 16.8-26 16.8S13.6 43.2 6 32Z" />
+        <circle cx="32" cy="32" r="10.5" />
+        <path d="M32 24.2a4.2 4.2 0 0 1 2.6 7.5v6.2h-5.2v-6.2a4.2 4.2 0 0 1 2.6-7.5Z" />
+      </svg>
+    </span>
+  );
+}
 
 export default function HomeHeader() {
   const pathname = usePathname();
@@ -31,18 +44,22 @@ export default function HomeHeader() {
   }, [open]);
 
   return (
-    <header className="site-header">
-      <Link className="brand" href="/" aria-label="Obserra home">
-        <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt="Obserra Executive Protection and Intelligence LLC" />
-      </Link>
-      <button className="menu-toggle" type="button" aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="primary-navigation" onClick={() => setOpen((current) => !current)}>
-        <span /><span /><span />
-      </button>
-      <nav id="primary-navigation" className={open ? "is-open" : ""} aria-label="Primary navigation">
+    <header className="obs-site-header">
+      <div className="obs-site-header__brand-row">
+        <Link className="obs-site-header__brand" href="/" aria-label="Obserra home">
+          <ObserraMark />
+          <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt="Obserra Executive Protection and Intelligence LLC" />
+        </Link>
+        <button className="obs-site-header__toggle" type="button" aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="primary-navigation" onClick={() => setOpen((current) => !current)}>
+          <span /><span /><span />
+        </button>
+      </div>
+      <nav id="primary-navigation" className={`obs-site-header__nav${open ? " is-open" : ""}`} aria-label="Primary navigation">
         {navigation.map((item) => (
           <Link key={item.href} href={item.href} aria-current={pathname === item.href || pathname.startsWith(`${item.href}/`) ? "page" : undefined}>{item.label}</Link>
         ))}
-        <Link className="nav-cta" href="/contact">Contact Obserra</Link>
+        <Link href="/contact">Contact</Link>
+        <Link className="obs-site-header__cta" href="/contact?interest=enterprise-consultation">Get in touch <span aria-hidden="true">→</span></Link>
       </nav>
     </header>
   );
