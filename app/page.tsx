@@ -7,7 +7,7 @@ import "./home.css";
 export const metadata: Metadata = {
   title: "Obserra | Executive Intelligence, Cybersecurity and Protection",
   description:
-    "Obserra helps leaders reduce cyber, operational, travel, and executive risk through senior advisory, protective intelligence, secure applications, and professional training.",
+    "Obserra helps leaders reduce cyber, operational, travel, and executive risk through senior advisory, protective intelligence, enterprise applications, and professional training.",
   alternates: { canonical: "/" },
 };
 
@@ -15,7 +15,7 @@ const capabilities = [
   ["01", "Cybersecurity Advisory", "Executive cyber strategy, risk assessments, governance, incident readiness, security transformation, and board communication.", "/services", "Explore advisory services"],
   ["02", "Protection and Intelligence", "Executive protection planning, protective intelligence, travel risk, digital exposure reviews, and discreet risk support.", "/protection-intelligence", "Explore protection services"],
   ["03", "Applications and EIOS", "Secure enterprise applications and governed intelligence experiences that convert complex information into accountable action.", "/apps", "View application offerings"],
-  ["04", "Obserra Academy", "Practical, self-paced professional training across cybersecurity, intelligence, protection, and secure technology.", "/academy", "Browse professional training"],
+  ["04", "Obserra Academy", "Practical, self-paced professional training across cybersecurity, intelligence, protection, and secure technology.", "/academy", "Browse and purchase courses"],
 ];
 
 const applications = [
@@ -33,15 +33,18 @@ export default function HomePage() {
       <HomeHeader />
 
       <section className="hero">
-        <Image className="hero-image" src="/brand/visuals/obserra-eios-intelligence-hero.png" alt="" aria-hidden="true" fill priority sizes="100vw" />
+        <Image className="hero-image" src="/brand/visuals/obserra-eios-intelligence-hero.png" alt="Obserra enterprise intelligence platform visualization" fill priority sizes="100vw" />
         <div className="hero-overlay" />
         <div className="hero-content">
           <p className="eyebrow">VETERAN OWNED. EXECUTIVE LED. SECURE BY DESIGN.</p>
           <h1>Turn enterprise risk into confident, accountable action.</h1>
-          <p className="hero-summary">Obserra helps leaders reduce cyber, operational, travel, and executive risk through senior advisory, protective intelligence, secure applications, and professional training.</p>
+          <p className="hero-summary">Obserra combines senior advisory, protective intelligence, enterprise applications, and professional training to help organizations act decisively in high-consequence environments.</p>
           <div className="actions">
-            <Link className="button primary" href="/contact">Start a confidential conversation</Link>
-            <Link className="button secondary" href="#applications">Explore applications</Link>
+            <Link className="button primary" href="/contact?interest=enterprise-consultation">Schedule an enterprise consultation</Link>
+            <Link className="button secondary" href="/academy">Purchase professional training</Link>
+          </div>
+          <div className="trust-strip" aria-label="Obserra commercial assurances">
+            <span>Secure engagement</span><span>Executive-ready deliverables</span><span>Accountable outcomes</span>
           </div>
         </div>
         <aside className="hero-panel">
@@ -50,9 +53,10 @@ export default function HomePage() {
           <h2>Expert judgment, intelligence, and technology in one operating model.</h2>
           <ul>
             <li>Executive and board-ready guidance</li>
-            <li>Commercially focused engagements</li>
-            <li>Secure applications designed around business outcomes</li>
+            <li>Commercial solutions aligned to business outcomes</li>
+            <li>Secure applications and professional training</li>
           </ul>
+          <Link className="panel-link" href="/contact?interest=capability-review">Discuss your requirements →</Link>
         </aside>
       </section>
 
@@ -63,19 +67,21 @@ export default function HomePage() {
       </section>
 
       <section className="section-heading" id="capabilities">
-        <p className="eyebrow">WHAT OBSERRA DOES</p>
+        <p className="eyebrow">WHAT OBSERRA DELIVERS</p>
         <h2>Integrated expertise for risks leaders cannot treat in isolation.</h2>
-        <p>Engage Obserra for a focused need or combine advisory, intelligence, applications, and training into a coordinated program.</p>
+        <p>Select a focused service, purchase professional training, or combine advisory, intelligence, applications, and workforce development into one coordinated program.</p>
       </section>
 
       <section className="capability-grid">
         {capabilities.map(([number, title, copy, href, label]) => (
-          <article key={title}>
-            <span className="card-number">{number}</span>
-            <h3>{title}</h3>
-            <p>{copy}</p>
-            <Link href={href}>{label} →</Link>
-          </article>
+          <Link className="commercial-card" href={href} key={title}>
+            <article>
+              <span className="card-number">{number}</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+              <strong>{label} →</strong>
+            </article>
+          </Link>
         ))}
       </section>
 
@@ -83,21 +89,41 @@ export default function HomePage() {
         <div className="section-heading compact">
           <p className="eyebrow">OBSERRA APPLICATIONS</p>
           <h2>Purpose-built software for enterprise risk, governance, and intelligence.</h2>
-          <p>Obserra applications complement existing enterprise systems with decision intelligence, workflow governance, evidence, and executive visibility.</p>
+          <p>Explore each solution, review its enterprise use case, and request a tailored deployment conversation directly from the product page.</p>
         </div>
         <div className="application-grid">
           {applications.map(([name, category, status, copy, href]) => (
-            <article key={name}>
-              <div className="app-meta"><span>{category}</span><strong className={status === "Pilot" ? "pilot" : "available"}>{status}</strong></div>
-              <h3>{name}</h3>
-              <p>{copy}</p>
-              <Link href={href}>View application →</Link>
-            </article>
+            <Link className="commercial-card" href={href} key={name}>
+              <article>
+                <div className="app-meta"><span>{category}</span><strong className={status === "Pilot" ? "pilot" : "available"}>{status}</strong></div>
+                <h3>{name}</h3>
+                <p>{copy}</p>
+                <strong>View solution and request access →</strong>
+              </article>
+            </Link>
           ))}
         </div>
         <div className="applications-cta">
-          <Link className="button primary" href="/apps">View all applications</Link>
-          <Link className="button secondary" href="/contact">Discuss a deployment</Link>
+          <Link className="button primary" href="/apps">Compare all applications</Link>
+          <Link className="button secondary" href="/contact?interest=application-demo">Request an enterprise demo</Link>
+        </div>
+      </section>
+
+      <section className="academy-conversion">
+        <div>
+          <p className="eyebrow">OBSERRA ACADEMY</p>
+          <h2>Purchase practical training and begin learning immediately after verified payment.</h2>
+          <p>Secure checkout, account-based course access, saved progress, final assessment, and a branded Obserra Certificate of Training after successful completion.</p>
+          <div className="actions">
+            <Link className="button primary" href="/academy">Browse and purchase courses</Link>
+            <Link className="button secondary" href="/contact?interest=enterprise-training">Request team training</Link>
+          </div>
+        </div>
+        <div className="purchase-journey">
+          <span><b>1</b>Choose a course</span>
+          <span><b>2</b>Sign in and pay securely</span>
+          <span><b>3</b>Receive course access</span>
+          <span><b>4</b>Complete training and earn a certificate</span>
         </div>
       </section>
 
@@ -106,7 +132,10 @@ export default function HomePage() {
           <p className="eyebrow">FLAGSHIP PLATFORM</p>
           <h2>Obserra EIOS connects intelligence, governance, and execution.</h2>
           <p>EIOS brings risk context, evidence, policy, approvals, and accountable execution into one governed decision environment.</p>
-          <Link className="button primary" href="/eios">Explore Obserra EIOS</Link>
+          <div className="actions">
+            <Link className="button primary" href="/eios">Explore Obserra EIOS</Link>
+            <Link className="button secondary" href="/contact?interest=eios-demo">Request an EIOS briefing</Link>
+          </div>
         </div>
         <Link className="eios-visual" href="/eios" aria-label="Explore Obserra EIOS">
           <Image src="/eios/eios-overview-marketing.png" alt="Obserra EIOS executive intelligence dashboard" width={1200} height={675} sizes="(max-width: 900px) 100vw, 52vw" />
@@ -115,18 +144,18 @@ export default function HomePage() {
 
       <section className="final-cta">
         <Image src="/brand/obserra-logo.png" width={230} height={44} alt="Obserra" />
-        <p className="eyebrow">START A CONVERSATION</p>
-        <h2>Bring clarity to the risk in front of you.</h2>
-        <p>Tell us what is at stake. Obserra will help define the right engagement, application, decision path, and next action.</p>
+        <p className="eyebrow">TAKE THE NEXT STEP</p>
+        <h2>Choose the Obserra solution that moves your organization forward.</h2>
+        <p>Purchase a course, evaluate an application, or begin a confidential enterprise engagement.</p>
         <div className="actions">
-          <Link className="button primary" href="/contact">Contact Obserra</Link>
-          <Link className="button secondary" href="/services">Review services</Link>
+          <Link className="button primary" href="/academy">Purchase training</Link>
+          <Link className="button secondary" href="/contact?interest=enterprise-consultation">Contact Obserra</Link>
         </div>
       </section>
 
       <footer className="site-footer">
         <Link href="/" aria-label="Obserra home"><Image src="/brand/obserra-logo.png" width={190} height={37} alt="Obserra Executive Protection and Intelligence LLC" /></Link>
-        <p>Copyright Obserra Executive Protection &amp; Intelligence LLC. All rights reserved.</p>
+        <div><p>Obserra Executive Protection &amp; Intelligence LLC</p><nav aria-label="Footer links"><Link href="/trust">Trust Center</Link><Link href="/trust/privacy-policy">Privacy</Link><Link href="/trust/terms-of-use">Terms</Link><Link href="/trust/refund-and-cancellation-policy">Refunds</Link></nav></div>
       </footer>
     </main>
   );
