@@ -17,13 +17,18 @@ for (const match of source.matchAll(appPattern)) {
 }
 if (!apps.length) throw new Error("No marketplace applications were parsed from appsData.ts");
 
-const outputRoot = path.resolve(process.argv[2] || path.join(root, "release", "Obserra-Application-Release-Bundle"));
+const windowsProductionRoot = "C:\\Users\\jblan\\OneDrive\\Desktop\\Final Production Release Apps";
+const fallbackRoot = path.join(root, "release", "Final Production Release Apps");
+const defaultRoot = process.platform === "win32" ? windowsProductionRoot : fallbackRoot;
+const outputRoot = path.resolve(process.argv[2] || defaultRoot);
+
 fs.rmSync(outputRoot, { recursive: true, force: true });
 fs.mkdirSync(outputRoot, { recursive: true });
 
 const catalog = [];
 for (const app of apps) {
-  const finalDir = path.join(outputRoot, app.slug, "FINAL");
+  const appDir = path.join(outputRoot, app.name);
+  const finalDir = path.join(appDir, "FINAL");
   fs.mkdirSync(finalDir, { recursive: true });
   const manifest = {
     schemaVersion: "1.0",
@@ -40,6 +45,7 @@ for (const app of apps) {
       deploymentModels: app.deployment,
       websiteProductPath: `/apps/${app.slug}`,
       subscriptionPath: `/apps/${app.slug}/subscribe`,
+      customerPortalPath: "/portal/applications",
       saasLaunchPath: `/api/apps/access?app=${app.slug}`,
       downloadPath: `/api/apps/download?app=${app.slug}`,
       billingPortalPath: "/api/apps/billing-portal",
@@ -49,10 +55,10 @@ for (const app of apps) {
   fs.writeFileSync(path.join(finalDir, "SUBSCRIPTION-POLICY.md"), `# ${app.name} Subscription Policy\n\nAccess is granted only while Stripe reports an active or trialing subscription. Access, launch, and downloads are denied when payment is past due, unpaid, canceled, incomplete, expired, or paused. Revalidation occurs before each controlled delivery action.\n`);
   fs.writeFileSync(path.join(finalDir, "DEPLOYMENT-PROFILE.md"), `# ${app.name} Deployment Profile\n\nSupported models: ${app.deployment.join(", ")}\n\n- SaaS: provisioned and launched through the Obserra customer portal.\n- Private Cloud: customer-specific managed environment after implementation approval.\n- Hybrid: governed combination of Obserra-hosted control plane and customer-hosted components.\n- On-Premises: signed package delivered only after entitlement, licensing, and deployment approval.\n`);
   fs.writeFileSync(path.join(finalDir, "RELEASE-CHECKLIST.md"), `# Final Release Checklist\n\n- [ ] Production artifact built and signed\n- [ ] Malware and dependency scans passed\n- [ ] SBOM attached\n- [ ] Version and checksum recorded\n- [ ] Stripe product and prices configured\n- [ ] SaaS launch target configured when applicable\n- [ ] Download artifact URL configured when applicable\n- [ ] Entitlement enforcement tested\n- [ ] Installation and rollback guidance validated\n- [ ] Release approved for customer delivery\n`);
-  fs.writeFileSync(path.join(finalDir, "README.md"), `# ${app.name} FINAL Release\n\nThis directory is the controlled final-release location for ${app.name}. It intentionally contains release governance metadata rather than an unsigned placeholder binary. Add only validated, signed, customer-deliverable artifacts.\n`);
+  fs.writeFileSync(path.join(finalDir, "README.md"), `# ${app.name} FINAL Release\n\nThis directory is the controlled final-release location for ${app.name}. Add only validated, signed, customer-deliverable artifacts. Unsigned placeholders are prohibited.\n`);
   catalog.push(manifest);
 }
 
 fs.writeFileSync(path.join(outputRoot, "release-catalog.json"), JSON.stringify({ generatedAt: new Date().toISOString(), applications: catalog }, null, 2));
-fs.writeFileSync(path.join(outputRoot, "README.md"), `# Obserra Application Release Bundle\n\nGenerated from the website marketplace catalog. Each application has an isolated FINAL folder containing its release manifest, deployment profile, subscription policy, and release checklist.\n\nGenerate locally with:\n\n\`\`\`powershell\npnpm run release:apps -- "$env:USERPROFILE\\Desktop\\Obserra-Application-Release-Bundle"\n\`\`\`\n`);
+fs.writeFileSync(path.join(outputRoot, "README.md"), `# Obserra Final Production Release Apps\n\nGenerated from the website marketplace catalog. Each application has its own named folder and isolated FINAL directory containing release governance and delivery metadata.\n\nDefault Windows destination:\n\n\`C:\\Users\\jblan\\OneDrive\\Desktop\\Final Production Release Apps\`\n\nGenerate from the repository with:\n\n\`\`\`powershell\npnpm run release:apps\n\`\`\`\n\nAn explicit destination can still be supplied as the first argument.\n`);
 console.log(`Generated ${apps.length} application release folders at ${outputRoot}`);
