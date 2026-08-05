@@ -1,5 +1,5 @@
 import { createSign } from "node:crypto";
-import storeCatalog from "../app/apps/store-catalog.json";
+import rawStoreCatalog from "../app/apps/store-catalog.json";
 
 function cloudFrontSafe(value: string) {
   return value.replace(/\+/g, "-").replace(/=/g, "_").replace(/\//g, "~");
@@ -12,15 +12,13 @@ export type PublishedRelease = {
   objectKey: string;
 };
 
+type ReleaseCatalog = { applications: PublishedRelease[] };
+const storeCatalog = rawStoreCatalog as ReleaseCatalog;
+
 export function publishedReleaseFor(slug: string): PublishedRelease | undefined {
   const record = storeCatalog.applications.find((entry) => entry.slug === slug);
   if (!record?.artifactFile || !record?.objectKey || !record?.version) return undefined;
-  return {
-    slug: record.slug,
-    version: record.version,
-    artifactFile: record.artifactFile,
-    objectKey: record.objectKey,
-  };
+  return record;
 }
 
 export function signedReleaseUrl(release: PublishedRelease, expiresInSeconds = 300) {
