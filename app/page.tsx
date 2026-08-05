@@ -3,22 +3,24 @@ import Image from "next/image";
 import "./home.css";
 
 export const metadata: Metadata = {
-  title: "Obserra | Executive Cybersecurity, Intelligence and Protection",
+  title: "Obserra | Executive Intelligence, Cybersecurity and Protection",
   description:
-    "Obserra Executive Protection & Intelligence LLC helps leaders reduce cyber, operational, travel, and executive risk through senior advisory, protective intelligence, secure technology, and professional training.",
+    "Obserra helps leaders reduce cyber, operational, travel, and executive risk through senior advisory, protective intelligence, secure applications, and professional training.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Obserra | Executive Cybersecurity, Intelligence and Protection",
+    title: "Obserra | Executive Intelligence, Cybersecurity and Protection",
     description:
-      "Senior advisory, protective intelligence, secure technology, and professional training for high consequence decisions.",
+      "Executive advisory, protective intelligence, secure applications, and professional training for high consequence decisions.",
     url: "https://www.obserrallc.com",
     type: "website",
-    images: [{
-      url: "/brand/visuals/obserra-eios-intelligence-hero.png",
-      width: 1672,
-      height: 941,
-      alt: "Obserra enterprise intelligence",
-    }],
+    images: [
+      {
+        url: "/brand/visuals/obserra-eios-intelligence-hero.png",
+        width: 1672,
+        height: 941,
+        alt: "Obserra enterprise intelligence",
+      },
+    ],
   },
 };
 
@@ -39,17 +41,62 @@ const capabilities = [
   },
   {
     number: "03",
-    title: "EIOS and Applications",
-    copy: "Secure AI native applications and governed intelligence experiences that turn complex information into accountable action.",
-    href: "/eios",
-    link: "Discover EIOS",
+    title: "Applications and EIOS",
+    copy: "Secure enterprise applications and governed intelligence experiences that convert complex information into accountable action.",
+    href: "/apps",
+    link: "View application offerings",
   },
   {
     number: "04",
     title: "Obserra Academy",
     copy: "Practical, self paced professional training across cybersecurity, intelligence, protection, and secure technology.",
     href: "/academy",
-    link: "Browse courses",
+    link: "Browse professional training",
+  },
+];
+
+const applications = [
+  {
+    name: "Obserra EIOS",
+    category: "Enterprise Intelligence",
+    status: "Available",
+    copy: "A governed command layer that unifies enterprise context, decision workflows, evidence, and verified outcomes.",
+    href: "/apps/obserra-eios",
+  },
+  {
+    name: "AI Governance Suite",
+    category: "AI Governance",
+    status: "Available",
+    copy: "Policy aligned oversight for enterprise AI use, model inventory, approvals, controls, and defensible governance records.",
+    href: "/apps/obserra-ai-governance-suite",
+  },
+  {
+    name: "Cyber Risk Register",
+    category: "Cyber Risk",
+    status: "Available",
+    copy: "Dynamic, evidence backed cyber risk intelligence with control linkage, confidence scoring, and board ready reporting.",
+    href: "/apps/obserra-cyber-risk-register",
+  },
+  {
+    name: "Security Control Evidence Manager",
+    category: "Assurance and Compliance",
+    status: "Available",
+    copy: "Automated evidence collection, validation, framework mapping, and audit ready exports across security programs.",
+    href: "/apps/obserra-security-control-evidence-manager",
+  },
+  {
+    name: "Vulnerability Prioritizer",
+    category: "Cybersecurity Operations",
+    status: "Available",
+    copy: "Business context driven vulnerability prioritization based on exploitability, asset importance, and operational impact.",
+    href: "/apps/obserra-vulnerability-prioritizer",
+  },
+  {
+    name: "Executive Exposure Monitor",
+    category: "Protective Intelligence",
+    status: "Pilot",
+    copy: "Digital and physical exposure intelligence for executives, travel, events, and emerging threat conditions.",
+    href: "/apps/obserra-executive-exposure-monitor",
   },
 ];
 
@@ -64,11 +111,18 @@ export default function HomePage() {
     <main className="obserra-home">
       <header className="site-header">
         <a className="brand" href="/" aria-label="Obserra home">
-          <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt="Obserra Executive Protection and Intelligence LLC" />
+          <Image
+            src="/brand/obserra-logo.png"
+            width={286}
+            height={55}
+            priority
+            alt="Obserra Executive Protection and Intelligence LLC"
+          />
         </a>
         <nav aria-label="Primary navigation">
           <a href="/services">Services</a>
           <a href="/protection-intelligence">Protection</a>
+          <a href="/apps">Applications</a>
           <a href="/eios">EIOS</a>
           <a href="/academy">Academy</a>
           <a href="/about">About</a>
@@ -77,30 +131,38 @@ export default function HomePage() {
       </header>
 
       <section className="hero">
-        <Image className="hero-image" src="/brand/visuals/obserra-eios-intelligence-hero.png" alt="" aria-hidden="true" fill priority sizes="100vw" />
+        <Image
+          className="hero-image"
+          src="/brand/visuals/obserra-eios-intelligence-hero.png"
+          alt=""
+          aria-hidden="true"
+          fill
+          priority
+          sizes="100vw"
+        />
         <div className="hero-overlay" />
         <div className="hero-content">
           <p className="eyebrow">VETERAN OWNED. EXECUTIVE LED. SECURE BY DESIGN.</p>
-          <h1>Make high consequence decisions with greater clarity and confidence.</h1>
+          <h1>Turn enterprise risk into confident, accountable action.</h1>
           <p className="hero-summary">
             Obserra helps leaders reduce cyber, operational, travel, and executive risk through senior advisory,
-            protective intelligence, secure technology, and professional training.
+            protective intelligence, secure applications, and professional training.
           </p>
           <div className="actions">
             <a className="button primary" href="/contact">Start a confidential conversation</a>
-            <a className="button secondary" href="#capabilities">Explore capabilities</a>
+            <a className="button secondary" href="#applications">Explore applications</a>
           </div>
         </div>
         <aside className="hero-panel" aria-label="Obserra value proposition">
           <p className="panel-label">ONE TRUSTED PARTNER</p>
-          <h2>From risk signal to accountable action.</h2>
+          <h2>Expert judgment, intelligence, and technology in one operating model.</h2>
           <p>
-            Obserra brings executive judgment, intelligence, security, and technology together so organizations can move faster without sacrificing governance or trust.
+            Obserra helps organizations move from uncertainty to a defensible course of action without sacrificing governance, confidentiality, or trust.
           </p>
           <ul>
             <li>Executive and board ready guidance</li>
-            <li>Confidential and outcome focused engagements</li>
-            <li>Integrated cyber, protection, intelligence, and technology expertise</li>
+            <li>Commercially focused engagements</li>
+            <li>Secure applications designed around business outcomes</li>
           </ul>
         </aside>
       </section>
@@ -113,9 +175,9 @@ export default function HomePage() {
 
       <section className="section-heading" id="capabilities">
         <p className="eyebrow">WHAT OBSERRA DOES</p>
-        <h2>Integrated expertise for the risks leaders cannot treat in isolation.</h2>
+        <h2>Integrated expertise for risks leaders cannot treat in isolation.</h2>
         <p>
-          Choose the capability you need now, or combine services into a coordinated engagement built around your organization, decision, and desired outcome.
+          Engage Obserra for a focused need or combine advisory, intelligence, applications, and training into a coordinated program.
         </p>
       </section>
 
@@ -130,17 +192,50 @@ export default function HomePage() {
         ))}
       </section>
 
+      <section className="applications" id="applications">
+        <div className="section-heading compact">
+          <p className="eyebrow">OBSERRA APPLICATIONS</p>
+          <h2>Purpose built software for enterprise risk, governance, and intelligence.</h2>
+          <p>
+            Obserra applications complement existing enterprise systems with decision intelligence, workflow governance, evidence, and executive visibility.
+          </p>
+        </div>
+        <div className="application-grid">
+          {applications.map((application) => (
+            <article key={application.name}>
+              <div className="app-meta">
+                <span>{application.category}</span>
+                <strong className={application.status === "Pilot" ? "pilot" : "available"}>{application.status}</strong>
+              </div>
+              <h3>{application.name}</h3>
+              <p>{application.copy}</p>
+              <a href={application.href}>View application</a>
+            </article>
+          ))}
+        </div>
+        <div className="applications-cta">
+          <a className="button primary" href="/apps">View the complete application marketplace</a>
+          <a className="button secondary" href="/contact">Discuss an enterprise deployment</a>
+        </div>
+      </section>
+
       <section className="eios-feature">
         <div className="eios-copy">
-          <p className="eyebrow">OBSERRA EIOS</p>
-          <h2>Enterprise intelligence built around decisions, not dashboards.</h2>
+          <p className="eyebrow">FLAGSHIP PLATFORM</p>
+          <h2>Obserra EIOS connects intelligence, governance, and execution.</h2>
           <p>
-            EIOS connects risk context, evidence, policy, approvals, and accountable execution in one governed decision environment. It is designed to help leaders see what matters, choose a defensible response, and verify the outcome.
+            EIOS brings risk context, evidence, policy, approvals, and accountable execution into one governed decision environment. Leaders can see what matters, choose a defensible response, and verify the outcome.
           </p>
-          <a className="button primary" href="/eios">Explore the EIOS platform</a>
+          <a className="button primary" href="/eios">Explore Obserra EIOS</a>
         </div>
         <div className="eios-visual">
-          <Image src="/eios/eios-overview-marketing.png" alt="Obserra EIOS executive intelligence dashboard" width={1200} height={675} sizes="(max-width: 900px) 100vw, 52vw" />
+          <Image
+            src="/eios/eios-overview-marketing.png"
+            alt="Obserra EIOS executive intelligence dashboard"
+            width={1200}
+            height={675}
+            sizes="(max-width: 900px) 100vw, 52vw"
+          />
         </div>
       </section>
 
@@ -160,7 +255,7 @@ export default function HomePage() {
         <p className="eyebrow">START A CONVERSATION</p>
         <h2>Bring clarity to the risk in front of you.</h2>
         <p>
-          Tell us what is at stake. Obserra will help define the right engagement, decision path, and next action.
+          Tell us what is at stake. Obserra will help define the right engagement, application, decision path, and next action.
         </p>
         <div className="actions">
           <a className="button primary" href="/contact">Contact Obserra</a>
