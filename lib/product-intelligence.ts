@@ -1,5 +1,5 @@
 import rawStoreCatalog from "../app/apps/store-catalog.json";
-import rawMarketingCatalog from "../app/apps/marketing-campaigns.json";
+import rawMarketingCatalog from "../app/apps/marketing-catalog.json";
 
 export type ProductMarketing = {
   campaignName?: string;
