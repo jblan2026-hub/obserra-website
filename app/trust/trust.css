@@ -5,9 +5,7 @@
   font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
 }
 
-.trust-page * {
-  box-sizing: border-box;
-}
+.trust-page * { box-sizing: border-box; }
 
 .trust-wrap {
   max-width: 1240px;
@@ -24,43 +22,98 @@
 }
 
 .trust-wrap h1 {
+  max-width: 980px;
   margin: 0;
   font-size: clamp(38px, 5vw, 62px);
-  line-height: 0.96;
+  line-height: 0.98;
   letter-spacing: -0.05em;
 }
 
 .trust-lead {
-  max-width: 860px;
+  max-width: 900px;
+  margin: 24px 0 0;
   color: #c5e2f1;
-  line-height: 1.65;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.trust-assurance {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 34px 0 64px;
+}
+
+.trust-assurance article {
+  min-height: 170px;
+  padding: 22px;
+  border: 1px solid rgba(127, 205, 234, 0.3);
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(12, 53, 84, 0.95), rgba(5, 28, 48, 0.98));
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.18);
+}
+
+.trust-assurance strong {
+  display: block;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.trust-assurance span {
+  display: block;
+  margin-top: 12px;
+  color: #c4deed;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.trust-priority,
+.trust-additional { margin-top: 54px; }
+
+.trust-section-heading { max-width: 850px; }
+
+.trust-section-heading h2,
+.trust-contact h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
 }
 
 .trust-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 22px;
+  gap: 14px;
+  margin-top: 24px;
 }
 
+.trust-grid-priority { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
 .trust-card {
-  display: grid;
-  gap: 8px;
-  padding: 18px;
-  border: 1px solid #7fcdea59;
-  border-radius: 12px;
-  background: #0a2c49;
-  text-decoration: none;
+  display: flex;
+  min-height: 190px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+  border: 1px solid rgba(127, 205, 234, 0.35);
+  border-radius: 16px;
+  background: linear-gradient(160deg, #0a2c49, #061c31);
   color: inherit;
+  text-decoration: none;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
 
 .trust-card:hover,
 .trust-card:focus-visible {
   border-color: #f4ba55;
-  transform: translateY(-1px);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
 }
 
-.trust-card h2 {
+.trust-card h2,
+.trust-card h3 {
   margin: 0;
   color: #f7fbff;
   font-size: 20px;
@@ -71,49 +124,108 @@
   margin: 0;
   color: #c4deed;
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.6;
+}
+
+.trust-card span {
+  margin-top: auto;
+  color: #f4ba55;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.trust-contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, .6fr);
+  gap: 36px;
+  align-items: center;
+  margin-top: 70px;
+  padding: 34px;
+  border: 1px solid rgba(244, 186, 85, .48);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(13, 52, 82, .96), rgba(5, 26, 45, .98));
+}
+
+.trust-contact p:not(.trust-eyebrow) {
+  color: #c8e1ef;
+  line-height: 1.65;
+}
+
+.trust-contact-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.trust-contact-actions a {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border: 1px solid rgba(244, 186, 85, .65);
+  border-radius: 999px;
+  color: #f4ba55;
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
+}
+
+.trust-contact-actions a:first-child {
+  background: #f4ba55;
+  color: #082038;
 }
 
 .trust-policy {
   display: grid;
   gap: 14px;
-  margin-top: 22px;
+  margin-top: 28px;
 }
 
 .trust-policy section {
-  padding: 18px;
-  border: 1px solid #7fcdea59;
-  border-radius: 12px;
+  padding: 22px;
+  border: 1px solid rgba(127, 205, 234, 0.35);
+  border-radius: 14px;
   background: #0a2c49;
 }
 
 .trust-policy h2 {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   font-size: 24px;
 }
 
 .trust-policy ul {
+  display: grid;
+  gap: 8px;
   margin: 0;
   padding-left: 18px;
-  display: grid;
-  gap: 7px;
 }
 
 .trust-policy li {
   color: #d7eefb;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .trust-return {
   display: inline-flex;
-  margin-top: 10px;
+  margin-top: 14px;
   color: #f4ba55;
   font-weight: 800;
   text-decoration: none;
 }
 
 @media (max-width: 980px) {
-  .trust-grid {
-    grid-template-columns: 1fr;
-  }
+  .trust-assurance { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trust-grid,
+  .trust-grid-priority { grid-template-columns: 1fr; }
+  .trust-contact { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .trust-wrap { padding: 48px 18px; }
+  .trust-assurance { grid-template-columns: 1fr; margin-bottom: 48px; }
+  .trust-assurance article { min-height: 0; }
+  .trust-card { min-height: 0; }
+  .trust-contact { padding: 24px 18px; }
 }
