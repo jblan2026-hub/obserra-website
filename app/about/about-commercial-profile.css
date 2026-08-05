@@ -1,0 +1,82 @@
+.about-profile p {
+  max-width: 820px;
+}
+
+.about-profile .about-actions {
+  margin-top: 24px;
+}
+
+.credential-issuer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 28px;
+  margin-bottom: 14px;
+  padding: 5px 9px;
+  border: 1px solid rgba(201, 165, 82, 0.42);
+  border-radius: 6px;
+  background: rgba(8, 25, 43, 0.86);
+  color: #f2cf7d;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.credential-issuer-isc2 {
+  color: #a8e3f5;
+  border-color: rgba(89, 185, 218, 0.5);
+}
+
+.credential-issuer-comptia {
+  color: #f0b45a;
+  border-color: rgba(240, 180, 90, 0.52);
+}
+
+.credential-issuer-ec-council {
+  color: #e6e6e6;
+  border-color: rgba(230, 230, 230, 0.34);
+}
+
+.credential-issuer-isaca {
+  color: #82d5d8;
+  border-color: rgba(130, 213, 216, 0.48);
+}
+
+.credential-issuer-adg {
+  color: #e9c874;
+}
+
+.credential-issuer-florida {
+  color: #c9ddf0;
+  border-color: rgba(201, 221, 240, 0.36);
+}
+
+.credentials-grid article {
+  position: relative;
+  overflow: hidden;
+}
+
+.credentials-grid article::after {
+  position: absolute;
+  right: -18px;
+  bottom: -30px;
+  width: 94px;
+  height: 94px;
+  border: 1px solid rgba(201, 165, 82, 0.12);
+  border-radius: 50%;
+  content: "";
+}
+
+@media (max-width: 720px) {
+  .about-profile .about-actions a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .credential-issuer {
+    font-size: 9px;
+  }
+}
