@@ -11,12 +11,14 @@ import {
   Check,
   ChevronRight,
   Cloud,
+  FileCheck2,
   Filter,
   Globe2,
   Layers3,
   LockKeyhole,
   Scale,
   Search,
+  Server,
   ShieldCheck,
   Sparkles,
   Users,
@@ -67,6 +69,41 @@ const collections = [
     copy: "Manage enterprise risk, control evidence, AI governance, policy decisions, and executive assurance.",
     categories: ["GRC", "AI Governance"] as AppCategory[],
     href: "/apps?category=GRC",
+  },
+] as const;
+
+const procurementPaths = [
+  {
+    icon: Cloud,
+    title: "Obserra Cloud",
+    label: "Managed SaaS",
+    copy: "Accelerated deployment, managed upgrades, enterprise identity integration, and governed tenant isolation.",
+    action: "Request SaaS proposal",
+    href: "/contact?interest=saas-proposal",
+  },
+  {
+    icon: Building2,
+    title: "Private Cloud",
+    label: "Dedicated environment",
+    copy: "Dedicated cloud deployment with customer-controlled networking, identity, integration, and data boundaries.",
+    action: "Scope private cloud",
+    href: "/contact?interest=private-cloud",
+  },
+  {
+    icon: Server,
+    title: "On Premises",
+    label: "Customer-hosted",
+    copy: "Customer-controlled deployment for regulated, sovereign, restricted, or disconnected operating environments.",
+    action: "Plan on-premises deployment",
+    href: "/contact?interest=on-premises",
+  },
+  {
+    icon: FileCheck2,
+    title: "Enterprise Procurement",
+    label: "Commercial and government",
+    copy: "Structured evaluation, implementation planning, licensing, support, legal review, and procurement documentation.",
+    action: "Start procurement review",
+    href: "/contact?interest=enterprise-procurement",
   },
 ] as const;
 
@@ -322,10 +359,42 @@ export default function FortuneMarketplaceClient() {
             ))}
           </div>
           <div className="f100-comparison-actions">
-            <Link href={`/contact?interest=portfolio-comparison&products=${encodeURIComponent(comparedApps.map((app) => app.name).join(", "))}`} className="f100-primary">Request portfolio comparison <ArrowRight size={16} /></Link>
+            <Link href={`/contact?interest=portfolio-comparison&products=${encodeURIComponent(comparedApps.map((app) => app.name).join(", "))}`} className="f100-primary">Request comparison consultation <ArrowRight size={16} /></Link>
           </div>
         </section>
       )}
+
+      <section className="f100-procurement" aria-label="Enterprise procurement pathways">
+        <div className="f100-section-heading">
+          <div>
+            <p className="f100-kicker">PROCUREMENT AND DEPLOYMENT CENTER</p>
+            <h2>Move from product discovery to an executable acquisition path.</h2>
+            <p>Choose the operating model that best fits your security, regulatory, architecture, and commercial requirements.</p>
+          </div>
+          <Link href="/trust">Review security and trust <ArrowRight size={16} /></Link>
+        </div>
+        <div className="f100-procurement-grid">
+          {procurementPaths.map(({ icon: Icon, title, label, copy, action, href }) => (
+            <article key={title}>
+              <div className="f100-procurement-icon"><Icon size={23} /></div>
+              <small>{label}</small>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+              <Link href={href}>{action} <ArrowRight size={15} /></Link>
+            </article>
+          ))}
+        </div>
+        <div className="f100-procurement-note">
+          <div>
+            <strong>Enterprise buying support</strong>
+            <p>Obserra supports solution design, architecture review, pilot planning, security review, implementation scoping, licensing, onboarding, and executive adoption.</p>
+          </div>
+          <div className="f100-actions">
+            <Link href="/contact?interest=enterprise-quote" className="f100-primary">Request enterprise proposal <ArrowRight size={16} /></Link>
+            <Link href="/contact?interest=application-demo" className="f100-secondary">Schedule demonstration</Link>
+          </div>
+        </div>
+      </section>
 
       <section className="f100-enterprise-cta">
         <div>
