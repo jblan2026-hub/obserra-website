@@ -1,5 +1,10 @@
 .services-page {
   font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
+  background:
+    linear-gradient(90deg, rgba(3, 17, 31, 0.94) 0%, rgba(4, 18, 32, 0.88) 42%, rgba(7, 31, 52, 0.8) 100%),
+    url("/brand/visuals/obserra-eios-intelligence-hero.png") center / cover no-repeat,
+    #041220;
+  color: #eaf6ff;
 }
 
 .services-page .apps-nav {
@@ -100,8 +105,253 @@
   color: #84d6f5;
 }
 
+.service-detail-page {
+  background:
+    radial-gradient(circle at 88% 12%, #1b5e8424 0, transparent 30%),
+    radial-gradient(circle at 10% 8%, #f4ba551a 0, transparent 24%),
+    #04111d;
+}
+
+.service-detail-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.76fr);
+  gap: 24px;
+  padding: 86px max(5vw, 24px) 28px;
+  border-bottom: 1px solid #7cc4e02c;
+}
+
+.service-detail-hero-copy h1 {
+  max-width: 880px;
+  margin-bottom: 16px;
+}
+
+.service-detail-hero-copy > p:not(.apps-eyebrow) {
+  max-width: 760px;
+}
+
+.service-detail-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.service-detail-highlights li {
+  min-height: 112px;
+  padding: 16px 16px 18px;
+  border: 1px solid #80c8ea3b;
+  border-radius: 12px;
+  background: #082945c7;
+  color: #def2fb;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.service-detail-panel {
+  padding: 22px;
+  border: 1px solid #84cbe847;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #0b2a48, #071a2c);
+  box-shadow: 0 24px 40px #0000003a;
+}
+
+.service-detail-panel-kicker {
+  margin: 0 0 10px;
+  color: #f4ba55;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.service-detail-panel strong {
+  display: block;
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.service-detail-panel span {
+  display: block;
+  margin-top: 12px;
+  color: #c8e4f3;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.service-detail-panel-stats {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.service-detail-panel-stats article {
+  padding: 14px 15px;
+  border: 1px solid #7ecce84a;
+  border-radius: 12px;
+  background: #082641d7;
+}
+
+.service-detail-panel-stats b,
+.service-detail-panel-stats span {
+  display: block;
+}
+
+.service-detail-panel-stats b {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.service-detail-panel-stats span {
+  margin-top: 4px;
+  color: #b9d7e8;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.service-detail-proof,
+.service-detail-split,
+.service-detail-steps,
+.service-detail-cta {
+  padding: 28px max(5vw, 24px);
+}
+
+.service-detail-proof article,
+.service-detail-cta {
+  border: 1px solid #7cc4e02f;
+  border-radius: 18px;
+  background: #071a2be6;
+}
+
+.service-detail-proof article {
+  padding: 24px;
+}
+
+.service-detail-proof p,
+.service-detail-split .apps-eyebrow,
+.service-detail-steps .apps-eyebrow {
+  margin-bottom: 12px;
+}
+
+.service-detail-proof h2,
+.service-detail-split h2,
+.service-detail-cta h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(32px, 4vw, 56px);
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+}
+
+.service-detail-proof div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.service-detail-proof span,
+.service-detail-cards article,
+.service-detail-steps-grid article {
+  border: 1px solid #7fc8e838;
+  border-radius: 14px;
+  background: #082945b8;
+}
+
+.service-detail-proof span {
+  padding: 16px;
+  color: #d8edf8;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.service-detail-split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.service-detail-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.service-detail-cards article,
+.service-detail-steps-grid article {
+  padding: 18px;
+}
+
+.service-detail-cards strong {
+  display: block;
+  color: #fff;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.service-detail-cards p,
+.service-detail-steps-grid p,
+.service-detail-cta p {
+  margin: 0;
+  color: #c5dfef;
+  line-height: 1.6;
+}
+
+.service-detail-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.service-detail-steps-grid span {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #f4ba55;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.service-detail-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 10px max(5vw, 24px) 28px;
+  padding: 24px;
+}
+
+.service-detail-cta > div:first-child {
+  max-width: 780px;
+}
+
+.service-detail-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 @media (max-width: 700px) {
   .services-results .apps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .service-detail-hero,
+  .service-detail-split,
+  .service-detail-cta {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .service-detail-highlights,
+  .service-detail-proof div,
+  .service-detail-cards,
+  .service-detail-steps-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -1,0 +1,119 @@
+.trust-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at 92% -8%, #1f648a2f 0, transparent 36%), #041629;
+  color: #eaf6ff;
+  font-family: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
+}
+
+.trust-page * {
+  box-sizing: border-box;
+}
+
+.trust-wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 74px max(5vw, 24px);
+}
+
+.trust-eyebrow {
+  margin: 0 0 12px;
+  color: #f4ba55;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.trust-wrap h1 {
+  margin: 0;
+  font-size: clamp(38px, 5vw, 62px);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+}
+
+.trust-lead {
+  max-width: 860px;
+  color: #c5e2f1;
+  line-height: 1.65;
+}
+
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.trust-card {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid #7fcdea59;
+  border-radius: 12px;
+  background: #0a2c49;
+  text-decoration: none;
+  color: inherit;
+}
+
+.trust-card:hover,
+.trust-card:focus-visible {
+  border-color: #f4ba55;
+  transform: translateY(-1px);
+}
+
+.trust-card h2 {
+  margin: 0;
+  color: #f7fbff;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.trust-card p {
+  margin: 0;
+  color: #c4deed;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.trust-policy {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.trust-policy section {
+  padding: 18px;
+  border: 1px solid #7fcdea59;
+  border-radius: 12px;
+  background: #0a2c49;
+}
+
+.trust-policy h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+}
+
+.trust-policy ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 7px;
+}
+
+.trust-policy li {
+  color: #d7eefb;
+  line-height: 1.55;
+}
+
+.trust-return {
+  display: inline-flex;
+  margin-top: 10px;
+  color: #f4ba55;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+@media (max-width: 980px) {
+  .trust-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -31,6 +31,10 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
   const [category, setCategory] = useState<AppCategory | "All">(initialCategory);
   const [status, setStatus] = useState<AppStatus | "All">("All");
 
+  const flagshipApps = useMemo(() => {
+    return marketplaceApps.slice(0, 4);
+  }, []);
+
   const visibleApps = useMemo(() => {
     return marketplaceApps.filter((entry) => {
       const q = query.trim().toLowerCase();
@@ -55,6 +59,8 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
         <nav aria-label="Applications navigation">
           <a href="/">Home</a>
           <a href="/services">Services</a>
+          <a href="/protection-intelligence">Protection</a>
+          <a href="/catalog">Catalog</a>
           <a href="/eios">EIOS</a>
           <a href="/academy">Academy</a>
           <a href="/about">About</a>
@@ -66,12 +72,13 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
       <section className="apps-hero">
         <div>
           <p className="apps-eyebrow">OBSERRA ENTERPRISE COMMERCIAL APPLICATIONS</p>
-          <h1>Software built for the work we deliver: cybersecurity, protection, intelligence, and governed execution.</h1>
+          <h1>Enterprise applications built to strengthen cyber decisions, governance, and operational control.</h1>
           <p>
             Evaluate Obserra applications that support our core engagements: cyber risk management,
             protective intelligence, identity and access governance, enterprise command, and workforce
-            readiness. Solutions labeled Coming Soon are roadmap offerings and are not currently
-            purchasable for production deployment.
+            readiness. These products are designed for real enterprise use cases, measurable outcomes,
+            and secure adoption. Solutions labeled Coming Soon are roadmap offerings and are
+            not currently purchasable for production deployment.
           </p>
           <div className="apps-actions">
             <a href="mailto:info@obserrallc.com?subject=Request%20Obserra%20Enterprise%20Demo" className="apps-button">Request enterprise demo</a>
@@ -83,6 +90,26 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
           <p><Sparkles size={16} /> Governed AI capabilities aligned to policy, audit, and risk controls</p>
           <p><BriefcaseBusiness size={16} /> Deployment patterns designed for enterprise security boundaries and regulated operations</p>
         </aside>
+      </section>
+
+      <section className="apps-spotlight" aria-label="Flagship applications">
+        <div className="apps-spotlight-heading">
+          <p className="apps-eyebrow">FLAGSHIP APPLICATIONS</p>
+          <h2>Start with the products buyers ask for first.</h2>
+          <p>
+            These are the strongest options for immediate evaluation and enterprise deployment planning.
+          </p>
+        </div>
+        <div className="apps-spotlight-grid">
+          {flagshipApps.map((entry) => (
+            <article key={entry.slug} className="apps-spotlight-card">
+              <span className={`status-pill ${statusToneClass[entry.status]}`}>{entry.status}</span>
+              <h3>{entry.name}</h3>
+              <p>{entry.value}</p>
+              <a href={`/apps/${entry.slug}`}>Open product brief <ArrowRight size={15} /></a>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="apps-filter-wrap" aria-label="Filter applications">
@@ -128,7 +155,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
       </section>
 
       <section className="apps-results" aria-live="polite">
-        <p>{visibleApps.length} products matched to your filters across Obserra delivery domains</p>
+        <p>{visibleApps.length} products matched to your filters</p>
         <div className="apps-grid">
           {visibleApps.map((entry, index) => (
             <motion.article

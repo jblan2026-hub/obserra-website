@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { courseForId } from "../../../lib/academy";
 import "./course-page.css";
 
+const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+
 export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }): Promise<Metadata> {
   const course = courseForId((await params).courseId);
   if (!course) return {};
@@ -40,11 +42,130 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
     offers: { "@type": "Offer", price: course.price, priceCurrency: "USD", availability: "https://schema.org/InStock", url: `https://www.obserrallc.com/academy/${course.id}` },
     hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: course.duration },
   };
-  return <main className="academy-course-page">
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
-    <header className="academy-course-nav"><a href="/academy"><Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={220} height={42} /><b>ACADEMY</b></a><a href="/academy#courses">All courses</a></header>
-    <section className="academy-course-hero"><p>{course.track} · {course.level}</p><h1>{course.title}</h1><div><span>{course.duration}</span><span>{course.modules.length} original interactive lessons</span><span>25-question final assessment</span></div><p className="academy-course-description">{course.description}</p><a className="academy-course-checkout" href={`/api/academy/checkout?course=${course.id}`}>Purchase secure enrollment · ${course.price}</a><small>Secure Stripe Checkout. Return directly to paid course access—no Academy sign-in required.</small></section>
-    <section className="academy-course-content"><div><p className="academy-course-kicker">WHAT YOU WILL LEARN</p><h2>Practical learning tied to real cybersecurity, protection, and intelligence work.</h2><ul>{course.outcomes.map((outcome) => <li key={outcome}>{outcome}</li>)}</ul></div><ol>{course.modules.map((module, index) => <li key={module.title}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{module.title}</strong><p>{module.description}</p></div><em>{module.format}<br />{module.duration}</em></li>)}</ol></section>
-    <section className="academy-course-certificate"><p className="academy-course-kicker">COMPLETION</p><h2>Receive an Obserra Certificate of Training upon successful completion.</h2><p>Complete every interactive lesson and achieve 80 percent or higher on the final assessment. This informational program does not confer professional licensure, accredited academic credit, or third-party industry certification.</p></section>
-  </main>;
+  return (
+    <main className="academy-course-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
+
+      <header className="academy-course-nav">
+        <a href="/academy" className="academy-course-brand">
+          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={220} height={42} />
+          <b>ACADEMY</b>
+        </a>
+        <nav aria-label="Course navigation">
+          <a href="/academy#courses">All courses</a>
+          <a href="/catalog">Catalog</a>
+          <a href="/contact">Contact</a>
+        </nav>
+      </header>
+
+      <section className="academy-course-hero">
+        <div className="academy-course-eyebrow-row">
+          <p>{course.track} · {course.level}</p>
+          <span>Paid enrollment</span>
+        </div>
+
+        <div className="academy-course-grid">
+          <div className="academy-course-copy">
+            <p className="academy-course-kicker">FLAGSHIP TRAINING</p>
+            <h1>{course.title}</h1>
+            <p className="academy-course-description">{course.description}</p>
+
+            <div className="academy-course-pills" aria-label="Course summary">
+              <span>{course.duration}</span>
+              <span>{course.modules.length} original lessons</span>
+              <span>25-question final assessment</span>
+              <span>{course.audience}</span>
+            </div>
+
+            <div className="academy-course-actions">
+              <a className="academy-course-checkout" href={`/api/academy/checkout?course=${course.id}`}>Purchase secure enrollment · {money.format(course.price)}</a>
+              <a className="academy-course-secondary" href="#curriculum">See curriculum</a>
+            </div>
+
+            <div className="academy-course-assurance">
+              <div>
+                <strong>Secure Stripe Checkout</strong>
+                <span>Buy once and return directly to paid course access.</span>
+              </div>
+              <div>
+                <strong>Practical decision training</strong>
+                <span>Built around applied judgment, not passive slides.</span>
+              </div>
+              <div>
+                <strong>Certificate standard</strong>
+                <span>Complete every lesson and score 80 percent or higher.</span>
+              </div>
+            </div>
+          </div>
+
+          <aside className="academy-course-card">
+            <p>Course investment</p>
+            <strong>{money.format(course.price)}</strong>
+            <span>per learner</span>
+            <dl>
+              <div><dt>Duration</dt><dd>{course.duration}</dd></div>
+              <div><dt>Modules</dt><dd>{course.modules.length}</dd></div>
+              <div><dt>Audience</dt><dd>{course.audience}</dd></div>
+              <div><dt>Format</dt><dd>Self-paced online</dd></div>
+            </dl>
+            <a className="academy-course-checkout academy-course-card-cta" href={`/api/academy/checkout?course=${course.id}`}>Buy secure enrollment</a>
+            <small>Enterprise-ready training with a governed completion path and proprietary Obserra certificate.</small>
+          </aside>
+        </div>
+      </section>
+
+      <section className="academy-course-proof">
+        <article>
+          <span>01</span>
+          <h2>What this course gives the learner</h2>
+          <p>Structured judgment, practical methods, and decision habits that translate into safer actions inside real organizations.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h2>Where it fits in the commercial offer</h2>
+          <p>Supports enterprise teams, executive buyers, and individual practitioners who need paid training that feels premium and defensible.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h2>How it is completed</h2>
+          <p>Lessons, scenario practice, and assessment are sequenced to make the final certificate meaningful, not decorative.</p>
+        </article>
+      </section>
+
+      <section className="academy-course-content" id="curriculum">
+        <div className="academy-course-outcomes">
+          <p className="academy-course-kicker">WHAT YOU WILL LEARN</p>
+          <h2>Practical learning tied to real cybersecurity, protection, and intelligence work.</h2>
+          <ul>
+            {course.outcomes.map((outcome) => <li key={outcome}>{outcome}</li>)}
+          </ul>
+        </div>
+
+        <ol className="academy-course-modules">
+          {course.modules.map((module, index) => (
+            <li key={module.title}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <strong>{module.title}</strong>
+                <p>{module.description}</p>
+              </div>
+              <em>{module.format}<br />{module.duration}</em>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="academy-course-certificate">
+        <div>
+          <p className="academy-course-kicker">COMPLETION</p>
+          <h2>Receive an Obserra Certificate of Training upon successful completion.</h2>
+          <p>Complete every interactive lesson and achieve 80 percent or higher on the final assessment. This informational program does not confer professional licensure, accredited academic credit, or third-party industry certification.</p>
+        </div>
+        <aside>
+          <strong>Buyer-safe details</strong>
+          <p>One purchase route. One completion standard. One certificate record for the learner who finishes the course.</p>
+        </aside>
+      </section>
+    </main>
+  );
 }

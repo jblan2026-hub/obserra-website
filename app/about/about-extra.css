@@ -44,7 +44,7 @@
 
 .books, .credentials, .recognition, .leadership-media, .expertise, .about-cta { padding: 104px max(5vw, 24px); }
 .books { background: radial-gradient(circle at 90% 12%, #275f7e, transparent 34%), #051426; }
-.credentials { background: linear-gradient(135deg, #04182a, #0a3151); }
+.credentials { background: radial-gradient(circle at 12% 12%, #1a5a7b57, transparent 34%), linear-gradient(135deg, #04182a, #0a3151); }
 .recognition { background: #061a2e; }
 .leadership-media { background: radial-gradient(circle at 7% 0%, #155276, transparent 30%), #06192d; }
 .expertise { background: #051426; }
@@ -60,11 +60,12 @@
 .books-grid article > div:last-child > span { display: block; margin: 13px 0 23px; color: #b7d8e8; font-size: 14px; }
 .books-grid a { border-bottom: 1px solid #f3ba55; color: #fff; font-size: 13px; font-weight: 900; text-decoration: none; }
 
-.credentials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; max-width: 1440px; margin: 42px auto 0; }
-.credentials-grid article { min-height: 0; padding: 16px 17px; border: 1px solid #80cee754; border-radius: 10px; background: linear-gradient(145deg, #0a2e4c, #061c31); box-shadow: 0 10px 22px #0003; }
-.credentials-grid span { display: inline-block; margin-bottom: 9px; color: #f5bc58; font-size: 10px; font-weight: 900; letter-spacing: .12em; }
-.credentials-grid h3 { margin: 0; color: #f3fbff; font-size: 15px; line-height: 1.28; }
-.credentials-grid p { margin: 7px 0 0; color: #91cae3; font-size: 11px; font-weight: 800; }
+.credentials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; max-width: 1440px; margin: 42px auto 0; }
+.credentials-grid article { position: relative; min-height: 0; padding: 16px 17px 18px; border: 1px solid #8cd5ef57; border-radius: 12px; background: linear-gradient(160deg, #0b3252, #08253e 55%, #071e34); box-shadow: 0 14px 28px #0004; }
+.credentials-grid article::before { position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 12px 12px 0 0; background: linear-gradient(90deg, #f4bc57, #8ad1ef); content: ""; }
+.credential-code { display: inline-flex; align-items: center; justify-content: center; min-height: 24px; padding: 0 10px; border: 1px solid #f4bf5f6b; border-radius: 999px; color: #ffdca0; font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; background: #0a2237cc; }
+.credentials-grid h3 { margin: 12px 0 0; color: #f6fcff; font-size: 15px; line-height: 1.34; }
+.credential-meta { margin-top: 10px; color: #8cc8e4; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 
 .recognition-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; max-width: 1440px; margin: 46px auto 0; }
 .recognition-grid article { display: flex; min-width: 0; min-height: 270px; flex-direction: column; padding: 18px; border: 1px solid #78c8e554; border-radius: 14px; background: #082944; box-shadow: 0 18px 32px #0004; }

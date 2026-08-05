@@ -89,7 +89,7 @@ export default function EiosShowcase() {
             to <em>commercially accountable execution.</em>
           </h1>
           <p className="eios-lede">
-            EIOS is the enterprise intelligence and execution system from OBSERRA EXECUTIVE
+            EIOS is the Enterprise Intelligence Operating System from OBSERRA EXECUTIVE
             PROTECTION &amp; INTELLIGENCE LLC. It helps leadership teams connect systems,
             quantify risk and business impact, authorize action, and verify outcome integrity
             without replacing core enterprise platforms.

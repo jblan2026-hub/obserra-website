@@ -7,8 +7,8 @@
   --apps-cyan: #83d0f8;
   --apps-font: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
   background:
-    radial-gradient(circle at 92% -6%, #1d638731 0, transparent 38%),
-    radial-gradient(circle at 5% 12%, #1b567726 0, transparent 35%),
+    linear-gradient(92deg, rgba(3, 17, 31, 0.95) 0%, rgba(4, 18, 32, 0.89) 44%, rgba(7, 30, 51, 0.82) 100%),
+    url("/brand/visuals/obserra-eios-intelligence-hero.png") center / cover no-repeat,
     var(--apps-bg);
   color: var(--apps-text);
   min-height: 100svh;
@@ -273,6 +273,75 @@
   padding: 24px max(5vw, 24px) 90px;
 }
 
+.apps-spotlight {
+  display: grid;
+  grid-template-columns: minmax(240px, .9fr) minmax(0, 1.1fr);
+  gap: 18px;
+  padding: 10px max(5vw, 24px) 0;
+}
+
+.apps-spotlight-heading,
+.apps-spotlight-card {
+  border: 1px solid var(--apps-line);
+  border-radius: 14px;
+  background: linear-gradient(145deg, #0d3556, #071f34);
+}
+
+.apps-spotlight-heading {
+  padding: 22px;
+}
+
+.apps-spotlight-heading h2 {
+  margin: 0;
+  font-size: clamp(26px, 3.4vw, 38px);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.apps-spotlight-heading p:last-child {
+  margin: 14px 0 0;
+  color: #c8e0ef;
+  line-height: 1.65;
+}
+
+.apps-spotlight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.apps-spotlight-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 190px;
+  padding: 18px;
+}
+
+.apps-spotlight-card h3 {
+  margin: 12px 0 10px;
+  font-size: 19px;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.apps-spotlight-card p {
+  margin: 0;
+  color: #c8e0ef;
+  line-height: 1.55;
+}
+
+.apps-spotlight-card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: var(--apps-cyan);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .apps-results > p {
   margin: 0 0 16px;
   color: #90bfd7;
@@ -291,11 +360,12 @@
 .apps-grid article {
   display: flex;
   flex-direction: column;
-  min-height: 320px;
+  min-height: 332px;
   padding: 20px;
   border: 1px solid var(--apps-line);
-  border-radius: 12px;
-  background: linear-gradient(145deg, #0d3556, #071f34);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, #0f395d 0%, #0a2944 100%);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -303,6 +373,16 @@
   transform: translateY(-5px);
   border-color: #f4ba5563;
   box-shadow: 0 18px 32px #00000045;
+}
+
+.apps-grid article::before {
+  display: block;
+  width: 42px;
+  height: 3px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+  background: linear-gradient(90deg, var(--apps-gold), var(--apps-cyan));
+  content: "";
 }
 
 .apps-grid article header {
@@ -344,10 +424,10 @@
 }
 
 .apps-grid article h2 {
-  margin: 16px 0 10px;
-  font-size: 24px;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  margin: 0 0 10px;
+  font-size: 23px;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
 }
 
 .apps-grid article p {

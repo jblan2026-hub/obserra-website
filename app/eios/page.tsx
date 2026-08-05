@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "EIOS | Governed Enterprise Intelligence and Action",
-    description: "Enterprise intelligence and execution with accountable, evidence-backed decisions.",
+    description: "Enterprise Intelligence Operating System with accountable, evidence-backed decisions.",
     images: ["/eios/eios-overview-marketing.png"],
   },
 };
@@ -39,7 +39,7 @@ export default function EiosPage() {
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
         url: "https://www.obserrallc.com/eios",
-        description: "A governed enterprise intelligence and execution layer that connects enterprise context, supports evidence-backed decisions, governs authorized action, and verifies outcomes.",
+        description: "A governed Enterprise Intelligence Operating System that connects enterprise context, supports evidence-backed decisions, governs authorized action, and verifies outcomes.",
         provider: {
           "@type": "Organization",
           name: "Obserra Executive Protection & Intelligence LLC",

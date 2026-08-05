@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import ObserraGuide from "./ObserraGuide";
 import "./globals.css";
@@ -77,6 +76,28 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         logo: "https://www.obserrallc.com/brand/obserra-logo.png",
         description: "Enterprise intelligence, cybersecurity strategy, protective intelligence, secure technology, and professional training.",
         email: "info@obserrallc.com",
+        sameAs: [
+          "https://www.linkedin.com/company/obserra-executive-protection-intelligence-llc",
+          "https://www.youtube.com/@obserra",
+        ],
+        contactPoint: [
+          {
+            "@type": "ContactPoint",
+            contactType: "sales",
+            email: "info@obserrallc.com",
+            availableLanguage: ["en"],
+            areaServed: "US",
+          },
+        ],
+        areaServed: ["US", "CA", "UK", "EU"],
+        knowsAbout: [
+          "Enterprise intelligence",
+          "Cybersecurity consulting",
+          "Protective intelligence",
+          "Executive protection",
+          "AI governance",
+          "Professional training",
+        ],
       },
       {
         "@type": "WebSite",
@@ -85,18 +106,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         url: "https://www.obserrallc.com",
         publisher: { "@id": "https://www.obserrallc.com/#organization" },
         inLanguage: "en-US",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: "https://www.obserrallc.com/catalog?query={search_term_string}",
+          "query-input": "required name=search_term_string",
+        },
       },
     ],
   };
-  const page = <html lang="en"><body>{children}<aside className="site-proprietary-notice" aria-label="Proprietary material notice">Property of Obserra · Proprietary material · Not for reproduction, distribution, recording, or use without prior written approval.</aside><ObserraGuide /><Analytics /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></body></html>;
-  return process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
-    <ClerkProvider
-      signInUrl="/sign-in"
-      signUpUrl="/sign-up"
-      signInFallbackRedirectUrl="/academy"
-      signUpFallbackRedirectUrl="/academy"
-    >
-      {page}
-    </ClerkProvider>
-  ) : page;
+  return <html lang="en"><body>{children}<aside className="site-proprietary-notice" aria-label="Proprietary material notice">Property of Obserra · Proprietary material · Not for reproduction, distribution, recording, or use without prior written approval.</aside><nav className="site-trust-links" aria-label="Trust and legal links"><a href="/trust">Trust Center</a><a href="/trust/privacy-policy">Privacy</a><a href="/trust/terms-of-use">Terms</a><a href="/trust/refund-and-cancellation-policy">Refunds</a><a href="/trust/security-and-responsible-disclosure">Security Disclosure</a><a href="/trust/data-handling-statement">Data Handling</a></nav><ObserraGuide /><Analytics /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /></body></html>;
 }

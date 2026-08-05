@@ -23,6 +23,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${entry.name} | Obserra Applications`,
     description: entry.value,
     alternates: { canonical: `/apps/${entry.slug}` },
+    keywords: [
+      entry.name,
+      entry.category,
+      "enterprise software",
+      "cybersecurity software",
+      "AI governance software",
+      "Obserra Applications",
+    ],
     openGraph: {
       title: `${entry.name} | Obserra Applications`,
       description: entry.value,
@@ -49,27 +57,46 @@ export default async function AppDetailPage({ params }: Props) {
 
   const schema = {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: entry.name,
-    applicationCategory: entry.category,
-    description: entry.value,
-    operatingSystem: "Web",
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "USD",
-      availability:
-        entry.status === "Available"
-          ? "https://schema.org/InStock"
-          : entry.status === "Pilot"
-            ? "https://schema.org/PreOrder"
-            : "https://schema.org/PreSale"
-    },
-    url: `https://www.obserrallc.com/apps/${entry.slug}`,
-    provider: {
-      "@type": "Organization",
-      name: "Obserra Executive Protection & Intelligence LLC",
-      url: "https://www.obserrallc.com"
-    }
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        name: entry.name,
+        applicationCategory: entry.category,
+        description: entry.value,
+        operatingSystem: "Web",
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "USD",
+          availability:
+            entry.status === "Available"
+              ? "https://schema.org/InStock"
+              : entry.status === "Pilot"
+                ? "https://schema.org/PreOrder"
+                : "https://schema.org/PreSale"
+        },
+        url: `https://www.obserrallc.com/apps/${entry.slug}`,
+        provider: {
+          "@type": "Organization",
+          name: "Obserra Executive Protection & Intelligence LLC",
+          url: "https://www.obserrallc.com"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://www.obserrallc.com" },
+          { "@type": "ListItem", position: 2, name: "Applications", item: "https://www.obserrallc.com/apps" },
+          { "@type": "ListItem", position: 3, name: entry.name, item: `https://www.obserrallc.com/apps/${entry.slug}` },
+        ],
+      },
+      {
+        "@type": "WebPage",
+        name: `${entry.name} | Obserra Applications`,
+        url: `https://www.obserrallc.com/apps/${entry.slug}`,
+        isPartOf: { "@id": "https://www.obserrallc.com/#website" },
+        about: { "@id": "https://www.obserrallc.com/#organization" },
+      },
+    ]
   };
 
   return (

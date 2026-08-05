@@ -78,7 +78,7 @@ export default function CertificateView({
 
         <div className="certificate-verification">
           <span>Completion date <b>{completionDate}</b></span>
-          <span>Verify at <b>obserrallc.com/academy</b></span>
+          <span>Verify at <b>www.obserrallc.com/academy</b></span>
         </div>
 
         <footer>

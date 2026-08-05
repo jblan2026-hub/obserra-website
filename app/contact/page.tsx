@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import ContactExperience from "./ContactExperience";
 import "./contact.css";
 
 export const metadata: Metadata = {
@@ -124,6 +125,8 @@ export default function ContactPage() {
           <a className="contact-outline" href="/services">Review enterprise services</a>
         </div>
       </section>
+
+      <ContactExperience />
 
       <section className="contact-grid" aria-label="Contact pathways">
         {engagementTracks.map((item) => (

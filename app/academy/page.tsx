@@ -3,12 +3,12 @@ import AcademyClient from "./AcademyClient";
 import { courses } from "./courseData";
 
 export const metadata: Metadata = {
-  title: "Academy | Paid Professional Security, Intelligence & Technology Training",
-  description: "Obserra Academy offers paid, interactive training in cybersecurity, protective operations, intelligence, and secure technology governance.",
+  title: "Training Academy | Paid Professional Security, Intelligence & Technology Training",
+  description: "Obserra Training Academy offers paid, interactive training in cybersecurity, protective operations, intelligence, and secure technology governance.",
   alternates: { canonical: "/academy" },
   keywords: ["cybersecurity training", "executive protection training", "intelligence training", "paid professional courses"],
   openGraph: {
-    title: "Obserra Academy | Professional Security and Intelligence Training",
+    title: "Obserra Training Academy | Professional Security and Intelligence Training",
     description: "Paid, interactive, certificate-based training across cybersecurity, protection, intelligence, and technology.",
     url: "https://www.obserrallc.com/academy",
     type: "website",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Obserra Academy | Professional Training",
+    title: "Obserra Training Academy | Professional Training",
     description: "Interactive paid training with final assessment and Obserra Certificate of Training.",
     images: ["/brand/visuals/obserra-cybersecurity.png"],
   },
@@ -28,7 +28,7 @@ export default function AcademyPage() {
     "@graph": [
       {
         "@type": "ItemList",
-        name: "Obserra Academy professional course catalog",
+        name: "Obserra Training Academy professional course catalog",
         numberOfItems: courses.length,
         itemListElement: courses.map((course, index) => ({
           "@type": "ListItem",
@@ -38,7 +38,7 @@ export default function AcademyPage() {
             name: course.title,
             description: course.description,
             url: `https://www.obserrallc.com/academy/${course.id}`,
-            provider: { "@type": "Organization", name: "Obserra Academy", url: "https://www.obserrallc.com/academy" },
+            provider: { "@type": "Organization", name: "Obserra Training Academy", url: "https://www.obserrallc.com/academy" },
             offers: { "@type": "Offer", price: course.price, priceCurrency: "USD", availability: "https://schema.org/InStock" },
           },
         })),
@@ -47,7 +47,7 @@ export default function AcademyPage() {
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: "https://www.obserrallc.com" },
-          { "@type": "ListItem", position: 2, name: "Academy", item: "https://www.obserrallc.com/academy" }
+          { "@type": "ListItem", position: 2, name: "Training Academy", item: "https://www.obserrallc.com/academy" }
         ]
       }
     ],

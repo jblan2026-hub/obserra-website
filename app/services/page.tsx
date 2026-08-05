@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowRight, ShieldCheck, Brain, Briefcase, Users, Binary, Landmark, BookOpen, Building2, LockKeyhole } from "lucide-react";
 import "../apps/apps.css";
 import "./services.css";
+import { serviceCatalog } from "./serviceCatalog";
 
 export const metadata: Metadata = {
   title: "Services | Obserra Executive Protection, Cybersecurity, Intelligence and Advisory",
@@ -25,20 +26,18 @@ export const metadata: Metadata = {
   },
 };
 
-const services = [
-  ["Executive Protection", "Executive-facing protective programs with advance planning, travel safeguards, and high-risk event posture control.", ShieldCheck],
-  ["Protective Intelligence", "Operational intelligence workflows that identify threat indicators early and support defensible protective decisions.", Brain],
-  ["Cybersecurity Consulting", "Board-relevant cyber strategy, control architecture, and resilience planning for complex enterprise environments.", LockKeyhole],
-  ["Fractional CISO", "Interim security leadership for governance maturity, risk reduction, executive reporting, and prioritized execution.", Briefcase],
-  ["AI Governance", "Policy-aligned AI operating controls covering model risk, approval workflow, evidence, and accountability.", Binary],
-  ["Enterprise Risk", "Cross-functional risk intelligence that links business impact, control posture, and leadership action paths.", Landmark],
-  ["Identity Access Management", "Identity lifecycle, privileged access governance, and certification controls for enterprise-scale access risk.", Users],
-  ["GRC", "Governance, risk, and compliance structures that produce audit-ready evidence and executive-level decision clarity.", Building2],
-  ["Digital Risk", "Exposure mapping across identity, surface area, and digital ecosystems with mitigation prioritization.", ShieldCheck],
-  ["Training", "Outcome-driven professional training through Obserra Academy and enterprise cohort enablement.", BookOpen],
-  ["Corporate Security", "Integrated corporate security design aligned to legal, HR, cyber, and physical operations.", ShieldCheck],
-  ["Technology Consulting", "Secure AI-native product strategy, implementation planning, and enterprise integration governance.", ArrowRight]
-] as const;
+const iconByKey = {
+  ShieldCheck,
+  Brain,
+  LockKeyhole,
+  Briefcase,
+  Binary,
+  Landmark,
+  Users,
+  Building2,
+  BookOpen,
+  ArrowRight,
+};
 
 export default function ServicesPage() {
   const schema = {
@@ -73,7 +72,9 @@ export default function ServicesPage() {
         </a>
         <nav aria-label="Services navigation">
           <a href="/">Home</a>
+          <a href="/protection-intelligence">Protection</a>
           <a href="/apps">Applications</a>
+          <a href="/catalog">Catalog</a>
           <a href="/eios">EIOS</a>
           <a href="/academy">Academy</a>
           <a href="/about">About</a>
@@ -84,17 +85,18 @@ export default function ServicesPage() {
 
       <section className="apps-hero services-hero">
         <div>
-          <p className="apps-eyebrow">ENTERPRISE COMMERCIAL SERVICES</p>
-          <h1>Cybersecurity, protection, intelligence, and governance services built for high-consequence decisions.</h1>
+          <p className="apps-eyebrow">EXECUTIVE SERVICES</p>
+          <h1>Bring in proven cyber, protection, and intelligence experts when the stakes are high.</h1>
           <p>
             OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC delivers advisory and execution across
             executive protection, protective intelligence, cybersecurity leadership, AI governance,
-            identity and access, and enterprise risk so teams can reduce exposure and move faster with control.
+            identity and access, and enterprise risk. We help leadership teams reduce exposure,
+            make faster decisions, and execute confidently across critical priorities.
           </p>
           <div className="apps-actions">
             <a className="apps-button" href="mailto:info@obserrallc.com?subject=Request%20Obserra%20Executive%20Consultation">Request executive consultation</a>
             <a className="apps-outline" href="mailto:info@obserrallc.com?subject=Schedule%20Obserra%20Scoping%20Session">Book commercial scoping session</a>
-            <a className="apps-outline" href="mailto:info@obserrallc.com?subject=Free%20Lead%20Generation%20and%20Advertising%20Strategy%20Session">Free growth strategy session</a>
+            <a className="apps-outline" href="/catalog">View course catalog</a>
           </div>
         </div>
         <aside>
@@ -105,26 +107,29 @@ export default function ServicesPage() {
       </section>
 
       <section className="apps-results services-results">
-        <p>Service lines we deliver today</p>
+        <p>Service lines available for immediate engagement</p>
         <div className="apps-grid">
-          {services.map(([title, copy, Icon]) => (
-            <article key={title}>
+          {serviceCatalog.map((service) => {
+            const Icon = iconByKey[service.icon];
+            return (
+              <article key={service.id}>
               <header>
                 <span className="status-pill status-available">Service</span>
                 <small>Advisory</small>
               </header>
-              <h2>{title}</h2>
-              <p>{copy}</p>
+              <h2>{service.title}</h2>
+              <p>{service.summary}</p>
               <footer>
-                <a href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`${title} consultation`)}`}>
+                <a href={`/services/${service.id}`}>
                   Start this engagement <ArrowRight size={15} />
                 </a>
               </footer>
               <div className="service-icon-wrap">
                 <Icon size={16} />
               </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </section>
 
