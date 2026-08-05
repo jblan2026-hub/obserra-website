@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import AppsMarketplaceClient from "./AppsMarketplaceClient";
 import { marketplaceApps } from "./appsData";
 import "./apps.css";
+import "./apps-interactions.css";
 
 export const metadata: Metadata = {
   title: "Applications | Obserra Enterprise Marketplace",
@@ -42,18 +43,18 @@ export default function AppsPage() {
             applicationCategory: entry.category,
             description: entry.value,
             operatingSystem: "Web",
-            url: `https://www.obserrallc.com/apps/${entry.slug}`
-          }
-        }))
+            url: `https://www.obserrallc.com/apps/${entry.slug}`,
+          },
+        })),
       },
       {
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: "https://www.obserrallc.com" },
-          { "@type": "ListItem", position: 2, name: "Applications", item: "https://www.obserrallc.com/apps" }
-        ]
-      }
-    ]
+          { "@type": "ListItem", position: 2, name: "Applications", item: "https://www.obserrallc.com/apps" },
+        ],
+      },
+    ],
   };
 
   return (
