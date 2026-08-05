@@ -38,6 +38,15 @@ function normalizeLicenseType(value?: string): LicenseType {
   }
 }
 
+function subscriptionRenewalAt(subscription: Awaited<ReturnType<ReturnType<typeof getStripe>["subscriptions"]["retrieve"]>>) {
+  const periodEnds = subscription.items.data
+    .map((item) => item.current_period_end)
+    .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
+
+  if (!periodEnds.length) return undefined;
+  return new Date(Math.max(...periodEnds) * 1000).toISOString();
+}
+
 export class StripeLicenseRepository implements LicenseRepository {
   async listForSubject(query: LicenseQuery): Promise<LicenseRepositoryResult> {
     if (!process.env.STRIPE_SECRET_KEY) {
@@ -59,12 +68,13 @@ export class StripeLicenseRepository implements LicenseRepository {
     });
 
     const records = subscriptions.data.map<LicenseRecord>((subscription) => {
-      const seatsPurchased = Math.max(1, Number(subscription.metadata.seatsPurchased || subscription.items.data[0]?.quantity || 1));
+      const primaryItem = subscription.items.data[0];
+      const seatsPurchased = Math.max(1, Number(subscription.metadata.seatsPurchased || primaryItem?.quantity || 1));
       const seatsAssigned = Math.max(0, Number(subscription.metadata.seatsAssigned || 1));
       const productSlug = subscription.metadata.obserraApp || "unmapped-product";
       const tenantId = subscription.metadata.tenantId || subscription.metadata.organizationId || query.tenantId || `subject:${query.subjectId}`;
       const expiresAt = subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : undefined;
-      const renewalAt = subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : undefined;
+      const renewalAt = subscriptionRenewalAt(subscription);
 
       return {
         id: subscription.id,
