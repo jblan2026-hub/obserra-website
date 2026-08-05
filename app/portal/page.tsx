@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import "./portal.css";
 
 export const metadata: Metadata = {
   title: "Customer Portal | Obserra",
-  description: "Access Obserra Academy, certificates, purchases, enterprise licensing, reports, support, and account services through one customer entry point.",
+  description: "Access Obserra Academy, certificates, purchases, enterprise licensing, reports, support, and account services through one protected customer entry point.",
   alternates: { canonical: "/portal" },
+  robots: { index: false, follow: false },
 };
 
 const services = [
@@ -18,7 +22,10 @@ const services = [
   ["SUPPORT", "Customer support", "Open a confidential support conversation for Academy, applications, advisory, or protection services.", "/contact?interest=customer-support", "Open support"],
 ];
 
-export default function PortalPage() {
+export default async function PortalPage() {
+  const { userId } = await auth();
+  if (!userId) redirect("/sign-in?redirect_url=/portal");
+
   return (
     <main className="portal-page">
       <header className="portal-nav">
@@ -29,23 +36,24 @@ export default function PortalPage() {
         <nav aria-label="Portal navigation">
           <Link href="/academy">Academy</Link><Link href="/apps">Applications</Link><Link href="/trust">Trust</Link><Link href="/contact">Contact</Link>
           <Link className="portal-cta" href="/contact?interest=customer-support">Get support</Link>
+          <div className="portal-account-bar" aria-label="Account menu"><UserButton /></div>
         </nav>
       </header>
 
       <section className="portal-hero">
         <div>
-          <p className="portal-eyebrow">OBSERRA CUSTOMER SERVICES</p>
-          <h1>One secure entry point for learning, licensing, deliverables, and support.</h1>
-          <p>This portal foundation centralizes customer pathways already supported by Obserra. Authenticated dashboards, order history, certificates, downloads, licenses, and account administration will be activated as the corresponding backend services are released.</p>
+          <p className="portal-eyebrow">AUTHENTICATED CUSTOMER SERVICES</p>
+          <h1>One protected entry point for learning, licensing, deliverables, and support.</h1>
+          <p>Your verified Obserra identity now protects access to this portal. Customer dashboards, order history, certificates, downloads, licenses, and account administration will be activated only as their supporting authorization and data controls are completed.</p>
           <div className="portal-actions">
             <Link className="portal-button" href="/academy">Open Academy</Link>
             <Link className="portal-outline" href="/contact?interest=customer-support">Contact customer support</Link>
           </div>
         </div>
         <aside className="portal-status" aria-label="Portal service status">
+          <article><span>IDENTITY</span><strong>Authenticated session active</strong></article>
           <article><span>ACADEMY</span><strong>Enrollment and course access available</strong></article>
           <article><span>ENTERPRISE SERVICES</span><strong>Licensing and support available</strong></article>
-          <article><span>ACCOUNT DASHBOARD</span><strong>Phased activation in progress</strong></article>
         </aside>
       </section>
 
@@ -59,10 +67,10 @@ export default function PortalPage() {
 
       <section className="portal-section">
         <p className="portal-eyebrow">SECURITY AND ACCOUNT INTEGRITY</p>
-        <h2>Customer access will be activated only when identity, authorization, audit, and data protections are ready.</h2>
+        <h2>Identity is active. Authorization and customer data capabilities will remain phased and controlled.</h2>
         <div className="portal-security">
-          <p>Obserra will not expose placeholder account data or simulated customer records. New authenticated capabilities will be released only after the related identity, tenant isolation, authorization, logging, privacy, and recovery controls are implemented and validated.</p>
-          <ul><li>Least-privilege access</li><li>Role-based authorization</li><li>Tenant-aware data boundaries</li><li>Audit logging and traceability</li><li>Secure payment and account workflows</li><li>Privacy and retention controls</li></ul>
+          <p>Obserra does not expose placeholder account data or simulated customer records. New authenticated capabilities are released only after identity, tenant isolation, authorization, logging, privacy, recovery, and operational support controls are implemented and validated.</p>
+          <ul><li>Verified user identity</li><li>Protected portal routes</li><li>Least-privilege authorization</li><li>Audit logging and traceability</li><li>Secure payment and account workflows</li><li>Privacy and retention controls</li></ul>
         </div>
       </section>
 

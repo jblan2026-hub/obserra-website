@@ -4,35 +4,32 @@ import Link from "next/link";
 import { SignIn } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
-  title: "Learner Sign In",
-  description: "Sign in to purchase and access Obserra Academy professional training.",
+  title: "Sign In | Obserra Customer Portal",
+  description: "Sign in securely to access Obserra Academy, customer services, licensing, reports, and support.",
   robots: { index: false, follow: false },
 };
 
 export default function SignInPage() {
   return (
     <main className="auth-shell">
-      <section className="auth-card">
-        <Link href="/academy" aria-label="Return to Obserra Academy">
-          <Image src="/brand/obserra-logo.png" width={240} height={46} alt="Obserra Academy" />
+      <header className="auth-header">
+        <Link href="/" aria-label="Obserra home">
+          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} priority />
         </Link>
-        <p className="auth-kicker">SECURE LEARNER ACCESS</p>
-        <h1>Sign in to continue your enrollment.</h1>
-        <p>
-          Create or access your learner account to complete secure payment, unlock your selected course,
-          save progress across devices, complete the final assessment, and generate your certificate.
-        </p>
-        <SignIn
-          routing="path"
-          path="/sign-in"
-          fallbackRedirectUrl="/academy"
-          signUpUrl="/sign-up"
-        />
-        <p className="auth-help">
-          Your account is used only to manage enrollment, course access, progress, and completion records. Need help?{" "}
-          <a href="mailto:info@obserrallc.com?subject=Obserra%20Academy%20Learner%20Access">Contact Obserra Academy</a>.
-        </p>
+        <Link href="/trust">Trust Center</Link>
+      </header>
+      <section className="auth-layout">
+        <div className="auth-copy">
+          <p className="eyebrow">SECURE CUSTOMER ACCESS</p>
+          <h1>Sign in to your Obserra account.</h1>
+          <p>Access customer services through a governed identity boundary designed for account integrity, least privilege, protected transactions, and auditable access.</p>
+          <div className="auth-assurance">
+            <span>Protected customer portal</span><span>Account based Academy access</span><span>Secure purchase workflows</span><span>Enterprise identity ready</span>
+          </div>
+        </div>
+        <div className="auth-panel"><SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" fallbackRedirectUrl="/portal" /></div>
       </section>
+      <p className="auth-note">Authorized access only. Authentication activity may be logged for security, fraud prevention, support, and compliance purposes.</p>
     </main>
   );
 }
