@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { findAppBySlug } from "../../../apps/appsData";
 import { availablePlansFor, stripePriceEnvironmentKey, type BillingInterval } from "../../../apps/commerce";
 import { getStripe } from "../../../../lib/stripe";
+import { primaryAccountEmail } from "../../../../lib/app-entitlements";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -40,6 +41,7 @@ export async function GET(request: Request) {
 
   try {
     const stripe = getStripe();
+    const email = await primaryAccountEmail();
     const successUrl = new URL("/portal", requestUrl);
     successUrl.searchParams.set("subscription", "activated");
     successUrl.searchParams.set("app", app.slug);
@@ -58,11 +60,14 @@ export async function GET(request: Request) {
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       client_reference_id: userId,
+      customer_email: email,
       metadata,
       subscription_data: { metadata },
       success_url: successUrl.toString(),
       cancel_url: cancelUrl.toString(),
       allow_promotion_codes: true,
+      billing_address_collection: "required",
+      tax_id_collection: { enabled: true },
     });
 
     if (!session.url) throw new Error("Stripe did not return a checkout URL");
