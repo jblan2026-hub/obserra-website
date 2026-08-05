@@ -2,10 +2,9 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { findAppBySlug } from "../../../apps/appsData";
 import { resolveAppEntitlement } from "../../../../lib/app-entitlements";
+import { publishedReleaseFor, signedReleaseUrl } from "../../../../lib/release-delivery";
 
-function downloadEnvironmentKey(slug: string) {
-  return `APP_DOWNLOAD_${slug.replace(/[^a-z0-9]+/gi, "_").toUpperCase()}`;
-}
+export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -27,11 +26,15 @@ export async function GET(request: Request) {
     return NextResponse.redirect(subscribe);
   }
 
-  const downloadUrl = process.env[downloadEnvironmentKey(app.slug)];
-  if (!downloadUrl) return NextResponse.redirect(new URL(`/portal?download=not-published&app=${app.slug}`, requestUrl));
+  const release = publishedReleaseFor(app.slug);
+  if (!release) return NextResponse.redirect(new URL(`/portal/applications?download=not-published&app=${app.slug}`, requestUrl));
+
+  const downloadUrl = signedReleaseUrl(release);
+  if (!downloadUrl) return NextResponse.redirect(new URL(`/portal/applications?download=delivery-not-configured&app=${app.slug}`, requestUrl));
 
   const response = NextResponse.redirect(downloadUrl, 303);
   response.headers.set("Cache-Control", "no-store, private");
+  response.headers.set("Content-Disposition", `attachment; filename="${release.artifactFile.replace(/"/g, "")}"`);
   response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   return response;
 }
