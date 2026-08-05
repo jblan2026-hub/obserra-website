@@ -1,29 +1,37 @@
 import type { Metadata } from "next";
-import AppsMarketplaceClient from "./AppsMarketplaceClient";
+import FortuneMarketplaceClient from "./FortuneMarketplaceClient";
 import { marketplaceApps } from "./appsData";
 import "./apps.css";
 import "./apps-interactions.css";
 import "./apps-commercial.css";
 import "./apps-responsive.css";
+import "./fortune-marketplace.css";
 
 export const metadata: Metadata = {
-  title: "Applications | Obserra Enterprise Marketplace",
+  title: "Enterprise Application Marketplace | Obserra",
   description:
-    "Explore Obserra enterprise applications across cybersecurity, executive protection, intelligence, AI governance, and operational command.",
+    "Explore Obserra enterprise applications for executive intelligence, cybersecurity, identity, governance, AI oversight, protective operations, and enterprise execution.",
   alternates: { canonical: "/apps" },
-  keywords: ["enterprise applications", "cybersecurity software", "AI governance software", "obserra apps"],
+  keywords: [
+    "enterprise application marketplace",
+    "executive intelligence software",
+    "cybersecurity software",
+    "AI governance software",
+    "enterprise risk applications",
+    "Obserra applications",
+  ],
   openGraph: {
-    title: "Obserra Applications Marketplace",
+    title: "Obserra Enterprise Application Marketplace",
     description:
-      "Enterprise software for intelligence, cybersecurity, executive protection, AI governance, and risk operations.",
+      "Secure enterprise applications for intelligence, cybersecurity, identity, governance, AI oversight, and accountable execution.",
     url: "https://www.obserrallc.com/apps",
     type: "website",
-    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: "Obserra Applications Marketplace" }],
+    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: "Obserra Enterprise Application Marketplace" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Obserra Applications Marketplace",
-    description: "Enterprise applications for cyber, intelligence, governance, and execution.",
+    title: "Obserra Enterprise Application Marketplace",
+    description: "Enterprise applications for intelligence, cybersecurity, governance, and execution.",
     images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
   },
 };
@@ -34,7 +42,7 @@ export default function AppsPage() {
     "@graph": [
       {
         "@type": "ItemList",
-        name: "Obserra Enterprise Applications Marketplace",
+        name: "Obserra Enterprise Application Marketplace",
         numberOfItems: marketplaceApps.length,
         itemListElement: marketplaceApps.map((entry, index) => ({
           "@type": "ListItem",
@@ -61,7 +69,7 @@ export default function AppsPage() {
 
   return (
     <>
-      <AppsMarketplaceClient />
+      <FortuneMarketplaceClient />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
     </>
   );
