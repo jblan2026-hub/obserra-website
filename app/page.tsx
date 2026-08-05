@@ -4,6 +4,7 @@ import Link from "next/link";
 import HomeHeader from "./HomeHeader";
 import { ButtonLink, KpiCard, StatusBadge } from "./components/ui/ObserraUI";
 import "./executive-mission-control.css";
+import "./executive-mission-control-polish.css";
 
 export const metadata: Metadata = {
   title: "Obserra | Executive Intelligence for High-Consequence Organizations",
@@ -125,7 +126,7 @@ export default function HomePage() {
 
       <section className="mission-section">
         <div className="mission-academy">
-          <div><p className="obs-eyebrow">OBSERRA ACADEMY</p><h2>Build workforce capability for the decisions that matter now.</h2><p>Purchase professional training through secure Stripe checkout, receive account-based course access, save progress, complete assessments, and generate an Obserra Certificate of Training after meeting the published standard.</p><div className="mission-hero__actions"><ButtonLink href="/academy">Browse Academy courses</ButtonLink><ButtonLink href="/contact?interest=enterprise-training" variant="secondary">Request team training</ButtonLink></div></div>
+          <div><p className="obs-eyebrow">OBSERRA ACADEMY</p><h2>Build workforce capability for the decisions that matter now.</h2><p>Purchase professional training through secure Stripe checkout, receive account-based course access, save progress, complete assessments, and generate an Obserra Certificate of Training after meeting the published standard.</p><div className="mission-hero__actions"><ButtonLink href="/academy">Browse Academy courses</ButtonLink><ButtonLink href="/academy/enterprise" variant="secondary">Explore enterprise training</ButtonLink></div></div>
           <div className="mission-academy__steps"><span><b>1</b>Select the right course or learning path</span><span><b>2</b>Sign in and pay securely</span><span><b>3</b>Receive immediate account-based access</span><span><b>4</b>Complete, assess, and certify</span></div>
         </div>
       </section>
