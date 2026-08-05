@@ -1,26 +1,106 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import "../commercial-pages.css";
+import { ArrowRight, Building2, Brain, GraduationCap, ShieldCheck } from "lucide-react";
+import { industrySolutions } from "./industryData";
+import "./industries.css";
 
 export const metadata: Metadata = {
-  title: "Industries | Obserra Executive Intelligence and Cybersecurity",
-  description: "Explore Obserra solutions for regulated and high-consequence industries including healthcare, financial services, manufacturing, critical infrastructure, government, and technology.",
+  title: "Industries | Obserra Enterprise Intelligence and Security Solutions",
+  description: "Industry-specific cybersecurity, executive protection, AI governance, intelligence, risk, and EIOS solutions for regulated and high-consequence sectors.",
   alternates: { canonical: "/industries" },
+  openGraph: {
+    title: "Obserra Industry Solutions",
+    description: "Industry-specific executive intelligence, cybersecurity, protection, AI governance, and assurance solutions.",
+    url: "https://www.obserrallc.com/industries",
+    type: "website",
+    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1344, height: 768, alt: "Obserra industry solutions" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Obserra Industry Solutions",
+    description: "Industry-specific executive intelligence, cybersecurity, protection, AI governance, and assurance solutions.",
+    images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
+  },
 };
 
-const industries = [
-  ["Healthcare and Medical Technology", "Protect connected care, regulated products, sensitive data, and executive decision-making across complex clinical and technology environments."],
-  ["Financial Services and Insurance", "Strengthen cyber governance, operational resilience, third-party risk, AI oversight, and board-level accountability."],
-  ["Manufacturing and Industrial Operations", "Connect enterprise risk, operational technology, supply-chain exposure, and continuity planning into one decision framework."],
-  ["Energy and Critical Infrastructure", "Support high-availability operations with cyber resilience, intelligence, governance, and consequence-aware prioritization."],
-  ["Government and Defense", "Improve mission assurance, secure technology adoption, intelligence workflows, and compliance-aligned execution."],
-  ["Technology and Cloud Services", "Scale secure products, AI governance, customer assurance, incident readiness, and enterprise risk management."],
-];
-
 export default function IndustriesPage() {
-  return <main className="commercial-page"><div className="commercial-shell">
-    <section className="commercial-hero"><p className="commercial-eyebrow">INDUSTRY SOLUTIONS</p><h1>Enterprise risk intelligence built for the operating environment.</h1><p>Obserra aligns advisory, applications, intelligence, protection, and professional training to the regulatory pressure, operational realities, and decision consequences of each industry.</p></section>
-    <section className="commercial-grid">{industries.map(([title, copy]) => <article className="commercial-card" key={title}><span>Industry solution</span><h2>{title}</h2><p>{copy}</p><Link href={`/contact?interest=enterprise-consultation&industry=${encodeURIComponent(title)}`}>Discuss your industry requirements →</Link></article>)}</section>
-    <section className="commercial-cta"><div><h2>Build an industry-specific Obserra engagement.</h2><p>Combine executive advisory, applications, Academy training, and intelligence capabilities around your operating model.</p></div><Link href="/contact?interest=enterprise-consultation">Start a confidential conversation</Link></section>
-  </div></main>;
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: "Obserra Industry Solutions",
+        url: "https://www.obserrallc.com/industries",
+        description: "Industry-specific enterprise intelligence, cybersecurity, protection, AI governance, and assurance solutions.",
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://www.obserrallc.com" },
+          { "@type": "ListItem", position: 2, name: "Industries", item: "https://www.obserrallc.com/industries" },
+        ],
+      },
+    ],
+  };
+
+  return (
+    <main className="industry-page">
+      <section className="industry-hero">
+        <div>
+          <p className="industry-eyebrow">INDUSTRY SOLUTIONS</p>
+          <h1>Enterprise intelligence built around the operating environment.</h1>
+          <p>Obserra aligns cybersecurity, protection, intelligence, AI governance, assurance, and executive decision support to each industry&apos;s regulatory pressure, operational dependencies, and consequence profile.</p>
+          <div className="industry-actions">
+            <Link href="/contact?interest=enterprise-consultation">Start an industry consultation</Link>
+            <Link href="/services">Explore enterprise services</Link>
+          </div>
+        </div>
+        <aside>
+          <article><ShieldCheck size={18} /><strong>12 sectors</strong><span>Purpose-built industry pathways</span></article>
+          <article><Brain size={18} /><strong>Cross-domain</strong><span>Cyber, physical, AI, and enterprise risk</span></article>
+          <article><Building2 size={18} /><strong>Executive-ready</strong><span>Decision support and board-level context</span></article>
+        </aside>
+      </section>
+
+      <section className="industry-grid-section">
+        <div className="industry-section-heading">
+          <p>INDUSTRY PORTFOLIO</p>
+          <h2>Select the operating environment that best matches your enterprise.</h2>
+        </div>
+        <div className="industry-grid">
+          {industrySolutions.map((industry) => (
+            <article key={industry.slug}>
+              <span>{industry.shortName}</span>
+              <h2>{industry.name}</h2>
+              <p>{industry.summary}</p>
+              <div className="industry-card-signals">
+                <small>{industry.regulatoryContext.length} regulatory contexts</small>
+                <small>{industry.serviceSlugs.length} aligned services</small>
+              </div>
+              <Link href={`/industries/${industry.slug}`}>Open industry solution <ArrowRight size={15} /></Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="industry-operating-model">
+        <div>
+          <p className="industry-eyebrow">ONE CONNECTED OPERATING MODEL</p>
+          <h2>Industry context flows into every Obserra capability.</h2>
+        </div>
+        <div className="industry-model-grid">
+          <article><ShieldCheck size={20} /><strong>Services</strong><p>Executive advisory and delivery aligned to sector-specific risk.</p><Link href="/services">View services</Link></article>
+          <article><Brain size={20} /><strong>EIOS</strong><p>Enterprise intelligence, digital twin, knowledge graph, and AI decision support.</p><Link href="/eios">View EIOS</Link></article>
+          <article><GraduationCap size={20} /><strong>Academy</strong><p>Role-based learning pathways for leaders, practitioners, and teams.</p><Link href="/academy/enterprise">View enterprise learning</Link></article>
+          <article><Building2 size={20} /><strong>Trust Center</strong><p>Security architecture, framework alignment, policy, and procurement assurance.</p><Link href="/trust">Open Trust Center</Link></article>
+        </div>
+      </section>
+
+      <section className="industry-cta">
+        <div><p className="industry-eyebrow">BUILD THE RIGHT ENGAGEMENT</p><h2>Connect industry pressure to a controlled executive action plan.</h2><p>Obserra scopes engagements around the actual operating model, regulatory environment, risk appetite, and decision priorities of the organization.</p></div>
+        <Link href="/contact?interest=enterprise-consultation">Request industry consultation</Link>
+      </section>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+    </main>
+  );
 }
