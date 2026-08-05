@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "test": "node --test",
     "test:production": "node --test scripts/production-smoke.mjs",
-    "release:apps": "node scripts/generate-app-release-bundle.mjs"
+    "release:apps": "node scripts/generate-app-release-bundle.mjs",
+    "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.6.4",
