@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const event = {
     level,
     event: "persistent_control_room_check",
-    durationMs: Date.now() - startedAt,
+    requestDurationMs: Date.now() - startedAt,
     ...snapshot,
   };
   if (level === "error") console.error(JSON.stringify(event));
