@@ -4,6 +4,8 @@ import nist from "../compliance/nist-security-by-design-crosswalk.json";
 import iso27001 from "../compliance/iso27001-security-by-design-crosswalk.json";
 import soc2 from "../compliance/soc2-security-by-design-crosswalk.json";
 import privacy from "../compliance/privacy-security-by-design-crosswalk.json";
+import pci from "../compliance/pci-dss-purchase-stream-crosswalk.json";
+import dataProtection from "../compliance/data-protection-security-by-design-crosswalk.json";
 
 type RawControl = {
   controlId: string;
@@ -17,15 +19,16 @@ type RawControl = {
   ssdf?: string[];
   gdpr?: string[];
   iso27701?: string;
+  nist?: string[];
+  iso27001?: string[];
 };
 
-export type GovernanceControl = RawControl & {
-  framework: "NIST" | "ISO 27001" | "SOC 2" | "Privacy";
-};
+export type GovernanceFramework = "NIST" | "ISO 27001" | "SOC 2" | "Privacy" | "PCI DSS" | "Data Protection";
+export type GovernanceControl = RawControl & { framework: GovernanceFramework };
 
 export type AuditableDocument = {
   id: string;
-  category: "Governance" | "Security" | "Privacy" | "Release" | "Operations" | "Architecture" | "Testing";
+  category: "Governance" | "Security" | "Privacy" | "Release" | "Operations" | "Architecture" | "Testing" | "Commerce";
   title: string;
   source: string;
   description: string;
@@ -33,11 +36,15 @@ export type AuditableDocument = {
   evidenceType: "policy" | "crosswalk" | "source" | "test" | "workflow" | "release";
 };
 
+const frameworks: GovernanceFramework[] = ["NIST", "ISO 27001", "SOC 2", "Privacy", "PCI DSS", "Data Protection"];
+
 const controls: GovernanceControl[] = [
   ...(nist.controls as RawControl[]).map((control) => ({ ...control, framework: "NIST" as const })),
   ...(iso27001.controls as RawControl[]).map((control) => ({ ...control, framework: "ISO 27001" as const })),
   ...(soc2.controls as RawControl[]).map((control) => ({ ...control, framework: "SOC 2" as const })),
   ...(privacy.controls as RawControl[]).map((control) => ({ ...control, framework: "Privacy" as const })),
+  ...(pci.controls as RawControl[]).map((control) => ({ ...control, framework: "PCI DSS" as const })),
+  ...(dataProtection.controls as RawControl[]).map((control) => ({ ...control, framework: "Data Protection" as const })),
 ];
 
 const auditableDocuments: AuditableDocument[] = [
@@ -45,10 +52,13 @@ const auditableDocuments: AuditableDocument[] = [
   { id: "iso-crosswalk", category: "Governance", title: "ISO/IEC 27001 Annex A Crosswalk", source: "compliance/iso27001-security-by-design-crosswalk.json", description: "ISO control identifiers mapped to Obserra implementation evidence without reproducing licensed text.", exportable: true, evidenceType: "crosswalk" },
   { id: "soc2-crosswalk", category: "Governance", title: "SOC 2 Trust Services Crosswalk", source: "compliance/soc2-security-by-design-crosswalk.json", description: "SOC 2 criteria mapped to security, availability, confidentiality, processing integrity, and privacy evidence.", exportable: true, evidenceType: "crosswalk" },
   { id: "privacy-crosswalk", category: "Privacy", title: "Privacy Security-by-Design Crosswalk", source: "compliance/privacy-security-by-design-crosswalk.json", description: "NIST Privacy Framework, ISO/IEC 27701, and GDPR-aligned evidence mapping.", exportable: true, evidenceType: "crosswalk" },
+  { id: "pci-crosswalk", category: "Commerce", title: "PCI DSS Purchase-Stream Crosswalk", source: "compliance/pci-dss-purchase-stream-crosswalk.json", description: "PCI DSS v4.0.1 purchase-stream readiness mappings for Stripe-hosted checkout, billing, webhooks, logging, and payment-page integrity.", exportable: true, evidenceType: "crosswalk" },
+  { id: "data-protection-crosswalk", category: "Privacy", title: "Data Protection Compliance Crosswalk", source: "compliance/data-protection-security-by-design-crosswalk.json", description: "Data governance, classification, minimization, encryption, retention, deletion, DLP, recovery, incident response, and continuous assurance mappings.", exportable: true, evidenceType: "crosswalk" },
   { id: "release-workflow", category: "Release", title: "Branch and Deployed-System Validation Workflow", source: ".github/workflows/branch-validation.yml", description: "Release-blocking CI workflow covering static, security, operational, framework, and deployed-system checks.", exportable: true, evidenceType: "workflow" },
   { id: "release-command", category: "Release", title: "Complete Release Verification Command", source: "package.json#verify:release", description: "Authoritative command sequence for linting, tests, framework gates, rollback evidence, and production build.", exportable: true, evidenceType: "release" },
   { id: "security-resilience", category: "Security", title: "Security and Resilience Readiness Evidence", source: "scripts/security-resilience-readiness.mjs", description: "Secure defaults, bounded inputs, abuse resistance, failure behavior, and resilience checks.", exportable: true, evidenceType: "test" },
   { id: "data-protection", category: "Privacy", title: "Data Protection Readiness Evidence", source: "scripts/data-protection-readiness.mjs", description: "Privacy, secret handling, caching, disclosure, and data-protection validation.", exportable: true, evidenceType: "test" },
+  { id: "pci-purchase-stream", category: "Commerce", title: "PCI Purchase-Stream Readiness Evidence", source: "scripts/pci-purchase-stream-readiness.mjs", description: "Checkout, payment-page, webhook, card-data-scope, access, logging, security testing, and incident-response validation.", exportable: true, evidenceType: "test" },
   { id: "supply-chain", category: "Security", title: "Software Supply Chain Evidence", source: "scripts/supply-chain-readiness.mjs", description: "Dependency, package-lock, release artifact, and software-supply-chain validation.", exportable: true, evidenceType: "test" },
   { id: "rollback", category: "Release", title: "Rollback and Recovery Evidence", source: "scripts/rollback-readiness-gate.mjs", description: "Rollback prerequisites, evidence, and recovery validation for production changes.", exportable: true, evidenceType: "test" },
   { id: "operational-slo", category: "Operations", title: "Operational Service-Level Evidence", source: "scripts/operational-slo-readiness.mjs", description: "Health, timeout, service-level, monitoring, and operational readiness checks.", exportable: true, evidenceType: "test" },
@@ -56,34 +66,29 @@ const auditableDocuments: AuditableDocument[] = [
   { id: "identity", category: "Security", title: "Passwordless Identity and Step-Up Evidence", source: "lib/passwordless-auth-policy.ts", description: "Passwordless authentication, recovery, passkey, session, and recent-authentication controls.", exportable: true, evidenceType: "source" },
   { id: "session-containment", category: "Security", title: "Session and Token Containment Evidence", source: "lib/saas-session-revocation.ts", description: "Durable session, token, and organization-wide containment mechanisms.", exportable: true, evidenceType: "source" },
   { id: "health-contract", category: "Operations", title: "Production Health Contract", source: "app/api/health/route.ts", description: "Sanitized platform, storage, token, and readiness health evidence.", exportable: true, evidenceType: "source" },
-  { id: "governance-center", category: "Governance", title: "Governance Center Implementation", source: "app/admin/governance/page.tsx", description: "Owner-only control center for framework coverage, auditable documents, exports, and evidence review.", exportable: true, evidenceType: "source" },
+  { id: "governance-center", category: "Governance", title: "Governance Center Implementation", source: "app/admin/governance/page.tsx", description: "Owner-only control center for framework coverage, auditable documents, exports, vulnerability intelligence, and continuous compliance.", exportable: true, evidenceType: "source" },
 ];
 
-export function getGovernanceControls() {
-  return controls;
-}
-
-export function getAuditableDocuments() {
-  return auditableDocuments;
-}
+export function getGovernanceFrameworks() { return frameworks; }
+export function getGovernanceControls() { return controls; }
+export function getAuditableDocuments() { return auditableDocuments; }
 
 export function getGovernanceSummary() {
-  const byFramework = Object.fromEntries(
-    ["NIST", "ISO 27001", "SOC 2", "Privacy"].map((framework) => {
-      const frameworkControls = controls.filter((control) => control.framework === framework);
-      return [framework, {
-        total: frameworkControls.length,
-        implemented: frameworkControls.filter((control) => control.status === "implemented").length,
-        partial: frameworkControls.filter((control) => control.status === "partial").length,
-        planned: frameworkControls.filter((control) => control.status === "planned").length,
-      }];
-    }),
-  );
+  const byFramework = Object.fromEntries(frameworks.map((framework) => {
+    const frameworkControls = controls.filter((control) => control.framework === framework);
+    return [framework, {
+      total: frameworkControls.length,
+      implemented: frameworkControls.filter((control) => control.status === "implemented").length,
+      partial: frameworkControls.filter((control) => control.status === "partial").length,
+      planned: frameworkControls.filter((control) => control.status === "planned").length,
+    }];
+  }));
   const implemented = controls.filter((control) => control.status === "implemented").length;
   return {
     generatedAt: new Date().toISOString(),
     totalControls: controls.length,
     implementedControls: implemented,
+    partialControls: controls.filter((control) => control.status === "partial").length,
     plannedControls: controls.filter((control) => control.status === "planned").length,
     coveragePercent: controls.length ? Math.round((implemented / controls.length) * 100) : 0,
     evidenceReferences: new Set(controls.flatMap((control) => control.evidence)).size,
@@ -95,15 +100,15 @@ export function getGovernanceSummary() {
 
 export function buildGovernanceExport() {
   return {
-    title: "Obserra Governance, Security, Privacy, and Release Evidence Package",
+    title: "Obserra Governance, Security, Privacy, PCI, Data Protection, and Release Evidence Package",
     company: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
     generatedAt: new Date().toISOString(),
     summary: getGovernanceSummary(),
     controls,
     documents: auditableDocuments,
     disclaimers: [
-      "This package provides implementation evidence and readiness mappings; it is not a certification, legal opinion, or independent auditor attestation.",
-      "Licensed standards text is not reproduced. Control identifiers and Obserra-authored implementation summaries are provided for evidence traceability.",
+      "This package provides implementation evidence and readiness mappings; it is not a certification, legal opinion, PCI attestation, SOC report, or independent auditor conclusion.",
+      "Licensed standards and authoritative framework text are not reproduced. Control identifiers and Obserra-authored implementation summaries are provided for evidence traceability.",
     ],
   };
 }
