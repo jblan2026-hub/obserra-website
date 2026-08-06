@@ -77,6 +77,10 @@ check("intelligence endpoint reports services", /services/.test(intelligence));
 check("intelligence endpoint reports deployment", /deployment/.test(intelligence));
 check("intelligence endpoint reports identity", /identity/.test(intelligence));
 check("intelligence endpoint is non-cacheable", /no-store/.test(intelligence) || /force-dynamic/.test(intelligence));
+check("intelligence endpoint requires owner token", /OBSERRA_INTELLIGENCE_TOKEN/.test(intelligence));
+check("intelligence endpoint uses bearer authorization", /Bearer /.test(intelligence) && /authorization/.test(intelligence));
+check("intelligence token comparison is timing safe", /timingSafeEqual/.test(intelligence));
+check("unauthorized intelligence requests return 401", /status:\s*401/.test(intelligence));
 
 const appRoot = path.join(root, "app");
 const pageFiles = [];
@@ -115,6 +119,7 @@ console.log(JSON.stringify({
   purchaseEvents: 500,
   flowEndpoints: simulatedRequests.length,
   discoveredPages: pageFiles.length,
+  authenticatedIntelligence: true,
   digest,
   failures,
 }, null, 2));
