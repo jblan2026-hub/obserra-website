@@ -83,6 +83,9 @@ jobs:
       - name: SaaS owner operations and audit gate
         run: npm run test:saas-owner-operations
 
+      - name: SaaS customer subscription summary gate
+        run: npm run test:saas-subscription-summary
+
       - name: Rollback and release evidence gate
         run: npm run test:rollback-readiness
 
@@ -139,6 +142,9 @@ jobs:
 
       - name: Verify SaaS owner operations and audit controls
         run: npm run test:saas-owner-operations
+
+      - name: Verify SaaS customer subscription summary
+        run: npm run test:saas-subscription-summary
 
       - name: Verify rollback and release evidence
         run: npm run test:rollback-readiness
