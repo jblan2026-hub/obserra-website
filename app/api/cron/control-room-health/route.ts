@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildControlRoomSnapshot } from "../../../../../lib/control-room-monitor";
+import { buildControlRoomSnapshot } from "../../../../lib/control-room-monitor";
 
 export const dynamic = "force-dynamic";
 
@@ -11,13 +11,15 @@ export async function GET(request: Request) {
 
   const startedAt = Date.now();
   const snapshot = await buildControlRoomSnapshot();
-  const level = snapshot.status === "healthy" ? "info" : snapshot.status === "degraded" ? "warn" : "error";
-  console[level === "error" ? "error" : level === "warn" ? "warn" : "log"](JSON.stringify({
-    level,
+  const payload = JSON.stringify({
+    level: snapshot.status === "healthy" ? "info" : snapshot.status === "degraded" ? "warn" : "error",
     event: "persistent_control_room_check",
     durationMs: Date.now() - startedAt,
     ...snapshot,
-  }));
+  });
+  if (snapshot.status === "unhealthy") console.error(payload);
+  else if (snapshot.status === "degraded") console.warn(payload);
+  else console.log(payload);
 
   return NextResponse.json(snapshot, {
     status: snapshot.status === "unhealthy" ? 503 : 200,
