@@ -57,7 +57,7 @@ jobs:
   deployed-system-gates:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -79,12 +79,27 @@ jobs:
           OBSERRA_BASE_URL: ${{ secrets.OBSERRA_WEBSITE_LIVE_URL }}
         run: npm run test:journey
 
+      - name: Verify primary website HA performance isolation
+        env:
+          OBSERRA_BASE_URL: ${{ secrets.OBSERRA_WEBSITE_LIVE_URL }}
+        run: npm run test:performance-isolation
+
       - name: Verify secondary website customer and owner journeys
         env:
           OBSERRA_BASE_URL: ${{ secrets.OBSERRA_WEBSITE_LCN2_URL }}
         run: npm run test:journey
 
+      - name: Verify secondary website HA performance isolation
+        env:
+          OBSERRA_BASE_URL: ${{ secrets.OBSERRA_WEBSITE_LCN2_URL }}
+        run: npm run test:performance-isolation
+
       - name: Verify integrated services customer and owner journeys
         env:
           OBSERRA_BASE_URL: ${{ secrets.OBSERRA_INTEGRATED_SERVICES_URL }}
         run: npm run test:journey
+
+      - name: Verify integrated services HA performance isolation
+        env:
+          OBSERRA_BASE_URL: ${{ secrets.OBSERRA_INTEGRATED_SERVICES_URL }}
+        run: npm run test:performance-isolation
