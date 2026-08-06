@@ -62,6 +62,15 @@ jobs:
       - name: Data protection and privacy readiness gate
         run: npm run test:data-protection
 
+      - name: PCI DSS purchase-stream readiness gate
+        run: npm run test:pci-purchase-streams
+
+      - name: Governance production 500x control matrix
+        run: npm run test:governance-500x
+
+      - name: Governance evidence and continuous compliance gate
+        run: npm run test:governance-evidence
+
       - name: AI governance and reliability readiness gate
         run: npm run test:ai-governance
 
@@ -140,6 +149,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Verify browser asset accessibility and security integrity
         run: npm run test:browser-integrity
 
@@ -151,6 +163,15 @@ jobs:
 
       - name: Verify data protection and privacy readiness
         run: npm run test:data-protection
+
+      - name: Verify PCI DSS purchase-stream readiness
+        run: npm run test:pci-purchase-streams
+
+      - name: Verify governance production 500x control matrix
+        run: npm run test:governance-500x
+
+      - name: Verify governance evidence and continuous compliance
+        run: npm run test:governance-evidence
 
       - name: Verify AI governance and reliability readiness
         run: npm run test:ai-governance
