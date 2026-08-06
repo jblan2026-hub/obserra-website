@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { courseForId } from "../../../../lib/academy";
 import {
   safeStudioPaymentLink,
@@ -7,6 +6,7 @@ import {
   studioCourseForId,
   studioLicenseMetadata,
 } from "../../../../lib/academy-studio";
+import { safeIdentity } from "../../../../lib/identity-runtime";
 import { getStripe } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
@@ -20,8 +20,14 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/academy?enrollment=not-ready", requestUrl));
   }
 
-  const { userId } = await auth();
-  if (!userId) {
+  const identity = await safeIdentity();
+  if (!identity.configured) {
+    const unavailableUrl = new URL("/academy", requestUrl);
+    unavailableUrl.searchParams.set("enrollment", "identity-configuration-required");
+    return NextResponse.redirect(unavailableUrl, { status: 307 });
+  }
+
+  if (!identity.userId) {
     const signInUrl = new URL("/sign-in", requestUrl);
     signInUrl.searchParams.set("redirect_url", requestUrl.toString());
     return NextResponse.redirect(signInUrl);
@@ -45,7 +51,7 @@ export async function GET(request: Request) {
 
     const metadata = {
       courseId: course.id,
-      clerkUserId: userId,
+      clerkUserId: identity.userId,
       enrollmentMode: "authenticated-paid-access",
       entitlementType: license.entitlementType,
       entitlementCode: license.entitlementCode,
@@ -62,7 +68,7 @@ export async function GET(request: Request) {
 
     const approvedPaymentLink = safeStudioPaymentLink(studioCourse?.commerce.paymentLink);
     if (approvedPaymentLink) {
-      approvedPaymentLink.searchParams.set("client_reference_id", userId);
+      approvedPaymentLink.searchParams.set("client_reference_id", identity.userId);
       return NextResponse.redirect(approvedPaymentLink, { status: 303 });
     }
 
@@ -91,7 +97,7 @@ export async function GET(request: Request) {
       mode: "payment",
       line_items: [lineItem],
       customer_creation: "always",
-      client_reference_id: userId,
+      client_reference_id: identity.userId,
       metadata,
       payment_intent_data: { metadata },
       success_url: successUrl.toString(),
