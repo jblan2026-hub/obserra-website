@@ -12,6 +12,8 @@ import { getStripe } from "../../../../lib/stripe";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+const CLAIM_POLICY = "purchaser-email-match-v1";
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const course = courseForId(requestUrl.searchParams.get("course") ?? "");
@@ -45,6 +47,7 @@ export async function GET(request: Request) {
       purchaserReference,
       identityMode,
       enrollmentMode: identity.userId ? "authenticated-paid-access" : "paid-pending-account-claim",
+      claimPolicy: CLAIM_POLICY,
       entitlementType: license.entitlementType,
       entitlementCode: license.entitlementCode,
       accessPolicy: license.accessPolicy,
@@ -95,6 +98,7 @@ export async function GET(request: Request) {
 
     const response = NextResponse.redirect(session.url, { status: 303 });
     response.headers.set("x-obserra-commerce-mode", identityMode);
+    response.headers.set("x-obserra-claim-policy", CLAIM_POLICY);
     return response;
   } catch (error) {
     console.error("academy checkout failed", error);
