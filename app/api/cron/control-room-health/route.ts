@@ -10,16 +10,17 @@ export async function GET(request: Request) {
   }
 
   const startedAt = Date.now();
-  const snapshot = await buildControlRoomSnapshot();
-  const payload = JSON.stringify({
-    level: snapshot.status === "healthy" ? "info" : snapshot.status === "degraded" ? "warn" : "error",
+  const snapshot = await buildControlRoomSnapshot("persistent");
+  const level = snapshot.status === "healthy" ? "info" : snapshot.status === "degraded" ? "warn" : "error";
+  const event = {
+    level,
     event: "persistent_control_room_check",
     durationMs: Date.now() - startedAt,
     ...snapshot,
-  });
-  if (snapshot.status === "unhealthy") console.error(payload);
-  else if (snapshot.status === "degraded") console.warn(payload);
-  else console.log(payload);
+  };
+  if (level === "error") console.error(JSON.stringify(event));
+  else if (level === "warn") console.warn(JSON.stringify(event));
+  else console.log(JSON.stringify(event));
 
   return NextResponse.json(snapshot, {
     status: snapshot.status === "unhealthy" ? 503 : 200,
