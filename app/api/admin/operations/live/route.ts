@@ -14,7 +14,7 @@ export async function GET() {
 
   const startedAt = Date.now();
   try {
-    const snapshot = await buildControlRoomSnapshot();
+    const snapshot = await buildControlRoomSnapshot("live");
     console.log(JSON.stringify({
       level: snapshot.status === "healthy" ? "info" : "warn",
       event: "control_room_live_snapshot",
