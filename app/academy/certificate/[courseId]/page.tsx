@@ -2,6 +2,7 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 import CertificateView from "./CertificateView";
 import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
+import { verifyCertificateClaim } from "../../../../lib/certificate-signing";
 
 export default async function CertificatePage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
@@ -17,8 +18,16 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
   if (!state.entitlements[courseId]) redirect(`/academy/${courseId}?required=paid-access`);
 
   const progress = state.progress[courseId];
-  if (!progress?.certificateId || !progress.completedAt || (progress.assessmentScore ?? 0) < 80) {
-    redirect(`/academy/learn/${courseId}`);
+  if (
+    !progress?.certificateId ||
+    !progress.completedAt ||
+    !progress.signedCertificate ||
+    (progress.assessmentScore ?? 0) < 80 ||
+    !verifyCertificateClaim(progress.signedCertificate) ||
+    progress.signedCertificate.courseId !== courseId ||
+    progress.signedCertificate.certificateId !== progress.certificateId
+  ) {
+    redirect(`/academy/learn/${courseId}?certificate=signature-required`);
   }
 
   const user = await (await clerkClient()).users.getUser(userId);
@@ -33,6 +42,8 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
       trainingHours={course.duration}
       completedAt={progress.completedAt}
       certificateId={progress.certificateId}
+      signatureAlgorithm={progress.signedCertificate.signatureAlgorithm}
+      publicKeyFingerprint={progress.signedCertificate.publicKeyFingerprint}
     />
   );
 }
