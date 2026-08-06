@@ -62,6 +62,9 @@ jobs:
       - name: Data protection and privacy readiness gate
         run: npm run test:data-protection
 
+      - name: AI governance and reliability readiness gate
+        run: npm run test:ai-governance
+
       - name: Rollback and release evidence gate
         run: npm run test:rollback-readiness
 
@@ -97,6 +100,9 @@ jobs:
 
       - name: Verify data protection and privacy readiness
         run: npm run test:data-protection
+
+      - name: Verify AI governance and reliability readiness
+        run: npm run test:ai-governance
 
       - name: Verify rollback and release evidence
         run: npm run test:rollback-readiness
