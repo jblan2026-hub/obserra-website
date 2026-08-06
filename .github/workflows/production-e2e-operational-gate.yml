@@ -1,0 +1,77 @@
+name: Production End-to-End Operational Gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: obserra-production-e2e
+  cancel-in-progress: true
+
+jobs:
+  production-operational-verification:
+    name: Website, Academy, identity, commerce, and security
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Verify homepage and security headers
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --max-time 30 https://www.obserrallc.com -o /tmp/home.html
+          curl --fail --silent --show-error --head --max-time 30 https://www.obserrallc.com -o /tmp/home-headers.txt
+          grep -Eqi 'Obserra' /tmp/home.html
+          grep -Eqi '^strict-transport-security:' /tmp/home-headers.txt
+          grep -Eqi '^content-security-policy:' /tmp/home-headers.txt
+          grep -Eqi '^x-content-type-options:[[:space:]]*nosniff' /tmp/home-headers.txt
+          grep -Eqi '^x-frame-options:[[:space:]]*DENY' /tmp/home-headers.txt
+
+      - name: Verify Academy catalog and legal controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --max-time 30 https://www.obserrallc.com/academy -o /tmp/academy.html
+          grep -Eqi '60[^0-9]+paid courses|60[^0-9]+course' /tmp/academy.html
+          grep -Eqi 'Stripe checkout|checkout.stripe.com' /tmp/academy.html
+          grep -Eqi 'not a state license|not.*professional certification|not third-party certification' /tmp/academy.html
+          grep -Eqi 'Certificate of Training|completion record' /tmp/academy.html
+          grep -Eqi '/api/academy/checkout\?course=' /tmp/academy.html
+
+      - name: Verify protected checkout and authentication handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --silent --show-error --location --max-time 30 \
+            'https://www.obserrallc.com/api/academy/checkout?course=zero-trust-strategy' \
+            -D /tmp/checkout-headers.txt -o /tmp/checkout.html
+          grep -Eqi 'Sign In|SECURE CUSTOMER ACCESS|clerk' /tmp/checkout.html
+          grep -Eqi 'redirect_url|zero-trust-strategy' /tmp/checkout.html
+          grep -Eqi '^cache-control:[[:space:]].*(private|no-cache|no-store)' /tmp/checkout-headers.txt
+
+      - name: Reject development identity configuration in production
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat /tmp/home.html /tmp/academy.html /tmp/checkout.html > /tmp/production-pages.html
+          if grep -Eqi 'pk_test_|clerk\.accounts\.dev|clerkstage\.dev' /tmp/production-pages.html; then
+            echo 'Production is using a Clerk development identity configuration.' >&2
+            exit 1
+          fi
+          grep -Eqi 'pk_live_' /tmp/production-pages.html
+
+      - name: Verify canonical domain redirect
+        shell: bash
+        run: |
+          set -euo pipefail
+          final_url=$(curl --silent --show-error --location --max-time 30 -o /dev/null -w '%{url_effective}' https://obserrallc.com)
+          case "$final_url" in
+            https://www.obserrallc.com|https://www.obserrallc.com/) ;;
+            *) echo "Unexpected canonical destination: $final_url" >&2; exit 1 ;;
+          esac
