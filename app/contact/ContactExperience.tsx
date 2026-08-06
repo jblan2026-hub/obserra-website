@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { track } from "@vercel/analytics";
 
 type InquiryCategory =
@@ -17,6 +18,8 @@ type InquiryCategory =
 
 type ContactMethod = "Email" | "Phone" | "Either";
 type Urgency = "Urgent" | "Same business day" | "This week" | "Standard";
+
+const defaultCategory: InquiryCategory = "Strategic partnership or general inquiry";
 
 const categories: InquiryCategory[] = [
   "Executive protection or urgent travel support",
@@ -48,7 +51,11 @@ const interestMap: Record<string, InquiryCategory> = {
 const schedulingUrl = "https://calendly.com/obserra/executive-consultation";
 
 export default function ContactExperience() {
-  const [category, setCategory] = useState<InquiryCategory>("Strategic partnership or general inquiry");
+  const searchParams = useSearchParams();
+  const requestedInterest = searchParams.get("interest")?.toLowerCase();
+  const requestedCategory = requestedInterest ? interestMap[requestedInterest] : undefined;
+  const [selectedCategory, setSelectedCategory] = useState<InquiryCategory | null>(null);
+  const category = selectedCategory ?? requestedCategory ?? defaultCategory;
   const [method, setMethod] = useState<ContactMethod>("Email");
   const [urgency, setUrgency] = useState<Urgency>("Standard");
   const [company, setCompany] = useState("");
@@ -57,11 +64,6 @@ export default function ContactExperience() {
   const [phone, setPhone] = useState("");
   const [confidential, setConfidential] = useState(false);
   const [summary, setSummary] = useState("");
-
-  useEffect(() => {
-    const interest = new URLSearchParams(window.location.search).get("interest")?.toLowerCase();
-    if (interest && interestMap[interest]) setCategory(interestMap[interest]);
-  }, []);
 
   const responseTime = useMemo(() => {
     if (urgency === "Urgent") return "Urgent priority selected. Include a direct phone number and the time-sensitive outcome you need.";
@@ -143,7 +145,7 @@ export default function ContactExperience() {
           <form onSubmit={submitInquiry} className="contact-form-grid">
             <label>
               Area of interest
-              <select value={category} onChange={(event) => setCategory(event.target.value as InquiryCategory)}>
+              <select value={category} onChange={(event) => setSelectedCategory(event.target.value as InquiryCategory)}>
                 {categories.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
