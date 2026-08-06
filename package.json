@@ -8,6 +8,9 @@
     "lint": "eslint .",
     "test": "node --test",
     "test:production": "node --test scripts/production-smoke.mjs",
+    "test:platform": "node scripts/release-readiness.mjs",
+    "test:cross-target": "node scripts/cross-target-contract.mjs",
+    "verify:release": "npm run lint && npm test && npm run test:platform && npm run build",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
   },
