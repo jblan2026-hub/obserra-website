@@ -71,6 +71,9 @@ jobs:
       - name: Standalone SaaS catalog readiness gate
         run: npm run test:saas-catalog
 
+      - name: SaaS tenant and entitlement control plane gate
+        run: npm run test:saas-control-plane
+
       - name: Rollback and release evidence gate
         run: npm run test:rollback-readiness
 
@@ -115,6 +118,9 @@ jobs:
 
       - name: Verify standalone SaaS catalog readiness
         run: npm run test:saas-catalog
+
+      - name: Verify SaaS tenant and entitlement control plane
+        run: npm run test:saas-control-plane
 
       - name: Verify rollback and release evidence
         run: npm run test:rollback-readiness
