@@ -29,6 +29,19 @@ export type ControlRoomTargetStatus = {
   error?: string;
 };
 
+export type ControlRoomMonitorMode = "live" | "persistent";
+
+type MonitorPolicy = {
+  attempts: number;
+  timeoutMs: number;
+  baseDelayMs: number;
+};
+
+const monitorPolicies: Record<ControlRoomMonitorMode, MonitorPolicy> = {
+  live: { attempts: 1, timeoutMs: 2_500, baseDelayMs: 50 },
+  persistent: { attempts: 2, timeoutMs: 5_000, baseDelayMs: 150 },
+};
+
 function targetUrl(projectName: string): string | null {
   const explicit: Record<string, string | undefined> = {
     "obserra-website-live": process.env.OBSERRA_WEBSITE_LIVE_URL,
@@ -39,7 +52,10 @@ function targetUrl(projectName: string): string | null {
   return value ? value.replace(/\/$/, "") : null;
 }
 
-async function checkTarget(target: (typeof deploymentTargets)[number]): Promise<ControlRoomTargetStatus> {
+async function checkTarget(
+  target: (typeof deploymentTargets)[number],
+  policy: MonitorPolicy,
+): Promise<ControlRoomTargetStatus> {
   const url = targetUrl(target.projectName);
   const checkedAt = new Date().toISOString();
   if (!url) {
@@ -72,7 +88,12 @@ async function checkTarget(target: (typeof deploymentTargets)[number]): Promise<
         if (!response.ok) throw new Error(`Health returned HTTP ${response.status}`);
         return payload;
       },
-      { operation: `control-room:${target.key}`, attempts: 2, timeoutMs: 8_000, baseDelayMs: 150 },
+      {
+        operation: `control-room:${target.key}`,
+        attempts: policy.attempts,
+        timeoutMs: policy.timeoutMs,
+        baseDelayMs: policy.baseDelayMs,
+      },
     );
     const payload = result.value;
     const capabilities = payload.capabilities ?? [];
@@ -107,8 +128,10 @@ async function checkTarget(target: (typeof deploymentTargets)[number]): Promise<
   }
 }
 
-export async function buildControlRoomSnapshot() {
-  const targets = await Promise.all(deploymentTargets.map(checkTarget));
+export async function buildControlRoomSnapshot(mode: ControlRoomMonitorMode = "live") {
+  const policy = monitorPolicies[mode];
+  const startedAt = Date.now();
+  const targets = await Promise.all(deploymentTargets.map((target) => checkTarget(target, policy)));
   const healthy = targets.filter((item) => item.ready && item.identityValid).length;
   const unhealthy = targets.filter((item) => !item.reachable || !item.ready).length;
   const degraded = targets.length - healthy - unhealthy;
@@ -117,6 +140,9 @@ export async function buildControlRoomSnapshot() {
   return {
     generatedAt: new Date().toISOString(),
     status,
+    mode,
+    durationMs: Date.now() - startedAt,
+    latencyBudgetMs: mode === "live" ? 3_500 : 11_000,
     targetCount: targets.length,
     healthy,
     degraded,
@@ -124,6 +150,7 @@ export async function buildControlRoomSnapshot() {
     pollRecommendationSeconds: 15,
     persistentCheckIntervalMinutes: 5,
     capabilitiesExpected: sharedPlatformCapabilities.length,
+    nonBlockingCustomerPath: true,
     targets,
   };
 }
