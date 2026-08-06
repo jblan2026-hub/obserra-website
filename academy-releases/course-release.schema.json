@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.obserrallc.com/schemas/academy-course-release-v1.json",
+  "title": "Obserra Academy Course Release",
+  "type": "object",
+  "required": ["schemaVersion", "course", "commerce", "lessons", "assessment", "certificate", "ownerApproval"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "course": {
+      "type": "object",
+      "required": ["id", "title", "department", "level", "track", "audience", "description", "instructionalHours", "prerequisites", "outcomes", "tags", "version", "releaseStatus"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "title": { "type": "string", "minLength": 8 },
+        "department": { "enum": ["Cyber", "Protection", "Intelligence", "Technologies"] },
+        "level": { "enum": ["Foundation", "Professional", "Advanced", "Executive Intensive", "CISO Masterclass"] },
+        "track": { "type": "string", "minLength": 3 },
+        "audience": { "type": "string", "minLength": 10 },
+        "description": { "type": "string", "minLength": 40 },
+        "instructionalHours": { "type": "number", "exclusiveMinimum": 0 },
+        "prerequisites": { "type": "array", "items": { "type": "string" } },
+        "outcomes": { "type": "array", "minItems": 3, "items": { "type": "string", "minLength": 8 } },
+        "tags": { "type": "object" },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "releaseStatus": { "enum": ["draft", "pending-approval", "approved", "published"] }
+      }
+    },
+    "commerce": {
+      "type": "object",
+      "required": ["model", "price", "currency", "paymentLink", "stripePriceId"],
+      "properties": {
+        "model": { "const": "one-time-payment" },
+        "price": { "type": "number", "minimum": 0 },
+        "currency": { "const": "USD" },
+        "paymentLink": { "type": ["string", "null"] },
+        "stripePriceId": { "type": ["string", "null"] }
+      }
+    },
+    "lessons": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "sequence", "title", "durationMinutes", "format", "description", "content", "knowledgeChecks"],
+        "properties": {
+          "id": { "type": "string", "minLength": 3 },
+          "sequence": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string", "minLength": 5 },
+          "durationMinutes": { "type": "integer", "minimum": 5 },
+          "format": { "enum": ["Interactive lesson", "Interactive scenario", "Applied decision workshop", "Video lesson", "Reading and exercise"] },
+          "description": { "type": "string", "minLength": 30 },
+          "content": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["type", "title", "body"], "properties": { "type": { "enum": ["lesson", "video", "reading", "scenario", "exercise", "download"] }, "title": { "type": "string" }, "body": { "type": "string", "minLength": 20 } } },
+          "knowledgeChecks": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/question" } }
+        }
+      }
+    },
+    "assessment": {
+      "type": "object",
+      "required": ["passingScore", "questions"],
+      "properties": {
+        "passingScore": { "type": "integer", "minimum": 70, "maximum": 100 },
+        "questions": { "type": "array", "minItems": 25, "items": { "$ref": "#/$defs/question" } }
+      }
+    },
+    "certificate": {
+      "type": "object",
+      "required": ["issued", "verificationRequired", "templateId", "title", "disclaimer"],
+      "properties": {
+        "issued": { "const": true },
+        "verificationRequired": { "const": true },
+        "templateId": { "type": "string", "minLength": 5 },
+        "title": { "const": "Certificate of Course Completion" },
+        "disclaimer": { "type": "string", "minLength": 40 }
+      }
+    },
+    "ownerApproval": {
+      "type": "object",
+      "required": ["status", "approvedBy", "approvedAt", "priceApproved"],
+      "properties": {
+        "status": { "enum": ["pending", "approved", "rejected"] },
+        "approvedBy": { "type": ["string", "null"] },
+        "approvedAt": { "type": ["string", "null"], "format": "date-time" },
+        "priceApproved": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "question": {
+      "type": "object",
+      "required": ["prompt", "options", "answer", "explanation"],
+      "properties": {
+        "prompt": { "type": "string", "minLength": 10 },
+        "options": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "string", "minLength": 1 } },
+        "answer": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "explanation": { "type": "string", "minLength": 10 }
+      }
+    }
+  }
+}
