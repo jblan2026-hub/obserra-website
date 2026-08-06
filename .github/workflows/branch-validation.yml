@@ -19,7 +19,7 @@ concurrency:
 jobs:
   release-readiness:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 65
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -92,6 +92,9 @@ jobs:
       - name: SaaS access-token key rotation gate
         run: npm run test:saas-token-key-rotation
 
+      - name: SaaS access-token revocation gate
+        run: npm run test:saas-token-revocation
+
       - name: Rollback and release evidence gate
         run: npm run test:rollback-readiness
 
@@ -104,7 +107,7 @@ jobs:
   deployed-system-gates:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 70
+    timeout-minutes: 75
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -157,6 +160,9 @@ jobs:
 
       - name: Verify SaaS access-token key rotation
         run: npm run test:saas-token-key-rotation
+
+      - name: Verify SaaS access-token revocation
+        run: npm run test:saas-token-revocation
 
       - name: Verify rollback and release evidence
         run: npm run test:rollback-readiness
