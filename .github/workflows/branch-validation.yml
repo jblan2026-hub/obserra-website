@@ -19,7 +19,7 @@ concurrency:
 jobs:
   release-readiness:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,6 +44,9 @@ jobs:
 
       - name: Security resilience and rollback gate
         run: npm run test:security-resilience
+
+      - name: Operational commerce lifecycle and live control room gate
+        run: npm run test:operational-release
 
       - name: Production build
         run: npm run build
