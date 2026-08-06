@@ -1,8 +1,8 @@
-import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { verifySaasAccessToken } from "../../../../lib/saas-access-token";
 import { tokenPredatesOrganizationCutoff } from "../../../../lib/saas-organization-token-cutoff";
+import { authorizeSaasService } from "../../../../lib/saas-service-credentials";
 import { tokenIsRevoked } from "../../../../lib/saas-token-revocation";
 import { enforceValidationRateLimit } from "../../../../lib/saas-token-validation-rate-limit";
 
@@ -15,25 +15,15 @@ type ValidationRequest = {
   organizationId?: unknown;
 };
 
-type ResponseHeaders = Record<string, string>;
-
-function response(body: unknown, status = 200, additionalHeaders: ResponseHeaders = {}) {
+function response(body: unknown, status = 200, extraHeaders: Record<string, string> = {}) {
   return NextResponse.json(body, {
     status,
     headers: {
       "Cache-Control": "private, no-store, max-age=0",
       "X-Robots-Tag": "noindex, nofollow",
-      ...additionalHeaders,
+      ...extraHeaders,
     },
   });
-}
-
-function serviceCredentialIsValid(provided: string | null) {
-  const configured = process.env.OBSERRA_SAAS_TOKEN_VALIDATION_SECRET?.trim();
-  if (!configured || configured.length < 32 || !provided) return false;
-  const left = Buffer.from(provided);
-  const right = Buffer.from(configured);
-  return left.length === right.length && timingSafeEqual(left, right);
 }
 
 function boundedString(value: unknown, maximumLength: number) {
@@ -43,20 +33,15 @@ function boundedString(value: unknown, maximumLength: number) {
 }
 
 function boundedServiceId(value: string | null) {
-  if (!value) return "";
-  const normalized = value.trim();
-  if (!normalized || normalized.length > 120 || !/^[A-Za-z0-9._:@/-]+$/.test(normalized)) return "";
-  return normalized;
+  const normalized = value?.trim() || "";
+  return /^[A-Za-z0-9._:@/-]{3,120}$/.test(normalized) ? normalized : "";
 }
 
 export async function POST(request: Request) {
-  if (!serviceCredentialIsValid(request.headers.get("x-obserra-service-key"))) {
-    return response({ valid: false, reason: "service-authentication-required" }, 401);
-  }
-
   const serviceId = boundedServiceId(request.headers.get("x-obserra-service-id"));
-  if (!serviceId) {
-    return response({ valid: false, reason: "service-identity-required" }, 400);
+  const serviceSecret = request.headers.get("x-obserra-service-key")?.trim() || "";
+  if (!serviceId || !serviceSecret) {
+    return response({ valid: false, reason: "service-authentication-required" }, 401);
   }
 
   let body: ValidationRequest;
@@ -73,31 +58,37 @@ export async function POST(request: Request) {
     return response({ valid: false, reason: "invalid-request" }, 400);
   }
 
+  let serviceAuthorization;
+  try {
+    serviceAuthorization = authorizeSaasService({ serviceId, secret: serviceSecret, productSlug });
+  } catch {
+    return response({ valid: false, reason: "service-authorization-unavailable" }, 503);
+  }
+  if (!serviceAuthorization.allowed) return response({ valid: false, reason: serviceAuthorization.reason }, 403);
+
   let rateLimit;
   try {
     rateLimit = await enforceValidationRateLimit({ serviceId, productSlug, organizationId });
   } catch {
     return response({ valid: false, reason: "rate-limit-service-unavailable" }, 503);
   }
-
-  const rateLimitHeaders = {
+  const rateHeaders = {
     "RateLimit-Limit": String(rateLimit.limit),
     "RateLimit-Remaining": String(rateLimit.remaining),
     "RateLimit-Reset": String(rateLimit.resetAt),
   };
-
   if (!rateLimit.allowed) {
     const retryAfter = Math.max(1, rateLimit.resetAt - Math.floor(Date.now() / 1000));
     console.warn("SaaS token validation rate limited", {
       serviceId,
       productSlug,
-      organizationScoped: Boolean(organizationId),
+      organizationAudienceSupplied: Boolean(organizationId),
       resetAt: rateLimit.resetAt,
     });
     return response(
       { valid: false, reason: "rate-limit-exceeded" },
       429,
-      { ...rateLimitHeaders, "Retry-After": String(retryAfter) },
+      { ...rateHeaders, "Retry-After": String(retryAfter) },
     );
   }
 
@@ -105,10 +96,10 @@ export async function POST(request: Request) {
   try {
     result = verifySaasAccessToken(token, { productSlug, organizationId });
   } catch {
-    return response({ valid: false, reason: "validation-service-unavailable" }, 503, rateLimitHeaders);
+    return response({ valid: false, reason: "validation-service-unavailable" }, 503, rateHeaders);
   }
 
-  if (!result.valid) return response(result, 401, rateLimitHeaders);
+  if (!result.valid) return response(result, 401, rateHeaders);
 
   try {
     const [revoked, predatesCutoff] = await Promise.all([
@@ -122,29 +113,23 @@ export async function POST(request: Request) {
         issuedAt: result.claims.issuedAt,
       }),
     ]);
-    if (revoked) return response({ valid: false, reason: "token-revoked" }, 401, rateLimitHeaders);
-    if (predatesCutoff) {
-      return response({ valid: false, reason: "organization-token-cutoff" }, 401, rateLimitHeaders);
-    }
+    if (revoked) return response({ valid: false, reason: "token-revoked" }, 401, rateHeaders);
+    if (predatesCutoff) return response({ valid: false, reason: "organization-token-cutoff" }, 401, rateHeaders);
   } catch {
-    return response({ valid: false, reason: "containment-service-unavailable" }, 503, rateLimitHeaders);
+    return response({ valid: false, reason: "containment-service-unavailable" }, 503, rateHeaders);
   }
 
-  return response(
-    {
-      valid: true,
-      claims: {
-        subject: result.claims.subject,
-        organizationId: result.claims.organizationId,
-        tenantId: result.claims.tenantId,
-        productSlug: result.claims.productSlug,
-        planId: result.claims.planId,
-        features: result.claims.features,
-        issuedAt: result.claims.issuedAt,
-        expiresAt: result.claims.expiresAt,
-      },
+  return response({
+    valid: true,
+    claims: {
+      subject: result.claims.subject,
+      organizationId: result.claims.organizationId,
+      tenantId: result.claims.tenantId,
+      productSlug: result.claims.productSlug,
+      planId: result.claims.planId,
+      features: result.claims.features,
+      issuedAt: result.claims.issuedAt,
+      expiresAt: result.claims.expiresAt,
     },
-    200,
-    rateLimitHeaders,
-  );
+  }, 200, rateHeaders);
 }
