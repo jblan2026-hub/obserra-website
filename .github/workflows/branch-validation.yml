@@ -65,6 +65,9 @@ jobs:
       - name: AI governance and reliability readiness gate
         run: npm run test:ai-governance
 
+      - name: Commerce and credential integrity readiness gate
+        run: npm run test:commerce-credential
+
       - name: Rollback and release evidence gate
         run: npm run test:rollback-readiness
 
@@ -103,6 +106,9 @@ jobs:
 
       - name: Verify AI governance and reliability readiness
         run: npm run test:ai-governance
+
+      - name: Verify commerce and credential integrity readiness
+        run: npm run test:commerce-credential
 
       - name: Verify rollback and release evidence
         run: npm run test:rollback-readiness
