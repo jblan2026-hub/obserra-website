@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "test": "node --test",
     "test:academy-70x": "node scripts/academy-70x-gate.mjs",
-    "verify:academy-release": "npm run lint && npm test && npm run test:academy-70x && npm run build",
+    "test:academy-500x": "node scripts/academy-500x-workload-gate.mjs",
+    "verify:academy-release": "npm run lint && npm test && npm run test:academy-70x && npm run test:academy-500x && npm run build",
     "test:production": "node --test scripts/production-smoke.mjs",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
