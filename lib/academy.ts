@@ -2,6 +2,12 @@ import "server-only";
 
 import { clerkClient } from "@clerk/nextjs/server";
 import { courses } from "../app/academy/courseData";
+import {
+  certificateSigningReady,
+  signCertificateClaim,
+  type SignedCertificateClaim,
+  verifyCertificateClaim,
+} from "./certificate-signing";
 import { getStripe } from "./stripe";
 
 export type CourseProgress = {
@@ -9,6 +15,7 @@ export type CourseProgress = {
   assessmentScore?: number;
   completedAt?: string;
   certificateId?: string;
+  signedCertificate?: SignedCertificateClaim;
 };
 
 export type AcademyState = {
@@ -68,14 +75,26 @@ export async function recordAssessment(userId: string, courseId: string, score: 
   if (!state.entitlements[courseId]) throw new Error("Enrollment required");
   const current = state.progress[courseId] ?? { completedLessons: [] };
   if (current.completedLessons.length !== course.modules.length) throw new Error("Complete every lesson before the assessment");
+
   const passed = score >= 80;
+  let completion = {} as Pick<CourseProgress, "completedAt" | "certificateId" | "signedCertificate">;
+  if (passed && !current.signedCertificate) {
+    if (!certificateSigningReady()) {
+      throw new Error("Certificate signing is not configured. Contact Obserra Academy support.");
+    }
+    const completedAt = current.completedAt ?? new Date().toISOString();
+    const certificateId = current.certificateId ?? `OBS-${courseId.toUpperCase().replaceAll("-", "")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+    completion = {
+      completedAt,
+      certificateId,
+      signedCertificate: signCertificateClaim({ certificateId, courseId, completedAt, assessmentScore: score }),
+    };
+  }
+
   state.progress[courseId] = {
     ...current,
     assessmentScore: score,
-    ...(passed && !current.certificateId ? {
-      completedAt: new Date().toISOString(),
-      certificateId: `OBS-${courseId.toUpperCase().replaceAll("-", "")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
-    } : {}),
+    ...completion,
   };
   await saveState(userId, state);
   return state.progress[courseId];
@@ -95,11 +114,6 @@ function emailsForUser(user: { emailAddresses: { emailAddress: string }[] }) {
   return user.emailAddresses.map((item) => item.emailAddress);
 }
 
-/**
- * The owner account is server-allowlisted, never granted through a public
- * route. A matching Clerk account receives private review access to each
- * course without altering the paid learner enrollment path.
- */
 export async function academyStateWithOwnerAccess(userId: string, courseId: string) {
   const course = courseForId(courseId);
   if (!course) throw new Error("Unknown course");
@@ -114,6 +128,46 @@ export async function academyStateWithOwnerAccess(userId: string, courseId: stri
   };
   await saveState(userId, state);
   return state;
+}
+
+export async function findVerifiedCertificate(certificateId: string) {
+  const normalized = certificateId.trim().toUpperCase();
+  if (!normalized || normalized.length > 180 || !certificateSigningReady()) return null;
+  const client = await clerkClient();
+  const pageSize = 100;
+  let offset = 0;
+  let totalCount = 0;
+  do {
+    const page = await client.users.getUserList({ limit: pageSize, offset });
+    totalCount = page.totalCount;
+    for (const user of page.data) {
+      const state = academyStateFromUser(user);
+      for (const [courseId, progress] of Object.entries(state.progress)) {
+        if (progress.certificateId?.toUpperCase() !== normalized || !progress.signedCertificate) continue;
+        if (!verifyCertificateClaim(progress.signedCertificate)) return null;
+        if (progress.signedCertificate.courseId !== courseId) return null;
+        const course = courseForId(courseId);
+        if (!course) return null;
+        const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+        return {
+          valid: true as const,
+          certificateId: progress.certificateId,
+          learnerName: fullName || "Obserra Academy Learner",
+          courseId,
+          courseTitle: course.title,
+          completedAt: progress.completedAt,
+          assessmentScore: progress.assessmentScore,
+          trainingHours: course.duration,
+          signerName: progress.signedCertificate.signerName,
+          issuer: progress.signedCertificate.issuer,
+          signatureAlgorithm: progress.signedCertificate.signatureAlgorithm,
+          publicKeyFingerprint: progress.signedCertificate.publicKeyFingerprint,
+        };
+      }
+    }
+    offset += page.data.length;
+  } while (offset < totalCount && offset < 10_000);
+  return null;
 }
 
 export async function getAcademyAggregateMetrics() {
@@ -140,7 +194,7 @@ export async function getAcademyAggregateMetrics() {
       if (courseId in coursesByEnrollment) coursesByEnrollment[courseId] += 1;
     }
     for (const [courseId, progress] of Object.entries(state.progress)) {
-      if (!progress.certificateId) continue;
+      if (!progress.signedCertificate || !verifyCertificateClaim(progress.signedCertificate)) continue;
       certificates += 1;
       if (courseId in coursesByCertificate) coursesByCertificate[courseId] += 1;
     }
@@ -148,10 +202,6 @@ export async function getAcademyAggregateMetrics() {
   return { learnerAccounts: totalCount, enrollments, certificates, coursesByEnrollment, coursesByCertificate, sampledLearners: users.length };
 }
 
-/**
- * Owner-only reporting summary from Stripe. No payment instruments, billing
- * addresses, or learner identities are returned to the application UI.
- */
 export async function getAcademyCommerceMetrics() {
   try {
     const stripe = getStripe();
