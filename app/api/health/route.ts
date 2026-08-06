@@ -7,10 +7,22 @@ export const dynamic = "force-dynamic";
 
 type Check = { name: string; status: "pass" | "warn" | "fail"; detail: string };
 
+function releaseIdentity() {
+  return {
+    commitSha: process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GITHUB_SHA ?? null,
+    commitRef: process.env.VERCEL_GIT_COMMIT_REF ?? process.env.GITHUB_REF_NAME ?? null,
+    environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown",
+    deploymentUrl: process.env.VERCEL_URL ?? null,
+    productionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL ?? null,
+    region: process.env.VERCEL_REGION ?? null,
+  };
+}
+
 export async function GET(request: Request) {
   const startedAt = Date.now();
   const checks: Check[] = [];
   const target = resolveDeploymentTarget();
+  const topology = platformDependencySummary();
 
   checks.push({
     name: "catalog",
@@ -51,7 +63,11 @@ export async function GET(request: Request) {
     role: target.role,
     status,
     ready: failed === 0,
-    topology: platformDependencySummary(),
+    target,
+    platform: topology,
+    topology,
+    capabilities: sharedPlatformCapabilities,
+    release: releaseIdentity(),
     checks,
     durationMs: Date.now() - startedAt,
     timestamp: new Date().toISOString(),
