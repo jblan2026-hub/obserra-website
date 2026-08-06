@@ -64,7 +64,16 @@ const growthLinks = [
   },
 ];
 
-export default function ContactPage() {
+type ContactPageProps = {
+  searchParams: Promise<{ interest?: string | string[] }>;
+};
+
+export default async function ContactPage({ searchParams }: ContactPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const initialInterest = Array.isArray(resolvedSearchParams.interest)
+    ? resolvedSearchParams.interest[0]
+    : resolvedSearchParams.interest;
+
   const contactSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -89,10 +98,10 @@ export default function ContactPage() {
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: "https://www.obserrallc.com" },
-          { "@type": "ListItem", position: 2, name: "Contact", item: "https://www.obserrallc.com/contact" }
-        ]
-      }
-    ]
+          { "@type": "ListItem", position: 2, name: "Contact", item: "https://www.obserrallc.com/contact" },
+        ],
+      },
+    ],
   };
 
   return (
@@ -126,7 +135,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <ContactExperience />
+      <ContactExperience initialInterest={initialInterest} />
 
       <section className="contact-grid" aria-label="Contact pathways">
         {engagementTracks.map((item) => (
