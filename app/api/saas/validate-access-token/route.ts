@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { verifySaasAccessToken } from "../../../../lib/saas-access-token";
+import { tokenPredatesOrganizationCutoff } from "../../../../lib/saas-organization-token-cutoff";
 import { tokenIsRevoked } from "../../../../lib/saas-token-revocation";
 
 export const runtime = "nodejs";
@@ -66,14 +67,21 @@ export async function POST(request: Request) {
   if (!result.valid) return response(result, 401);
 
   try {
-    const revoked = await tokenIsRevoked({
-      nonce: result.claims.nonce,
-      organizationId: result.claims.organizationId,
-      productSlug: result.claims.productSlug,
-    });
+    const [revoked, predatesCutoff] = await Promise.all([
+      tokenIsRevoked({
+        nonce: result.claims.nonce,
+        organizationId: result.claims.organizationId,
+        productSlug: result.claims.productSlug,
+      }),
+      tokenPredatesOrganizationCutoff({
+        organizationId: result.claims.organizationId,
+        issuedAt: result.claims.issuedAt,
+      }),
+    ]);
     if (revoked) return response({ valid: false, reason: "token-revoked" }, 401);
+    if (predatesCutoff) return response({ valid: false, reason: "organization-token-cutoff" }, 401);
   } catch {
-    return response({ valid: false, reason: "revocation-service-unavailable" }, 503);
+    return response({ valid: false, reason: "containment-service-unavailable" }, 503);
   }
 
   return response({
