@@ -18,15 +18,15 @@ export async function GET() {
     console.log(JSON.stringify({
       level: snapshot.status === "healthy" ? "info" : "warn",
       event: "control_room_live_snapshot",
-      durationMs: Date.now() - startedAt,
-      ...snapshot,
+      requestDurationMs: Date.now() - startedAt,
+      snapshot,
     }));
     return NextResponse.json(snapshot, { headers: { "cache-control": "no-store" } });
   } catch (error) {
     console.error(JSON.stringify({
       level: "error",
       event: "control_room_live_snapshot_failed",
-      durationMs: Date.now() - startedAt,
+      requestDurationMs: Date.now() - startedAt,
       error: error instanceof Error ? error.message : String(error),
     }));
     return NextResponse.json({ error: "Unable to load live operations" }, { status: 500 });
