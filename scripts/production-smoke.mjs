@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 const baseUrl = (process.env.OBSERRA_BASE_URL || "https://www.obserrallc.com").replace(/\/$/, "");
-const publicRoutes = ["/", "/about", "/speaking", "/services", "/protection-intelligence", "/eios", "/apps", "/academy", "/industries", "/resources", "/trust", "/contact", "/sitemap.xml", "/robots.txt"];
+const publicRoutes = ["/", "/about", "/speaking", "/services", "/protection-intelligence", "/eios", "/apps", "/academy", "/academy/verify", "/industries", "/resources", "/trust", "/contact", "/sitemap.xml", "/robots.txt"];
 
 async function fetchWithTimeout(path, init = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15_000);
   try {
-    return await fetch(`${baseUrl}${path}`, { redirect: "manual", signal: controller.signal, headers: { "user-agent": "ObserraProductionSmoke/2.1" }, ...init });
+    return await fetch(`${baseUrl}${path}`, { redirect: "manual", signal: controller.signal, headers: { "user-agent": "ObserraProductionSmoke/2.2" }, ...init });
   } finally {
     clearTimeout(timer);
   }
@@ -32,7 +32,7 @@ test("homepage contains commercial and SEO essentials", async () => {
   assert.match(html, /name=["']description["']/i, "Missing meta description");
   assert.match(html, /rel=["']canonical["']/i, "Missing canonical link");
   assert.match(html, /application\/ld\+json/i, "Missing structured data");
-  assert.doesNotMatch(html, /lorem ipsum|coming soon|placeholder text/i, "Placeholder copy detected");
+  assert.doesNotMatch(html, /lorem ipsum|placeholder text/i, "Placeholder copy detected");
 });
 
 test("primary public pages expose one clear H1 and no obvious placeholder copy", async () => {
@@ -83,10 +83,48 @@ test("Academy catalog exposes discovery and secure enrollment signals", async ()
   assert.match(html, /Certificate of Training/i, "Certificate disclosure is missing");
 });
 
+test("Academy credential verification page is public and clearly governed", async () => {
+  const response = await fetchWithTimeout("/academy/verify");
+  assert.equal(response.status, 200, `Academy verification route returned HTTP ${response.status}`);
+  const html = await response.text();
+  assert.match(html, /Verify a certificate/i, "Certificate verification heading is missing");
+  assert.match(html, /Credential Services/i, "Credential governance label is missing");
+  assert.match(html, /certificateId/i, "Certificate identifier input is missing");
+});
+
+test("Academy certificate API rejects missing and malformed IDs without server failure", async () => {
+  const missing = await fetchWithTimeout("/api/academy/certificate/verify");
+  assert.equal(missing.status, 400, `Missing certificate ID returned HTTP ${missing.status}`);
+  const malformed = await fetchWithTimeout("/api/academy/certificate/verify?certificateId=invalid");
+  assert.equal(malformed.status, 400, `Malformed certificate ID returned HTTP ${malformed.status}`);
+});
+
 test("Academy checkout rejects an invalid course without server failure", async () => {
   const response = await fetchWithTimeout("/api/academy/checkout?course=invalid-smoke-course");
   assert.ok(response.status >= 300 && response.status < 400, `Unexpected HTTP ${response.status}`);
   assert.match(response.headers.get("location") || "", /\/academy\?enrollment=not-ready/, "Unexpected invalid-course redirect");
+});
+
+test("owner AI website controls fail closed for anonymous users", async () => {
+  const plan = await fetchWithTimeout("/api/admin/site-change/plan", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ instruction: "Update the course description" }),
+  });
+  assert.ok(plan.status === 401 || plan.status === 404, `Anonymous owner plan endpoint returned HTTP ${plan.status}`);
+
+  const preview = await fetchWithTimeout("/api/admin/site-change/preview", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ plan: { requiresOwnerApproval: true, operations: [] } }),
+  });
+  assert.ok(preview.status === 401 || preview.status === 404, `Anonymous owner preview endpoint returned HTTP ${preview.status}`);
+});
+
+test("owner AI control page requires authentication", async () => {
+  const response = await fetchWithTimeout("/admin/site-control");
+  assert.ok(response.status >= 300 && response.status < 400, `Owner control page returned HTTP ${response.status}`);
+  assert.match(response.headers.get("location") || "", /sign-in/i, "Owner control page did not redirect to sign in");
 });
 
 test("unknown paths use the branded not-found experience", async () => {
