@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { track } from "@vercel/analytics";
 
 type InquiryCategory =
@@ -50,12 +49,13 @@ const interestMap: Record<string, InquiryCategory> = {
 
 const schedulingUrl = "https://calendly.com/obserra/executive-consultation";
 
-export default function ContactExperience() {
-  const searchParams = useSearchParams();
-  const requestedInterest = searchParams.get("interest")?.toLowerCase();
-  const requestedCategory = requestedInterest ? interestMap[requestedInterest] : undefined;
-  const [selectedCategory, setSelectedCategory] = useState<InquiryCategory | null>(null);
-  const category = selectedCategory ?? requestedCategory ?? defaultCategory;
+function resolveInitialCategory(initialInterest?: string): InquiryCategory {
+  if (!initialInterest) return defaultCategory;
+  return interestMap[initialInterest.toLowerCase()] ?? defaultCategory;
+}
+
+export default function ContactExperience({ initialInterest }: { initialInterest?: string }) {
+  const [category, setCategory] = useState<InquiryCategory>(() => resolveInitialCategory(initialInterest));
   const [method, setMethod] = useState<ContactMethod>("Email");
   const [urgency, setUrgency] = useState<Urgency>("Standard");
   const [company, setCompany] = useState("");
@@ -145,7 +145,7 @@ export default function ContactExperience() {
           <form onSubmit={submitInquiry} className="contact-form-grid">
             <label>
               Area of interest
-              <select value={category} onChange={(event) => setSelectedCategory(event.target.value as InquiryCategory)}>
+              <select value={category} onChange={(event) => setCategory(event.target.value as InquiryCategory)}>
                 {categories.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
