@@ -3,10 +3,9 @@ import "server-only";
 import type { ObserrianReply } from "./obserrian-agent";
 
 const repository = "jblan2026-hub/obserra-website";
-const reviewLedgerPath = "data/obserrian/review-ledger.json";
-const trendsPath = "data/obserrian/trends.json";
+const telemetryIssueNumber = 45;
+const telemetryPrefix = "<!-- OBSERRIAN_TELEMETRY_V1 -->";
 
-type ReviewDisposition = "pending" | "reviewed" | "approved" | "flagged" | "dismissed";
 type ComplaintSeverity = "none" | "low" | "medium" | "high" | "critical";
 
 export type ObserrianReviewRecord = {
@@ -26,14 +25,11 @@ export type ObserrianReviewRecord = {
     category: string | null;
     severity: ComplaintSeverity;
   };
-  disposition: ReviewDisposition;
-  ownerNotes: string;
 };
 
 export type ObserrianTrendSnapshot = {
   generatedAt: string;
   totalInteractions: number;
-  pendingReviews: number;
   negativeInteractions: number;
   complaints: number;
   topics: Array<{ name: string; count: number }>;
@@ -43,7 +39,7 @@ export type ObserrianTrendSnapshot = {
   recommendedAdjustments: string[];
 };
 
-type GitHubContent = { content: string; sha: string; encoding: string };
+type GitHubComment = { body?: string | null; created_at?: string };
 
 function githubHeaders() {
   const token = process.env.OBSERRA_GITHUB_PUBLISH_TOKEN?.trim();
@@ -62,30 +58,8 @@ async function githubRequest<T>(path: string, init?: RequestInit): Promise<T> {
     headers: { ...githubHeaders(), ...(init?.headers ?? {}) },
     cache: "no-store",
   });
-  if (!response.ok) throw new Error(`Obserrian review storage failed with ${response.status}`);
+  if (!response.ok) throw new Error(`Obserrian telemetry failed with ${response.status}`);
   return response.json() as Promise<T>;
-}
-
-async function readJson<T>(path: string, fallback: T): Promise<{ value: T; sha?: string }> {
-  try {
-    const result = await githubRequest<GitHubContent>(`/contents/${encodeURI(path)}?ref=main`);
-    const decoded = Buffer.from(result.content.replace(/\n/g, ""), "base64").toString("utf8");
-    return { value: JSON.parse(decoded) as T, sha: result.sha };
-  } catch {
-    return { value: fallback };
-  }
-}
-
-async function writeJson(path: string, value: unknown, sha: string | undefined, message: string) {
-  return githubRequest(`/contents/${encodeURI(path)}`, {
-    method: "PUT",
-    body: JSON.stringify({
-      message,
-      branch: "main",
-      ...(sha ? { sha } : {}),
-      content: Buffer.from(`${JSON.stringify(value, null, 2)}\n`).toString("base64"),
-    }),
-  });
 }
 
 function redact(value: string) {
@@ -150,14 +124,13 @@ export function buildTrendSnapshot(records: ObserrianReviewRecord[]): ObserrianT
   const topTopics = countBy(records, (record) => record.topic);
   const lowConfidence = records.filter((record) => record.confidence < 0.65).slice(-20).map((record) => ({ question: record.question, pathname: record.pathname, confidence: record.confidence }));
   const recommendedAdjustments: string[] = [];
-  if (lowConfidence.length >= 3) recommendedAdjustments.push("Review low-confidence answers and add missing grounded website content or catalog metadata.");
-  if (complaints.some((record) => record.complaint.category === "billing")) recommendedAdjustments.push("Review pricing, refund, cancellation, and payment explanations across Academy and application pages.");
-  if (complaints.some((record) => record.complaint.category === "access")) recommendedAdjustments.push("Review sign-in, enrollment, entitlement, and account recovery instructions.");
+  if (lowConfidence.length >= 3) recommendedAdjustments.push("Add or improve grounded website content for recurring low-confidence questions.");
+  if (complaints.some((record) => record.complaint.category === "billing")) recommendedAdjustments.push("Clarify pricing, refunds, cancellation, and payment terms.");
+  if (complaints.some((record) => record.complaint.category === "access")) recommendedAdjustments.push("Improve sign-in, enrollment, entitlement, and account recovery guidance.");
   if ((topTopics[0]?.count ?? 0) >= 5) recommendedAdjustments.push(`Create or improve a high-visibility FAQ for the recurring ${topTopics[0].name} topic.`);
   return {
     generatedAt: new Date().toISOString(),
     totalInteractions: records.length,
-    pendingReviews: records.filter((record) => record.disposition === "pending").length,
     negativeInteractions: records.filter((record) => record.sentiment === "negative").length,
     complaints: complaints.length,
     topics: topTopics,
@@ -166,6 +139,17 @@ export function buildTrendSnapshot(records: ObserrianReviewRecord[]): ObserrianT
     lowConfidenceQuestions: lowConfidence,
     recommendedAdjustments,
   };
+}
+
+function parseTelemetryComment(body: string | null | undefined): ObserrianReviewRecord | null {
+  if (!body?.startsWith(telemetryPrefix)) return null;
+  try {
+    const json = body.slice(telemetryPrefix.length).trim();
+    const record = JSON.parse(json) as ObserrianReviewRecord;
+    return record?.id && record?.createdAt ? record : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function recordObserrianInteraction(input: { pathname: string; question: string; reply: ObserrianReply }) {
@@ -180,19 +164,16 @@ export async function recordObserrianInteraction(input: { pathname: string; ques
     confidence: input.reply.confidence,
     groundedIn: input.reply.groundedIn,
     ...classification,
-    disposition: "pending",
-    ownerNotes: "",
   };
-  const ledger = await readJson<{ schemaVersion: string; records: ObserrianReviewRecord[] }>(reviewLedgerPath, { schemaVersion: "1.0", records: [] });
-  ledger.value.records = [...ledger.value.records.slice(-999), record];
-  await writeJson(reviewLedgerPath, ledger.value, ledger.sha, `Record Obserrian interaction ${record.id}`);
-  const trends = buildTrendSnapshot(ledger.value.records);
-  const trendFile = await readJson<ObserrianTrendSnapshot>(trendsPath, trends);
-  await writeJson(trendsPath, trends, trendFile.sha, "Refresh Obserrian question and complaint trends");
+  await githubRequest(`/issues/${telemetryIssueNumber}/comments`, {
+    method: "POST",
+    body: JSON.stringify({ body: `${telemetryPrefix}\n${JSON.stringify(record)}` }),
+  });
   return record;
 }
 
 export async function getObserrianReviewData() {
-  const ledger = await readJson<{ schemaVersion: string; records: ObserrianReviewRecord[] }>(reviewLedgerPath, { schemaVersion: "1.0", records: [] });
-  return { records: [...ledger.value.records].reverse(), trends: buildTrendSnapshot(ledger.value.records) };
+  const comments = await githubRequest<GitHubComment[]>(`/issues/${telemetryIssueNumber}/comments?per_page=100`);
+  const records = comments.map((comment) => parseTelemetryComment(comment.body)).filter((record): record is ObserrianReviewRecord => Boolean(record));
+  return { records: [...records].reverse(), trends: buildTrendSnapshot(records) };
 }
