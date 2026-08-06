@@ -45,8 +45,8 @@ export async function GET(request: Request) {
     name: "saas-control-plane",
     status: saas.configured ? "pass" : "warn",
     detail: saas.configured
-      ? `${saas.subscriptionCount} tenant subscription records loaded with fail-closed entitlement enforcement`
-      : "Fail-closed entitlement service available; tenant subscription source is not configured",
+      ? `Durable ${saas.storage.mode} subscription storage configured with fail-closed entitlement enforcement`
+      : "Fail-closed entitlement service available; durable subscription storage is not configured",
   });
   checks.push({
     name: "ai-gateway",
@@ -80,8 +80,8 @@ export async function GET(request: Request) {
       configured: saas.configured,
       failClosed: saas.failClosed,
       planCount: saas.planCount,
-      subscriptionCount: saas.subscriptionCount,
       supportedStatuses: saas.supportedStatuses,
+      storage: saas.storage,
     },
     release: releaseIdentity(),
     checks,
