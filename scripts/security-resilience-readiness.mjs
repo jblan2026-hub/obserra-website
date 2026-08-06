@@ -23,7 +23,7 @@ const securityFiles = [
   "app/api/admin/obserrian/analytics/route.ts",
   "app/api/admin/maintenance/recommendations/route.ts",
   "scripts/cross-target-contract.mjs",
-  "scripts/end-to-end-journeys.mjs",
+  "scripts/customer-journey-gate.mjs",
   ".github/workflows/branch-validation.yml",
 ];
 
@@ -99,7 +99,7 @@ gate("rollback-candidate-and-drift-controls", () => {
 });
 
 gate("abuse-and-invalid-input-coverage", () => {
-  const journey = read("scripts/end-to-end-journeys.mjs");
+  const journey = read("scripts/customer-journey-gate.mjs");
   for (const signal of [
     "/api/admin/obserrian/analytics",
     "/api/admin/maintenance/recommendations",
