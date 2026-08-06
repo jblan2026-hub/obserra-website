@@ -8,7 +8,7 @@ async function fetchWithTimeout(path, init = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15_000);
   try {
-    return await fetch(`${baseUrl}${path}`, { redirect: "manual", signal: controller.signal, headers: { "user-agent": "ObserraProductionSmoke/2.2" }, ...init });
+    return await fetch(`${baseUrl}${path}`, { redirect: "manual", signal: controller.signal, headers: { "user-agent": "ObserraProductionSmoke/3.0", ...(init.headers || {}) }, ...init });
   } finally {
     clearTimeout(timer);
   }
@@ -24,6 +24,16 @@ for (const route of publicRoutes) {
     assert.ok(response.status >= 200 && response.status < 400, `${route} returned HTTP ${response.status}`);
   });
 }
+
+test("health endpoint reports operational readiness", async () => {
+  const response = await fetchWithTimeout("/api/health");
+  assert.equal(response.status, 200, `Health endpoint returned HTTP ${response.status}`);
+  const payload = await response.json();
+  assert.equal(payload.service, "obserra-website-live");
+  assert.equal(payload.ready, true, `Health endpoint is not ready: ${JSON.stringify(payload)}`);
+  assert.ok(["healthy", "degraded"].includes(payload.status));
+  assert.ok(Array.isArray(payload.checks) && payload.checks.length >= 5);
+});
 
 test("homepage contains commercial and SEO essentials", async () => {
   const response = await fetchWithTimeout("/");
@@ -55,14 +65,46 @@ test("homepage internal navigation targets resolve", async () => {
   }
 });
 
-test("homepage image assets resolve", async () => {
-  const response = await fetchWithTimeout("/");
-  const html = await response.text();
-  const images = [...new Set(extract(html, /(?:src|srcset)=["'](\/[^\"' ,]+)/gi))].filter((src) => !src.startsWith("/_next/")).slice(0, 30);
-  for (const src of images) {
-    const asset = await fetchWithTimeout(src);
-    assert.ok(asset.status >= 200 && asset.status < 400, `Image ${src} returned HTTP ${asset.status}`);
+test("critical page image assets resolve", async () => {
+  for (const route of ["/", "/about", "/protection-intelligence"]) {
+    const response = await fetchWithTimeout(route);
+    const html = await response.text();
+    const images = [...new Set(extract(html, /(?:src|srcset)=["'](\/[^\"' ,]+)/gi))].filter((src) => !src.startsWith("/_next/")).slice(0, 50);
+    for (const src of images) {
+      const asset = await fetchWithTimeout(src);
+      assert.ok(asset.status >= 200 && asset.status < 400, `${route} image ${src} returned HTTP ${asset.status}`);
+    }
   }
+});
+
+test("EC-Council credentials render without missing local badge files", async () => {
+  const response = await fetchWithTimeout("/about");
+  const html = await response.text();
+  assert.match(html, /EC-Council verified credentials/i);
+  assert.doesNotMatch(html, /\/badges\/eccouncil\//i, "About page still references missing EC-Council badge assets");
+  assert.match(html, /Verify credential/i);
+});
+
+test("Obserrian is mounted across representative customer pages", async () => {
+  for (const route of ["/", "/apps", "/academy", "/protection-intelligence", "/about"]) {
+    const response = await fetchWithTimeout(route);
+    const html = await response.text();
+    assert.match(html, /Obserrian/i, `${route} does not include Obserrian`);
+  }
+});
+
+test("Obserrian API remains available with fallback behavior", async () => {
+  const response = await fetchWithTimeout("/api/obserrian", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ message: "Recommend an Obserra course", pathname: "/academy", conversation: [] }),
+  });
+  assert.equal(response.status, 200, `Obserrian API returned HTTP ${response.status}`);
+  const payload = await response.json();
+  assert.equal(typeof payload.answer, "string");
+  assert.ok(payload.answer.length > 20);
+  assert.ok(Array.isArray(payload.actions));
+  assert.equal(typeof payload.confidence, "number");
 });
 
 test("design system validation route renders shared primitives and remains non-indexed", async () => {
@@ -105,20 +147,16 @@ test("Academy checkout rejects an invalid course without server failure", async 
   assert.match(response.headers.get("location") || "", /\/academy\?enrollment=not-ready/, "Unexpected invalid-course redirect");
 });
 
-test("owner AI website controls fail closed for anonymous users", async () => {
-  const plan = await fetchWithTimeout("/api/admin/site-change/plan", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ instruction: "Update the course description" }),
-  });
-  assert.ok(plan.status === 401 || plan.status === 404, `Anonymous owner plan endpoint returned HTTP ${plan.status}`);
-
-  const preview = await fetchWithTimeout("/api/admin/site-change/preview", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ plan: { requiresOwnerApproval: true, operations: [] } }),
-  });
-  assert.ok(preview.status === 401 || preview.status === 404, `Anonymous owner preview endpoint returned HTTP ${preview.status}`);
+test("owner control APIs fail closed for anonymous users", async () => {
+  const requests = [
+    fetchWithTimeout("/api/admin/site-change/plan", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ instruction: "Update the course description" }) }),
+    fetchWithTimeout("/api/admin/site-change/preview", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ plan: { requiresOwnerApproval: true, operations: [] } }) }),
+    fetchWithTimeout("/api/admin/maintenance/recommendations"),
+    fetchWithTimeout("/api/admin/obserrian/analytics"),
+  ];
+  for (const response of await Promise.all(requests)) {
+    assert.ok([401, 403, 404].includes(response.status), `Anonymous owner endpoint returned HTTP ${response.status}`);
+  }
 });
 
 test("owner AI control page requires authentication", async () => {
