@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       operationId,
       actorId: owner.userId,
       organizationId: stepUp.organizationId,
-      exportType: "excel-download" as "pdf-download",
+      exportType: "excel-download",
       frameworkScope: ["NIST", "ISO 27001", "SOC 2", "Privacy"],
       recipientDomain: null,
       requestedAt: new Date().toISOString(),
