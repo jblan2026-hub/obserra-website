@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { timingSafeEqual } from "node:crypto";
+import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,7 +26,35 @@ function configured(name: string): boolean {
   return Boolean(process.env[name]?.trim());
 }
 
-export async function GET() {
+function secureEqual(actual: string, expected: string): boolean {
+  const actualBuffer = Buffer.from(actual, "utf8");
+  const expectedBuffer = Buffer.from(expected, "utf8");
+  return actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer);
+}
+
+function authorized(request: NextRequest): boolean {
+  const expected = process.env.OBSERRA_INTELLIGENCE_TOKEN?.trim();
+  if (!expected) return false;
+  const authorization = request.headers.get("authorization") ?? "";
+  const prefix = "Bearer ";
+  if (!authorization.startsWith(prefix)) return false;
+  return secureEqual(authorization.slice(prefix.length), expected);
+}
+
+const responseHeaders = {
+  "cache-control": "private, no-store, max-age=0",
+  "x-content-type-options": "nosniff",
+  "x-obserra-intelligence-source": "website",
+};
+
+export async function GET(request: NextRequest) {
+  if (!authorized(request)) {
+    return NextResponse.json(
+      { schemaVersion: "1.0", sourceId: "website", status: "unauthorized", error: "Valid owner intelligence credentials are required." },
+      { status: 401, headers: { ...responseHeaders, "www-authenticate": "Bearer" } },
+    );
+  }
+
   const identityReady = configured("CLERK_SECRET_KEY") && configured("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY");
   const stripeReady = configured("STRIPE_SECRET_KEY");
   const webhookReady = configured("STRIPE_WEBHOOK_SECRET");
@@ -100,12 +129,5 @@ export async function GET() {
     recommendations,
   };
 
-  return NextResponse.json(payload, {
-    status: 200,
-    headers: {
-      "cache-control": "private, no-store, max-age=0",
-      "x-content-type-options": "nosniff",
-      "x-obserra-intelligence-source": "website",
-    },
-  });
+  return NextResponse.json(payload, { status: 200, headers: responseHeaders });
 }
