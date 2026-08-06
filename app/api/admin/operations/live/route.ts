@@ -1,7 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { ownerEmailAllowed } from "../../../../../../lib/academy";
-import { buildControlRoomSnapshot } from "../../../../../../lib/control-room-monitor";
+import { ownerEmailAllowed } from "../../../../../lib/academy";
+import { buildControlRoomSnapshot } from "../../../../../lib/control-room-monitor";
 
 export const dynamic = "force-dynamic";
 
