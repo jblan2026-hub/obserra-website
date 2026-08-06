@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
 
 type InquiryCategory =
@@ -17,6 +17,8 @@ type InquiryCategory =
 
 type ContactMethod = "Email" | "Phone" | "Either";
 type Urgency = "Urgent" | "Same business day" | "This week" | "Standard";
+
+const defaultCategory: InquiryCategory = "Strategic partnership or general inquiry";
 
 const categories: InquiryCategory[] = [
   "Executive protection or urgent travel support",
@@ -47,8 +49,13 @@ const interestMap: Record<string, InquiryCategory> = {
 
 const schedulingUrl = "https://calendly.com/obserra/executive-consultation";
 
-export default function ContactExperience() {
-  const [category, setCategory] = useState<InquiryCategory>("Strategic partnership or general inquiry");
+function resolveInitialCategory(initialInterest?: string): InquiryCategory {
+  if (!initialInterest) return defaultCategory;
+  return interestMap[initialInterest.toLowerCase()] ?? defaultCategory;
+}
+
+export default function ContactExperience({ initialInterest }: { initialInterest?: string }) {
+  const [category, setCategory] = useState<InquiryCategory>(() => resolveInitialCategory(initialInterest));
   const [method, setMethod] = useState<ContactMethod>("Email");
   const [urgency, setUrgency] = useState<Urgency>("Standard");
   const [company, setCompany] = useState("");
@@ -57,11 +64,6 @@ export default function ContactExperience() {
   const [phone, setPhone] = useState("");
   const [confidential, setConfidential] = useState(false);
   const [summary, setSummary] = useState("");
-
-  useEffect(() => {
-    const interest = new URLSearchParams(window.location.search).get("interest")?.toLowerCase();
-    if (interest && interestMap[interest]) setCategory(interestMap[interest]);
-  }, []);
 
   const responseTime = useMemo(() => {
     if (urgency === "Urgent") return "Urgent priority selected. Include a direct phone number and the time-sensitive outcome you need.";
