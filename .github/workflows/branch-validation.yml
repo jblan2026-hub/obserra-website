@@ -53,6 +53,9 @@ jobs:
       - name: Browser asset accessibility and security gate
         run: npm run test:browser-integrity
 
+      - name: Software supply chain readiness gate
+        run: npm run test:supply-chain
+
       - name: Rollback and release evidence gate
         run: npm run test:rollback-readiness
 
@@ -79,6 +82,9 @@ jobs:
 
       - name: Verify browser asset accessibility and security integrity
         run: npm run test:browser-integrity
+
+      - name: Verify software supply chain readiness
+        run: npm run test:supply-chain
 
       - name: Verify rollback and release evidence
         run: npm run test:rollback-readiness
