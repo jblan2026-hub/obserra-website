@@ -1,5 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { requireStepUp } from "../../../../../lib/require-step-up";
 import { subscriptionForOrganization } from "../../../../../lib/saas-control-plane";
 import { getStripe } from "../../../../../lib/stripe";
 
@@ -17,11 +17,11 @@ function noStoreJson(body: unknown, status: number) {
 }
 
 export async function POST(request: Request) {
-  const identity = await auth();
-  if (!identity.userId) return noStoreJson({ error: "authentication-required" }, 401);
-  if (!identity.orgId) return noStoreJson({ error: "organization-required" }, 403);
+  const stepUp = await requireStepUp("strict");
+  if (!stepUp.allowed) return stepUp.response;
+  if (!stepUp.organizationId) return noStoreJson({ error: "organization-required" }, 403);
 
-  const subscription = await subscriptionForOrganization(identity.orgId);
+  const subscription = await subscriptionForOrganization(stepUp.organizationId);
   if (!subscription?.stripeCustomerId) {
     return noStoreJson({ error: "billing-account-unavailable" }, 404);
   }
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error("SaaS billing portal creation failed", {
-      organizationId: identity.orgId,
+      organizationId: stepUp.organizationId,
       error: error instanceof Error ? error.message : String(error),
     });
     return noStoreJson({ error: "billing-portal-unavailable" }, 503);
