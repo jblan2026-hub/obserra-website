@@ -4,6 +4,9 @@ import Image from "next/image";
 import "./certificate.css";
 import "./brand-certificate.css";
 
+const LEGAL_NAME = "Obserra Executive Protection & Intelligence, LLC";
+const OFFICIAL_LOGO = "/brand/obserra-logo.png";
+
 type CertificateProps = {
   learnerName: string;
   courseTitle: string;
@@ -44,20 +47,20 @@ export default function CertificateView({
         <div className="certificate-corner certificate-corner-left" />
         <div className="certificate-corner certificate-corner-right" />
         <div className="certificate-brands">
-          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={220} height={42} />
-          <div className="academy-seal" aria-label="Obserra Academy, a training division of Obserra Executive Protection and Intelligence LLC">
+          <Image src={OFFICIAL_LOGO} alt={LEGAL_NAME} width={220} height={42} priority />
+          <div className="academy-seal" aria-label={`Obserra Academy, a training division of ${LEGAL_NAME}`}>
             <span>OA</span>
             <b>OBSERRA ACADEMY</b>
-            <small>A TRAINING DIVISION OF OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</small>
+            <small>A TRAINING DIVISION OF OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE, LLC</small>
           </div>
         </div>
 
         <div className="certificate-rule" />
         <p className="certificate-label">Certificate of Training Completion</p>
-        <p className="certificate-kicker">Cryptographically signed professional development record of Obserra Executive Protection &amp; Intelligence LLC</p>
+        <p className="certificate-kicker">Cryptographically signed professional development record of {LEGAL_NAME}</p>
         <h1>This certifies that</h1>
         <h2>{learnerName}</h2>
-        <p className="certificate-copy">has successfully completed the Obserra Academy professional training program of Obserra Executive Protection &amp; Intelligence LLC</p>
+        <p className="certificate-copy">has successfully completed the Obserra Academy professional training program of {LEGAL_NAME}</p>
         <h3>{courseTitle}</h3>
         <p className="certificate-copy certificate-copy-strong">Completion included every required learning experience and a final assessment score of 80 percent or higher.</p>
 
@@ -68,9 +71,9 @@ export default function CertificateView({
         </div>
 
         <div className="certificate-authentication">
-          <div className="certificate-verification-seal" aria-label="Obserra Executive Protection and Intelligence LLC verified digital seal">
+          <div className="certificate-verification-seal" aria-label={`${LEGAL_NAME} verified digital seal`}>
             <div className="certificate-verification-seal-inner">
-              <Image src="/brand/obserra-logo.png" alt="Official Obserra Executive Protection and Intelligence LLC logo" width={96} height={96} />
+              <Image src={OFFICIAL_LOGO} alt={`Official ${LEGAL_NAME} logo`} width={96} height={96} />
               <b>VERIFIED</b>
               <small>{signatureAlgorithm} SIGNATURE</small>
             </div>
@@ -78,7 +81,7 @@ export default function CertificateView({
           <div className="certificate-signature">
             <span className="signature-mark">Dr. Jody Blanchard</span>
             <b>DR. JODY BLANCHARD</b>
-            <small>Founder and Owner. This completion record is digitally signed by Dr. Jody Blanchard and issued by Obserra Executive Protection &amp; Intelligence LLC.</small>
+            <small>Founder and Owner. This completion record is digitally signed by Dr. Jody Blanchard and issued by {LEGAL_NAME}.</small>
           </div>
         </div>
 
@@ -90,8 +93,8 @@ export default function CertificateView({
         </div>
 
         <footer>
-          <b>Issued by Obserra Executive Protection &amp; Intelligence LLC</b>
-          <small>Property of Obserra Executive Protection &amp; Intelligence LLC. This signed record confirms completion of an Obserra Academy professional training program. It is not a government license, occupational authorization, accredited academic credit, or third party professional certification.</small>
+          <b>Issued by {LEGAL_NAME}</b>
+          <small>Property of {LEGAL_NAME}. This signed record confirms completion of an Obserra Academy professional training program. It is not a government license, occupational authorization, accredited academic credit, or third party professional certification.</small>
         </footer>
       </section>
     </main>
