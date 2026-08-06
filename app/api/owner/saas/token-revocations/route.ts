@@ -24,6 +24,10 @@ export async function POST(request: Request) {
   if (!owner.allowed) {
     return noStore({ error: owner.reason }, owner.reason === "authentication-required" ? 401 : 403);
   }
+  const actorUserId = owner.userId;
+  if (!actorUserId) {
+    return noStore({ error: "owner-principal-unavailable" }, 403);
+  }
 
   let body: RevocationRequest;
   try {
@@ -57,7 +61,7 @@ export async function POST(request: Request) {
       productSlug: verified.claims.productSlug,
       expiresAt: verified.claims.expiresAt,
       revokedAt: new Date().toISOString(),
-      revokedBy: owner.userId,
+      revokedBy: actorUserId,
       reason,
     },
     idempotencyKey,
@@ -65,7 +69,7 @@ export async function POST(request: Request) {
 
   console.info("SaaS access token revoked", {
     operationId: idempotencyKey,
-    actorUserId: owner.userId,
+    actorUserId,
     organizationId: verified.claims.organizationId,
     tenantId: verified.claims.tenantId,
     productSlug: verified.claims.productSlug,
