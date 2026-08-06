@@ -19,7 +19,8 @@
     "test:supply-chain": "node scripts/supply-chain-readiness.mjs",
     "test:operational-slo": "node scripts/operational-slo-readiness.mjs",
     "test:data-protection": "node scripts/data-protection-readiness.mjs",
-    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run test:browser-integrity && npm run test:supply-chain && npm run test:operational-slo && npm run test:data-protection && npm run test:rollback-readiness && npm run build",
+    "test:ai-governance": "node scripts/ai-governance-readiness.mjs",
+    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run test:browser-integrity && npm run test:supply-chain && npm run test:operational-slo && npm run test:data-protection && npm run test:ai-governance && npm run test:rollback-readiness && npm run build",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
   },
