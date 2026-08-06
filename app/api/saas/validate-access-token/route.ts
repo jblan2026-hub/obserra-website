@@ -3,17 +3,14 @@ import { NextResponse } from "next/server";
 import { verifySaasAccessToken } from "../../../../lib/saas-access-token";
 import { tokenPredatesOrganizationCutoff } from "../../../../lib/saas-organization-token-cutoff";
 import { authorizeSaasService } from "../../../../lib/saas-service-credentials";
+import { sessionIsRevoked } from "../../../../lib/saas-session-revocation";
 import { tokenIsRevoked } from "../../../../lib/saas-token-revocation";
 import { enforceValidationRateLimit } from "../../../../lib/saas-token-validation-rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type ValidationRequest = {
-  token?: unknown;
-  productSlug?: unknown;
-  organizationId?: unknown;
-};
+type ValidationRequest = { token?: unknown; productSlug?: unknown; organizationId?: unknown };
 
 function response(body: unknown, status = 200, extraHeaders: Record<string, string> = {}) {
   return NextResponse.json(body, {
@@ -40,9 +37,7 @@ function boundedServiceId(value: string | null) {
 export async function POST(request: Request) {
   const serviceId = boundedServiceId(request.headers.get("x-obserra-service-id"));
   const serviceSecret = request.headers.get("x-obserra-service-key")?.trim() || "";
-  if (!serviceId || !serviceSecret) {
-    return response({ valid: false, reason: "service-authentication-required" }, 401);
-  }
+  if (!serviceId || !serviceSecret) return response({ valid: false, reason: "service-authentication-required" }, 401);
 
   let body: ValidationRequest;
   try {
@@ -85,11 +80,10 @@ export async function POST(request: Request) {
       organizationAudienceSupplied: Boolean(organizationId),
       resetAt: rateLimit.resetAt,
     });
-    return response(
-      { valid: false, reason: "rate-limit-exceeded" },
-      429,
-      { ...rateHeaders, "Retry-After": String(retryAfter) },
-    );
+    return response({ valid: false, reason: "rate-limit-exceeded" }, 429, {
+      ...rateHeaders,
+      "Retry-After": String(retryAfter),
+    });
   }
 
   let result;
@@ -98,15 +92,19 @@ export async function POST(request: Request) {
   } catch {
     return response({ valid: false, reason: "validation-service-unavailable" }, 503, rateHeaders);
   }
-
   if (!result.valid) return response(result, 401, rateHeaders);
 
   try {
-    const [revoked, predatesCutoff] = await Promise.all([
+    const [revoked, sessionRevoked, predatesCutoff] = await Promise.all([
       tokenIsRevoked({
         nonce: result.claims.nonce,
         organizationId: result.claims.organizationId,
         productSlug: result.claims.productSlug,
+      }),
+      sessionIsRevoked({
+        sessionId: result.claims.sessionId,
+        userId: result.claims.subject,
+        organizationId: result.claims.organizationId,
       }),
       tokenPredatesOrganizationCutoff({
         organizationId: result.claims.organizationId,
@@ -114,6 +112,7 @@ export async function POST(request: Request) {
       }),
     ]);
     if (revoked) return response({ valid: false, reason: "token-revoked" }, 401, rateHeaders);
+    if (sessionRevoked) return response({ valid: false, reason: "session-revoked" }, 401, rateHeaders);
     if (predatesCutoff) return response({ valid: false, reason: "organization-token-cutoff" }, 401, rateHeaders);
   } catch {
     return response({ valid: false, reason: "containment-service-unavailable" }, 503, rateHeaders);
@@ -130,6 +129,7 @@ export async function POST(request: Request) {
       features: result.claims.features,
       issuedAt: result.claims.issuedAt,
       expiresAt: result.claims.expiresAt,
+      sessionBound: true,
     },
   }, 200, rateHeaders);
 }
