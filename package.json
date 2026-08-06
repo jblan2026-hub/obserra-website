@@ -17,7 +17,8 @@
     "test:rollback-readiness": "node scripts/rollback-readiness-gate.mjs",
     "test:browser-integrity": "node scripts/browser-asset-security-gate.mjs",
     "test:supply-chain": "node scripts/supply-chain-readiness.mjs",
-    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run test:browser-integrity && npm run test:supply-chain && npm run test:rollback-readiness && npm run build",
+    "test:operational-slo": "node scripts/operational-slo-readiness.mjs",
+    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run test:browser-integrity && npm run test:supply-chain && npm run test:operational-slo && npm run test:rollback-readiness && npm run build",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
   },
