@@ -19,7 +19,7 @@ concurrency:
 jobs:
   release-readiness:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,6 +77,9 @@ jobs:
       - name: SaaS billing lifecycle and persistence gate
         run: npm run test:saas-billing-control-plane
 
+      - name: SaaS usage metering and quota gate
+        run: npm run test:saas-usage-metering
+
       - name: Rollback and release evidence gate
         run: npm run test:rollback-readiness
 
@@ -89,7 +92,7 @@ jobs:
   deployed-system-gates:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 55
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -127,6 +130,9 @@ jobs:
 
       - name: Verify SaaS billing lifecycle and persistence
         run: npm run test:saas-billing-control-plane
+
+      - name: Verify SaaS usage metering and quotas
+        run: npm run test:saas-usage-metering
 
       - name: Verify rollback and release evidence
         run: npm run test:rollback-readiness
