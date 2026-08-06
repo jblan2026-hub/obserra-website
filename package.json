@@ -10,7 +10,8 @@
     "test:academy-70x": "node scripts/academy-70x-gate.mjs",
     "test:academy-500x": "node scripts/academy-500x-workload-gate.mjs",
     "test:academy-1000x-remediation": "node scripts/academy-1000x-remediation-gate.mjs",
-    "verify:academy-release": "npm run lint && npm test && npm run test:academy-70x && npm run test:academy-500x && npm run test:academy-1000x-remediation && npm run build",
+    "test:academy-2000x-resilience": "node scripts/academy-2000x-resilience-gate.mjs",
+    "verify:academy-release": "npm run lint && npm test && npm run test:academy-70x && npm run test:academy-500x && npm run test:academy-1000x-remediation && npm run test:academy-2000x-resilience && npm run build",
     "test:production": "node --test scripts/production-smoke.mjs",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
