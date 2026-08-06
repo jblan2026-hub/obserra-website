@@ -50,6 +50,9 @@ jobs:
       - name: Operational commerce lifecycle and live control room gate
         run: npm run test:operational-release
 
+      - name: Browser asset accessibility and security gate
+        run: npm run test:browser-integrity
+
       - name: Rollback and release evidence gate
         run: npm run test:rollback-readiness
 
@@ -73,6 +76,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Verify browser asset accessibility and security integrity
+        run: npm run test:browser-integrity
 
       - name: Verify rollback and release evidence
         run: npm run test:rollback-readiness
