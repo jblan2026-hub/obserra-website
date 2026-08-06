@@ -1,0 +1,46 @@
+name: Academy 70x Production Gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app/academy/**"
+      - "app/api/academy/**"
+      - "app/api/webhook/stripe/**"
+      - "lib/academy.ts"
+      - "scripts/academy-70x-gate.mjs"
+      - "package.json"
+      - ".github/workflows/academy-70x-production-gate.yml"
+  push:
+    branches: [feature/academy-complete-learning-experience]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: academy-70x-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  academy-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Run Academy 70x structural and functional contract gate
+        run: npm run test:academy-70x
+      - name: Run repository tests
+        run: npm test
+      - name: Run static quality validation
+        run: npm run lint
+      - name: Build production application
+        run: npm run build
+      - name: Verify generated source remains clean
+        run: git diff --exit-code
