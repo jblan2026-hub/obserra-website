@@ -25,7 +25,8 @@
     "test:saas-control-plane": "node scripts/saas-control-plane-readiness.mjs",
     "test:saas-billing-control-plane": "node scripts/saas-billing-control-plane-readiness.mjs",
     "test:saas-usage-metering": "node scripts/saas-usage-metering-readiness.mjs",
-    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run test:browser-integrity && npm run test:supply-chain && npm run test:operational-slo && npm run test:data-protection && npm run test:ai-governance && npm run test:commerce-credential && npm run test:saas-catalog && npm run test:saas-control-plane && npm run test:saas-billing-control-plane && npm run test:saas-usage-metering && npm run test:rollback-readiness && npm run build",
+    "test:saas-owner-operations": "node scripts/saas-owner-operations-readiness.mjs",
+    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run test:browser-integrity && npm run test:supply-chain && npm run test:operational-slo && npm run test:data-protection && npm run test:ai-governance && npm run test:commerce-credential && npm run test:saas-catalog && npm run test:saas-control-plane && npm run test:saas-billing-control-plane && npm run test:saas-usage-metering && npm run test:saas-owner-operations && npm run test:rollback-readiness && npm run build",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
   },
