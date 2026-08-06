@@ -64,6 +64,23 @@ const intelligence = read("app/api/obserra/intelligence/route.ts");
 check("intelligence requires bearer token", /authorization/i.test(intelligence) && /Bearer/.test(intelligence));
 check("intelligence uses timing safe compare", /timingSafeEqual/.test(intelligence));
 check("intelligence is no store", /no-store/.test(intelligence));
+for (const term of [
+  "remediation",
+  "status: \"ready\"",
+  "ownerApprovalRequired: true",
+  "isolatedBranchRequired: true",
+  "draftPullRequestOnly: true",
+  "sourceHashValidationRequired: true",
+  "rollbackEvidenceRequired: true",
+  "directDefaultBranchWriteAllowed: false",
+  "automaticMergeAllowed: false",
+  "automaticProductionDeploymentAllowed: false",
+  "verify:academy-release"
+]) {
+  check(`intelligence remediation contract includes ${term}`, intelligence.includes(term));
+}
+check("intelligence advertises MITRE and OWASP mapping requirements", intelligence.includes("MITRE ATT&CK") && intelligence.includes("OWASP Top 10"));
+check("intelligence schema supports remediation contract", /schemaVersion:\s*\"1\.1\"/.test(intelligence));
 
 const checkout = read("app/api/academy/checkout/route.ts");
 check("checkout remains fail closed", /STRIPE_WEBHOOK_SECRET/.test(checkout) && /not-ready/.test(checkout));
@@ -81,6 +98,7 @@ console.log(JSON.stringify({
   cases: cases.length,
   flows: [...new Set(cases.map((item) => item.flow))],
   mappings: [...new Set(cases.map((item) => item.mapping))],
+  intelligenceContract: "authenticated-remediation-v1.1",
   digest,
   failures
 }, null, 2));
