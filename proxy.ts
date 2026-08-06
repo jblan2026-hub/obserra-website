@@ -7,28 +7,43 @@ const PREVIEW_NOINDEX = "noindex, nofollow, noarchive, nosnippet";
 
 const isProtected = createRouteMatcher(["/admin(.*)", "/portal(.*)"]);
 
-function isValidClerkPublishableKey(value: string | undefined) {
-  return Boolean(value && /^(pk_test_|pk_live_)[A-Za-z0-9_-]+$/.test(value.trim()));
+type ClerkEnvironment = "test" | "live";
+
+function decodeBase64Url(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+  return atob(padded);
 }
 
-function isValidClerkSecretKey(value: string | undefined) {
-  return Boolean(value && /^(sk_test_|sk_live_)[A-Za-z0-9_-]+$/.test(value.trim()));
+function clerkPublishableEnvironment(value: string | undefined): ClerkEnvironment | null {
+  if (!value || value !== value.trim()) return null;
+  const match = /^pk_(test|live)_([A-Za-z0-9_-]+)$/.exec(value);
+  if (!match) return null;
+
+  try {
+    const decoded = decodeBase64Url(match[2]);
+    if (!decoded.endsWith("$")) return null;
+    const frontendApi = decoded.slice(0, -1);
+    if (!/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,}$/i.test(frontendApi)) return null;
+    return match[1] as ClerkEnvironment;
+  } catch {
+    return null;
+  }
 }
 
-function clerkEnvironmentsMatch(publishableKey: string | undefined, secretKey: string | undefined) {
-  if (!publishableKey || !secretKey) return false;
-  return (
-    (publishableKey.startsWith("pk_test_") && secretKey.startsWith("sk_test_")) ||
-    (publishableKey.startsWith("pk_live_") && secretKey.startsWith("sk_live_"))
-  );
+function clerkSecretEnvironment(value: string | undefined): ClerkEnvironment | null {
+  if (!value || value !== value.trim()) return null;
+  const match = /^sk_(test|live)_([A-Za-z0-9_-]{20,})$/.exec(value);
+  return match ? (match[1] as ClerkEnvironment) : null;
 }
 
-const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim();
-const clerkSecretKey = process.env.CLERK_SECRET_KEY?.trim();
-const authenticationReady =
-  isValidClerkPublishableKey(clerkPublishableKey) &&
-  isValidClerkSecretKey(clerkSecretKey) &&
-  clerkEnvironmentsMatch(clerkPublishableKey, clerkSecretKey);
+const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+const publishableEnvironment = clerkPublishableEnvironment(clerkPublishableKey);
+const secretEnvironment = clerkSecretEnvironment(clerkSecretKey);
+const authenticationReady = Boolean(
+  publishableEnvironment && secretEnvironment && publishableEnvironment === secretEnvironment,
+);
 
 function withPreviewNoIndex(response: NextResponse, request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase().split(":")[0];
