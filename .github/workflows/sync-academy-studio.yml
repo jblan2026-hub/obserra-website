@@ -1,0 +1,81 @@
+name: Sync Obserra Academy Studio
+
+on:
+  workflow_dispatch:
+    inputs:
+      studio_ref:
+        description: Academy Production Studio branch or tag
+        required: false
+        default: main
+  repository_dispatch:
+    types: [academy_catalog_published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: academy-studio-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require synchronization credential
+        env:
+          ACADEMY_STUDIO_TOKEN: ${{ secrets.ACADEMY_STUDIO_TOKEN }}
+        run: test -n "$ACADEMY_STUDIO_TOKEN"
+
+      - name: Checkout website
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.ACADEMY_STUDIO_TOKEN }}
+
+      - name: Checkout Academy Production Studio
+        uses: actions/checkout@v4
+        with:
+          repository: jblan2026-hub/obserra-academy-production-studio
+          ref: ${{ github.event.client_payload.ref || inputs.studio_ref || 'main' }}
+          path: academy-studio
+          token: ${{ secrets.ACADEMY_STUDIO_TOKEN }}
+
+      - name: Copy approved Academy catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f academy-studio/catalog/academy-course-catalog.json
+          mkdir -p app/academy/generated
+          cp academy-studio/catalog/academy-course-catalog.json app/academy/generated/studio-catalog.json
+          rm -rf academy-studio
+
+      - name: Validate governed catalog contract
+        shell: bash
+        run: |
+          node <<'NODE'
+          const catalog = require('./app/academy/generated/studio-catalog.json');
+          if (catalog.schemaVersion !== '1.2') throw new Error('Academy catalog schemaVersion must equal 1.2');
+          if (!Array.isArray(catalog.courses)) throw new Error('Academy catalog courses must be an array');
+          for (const course of catalog.courses) {
+            if (!course.id || !course.title || !course.duration) throw new Error(`Invalid course identity: ${course.id ?? 'unknown'}`);
+            if (!Array.isArray(course.modules) || course.modules.length === 0) throw new Error(`Course ${course.id} has no modules`);
+            if (!course.commerce || !course.licensing || !course.completion || !course.certificate) throw new Error(`Course ${course.id} is missing governed commercial metadata`);
+            if (!course.branding || !course.tags || !course.disclaimer || course.acknowledgementRequired !== true) throw new Error(`Course ${course.id} is missing branding, tags, or legal policy`);
+            if (course.certificate.isProfessionalCertification !== false || course.certificate.isComplianceEvidence !== false) throw new Error(`Course ${course.id} has an invalid credential designation`);
+            if (!['approved', 'published'].includes(course.releaseStatus)) throw new Error(`Course ${course.id} is not approved for publication`);
+          }
+          NODE
+
+      - name: Commit published catalog
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "obserra-academy-bot"
+          git config user.email "academy-bot@obserrallc.com"
+          git add app/academy/generated/studio-catalog.json
+          if git diff --cached --quiet; then
+            echo "Academy catalog is already current"
+          else
+            git commit -m "Publish approved Academy Studio catalog"
+            git push origin main
+          fi
