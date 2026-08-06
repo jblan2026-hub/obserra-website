@@ -8,8 +8,28 @@ import "../apps.css";
 
 type Props = { params: Promise<{ slug: string }> };
 
+type Props = { params: Promise<{ slug: string }> };
+
 const liveApplicationUrls: Record<string, string> = {
   "obserra-eios": "https://app.obserrallc.com",
+  "obserra-sap-uac": "https://obserra-sap-3c98pt0op-obserra.vercel.app",
+  "obserra-offboarding-orchestrator": "https://obserra-offboarding-7vcx1bq9m-obserra.vercel.app",
+  "obserra-asset-intelligence": "https://obserra-asset-intel-oumjgaik0-obserra.vercel.app",
+  "obserra-cyber-risk-register": "https://obserra-cyber-risk-lm0g1nht4-obserra.vercel.app",
+  "obserra-identity-certification": "https://obserra-identity-cert-oumyo87fc-obserra.vercel.app",
+  "obserra-vulnerability-prioritizer": "https://obserra-vulnerability-aop5neh0v-obserra.vercel.app",
+  "obserra-incident-command": "https://obserra-incident-kdk49sh0o-obserra.vercel.app",
+  "obserra-cloud-security-posture": "https://obserra-cloud-posture-4l4u6fbjk-obserra.vercel.app",
+  "obserra-data-protection": "https://obserra-data-protection-a2azfhygo-obserra.vercel.app",
+  "obserra-technology-lifecycle": "https://obserra-tech-lifecycle-43ynzbbwx-obserra.vercel.app",
+  "obserra-business-continuity": "https://obserra-bgkajqcp6-obserra.vercel.app",
+  "obserra-third-party-risk": "https://obserra-tprm-13fjfrcdy-obserra.vercel.app",
+  "obserra-ai-governance": "https://obserra-ai-governance-drowgelrk-obserra.vercel.app",
+  "obserra-security-control-evidence": "https://obserra-sec-evidence-jd4sqimkt-obserra.vercel.app",
+  "obserra-executive-exposure": "https://obserra-exec-exposure-l8ptqfnpq-obserra.vercel.app",
+  "obserra-it-pmo": "https://obserra-it-6qyp48efd-obserra.vercel.app",
+  "obserra-executive-intelligence": "https://obserra-exec-intel-luuf9gjl1-obserra.vercel.app",
+  "obserra-eios-console": "https://obserra-eios-console-puxc0g8gd-obserra.vercel.app",
 };
 
 export function generateStaticParams() { return marketplaceApps.map((entry) => ({ slug: entry.slug })); }
