@@ -15,7 +15,8 @@
     "test:cross-target": "node scripts/cross-target-contract.mjs",
     "test:performance-isolation": "node scripts/performance-isolation-gate.mjs",
     "test:rollback-readiness": "node scripts/rollback-readiness-gate.mjs",
-    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run test:rollback-readiness && npm run build",
+    "test:browser-integrity": "node scripts/browser-asset-security-gate.mjs",
+    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run test:browser-integrity && npm run test:rollback-readiness && npm run build",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
   },
