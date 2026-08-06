@@ -26,11 +26,13 @@ export default function CertificateView({
     day: "numeric",
     year: "numeric",
   }).format(new Date(completedAt));
+  const verificationPath = `/academy/verify?certificateId=${encodeURIComponent(certificateId)}`;
 
   return (
     <main className="certificate-page">
       <nav>
         <a href="/academy">Obserra Academy</a>
+        <a href={verificationPath}>Verify credential</a>
         <button onClick={() => window.print()}>Print certificate</button>
       </nav>
 
@@ -78,7 +80,7 @@ export default function CertificateView({
 
         <div className="certificate-verification">
           <span>Completion date <b>{completionDate}</b></span>
-          <span>Verify at <b>www.obserrallc.com/academy</b></span>
+          <span>Verify at <b>www.obserrallc.com{verificationPath}</b></span>
         </div>
 
         <footer>
