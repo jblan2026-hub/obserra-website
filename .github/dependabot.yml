@@ -1,0 +1,45 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/New_York
+    open-pull-requests-limit: 10
+    versioning-strategy: increase-if-necessary
+    groups:
+      commerce-and-licensing:
+        patterns:
+          - stripe
+      identity-and-access:
+        patterns:
+          - "@clerk/*"
+      hosting-and-observability:
+        patterns:
+          - "@vercel/*"
+          - next
+      frontend-runtime:
+        patterns:
+          - react
+          - react-dom
+    labels:
+      - dependencies
+      - integration-update
+    commit-message:
+      prefix: "chore(connections)"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      day: monday
+      time: "10:00"
+      timezone: America/New_York
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - automation-update
+    commit-message:
+      prefix: "chore(actions)"
