@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,9 +17,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  release-readiness:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,11 +33,37 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Lint and static quality
         run: npm run lint
 
-      - name: Unit tests
+      - name: Unit and integration tests
         run: npm test
+
+      - name: Macro platform readiness gate
+        run: npm run test:platform
 
       - name: Production build
         run: npm run build
+
+      - name: Verify no generated source drift
+        run: git diff --exit-code
+
+  cross-target-contract:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      OBSERRA_WEBSITE_LIVE_URL: ${{ secrets.OBSERRA_WEBSITE_LIVE_URL }}
+      OBSERRA_WEBSITE_LCN2_URL: ${{ secrets.OBSERRA_WEBSITE_LCN2_URL }}
+      OBSERRA_INTEGRATED_SERVICES_URL: ${{ secrets.OBSERRA_INTEGRATED_SERVICES_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify all deployment contracts
+        run: npm run test:cross-target
