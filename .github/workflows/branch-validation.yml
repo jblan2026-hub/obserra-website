@@ -56,6 +56,9 @@ jobs:
       - name: Software supply chain readiness gate
         run: npm run test:supply-chain
 
+      - name: Operational service level readiness gate
+        run: npm run test:operational-slo
+
       - name: Rollback and release evidence gate
         run: npm run test:rollback-readiness
 
@@ -85,6 +88,9 @@ jobs:
 
       - name: Verify software supply chain readiness
         run: npm run test:supply-chain
+
+      - name: Verify operational service level readiness
+        run: npm run test:operational-slo
 
       - name: Verify rollback and release evidence
         run: npm run test:rollback-readiness
