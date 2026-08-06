@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { authorizeOwner } from "../../../../../lib/owner-authorization";
+import { requireStepUp } from "../../../../../lib/require-step-up";
 import { verifySaasAccessToken } from "../../../../../lib/saas-access-token";
 import { revokeToken } from "../../../../../lib/saas-token-revocation";
 
@@ -20,12 +21,15 @@ function noStore(body: unknown, status = 200) {
 }
 
 export async function POST(request: Request) {
+  const stepUp = await requireStepUp("strict");
+  if (!stepUp.allowed) return stepUp.response;
+
   const owner = await authorizeOwner();
   if (!owner.allowed) {
     return noStore({ error: owner.reason }, owner.reason === "authentication-required" ? 401 : 403);
   }
   const actorUserId = owner.userId;
-  if (!actorUserId) {
+  if (!actorUserId || actorUserId !== stepUp.userId) {
     return noStore({ error: "owner-principal-unavailable" }, 403);
   }
 
