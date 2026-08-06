@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "updatedAt": "2026-08-06T07:20:00.000Z",
+  "currency": "USD",
+  "methodology": "Owner-governed market observations from public vendor pricing pages, marketplaces, customer discovery, and approved competitive research. Values are recommendation inputs, not automatic production prices.",
+  "categories": {
+    "Cybersecurity": {
+      "starterMonthly": [99, 499],
+      "businessMonthly": [750, 3500],
+      "enterpriseAnnual": [25000, 150000],
+      "commonModels": ["tiered subscription", "asset or user based", "enterprise quote", "usage add-on"]
+    },
+    "GRC": {
+      "starterMonthly": [299, 1250],
+      "businessMonthly": [1500, 6000],
+      "enterpriseAnnual": [25000, 175000],
+      "commonModels": ["platform fee", "framework add-on", "employee band", "enterprise quote"]
+    },
+    "AI Governance": {
+      "starterMonthly": [499, 2000],
+      "businessMonthly": [2500, 10000],
+      "enterpriseAnnual": [50000, 250000],
+      "commonModels": ["platform subscription", "model or agent inventory", "usage credits", "enterprise quote"]
+    },
+    "Identity": {
+      "starterMonthly": [199, 1000],
+      "businessMonthly": [1250, 7500],
+      "enterpriseAnnual": [30000, 250000],
+      "commonModels": ["per identity", "per administrator", "tiered subscription", "enterprise quote"]
+    },
+    "Intelligence": {
+      "starterMonthly": [299, 1500],
+      "businessMonthly": [2000, 10000],
+      "enterpriseAnnual": [50000, 300000],
+      "commonModels": ["analyst seats", "data feeds", "usage credits", "enterprise quote"]
+    },
+    "Executive Protection": {
+      "starterMonthly": [199, 999],
+      "businessMonthly": [1500, 7500],
+      "enterpriseAnnual": [30000, 200000],
+      "commonModels": ["subscription plus services", "executive count", "monitoring tier", "enterprise quote"]
+    },
+    "Operations": {
+      "starterMonthly": [199, 1000],
+      "businessMonthly": [1500, 8000],
+      "enterpriseAnnual": [40000, 250000],
+      "commonModels": ["seat based", "asset based", "workflow volume", "enterprise quote"]
+    }
+  },
+  "guardrails": {
+    "maximumSingleAdjustmentPercent": 20,
+    "minimumGrossMarginPercent": 70,
+    "minimumEvidenceSignals": 3,
+    "ownerApprovalRequired": true,
+    "previewRequired": true,
+    "productionAutoPublish": false
+  },
+  "sources": [
+    {
+      "vendor": "Vanta",
+      "observation": "Tiered plans with personalized pricing and AI capabilities differentiated by plan.",
+      "sourceType": "official pricing page",
+      "observedAt": "2026-08-06"
+    },
+    {
+      "vendor": "Drata",
+      "observation": "Tiered plans; public marketplace examples include a platform fee and separately priced framework entitlements.",
+      "sourceType": "official plan page and cloud marketplace",
+      "observedAt": "2026-08-06"
+    },
+    {
+      "vendor": "Enterprise AI market",
+      "observation": "Hybrid seat, usage-credit, and outcome-oriented pricing models are increasingly common.",
+      "sourceType": "market research",
+      "observedAt": "2026-08-06"
+    }
+  ]
+}
