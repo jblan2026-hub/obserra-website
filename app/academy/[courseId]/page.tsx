@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { courseForId } from "../../../lib/academy";
 import "./course-page.css";
 
+const LEGAL_NAME = "Obserra Executive Protection & Intelligence, LLC";
+const OFFICIAL_LOGO = "/brand/obserra-logo.png";
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
 export async function generateMetadata({ params }: { params: Promise<{ courseId: string }> }): Promise<Metadata> {
@@ -18,13 +20,13 @@ export async function generateMetadata({ params }: { params: Promise<{ courseId:
       description: course.description,
       url: `https://www.obserrallc.com/academy/${course.id}`,
       type: "article",
-      images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: course.title }],
+      images: [{ url: OFFICIAL_LOGO, width: 1344, height: 768, alt: `${LEGAL_NAME}: ${course.title}` }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${course.title} | Obserra Academy`,
       description: course.description,
-      images: ["/brand/visuals/obserra-cybersecurity.png"],
+      images: [OFFICIAL_LOGO],
     },
   };
 }
@@ -37,7 +39,7 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
     "@type": "Course",
     name: course.title,
     description: course.description,
-    provider: { "@type": "Organization", name: "Obserra Academy", url: "https://www.obserrallc.com/academy" },
+    provider: { "@type": "Organization", name: LEGAL_NAME, url: "https://www.obserrallc.com/academy", logo: `https://www.obserrallc.com${OFFICIAL_LOGO}` },
     audience: { "@type": "Audience", audienceType: course.audience },
     offers: { "@type": "Offer", price: course.price, priceCurrency: "USD", availability: "https://schema.org/InStock", url: `https://www.obserrallc.com/academy/${course.id}` },
     hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: course.duration },
@@ -48,7 +50,7 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
 
       <header className="academy-course-nav">
         <a href="/academy" className="academy-course-brand">
-          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={220} height={42} />
+          <Image src={OFFICIAL_LOGO} alt={LEGAL_NAME} width={220} height={42} priority />
           <b>ACADEMY</b>
         </a>
         <nav aria-label="Course navigation">
@@ -92,7 +94,7 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
                 <span>Built around applied judgment, not passive slides.</span>
               </div>
               <div>
-                <strong>Certificate standard</strong>
+                <strong>Digitally signed certificate standard</strong>
                 <span>Complete every lesson and score 80 percent or higher.</span>
               </div>
             </div>
@@ -104,12 +106,12 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
             <span>per learner</span>
             <dl>
               <div><dt>Duration</dt><dd>{course.duration}</dd></div>
-              <div><dt>Modules</dt><dd>{course.modules.length}</dd></div>
+              <div><dt>Lessons</dt><dd>{course.modules.length}</dd></div>
               <div><dt>Audience</dt><dd>{course.audience}</dd></div>
               <div><dt>Format</dt><dd>Self-paced online</dd></div>
             </dl>
             <a className="academy-course-checkout academy-course-card-cta" href={`/api/academy/checkout?course=${course.id}`}>Buy secure enrollment</a>
-            <small>Enterprise-ready training with a governed completion path and proprietary Obserra certificate.</small>
+            <small>Enterprise-ready training with a governed completion path and cryptographically signed completion certificate issued by {LEGAL_NAME}.</small>
           </aside>
         </div>
       </section>
@@ -128,14 +130,14 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
         <article>
           <span>03</span>
           <h2>How it is completed</h2>
-          <p>Lessons, scenario practice, and assessment are sequenced to make the final certificate meaningful, not decorative.</p>
+          <p>Lessons, scenario practice, and assessment are sequenced to make the final certificate meaningful, verifiable, and tamper evident.</p>
         </article>
       </section>
 
       <section className="academy-course-content" id="curriculum">
         <div className="academy-course-outcomes">
           <p className="academy-course-kicker">WHAT YOU WILL LEARN</p>
-          <h2>Practical learning tied to real cybersecurity, protection, and intelligence work.</h2>
+          <h2>Practical learning tied to the course description and intended professional audience.</h2>
           <ul>
             {course.outcomes.map((outcome) => <li key={outcome}>{outcome}</li>)}
           </ul>
@@ -158,12 +160,12 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
       <section className="academy-course-certificate">
         <div>
           <p className="academy-course-kicker">COMPLETION</p>
-          <h2>Receive an Obserra Certificate of Training upon successful completion.</h2>
-          <p>Complete every interactive lesson and achieve 80 percent or higher on the final assessment. This informational program does not confer professional licensure, accredited academic credit, or third-party industry certification.</p>
+          <h2>Receive a digitally signed Certificate of Training Completion.</h2>
+          <p>Complete every required lesson and achieve 80 percent or higher on the final assessment. The certificate is cryptographically signed by Dr. Jody Blanchard, issued by {LEGAL_NAME}, and linked to a public verification record.</p>
         </div>
         <aside>
           <strong>Buyer-safe details</strong>
-          <p>One purchase route. One completion standard. One certificate record for the learner who finishes the course.</p>
+          <p>One purchase route. One completion standard. One signed certificate record for the learner who finishes the course.</p>
         </aside>
       </section>
     </main>
