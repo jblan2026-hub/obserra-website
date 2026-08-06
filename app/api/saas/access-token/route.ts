@@ -20,7 +20,7 @@ function noStore(body: unknown, status = 200) {
 
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session.userId) return noStore({ error: "authentication-required" }, 401);
+  if (!session.userId || !session.sessionId) return noStore({ error: "authentication-required" }, 401);
   if (!session.orgId) return noStore({ error: "organization-required" }, 403);
 
   let body: { productSlug?: unknown; ttlSeconds?: unknown };
@@ -37,10 +37,7 @@ export async function POST(request: Request) {
     return noStore({ error: "invalid-ttl" }, 400);
   }
 
-  const entitlement = await evaluateProductEntitlement({
-    organizationId: session.orgId,
-    productSlug,
-  });
+  const entitlement = await evaluateProductEntitlement({ organizationId: session.orgId, productSlug });
   if (!entitlement.allowed || !entitlement.tenantId || !entitlement.planId) {
     return noStore({ error: entitlement.reason }, 403);
   }
@@ -48,6 +45,7 @@ export async function POST(request: Request) {
   try {
     const issued = issueSaasAccessToken({
       subject: session.userId,
+      sessionId: session.sessionId,
       organizationId: session.orgId,
       tenantId: entitlement.tenantId,
       productSlug,
@@ -62,6 +60,7 @@ export async function POST(request: Request) {
       expiresAt: issued.expiresAt,
       ttlSeconds: issued.ttlSeconds,
       productSlug,
+      sessionBound: true,
     });
   } catch {
     return noStore({ error: "access-token-service-unavailable" }, 503);
