@@ -19,6 +19,8 @@
     "test:supply-chain": "node scripts/supply-chain-readiness.mjs",
     "test:operational-slo": "node scripts/operational-slo-readiness.mjs",
     "test:data-protection": "node scripts/data-protection-readiness.mjs",
+    "test:pci-purchase-streams": "node scripts/pci-purchase-stream-readiness.mjs",
+    "test:governance-500x": "node scripts/governance-production-500x.mjs",
     "test:ai-governance": "node scripts/ai-governance-readiness.mjs",
     "test:commerce-credential": "node scripts/commerce-credential-readiness.mjs",
     "test:saas-catalog": "node scripts/saas-catalog-readiness.mjs",
@@ -38,7 +40,7 @@
     "test:step-up-enforcement": "node scripts/step-up-enforcement-readiness.mjs",
     "test:saas-session-assurance": "node scripts/saas-session-assurance-readiness.mjs",
     "test:governance-evidence": "node scripts/governance-evidence-readiness.mjs",
-    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run test:browser-integrity && npm run test:supply-chain && npm run test:operational-slo && npm run test:data-protection && npm run test:ai-governance && npm run test:commerce-credential && npm run test:saas-catalog && npm run test:saas-control-plane && npm run test:saas-billing-control-plane && npm run test:saas-usage-metering && npm run test:saas-owner-operations && npm run test:saas-subscription-summary && npm run test:saas-access-token && npm run test:saas-token-key-rotation && npm run test:saas-token-revocation && npm run test:saas-organization-token-cutoff && npm run test:saas-token-validation-rate-limit && npm run test:saas-service-credentials && npm run test:passwordless-auth && npm run test:passwordless-recovery && npm run test:step-up-enforcement && npm run test:saas-session-assurance && npm run test:governance-evidence && npm run test:rollback-readiness && npm run build",
+    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run test:browser-integrity && npm run test:supply-chain && npm run test:operational-slo && npm run test:data-protection && npm run test:pci-purchase-streams && npm run test:governance-500x && npm run test:ai-governance && npm run test:commerce-credential && npm run test:saas-catalog && npm run test:saas-control-plane && npm run test:saas-billing-control-plane && npm run test:saas-usage-metering && npm run test:saas-owner-operations && npm run test:saas-subscription-summary && npm run test:saas-access-token && npm run test:saas-token-key-rotation && npm run test:saas-token-revocation && npm run test:saas-organization-token-cutoff && npm run test:saas-token-validation-rate-limit && npm run test:saas-service-credentials && npm run test:passwordless-auth && npm run test:passwordless-recovery && npm run test:step-up-enforcement && npm run test:saas-session-assurance && npm run test:governance-evidence && npm run test:rollback-readiness && npm run build",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
   },
