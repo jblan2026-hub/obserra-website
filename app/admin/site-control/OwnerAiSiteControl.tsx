@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { OwnerSiteChangePlan } from "../../../lib/owner-ai-site-changes";
 
 type PreviewResult = {
@@ -31,6 +31,32 @@ type AnalyticsPayload = {
   records?: Array<{ id: string; createdAt: string; pathname: string; question: string; answer: string; confidence: number }>;
 };
 
+type LiveOperations = {
+  generatedAt: string;
+  status: "healthy" | "degraded" | "unhealthy";
+  targetCount: number;
+  healthy: number;
+  degraded: number;
+  unhealthy: number;
+  pollRecommendationSeconds: number;
+  persistentCheckIntervalMinutes: number;
+  capabilitiesExpected: number;
+  targets: Array<{
+    key: string;
+    projectName: string;
+    role: string;
+    url: string | null;
+    reachable: boolean;
+    ready: boolean;
+    status: string;
+    latencyMs: number;
+    checkedAt: string;
+    capabilityCount: number;
+    identityValid: boolean;
+    error?: string;
+  }>;
+};
+
 const panelStyle = { marginTop: 24, padding: 20, border: "1px solid #425d78", borderRadius: 12 };
 
 export default function OwnerAiSiteControl() {
@@ -40,15 +66,46 @@ export default function OwnerAiSiteControl() {
   const [preview, setPreview] = useState<PreviewResult | null>(null);
   const [maintenance, setMaintenance] = useState<MaintenanceSnapshot | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsPayload | null>(null);
+  const [liveOperations, setLiveOperations] = useState<LiveOperations | null>(null);
+  const [liveEnabled, setLiveEnabled] = useState(true);
+  const [liveRefreshing, setLiveRefreshing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  async function requestJson(url: string) {
+  const requestJson = useCallback(async (url: string) => {
     const response = await fetch(url, { cache: "no-store" });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error ?? `Unable to load ${url}`);
     return payload;
-  }
+  }, []);
+
+  const loadLiveOperations = useCallback(async (showError = false) => {
+    if (document.visibilityState === "hidden") return;
+    setLiveRefreshing(true);
+    try {
+      const payload = await requestJson("/api/admin/operations/live");
+      setLiveOperations(payload);
+      if (showError) setError("");
+    } catch (caught) {
+      if (showError) setError(caught instanceof Error ? caught.message : "Unable to load live operations");
+    } finally {
+      setLiveRefreshing(false);
+    }
+  }, [requestJson]);
+
+  useEffect(() => {
+    if (!liveEnabled) return;
+    void loadLiveOperations(false);
+    const interval = window.setInterval(() => void loadLiveOperations(false), 15_000);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") void loadLiveOperations(false);
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [liveEnabled, loadLiveOperations]);
 
   async function requestPlan() {
     if (instruction.trim().length < 8) {
@@ -99,12 +156,14 @@ export default function OwnerAiSiteControl() {
     setBusy(true);
     setError("");
     try {
-      const [maintenancePayload, analyticsPayload] = await Promise.all([
+      const [maintenancePayload, analyticsPayload, livePayload] = await Promise.all([
         requestJson("/api/admin/maintenance/recommendations"),
         requestJson("/api/admin/obserrian/analytics"),
+        requestJson("/api/admin/operations/live"),
       ]);
       setMaintenance(maintenancePayload);
       setAnalytics(analyticsPayload);
+      setLiveOperations(livePayload);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Unable to load operational intelligence");
     } finally {
@@ -116,8 +175,51 @@ export default function OwnerAiSiteControl() {
     <section className="admin-section">
       <h2>AI website control center</h2>
       <p>
-        Govern website, Academy, catalog, pricing, maintenance, and customer-experience changes from one owner workspace. AI may recommend and prepare changes, but production remains blocked until preview validation and owner approval are complete.
+        Govern website, Academy, catalog, pricing, maintenance, customer experience, and platform operations from one owner workspace. AI may recommend and prepare changes, but production remains blocked until preview validation and owner approval are complete.
       </p>
+
+      <article style={{ ...panelStyle, borderColor: liveOperations?.status === "healthy" ? "#3b7c68" : liveOperations?.status === "unhealthy" ? "#a84f4f" : "#8a7537" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div>
+            <h3 style={{ marginTop: 0 }}>Persistent live operations</h3>
+            <p style={{ marginBottom: 4 }}>
+              Browser updates every 15 seconds while visible. Server checks run every five minutes through Vercel Cron.
+            </p>
+            <small>
+              Last update: {liveOperations?.generatedAt ? new Date(liveOperations.generatedAt).toLocaleString() : "Waiting for first check"}
+              {liveRefreshing ? " · Refreshing" : ""}
+            </small>
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <button type="button" onClick={() => void loadLiveOperations(true)} disabled={liveRefreshing}>Refresh now</button>
+            <button type="button" onClick={() => setLiveEnabled((value) => !value)}>{liveEnabled ? "Pause live updates" : "Resume live updates"}</button>
+          </div>
+        </div>
+
+        {liveOperations ? (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10, marginTop: 18 }}>
+              <p><strong>{liveOperations.status.toUpperCase()}</strong><br />Platform status</p>
+              <p><strong>{liveOperations.healthy}</strong><br />Healthy targets</p>
+              <p><strong>{liveOperations.degraded}</strong><br />Degraded targets</p>
+              <p><strong>{liveOperations.unhealthy}</strong><br />Unhealthy targets</p>
+            </div>
+            <div style={{ display: "grid", gap: 12, marginTop: 14 }}>
+              {liveOperations.targets.map((target) => (
+                <div key={target.key} style={{ padding: 14, border: "1px solid #294861", borderRadius: 10 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                    <strong>{target.projectName}</strong>
+                    <span>{target.ready && target.identityValid ? "Operational" : target.status}</span>
+                  </div>
+                  <p style={{ marginBottom: 4 }}>{target.role} · {target.latencyMs} ms · {target.capabilityCount}/{liveOperations.capabilitiesExpected} capabilities</p>
+                  <small>Reachable: {target.reachable ? "Yes" : "No"} · Ready: {target.ready ? "Yes" : "No"} · Identity parity: {target.identityValid ? "Valid" : "Invalid"}</small>
+                  {target.error ? <p role="alert" style={{ color: "#ff9b9b" }}>{target.error}</p> : null}
+                </div>
+              ))}
+            </div>
+          </>
+        ) : <p style={{ marginTop: 18 }}>Live target checks are initializing.</p>}
+      </article>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 18 }}>
         <button type="button" onClick={loadOperations} disabled={busy}>
