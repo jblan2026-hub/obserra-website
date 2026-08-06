@@ -1,7 +1,7 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { courseForId } from "../../../../lib/academy";
 import {
-  safeStudioPaymentLink,
   studioCertificateMetadata,
   studioCourseForId,
   studioLicenseMetadata,
@@ -20,24 +20,14 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/academy?enrollment=not-ready", requestUrl));
   }
 
-  const identity = await safeIdentity();
-  if (!identity.configured) {
-    const unavailableUrl = new URL("/academy", requestUrl);
-    unavailableUrl.searchParams.set("enrollment", "identity-configuration-required");
-    return NextResponse.redirect(unavailableUrl, { status: 307 });
-  }
-
-  if (!identity.userId) {
-    const signInUrl = new URL("/sign-in", requestUrl);
-    signInUrl.searchParams.set("redirect_url", requestUrl.toString());
-    return NextResponse.redirect(signInUrl);
-  }
-
   if (!process.env.STRIPE_WEBHOOK_SECRET) {
     console.warn("academy checkout running without STRIPE_WEBHOOK_SECRET; success redemption remains enabled");
   }
 
   try {
+    const identity = await safeIdentity();
+    const purchaserReference = identity.userId ?? `guest_${randomUUID()}`;
+    const identityMode = identity.userId ? "authenticated" : "guest-email";
     const stripe = getStripe();
     const studioCourse = studioCourseForId(course.id);
     const license = studioLicenseMetadata(course.id);
@@ -51,8 +41,10 @@ export async function GET(request: Request) {
 
     const metadata = {
       courseId: course.id,
-      clerkUserId: identity.userId,
-      enrollmentMode: "authenticated-paid-access",
+      clerkUserId: identity.userId ?? "",
+      purchaserReference,
+      identityMode,
+      enrollmentMode: identity.userId ? "authenticated-paid-access" : "paid-pending-account-claim",
       entitlementType: license.entitlementType,
       entitlementCode: license.entitlementCode,
       accessPolicy: license.accessPolicy,
@@ -65,12 +57,6 @@ export async function GET(request: Request) {
       courseVersion: studioCourse?.version ?? "website-catalog",
       studioManaged: String(Boolean(studioCourse)),
     };
-
-    const approvedPaymentLink = safeStudioPaymentLink(studioCourse?.commerce.paymentLink);
-    if (approvedPaymentLink) {
-      approvedPaymentLink.searchParams.set("client_reference_id", identity.userId);
-      return NextResponse.redirect(approvedPaymentLink, { status: 303 });
-    }
 
     const lineItem = studioCourse?.commerce.stripePriceId
       ? { price: studioCourse.commerce.stripePriceId, quantity: 1 }
@@ -97,15 +83,19 @@ export async function GET(request: Request) {
       mode: "payment",
       line_items: [lineItem],
       customer_creation: "always",
-      client_reference_id: identity.userId,
+      client_reference_id: purchaserReference,
       metadata,
       payment_intent_data: { metadata },
       success_url: successUrl.toString(),
       cancel_url: cancelUrl.toString(),
+      billing_address_collection: "auto",
     });
 
     if (!session.url) throw new Error("Stripe did not return a checkout URL");
-    return NextResponse.redirect(session.url, { status: 303 });
+
+    const response = NextResponse.redirect(session.url, { status: 303 });
+    response.headers.set("x-obserra-commerce-mode", identityMode);
+    return response;
   } catch (error) {
     console.error("academy checkout failed", error);
     return NextResponse.redirect(new URL(`/academy/${course.id}?enrollment=checkout-unavailable`, requestUrl));
