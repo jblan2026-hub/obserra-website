@@ -14,7 +14,7 @@ function decodeBase64Url(value: string) {
   return atob(padded);
 }
 
-function publishableEnvironment(value: string | undefined): IdentityEnvironment | null {
+function getPublishableEnvironment(value: string | undefined): IdentityEnvironment | null {
   if (!value || value !== value.trim()) return null;
   const match = /^pk_(test|live)_([A-Za-z0-9_-]+)$/.exec(value);
   if (!match) return null;
@@ -30,25 +30,27 @@ function publishableEnvironment(value: string | undefined): IdentityEnvironment 
   }
 }
 
-function secretEnvironment(value: string | undefined): IdentityEnvironment | null {
+function getSecretEnvironment(value: string | undefined): IdentityEnvironment | null {
   if (!value || value !== value.trim()) return null;
   const match = /^sk_(test|live)_([A-Za-z0-9_-]{20,})$/.exec(value);
   return match ? (match[1] as IdentityEnvironment) : null;
 }
 
 export function isClerkIdentityConfigured() {
-  const publishableEnvironment = publishableEnvironment(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-  const configuredSecretEnvironment = secretEnvironment(process.env.CLERK_SECRET_KEY);
+  const configuredPublishableEnvironment = getPublishableEnvironment(
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  );
+  const configuredSecretEnvironment = getSecretEnvironment(process.env.CLERK_SECRET_KEY);
 
   return Boolean(
-    publishableEnvironment &&
+    configuredPublishableEnvironment &&
       configuredSecretEnvironment &&
-      publishableEnvironment === configuredSecretEnvironment,
+      configuredPublishableEnvironment === configuredSecretEnvironment,
   );
 }
 
 export async function safeIdentity(): Promise<SafeIdentity> {
-  const environment = publishableEnvironment(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const environment = getPublishableEnvironment(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
   if (!isClerkIdentityConfigured()) {
     return { configured: false, userId: null, environment };
