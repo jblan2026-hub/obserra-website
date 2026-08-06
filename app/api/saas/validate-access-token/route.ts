@@ -94,6 +94,9 @@ export async function POST(request: Request) {
   }
   if (!result.valid) return response(result, 401, rateHeaders);
 
+  const sessionId = result.claims.sessionId;
+  if (!sessionId) return response({ valid: false, reason: "session-binding-required" }, 401, rateHeaders);
+
   try {
     const [revoked, sessionRevoked, predatesCutoff] = await Promise.all([
       tokenIsRevoked({
@@ -102,7 +105,7 @@ export async function POST(request: Request) {
         productSlug: result.claims.productSlug,
       }),
       sessionIsRevoked({
-        sessionId: result.claims.sessionId,
+        sessionId,
         userId: result.claims.subject,
         organizationId: result.claims.organizationId,
       }),
