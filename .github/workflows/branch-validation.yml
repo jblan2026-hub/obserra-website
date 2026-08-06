@@ -48,14 +48,10 @@ jobs:
       - name: Verify no generated source drift
         run: git diff --exit-code
 
-  cross-target-contract:
+  deployed-system-gates:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      OBSERRA_WEBSITE_LIVE_URL: ${{ secrets.OBSERRA_WEBSITE_LIVE_URL }}
-      OBSERRA_WEBSITE_LCN2_URL: ${{ secrets.OBSERRA_WEBSITE_LCN2_URL }}
-      OBSERRA_INTEGRATED_SERVICES_URL: ${{ secrets.OBSERRA_INTEGRATED_SERVICES_URL }}
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,5 +61,24 @@ jobs:
         with:
           node-version: 22
 
-      - name: Verify all deployment contracts
+      - name: Verify shared contracts across all targets
+        env:
+          OBSERRA_WEBSITE_LIVE_URL: ${{ secrets.OBSERRA_WEBSITE_LIVE_URL }}
+          OBSERRA_WEBSITE_LCN2_URL: ${{ secrets.OBSERRA_WEBSITE_LCN2_URL }}
+          OBSERRA_INTEGRATED_SERVICES_URL: ${{ secrets.OBSERRA_INTEGRATED_SERVICES_URL }}
         run: npm run test:cross-target
+
+      - name: Verify primary website customer and owner journeys
+        env:
+          OBSERRA_BASE_URL: ${{ secrets.OBSERRA_WEBSITE_LIVE_URL }}
+        run: npm run test:journey
+
+      - name: Verify secondary website customer and owner journeys
+        env:
+          OBSERRA_BASE_URL: ${{ secrets.OBSERRA_WEBSITE_LCN2_URL }}
+        run: npm run test:journey
+
+      - name: Verify integrated services customer and owner journeys
+        env:
+          OBSERRA_BASE_URL: ${{ secrets.OBSERRA_INTEGRATED_SERVICES_URL }}
+        run: npm run test:journey
