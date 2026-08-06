@@ -23,11 +23,15 @@ const required = [
   "app/admin/site-control/OwnerAiSiteControl.tsx",
   "app/api/admin/site-change/plan/route.ts",
   "app/api/admin/site-change/preview/route.ts",
+  "app/api/admin/operations/live/route.ts",
+  "app/api/cron/control-room-health/route.ts",
   "app/api/health/route.ts",
   "app/api/obserrian/route.ts",
+  "lib/control-room-monitor.ts",
   "scripts/customer-journey-gate.mjs",
   "scripts/cross-target-contract.mjs",
   "scripts/security-resilience-readiness.mjs",
+  "vercel.json",
 ];
 
 gate("required-operational-surfaces", () => {
@@ -62,6 +66,27 @@ gate("owner-change-control-is-preview-first", () => {
   assert.doesNotMatch(control, /auto.?publish|publish.?without.?approval/i);
 });
 
+gate("persistent-live-control-room", () => {
+  const control = read("app/admin/site-control/OwnerAiSiteControl.tsx");
+  const monitor = read("lib/control-room-monitor.ts");
+  const liveApi = read("app/api/admin/operations/live/route.ts");
+  const cronApi = read("app/api/cron/control-room-health/route.ts");
+  const vercel = read("vercel.json");
+  assert.match(control, /setInterval\([^]*15_000/s);
+  assert.match(control, /visibilitychange/);
+  assert.match(control, /Pause live updates/);
+  assert.match(control, /api\/admin\/operations\/live/);
+  assert.match(monitor, /Promise\.all\(deploymentTargets\.map/);
+  assert.match(monitor, /withResilience/);
+  assert.match(monitor, /identityValid/);
+  assert.match(liveApi, /currentUser/);
+  assert.match(liveApi, /ownerEmailAllowed/);
+  assert.match(cronApi, /CRON_SECRET/);
+  assert.match(cronApi, /persistent_control_room_check/);
+  assert.match(vercel, /api\/cron\/control-room-health/);
+  assert.match(vercel, /\*\/5 \* \* \* \*/);
+});
+
 gate("operational-health-and-ai-continuity", () => {
   const health = read("app/api/health/route.ts");
   const ai = read("app/api/obserrian/route.ts");
@@ -89,8 +114,10 @@ gate("deployed-journey-coverage", () => {
 
 gate("three-target-operational-parity", () => {
   const contract = read("scripts/cross-target-contract.mjs");
+  const monitor = read("lib/control-room-monitor.ts");
   for (const key of ["website-live", "website-lcn2", "integrated-services"]) {
     assert.ok(contract.includes(key), `Missing target ${key}`);
+    assert.ok(monitor.includes(key), `Live monitor missing ${key}`);
   }
   assert.match(contract, /ready/);
   assert.match(contract, /capabilities/);
@@ -105,5 +132,5 @@ gate("release-process-blocks-drift", () => {
 });
 
 const failed = results.filter((result) => result.status === "fail");
-console.log(JSON.stringify({ passed: failed.length === 0, macroGate: "operational-commerce-lifecycle", gateCount: results.length, results }, null, 2));
+console.log(JSON.stringify({ passed: failed.length === 0, macroGate: "operational-commerce-lifecycle-live-control-room", gateCount: results.length, results }, null, 2));
 assert.equal(failed.length, 0, `${failed.length} operational release gate(s) failed`);
