@@ -19,7 +19,7 @@ concurrency:
 jobs:
   release-readiness:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 80
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -107,6 +107,9 @@ jobs:
       - name: Passwordless authentication readiness gate
         run: npm run test:passwordless-auth
 
+      - name: Passwordless recovery and step-up readiness gate
+        run: npm run test:passwordless-recovery
+
       - name: Rollback and release evidence gate
         run: npm run test:rollback-readiness
 
@@ -119,7 +122,7 @@ jobs:
   deployed-system-gates:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 85
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -187,6 +190,9 @@ jobs:
 
       - name: Verify passwordless authentication readiness
         run: npm run test:passwordless-auth
+
+      - name: Verify passwordless recovery and step-up readiness
+        run: npm run test:passwordless-recovery
 
       - name: Verify rollback and release evidence
         run: npm run test:rollback-readiness
