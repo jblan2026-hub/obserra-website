@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { verifySaasAccessToken } from "../../../../lib/saas-access-token";
+import { tokenIsRevoked } from "../../../../lib/saas-token-revocation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -63,6 +64,17 @@ export async function POST(request: Request) {
   }
 
   if (!result.valid) return response(result, 401);
+
+  try {
+    const revoked = await tokenIsRevoked({
+      nonce: result.claims.nonce,
+      organizationId: result.claims.organizationId,
+      productSlug: result.claims.productSlug,
+    });
+    if (revoked) return response({ valid: false, reason: "token-revoked" }, 401);
+  } catch {
+    return response({ valid: false, reason: "revocation-service-unavailable" }, 503);
+  }
 
   return response({
     valid: true,
