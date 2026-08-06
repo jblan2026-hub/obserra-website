@@ -64,7 +64,9 @@ export class StripeLicenseRepository implements LicenseRepository {
       const productSlug = subscription.metadata.obserraApp || "unmapped-product";
       const tenantId = subscription.metadata.tenantId || subscription.metadata.organizationId || query.tenantId || `subject:${query.subjectId}`;
       const expiresAt = subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : undefined;
-      const renewalAt = subscription.current_period_end ? new Date(subscription.current_period_end * 1000).toISOString() : undefined;
+      const renewalAt = (subscription as unknown as Record<string, unknown>)["current_period_end"]
+        ? new Date(Number((subscription as unknown as Record<string, unknown>)["current_period_end"]) * 1000).toISOString()
+        : undefined;
 
       return {
         id: subscription.id,

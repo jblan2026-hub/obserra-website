@@ -8,8 +8,6 @@ import "../apps.css";
 
 type Props = { params: Promise<{ slug: string }> };
 
-type Props = { params: Promise<{ slug: string }> };
-
 const liveApplicationUrls: Record<string, string> = {
   "obserra-eios": "https://app.obserrallc.com",
   "obserra-sap-uac": "https://obserra-sap-3c98pt0op-obserra.vercel.app",
