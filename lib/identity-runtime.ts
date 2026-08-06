@@ -1,8 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
 
-const PUBLISHABLE_KEY_PATTERN = /^pk_(test|live)_[A-Za-z0-9_-]+$/;
-const SECRET_KEY_PATTERN = /^sk_(test|live)_[A-Za-z0-9_-]+$/;
-
 type IdentityEnvironment = "test" | "live";
 
 export type SafeIdentity = {
@@ -11,32 +8,49 @@ export type SafeIdentity = {
   environment: IdentityEnvironment | null;
 };
 
-function environmentFromKey(key: string | undefined, prefix: "pk" | "sk"): IdentityEnvironment | null {
-  if (!key) return null;
-  if (key.startsWith(`${prefix}_test_`)) return "test";
-  if (key.startsWith(`${prefix}_live_`)) return "live";
-  return null;
+function decodeBase64Url(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+  return atob(padded);
+}
+
+function getPublishableEnvironment(value: string | undefined): IdentityEnvironment | null {
+  if (!value || value !== value.trim()) return null;
+  const match = /^pk_(test|live)_([A-Za-z0-9_-]+)$/.exec(value);
+  if (!match) return null;
+
+  try {
+    const decoded = decodeBase64Url(match[2]);
+    if (!decoded.endsWith("$")) return null;
+    const frontendApi = decoded.slice(0, -1);
+    if (!/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,}$/i.test(frontendApi)) return null;
+    return match[1] as IdentityEnvironment;
+  } catch {
+    return null;
+  }
+}
+
+function getSecretEnvironment(value: string | undefined): IdentityEnvironment | null {
+  if (!value || value !== value.trim()) return null;
+  const match = /^sk_(test|live)_([A-Za-z0-9_-]{20,})$/.exec(value);
+  return match ? (match[1] as IdentityEnvironment) : null;
 }
 
 export function isClerkIdentityConfigured() {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-  const secretKey = process.env.CLERK_SECRET_KEY;
-  const publishableEnvironment = environmentFromKey(publishableKey, "pk");
-  const secretEnvironment = environmentFromKey(secretKey, "sk");
+  const configuredPublishableEnvironment = getPublishableEnvironment(
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  );
+  const configuredSecretEnvironment = getSecretEnvironment(process.env.CLERK_SECRET_KEY);
 
   return Boolean(
-    publishableKey &&
-      secretKey &&
-      PUBLISHABLE_KEY_PATTERN.test(publishableKey) &&
-      SECRET_KEY_PATTERN.test(secretKey) &&
-      publishableEnvironment &&
-      publishableEnvironment === secretEnvironment,
+    configuredPublishableEnvironment &&
+      configuredSecretEnvironment &&
+      configuredPublishableEnvironment === configuredSecretEnvironment,
   );
 }
 
 export async function safeIdentity(): Promise<SafeIdentity> {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-  const environment = environmentFromKey(publishableKey, "pk");
+  const environment = getPublishableEnvironment(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
   if (!isClerkIdentityConfigured()) {
     return { configured: false, userId: null, environment };
