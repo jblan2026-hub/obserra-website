@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   }
 
   const tenantId = requestUrl.searchParams.get("tenant")?.trim() || null;
-  const decision = evaluateProductEntitlement({
+  const decision = await evaluateProductEntitlement({
     organizationId: identity.orgId,
     tenantId,
     productSlug,
