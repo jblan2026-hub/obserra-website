@@ -9,6 +9,7 @@
     "test": "node --test",
     "test:production": "node --test scripts/production-smoke.mjs",
     "test:platform": "node scripts/release-readiness.mjs",
+    "test:journey": "node scripts/customer-journey-gate.mjs",
     "test:cross-target": "node scripts/cross-target-contract.mjs",
     "verify:release": "npm run lint && npm test && npm run test:platform && npm run build",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
