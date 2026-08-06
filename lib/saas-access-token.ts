@@ -5,6 +5,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 export type SaasAccessTokenClaims = {
   version: 1;
   subject: string;
+  sessionId?: string;
   organizationId: string;
   tenantId: string;
   productSlug: string;
@@ -86,9 +87,11 @@ function signaturesMatch(provided: string, expected: string) {
 export function issueSaasAccessToken(input: Omit<SaasAccessTokenClaims, "version" | "issuedAt" | "expiresAt"> & { ttlSeconds?: number }) {
   const issuedAt = Math.floor(Date.now() / 1000);
   const ttlSeconds = Math.min(MAX_TTL_SECONDS, Math.max(30, Math.floor(input.ttlSeconds ?? 120)));
+  if (!input.sessionId || input.sessionId.length > 200) throw new Error("A valid Clerk session is required for SaaS access-token issuance");
   const claims: SaasAccessTokenClaims = {
     version: 1,
     subject: input.subject,
+    sessionId: input.sessionId,
     organizationId: input.organizationId,
     tenantId: input.tenantId,
     productSlug: input.productSlug,
@@ -136,6 +139,9 @@ export function verifySaasAccessToken(token: string, expected?: { productSlug?: 
   if (claims.version !== 1 || claims.expiresAt <= now || claims.issuedAt > now + 30 || claims.expiresAt - claims.issuedAt > MAX_TTL_SECONDS) {
     return { valid: false as const, reason: "expired-or-invalid-time" };
   }
+  if (!claims.sessionId || claims.sessionId.length > 200) {
+    return { valid: false as const, reason: "session-binding-required" };
+  }
   if (expected?.productSlug && claims.productSlug !== expected.productSlug) {
     return { valid: false as const, reason: "product-mismatch" };
   }
@@ -156,6 +162,7 @@ export function saasAccessTokenHealth() {
       verificationKeyCount: keys.length,
       rotationEnabled: keys.length > 1,
       legacyVerificationEnabled: keys.some((key) => key.id === LEGACY_KEY_ID),
+      sessionBindingRequired: true,
       maximumTtlSeconds: MAX_TTL_SECONDS,
       failClosed: true,
     };
@@ -167,6 +174,7 @@ export function saasAccessTokenHealth() {
       verificationKeyCount: 0,
       rotationEnabled: false,
       legacyVerificationEnabled: false,
+      sessionBindingRequired: true,
       maximumTtlSeconds: MAX_TTL_SECONDS,
       failClosed: true,
     };
