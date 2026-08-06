@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { productIntelligence } from "../../../lib/product-intelligence";
 import { platformDependencySummary, resolveDeploymentTarget, sharedPlatformCapabilities } from "../../../lib/platform-topology";
+import { saasControlPlaneHealth } from "../../../lib/saas-control-plane";
 import { courses } from "../../academy/courseData";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +24,7 @@ export async function GET(request: Request) {
   const checks: Check[] = [];
   const target = resolveDeploymentTarget();
   const topology = platformDependencySummary();
+  const saas = saasControlPlaneHealth();
 
   checks.push({
     name: "catalog",
@@ -38,6 +40,13 @@ export async function GET(request: Request) {
     name: "shared-platform",
     status: sharedPlatformCapabilities.length >= 10 ? "pass" : "warn",
     detail: `${sharedPlatformCapabilities.length} reusable platform capabilities enabled for ${target.projectName}`,
+  });
+  checks.push({
+    name: "saas-control-plane",
+    status: saas.configured ? "pass" : "warn",
+    detail: saas.configured
+      ? `${saas.subscriptionCount} tenant subscription records loaded with fail-closed entitlement enforcement`
+      : "Fail-closed entitlement service available; tenant subscription source is not configured",
   });
   checks.push({
     name: "ai-gateway",
@@ -67,6 +76,13 @@ export async function GET(request: Request) {
     platform: topology,
     topology,
     capabilities: sharedPlatformCapabilities,
+    saas: {
+      configured: saas.configured,
+      failClosed: saas.failClosed,
+      planCount: saas.planCount,
+      subscriptionCount: saas.subscriptionCount,
+      supportedStatuses: saas.supportedStatuses,
+    },
     release: releaseIdentity(),
     checks,
     durationMs: Date.now() - startedAt,
