@@ -6,13 +6,14 @@ import { redirect } from "next/navigation";
 import { authorizeOwner } from "../../../lib/owner-authorization";
 import { getAuditableDocuments, getGovernanceControls, getGovernanceSummary } from "../../../lib/governance-evidence";
 import { vulnerabilityIntelligenceHealth } from "../../../lib/vulnerability-intelligence";
+import ContinuousCompliancePanel from "./ContinuousCompliancePanel";
 import GovernanceExportActions from "./GovernanceExportActions";
 import VulnerabilityIntelligencePanel from "./VulnerabilityIntelligencePanel";
 import "./governance.css";
 
 export const metadata: Metadata = {
   title: "Governance Center | Obserra Control Center",
-  description: "Protected governance, security, privacy, audit evidence, release documentation, framework crosswalks, vulnerability intelligence, and governed exports.",
+  description: "Protected governance, security, privacy, audit evidence, release documentation, framework crosswalks, continuous compliance, vulnerability intelligence, and governed exports.",
   robots: { index: false, follow: false },
 };
 
@@ -42,8 +43,8 @@ export default async function GovernanceCenterPage() {
       <section className="governance-hero">
         <div>
           <p className="governance-eyebrow">OWNER-ONLY CONTROL CENTER</p>
-          <h1>Governance, security, privacy, release evidence, and vulnerability intelligence in one auditable workspace.</h1>
-          <p>Every framework mapping links to implementation evidence and validation commands. Exports require recent identity reverification and create durable audit records.</p>
+          <h1>Governance, security, privacy, release evidence, vulnerability intelligence, and continuous compliance in one auditable workspace.</h1>
+          <p>Every framework mapping links to implementation evidence and validation commands. The AI Compliance Compiler refreshes verified status continuously while exports require recent identity reverification and create durable audit records.</p>
         </div>
         <aside><span>CONTROL OWNER</span><strong>{owner.userId}</strong><p>Access is fail-closed through OBSERRA_OWNER_USER_IDS.</p></aside>
       </section>
@@ -54,6 +55,8 @@ export default async function GovernanceCenterPage() {
         <article><span>AUDITABLE DOCUMENTS</span><strong>{summary.auditableDocuments}</strong><p>Security, privacy, release, and operations</p></article>
         <article><span>VALIDATION COMMANDS</span><strong>{summary.validationCommands}</strong><p>Release-blocking test references</p></article>
       </section>
+
+      <ContinuousCompliancePanel />
 
       <section className="governance-section">
         <div className="governance-heading"><div><p className="governance-eyebrow">FRAMEWORK COVERAGE</p><h2>Individual controls mapped to source evidence and tests.</h2></div><p>Mappings support audit preparation and control testing; they are not independent certifications or legal conclusions.</p></div>
