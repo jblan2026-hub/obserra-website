@@ -11,8 +11,9 @@
     "test:platform": "node scripts/release-readiness.mjs",
     "test:journey": "node scripts/customer-journey-gate.mjs",
     "test:security-resilience": "node scripts/security-resilience-readiness.mjs",
+    "test:operational-release": "node scripts/operational-release-readiness.mjs",
     "test:cross-target": "node scripts/cross-target-contract.mjs",
-    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run build",
+    "verify:release": "npm run lint && npm test && npm run test:platform && npm run test:security-resilience && npm run test:operational-release && npm run build",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
   },
