@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "1.0",
+  "updatedAt": "2026-08-06T07:24:00.000Z",
+  "currency": "USD",
+  "methodology": "Owner-governed pricing inputs using public learning-platform models, specialist professional training observations, instructional hours, assessment rigor, target audience, and Obserra course demand. Recommendations never publish automatically.",
+  "levels": {
+    "Foundation": {
+      "oneTimeRange": [79, 199],
+      "recommendedPerHour": [30, 80],
+      "positioning": "Accessible entry-level professional development with interactive lessons and completion assessment."
+    },
+    "Professional": {
+      "oneTimeRange": [179, 399],
+      "recommendedPerHour": [45, 95],
+      "positioning": "Role-specific professional training with applied scenarios, knowledge checks, and practical outcomes."
+    },
+    "Advanced": {
+      "oneTimeRange": [299, 699],
+      "recommendedPerHour": [55, 110],
+      "positioning": "Deep technical or governance training with advanced scenarios, evidence-based application, and rigorous assessment."
+    },
+    "Executive Intensive": {
+      "oneTimeRange": [449, 999],
+      "recommendedPerHour": [65, 140],
+      "positioning": "Executive-focused programs emphasizing strategic decisions, organizational consequences, governance, and action planning."
+    },
+    "CISO Masterclass": {
+      "oneTimeRange": [649, 1499],
+      "recommendedPerHour": [75, 165],
+      "positioning": "Premium executive masterclasses built around leadership judgment, enterprise strategy, board communication, and applied decision work."
+    }
+  },
+  "deliveryModels": {
+    "singleCourse": {
+      "discountFromListPercent": [0, 10]
+    },
+    "threeCourseBundle": {
+      "discountFromCombinedListPercent": [10, 18]
+    },
+    "academySubscription": {
+      "monthlyRange": [79, 249],
+      "annualRange": [699, 1999],
+      "notes": "Use only after sufficient catalog depth and learner demand are established."
+    },
+    "teamLicense": {
+      "annualRange": [5000, 50000],
+      "notes": "Price by learner band, reporting, assignment workflows, and enterprise support."
+    },
+    "enterpriseAcademy": {
+      "annualRange": [25000, 150000],
+      "notes": "Includes team administration, reporting, curated pathways, custom content, and EIOS integration where contracted."
+    }
+  },
+  "signals": {
+    "increasePriceWhen": [
+      "Conversion remains stable above target after sufficient traffic",
+      "Completion and assessment pass rates demonstrate strong learner value",
+      "Course demand exceeds comparable Academy offerings",
+      "The course includes premium executive, technical, or regulatory specialization",
+      "Enterprise buyers request team licensing or reporting"
+    ],
+    "decreaseOrPackageWhen": [
+      "High page traffic produces weak checkout conversion",
+      "Repeated price objections appear in Obserrian complaint trends",
+      "A course is primarily an entry product for a larger pathway",
+      "Completion rates indicate a need for redesign before premium pricing",
+      "A bundle improves lifetime value without eroding premium positioning"
+    ]
+  },
+  "guardrails": {
+    "maximumSingleAdjustmentPercent": 20,
+    "minimumObservedCourseViews": 100,
+    "minimumObservedPurchases": 10,
+    "minimumEvidenceSignals": 3,
+    "ownerApprovalRequired": true,
+    "previewRequired": true,
+    "productionAutoPublish": false,
+    "certificateClaimMustRemain": "Certificate of course completion only; not a government license, academic credit, or third-party professional certification."
+  },
+  "marketObservations": [
+    {
+      "provider": "Coursera",
+      "observation": "Uses subscriptions and individual learning products, with broad access to courses and professional certificates.",
+      "observedAt": "2026-08-06"
+    },
+    {
+      "provider": "LinkedIn Learning",
+      "observation": "Uses subscription access and includes completion certificates, quizzes, exercise files, history, and recommendations.",
+      "observedAt": "2026-08-06"
+    },
+    {
+      "provider": "Specialist professional training market",
+      "observation": "Advanced cybersecurity, governance, and executive programs command higher one-time prices when assessment rigor, specialization, and practical application are clear.",
+      "observedAt": "2026-08-06"
+    }
+  ]
+}
