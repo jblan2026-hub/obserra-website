@@ -1,5 +1,7 @@
 import "server-only";
 
+import { readSubscriptionByOrganization, subscriptionStoreHealth } from "./saas-subscription-store";
+
 export type SubscriptionStatus =
   | "trialing"
   | "active"
@@ -74,32 +76,6 @@ const plans: Record<string, SaasPlan> = {
   },
 };
 
-function parseSubscriptions(): TenantSubscription[] {
-  const raw = process.env.OBSERRA_SAAS_SUBSCRIPTIONS_JSON?.trim();
-  if (!raw) return [];
-
-  try {
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isTenantSubscription);
-  } catch {
-    return [];
-  }
-}
-
-function isTenantSubscription(value: unknown): value is TenantSubscription {
-  if (!value || typeof value !== "object") return false;
-  const candidate = value as Partial<TenantSubscription>;
-  return Boolean(
-    typeof candidate.tenantId === "string" &&
-      typeof candidate.organizationId === "string" &&
-      typeof candidate.planId === "string" &&
-      typeof candidate.status === "string" &&
-      typeof candidate.seatsUsed === "number" &&
-      typeof candidate.updatedAt === "string",
-  );
-}
-
 function isTimeBoundStatusUsable(subscription: TenantSubscription, now: Date) {
   if (subscription.status === "active" || subscription.status === "trialing") return true;
   if (subscription.status !== "grace_period") return false;
@@ -107,112 +83,82 @@ function isTimeBoundStatusUsable(subscription: TenantSubscription, now: Date) {
   return new Date(subscription.gracePeriodEnd).getTime() > now.getTime();
 }
 
+function denied(
+  reason: Exclude<EntitlementDecision["reason"], "entitled">,
+  productSlug: string,
+  subscription?: TenantSubscription | null,
+): EntitlementDecision {
+  return {
+    allowed: false,
+    reason,
+    tenantId: subscription?.tenantId ?? null,
+    organizationId: subscription?.organizationId ?? null,
+    planId: subscription?.planId ?? null,
+    status: subscription?.status ?? null,
+    productSlug,
+    features: [],
+  };
+}
+
 export function listSaasPlans() {
-  return Object.values(plans).map((plan) => ({ ...plan, productSlugs: [...plan.productSlugs], features: [...plan.features] }));
+  return Object.values(plans).map((plan) => ({
+    ...plan,
+    productSlugs: [...plan.productSlugs],
+    features: [...plan.features],
+  }));
 }
 
-export function subscriptionForOrganization(organizationId: string) {
-  return parseSubscriptions().find((subscription) => subscription.organizationId === organizationId) ?? null;
+export function planForId(planId: string) {
+  const plan = plans[planId];
+  return plan ? { ...plan, productSlugs: [...plan.productSlugs], features: [...plan.features] } : null;
 }
 
-export function evaluateProductEntitlement(input: {
+export async function subscriptionForOrganization(organizationId: string) {
+  try {
+    return await readSubscriptionByOrganization(organizationId);
+  } catch (error) {
+    console.error("SaaS subscription lookup failed", {
+      organizationId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
+
+export async function evaluateProductEntitlement(input: {
   organizationId: string | null;
   tenantId?: string | null;
   productSlug: string;
   now?: Date;
-}): EntitlementDecision {
+}): Promise<EntitlementDecision> {
   const { organizationId, productSlug } = input;
-  if (!organizationId) {
-    return {
-      allowed: false,
-      reason: "subscription-unavailable",
-      tenantId: null,
-      organizationId: null,
-      planId: null,
-      status: null,
-      productSlug,
-      features: [],
-    };
-  }
+  if (!organizationId) return denied("subscription-unavailable", productSlug);
 
-  const subscription = subscriptionForOrganization(organizationId);
+  const subscription = await subscriptionForOrganization(organizationId);
   if (!subscription) {
     return {
-      allowed: false,
-      reason: "subscription-unavailable",
-      tenantId: null,
+      ...denied("subscription-unavailable", productSlug),
       organizationId,
-      planId: null,
-      status: null,
-      productSlug,
-      features: [],
     };
   }
 
   if (input.tenantId && input.tenantId !== subscription.tenantId) {
-    return {
-      allowed: false,
-      reason: "tenant-mismatch",
-      tenantId: subscription.tenantId,
-      organizationId,
-      planId: subscription.planId,
-      status: subscription.status,
-      productSlug,
-      features: [],
-    };
+    return denied("tenant-mismatch", productSlug, subscription);
   }
 
   const plan = plans[subscription.planId];
-  if (!plan) {
-    return {
-      allowed: false,
-      reason: "subscription-unavailable",
-      tenantId: subscription.tenantId,
-      organizationId,
-      planId: subscription.planId,
-      status: subscription.status,
-      productSlug,
-      features: [],
-    };
-  }
+  if (!plan) return denied("subscription-unavailable", productSlug, subscription);
 
   if (!isTimeBoundStatusUsable(subscription, input.now ?? new Date())) {
-    return {
-      allowed: false,
-      reason: "subscription-inactive",
-      tenantId: subscription.tenantId,
-      organizationId,
-      planId: plan.id,
-      status: subscription.status,
-      productSlug,
-      features: [],
-    };
+    return denied("subscription-inactive", productSlug, subscription);
   }
 
   if (!plan.productSlugs.includes("*") && !plan.productSlugs.includes(productSlug)) {
-    return {
-      allowed: false,
-      reason: "product-not-in-plan",
-      tenantId: subscription.tenantId,
-      organizationId,
-      planId: plan.id,
-      status: subscription.status,
-      productSlug,
-      features: [],
-    };
+    return denied("product-not-in-plan", productSlug, subscription);
   }
 
   if (plan.seatLimit !== null && subscription.seatsUsed > plan.seatLimit) {
-    return {
-      allowed: false,
-      reason: "seat-limit-exceeded",
-      tenantId: subscription.tenantId,
-      organizationId,
-      planId: plan.id,
-      status: subscription.status,
-      productSlug,
-      features: [],
-    };
+    return denied("seat-limit-exceeded", productSlug, subscription);
   }
 
   return {
@@ -228,12 +174,12 @@ export function evaluateProductEntitlement(input: {
 }
 
 export function saasControlPlaneHealth() {
-  const subscriptions = parseSubscriptions();
+  const storage = subscriptionStoreHealth();
   return {
-    configured: Boolean(process.env.OBSERRA_SAAS_SUBSCRIPTIONS_JSON?.trim()),
+    configured: storage.configured,
     failClosed: true,
     planCount: Object.keys(plans).length,
-    subscriptionCount: subscriptions.length,
     supportedStatuses: ["trialing", "active", "past_due", "grace_period", "suspended", "canceled", "expired"],
+    storage,
   };
 }
