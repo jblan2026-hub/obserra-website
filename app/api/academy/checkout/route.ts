@@ -18,12 +18,8 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const course = courseForId(requestUrl.searchParams.get("course") ?? "");
 
-  if (!course || !process.env.STRIPE_SECRET_KEY) {
+  if (!course || !process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.redirect(new URL("/academy?enrollment=not-ready", requestUrl));
-  }
-
-  if (!process.env.STRIPE_WEBHOOK_SECRET) {
-    console.warn("academy checkout running without STRIPE_WEBHOOK_SECRET; success redemption remains enabled");
   }
 
   try {
@@ -99,6 +95,8 @@ export async function GET(request: Request) {
     const response = NextResponse.redirect(session.url, { status: 303 });
     response.headers.set("x-obserra-commerce-mode", identityMode);
     response.headers.set("x-obserra-claim-policy", CLAIM_POLICY);
+    response.headers.set("Cache-Control", "private, no-store, max-age=0");
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
     return response;
   } catch (error) {
     console.error("academy checkout failed", error);
