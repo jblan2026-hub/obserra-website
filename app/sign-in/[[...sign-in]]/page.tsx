@@ -4,8 +4,8 @@ import Link from "next/link";
 import { SignIn } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
-  title: "Sign In | Obserra Customer Portal",
-  description: "Sign in securely to access Obserra Academy, customer services, licensing, reports, and support.",
+  title: "Passwordless Sign In | Obserra Customer Portal",
+  description: "Sign in to Obserra using a passkey, verified email code, secure email link, or approved enterprise identity provider.",
   robots: { index: false, follow: false },
 };
 
@@ -20,16 +20,16 @@ export default function SignInPage() {
       </header>
       <section className="auth-layout">
         <div className="auth-copy">
-          <p className="eyebrow">SECURE CUSTOMER ACCESS</p>
-          <h1>Sign in to your Obserra account.</h1>
-          <p>Access customer services through a governed identity boundary designed for account integrity, least privilege, protected transactions, and auditable access.</p>
+          <p className="eyebrow">PASSWORDLESS CUSTOMER ACCESS</p>
+          <h1>Sign in without a password.</h1>
+          <p>Use a passkey, verified email code, secure email link, or approved enterprise identity provider. Obserra does not require a username-and-password credential for customer access.</p>
           <div className="auth-assurance">
-            <span>Protected customer portal</span><span>Account based Academy access</span><span>Secure purchase workflows</span><span>Enterprise identity ready</span>
+            <span>Passkey ready</span><span>Verified email access</span><span>Phishing-resistant authentication</span><span>Enterprise federation ready</span>
           </div>
         </div>
         <div className="auth-panel"><SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" fallbackRedirectUrl="/portal" /></div>
       </section>
-      <p className="auth-note">Authorized access only. Authentication activity may be logged for security, fraud prevention, support, and compliance purposes.</p>
+      <p className="auth-note">Authorized access only. Passwordless authentication activity may be logged for security, fraud prevention, support, and compliance purposes.</p>
     </main>
   );
 }
