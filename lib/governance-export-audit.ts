@@ -4,7 +4,7 @@ export type GovernanceExportAuditRecord = {
   operationId: string;
   actorId: string;
   organizationId: string | null;
-  exportType: "pdf-download" | "email";
+  exportType: "pdf-download" | "excel-download" | "email-pdf" | "email-excel";
   frameworkScope: string[];
   recipientDomain: string | null;
   requestedAt: string;
