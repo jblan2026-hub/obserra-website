@@ -33,6 +33,14 @@ const durations: Record<CourseLevel, string> = {
   "CISO Masterclass": "11 hours",
 };
 
+const moduleMinutes: Record<CourseLevel, number[]> = {
+  Foundation: [24, 26, 28, 30, 42],
+  Professional: [42, 48, 54, 60, 66],
+  Advanced: [60, 72, 78, 84, 126],
+  "Executive Intensive": [84, 96, 102, 114, 144],
+  "CISO Masterclass": [108, 120, 132, 144, 156],
+};
+
 const audiences: Record<Department, string> = {
   Cyber: "Security leaders, technology teams, risk owners, and business decision makers",
   Protection: "Corporate security teams, executive support personnel, and protection professionals",
@@ -104,11 +112,10 @@ const specs: CourseSpec[] = [
 ];
 
 function createModules(title: string, focus: string, level: CourseLevel): Course["modules"] {
-  const minutes = level === "Foundation" ? [24, 26, 28, 30, 42] : level === "Professional" ? [38, 44, 48, 54, 56] : level === "Advanced" ? [60, 72, 78, 84, 126] : level === "Executive Intensive" ? [84, 96, 102, 114, 144] : [108, 120, 132, 144, 156];
   const phases = ["Decision context", "Evidence and risk", "Control and authority", "Scenario practice", "Action and improvement"];
   return phases.map((phase, index) => ({
     title: `${phase}: ${index === 0 ? title : focus}`,
-    duration: `${minutes[index]} min`,
+    duration: `${moduleMinutes[level][index]} min`,
     format: index === 3 ? "Interactive scenario" : index === 4 ? "Applied decision workshop" : "Interactive lesson",
     description: `Original Obserra Academy instruction on ${focus}. Learners work through context, evidence, trade-offs, and an accountable next action.`,
   }));
@@ -116,9 +123,21 @@ function createModules(title: string, focus: string, level: CourseLevel): Course
 
 function createCourse([id, title, level, department, track, focus]: CourseSpec): Course {
   return {
-    id, title, level, department, track, price: prices[level], duration: durations[level], audience: audiences[department],
-    description: `An original Obserra Academy ${level.toLowerCase()} course focused on ${focus}. It uses practical decision scenarios, knowledge checks, and accountable application—not third-party certification material.`,
-    outcomes: [`Frame ${focus} in business context`, "Evaluate evidence and uncertainty before acting", "Apply policy, authority, and proportionate escalation", "Document a defensible next action"],
+    id,
+    title,
+    level,
+    department,
+    track,
+    price: prices[level],
+    duration: durations[level],
+    audience: audiences[department],
+    description: `An original Obserra Academy ${level.toLowerCase()} course focused on ${focus}. It uses guided course videos, training materials, practical decision scenarios, checks on learning, and accountable application, not third-party certification material.`,
+    outcomes: [
+      `Frame ${focus} in business context`,
+      "Evaluate evidence and uncertainty before acting",
+      "Apply policy, authority, and proportionate escalation",
+      "Document a defensible next action",
+    ],
     modules: createModules(title, focus, level),
   };
 }
