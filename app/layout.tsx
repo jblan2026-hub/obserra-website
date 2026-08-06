@@ -31,6 +31,18 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
 };
 
+function isValidClerkConfiguration() {
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim();
+  const secretKey = process.env.CLERK_SECRET_KEY?.trim();
+  if (!publishableKey || !secretKey) return false;
+  const publishableValid = /^(pk_test_|pk_live_)[A-Za-z0-9_-]+$/.test(publishableKey);
+  const secretValid = /^(sk_test_|sk_live_)[A-Za-z0-9_-]+$/.test(secretKey);
+  const environmentsMatch =
+    (publishableKey.startsWith("pk_test_") && secretKey.startsWith("sk_test_")) ||
+    (publishableKey.startsWith("pk_live_") && secretKey.startsWith("sk_live_"));
+  return publishableValid && secretValid && environmentsMatch;
+}
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const structuredData = {
     "@context": "https://schema.org",
@@ -40,17 +52,23 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     ],
   };
 
+  const application = (
+    <html lang="en">
+      <body>
+        {children}
+        <CredlyProfileLink />
+        <ObserraGuide />
+        <Analytics />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      </body>
+    </html>
+  );
+
+  if (!isValidClerkConfiguration()) return application;
+
   return (
     <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up" signInFallbackRedirectUrl="/portal" signUpFallbackRedirectUrl="/portal">
-      <html lang="en">
-        <body>
-          {children}
-          <CredlyProfileLink />
-          <ObserraGuide />
-          <Analytics />
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-        </body>
-      </html>
+      {application}
     </ClerkProvider>
   );
 }
