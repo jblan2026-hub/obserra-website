@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { alignmentAuthorities, alignmentDisclaimer } from "../../lib/control-alignment";
 import { trustPolicies } from "./policies";
 import "./trust.css";
 
@@ -53,19 +54,6 @@ const prioritySlugs = new Set([
   "data-handling-statement",
 ]);
 
-const frameworks = [
-  ["NIST CSF 2.0", "Cybersecurity risk governance, identification, protection, detection, response, and recovery."],
-  ["NIST SP 800-53", "Enterprise security and privacy control design, traceability, evidence, and oversight."],
-  ["NIST SSDF", "Secure software development practices across design, build, verification, release, and maintenance."],
-  ["NIST AI RMF", "Governed AI risk management, human oversight, transparency, monitoring, and accountable use."],
-  ["ISO 27001", "Information security management principles, risk treatment, control ownership, and continual improvement."],
-  ["CIS Controls", "Prioritized technical and operational safeguards for cyber hygiene and control implementation."],
-  ["CMMC", "Defense industrial base security expectations, evidence discipline, and controlled information safeguards."],
-  ["FDA Cybersecurity", "Medical device security, lifecycle risk management, secure development, and postmarket readiness."],
-  ["HIPAA", "Administrative, physical, and technical safeguards for protected health information environments."],
-  ["GDPR and EU AI Act", "Privacy engineering, lawful processing, accountability, risk classification, and AI governance readiness."],
-];
-
 const architecture = [
   ["Identity and least privilege", "Role-based access, strong authentication, separation of duties, and governed administrative permissions."],
   ["Encryption and data protection", "Protection of data in transit and at rest, data minimization, retention controls, and secure handling boundaries."],
@@ -102,7 +90,7 @@ export default function TrustCenterPage() {
       "Enterprise security, privacy, responsible AI, procurement, framework alignment, verified credentials, and buyer assurance information for Obserra.",
     isPartOf: {
       "@type": "WebSite",
-      name: "Obserra Executive Protection & Intelligence LLC",
+      name: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
       url: "https://www.obserrallc.com",
     },
   };
@@ -144,12 +132,16 @@ export default function TrustCenterPage() {
         <section className="trust-frameworks">
           <div className="trust-section-heading">
             <p className="trust-eyebrow">FRAMEWORK INTELLIGENCE</p>
-            <h2>Security and governance designed around recognized control frameworks.</h2>
-            <p>Framework references describe alignment and design intent. They do not represent certification, authorization, attestation, or government approval unless explicitly stated in a verified source.</p>
+            <h2>Published alignment metadata from one governed source.</h2>
+            <p>{alignmentDisclaimer}</p>
+            <p><Link href="/trust/alignment">Review detailed alignment scope, authorities, domains, and source references.</Link></p>
           </div>
           <div className="trust-framework-grid">
-            {frameworks.map(([title, description]) => (
-              <article key={title}><strong>{title}</strong><span>{description}</span></article>
+            {alignmentAuthorities.map((authority) => (
+              <article key={authority.id}>
+                <strong>{authority.shortName}</strong>
+                <span>{authority.scope}</span>
+              </article>
             ))}
           </div>
         </section>
@@ -189,7 +181,7 @@ export default function TrustCenterPage() {
           </div>
           <div className="trust-verification-grid">
             {verifiedCredentials.map(([title, description, href]) => (
-              <Link href={href} key={title}><strong>{title}</strong><span>{description}</span><b>Review verification →</b></Link>
+              <Link href={href} key={title}><strong>{title}</strong><span>{description}</span><b>Review verification</b></Link>
             ))}
           </div>
         </section>
@@ -201,7 +193,7 @@ export default function TrustCenterPage() {
           </div>
           <div className="trust-procurement-grid">
             {procurementPaths.map(([title, description, href]) => (
-              <a href={href} key={title}><strong>{title}</strong><span>{description}</span><b>Start request →</b></a>
+              <a href={href} key={title}><strong>{title}</strong><span>{description}</span><b>Start request</b></a>
             ))}
           </div>
         </section>
