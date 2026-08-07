@@ -42,7 +42,7 @@ export default async function AcademyOwnerReviewPage() {
             <p style={{ color: "#f4c66a", fontWeight: 800, letterSpacing: ".12em", fontSize: 12, margin: 0 }}>OBSERRA ACADEMY OWNER REVIEW</p>
             <h1 style={{ fontSize: 38, margin: "8px 0 10px" }}>Review all 60 courses before commercial release.</h1>
             <p style={{ maxWidth: 900, color: "#bcd8e8", lineHeight: 1.7, margin: 0 }}>
-              This owner workspace is isolated from the public customer experience. Preview deployments use Vercel deployment protection as the owner access boundary. Production owner access continues to require an authenticated approved owner account.
+              This owner workspace is isolated from customer records. The protected preview lets you inspect every lesson, the full final assessment, the sales page, and a certificate sample without creating a purchase, learner progress record, or issued certificate.
             </p>
             <p style={{ color: "#8fcde7", fontSize: 12, marginTop: 10 }}>Access mode: {access.mode}</p>
           </div>
@@ -66,7 +66,8 @@ export default async function AcademyOwnerReviewPage() {
                 <span style={miniPillStyle}>${course.price}</span>
               </div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <Link href={`/academy/learn/${course.id}`} style={primaryLinkStyle}>Open learner experience</Link>
+                <Link href={`/academy/admin/review/${course.id}`} style={primaryLinkStyle}>Review course</Link>
+                <Link href={`/academy/admin/review/${course.id}/certificate`} style={secondaryLinkStyle}>Review certificate</Link>
                 <Link href={`/academy/${course.id}`} style={secondaryLinkStyle}>View sales page</Link>
               </div>
             </article>
