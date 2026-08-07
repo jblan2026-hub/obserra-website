@@ -1,12 +1,7 @@
-import { redirect } from "next/navigation";
+import { redirectToOwnerSite } from "../../../../../lib/owner-site-redirect";
 
 export const dynamic = "force-dynamic";
 
-export default async function LegacyOwnerCourseReviewPage({
-  params,
-}: {
-  params: Promise<{ courseId: string }>;
-}) {
-  const { courseId } = await params;
-  redirect(`/command-center/academy/${encodeURIComponent(courseId)}`);
+export default function LegacyOwnerCourseReviewPage() {
+  redirectToOwnerSite("/course");
 }
