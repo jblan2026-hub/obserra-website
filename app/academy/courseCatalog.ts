@@ -26,9 +26,6 @@ export const academyCatalogGeneratedAt =
   studioCourses.length > 0 ? studioCatalogStatus.generatedAt : null;
 
 export const academyCatalogParity = {
-  baselineCourses: mergedCourses.length - studioCourses.filter((studioCourse) =>
-    !mergedCourses.some((course) => course.id === studioCourse.id && course === studioCourse),
-  ).length,
   synchronizedCourses: studioCatalogStatus.sourceCourseCount,
   acceptedStudioCourses: studioCatalogStatus.acceptedCourseCount,
   rejectedStudioCourses: studioCatalogStatus.rejectedCourseCount,
