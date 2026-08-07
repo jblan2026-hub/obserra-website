@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { academyCatalogParity } from "../../../academy/courseCatalog";
 import { courseForId } from "../../../../lib/academy";
+import { academyReleaseReadiness } from "../../../../lib/academy-delivery-server";
 import {
   studioCertificateMetadata,
   studioCourseForId,
@@ -23,6 +24,22 @@ export async function GET(request: Request) {
     const response = NextResponse.redirect(new URL("/academy?enrollment=not-ready", requestUrl));
     response.headers.set("x-obserra-commerce-status", "configuration-required");
     response.headers.set("x-obserra-webhook-verification", "required");
+    response.headers.set("cache-control", "private, no-store, max-age=0");
+    return response;
+  }
+
+  const readiness = await academyReleaseReadiness(course.id);
+  if (!readiness.ready || !readiness.version) {
+    console.error("academy checkout blocked: learner release is not ready", {
+      courseId: course.id,
+      reasons: readiness.reasons,
+      inventory: readiness.inventory,
+    });
+    const response = NextResponse.redirect(
+      new URL(`/academy/${course.id}?enrollment=content-not-published`, requestUrl),
+    );
+    response.headers.set("x-obserra-commerce-status", "content-not-published");
+    response.headers.set("x-obserra-content-release", "required");
     response.headers.set("cache-control", "private, no-store, max-age=0");
     return response;
   }
@@ -58,8 +75,9 @@ export async function GET(request: Request) {
       certificateIssuer: certificate.issuer,
       isProfessionalCertification: String(certificate.isProfessionalCertification),
       isComplianceEvidence: String(certificate.isComplianceEvidence),
-      courseVersion: studioCourse?.version ?? "website-catalog",
-      studioManaged: String(Boolean(studioCourse)),
+      courseVersion: readiness.version,
+      studioManaged: "true",
+      learnerReleaseReady: "true",
       catalogParityVerified: String(academyCatalogParity.matched),
     };
 
@@ -79,6 +97,7 @@ export async function GET(request: Request) {
                 level: course.level,
                 entitlementCode: license.entitlementCode,
                 credentialType: metadata.credentialType,
+                releaseVersion: readiness.version,
               },
             },
           },
@@ -101,6 +120,7 @@ export async function GET(request: Request) {
     const response = NextResponse.redirect(session.url, { status: 303 });
     response.headers.set("x-obserra-commerce-mode", identityMode);
     response.headers.set("x-obserra-claim-policy", CLAIM_POLICY);
+    response.headers.set("x-obserra-content-release", readiness.version);
     response.headers.set("x-obserra-catalog-parity", academyCatalogParity.matched ? "verified" : "live-contract-fallback");
     response.headers.set("x-obserra-webhook-verification", "required");
     response.headers.set("cache-control", "private, no-store, max-age=0");
