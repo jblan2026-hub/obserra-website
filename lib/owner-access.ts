@@ -16,9 +16,9 @@ function normalized(value: string | undefined) {
 
 /**
  * Establishes the server-side owner boundary for the private Command Center.
- * The route fails closed unless one signed-in Clerk user matches the singular
- * OBSERRA_OWNER_EMAIL value. OBSERRA_OWNER_USER_ID can additionally bind the
- * route to one immutable Clerk user identifier.
+ * The route fails closed unless one signed-in Clerk user has the singular
+ * OBSERRA_OWNER_EMAIL as its verified primary address. OBSERRA_OWNER_USER_ID
+ * can additionally bind the route to one immutable Clerk user identifier.
  */
 export async function requireOwnerAccess(returnTo: string): Promise<OwnerAccessContext> {
   const { userId } = await auth();
@@ -35,17 +35,21 @@ export async function requireOwnerAccess(returnTo: string): Promise<OwnerAccessC
 
   const client = await clerkClient();
   const user = await client.users.getUser(userId);
-  const emailAddresses = user.emailAddresses.map((item) => normalized(item.emailAddress));
-  const emailAuthorized = emailAddresses.includes(configuredOwnerEmail);
+  const matchingEmail = user.emailAddresses.find(
+    (item) => normalized(item.emailAddress) === configuredOwnerEmail,
+  );
+  const emailAuthorized = Boolean(
+    matchingEmail
+      && matchingEmail.id === user.primaryEmailAddressId
+      && matchingEmail.verification?.status === "verified",
+  );
   const userIdAuthorized = !configuredOwnerUserId || configuredOwnerUserId === userId;
 
   if (!emailAuthorized || !userIdAuthorized) {
     notFound();
   }
 
-  const primaryEmail = user.primaryEmailAddressId
-    ? user.emailAddresses.find((item) => item.id === user.primaryEmailAddressId)?.emailAddress ?? configuredOwnerEmail
-    : configuredOwnerEmail;
+  const primaryEmail = matchingEmail?.emailAddress ?? configuredOwnerEmail;
   const displayName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim() || primaryEmail;
 
   return {
