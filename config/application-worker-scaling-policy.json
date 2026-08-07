@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0",
+  "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "pool": {
+    "baselineWorkers": 30,
+    "minimumWorkers": 1,
+    "maximumWorkers": 120,
+    "targetApplicationsPerWorker": 2,
+    "targetQueuedTasksPerWorker": 4,
+    "scaleUpThresholdPercent": 75,
+    "scaleDownThresholdPercent": 25,
+    "scaleDownCooldownMinutes": 30
+  },
+  "authorization": {
+    "ownerApprovalReferenceRequiredAboveBaseline": true,
+    "ownerApprovalReferenceMinimumLength": 8,
+    "automaticProductionDeploymentAllowed": false,
+    "automaticPricingChangeAllowed": false,
+    "automaticCreditPurchaseAllowed": false
+  },
+  "cost": {
+    "defaultRunBudgetUsd": 25,
+    "maximumRunBudgetUsd": 250,
+    "hardStopOnBudgetExhaustion": true,
+    "reservedCriticalOperationsPercent": 20
+  },
+  "security": {
+    "leastPrivilegeWorkerIdentityRequired": true,
+    "isolatedJobExecutionRequired": true,
+    "immutableEvidenceRequired": true,
+    "secretInjectionFromApprovedStoreOnly": true,
+    "crossRepositoryWriteDeniedByDefault": true,
+    "ownerEmergencyStopRequired": true
+  },
+  "truthBoundary": "A planned worker is not an active worker. A dispatched job is not successful until its workflow evidence is complete. Scaling policy does not authorize production deployment, pricing changes, billing purchases, or bypass of release gates."
+}
