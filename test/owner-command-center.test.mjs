@@ -9,6 +9,7 @@ const exists = (relativePath) => fs.existsSync(path.join(root, relativePath));
 
 test("owner Command Center is separate, protected, private, and fail closed", () => {
   const proxy = read("proxy.ts");
+  const robots = read("app/robots.ts");
   const ownerAccess = read("lib/owner-access.ts");
   const commandCenter = read("app/command-center/page.tsx");
   const academyReview = read("app/command-center/academy/page.tsx");
@@ -17,8 +18,11 @@ test("owner Command Center is separate, protected, private, and fail closed", ()
   assert.match(proxy, /PRIVATE_NOINDEX/);
   assert.match(proxy, /private, no-store/);
   assert.match(proxy, /X-Frame-Options", "DENY"/);
+  assert.match(robots, /"\/command-center"/);
   assert.match(ownerAccess, /OBSERRA_OWNER_EMAIL/);
   assert.match(ownerAccess, /OBSERRA_OWNER_USER_ID/);
+  assert.match(ownerAccess, /primaryEmailAddressId/);
+  assert.match(ownerAccess, /verification\?\.status === "verified"/);
   assert.match(ownerAccess, /clerkClient/);
   assert.match(ownerAccess, /notFound\(\)/);
   assert.doesNotMatch(ownerAccess, /VERCEL_ENV/);
