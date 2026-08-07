@@ -6,7 +6,11 @@ import { ownerEmailAllowed } from "../../../../lib/academy";
 
 export const dynamic = "force-dynamic";
 
-export default async function AcademyOwnerReviewPage() {
+async function authorizeOwnerReview() {
+  if (process.env.VERCEL_ENV === "preview") {
+    return { mode: "Vercel protected owner preview" } as const;
+  }
+
   const { userId } = await auth();
   if (!userId) {
     redirect(`/sign-in?redirect_url=${encodeURIComponent("/academy/admin/review")}`);
@@ -19,6 +23,12 @@ export default async function AcademyOwnerReviewPage() {
     redirect("/academy?admin=unauthorized");
   }
 
+  return { mode: "Authenticated owner account" } as const;
+}
+
+export default async function AcademyOwnerReviewPage() {
+  const access = await authorizeOwnerReview();
+
   const counts = courses.reduce<Record<string, number>>((result, course) => {
     result[course.level] = (result[course.level] ?? 0) + 1;
     return result;
@@ -30,10 +40,11 @@ export default async function AcademyOwnerReviewPage() {
         <header style={{ display: "flex", gap: 24, justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", marginBottom: 28 }}>
           <div>
             <p style={{ color: "#f4c66a", fontWeight: 800, letterSpacing: ".12em", fontSize: 12, margin: 0 }}>OBSERRA ACADEMY OWNER REVIEW</p>
-            <h1 style={{ fontSize: 38, margin: "8px 0 10px" }}>Review all 60 courses exactly as a learner sees them.</h1>
+            <h1 style={{ fontSize: 38, margin: "8px 0 10px" }}>Review all 60 courses before commercial release.</h1>
             <p style={{ maxWidth: 900, color: "#bcd8e8", lineHeight: 1.7, margin: 0 }}>
-              This protected owner workspace bypasses payment only for approved Obserra owner accounts. Opening a course uses the same learner player, lesson material, scenarios, knowledge checks, tutor, assessment flow, and certificate logic used after purchase.
+              This owner workspace is isolated from the public customer experience. Preview deployments use Vercel deployment protection as the owner access boundary. Production owner access continues to require an authenticated approved owner account.
             </p>
+            <p style={{ color: "#8fcde7", fontSize: 12, marginTop: 10 }}>Access mode: {access.mode}</p>
           </div>
           <Link href="/academy" style={{ color: "#92ddff", fontWeight: 800 }}>Return to Academy</Link>
         </header>
