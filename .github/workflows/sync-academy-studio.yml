@@ -54,10 +54,14 @@ jobs:
         run: |
           node <<'NODE'
           const catalog = require('./app/academy/generated/studio-catalog.json');
-          if (catalog.schemaVersion !== '1.2') throw new Error('Academy catalog schemaVersion must equal 1.2');
+          const supportedSchemaVersions = new Set(['1.2', '1.3', '1.4']);
+          if (!supportedSchemaVersions.has(catalog.schemaVersion)) {
+            throw new Error(`Unsupported Academy catalog schemaVersion: ${catalog.schemaVersion ?? 'missing'}`);
+          }
           if (!Array.isArray(catalog.courses)) throw new Error('Academy catalog courses must be an array');
           for (const course of catalog.courses) {
             if (!course.id || !course.title || !course.duration) throw new Error(`Invalid course identity: ${course.id ?? 'unknown'}`);
+            if (!Array.isArray(course.outcomes) || course.outcomes.length === 0) throw new Error(`Course ${course.id} has no learning outcomes`);
             if (!Array.isArray(course.modules) || course.modules.length === 0) throw new Error(`Course ${course.id} has no modules`);
             if (!course.commerce || !course.licensing || !course.completion || !course.certificate) throw new Error(`Course ${course.id} is missing governed commercial metadata`);
             if (!course.branding || !course.tags || !course.disclaimer || course.acknowledgementRequired !== true) throw new Error(`Course ${course.id} is missing branding, tags, or legal policy`);
