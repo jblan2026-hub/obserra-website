@@ -1,5 +1,6 @@
 .about-nav { height: 98px; }
-.about-brand img { width: 320px; }
-.profile-photo-frame { min-height: 540px; background: #061426; }
-.profile-photo { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-@media(max-width:650px) { .about-nav { height: 78px; } .about-brand img { width: 230px; } .profile-photo-frame { min-height: 460px; } }
+.about-brand img { width: 320px; height: auto; }
+.profile-photo-frame { min-height: 0; aspect-ratio: 4 / 5; background: #061426; }
+.profile-photo { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 12%; }
+.recognition-grid article img { width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: contain; object-position: center; padding: 8px; }
+@media(max-width:650px) { .about-nav { height: 78px; } .about-brand img { width: 230px; } .profile-photo-frame { min-height: 0; aspect-ratio: 4 / 5; } }
