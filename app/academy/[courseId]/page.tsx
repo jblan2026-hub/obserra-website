@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { courseForId } from "../../../lib/academy";
+import { publicationForCourse } from "../coursePublication";
 import "./course-page.css";
 
-const LEGAL_NAME = "Obserra Executive Protection & Intelligence, LLC";
+const LEGAL_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
@@ -34,6 +35,18 @@ export async function generateMetadata({ params }: { params: Promise<{ courseId:
 export default async function AcademyCoursePage({ params }: { params: Promise<{ courseId: string }> }) {
   const course = courseForId((await params).courseId);
   if (!course) notFound();
+
+  const publication = publicationForCourse(course.id);
+  const passingScoreLabel = `${publication.passingScore} percent completion standard`;
+  const assessmentLabel = publication.assessmentRequired
+    ? publication.assessmentDuration
+      ? `Protected final assessment, ${publication.assessmentDuration}`
+      : "Protected final assessment"
+    : "No final assessment required";
+  const certificateLabel = publication.certificateIssued
+    ? "Governed completion certificate"
+    : "Completion record without certificate issuance";
+
   const courseSchema = {
     "@context": "https://schema.org",
     "@type": "Course",
@@ -44,6 +57,7 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
     offers: { "@type": "Offer", price: course.price, priceCurrency: "USD", availability: "https://schema.org/InStock", url: `https://www.obserrallc.com/academy/${course.id}` },
     hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: course.duration },
   };
+
   return (
     <main className="academy-course-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
@@ -75,8 +89,9 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
             <div className="academy-course-pills" aria-label="Course summary">
               <span>{course.duration}</span>
               <span>{course.modules.length} original lessons</span>
-              <span>25 question final assessment</span>
-              <span>80 percent completion standard</span>
+              <span>{assessmentLabel}</span>
+              {publication.assessmentRequired ? <span>{passingScoreLabel}</span> : null}
+              <span>{certificateLabel}</span>
               <span>Obserrian AI Tutor after authorized access</span>
               <span>{course.audience}</span>
             </div>
@@ -104,8 +119,8 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
                 <span>The course aware AI tutor unlocks with authorized access and can explain concepts, create ungraded practice, and translate the lesson into business use.</span>
               </div>
               <div>
-                <strong>Digitally signed certificate standard</strong>
-                <span>Complete every lesson and score 80 percent or higher on the protected final assessment.</span>
+                <strong>Governed completion standard</strong>
+                <span>{publication.assessmentRequired ? `Complete every required lesson and achieve ${publication.passingScore} percent or higher on the protected final assessment.` : "Complete every required lesson and the governed completion activities defined for this course."}</span>
               </div>
             </div>
           </div>
@@ -119,10 +134,12 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
               <div><dt>Lessons</dt><dd>{course.modules.length}</dd></div>
               <div><dt>Audience</dt><dd>{course.audience}</dd></div>
               <div><dt>Format</dt><dd>Self paced online, AI native</dd></div>
+              <div><dt>Assessment</dt><dd>{assessmentLabel}</dd></div>
               <div><dt>AI support</dt><dd>Obserrian Academy Tutor with authorized access</dd></div>
+              {publication.version ? <div><dt>Course version</dt><dd>{publication.version}</dd></div> : null}
             </dl>
             <a className="academy-course-checkout academy-course-card-cta" href={`/api/academy/checkout?course=${course.id}`}>Buy secure enrollment</a>
-            <small>Enterprise ready training with authoritative grounding, applied scenarios, an assessment protected AI tutor, a governed completion path, and a cryptographically signed completion certificate issued by {LEGAL_NAME}.</small>
+            <small>Enterprise ready training with authoritative grounding, applied scenarios, governed assessment controls where required, and a completion record issued by {LEGAL_NAME}.</small>
           </aside>
         </div>
       </section>
@@ -152,6 +169,14 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
           <ul>
             {course.outcomes.map((outcome) => <li key={outcome}>{outcome}</li>)}
           </ul>
+          {publication.prerequisites.length > 0 ? (
+            <>
+              <p className="academy-course-kicker">PREREQUISITES</p>
+              <ul>
+                {publication.prerequisites.map((prerequisite) => <li key={prerequisite}>{prerequisite}</li>)}
+              </ul>
+            </>
+          ) : null}
         </div>
 
         <ol className="academy-course-modules">
@@ -171,12 +196,13 @@ export default async function AcademyCoursePage({ params }: { params: Promise<{ 
       <section className="academy-course-certificate">
         <div>
           <p className="academy-course-kicker">COMPLETION</p>
-          <h2>Receive a digitally signed Certificate of Training Completion.</h2>
-          <p>Complete every required lesson and achieve 80 percent or higher on the final assessment. The Obserrian Tutor is available during learning and practice but is paused during the graded final assessment. The certificate is cryptographically signed by Dr. Jody Blanchard, issued by {LEGAL_NAME}, and linked to a public verification record.</p>
+          <h2>{publication.certificateIssued ? "Receive a governed Certificate of Course Completion." : "Receive a governed course completion record."}</h2>
+          <p>{publication.assessmentRequired ? `Complete every required lesson and achieve ${publication.passingScore} percent or higher on the protected final assessment. The Obserrian Tutor is available during learning and practice but is paused during the graded final assessment.` : "Complete every required lesson and the course specific completion activities. The Obserrian Tutor remains subject to the course access and assessment rules."} {publication.certificateIssued ? `The completion certificate is issued by ${LEGAL_NAME}.` : `The completion record is maintained by ${LEGAL_NAME}.`}</p>
+          {publication.credentialDisclaimer ? <p>{publication.credentialDisclaimer}</p> : null}
         </div>
         <aside>
           <strong>Buyer safe details</strong>
-          <p>One purchase route. One published duration. One lesson path. One protected assessment standard. One signed certificate record for the learner who finishes the course.</p>
+          <p>One governed purchase route, one published duration, one course specific lesson path, and completion requirements derived from the approved course contract rather than a sitewide hardcoded template.</p>
         </aside>
       </section>
     </main>
