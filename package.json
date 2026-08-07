@@ -18,7 +18,8 @@
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run",
     "market:apps": "node scripts/application-market-brain.mjs",
     "test:application-worker": "node scripts/application-production-worker.mjs",
-    "verify:application-release": "npm run sync:apps && npm run market:apps && npm run release:apps -- release/application-production && npm test && npm run lint && npm run build"
+    "verify:application-staging": "npm run release:apps -- release/application-production && npm run market:apps && npm test && npm run lint && npm run build",
+    "verify:application-release": "npm run sync:apps && npm test && npm run lint && npm run build"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.6.4",
@@ -33,7 +34,7 @@
   "devDependencies": {
     "@types/node": "^22.10.1",
     "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
+    "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.34.0",
     "eslint-config-next": "16.2.11",
