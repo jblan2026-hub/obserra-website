@@ -3,4 +3,11 @@
 .profile-photo-frame { min-height: 0; aspect-ratio: 4 / 5; background: #061426; }
 .profile-photo { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 12%; }
 .recognition-grid article img { width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: contain; object-position: center; padding: 8px; }
+.verified-credential-embed { position: relative; width: 100%; min-height: 270px; overflow: hidden; }
+.verified-credential-embed iframe { position: relative; z-index: 2; display: block; width: 150px !important; max-width: 100%; height: 270px !important; margin: 0 auto; border: 0; }
+.credential-loading-mark { position: absolute; z-index: 1; inset: 28px 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 1px solid rgba(242,198,109,.42); border-radius: 18px; background: radial-gradient(circle at 50% 30%,#17496d 0,#08243c 62%,#031321 100%); text-align: center; }
+.credential-loading-mark span { color: #f2c66d; font-size: .68rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.credential-loading-mark strong { color: #fff; font-size: 1.35rem; }
+.credential-loading-mark small { color: #bcd6e6; font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.ec-council-badge-artwork img { width: 100% !important; height: 100% !important; object-fit: contain !important; object-position: center !important; padding: 10px; }
 @media(max-width:650px) { .about-nav { height: 78px; } .about-brand img { width: 230px; } .profile-photo-frame { min-height: 0; aspect-ratio: 4 / 5; } }
