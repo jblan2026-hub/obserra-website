@@ -16,7 +16,6 @@ type PageContext = {
 const excludedPaths = [
   "/admin",
   "/api",
-  "/command-center",
   "/sign-in",
   "/sign-up",
   "/academy/learn",
@@ -113,7 +112,7 @@ function response(question: string, pathname: string): Message {
   if (/pay|price|buy|checkout|enroll|stripe|access/.test(input)) {
     return {
       from: "guide",
-      text: "Select a course and choose Enroll securely. You will sign in or create a learner account, complete payment through Stripe, and return to account-based course access. Your enrollment and progress remain connected to that learner account.",
+      text: "Choose an available course and select Enroll securely. Checkout is hosted by Stripe. An authenticated learner can receive direct account-based fulfillment; a guest purchase remains pending until the purchaser claims it using the verified payer email. Access is granted only after Obserra verifies Stripe's signed payment webhook.",
       actions: [{ href: "/academy#courses", label: "Choose a course" }],
     };
   }
@@ -121,7 +120,7 @@ function response(question: string, pathname: string): Message {
   if (/certificate|certify|completion|assessment|exam/.test(input)) {
     return {
       from: "guide",
-      text: "To earn an Obserra Certificate of Training, complete every lesson and score at least 80 percent on the final assessment. The certificate is generated from the authenticated completion record and includes a unique certificate ID.",
+      text: "To earn an Obserra Certificate of Training, complete every required lesson and meet the course's published passing-score requirement on the final assessment. The certificate is generated from the authenticated completion record and includes a unique certificate ID. It is a certificate of course completion, not a professional certification or evidence of regulatory compliance.",
       actions: [{ href: "/academy", label: "Review Academy standards" }],
     };
   }
