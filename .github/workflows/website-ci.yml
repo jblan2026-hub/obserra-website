@@ -24,8 +24,6 @@ jobs:
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-      OBSERRA_OWNER_EMAIL: ${{ secrets.OBSERRA_OWNER_EMAIL }}
-      OBSERRA_OWNER_USER_ID: ${{ secrets.OBSERRA_OWNER_USER_ID }}
       CI: "true"
     steps:
       - name: Checkout website
@@ -35,9 +33,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
 
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
+      - name: Install supported npm major
+        run: |
+          npm install --global npm@11 --no-audit --no-fund
+          test "$(npm --version | cut -d. -f1)" = "11"
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify lockfile remains immutable
+        run: git diff --exit-code -- package-lock.json
 
       - name: Run unit and catalog contract tests
         run: npm test
@@ -48,11 +56,11 @@ jobs:
       - name: Build production application
         run: npm run build
 
-      - name: Verify anonymous owner route fails closed at runtime
+      - name: Verify public site excludes private owner content
         shell: bash
         run: |
           set -euo pipefail
-          log_file="${RUNNER_TEMP}/obserra-owner-smoke.log"
+          log_file="${RUNNER_TEMP}/obserra-owner-separation-smoke.log"
           npm start -- --hostname 127.0.0.1 --port 3100 >"$log_file" 2>&1 &
           server_pid=$!
           cleanup() {
