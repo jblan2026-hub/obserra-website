@@ -33,15 +33,39 @@ export type InstructionSection = {
   application: string;
 };
 
+export type GuidedPracticeStep = {
+  title: string;
+  instruction: string;
+  evidence: string;
+};
+
+export type DecisionRubricRow = {
+  criterion: string;
+  strong: string;
+  weak: string;
+};
+
+export type FailureMode = {
+  pattern: string;
+  whyItFails: string;
+  correction: string;
+};
+
 export type LessonBrief = {
   title: string;
   format: string;
   focus: string;
   whyItMatters: string;
+  objectives: string[];
   observe: string;
   decide: string;
   act: string;
   instruction: InstructionSection[];
+  guidedPractice: GuidedPracticeStep[];
+  decisionRubric: DecisionRubricRow[];
+  failureModes: FailureMode[];
+  masteryCriteria: string[];
+  reflectionPrompts: string[];
   authorities: AuthorityReference[];
   practiceExample: PracticeExample;
   businessApplication: string[];
@@ -124,6 +148,126 @@ function phaseInstruction({
   ];
 }
 
+function createObjectives(subject: string, outcome: string, workProduct: string, authority: AuthorityReference) {
+  return [
+    `Explain the lesson subject accurately in professional terms: ${subject}`,
+    `Apply the subject to a realistic decision and use it to ${outcome.toLowerCase()}.`,
+    `Use evidence, assumptions, uncertainty, and ${authority.reference} to support or challenge a proposed action.`,
+    `Create a defensible ${workProduct} that identifies ownership, options, consequences, residual risk, and verification.`,
+    "Translate the professional analysis into a concise business recommendation that another leader can review and act on.",
+  ];
+}
+
+function createGuidedPractice(subject: string, workProduct: string, authority: AuthorityReference): GuidedPracticeStep[] {
+  return [
+    {
+      title: "Frame the decision",
+      instruction: `Write the exact decision the organization must make about ${subject.toLowerCase()}. Define the desired business or mission outcome, the affected stakeholders, and the deadline for a decision.`,
+      evidence: "A one sentence decision statement, named decision owner, affected stakeholders, and decision deadline.",
+    },
+    {
+      title: "Build the evidence picture",
+      instruction: "Separate verified facts, indicators, assumptions, estimates, and unknowns. For each important fact, note the source, age, scope, and whether another source corroborates it.",
+      evidence: "An evidence table with source, freshness, confidence, limitation, and any conflicting information.",
+    },
+    {
+      title: "Apply the authoritative basis",
+      instruction: `Review ${authority.reference} and identify the control objective, governance expectation, professional principle, or risk management concept that is relevant to the decision. Distinguish clearly between mandatory obligations and recognized guidance.`,
+      evidence: `A citation or reference note showing how ${authority.reference} informs the proposed action without overstating what the source requires.`,
+    },
+    {
+      title: "Compare realistic options",
+      instruction: "Develop at least two viable response options plus a deliberate no change or defer option when appropriate. Compare expected benefit, cost, effort, dependencies, operational impact, human impact, residual risk, and reversibility.",
+      evidence: "An option comparison that shows why the preferred choice is stronger and what risk remains after implementation.",
+    },
+    {
+      title: `Build the ${workProduct}`,
+      instruction: `Convert the analysis into a professional ${workProduct}. Name the accountable owner, approver, implementation steps, due dates, escalation triggers, and the evidence required to verify completion.`,
+      evidence: `A complete ${workProduct} that another qualified professional can review without reconstructing the reasoning from memory.`,
+    },
+    {
+      title: "Test the recommendation",
+      instruction: "Challenge the preferred recommendation. Ask what fact could make it wrong, what failure mode could create harm, what dependency could block execution, and what metric or evidence will demonstrate that the intended outcome was achieved.",
+      evidence: "A documented challenge, residual limitation, success measure, review date, and condition that would trigger reassessment.",
+    },
+  ];
+}
+
+function createDecisionRubric(subject: string, workProduct: string): DecisionRubricRow[] {
+  return [
+    {
+      criterion: "Subject matter accuracy",
+      strong: `The recommendation applies ${subject.toLowerCase()} correctly and uses the actual course concepts rather than generic terminology.`,
+      weak: "The recommendation sounds plausible but does not demonstrate the specific professional knowledge taught in the lesson.",
+    },
+    {
+      criterion: "Evidence quality",
+      strong: "Facts, assumptions, unknowns, source quality, freshness, confidence, and limitations are explicit and materially connected to the decision.",
+      weak: "The conclusion depends on unverified claims, stale information, unsupported certainty, or evidence that is not relevant to the decision.",
+    },
+    {
+      criterion: "Authority and accountability",
+      strong: "The accountable owner, required approver, governing obligation or guidance, escalation path, and decision boundary are clear.",
+      weak: "The recommendation assumes authority, bypasses approval, confuses guidance with a mandate, or leaves ownership ambiguous.",
+    },
+    {
+      criterion: "Business and human impact",
+      strong: "Options are compared using operational, financial, safety, security, privacy, customer, workforce, and stakeholder consequences that are relevant to the situation.",
+      weak: "The recommendation optimizes a single technical or operational factor without considering second order consequences or affected stakeholders.",
+    },
+    {
+      criterion: "Implementation and proof",
+      strong: `The ${workProduct} defines the action, owner, timeline, dependencies, residual risk, success measure, evidence, and reassessment trigger.`,
+      weak: "The recommendation ends with an opinion or task list and does not show how completion, effectiveness, or residual risk will be verified.",
+    },
+  ];
+}
+
+function createFailureModes(subject: string): FailureMode[] {
+  return [
+    {
+      pattern: "Tool first thinking",
+      whyItFails: `Starting with a preferred product, control, or tactic can bypass the actual decision and distort how ${subject.toLowerCase()} should be analyzed.`,
+      correction: "Define the objective, evidence, authority, and risk first. Select tools or controls only after the problem and success criteria are clear.",
+    },
+    {
+      pattern: "False certainty",
+      whyItFails: "Treating assumptions, estimates, model output, indicators, or incomplete reporting as verified facts can produce an overconfident and indefensible recommendation.",
+      correction: "Label facts, assumptions, confidence, unknowns, and limitations separately and state what evidence would cause the decision to change.",
+    },
+    {
+      pattern: "Authority drift",
+      whyItFails: "A technically reasonable action can still create legal, operational, safety, privacy, or governance problems when the person making the decision does not have the required authority.",
+      correction: "Identify the accountable owner and approver before consequential action and route exceptions or escalations through the defined governance path.",
+    },
+    {
+      pattern: "Closure without verification",
+      whyItFails: "Marking work complete because a task was performed does not establish that risk was reduced, the control works, or the intended outcome was achieved.",
+      correction: "Define objective closure evidence, independently verify high impact changes where appropriate, and reassess residual risk after implementation.",
+    },
+  ];
+}
+
+function createMasteryCriteria(subject: string, workProduct: string, authority: AuthorityReference) {
+  return [
+    `You can explain ${subject.toLowerCase()} accurately without relying on the course wording.` ,
+    "You can distinguish verified facts, assumptions, uncertainty, and missing information in a realistic case.",
+    `You can explain how ${authority.reference} informs the decision and correctly label whether it is law, regulation, standard, framework, or recognized guidance.`,
+    `You can create a usable ${workProduct} with ownership, authority, options, implementation, residual risk, and verification.`,
+    "You can defend the recommendation against a reasonable challenge and describe what evidence would cause you to revise it.",
+    "You can translate the lesson into an executive, operational, technical, or protective next action appropriate to your role and authority.",
+  ];
+}
+
+function createReflectionPrompts(subject: string, workProduct: string) {
+  return [
+    `Where does ${subject.toLowerCase()} appear in your current organization, role, client environment, or professional practice?`,
+    "Which current decision in your environment is being made with weak evidence, unclear ownership, or an untested assumption?",
+    `What would make a ${workProduct} credible to a skeptical executive, auditor, customer, investigator, or operational leader?`,
+    "What is one process, policy, architecture, training, or governance change you would make after completing this lesson and how would you measure the result?",
+  ];
+}
+
 function createVideoChapters({
   courseTitle,
   moduleTitle,
@@ -149,7 +293,7 @@ function createVideoChapters({
     [instruction[2]?.heading ?? "Professional method", instruction[2]?.body ?? "Apply a repeatable professional method."],
     [instruction[3]?.heading ?? "Business translation", instruction[3]?.body ?? "Translate the lesson into a business decision."],
     ["Applied work product", `Use the lesson to create a ${workProduct}. It should show evidence, authority, options, an accountable action, and verification rather than simply restating the course material.`],
-    ["Operational takeaway", `Close the lesson by stating the next action, success measure, escalation threshold, and one improvement that should be incorporated into normal operations.`],
+    ["Operational takeaway", "Close the lesson by stating the next action, success measure, escalation threshold, and one improvement that should be incorporated into normal operations."],
   ] as const;
 
   return chapterContent.map(([title, narration], index) => ({
@@ -302,10 +446,16 @@ export function lessonBrief(courseId: string, index: number): LessonBrief | null
     format: module.format,
     focus: `This ${module.format.toLowerCase()} directly implements the published course focus on ${focus}. The specific lesson subject is ${subject}`,
     whyItMatters: `${subject} This matters because the lesson subject can directly affect operational performance, security or safety, financial outcomes, regulatory or contractual exposure, workforce behavior, customer impact, resilience, and executive accountability. The instruction is grounded in ${primaryAuthority.reference} and the additional authoritative references listed for the lesson.`,
-    observe: `Start with the specific lesson subject. Identify the business objective, affected people, systems, data, services, or stakeholders, the current evidence, important assumptions, uncertainty, existing safeguards, and the information that would materially change the analysis.`,
+    objectives: createObjectives(subject, outcome, workProduct, primaryAuthority),
+    observe: "Start with the specific lesson subject. Identify the business objective, affected people, systems, data, services, or stakeholders, the current evidence, important assumptions, uncertainty, existing safeguards, and the information that would materially change the analysis.",
     decide: `Use ${primaryAuthority.reference}, the other listed authorities, the course subject, business impact, and assigned decision rights to compare realistic options. Select a proportionate action, explain why alternatives are weaker, and state the residual risk or limitation that remains.`,
     act: `Create the ${workProduct}, assign an accountable owner, execute through the approved process, preserve the evidence and rationale, communicate what must happen next, and define objective evidence that will verify whether the action worked.`,
     instruction,
+    guidedPractice: createGuidedPractice(subject, workProduct, primaryAuthority),
+    decisionRubric: createDecisionRubric(subject, workProduct),
+    failureModes: createFailureModes(subject),
+    masteryCriteria: createMasteryCriteria(subject, workProduct, primaryAuthority),
+    reflectionPrompts: createReflectionPrompts(subject, workProduct),
     authorities: [...grounding.authorities],
     practiceExample: grounding.example,
     businessApplication: [
@@ -384,7 +534,7 @@ export function finalAssessment(courseId: string): KnowledgeCheck[] {
 
 /**
  * The learner client receives only question text and choices. Answer keys stay
- * in the server-only Academy assessment route, which is the authoritative scorer.
+ * in the server only Academy assessment route, which is the authoritative scorer.
  */
 export function finalAssessmentQuestions(courseId: string): AssessmentQuestion[] {
   return finalAssessment(courseId).map(({ question, options }) => ({ question, options }));
