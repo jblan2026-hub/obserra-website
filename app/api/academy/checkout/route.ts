@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { academyCatalogParity } from "../../../academy/courseCatalog";
 import { courseForId } from "../../../../lib/academy";
 import {
   studioCertificateMetadata,
   studioCourseForId,
+  studioCourseIsApproved,
   studioLicenseMetadata,
 } from "../../../../lib/academy-studio";
 import { safeIdentity } from "../../../../lib/identity-runtime";
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
     const purchaserReference = identity.userId ?? `guest_${randomUUID()}`;
     const identityMode = identity.userId ? "authenticated" : "guest-email";
     const stripe = getStripe();
-    const studioCourse = academyCatalogParity.matched ? studioCourseForId(course.id) : null;
+    const studioCourse = studioCourseIsApproved(course.id) ? studioCourseForId(course.id) : null;
     const license = studioLicenseMetadata(course.id);
     const certificate = studioCertificateMetadata(course.id);
     const successUrl = new URL("/academy/success", requestUrl);
@@ -60,7 +60,7 @@ export async function GET(request: Request) {
       isComplianceEvidence: String(certificate.isComplianceEvidence),
       courseVersion: studioCourse?.version ?? "website-catalog",
       studioManaged: String(Boolean(studioCourse)),
-      catalogParityVerified: String(academyCatalogParity.matched),
+      catalogParityVerified: String(Boolean(studioCourse)),
     };
 
     const lineItem = studioCourse?.commerce.stripePriceId
@@ -101,13 +101,18 @@ export async function GET(request: Request) {
     const response = NextResponse.redirect(session.url, { status: 303 });
     response.headers.set("x-obserra-commerce-mode", identityMode);
     response.headers.set("x-obserra-claim-policy", CLAIM_POLICY);
-    response.headers.set("x-obserra-catalog-parity", academyCatalogParity.matched ? "verified" : "live-contract-fallback");
+    response.headers.set(
+      "x-obserra-catalog-parity",
+      studioCourse ? "governed-studio" : "baseline-fallback",
+    );
     response.headers.set("x-obserra-webhook-verification", "required");
     response.headers.set("cache-control", "private, no-store, max-age=0");
     return response;
   } catch (error) {
     console.error("academy checkout failed", error);
-    const response = NextResponse.redirect(new URL(`/academy/${course.id}?enrollment=checkout-unavailable`, requestUrl));
+    const response = NextResponse.redirect(
+      new URL(`/academy/${course.id}?enrollment=checkout-unavailable`, requestUrl),
+    );
     response.headers.set("x-obserra-commerce-status", "checkout-unavailable");
     response.headers.set("cache-control", "private, no-store, max-age=0");
     return response;
