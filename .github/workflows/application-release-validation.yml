@@ -13,6 +13,7 @@ on:
       - "lib/release-delivery.ts"
       - "scripts/application-market-brain.mjs"
       - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/validate-application-staging.mjs"
       - "scripts/sync-final-apps.mjs"
       - "config/application-market-intelligence-policy.json"
       - "config/application-production-policy.json"
@@ -30,6 +31,7 @@ on:
       - "lib/release-delivery.ts"
       - "scripts/application-market-brain.mjs"
       - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/validate-application-staging.mjs"
       - "scripts/sync-final-apps.mjs"
       - "config/application-market-intelligence-policy.json"
       - "config/application-production-policy.json"
@@ -63,42 +65,29 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Verify lockfile remains immutable
         run: git diff --exit-code -- package-lock.json
-      - name: Validate application source synchronization
-        run: npm run sync:apps
-      - name: Generate governed market guidance
-        run: npm run market:apps
       - name: Generate controlled staging manifests
         run: npm run release:apps -- release/application-production
+      - name: Validate staging identity and artifact boundary
+        run: npm run validate:application-staging
+      - name: Generate governed market guidance
+        run: npm run market:apps
       - name: Run repository tests
         run: npm test
       - name: Run lint
         run: npm run lint
       - name: Build production website
         run: npm run build
-      - name: Validate staging claim boundary
+      - name: Validate market guidance coverage
         run: |
           node - <<'NODE'
           const fs = require('fs');
           const path = require('path');
-          const root = path.join(process.cwd(), 'release', 'application-production');
-          const catalogPath = path.join(root, 'release-catalog.json');
-          if (!fs.existsSync(catalogPath)) throw new Error('release-catalog.json is missing');
-          const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
-          if (!Array.isArray(catalog.applications) || catalog.applications.length === 0) {
-            throw new Error('application release catalog is empty');
-          }
-          for (const app of catalog.applications) {
-            if (app.release?.artifactStatus !== 'awaiting-signed-artifact') {
-              throw new Error(`${app.product?.slug}: unexpected artifact state ${app.release?.artifactStatus}`);
-            }
-          }
-          const marketPath = path.join(process.cwd(), 'release', 'application-market-intelligence', 'market-guidance.json');
-          if (!fs.existsSync(marketPath)) throw new Error('market-guidance.json is missing');
-          const market = JSON.parse(fs.readFileSync(marketPath, 'utf8'));
+          const catalog = JSON.parse(fs.readFileSync(path.join('release', 'application-production', 'release-catalog.json'), 'utf8'));
+          const market = JSON.parse(fs.readFileSync(path.join('release', 'application-market-intelligence', 'market-guidance.json'), 'utf8'));
           if (!Array.isArray(market.applications) || market.applications.length !== catalog.applications.length) {
-            throw new Error('market guidance does not cover the complete application catalog');
+            throw new Error('market guidance does not cover the complete staged application catalog');
           }
-          console.log(`Validated ${catalog.applications.length} staged applications without false production claims.`);
+          console.log(`Market guidance covers all ${catalog.applications.length} staged applications.`);
           NODE
       - name: Upload independently validated staging evidence
         uses: actions/upload-artifact@v4
