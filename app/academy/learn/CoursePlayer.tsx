@@ -142,15 +142,27 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
         <div className="video-frame">
           <div className="video-top"><span>OBSERRA ACADEMY</span><span>PROPRIETARY TRAINING</span></div>
           <div className="video-orb" />
-          <div className="video-copy"><p>{lesson.format}</p><h2>{lesson.title}</h2><span>{lesson.videoDuration} guided professional instruction</span></div>
+          <div className="video-copy"><p>{lesson.format}</p><h2>{lesson.title}</h2><span>{lesson.videoDuration} guided professional learning session</span></div>
           <div className="video-controls"><i /><span>Original Obserra instruction grounded in authoritative sources</span><b>AI NATIVE</b></div>
         </div>
 
         <div className="lesson-content">
+          <section className="lesson-session-map" aria-label="Guided lesson chapters">
+            <div><p className="learning-kicker">Guided lesson plan</p><h2>{lesson.videoTitle}</h2></div>
+            <ol>{lesson.videoChapters.map((chapter) => <li key={`${chapter.timestamp}-${chapter.title}`}><span>{chapter.timestamp}</span><div><strong>{chapter.title}</strong><p>{chapter.narration}</p></div></li>)}</ol>
+            <details className="lesson-transcript"><summary>Read the guided lesson transcript</summary>{lesson.transcript.map((line) => <p key={line}>{line}</p>)}</details>
+          </section>
+
           <p className="learning-kicker">Lesson mission</p>
           <h2>Understand it. Apply it. Defend the decision.</h2>
           <p className="lesson-focus">{lesson.focus}</p>
           <div className="why-it-matters"><strong>Why this matters</strong><p>{lesson.whyItMatters}</p></div>
+
+          <section className="lesson-objectives" aria-label="Lesson objectives">
+            <p className="learning-kicker">Mastery objectives</p>
+            <h3>What you should be able to do after this lesson</h3>
+            <ol>{lesson.objectives.map((objective) => <li key={objective}>{objective}</li>)}</ol>
+          </section>
 
           <div className="brief-grid">
             <article><span>01</span><h3>Observe</h3><p>{lesson.observe}</p></article>
@@ -164,6 +176,27 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
               <span>{String(index + 1).padStart(2, "0")}</span>
               <div><h3>{section.heading}</h3><p>{section.body}</p><strong>Use it at work</strong><p>{section.application}</p></div>
             </article>)}
+          </section>
+
+          <section className="guided-practice" aria-label="Guided professional practice">
+            <div className="section-heading"><p className="learning-kicker">Guided professional practice</p><h3>Build the work, not just the vocabulary.</h3></div>
+            <ol>{lesson.guidedPractice.map((step, index) => <li key={step.title}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div><h4>{step.title}</h4><p>{step.instruction}</p><strong>Evidence to produce</strong><p>{step.evidence}</p></div>
+            </li>)}</ol>
+          </section>
+
+          <section className="decision-rubric" aria-label="Professional decision rubric">
+            <div className="section-heading"><p className="learning-kicker">Professional decision rubric</p><h3>What strong work looks like</h3></div>
+            <div className="rubric-table" role="table" aria-label="Decision quality rubric">
+              <div className="rubric-row rubric-head" role="row"><span role="columnheader">Criterion</span><span role="columnheader">Strong practice</span><span role="columnheader">Weak practice</span></div>
+              {lesson.decisionRubric.map((row) => <div className="rubric-row" role="row" key={row.criterion}><strong role="cell">{row.criterion}</strong><p role="cell">{row.strong}</p><p role="cell">{row.weak}</p></div>)}
+            </div>
+          </section>
+
+          <section className="failure-modes" aria-label="Common professional failure modes">
+            <div className="section-heading"><p className="learning-kicker">Common failure modes</p><h3>Recognize the mistakes that undermine otherwise good work.</h3></div>
+            <div>{lesson.failureModes.map((failure) => <article key={failure.pattern}><h4>{failure.pattern}</h4><p>{failure.whyItFails}</p><strong>Correction</strong><p>{failure.correction}</p></article>)}</div>
           </section>
 
           <section className="authority-section" aria-label="Authoritative grounding">
@@ -200,6 +233,19 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
             </div>
           </section>
 
+          <section className="mastery-review" aria-label="Lesson mastery review">
+            <div>
+              <p className="learning-kicker">Mastery criteria</p>
+              <h3>Before you leave this lesson</h3>
+              <ul>{lesson.masteryCriteria.map((item) => <li key={item}>{item}</li>)}</ul>
+            </div>
+            <div>
+              <p className="learning-kicker">Reflection and transfer</p>
+              <h3>Connect the lesson to your environment</h3>
+              <ol>{lesson.reflectionPrompts.map((item) => <li key={item}>{item}</li>)}</ol>
+            </div>
+          </section>
+
           <section className="learning-materials">
             <p className="learning-kicker">Course materials</p>
             <div className="material-grid">{lesson.materials.map((material) => <article key={material.title}>
@@ -219,7 +265,7 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
               <div><p className="learning-kicker">Included with paid access</p><h3>Obserrian Academy Tutor</h3></div>
               <span>Course aware · Lesson aware · Assessment protected</span>
             </div>
-            <p className="academy-tutor-intro">Ask for another explanation, a realistic example, an ungraded practice quiz, a study plan, or help translating this lesson into your business environment. The tutor is grounded in this course and the authoritative references shown above.</p>
+            <p className="academy-tutor-intro">Ask for another explanation, a realistic example, an ungraded practice quiz, a study plan, feedback on the professional work product, or help translating this lesson into your business environment. The tutor is grounded in this course, this lesson, the authoritative references, guided practice, decision rubric, and mastery criteria shown above.</p>
             <div className="tutor-quick-prompts">{quickTutorPrompts.map((prompt) => <button key={prompt} type="button" onClick={() => void askTutor(prompt)} disabled={tutorLoading}>{prompt}</button>)}</div>
             <label htmlFor="academy-tutor-question">Ask the tutor</label>
             <textarea id="academy-tutor-question" value={tutorQuestion} onChange={(event) => setTutorQuestion(event.target.value)} maxLength={1400} placeholder="Example: Walk me through how I would apply this lesson during a real enterprise decision." />
