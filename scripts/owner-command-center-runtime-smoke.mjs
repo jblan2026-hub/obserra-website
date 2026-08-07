@@ -1,15 +1,16 @@
 const baseUrl = (process.env.OWNER_SMOKE_BASE_URL ?? "http://127.0.0.1:3100").replace(/\/$/, "");
-const ownerMarkers = [
+const prohibitedOwnerMarkers = [
   "PRIVATE OWNER OPERATIONS",
   "Private Course Content Review",
   "OWNER VERIFIED",
   "OWNER ANSWER KEY",
+  "CORRECT ANSWER",
 ];
 
 function requireHeader(response, name, expectedFragment) {
   const value = response.headers.get(name) ?? "";
   if (!value.toLowerCase().includes(expectedFragment.toLowerCase())) {
-    throw new Error(`Owner Command Center smoke failed: ${name} did not include ${expectedFragment}. Received: ${value || "missing"}`);
+    throw new Error(`Owner-site separation smoke failed: ${name} did not include ${expectedFragment}. Received: ${value || "missing"}`);
   }
 }
 
@@ -18,7 +19,7 @@ async function request(pathname, redirect = "manual") {
     redirect,
     headers: {
       Accept: "text/html,application/xhtml+xml",
-      "User-Agent": "Obserra-Owner-Command-Center-CI-Smoke/1.0",
+      "User-Agent": "Obserra-Public-Site-Owner-Separation-CI/1.0",
     },
     signal: AbortSignal.timeout(15_000),
   });
@@ -34,9 +35,8 @@ if (!/Obserra/i.test(publicBody)) {
 }
 
 const ownerResponse = await request("/command-center");
-const permittedAnonymousStatuses = new Set([301, 302, 303, 307, 308, 401, 403, 404]);
-if (!permittedAnonymousStatuses.has(ownerResponse.status)) {
-  throw new Error(`Anonymous owner route returned unsafe HTTP ${ownerResponse.status}; expected redirect or denial.`);
+if (ownerResponse.status !== 404) {
+  throw new Error(`Unconfigured public owner route returned HTTP ${ownerResponse.status}; expected fail-closed HTTP 404.`);
 }
 
 requireHeader(ownerResponse, "cache-control", "no-store");
@@ -46,23 +46,17 @@ requireHeader(ownerResponse, "referrer-policy", "no-referrer");
 requireHeader(ownerResponse, "x-content-type-options", "nosniff");
 
 const ownerBody = await ownerResponse.text();
-for (const marker of ownerMarkers) {
+for (const marker of prohibitedOwnerMarkers) {
   if (ownerBody.includes(marker)) {
-    throw new Error(`Anonymous owner route exposed protected marker: ${marker}`);
+    throw new Error(`Public owner route exposed prohibited private marker: ${marker}`);
   }
-}
-
-const location = ownerResponse.headers.get("location") ?? "";
-if (ownerResponse.status >= 300 && ownerResponse.status < 400 && !location) {
-  throw new Error("Anonymous owner route redirected without a Location header.");
 }
 
 console.log(
   JSON.stringify({
-    contract: "owner-command-center-runtime-smoke-v1",
+    contract: "public-owner-site-separation-smoke-v2",
     publicAcademyStatus: publicResponse.status,
-    anonymousOwnerStatus: ownerResponse.status,
-    anonymousOwnerRedirect: location || null,
+    publicOwnerRouteStatus: ownerResponse.status,
     protectedContentExposed: false,
     privateCacheControl: true,
     privateRobotsControl: true,
