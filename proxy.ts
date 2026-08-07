@@ -1,18 +1,17 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 
 const CANONICAL_HOST = "www.obserrallc.com";
 const PREVIEW_NOINDEX = "noindex, nofollow, noarchive, nosnippet";
 const PRIVATE_NOINDEX = "noindex, nofollow, noarchive, nosnippet, noimageindex";
-
-const isProtected = createRouteMatcher([
-  "/admin(.*)",
-  "/portal(.*)",
-  "/command-center(.*)",
-  "/academy/admin(.*)",
-  "/academy/learn(.*)",
-  "/academy/certificate(.*)",
-]);
+const PROTECTED_PATH_PREFIXES = [
+  "/admin",
+  "/portal",
+  "/command-center",
+  "/academy/admin",
+  "/academy/learn",
+  "/academy/certificate",
+] as const;
 
 type ClerkEnvironment = "test" | "live";
 
@@ -50,6 +49,15 @@ function authenticationReady() {
   return Boolean(publishableEnvironment && secretEnvironment && publishableEnvironment === secretEnvironment);
 }
 
+function pathMatchesPrefix(pathname: string, prefix: string) {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
+
+function requiresAuthentication(request: NextRequest) {
+  const pathname = new URL(request.url).pathname;
+  return PROTECTED_PATH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix));
+}
+
 function isLocalHost(host: string | undefined) {
   return !host || host === "localhost" || host === "127.0.0.1";
 }
@@ -74,7 +82,7 @@ function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest)
     response.headers.set("X-Robots-Tag", PREVIEW_NOINDEX);
   }
 
-  if (url.pathname.startsWith("/command-center")) {
+  if (pathMatchesPrefix(url.pathname, "/command-center")) {
     response.headers.set("X-Robots-Tag", PRIVATE_NOINDEX);
     response.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
     response.headers.set("Pragma", "no-cache");
@@ -87,13 +95,21 @@ function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest)
   return response;
 }
 
+function redirectToSignIn(request: NextRequest) {
+  const requestedUrl = new URL(request.url);
+  const returnTo = `${requestedUrl.pathname}${requestedUrl.search}`;
+  const signInUrl = new URL("/sign-in", requestedUrl);
+  signInUrl.searchParams.set("redirect_url", returnTo);
+  return applyRouteSecurityHeaders(NextResponse.redirect(signInUrl), request);
+}
+
 function identityConfigurationResponse(request: NextRequest) {
   const url = new URL(request.url);
-  const requiresAuthentication =
-    isProtected(request) || url.pathname.startsWith("/sign-in") || url.pathname.startsWith("/sign-up");
+  const protectedOrIdentityRoute =
+    requiresAuthentication(request) || url.pathname.startsWith("/sign-in") || url.pathname.startsWith("/sign-up");
 
-  if (requiresAuthentication) {
-    const destination = url.pathname.startsWith("/command-center")
+  if (protectedOrIdentityRoute) {
+    const destination = pathMatchesPrefix(url.pathname, "/command-center")
       ? new URL("/?owner=identity-configuration-required", url)
       : new URL("/academy?identity=configuration-required", url);
     return applyRouteSecurityHeaders(NextResponse.redirect(destination), request);
@@ -113,7 +129,10 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
   }
 
   const handler = clerkMiddleware(async (auth, clerkRequest) => {
-    if (isProtected(clerkRequest)) await auth.protect();
+    if (requiresAuthentication(clerkRequest)) {
+      const { userId } = await auth();
+      if (!userId) return redirectToSignIn(clerkRequest);
+    }
     return applyRouteSecurityHeaders(NextResponse.next(), clerkRequest);
   });
 
