@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -6,29 +6,37 @@ export const dynamic = "force-dynamic";
 
 const PUBLIC_ROUTES = ["/", "/about", "/academy", "/apps", "/contact", "/eios", "/services", "/trust"] as const;
 const PROTECTED_ROUTES = ["/admin", "/portal", "/academy/success", "/academy/certificate/[courseId]"] as const;
+const MAX_AUTHORIZATION_HEADER_CHARS = 4096;
 
 function configured(name: string): boolean {
   return Boolean(process.env[name]?.trim());
 }
 
 function secureEqual(actual: string, expected: string): boolean {
-  const actualBuffer = Buffer.from(actual, "utf8");
-  const expectedBuffer = Buffer.from(expected, "utf8");
-  return actualBuffer.length === expectedBuffer.length && timingSafeEqual(actualBuffer, expectedBuffer);
+  const actualDigest = createHash("sha256").update(actual, "utf8").digest();
+  const expectedDigest = createHash("sha256").update(expected, "utf8").digest();
+  return timingSafeEqual(actualDigest, expectedDigest);
 }
 
 function authorized(request: NextRequest): boolean {
   const expected = process.env.OBSERRA_INTELLIGENCE_TOKEN?.trim();
   if (!expected) return false;
+
   const authorization = request.headers.get("authorization") ?? "";
-  if (!authorization.startsWith("Bearer ")) return false;
-  return secureEqual(authorization.slice(7), expected);
+  if (!authorization.startsWith("Bearer ") || authorization.length > MAX_AUTHORIZATION_HEADER_CHARS) return false;
+
+  const supplied = authorization.slice(7);
+  if (!supplied) return false;
+  return secureEqual(supplied, expected);
 }
 
 const responseHeaders = {
   "cache-control": "private, no-store, max-age=0",
+  "referrer-policy": "no-referrer",
+  "vary": "authorization",
   "x-content-type-options": "nosniff",
   "x-obserra-intelligence-source": "website",
+  "x-robots-tag": "noindex, nofollow, noarchive",
 };
 
 export async function GET(request: NextRequest) {
