@@ -11,8 +11,11 @@ function check(name, condition) {
 }
 
 const courseData = read("app/academy/courseData.ts");
+const curriculum = read("app/academy/courseCurriculum.ts");
 const experience = read("app/academy/courseExperience.ts");
 const grounding = read("app/academy/courseGrounding.ts");
+const academyClient = read("app/academy/AcademyClient.tsx");
+const coursePage = read("app/academy/[courseId]/page.tsx");
 const player = read("app/academy/learn/CoursePlayer.tsx");
 const learnerLayout = read("app/academy/learn/layout.tsx");
 const assessmentRoute = read("app/api/academy/assessment/route.ts");
@@ -23,15 +26,21 @@ const courseMatches = [...courseData.matchAll(/^\s*\["([a-z0-9-]+)",\s*"([^"]+)"
 const courseIds = courseMatches.map((match) => match[1]);
 const courseTitles = courseMatches.map((match) => match[2]);
 const courseLevels = courseMatches.map((match) => match[3]);
+const curriculumProfileIds = [...curriculum.matchAll(/^\s{2}"([a-z0-9-]+)": \{/gm)].map((match) => match[1]);
 
 check("catalog contains exactly 60 live courses", courseIds.length === 60);
 check("course ids are unique", new Set(courseIds).size === courseIds.length);
 check("course titles are unique", new Set(courseTitles).size === courseTitles.length);
 check("all five course levels are represented", new Set(courseLevels).size === 5);
+check("curriculum contains exactly 60 course specific profiles", curriculumProfileIds.length === 60);
+check("curriculum profile ids are unique", new Set(curriculumProfileIds).size === curriculumProfileIds.length);
+check("every live course has a course specific curriculum", courseIds.every((id) => curriculumProfileIds.includes(id)));
+check("curriculum has no unpublished course profile", curriculumProfileIds.every((id) => courseIds.includes(id)));
 
 for (const id of courseIds) {
   check(`course id ${id} is route safe`, /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id));
   check(`course id ${id} has no traversal token`, !id.includes("..") && !id.includes("/") && !id.includes("\\"));
+  check(`course id ${id} has curriculum coverage`, curriculumProfileIds.includes(id));
 }
 
 const expectedDurations = {
@@ -58,9 +67,12 @@ for (const [level, expected] of Object.entries(expectedDurations)) {
 
 const requiredFiles = [
   "app/academy/page.tsx",
+  "app/academy/AcademyClient.tsx",
   "app/academy/courseData.ts",
+  "app/academy/courseCurriculum.ts",
   "app/academy/courseExperience.ts",
   "app/academy/courseGrounding.ts",
+  "app/academy/[courseId]/page.tsx",
   "app/academy/learn/CoursePlayer.tsx",
   "app/academy/learn/layout.tsx",
   "app/academy/learn/ai-native-learning.css",
@@ -74,6 +86,14 @@ const requiredFiles = [
   "lib/academy.ts",
 ];
 for (const file of requiredFiles) check(`required file exists: ${file}`, exists(file));
+
+check("public Academy states 60 published courses", /60 published courses/.test(academyClient));
+check("public Academy markets AI native training", /AI native training/.test(academyClient));
+check("public Academy says AI tutor requires access", /unlocked only with authorized course access/.test(academyClient));
+check("public course page exposes published lesson count", /course\.modules\.length/.test(coursePage));
+check("public course page exposes published duration", /\{course\.duration\}/.test(coursePage));
+check("public course page exposes AI tutor after access", /Obserrian AI Tutor after authorized access/.test(coursePage));
+check("public course page preserves 80 percent standard", /80 percent completion standard/.test(coursePage));
 
 check("assessment generates 25 questions", /Array\.from\(\{ length: 25 \}/.test(experience));
 check("assessment answer keys remain server-side", /finalAssessmentQuestions/.test(experience) && /finalAssessment\(body\.courseId\)/.test(assessmentRoute));
@@ -101,6 +121,9 @@ check("player presents authoritative grounding", /Authoritative grounding/.test(
 check("player presents documented practice examples", /Documented practice example/.test(player));
 check("player presents business application", /How to use this in an organization/.test(player));
 
+check("course experience requires course specific curriculum", /curriculumForCourse/.test(experience));
+check("course experience uses lesson specific subjects", /curriculum\.lessonSubjects\[index\]/.test(experience));
+check("course experience uses lesson specific work products", /curriculum\.workProducts\[index\]/.test(experience));
 check("course experience includes guided video chapters", /videoChapters/.test(experience));
 check("course experience includes transcripts", /transcript/.test(experience));
 check("course experience includes training materials", /materials/.test(experience));
@@ -110,6 +133,22 @@ check("course experience includes authoritative references", /authorities:/.test
 check("course experience includes documented practice", /practiceExample/.test(experience));
 check("course experience includes enterprise application", /businessApplication/.test(experience));
 check("course descriptions preserve live non-certification language", /not third-party certification material/.test(courseData));
+
+check("Python course teaches Python fundamentals", /Python fundamentals for reliable security automation/.test(curriculum));
+check("API course teaches HTTP and API contracts", /HTTP methods, resources, requests and responses/.test(curriculum));
+check("Zero Trust course teaches no implicit trust", /no implicit trust based on network location/.test(curriculum));
+check("LLM course teaches tokenization and transformer concepts", /tokenization, embeddings, transformer based next token prediction/.test(curriculum));
+check("cloud course teaches shared responsibility", /Cloud service and deployment models, shared responsibility/.test(curriculum));
+check("identity course teaches joiner mover leaver lifecycle", /joiner, mover, leaver events/.test(curriculum));
+check("vulnerability course teaches CISA KEV prioritization", /CISA KEV/.test(curriculum));
+check("incident course teaches enterprise crisis leadership", /difference between technical response and enterprise crisis leadership/.test(curriculum));
+check("protective course preserves non tactical planning boundary", /without teaching offensive tactics/.test(curriculum));
+check("insider course prohibits profiling", /avoid profiling or unsupported accusations/.test(curriculum));
+check("board course teaches oversight rather than operations", /distinction between board oversight and operational management/.test(curriculum));
+check("executive metrics course teaches numerator and denominator", /numerator and denominator/.test(curriculum));
+check("AI native apps course teaches bounded authorization", /authorization at the action layer/.test(curriculum));
+check("SSDL course teaches software supply chain controls", /protect the software supply chain/.test(curriculum));
+check("data driven intelligence course teaches provenance", /Data driven risk intelligence from decision question to evidence/.test(curriculum));
 
 check("grounding includes NIST CSF", /NIST CSF 2\.0/.test(grounding));
 check("grounding includes NIST AI RMF", /NIST AI RMF 1\.0/.test(grounding));
