@@ -139,7 +139,21 @@ export async function GET(request: Request) {
       );
     }
 
-    return NextResponse.json(certificate, {
+    const publicCertificate = {
+      valid: certificate.valid,
+      certificateId: certificate.certificateId,
+      learnerName: certificate.learnerName,
+      courseId: certificate.courseId,
+      courseTitle: certificate.courseTitle,
+      completedAt: certificate.completedAt,
+      trainingHours: certificate.trainingHours,
+      signerName: certificate.signerName,
+      issuer: certificate.issuer,
+      signatureAlgorithm: certificate.signatureAlgorithm,
+      publicKeyFingerprint: certificate.publicKeyFingerprint,
+    };
+
+    return NextResponse.json(publicCertificate, {
       headers: {
         "cache-control": "public, max-age=300, stale-while-revalidate=3600",
         "x-obserra-certificate-signature": certificate.signatureAlgorithm,
