@@ -4,11 +4,8 @@ import type { ReactNode } from "react";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: {
-    default: "Owner Command Center | Obserra",
-    template: "%s | Owner Command Center",
-  },
-  description: "Private owner operations workspace for Obserra.",
+  title: "Private Owner Site | Obserra",
+  description: "Fail-closed redirect boundary for the separately deployed Obserra owner site.",
   robots: {
     index: false,
     follow: false,
@@ -16,6 +13,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function OwnerCommandCenterLayout({ children }: { children: ReactNode }) {
+export default function OwnerSiteRedirectLayout({ children }: { children: ReactNode }) {
   return children;
 }
