@@ -10,9 +10,12 @@ on:
       - "app/portal/applications/**"
       - "lib/release-delivery.ts"
       - "scripts/application-production-worker.mjs"
+      - "scripts/application-market-brain.mjs"
       - "scripts/generate-app-release-bundle.mjs"
       - "scripts/sync-final-apps.mjs"
       - "config/application-production-policy.json"
+      - "config/application-market-intelligence-policy.json"
+      - "config/site-workflow-operations-policy.json"
       - "docs/APPLICATION-PRODUCTION-PIPELINE.md"
       - "package.json"
       - "package-lock.json"
@@ -25,9 +28,12 @@ on:
       - "app/portal/applications/**"
       - "lib/release-delivery.ts"
       - "scripts/application-production-worker.mjs"
+      - "scripts/application-market-brain.mjs"
       - "scripts/generate-app-release-bundle.mjs"
       - "scripts/sync-final-apps.mjs"
       - "config/application-production-policy.json"
+      - "config/application-market-intelligence-policy.json"
+      - "config/site-workflow-operations-policy.json"
       - "docs/APPLICATION-PRODUCTION-PIPELINE.md"
       - "package.json"
       - "package-lock.json"
@@ -85,6 +91,8 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Validate application release synchronization
         run: npm run sync:apps
+      - name: Generate market and maintenance guidance
+        run: npm run market:apps
       - name: Generate governed release manifests
         run: npm run release:apps -- release/application-production
       - name: Run repository tests
@@ -112,6 +120,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: application-production-staging-${{ github.sha }}
-          path: release/application-production/**
+          path: |
+            release/application-production/**
+            release/application-market-intelligence/**
           if-no-files-found: error
           retention-days: 180
