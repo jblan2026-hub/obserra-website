@@ -3,7 +3,6 @@ import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server
 
 const CANONICAL_HOST = "www.obserrallc.com";
 const PREVIEW_NOINDEX = "noindex, nofollow, noarchive, nosnippet";
-const PRIVATE_NOINDEX = "noindex, nofollow, noarchive, nosnippet, noimageindex";
 const PROTECTED_PATH_PREFIXES = [
   "/admin",
   "/portal",
@@ -72,23 +71,12 @@ function canonicalRedirect(request: NextRequest) {
   return NextResponse.redirect(url, 308);
 }
 
-function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest) {
-  const url = new URL(request.url);
+function applyPreviewNoIndex(response: NextResponse, request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase().split(":")[0];
   const isPreviewHost = Boolean(host && host.endsWith(".vercel.app"));
 
   if (process.env.VERCEL_ENV !== "production" && isPreviewHost) {
     response.headers.set("X-Robots-Tag", PREVIEW_NOINDEX);
-  }
-
-  if (pathMatchesPrefix(url.pathname, "/command-center")) {
-    response.headers.set("X-Robots-Tag", PRIVATE_NOINDEX);
-    response.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
-    response.headers.set("Pragma", "no-cache");
-    response.headers.set("Expires", "0");
-    response.headers.set("Referrer-Policy", "no-referrer");
-    response.headers.set("X-Frame-Options", "DENY");
-    response.headers.set("X-Content-Type-Options", "nosniff");
   }
 
   return response;
@@ -99,7 +87,7 @@ function redirectToSignIn(request: NextRequest) {
   const returnTo = `${requestedUrl.pathname}${requestedUrl.search}`;
   const signInUrl = new URL("/sign-in", requestedUrl);
   signInUrl.searchParams.set("redirect_url", returnTo);
-  return applyRouteSecurityHeaders(NextResponse.redirect(signInUrl), request);
+  return applyPreviewNoIndex(NextResponse.redirect(signInUrl), request);
 }
 
 function identityConfigurationResponse(request: NextRequest) {
@@ -110,13 +98,13 @@ function identityConfigurationResponse(request: NextRequest) {
     url.pathname.startsWith("/sign-up");
 
   if (protectedOrIdentityRoute) {
-    return applyRouteSecurityHeaders(
+    return applyPreviewNoIndex(
       NextResponse.redirect(new URL("/academy?identity=configuration-required", url)),
       request,
     );
   }
 
-  const response = applyRouteSecurityHeaders(NextResponse.next(), request);
+  const response = applyPreviewNoIndex(NextResponse.next(), request);
   response.headers.set("X-Obserra-Identity-Status", "configuration-required");
   return response;
 }
@@ -134,7 +122,7 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
       const { userId } = await auth();
       if (!userId) return redirectToSignIn(clerkRequest);
     }
-    return applyRouteSecurityHeaders(NextResponse.next(), clerkRequest);
+    return applyPreviewNoIndex(NextResponse.next(), clerkRequest);
   });
 
   return handler(request, event);
