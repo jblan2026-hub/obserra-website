@@ -7,7 +7,6 @@ const PRIVATE_NOINDEX = "noindex, nofollow, noarchive, nosnippet, noimageindex";
 const PROTECTED_PATH_PREFIXES = [
   "/admin",
   "/portal",
-  "/command-center",
   "/academy/admin",
   "/academy/learn",
   "/academy/certificate",
@@ -82,10 +81,7 @@ function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest)
     response.headers.set("X-Robots-Tag", PREVIEW_NOINDEX);
   }
 
-  if (
-    pathMatchesPrefix(url.pathname, "/command-center") ||
-    pathMatchesPrefix(url.pathname, "/owner-access")
-  ) {
+  if (pathMatchesPrefix(url.pathname, "/command-center")) {
     response.headers.set("X-Robots-Tag", PRIVATE_NOINDEX);
     response.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
     response.headers.set("Pragma", "no-cache");
@@ -98,13 +94,12 @@ function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest)
   return response;
 }
 
-function redirectToIdentityGateway(request: NextRequest) {
+function redirectToSignIn(request: NextRequest) {
   const requestedUrl = new URL(request.url);
   const returnTo = `${requestedUrl.pathname}${requestedUrl.search}`;
-  const commandCenterRequest = pathMatchesPrefix(requestedUrl.pathname, "/command-center");
-  const gatewayUrl = new URL(commandCenterRequest ? "/owner-access" : "/sign-in", requestedUrl);
-  gatewayUrl.searchParams.set("redirect_url", returnTo);
-  return applyRouteSecurityHeaders(NextResponse.redirect(gatewayUrl), request);
+  const signInUrl = new URL("/sign-in", requestedUrl);
+  signInUrl.searchParams.set("redirect_url", returnTo);
+  return applyRouteSecurityHeaders(NextResponse.redirect(signInUrl), request);
 }
 
 function identityConfigurationResponse(request: NextRequest) {
@@ -112,15 +107,13 @@ function identityConfigurationResponse(request: NextRequest) {
   const protectedOrIdentityRoute =
     requiresAuthentication(request) ||
     url.pathname.startsWith("/sign-in") ||
-    url.pathname.startsWith("/sign-up") ||
-    url.pathname.startsWith("/owner-access");
+    url.pathname.startsWith("/sign-up");
 
   if (protectedOrIdentityRoute) {
-    const destination =
-      pathMatchesPrefix(url.pathname, "/command-center") || pathMatchesPrefix(url.pathname, "/owner-access")
-        ? new URL("/?owner=identity-configuration-required", url)
-        : new URL("/academy?identity=configuration-required", url);
-    return applyRouteSecurityHeaders(NextResponse.redirect(destination), request);
+    return applyRouteSecurityHeaders(
+      NextResponse.redirect(new URL("/academy?identity=configuration-required", url)),
+      request,
+    );
   }
 
   const response = applyRouteSecurityHeaders(NextResponse.next(), request);
@@ -139,7 +132,7 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
   const handler = clerkMiddleware(async (auth, clerkRequest) => {
     if (requiresAuthentication(clerkRequest)) {
       const { userId } = await auth();
-      if (!userId) return redirectToIdentityGateway(clerkRequest);
+      if (!userId) return redirectToSignIn(clerkRequest);
     }
     return applyRouteSecurityHeaders(NextResponse.next(), clerkRequest);
   });
