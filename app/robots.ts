@@ -9,6 +9,8 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/admin",
           "/api/",
+          "/command-center",
+          "/academy/admin/",
           "/academy/learn/",
           "/academy/certificate/",
           "/academy/success",
