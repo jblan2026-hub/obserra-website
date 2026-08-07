@@ -7,7 +7,8 @@ export const ACADEMY_PUBLIC_CATALOG_URL =
 export const ACADEMY_OWNER_EDGE_URL =
   "https://nwxnyqlyzyufgoadtqxs.supabase.co/functions/v1/academy-owner-control";
 
-export const ACADEMY_OWNER_CONTROL_URL = "/api/owner/academy";
+export const ACADEMY_OWNER_CONTROL_URL =
+  typeof window === "undefined" ? ACADEMY_OWNER_EDGE_URL : "/api/owner/academy";
 
 export type AcademyCourseLifecycle =
   | "published"
