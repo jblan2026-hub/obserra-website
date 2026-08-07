@@ -14,7 +14,11 @@ test("owner Command Center is separate, protected, private, and fail closed", ()
   const commandCenter = read("app/command-center/page.tsx");
   const academyReview = read("app/command-center/academy/page.tsx");
 
-  assert.match(proxy, /"\/command-center\(\.\*\)"/);
+  assert.match(proxy, /PROTECTED_PATH_PREFIXES/);
+  assert.match(proxy, /"\/command-center"/);
+  assert.match(proxy, /requiresAuthentication/);
+  assert.match(proxy, /const \{ userId \} = await auth\(\)/);
+  assert.doesNotMatch(proxy, /createRouteMatcher/);
   assert.match(proxy, /PRIVATE_NOINDEX/);
   assert.match(proxy, /private, no-store/);
   assert.match(proxy, /X-Frame-Options", "DENY"/);
@@ -71,6 +75,7 @@ test("all required owner Command Center files are present", () => {
     "app/command-center/academy/[courseId]/page.tsx",
     "app/command-center/academy/[courseId]/OwnerCourseReview.tsx",
     "app/command-center/academy/[courseId]/certificate/page.tsx",
+    "scripts/owner-command-center-runtime-smoke.mjs",
   ]) {
     assert.equal(exists(file), true, `missing required owner Command Center file: ${file}`);
   }
