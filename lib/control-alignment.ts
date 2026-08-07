@@ -90,8 +90,8 @@ export const alignmentAuthorities: AlignmentAuthority[] = [
   },
   {
     id: "pci-dss",
-    shortName: "PCI DSS",
-    name: "Payment Card Industry Data Security Standard",
+    shortName: "PCI DSS v4.0.1",
+    name: "Payment Card Industry Data Security Standard v4.0.1",
     kind: "payment-standard",
     authority: "PCI Security Standards Council",
     sourceUrl: "https://www.pcisecuritystandards.org/standards/pci-dss/",
