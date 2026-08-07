@@ -4,8 +4,10 @@ import type { KnowledgeCheck, LessonBrief } from "../app/academy/courseExperienc
 export const ACADEMY_PUBLIC_CATALOG_URL =
   "https://nwxnyqlyzyufgoadtqxs.supabase.co/functions/v1/academy-public-catalog";
 
-export const ACADEMY_OWNER_CONTROL_URL =
+export const ACADEMY_OWNER_EDGE_URL =
   "https://nwxnyqlyzyufgoadtqxs.supabase.co/functions/v1/academy-owner-control";
+
+export const ACADEMY_OWNER_CONTROL_URL = "/api/owner/academy";
 
 export type AcademyCourseLifecycle =
   | "published"
