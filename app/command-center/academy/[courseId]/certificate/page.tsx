@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import CertificateView from "../../../../academy/certificate/[courseId]/CertificateView";
-import { courseForId } from "../../../../../../lib/academy";
-import { requireOwnerAccess } from "../../../../../../lib/owner-access";
+import { courseForId } from "../../../../../lib/academy";
+import { requireOwnerAccess } from "../../../../../lib/owner-access";
 
 export const dynamic = "force-dynamic";
 
