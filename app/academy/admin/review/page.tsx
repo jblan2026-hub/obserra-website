@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import { redirectToOwnerSite } from "../../../../lib/owner-site-redirect";
 
 export const dynamic = "force-dynamic";
 
 export default function LegacyAcademyOwnerReviewPage() {
-  redirect("/command-center/academy");
+  redirectToOwnerSite("/course");
 }
