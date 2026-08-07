@@ -1,14 +1,15 @@
 import { notFound } from "next/navigation";
 import CoursePlayer from "../../../learn/CoursePlayer";
 import { courseForId } from "../../../../../lib/academy";
+import { requireAcademyOwnerReview } from "../../../../../lib/academy-owner-review";
 import { finalAssessmentQuestions, lessonBrief } from "../../../courseExperience";
 
 export const dynamic = "force-dynamic";
 
 export default async function OwnerCourseReviewPage({ params }: { params: Promise<{ courseId: string }> }) {
-  if (process.env.VERCEL_ENV !== "preview") notFound();
-
   const { courseId } = await params;
+  await requireAcademyOwnerReview(`/academy/admin/review/${courseId}`);
+
   const course = courseForId(courseId);
   if (!course) notFound();
 
