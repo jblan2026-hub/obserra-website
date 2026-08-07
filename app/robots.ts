@@ -10,6 +10,7 @@ export default function robots(): MetadataRoute.Robots {
           "/admin",
           "/api/",
           "/command-center",
+          "/owner-access",
           "/academy/admin/",
           "/academy/learn/",
           "/academy/certificate/",
