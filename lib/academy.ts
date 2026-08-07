@@ -8,6 +8,7 @@ import {
   type SignedCertificateClaim,
   verifyCertificateClaim,
 } from "./certificate-signing";
+import { ownerUserIdAllowed } from "./owner-auth";
 import { getStripe } from "./stripe";
 
 export type CourseProgress = {
@@ -100,20 +101,6 @@ export async function recordAssessment(userId: string, courseId: string, score: 
   return state.progress[courseId];
 }
 
-export function ownerEmailAllowed(emails: string[]) {
-  const singleOwner = process.env.OBSERRA_OWNER_EMAIL?.trim().toLowerCase();
-  const ownerList = (process.env.OBSERRA_OWNER_EMAILS ?? "")
-    .split(",")
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean);
-  const approvedOwners = new Set<string>(singleOwner ? [singleOwner, ...ownerList] : ownerList);
-  return approvedOwners.size > 0 && emails.some((email) => approvedOwners.has(email.toLowerCase()));
-}
-
-function emailsForUser(user: { emailAddresses: { emailAddress: string }[] }) {
-  return user.emailAddresses.map((item) => item.emailAddress);
-}
-
 export async function academyStateWithOwnerAccess(userId: string, courseId: string) {
   const course = courseForId(courseId);
   if (!course) throw new Error("Unknown course");
@@ -121,10 +108,10 @@ export async function academyStateWithOwnerAccess(userId: string, courseId: stri
   const user = await client.users.getUser(userId);
   const state = academyStateFromUser(user);
   if (state.entitlements[courseId]) return state;
-  if (!ownerEmailAllowed(emailsForUser(user))) return state;
+  if (!ownerUserIdAllowed(userId)) return state;
   state.entitlements[courseId] = {
     enrolledAt: new Date().toISOString(),
-    paymentReference: "owner-administrator-access",
+    paymentReference: "owner-identity-access",
   };
   await saveState(userId, state);
   return state;
