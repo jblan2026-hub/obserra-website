@@ -29,12 +29,15 @@ test("public website contains only a fail-closed boundary for the separate owner
   assert.doesNotMatch(academyReview, /courseData|Private Course Content Review|ANSWER KEY/);
 });
 
-test("public repository does not contain private owner course content or identity code", () => {
+test("public repository does not contain private owner course content, identity, or bootstrap code", () => {
   for (const file of [
     "lib/owner-access.ts",
     "app/command-center/owner-command-center.module.css",
     "app/command-center/academy/OwnerAcademyCatalog.tsx",
     "app/command-center/academy/[courseId]/OwnerCourseReview.tsx",
+    "app/owner-access/[[...owner-access]]/OwnerBootstrapClient.tsx",
+    "app/owner-access/[[...owner-access]]/owner-access.module.css",
+    "app/owner-access/[[...owner-access]]/page.tsx",
   ]) {
     assert.equal(exists(file), false, `private owner file must not exist in public repository: ${file}`);
   }
@@ -45,6 +48,18 @@ test("public repository does not contain private owner course content or identit
   assert.match(ownerCertificatePage, /redirectToOwnerSite\("\/course"\)/);
   assert.doesNotMatch(ownerCoursePage, /finalAssessment|lessonBrief|courseForId/);
   assert.doesNotMatch(ownerCertificatePage, /CertificateView|courseForId|OWNER-REVIEW/);
+});
+
+test("public Academy control client contains no owner authorization or protected-content API", () => {
+  const contracts = read("lib/academy-control-contracts.ts");
+  const control = read("lib/academy-control.ts");
+
+  assert.match(contracts, /ACADEMY_PUBLIC_CATALOG_URL/);
+  assert.match(control, /publicAcademyCatalog/);
+  assert.match(control, /publicAcademyCourse/);
+  assert.doesNotMatch(contracts, /ACADEMY_OWNER_CONTROL_URL|AcademyOwner|AcademyCourseDocument/);
+  assert.doesNotMatch(control, /ownerRequest|verifyAcademyOwner|academyOwnerCatalog|academyOwnerCourse/);
+  assert.doesNotMatch(control, /KnowledgeCheck|LessonBrief|authorization: `Bearer/);
 });
 
 test("legacy Academy owner URLs use the same separate-site redirect boundary", () => {
@@ -66,8 +81,8 @@ test("public environment and CI do not carry owner identity secrets", () => {
   const runtimeSmoke = read("scripts/owner-command-center-runtime-smoke.mjs");
 
   assert.match(environment, /OBSERRA_OWNER_SITE_URL=/);
-  assert.doesNotMatch(environment, /OBSERRA_OWNER_EMAIL|OBSERRA_OWNER_USER_ID/);
-  assert.doesNotMatch(workflow, /OBSERRA_OWNER_EMAIL|OBSERRA_OWNER_USER_ID/);
+  assert.doesNotMatch(environment, /OBSERRA_OWNER_EMAIL|OBSERRA_OWNER_USER_ID|OWNER_BOOTSTRAP/);
+  assert.doesNotMatch(workflow, /OBSERRA_OWNER_EMAIL|OBSERRA_OWNER_USER_ID|OWNER_BOOTSTRAP/);
   assert.match(runtimeSmoke, /expected fail-closed HTTP 404/);
   assert.match(runtimeSmoke, /protectedContentExposed: false/);
 });
