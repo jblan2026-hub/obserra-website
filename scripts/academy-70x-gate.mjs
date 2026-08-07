@@ -12,8 +12,11 @@ function check(name, condition) {
 
 const courseData = read("app/academy/courseData.ts");
 const experience = read("app/academy/courseExperience.ts");
+const grounding = read("app/academy/courseGrounding.ts");
 const player = read("app/academy/learn/CoursePlayer.tsx");
+const learnerLayout = read("app/academy/learn/layout.tsx");
 const assessmentRoute = read("app/api/academy/assessment/route.ts");
+const tutorRoute = read("app/api/academy/tutor/route.ts");
 const packageJson = JSON.parse(read("package.json"));
 
 const courseMatches = [...courseData.matchAll(/^\s*\["([a-z0-9-]+)",\s*"([^"]+)",\s*"([^"]+)"/gm)];
@@ -21,7 +24,7 @@ const courseIds = courseMatches.map((match) => match[1]);
 const courseTitles = courseMatches.map((match) => match[2]);
 const courseLevels = courseMatches.map((match) => match[3]);
 
-check("catalog contains exactly 60 courses", courseIds.length === 60);
+check("catalog contains exactly 60 live courses", courseIds.length === 60);
 check("course ids are unique", new Set(courseIds).size === courseIds.length);
 check("course titles are unique", new Set(courseTitles).size === courseTitles.length);
 check("all five course levels are represented", new Set(courseLevels).size === 5);
@@ -48,8 +51,8 @@ const parsedMinutes = Object.fromEntries(minuteBlocks.map((match) => {
 
 for (const [level, expected] of Object.entries(expectedDurations)) {
   const minutes = parsedMinutes[level] ?? [];
-  check(`${level} defines five modules`, minutes.length === 5);
-  check(`${level} module minutes are positive integers`, minutes.every((value) => Number.isInteger(value) && value > 0));
+  check(`${level} defines five published lessons`, minutes.length === 5);
+  check(`${level} lesson minutes are positive integers`, minutes.every((value) => Number.isInteger(value) && value > 0));
   check(`${level} published duration reconciles`, minutes.reduce((sum, value) => sum + value, 0) === expected);
 }
 
@@ -57,11 +60,15 @@ const requiredFiles = [
   "app/academy/page.tsx",
   "app/academy/courseData.ts",
   "app/academy/courseExperience.ts",
+  "app/academy/courseGrounding.ts",
   "app/academy/learn/CoursePlayer.tsx",
+  "app/academy/learn/layout.tsx",
+  "app/academy/learn/ai-native-learning.css",
   "app/academy/learn/[courseId]/page.tsx",
   "app/academy/certificate/[courseId]/CertificateView.tsx",
   "app/api/academy/assessment/route.ts",
   "app/api/academy/progress/route.ts",
+  "app/api/academy/tutor/route.ts",
   "app/api/academy/checkout/route.ts",
   "app/api/webhook/stripe/route.ts",
   "lib/academy.ts",
@@ -77,7 +84,7 @@ check("assessment returns certificate URL only when eligible", /certificateId \?
 check("assessment errors fail closed", /status: 400/.test(assessmentRoute));
 
 check("player initializes 25 unanswered responses", /Array\(25\)\.fill\(-1\)/.test(player));
-check("player blocks assessment until lessons complete", /disabled=!\{?lessonsComplete\}?/.test(player) || /disabled=\{!lessonsComplete\}/.test(player));
+check("player blocks assessment until lessons complete", /disabled=\{!lessonsComplete\}/.test(player));
 check("player blocks submission until all questions answered", /disabled=\{answers\.includes\(-1\)\}/.test(player));
 check("player persists lesson completion through API", /fetch\("\/api\/academy\/progress"/.test(player));
 check("player submits assessment through API", /fetch\("\/api\/academy\/assessment"/.test(player));
@@ -86,13 +93,51 @@ check("player communicates the 80 percent standard", /80%/.test(player));
 check("player prevents casual copy", /onCopy=/.test(player));
 check("player prevents casual cut", /onCut=/.test(player));
 check("player includes learner watermark", /learner-watermark/.test(player));
+check("player does not return null when assessment is active", /if \(!assessmentActive && !lesson\) return null/.test(player));
+check("player exposes entitlement gated AI tutor", /Obserrian Academy Tutor/.test(player) && /\/api\/academy\/tutor/.test(player));
+check("player pauses tutor during graded assessment", /Tutor is paused during the graded assessment/.test(player));
+check("player presents why this matters", /Why this matters/.test(player));
+check("player presents authoritative grounding", /Authoritative grounding/.test(player));
+check("player presents documented practice examples", /Documented practice example/.test(player));
+check("player presents business application", /How to use this in an organization/.test(player));
 
 check("course experience includes guided video chapters", /videoChapters/.test(experience));
 check("course experience includes transcripts", /transcript/.test(experience));
 check("course experience includes training materials", /materials/.test(experience));
-check("course experience includes observe-decide-act model", /Observe, Decide, Act worksheet/.test(experience));
+check("course experience includes observe decide act model", /observe:/.test(experience) && /decide:/.test(experience) && /act:/.test(experience));
 check("course experience includes knowledge checks", /KnowledgeCheck/.test(experience));
-check("course descriptions avoid third-party certification claims", /not third-party certification material/.test(courseData));
+check("course experience includes authoritative references", /authorities:/.test(experience) && /Authoritative basis/.test(experience));
+check("course experience includes documented practice", /practiceExample/.test(experience));
+check("course experience includes enterprise application", /businessApplication/.test(experience));
+check("course descriptions preserve live non-certification language", /not third-party certification material/.test(courseData));
+
+check("grounding includes NIST CSF", /NIST CSF 2\.0/.test(grounding));
+check("grounding includes NIST AI RMF", /NIST AI RMF 1\.0/.test(grounding));
+check("grounding includes NIST SSDF", /NIST SP 800-218/.test(grounding));
+check("grounding includes Zero Trust Architecture", /NIST SP 800-207/.test(grounding));
+check("grounding includes current digital identity guidance", /NIST SP 800-63-4/.test(grounding));
+check("grounding includes incident response guidance", /NIST SP 800-61 Rev\. 3/.test(grounding));
+check("grounding includes vulnerability prioritization sources", /CISA KEV Catalog/.test(grounding));
+check("grounding includes AI application security guidance", /OWASP LLM Top 10/.test(grounding));
+check("grounding includes API security guidance", /OWASP API Security Top 10/.test(grounding));
+check("grounding includes travel risk guidance", /ISO 31030:2021/.test(grounding));
+check("grounding includes workplace safety law", /29 U\.S\.C\. § 654\(a\)\(1\)/.test(grounding));
+check("grounding includes protective threat guidance", /U\.S\. Secret Service National Threat Assessment Center/.test(grounding));
+check("grounding includes intelligence analytic standards", /Intelligence Community Directive 203/.test(grounding));
+check("grounding includes SEC cyber disclosure requirements", /Regulation S-K Item 106/.test(grounding));
+check("grounding includes public practice examples", /Google/.test(grounding) && /Equifax/.test(grounding) && /SolarWinds/.test(grounding));
+
+check("tutor requires authentication", /if \(!userId\)/.test(tutorRoute));
+check("tutor requires paid entitlement", /Paid course access is required/.test(tutorRoute) && /state\.entitlements\[courseId\]/.test(tutorRoute));
+check("tutor is scoped to current course", /courseForId\(courseId\)/.test(tutorRoute));
+check("tutor is scoped to current lesson", /lessonBrief\(courseId, lessonIndex\)/.test(tutorRoute));
+check("tutor uses OpenAI Responses API", /https:\/\/api\.openai\.com\/v1\/responses/.test(tutorRoute));
+check("tutor model is configurable", /OBSERRA_ACADEMY_AI_MODEL/.test(tutorRoute));
+check("tutor fails closed without API key", /OPENAI_API_KEY/.test(tutorRoute) && /status: 503/.test(tutorRoute));
+check("tutor protects graded assessment integrity", /Do not provide answers to the course's graded final assessment/.test(tutorRoute));
+check("tutor limits question length", /question\.length > 1400/.test(tutorRoute));
+check("tutor disables caching", /private, no-store/.test(tutorRoute));
+check("learner layout loads AI native styles", /ai-native-learning\.css/.test(learnerLayout));
 
 check("package exposes build command", typeof packageJson.scripts?.build === "string");
 check("package exposes lint command", typeof packageJson.scripts?.lint === "string");
