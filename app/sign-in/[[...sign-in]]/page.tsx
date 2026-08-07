@@ -9,7 +9,20 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function SignInPage() {
+function safeRedirect(value: string | string[] | undefined) {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  if (!candidate || !candidate.startsWith("/") || candidate.startsWith("//")) return "/portal";
+  return candidate;
+}
+
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const redirectUrl = safeRedirect(params.redirect_url ?? params.redirectUrl);
+
   return (
     <main className="auth-shell">
       <header className="auth-header">
@@ -27,7 +40,15 @@ export default function SignInPage() {
             <span>Protected customer portal</span><span>Account based Academy access</span><span>Secure purchase workflows</span><span>Enterprise identity ready</span>
           </div>
         </div>
-        <div className="auth-panel"><SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" fallbackRedirectUrl="/portal" /></div>
+        <div className="auth-panel">
+          <SignIn
+            routing="path"
+            path="/sign-in"
+            signUpUrl="/sign-up"
+            forceRedirectUrl={redirectUrl}
+            fallbackRedirectUrl={redirectUrl}
+          />
+        </div>
       </section>
       <p className="auth-note">Authorized access only. Authentication activity may be logged for security, fraud prevention, support, and compliance purposes.</p>
     </main>
