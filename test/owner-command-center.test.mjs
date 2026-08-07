@@ -7,76 +7,67 @@ const root = process.cwd();
 const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), "utf8");
 const exists = (relativePath) => fs.existsSync(path.join(root, relativePath));
 
-test("owner Command Center is separate, protected, private, and fail closed", () => {
+test("public website contains only a fail-closed boundary for the separate owner site", () => {
   const proxy = read("proxy.ts");
   const robots = read("app/robots.ts");
-  const ownerAccess = read("lib/owner-access.ts");
+  const redirectBoundary = read("lib/owner-site-redirect.ts");
   const commandCenter = read("app/command-center/page.tsx");
   const academyReview = read("app/command-center/academy/page.tsx");
 
-  assert.match(proxy, /PROTECTED_PATH_PREFIXES/);
-  assert.match(proxy, /"\/command-center"/);
-  assert.match(proxy, /requiresAuthentication/);
-  assert.match(proxy, /const \{ userId \} = await auth\(\)/);
-  assert.doesNotMatch(proxy, /createRouteMatcher/);
   assert.match(proxy, /PRIVATE_NOINDEX/);
   assert.match(proxy, /private, no-store/);
   assert.match(proxy, /X-Frame-Options", "DENY"/);
   assert.match(robots, /"\/command-center"/);
-  assert.match(ownerAccess, /OBSERRA_OWNER_EMAIL/);
-  assert.match(ownerAccess, /OBSERRA_OWNER_USER_ID/);
-  assert.match(ownerAccess, /primaryEmailAddressId/);
-  assert.match(ownerAccess, /verification\?\.status === "verified"/);
-  assert.match(ownerAccess, /clerkClient/);
-  assert.match(ownerAccess, /notFound\(\)/);
-  assert.doesNotMatch(ownerAccess, /VERCEL_ENV/);
-  assert.match(commandCenter, /Owner Command Center/);
-  assert.match(commandCenter, /not part of the public Academy catalog/);
-  assert.match(academyReview, /Private Course Content Review/);
-  assert.match(academyReview, /does not create a purchase/);
+  assert.match(redirectBoundary, /import "server-only"/);
+  assert.match(redirectBoundary, /OBSERRA_OWNER_SITE_URL/);
+  assert.match(redirectBoundary, /url\.protocol !== "https:"/);
+  assert.match(redirectBoundary, /OWNER_SITE_PATHS/);
+  assert.match(redirectBoundary, /notFound\(\)/);
+  assert.match(commandCenter, /redirectToOwnerSite\("\/command-center"\)/);
+  assert.match(academyReview, /redirectToOwnerSite\("\/course"\)/);
+  assert.doesNotMatch(commandCenter, /courseData|Owner Command Center|OWNER VERIFIED/);
+  assert.doesNotMatch(academyReview, /courseData|Private Course Content Review|ANSWER KEY/);
 });
 
-test("owner course viewer exposes complete content without learner mutations", () => {
+test("public repository does not contain private owner course content or identity code", () => {
+  for (const file of [
+    "lib/owner-access.ts",
+    "app/command-center/owner-command-center.module.css",
+    "app/command-center/academy/OwnerAcademyCatalog.tsx",
+    "app/command-center/academy/[courseId]/OwnerCourseReview.tsx",
+  ]) {
+    assert.equal(exists(file), false, `private owner file must not exist in public repository: ${file}`);
+  }
+
   const ownerCoursePage = read("app/command-center/academy/[courseId]/page.tsx");
-  const ownerViewer = read("app/command-center/academy/[courseId]/OwnerCourseReview.tsx");
-
-  assert.match(ownerCoursePage, /requireOwnerAccess/);
-  assert.match(ownerCoursePage, /finalAssessment/);
-  assert.doesNotMatch(ownerCoursePage, /VERCEL_ENV/);
-  assert.match(ownerViewer, /GUIDED INSTRUCTION/);
-  assert.match(ownerViewer, /AUTHORITATIVE GROUNDING/);
-  assert.match(ownerViewer, /KNOWLEDGE CHECK · OWNER ANSWER KEY/);
-  assert.match(ownerViewer, /FINAL ASSESSMENT · PRIVATE OWNER ANSWER KEY/);
-  assert.doesNotMatch(ownerViewer, /\/api\/academy\/progress/);
-  assert.doesNotMatch(ownerViewer, /\/api\/academy\/assessment/);
-  assert.doesNotMatch(ownerViewer, /\/api\/academy\/checkout/);
+  const ownerCertificatePage = read("app/command-center/academy/[courseId]/certificate/page.tsx");
+  assert.match(ownerCoursePage, /redirectToOwnerSite\("\/course"\)/);
+  assert.match(ownerCertificatePage, /redirectToOwnerSite\("\/course"\)/);
+  assert.doesNotMatch(ownerCoursePage, /finalAssessment|lessonBrief|courseForId/);
+  assert.doesNotMatch(ownerCertificatePage, /CertificateView|courseForId|OWNER-REVIEW/);
 });
 
-test("legacy Academy owner URLs redirect into the private Command Center", () => {
+test("legacy Academy owner URLs use the same separate-site redirect boundary", () => {
   const indexRoute = read("app/academy/admin/review/page.tsx");
   const courseRoute = read("app/academy/admin/review/[courseId]/page.tsx");
   const certificateRoute = read("app/academy/admin/review/[courseId]/certificate/page.tsx");
 
-  assert.match(indexRoute, /redirect\("\/command-center\/academy"\)/);
-  assert.match(courseRoute, /\/command-center\/academy\/\$\{encodeURIComponent\(courseId\)\}/);
-  assert.match(certificateRoute, /\/command-center\/academy\/\$\{encodeURIComponent\(courseId\)\}\/certificate/);
-  assert.doesNotMatch(courseRoute, /notFound\(\)/);
-  assert.doesNotMatch(certificateRoute, /VERCEL_ENV/);
+  assert.match(indexRoute, /redirectToOwnerSite\("\/course"\)/);
+  assert.match(courseRoute, /redirectToOwnerSite\("\/course"\)/);
+  assert.match(certificateRoute, /redirectToOwnerSite\("\/course"\)/);
+  assert.doesNotMatch(indexRoute, /\/command-center\/academy/);
+  assert.doesNotMatch(courseRoute, /courseId/);
+  assert.doesNotMatch(certificateRoute, /courseId/);
 });
 
-test("all required owner Command Center files are present", () => {
-  for (const file of [
-    "lib/owner-access.ts",
-    "app/command-center/layout.tsx",
-    "app/command-center/page.tsx",
-    "app/command-center/owner-command-center.module.css",
-    "app/command-center/academy/page.tsx",
-    "app/command-center/academy/OwnerAcademyCatalog.tsx",
-    "app/command-center/academy/[courseId]/page.tsx",
-    "app/command-center/academy/[courseId]/OwnerCourseReview.tsx",
-    "app/command-center/academy/[courseId]/certificate/page.tsx",
-    "scripts/owner-command-center-runtime-smoke.mjs",
-  ]) {
-    assert.equal(exists(file), true, `missing required owner Command Center file: ${file}`);
-  }
+test("public environment and CI do not carry owner identity secrets", () => {
+  const environment = read(".env.example");
+  const workflow = read(".github/workflows/website-ci.yml");
+  const runtimeSmoke = read("scripts/owner-command-center-runtime-smoke.mjs");
+
+  assert.match(environment, /OBSERRA_OWNER_SITE_URL=/);
+  assert.doesNotMatch(environment, /OBSERRA_OWNER_EMAIL|OBSERRA_OWNER_USER_ID/);
+  assert.doesNotMatch(workflow, /OBSERRA_OWNER_EMAIL|OBSERRA_OWNER_USER_ID/);
+  assert.match(runtimeSmoke, /expected fail-closed HTTP 404/);
+  assert.match(runtimeSmoke, /protectedContentExposed: false/);
 });
