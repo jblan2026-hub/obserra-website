@@ -36,12 +36,18 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
   const lesson = lessons[activeLesson];
   const lessonsComplete = completedLessons.length === course.modules.length;
   const assessmentActive = activeLesson === course.modules.length;
+  const activeLessonCompleted = completedLessons.includes(activeLesson);
+  const learningCheckPassed = Boolean(lesson && checkedAnswer === lesson.check.answer);
 
   async function completeLesson() {
+    if (!lesson || checkedAnswer === null || checkedAnswer !== lesson.check.answer) {
+      setNotice("Complete the lesson knowledge check correctly before recording completion.");
+      return;
+    }
     const response = await fetch("/api/academy/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ courseId: course.id, lessonIndex: activeLesson }),
+      body: JSON.stringify({ courseId: course.id, lessonIndex: activeLesson, checkAnswer: checkedAnswer }),
     });
     const result = await response.json() as { progress?: CourseProgress; error?: string };
     if (!response.ok || !result.progress) return setNotice(result.error ?? "Unable to record this lesson");
@@ -129,6 +135,7 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
           setCheckedAnswer(null);
           setTutorAnswer("");
           setTutorError("");
+          setNotice("");
         }} className={activeLesson === index ? "active" : ""}>
           <span>{completedLessons.includes(index) ? "OK" : String(index + 1).padStart(2, "0")}</span>
           <div><strong>{module.title}</strong><small>{module.format} · {module.duration}</small></div>
@@ -254,9 +261,9 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
           </section>
 
           <div className="knowledge-check">
-            <p>Learning check</p>
+            <p>Required lesson knowledge check</p>
             <h3>{lesson.check.question}</h3>
-            {lesson.check.options.map((option, index) => <button key={option} onClick={() => setCheckedAnswer(index)} className={checkedAnswer === index ? "selected" : ""}>{String.fromCharCode(65 + index)}. {option}</button>)}
+            {lesson.check.options.map((option, index) => <button key={option} onClick={() => { setCheckedAnswer(index); setNotice(""); }} className={checkedAnswer === index ? "selected" : ""}>{String.fromCharCode(65 + index)}. {option}</button>)}
             {checkedAnswer !== null && <div className={checkedAnswer === lesson.check.answer ? "answer correct" : "answer incorrect"}>{checkedAnswer === lesson.check.answer ? "Correct. " : "Review this choice. "}{lesson.check.explanation}</div>}
           </div>
 
@@ -275,7 +282,10 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
             <small>The tutor will not provide answers to the graded final assessment and does not replace legal, regulatory, safety, medical, or organizational authority.</small>
           </section>
 
-          <button className="complete-lesson" onClick={completeLesson}>{completedLessons.includes(activeLesson) ? "Lesson recorded" : "Mark lesson complete"}</button>
+          <div className="lesson-completion-control">
+            <button className="complete-lesson" disabled={!activeLessonCompleted && !learningCheckPassed} onClick={completeLesson}>{activeLessonCompleted ? "Lesson recorded" : learningCheckPassed ? "Record lesson completion" : "Pass the knowledge check to complete"}</button>
+            {!activeLessonCompleted && !learningCheckPassed && <p>Lesson completion is recorded only after the required knowledge check is answered correctly.</p>}
+          </div>
           {notice && <p className="learning-notice">{notice}</p>}
         </div>
       </section> : <section className="assessment-stage">
