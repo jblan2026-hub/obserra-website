@@ -1,3 +1,5 @@
+import { mergeStudioCourses } from "./studioCatalog";
+
 export type Department = "Cyber" | "Protection" | "Intelligence" | "Technologies";
 export type CourseLevel = "Foundation" | "Professional" | "Advanced" | "Executive Intensive" | "CISO Masterclass";
 
@@ -123,4 +125,6 @@ function createCourse([id, title, level, department, track, focus]: CourseSpec):
   };
 }
 
-export const courses: Course[] = specs.map(createCourse);
+const fallbackCourses: Course[] = specs.map(createCourse);
+
+export const courses: Course[] = mergeStudioCourses(fallbackCourses);
