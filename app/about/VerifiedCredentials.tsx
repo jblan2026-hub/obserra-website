@@ -30,11 +30,37 @@ const ec = [
 ];
 
 const licenses = [
-  ["Private Investigator", "C 3600281", "BLANCHARD, JODY W"],
-  ["Security Officer", "D 3617216", "BLANCHARD, JODY W"],
-  ["Security Officer School Instructor", "DI3600107", "BLANCHARD, JODY W."],
-  ["Statewide Firearms License", "G 3604219", "BLANCHARD, JODY W."],
-];
+  {
+    type: "Private Investigator",
+    number: "C 3600281",
+    licensedName: "BLANCHARD, JODY W",
+    status: "licensed",
+  },
+  {
+    type: "Security Officer",
+    number: "D 3617216",
+    licensedName: "BLANCHARD, JODY W",
+    status: "licensed",
+  },
+  {
+    type: "Security Officer School Instructor",
+    number: "DI3600107",
+    licensedName: "BLANCHARD, JODY W.",
+    status: "licensed",
+  },
+  {
+    type: "Statewide Firearms License",
+    number: "G 3604219",
+    licensedName: "BLANCHARD, JODY W.",
+    status: "licensed",
+  },
+  {
+    type: "Class A Private Investigative Agency",
+    number: "APPLICATION PENDING",
+    licensedName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE, LLC",
+    status: "pending",
+  },
+] as const;
 
 export default function VerifiedCredentials() {
   useEffect(() => {
@@ -51,7 +77,7 @@ export default function VerifiedCredentials() {
       <div className="verified-credentials-heading">
         <p>VERIFIED EXECUTIVE CREDENTIALS</p>
         <h2 id="verified-credentials-title">Issuer-backed qualifications in cybersecurity, risk, privacy, audit, AI governance, and protective services.</h2>
-        <span>Use each issuer link to verify the credential or professional license at its official source.</span>
+        <span>Use each issuer link to verify the credential or professional license at its official source. Pending applications are identified separately and are not represented as issued licenses.</span>
       </div>
 
       <h3 className="verified-credentials-group-title">Credly verified credentials</h3>
@@ -81,10 +107,20 @@ export default function VerifiedCredentials() {
 
       <h3 className="verified-credentials-group-title">Florida FDACS professional licenses</h3>
       <div className="verified-credentials-grid florida-license-grid">
-        {licenses.map(([type, number, licensedName]) => (
-          <article className="verified-credential-card florida-license-card" key={number}>
-            <div className="fdacs-license-mark" aria-label="Florida Department of Agriculture and Consumer Services"><span>FLORIDA</span><strong>FDACS</strong><small>LICENSED</small></div>
-            <div className="verified-credential-detail"><span>Florida FDACS</span><strong>{type}</strong><p>{number}</p><small className="florida-license-name">{licensedName}</small><a className="verified-credential-verify-link" href="https://licensing.fdacs.gov/access/individual.aspx" target="_blank" rel="noreferrer">Verify with Florida FDACS</a></div>
+        {licenses.map(({ type, number, licensedName, status }) => (
+          <article className="verified-credential-card florida-license-card" key={`${type}-${number}`}>
+            <div className="fdacs-license-mark" aria-label={`Florida Department of Agriculture and Consumer Services ${status === "pending" ? "pending application" : "licensed credential"}`}>
+              <span>FLORIDA</span>
+              <strong>FDACS</strong>
+              <small>{status === "pending" ? "PENDING" : "LICENSED"}</small>
+            </div>
+            <div className="verified-credential-detail">
+              <span>Florida FDACS</span>
+              <strong>{type}</strong>
+              <p>{number}</p>
+              <small className="florida-license-name">{licensedName}</small>
+              <a className="verified-credential-verify-link" href="https://licensing.fdacs.gov/access/individual.aspx" target="_blank" rel="noreferrer">Verify with Florida FDACS</a>
+            </div>
           </article>
         ))}
       </div>
