@@ -19,11 +19,12 @@ This record separates source implementation, CI, preview deployment, production 
 - **Production sign-in:** NOT DIRECTLY VERIFIED IN THE CURRENT REVIEW.
 - **Academy checkout and payment handoff:** NOT DIRECTLY VERIFIED IN THE CURRENT REVIEW.
 - **Paid learner entitlement, progress, assessment, and certificate workflow:** NOT DIRECTLY VERIFIED END TO END.
-- **Private owner Command Center Academy module:** IMPLEMENTED IN SOURCE; NOT YET DEPLOYED OR DIRECTLY VERIFIED AT THE CANONICAL DOMAIN.
-- **Current sitewide governance branch deployment to the named live Vercel project:** NOT VERIFIED AFTER THE OWNER COMMAND CENTER CHANGE.
-- **Vercel project and runtime logs through the connected Vercel API:** BLOCKED BY THE CURRENT CONNECTOR PERMISSION BOUNDARY.
+- **Private owner Command Center Academy module:** IMPLEMENTED IN SOURCE, TESTED, LINTED, AND PRODUCTION-BUILD VERIFIED ON THE PRECEDING CODE HEAD; NOT YET DEPLOYED OR DIRECTLY VERIFIED AT THE CANONICAL DOMAIN.
+- **Independent preview deployments:** TWO VERCEL PREVIEW PROJECTS REPORTED READY FOR THE VERIFIED CODE HEAD.
+- **Named `obserra-website-live` project:** LATEST GITHUB VERCEL EVIDENCE REPORTS CANCELED, NOT READY.
+- **Direct Vercel project and runtime-log review:** BLOCKED BY THE CURRENT CONNECTOR PERMISSION BOUNDARY.
 
-The homepage and `/academy` rendered through the canonical public domain during direct review on August 7, 2026. The Academy page advertised 60 paid courses and presented course detail and purchase actions. That proves public rendering only. It does not prove the protected purchase, entitlement, lesson, progress, assessment, certificate, refund, dispute, recovery, or owner-review paths.
+Website CI run `70` completed successfully for source head `ea09c6eb95d92586a28d4ba555a112904db63cb6`. It passed dependency installation, unit and catalog contract tests, ESLint, and the production Next.js build. After that successful run, the owner-route regression test was strengthened to require verified-primary-email binding and crawler exclusion. Source head before this documentation update is `7b9a6820cd29bc6468e40b3a6963df3de4dbcdb1`; the exact final head must pass the same CI gate before promotion.
 
 ## Active website branches and pull requests
 
@@ -33,54 +34,58 @@ The homepage and `/academy` rendered through the canonical public domain during 
 - Pull request: `#44`
 - Reviewed head: `96f5a5a66a28c20ddbdc13b0f89c401089b876c6`
 - Purpose: complete the learner-facing experience across 60 courses, including final-assessment transition, lesson durations, guided course chapters, materials, knowledge checks, assessment, and certificate delivery.
-- Available Vercel bot evidence at that historical head reported ready preview deployments.
 
-This evidence establishes successful preview deployment at a historical head. It does not establish production promotion to the canonical domain or complete end-to-end learner verification.
+Historical preview success does not establish production promotion to the canonical domain or complete end-to-end learner verification.
 
 ### Sitewide governance, Academy Studio ingestion, and private owner review
 
 - Branch: `agent/sitewide-governance-auto-academy`
 - Pull request: `#46`
-- Source head before this status update: `76faeeca3c510faf1efe0e6bc4c95e7740a3ad71`
+- Source head before this status update: `7b9a6820cd29bc6468e40b3a6963df3de4dbcdb1`
 - Purpose: shared control-alignment registry, Trust Center alignment, governed Academy Studio ingestion, additive approved-course synchronization, fail-closed catalog behavior, owner-review pull-request automation, and the private owner Academy review site.
 
-The branch now contains these private routes:
+The branch contains these private routes:
 
 - `/command-center`
 - `/command-center/academy`
 - `/command-center/academy/[courseId]`
 - `/command-center/academy/[courseId]/certificate`
 
-The old `/academy/admin/review` URLs redirect into the private Command Center. The private course viewer displays complete lesson instruction, guided chapters, transcripts, source grounding, guided practice, decision rubrics, failure modes, business application, materials, lesson knowledge-check answers, and the complete 25-question final-assessment answer key. The owner viewer does not call learner progress, learner assessment, checkout, or certificate-issuance APIs.
+The old `/academy/admin/review` URLs redirect into the private Command Center. The private course viewer displays complete lesson instruction, guided chapters, transcripts, source grounding, guided practice, decision rubrics, failure modes, business application, materials, lesson knowledge-check answers, and the complete 25-question final-assessment answer key. The owner viewer does not call learner progress, learner assessment, checkout, entitlement, or certificate-issuance APIs.
 
-The branch remains draft and must not be represented as deployed to production until current-head CI, deployment, identity, owner-denial, and direct runtime tests pass.
+The pull request remains draft and must not be represented as deployed to production until final exact-head CI, authoritative-project deployment, identity, owner-denial, and direct runtime tests pass.
 
 ## Private owner identity boundary
 
-The private Command Center uses two separate server-side controls:
+The private Command Center uses separate server-side controls:
 
 1. Middleware protects every `/command-center` route with Clerk authentication.
-2. `requireOwnerAccess` requires the signed-in account to match the singular `OBSERRA_OWNER_EMAIL` value. When `OBSERRA_OWNER_USER_ID` is configured, the same request must also match that immutable Clerk user identifier.
+2. `requireOwnerAccess` requires the signed-in account to match the singular `OBSERRA_OWNER_EMAIL` value as its verified primary Clerk email address.
+3. When `OBSERRA_OWNER_USER_ID` is configured, the same request must also match that immutable Clerk user identifier.
 
-There is no Vercel-preview authorization bypass in the owner authorization helper. Missing owner configuration, an anonymous request, a non-owner identity, or a mismatched user ID fails closed. Production MFA still depends on the approved Clerk production configuration and remains a direct verification gate; repository source does not prove that MFA is enabled or effective.
+There is no Vercel-preview authorization bypass in the owner authorization helper. Missing owner configuration, an anonymous request, an unverified or non-primary matching address, a non-owner identity, or a mismatched user ID fails closed. Production MFA still depends on the approved Clerk production configuration and remains a direct verification gate; repository source does not prove that MFA is enabled or effective.
 
-Every Command Center response is designed to be private and non-indexable through route metadata and middleware headers, including `Cache-Control: private, no-store`, `X-Robots-Tag`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, and `X-Content-Type-Options: nosniff`.
+Every Command Center response is designed to be private and non-indexable through route metadata, `robots.txt`, and middleware headers, including `Cache-Control: private, no-store`, `X-Robots-Tag`, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, and `X-Content-Type-Options: nosniff`. The route is absent from the sitemap. Robots directives supplement but do not replace authentication and authorization.
 
-## Vercel source-of-truth inconsistency
+## Deployment evidence and unresolved authoritative-project issue
 
-The repository and historical pull-request evidence reference multiple Vercel projects, including `obserra-website-live`, `obserra-integrated-services`, and `obserra-website-lcn2`. The owner has identified `obserra-website-live` as the intended project.
+For code head `ea09c6eb95d92586a28d4ba555a112904db63cb6`, GitHub Vercel status evidence reported:
 
-This remains an unresolved release-governance issue. Before production promotion, one project must be designated as the authoritative production project, one branch must be designated as the production source, and the canonical domain must be verified to resolve to the approved deployment. Duplicate or legacy Vercel projects must be classified as production, preview, standby, or retired. Their environment variables, domains, deployment protections, and Git integration must not drift.
+- `obserra-integrated-services`: Ready preview.
+- `obserra-website-lcn2`: Ready preview.
+- `obserra-website-live`: Canceled.
 
-GitHub evidence does not replace direct project, build-log, runtime-log, environment, domain, and rollback verification.
+The repository and historical pull-request evidence reference multiple Vercel projects. The owner has identified `obserra-website-live` as the intended project. Before production promotion, one project must be designated as the authoritative production project, one branch must be designated as the production source, and the canonical domain must be verified to resolve to the approved deployment. Duplicate or legacy Vercel projects must be classified as production, preview, standby, or retired. Their environment variables, domains, deployment protections, and Git integration must not drift.
+
+The connected Vercel API returns permission-denied or not-found responses for direct deployment inspection. GitHub deployment status and bot comments therefore provide deployment-state evidence, but they do not replace direct build-log, runtime-log, environment, domain, authentication, and rollback verification.
 
 ## Academy and course-publication state
 
-The public Academy catalog presents 60 course listings in the last direct review. Pull request `#44` contains the active website learner-experience implementation. The separate Academy Production Studio pull request `#16` reports that the protected 60-course AI-authored learner catalog did not complete because the OpenAI provider returned `credit_balance_exhausted` before all courses were generated and before LCMS loading.
+The public Academy catalog presented 60 course listings in the last direct review. Pull request `#44` contains the active website learner-experience implementation. The separate Academy Production Studio pull request `#16` reports that the protected 60-course AI-authored learner catalog did not complete because the OpenAI provider returned `credit_balance_exhausted` before all courses were generated and before LCMS loading.
 
 These records are not automatically contradictory because the website may contain a reviewed baseline learner implementation while Studio develops a richer governed protected catalog. They do create a mandatory reconciliation gate. Before production claims or publication changes, each public course must map to an exact protected learner package, entitlement rule, duration, assessment, passing score, certificate rule, source record, version, release status, and rollback artifact. The website must fail closed to an approved baseline when Studio content is missing, malformed, draft, or unapproved.
 
-The new owner Command Center review route is a review surface over the current website course runtime. It does not prove that the protected Studio-authored LCMS package for every course is complete or loaded.
+The owner Command Center review route is a review surface over the current website course runtime. It does not prove that the protected Studio-authored LCMS package for every course is complete or loaded.
 
 ## Commerce and fulfillment state
 
@@ -96,7 +101,7 @@ The implemented website-side boundary is:
 Owner browser
   -> https://www.obserrallc.com/command-center
      -> Clerk authenticated route
-        -> singular owner email allowlist
+        -> singular verified primary owner email
            -> optional immutable Clerk owner user ID
               -> read-only Academy content review
 ```
@@ -115,25 +120,35 @@ Owner browser
 
 The current website change implements the private Academy review module only. It does not yet connect the website route to the protected EIOS backend, device registry, service registry, or dedicated EIOS database. The public website must not receive database credentials, JWT signing keys, connector secrets, raw evidence, private EIOS source, internal schemas, or customer data.
 
-## Verification completed in source
+## Verification evidence
 
-The source change includes deterministic regression assertions that verify:
+Website CI run `70` on `ea09c6eb95d92586a28d4ba555a112904db63cb6` passed:
+
+- dependency installation;
+- all Node unit and catalog contract tests;
+- the owner Command Center regression suite;
+- ESLint; and
+- the production Next.js build.
+
+The strengthened final regression contract verifies:
 
 - `/command-center` is a protected middleware route;
-- the owner helper requires the singular owner email and supports optional immutable user-ID binding;
+- the owner helper requires the singular owner email as a verified primary address;
+- optional immutable owner-user-ID binding is preserved;
 - the owner helper has no Vercel environment bypass;
 - Command Center responses are no-store and non-indexable;
+- robots explicitly exclude `/command-center`;
 - owner course routes use the server owner authorization helper;
 - owner course review includes lesson and final-assessment answer-key surfaces;
 - owner review source contains no learner progress, assessment, or checkout API call;
 - legacy Academy owner URLs redirect into the Command Center; and
 - all required owner Command Center files are present.
 
-These tests are source-level gates. Current-head CI and production deployment verification remain pending until the associated workflow and deployment evidence complete successfully.
+The exact final documentation head must pass CI again. Source and preview validation do not establish canonical-domain owner access or denied non-owner behavior.
 
 ## Rollback state
 
-The owner Command Center change is isolated by route and can be rolled back by restoring the prior proxy, restoring the three legacy Academy review route files, and removing the new `/command-center` route tree, `lib/owner-access.ts`, and the owner Command Center regression test. Rollback must preserve the public Academy and learner routes. No database migration or learner-data conversion is introduced by this change.
+The owner Command Center change is isolated by route and can be rolled back by restoring the prior proxy and robots configuration, restoring the three legacy Academy review route files, and removing the new `/command-center` route tree, `lib/owner-access.ts`, and the owner Command Center regression test. Rollback preserves the public Academy and learner routes. No database migration or learner-data conversion is introduced by this change.
 
 ## Production acceptance gates
 
