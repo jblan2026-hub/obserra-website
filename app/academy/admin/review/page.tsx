@@ -1,38 +1,20 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { courses } from "../../courseData";
-import { ownerEmailAllowed } from "../../../../lib/academy";
+import { requireAcademyOwnerReview } from "../../../../lib/academy-owner-review";
 
 export const dynamic = "force-dynamic";
 
-async function authorizeOwnerReview() {
-  if (process.env.VERCEL_ENV === "preview") {
-    return { mode: "Vercel protected owner preview" } as const;
-  }
-
-  const { userId } = await auth();
-  if (!userId) {
-    redirect(`/sign-in?redirect_url=${encodeURIComponent("/academy/admin/review")}`);
-  }
-
-  const client = await clerkClient();
-  const user = await client.users.getUser(userId);
-  const emails = user.emailAddresses.map((item) => item.emailAddress);
-  if (!ownerEmailAllowed(emails)) {
-    redirect("/academy?admin=unauthorized");
-  }
-
-  return { mode: "Authenticated owner account" } as const;
-}
-
 export default async function AcademyOwnerReviewPage() {
-  const access = await authorizeOwnerReview();
+  const access = await requireAcademyOwnerReview("/academy/admin/review");
 
   const counts = courses.reduce<Record<string, number>>((result, course) => {
     result[course.level] = (result[course.level] ?? 0) + 1;
     return result;
   }, {});
+
+  const accessLabel = access.mode === "authenticated-owner"
+    ? `Authenticated owner${access.email ? ` · ${access.email}` : ""}`
+    : "Vercel protected owner preview";
 
   return (
     <main style={{ minHeight: "100vh", background: "#04111d", color: "#eef8ff", padding: "32px" }}>
@@ -44,7 +26,7 @@ export default async function AcademyOwnerReviewPage() {
             <p style={{ maxWidth: 900, color: "#bcd8e8", lineHeight: 1.7, margin: 0 }}>
               This owner workspace is isolated from customer records. The protected preview lets you inspect every lesson, the full final assessment, the sales page, and a certificate sample without creating a purchase, learner progress record, or issued certificate.
             </p>
-            <p style={{ color: "#8fcde7", fontSize: 12, marginTop: 10 }}>Access mode: {access.mode}</p>
+            <p style={{ color: "#8fcde7", fontSize: 12, marginTop: 10 }}>Access mode: {accessLabel}</p>
           </div>
           <Link href="/academy" style={{ color: "#92ddff", fontWeight: 800 }}>Return to Academy</Link>
         </header>
