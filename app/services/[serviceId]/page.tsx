@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { controlAlignmentForService, siteWideAlignmentNotice } from "../../../lib/controlAlignment";
 import { serviceCatalog, serviceMap } from "../serviceCatalog";
 import "../services.css";
 
@@ -39,6 +40,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const service = serviceMap[serviceId];
   if (!service) notFound();
 
+  const frameworkAlignment = controlAlignmentForService(service.id);
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -130,6 +132,23 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               <article key={item}>
                 <strong>{String(index + 1).padStart(2, "0")} · {item}</strong>
                 <p>Scoped to the organization’s operating context, stakeholders, risk criteria, evidence requirements, and commercial objectives.</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="service-detail-split" aria-labelledby="control-alignment-heading">
+          <div>
+            <p className="apps-eyebrow">CONTROL ALIGNMENT</p>
+            <h2 id="control-alignment-heading">Traceable alignment to NIST, ISO, SOC 2, and CISA control expectations.</h2>
+            <p>{siteWideAlignmentNotice}</p>
+          </div>
+          <div className="service-detail-cards">
+            {frameworkAlignment.map(({ framework, references }) => (
+              <article key={framework.id}>
+                <strong>{framework.name}</strong>
+                <p>{framework.scope}</p>
+                <p>{references.join(" · ")}</p>
               </article>
             ))}
           </div>
