@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import { academyCatalogParity } from "../../../academy/courseCatalog";
 import { courseForId } from "../../../../lib/academy";
 import {
   studioCertificateMetadata,
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
     const purchaserReference = identity.userId ?? `guest_${randomUUID()}`;
     const identityMode = identity.userId ? "authenticated" : "guest-email";
     const stripe = getStripe();
-    const studioCourse = studioCourseForId(course.id);
+    const studioCourse = academyCatalogParity.matched ? studioCourseForId(course.id) : null;
     const license = studioLicenseMetadata(course.id);
     const certificate = studioCertificateMetadata(course.id);
     const successUrl = new URL("/academy/success", requestUrl);
@@ -59,6 +60,7 @@ export async function GET(request: Request) {
       isComplianceEvidence: String(certificate.isComplianceEvidence),
       courseVersion: studioCourse?.version ?? "website-catalog",
       studioManaged: String(Boolean(studioCourse)),
+      catalogParityVerified: String(academyCatalogParity.matched),
     };
 
     const lineItem = studioCourse?.commerce.stripePriceId
@@ -66,11 +68,11 @@ export async function GET(request: Request) {
       : {
           quantity: 1,
           price_data: {
-            currency: (studioCourse?.commerce.currency ?? "USD").toLowerCase(),
-            unit_amount: Math.round((studioCourse?.commerce.price ?? course.price) * 100),
+            currency: "usd",
+            unit_amount: Math.round(course.price * 100),
             product_data: {
-              name: studioCourse?.title ?? course.title,
-              description: studioCourse?.description ?? course.description,
+              name: course.title,
+              description: course.description,
               metadata: {
                 obserraCourseId: course.id,
                 department: course.department,
@@ -99,6 +101,7 @@ export async function GET(request: Request) {
     const response = NextResponse.redirect(session.url, { status: 303 });
     response.headers.set("x-obserra-commerce-mode", identityMode);
     response.headers.set("x-obserra-claim-policy", CLAIM_POLICY);
+    response.headers.set("x-obserra-catalog-parity", academyCatalogParity.matched ? "verified" : "live-contract-fallback");
     response.headers.set("x-obserra-webhook-verification", "required");
     response.headers.set("cache-control", "private, no-store, max-age=0");
     return response;
