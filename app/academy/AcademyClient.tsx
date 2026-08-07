@@ -15,7 +15,7 @@ const departmentLabels: Record<Department | "All", string> = {
   Technologies: "AI and Technology",
 };
 const collections = [
-  { key: "All", label: "All levels", matcher: (_level: CourseLevel) => true },
+  { key: "All", label: "All levels", matcher: () => true },
   { key: "Starter", label: "Starter", matcher: (level: CourseLevel) => level === "Foundation" },
   { key: "Career", label: "Career growth", matcher: (level: CourseLevel) => level === "Professional" || level === "Advanced" },
   { key: "Executive", label: "Executive", matcher: (level: CourseLevel) => level === "Executive Intensive" || level === "CISO Masterclass" },
@@ -50,8 +50,6 @@ export default function AcademyClient() {
     return () => window.clearInterval(timer);
   }, [flagshipCourses.length]);
 
-  useEffect(() => setVisibleCount(12), [department, collection, query, sort]);
-
   const filteredCourses = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     const result = courses.filter((course) => department === "All" || course.department === department)
@@ -66,9 +64,37 @@ export default function AcademyClient() {
       const bFeatured = featuredIds.includes(b.id as typeof featuredIds[number]) ? 1 : 0;
       return bFeatured - aFeatured || a.price - b.price || a.title.localeCompare(b.title);
     });
-  }, [collection, department, query, selectedCollection, sort]);
+  }, [department, query, selectedCollection, sort]);
 
   const visibleCourses = filteredCourses.slice(0, visibleCount);
+
+  function selectDepartment(value: Department | "All") {
+    setDepartment(value);
+    setVisibleCount(12);
+  }
+
+  function selectCollection(value: Collection) {
+    setCollection(value);
+    setVisibleCount(12);
+  }
+
+  function updateQuery(value: string) {
+    setQuery(value);
+    setVisibleCount(12);
+  }
+
+  function updateSort(value: SortMode) {
+    setSort(value);
+    setVisibleCount(12);
+  }
+
+  function resetCatalog() {
+    setQuery("");
+    setDepartment("All");
+    setCollection("All");
+    setSort("recommended");
+    setVisibleCount(12);
+  }
 
   return (
     <main>
@@ -100,15 +126,15 @@ export default function AcademyClient() {
         <div className="catalog-heading"><div><p className="kicker">COURSE CATALOG</p><h2>Choose from the 60 courses published by Obserra Academy.</h2></div><p>{courses.length} paid courses with the published course descriptions, stated training hours, five lesson learning paths, applied practice, final assessments, certificates, and course aware AI tutoring after access is granted.</p></div>
 
         <div className="academy-commerce-controls">
-          <label className="academy-search"><span>Search courses</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search AI governance, CISO, incident response..." type="search" /></label>
-          <label className="academy-sort"><span>Sort</span><select value={sort} onChange={(event) => setSort(event.target.value as SortMode)}><option value="recommended">Recommended</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="title">Title</option></select></label>
+          <label className="academy-search"><span>Search courses</span><input value={query} onChange={(event) => updateQuery(event.target.value)} placeholder="Search AI governance, CISO, incident response..." type="search" /></label>
+          <label className="academy-sort"><span>Sort</span><select value={sort} onChange={(event) => updateSort(event.target.value as SortMode)}><option value="recommended">Recommended</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="title">Title</option></select></label>
         </div>
 
-        <nav className="academy-category-rail" aria-label="Browse Academy categories">{departments.map((item) => <button key={item} className={department === item ? "active" : ""} onClick={() => setDepartment(item)}><span>{departmentLabels[item]}</span><b>{item === "All" ? courses.length : courses.filter((course) => course.department === item).length}</b></button>)}</nav>
-        <div className="academy-collection-rail" aria-label="Browse course levels">{collections.map((item) => <button key={item.key} className={collection === item.key ? "active" : ""} onClick={() => setCollection(item.key)}><span>{item.label}</span><b>{courses.filter((course) => item.matcher(course.level)).length}</b></button>)}</div>
+        <nav className="academy-category-rail" aria-label="Browse Academy categories">{departments.map((item) => <button key={item} className={department === item ? "active" : ""} onClick={() => selectDepartment(item)}><span>{departmentLabels[item]}</span><b>{item === "All" ? courses.length : courses.filter((course) => course.department === item).length}</b></button>)}</nav>
+        <div className="academy-collection-rail" aria-label="Browse course levels">{collections.map((item) => <button key={item.key} className={collection === item.key ? "active" : ""} onClick={() => selectCollection(item.key)}><span>{item.label}</span><b>{courses.filter((course) => item.matcher(course.level)).length}</b></button>)}</div>
         <div className="catalog-results"><p className="kicker">{departmentLabels[department]} · {selectedCollection.label}</p><strong>{filteredCourses.length} course{filteredCourses.length === 1 ? "" : "s"} found</strong></div>
 
-        {visibleCourses.length ? <div className="course-grid">{visibleCourses.map((course) => <article key={course.id} className="course-card"><span>{course.department}: {course.track}</span><h3>{course.title}</h3><p>{course.description}</p><div className="course-retail-meta"><i>{levelTag(course.level)}</i><i>{course.level}</i><i>AI native</i></div><div className="course-highlights">{course.outcomes.slice(0, 2).map((item) => <span key={item}>{item}</span>)}</div><footer><b>{money.format(course.price)}</b><em>· {course.duration}</em></footer><div className="course-card-actions"><a href={`/academy/${course.id}`}>View details</a><a href={`/api/academy/checkout?course=${course.id}`} onClick={() => track("academy_checkout_started", { course: course.id, source: "catalog" })}>Enroll securely</a></div></article>)}</div> : <div className="academy-empty-state"><h3>No courses match those filters.</h3><p>Clear the search or select a broader category.</p><button type="button" onClick={() => { setQuery(""); setDepartment("All"); setCollection("All"); }}>Reset catalog</button></div>}
+        {visibleCourses.length ? <div className="course-grid">{visibleCourses.map((course) => <article key={course.id} className="course-card"><span>{course.department}: {course.track}</span><h3>{course.title}</h3><p>{course.description}</p><div className="course-retail-meta"><i>{levelTag(course.level)}</i><i>{course.level}</i><i>AI native</i></div><div className="course-highlights">{course.outcomes.slice(0, 2).map((item) => <span key={item}>{item}</span>)}</div><footer><b>{money.format(course.price)}</b><em>· {course.duration}</em></footer><div className="course-card-actions"><a href={`/academy/${course.id}`}>View details</a><a href={`/api/academy/checkout?course=${course.id}`} onClick={() => track("academy_checkout_started", { course: course.id, source: "catalog" })}>Enroll securely</a></div></article>)}</div> : <div className="academy-empty-state"><h3>No courses match those filters.</h3><p>Clear the search or select a broader category.</p><button type="button" onClick={resetCatalog}>Reset catalog</button></div>}
 
         {visibleCount < filteredCourses.length && <div className="academy-load-more"><button type="button" onClick={() => setVisibleCount((count) => count + 12)}>Show 12 more courses</button><span>{visibleCourses.length} of {filteredCourses.length} shown</span></div>}
       </section>
