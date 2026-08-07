@@ -5,7 +5,13 @@ const CANONICAL_HOST = "www.obserrallc.com";
 const PROJECT_VERCEL_HOST = "obserra-website-live.vercel.app";
 const PREVIEW_NOINDEX = "noindex, nofollow, noarchive, nosnippet";
 
-const isProtected = createRouteMatcher(["/admin(.*)", "/portal(.*)"]);
+const isProtected = createRouteMatcher([
+  "/admin(.*)",
+  "/portal(.*)",
+  "/academy/admin(.*)",
+  "/academy/learn(.*)",
+  "/academy/certificate(.*)",
+]);
 
 type ClerkEnvironment = "test" | "live";
 
@@ -37,13 +43,11 @@ function clerkSecretEnvironment(value: string | undefined): ClerkEnvironment | n
   return match ? (match[1] as ClerkEnvironment) : null;
 }
 
-const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-const clerkSecretKey = process.env.CLERK_SECRET_KEY;
-const publishableEnvironment = clerkPublishableEnvironment(clerkPublishableKey);
-const secretEnvironment = clerkSecretEnvironment(clerkSecretKey);
-const authenticationReady = Boolean(
-  publishableEnvironment && secretEnvironment && publishableEnvironment === secretEnvironment,
-);
+function authenticationReady() {
+  const publishableEnvironment = clerkPublishableEnvironment(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const secretEnvironment = clerkSecretEnvironment(process.env.CLERK_SECRET_KEY);
+  return Boolean(publishableEnvironment && secretEnvironment && publishableEnvironment === secretEnvironment);
+}
 
 function withPreviewNoIndex(response: NextResponse, request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase().split(":")[0];
@@ -67,29 +71,26 @@ function canonicalRedirect(request: NextRequest) {
   return NextResponse.redirect(url, 308);
 }
 
-function configurationGate(request: NextRequest) {
+export default clerkMiddleware(async (auth, request) => {
   const canonical = canonicalRedirect(request);
   if (canonical) return canonical;
-  const url = new URL(request.url);
-  const requiresAuthentication =
-    isProtected(request) || url.pathname.startsWith("/sign-in") || url.pathname.startsWith("/sign-up");
-  if (requiresAuthentication) {
-    const academyUrl = new URL("/academy?enrollment=not-ready", url);
-    return withPreviewNoIndex(NextResponse.redirect(academyUrl), request);
-  }
-  const response = withPreviewNoIndex(NextResponse.next(), request);
-  response.headers.set("X-Obserra-Identity-Status", "configuration-required");
-  return response;
-}
 
-export default authenticationReady
-  ? clerkMiddleware(async (auth, request) => {
-      const canonical = canonicalRedirect(request);
-      if (canonical) return canonical;
-      if (isProtected(request)) await auth.protect();
-      return withPreviewNoIndex(NextResponse.next(), request);
-    })
-  : configurationGate;
+  if (!authenticationReady()) {
+    const url = new URL(request.url);
+    const requiresAuthentication =
+      isProtected(request) || url.pathname.startsWith("/sign-in") || url.pathname.startsWith("/sign-up");
+    if (requiresAuthentication) {
+      const academyUrl = new URL("/academy?identity=configuration-required", url);
+      return withPreviewNoIndex(NextResponse.redirect(academyUrl), request);
+    }
+    const response = withPreviewNoIndex(NextResponse.next(), request);
+    response.headers.set("X-Obserra-Identity-Status", "configuration-required");
+    return response;
+  }
+
+  if (isProtected(request)) await auth.protect();
+  return withPreviewNoIndex(NextResponse.next(), request);
+});
 
 export const config = {
   matcher: [
