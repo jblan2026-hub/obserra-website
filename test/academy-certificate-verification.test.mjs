@@ -24,7 +24,7 @@ test("certificate verification bounds per client and per instance request volume
   assert.match(route, /INSTANCE_REQUEST_LIMIT = 120/);
   assert.match(route, /clientBucket\.requests >= CLIENT_REQUEST_LIMIT/);
   assert.match(route, /state\.instance\.requests >= INSTANCE_REQUEST_LIMIT/);
-  assert.match(route, /status: 429|guardedResponse\([^\n]+429/);
+  assert.match(route, /guardedResponse\([^\n]+429/);
   assert.match(route, /retry-after/);
 });
 
@@ -39,6 +39,17 @@ test("certificate verification fails closed when the backing identity service is
   assert.match(route, /Certificate verification is temporarily unavailable/);
   assert.match(route, /guardedResponse\([^\n]+503/);
   assert.match(route, /private, no-store, max-age=0/);
+});
+
+test("public certificate verification minimizes learner data", () => {
+  const publicPayloadStart = route.indexOf("const publicCertificate = {");
+  const publicPayloadEnd = route.indexOf("};", publicPayloadStart);
+  assert.ok(publicPayloadStart >= 0 && publicPayloadEnd > publicPayloadStart);
+  const publicPayload = route.slice(publicPayloadStart, publicPayloadEnd);
+  assert.match(publicPayload, /learnerName/);
+  assert.match(publicPayload, /courseTitle/);
+  assert.match(publicPayload, /completedAt/);
+  assert.doesNotMatch(publicPayload, /assessmentScore/);
 });
 
 test("legacy certificate lookup retains an explicit bounded user scan", () => {
