@@ -16,6 +16,7 @@ type PageContext = {
 const excludedPaths = [
   "/admin",
   "/api",
+  "/command-center",
   "/sign-in",
   "/sign-up",
   "/academy/learn",
@@ -185,7 +186,10 @@ export default function ObserraGuide() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messagesByPath, setMessagesByPath] = useState<Record<string, Message[]>>({});
-  const messages = messagesByPath[pathname] ?? [{ from: "guide", text: context.welcome } satisfies Message];
+  const messages = useMemo(
+    () => messagesByPath[pathname] ?? [{ from: "guide", text: context.welcome } satisfies Message],
+    [context.welcome, messagesByPath, pathname],
+  );
   const messagesRef = useRef<HTMLDivElement | null>(null);
   const excluded = excludedPaths.some((path) => pathname.startsWith(path));
 
@@ -204,10 +208,6 @@ export default function ObserraGuide() {
   }, [messages, open]);
 
   if (excluded) return null;
-
-  function currentMessages() {
-    return messagesByPath[pathname] ?? [{ from: "guide", text: context.welcome } satisfies Message];
-  }
 
   function appendExchange(question: string) {
     setMessagesByPath((byPath) => ({
@@ -237,8 +237,6 @@ export default function ObserraGuide() {
     setOpen(false);
     window.sessionStorage.setItem("obserrian-auto-open-dismissed", "1");
   }
-
-  void currentMessages;
 
   return (
     <aside className={styles.guide} aria-label="Obserrian Executive Intelligence Advisor">
