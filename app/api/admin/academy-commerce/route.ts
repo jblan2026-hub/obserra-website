@@ -1,25 +1,29 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { courses } from "../../../academy/courseData";
-import { ownerEmailAllowed } from "../../../../lib/academy";
+import { requireOwnerApi } from "../../../../lib/owner-auth";
 import { paymentLinksByCourse, provisionCoursePaymentLink } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+const responseHeaders = {
+  "cache-control": "private, no-store, max-age=0",
+  "referrer-policy": "no-referrer",
+  "x-content-type-options": "nosniff",
+  "x-robots-tag": "noindex, nofollow, noarchive",
+};
+
 export async function POST() {
-  let approved = false;
-  try {
-    const { userId } = await auth();
-    const user = userId ? await currentUser() : null;
-    approved = ownerEmailAllowed(user?.emailAddresses.map((entry) => entry.emailAddress) ?? []);
-  } catch {
-    approved = false;
-  }
-  if (!approved) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const owner = await requireOwnerApi();
+  if (!owner) return NextResponse.json({ error: "Not found" }, { status: 404, headers: responseHeaders });
+
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
-    return NextResponse.json({ error: "Stripe production configuration is incomplete." }, { status: 503 });
+    return NextResponse.json(
+      { error: "Stripe production configuration is incomplete." },
+      { status: 503, headers: responseHeaders },
+    );
   }
+
   try {
     const existingByCourse = await paymentLinksByCourse();
     const results: boolean[] = [];
@@ -32,8 +36,14 @@ export async function POST() {
       results.push(...batchResults);
     }
     const created = results.filter(Boolean).length;
-    return NextResponse.json({ created, alreadyConfigured: results.length - created, total: results.length });
+    return NextResponse.json(
+      { created, alreadyConfigured: results.length - created, total: results.length },
+      { headers: responseHeaders },
+    );
   } catch {
-    return NextResponse.json({ error: "Commerce provisioning did not complete. No payment details were exposed." }, { status: 502 });
+    return NextResponse.json(
+      { error: "Commerce provisioning did not complete. No payment details were exposed." },
+      { status: 502, headers: responseHeaders },
+    );
   }
 }
