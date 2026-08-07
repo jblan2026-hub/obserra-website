@@ -80,20 +80,28 @@ export async function POST(request: Request) {
   const instructionContext = lesson.instruction
     .map((section) => `${section.heading}: ${section.body}\nApplication: ${section.application}`)
     .join("\n\n");
+  const practiceContext = lesson.guidedPractice
+    .map((step) => `${step.title}: ${step.instruction}\nEvidence to produce: ${step.evidence}`)
+    .join("\n\n");
+  const rubricContext = lesson.decisionRubric
+    .map((row) => `${row.criterion}\nStrong practice: ${row.strong}\nWeak practice: ${row.weak}`)
+    .join("\n\n");
 
   const developerInstruction = `You are the Obserrian Academy Tutor for a paid Obserra Academy learner.
 
-Your scope is the learner's current purchased course and current lesson. Teach the learner. Do not act as an independent legal, regulatory, safety, medical, or employment authority. Distinguish law, regulation, standards, recognized guidance, organizational policy, and professional practice. Never invent a requirement, citation, case, or source. If the supplied material does not establish a claim, say that the course context does not establish it.
+Your scope is the learner's current purchased course and current lesson. Teach the learner at a professional level. Do not act as an independent legal, regulatory, safety, medical, employment, licensing, or certification authority. Distinguish law, regulation, standards, recognized guidance, organizational policy, and professional practice. Never invent a requirement, citation, case, or source. If the supplied material does not establish a claim, say that the course context does not establish it.
 
-Do not provide answers to the course's graded final assessment or help bypass assessment integrity. You may explain concepts, create ungraded practice questions, walk through realistic scenarios, explain why an approach is stronger or weaker, build study plans, translate concepts into business use, and help the learner prepare for professional application.
+Do not provide answers to the course's graded final assessment or help bypass assessment integrity. You may explain concepts, create ungraded practice questions, walk through realistic scenarios, challenge a learner's reasoning, provide feedback against the supplied professional decision rubric, build study plans, translate concepts into business use, and help the learner prepare professional work products.
 
-Always structure the answer around: the concept, why it matters, authoritative grounding, a practical example, how to apply it in an organization, and one check for understanding when appropriate.
+Do not treat fluent output as verified evidence. When the learner asks about a current law, regulation, standard, product, threat, or event that is not established in the supplied lesson context, explain that current verification is required rather than fabricating an answer.
+
+Use the course material below as the primary instructional grounding. Structure substantive answers around the concept, why it matters, authoritative grounding, practical application, decision quality, and a check for understanding when appropriate. Keep advice within the learner's legitimate role and authority.
 
 COURSE
 Title: ${course.title}
 Published description: ${course.description}
 Audience: ${course.audience}
-Duration: ${course.duration}
+Published duration: ${course.duration}
 Learning outcomes: ${course.outcomes.join(" | ")}
 
 CURRENT LESSON
@@ -101,14 +109,23 @@ Title: ${lesson.title}
 Format: ${lesson.format}
 Published lesson focus: ${lesson.focus}
 Why it matters: ${lesson.whyItMatters}
+Mastery objectives: ${lesson.objectives.join(" | ")}
 Scenario: ${lesson.scenario}
 Business application: ${lesson.businessApplication.join(" | ")}
+Mastery criteria: ${lesson.masteryCriteria.join(" | ")}
+Reflection prompts: ${lesson.reflectionPrompts.join(" | ")}
 
 AUTHORITATIVE REFERENCES
 ${authorityContext}
 
 COURSE INSTRUCTION
 ${instructionContext}
+
+GUIDED PROFESSIONAL PRACTICE
+${practiceContext}
+
+DECISION QUALITY RUBRIC
+${rubricContext}
 
 DOCUMENTED PRACTICE EXAMPLE
 ${lesson.practiceExample.organization}: ${lesson.practiceExample.summary}
@@ -123,12 +140,13 @@ Source: ${lesson.practiceExample.url}`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: process.env.OBSERRA_ACADEMY_AI_MODEL?.trim() || "gpt-5.6-terra",
+        model: process.env.OBSERRA_ACADEMY_AI_MODEL?.trim() || "gpt-5.1",
         input: [
           { role: "developer", content: [{ type: "input_text", text: developerInstruction }] },
           { role: "user", content: [{ type: "input_text", text: question }] },
         ],
-        max_output_tokens: 1200,
+        max_output_tokens: 1400,
+        store: false,
       }),
       signal: AbortSignal.timeout(25_000),
     });
