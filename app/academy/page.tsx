@@ -29,14 +29,15 @@ export const metadata: Metadata = {
 
 export default async function AcademyPage() {
   const runtime = await publicAcademyCatalog(sourceCourses);
+  const publicCourses = runtime.controlPlane === "operational" ? runtime.courses : [];
   const catalogSchema = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "ItemList",
         name: "Obserra Academy professional course catalog",
-        numberOfItems: runtime.courses.length,
-        itemListElement: runtime.courses.map((course, index) => ({
+        numberOfItems: publicCourses.length,
+        itemListElement: publicCourses.map((course, index) => ({
           "@type": "ListItem",
           position: index + 1,
           item: {
@@ -70,7 +71,7 @@ export default async function AcademyPage() {
 
   return (
     <>
-      <AcademyControlledClient courses={runtime.courses} controlPlane={runtime.controlPlane} />
+      <AcademyControlledClient courses={publicCourses} controlPlane={runtime.controlPlane} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(catalogSchema) }}
