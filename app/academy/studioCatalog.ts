@@ -19,20 +19,49 @@ type StudioCourse = {
   audience?: string;
   description?: string;
   duration?: string;
+  prerequisites?: unknown;
   outcomes?: unknown;
   modules?: unknown;
+  tags?: unknown;
   commerce?: {
+    model?: string;
     price?: number;
     currency?: string;
+    paymentLink?: string | null;
+    stripePriceId?: string | null;
   };
+  licensing?: unknown;
+  completion?: unknown;
+  certificate?: unknown;
+  branding?: unknown;
+  disclaimer?: unknown;
+  acknowledgementRequired?: boolean;
+  version?: string;
   releaseStatus?: string;
 };
 
 type StudioCatalog = {
   schemaVersion?: string;
+  generatedAt?: string | null;
+  publisher?: string;
   courses?: unknown;
 };
 
+export type StudioCoursePublicationMetadata = {
+  prerequisites: string[];
+  tags: unknown;
+  commerce: StudioCourse["commerce"];
+  licensing: unknown;
+  completion: unknown;
+  certificate: unknown;
+  branding: unknown;
+  disclaimer: unknown;
+  acknowledgementRequired: boolean;
+  version: string | null;
+  releaseStatus: "approved" | "published";
+};
+
+const supportedSchemaVersions = new Set(["1.2", "1.3", "1.4"]);
 const allowedDepartments = new Set<Department>(["Cyber", "Protection", "Intelligence", "Technologies"]);
 const allowedLevels = new Set<CourseLevel>(["Foundation", "Professional", "Advanced", "Executive Intensive", "CISO Masterclass"]);
 
@@ -68,44 +97,66 @@ function toModules(value: unknown): Course["modules"] {
   });
 }
 
-function toCourse(candidate: unknown): Course | null {
-  const course = candidate as StudioCourse;
-  const department = toDepartment(course.department);
-  const level = toLevel(course.level);
-  const modules = toModules(course.modules);
-  const outcomes = toStringArray(course.outcomes);
+function releaseStatus(value: unknown): "approved" | "published" | null {
+  return value === "approved" || value === "published" ? value : null;
+}
+
+function toCourse(candidate: unknown): { course: Course; publication: StudioCoursePublicationMetadata } | null {
+  const source = candidate as StudioCourse;
+  const department = toDepartment(source.department);
+  const level = toLevel(source.level);
+  const modules = toModules(source.modules);
+  const outcomes = toStringArray(source.outcomes);
+  const status = releaseStatus(source.releaseStatus);
 
   if (
-    !isNonEmptyString(course.id) ||
-    !isNonEmptyString(course.title) ||
+    !isNonEmptyString(source.id) ||
+    !isNonEmptyString(source.title) ||
     !department ||
     !level ||
-    !isNonEmptyString(course.track) ||
-    !isNonEmptyString(course.audience) ||
-    !isNonEmptyString(course.description) ||
-    !isNonEmptyString(course.duration) ||
-    !Number.isFinite(course.commerce?.price) ||
-    (course.commerce?.price ?? 0) <= 0 ||
-    course.commerce?.currency !== "USD" ||
-    !["approved", "published"].includes(course.releaseStatus ?? "") ||
+    !isNonEmptyString(source.track) ||
+    !isNonEmptyString(source.audience) ||
+    !isNonEmptyString(source.description) ||
+    !isNonEmptyString(source.duration) ||
+    !Number.isFinite(source.commerce?.price) ||
+    (source.commerce?.price ?? 0) <= 0 ||
+    source.commerce?.currency !== "USD" ||
+    !status ||
     outcomes.length === 0 ||
     modules.length === 0
   ) {
     return null;
   }
 
-  return {
-    id: course.id.trim(),
-    title: course.title.trim(),
+  const course: Course = {
+    id: source.id.trim(),
+    title: source.title.trim(),
     department,
     level,
-    track: course.track.trim(),
-    audience: course.audience.trim(),
-    description: course.description.trim(),
-    duration: course.duration.trim(),
-    price: course.commerce!.price!,
+    track: source.track.trim(),
+    audience: source.audience.trim(),
+    description: source.description.trim(),
+    duration: source.duration.trim(),
+    price: source.commerce!.price!,
     outcomes,
     modules,
+  };
+
+  return {
+    course,
+    publication: {
+      prerequisites: toStringArray(source.prerequisites),
+      tags: source.tags ?? null,
+      commerce: source.commerce,
+      licensing: source.licensing ?? null,
+      completion: source.completion ?? null,
+      certificate: source.certificate ?? null,
+      branding: source.branding ?? null,
+      disclaimer: source.disclaimer ?? null,
+      acknowledgementRequired: source.acknowledgementRequired === true,
+      version: isNonEmptyString(source.version) ? source.version.trim() : null,
+      releaseStatus: status,
+    },
   };
 }
 
@@ -113,26 +164,40 @@ const catalog = studioCatalogJson as StudioCatalog;
 
 export const studioCatalogStatus = {
   schemaVersion: catalog.schemaVersion ?? "unknown",
+  generatedAt: catalog.generatedAt ?? null,
+  publisher: catalog.publisher ?? null,
+  supported: supportedSchemaVersions.has(catalog.schemaVersion ?? ""),
   sourceCourseCount: Array.isArray(catalog.courses) ? catalog.courses.length : 0,
   acceptedCourseCount: 0,
   rejectedCourseCount: 0,
-} as { schemaVersion: string; sourceCourseCount: number; acceptedCourseCount: number; rejectedCourseCount: number };
+} as {
+  schemaVersion: string;
+  generatedAt: string | null;
+  publisher: string | null;
+  supported: boolean;
+  sourceCourseCount: number;
+  acceptedCourseCount: number;
+  rejectedCourseCount: number;
+};
+
+export const studioCoursePublicationMetadataById = new Map<string, StudioCoursePublicationMetadata>();
 
 export const studioCourses: Course[] = (() => {
-  if (catalog.schemaVersion !== "1.2" || !Array.isArray(catalog.courses)) return [];
+  if (!supportedSchemaVersions.has(catalog.schemaVersion ?? "") || !Array.isArray(catalog.courses)) return [];
 
   const ids = new Set<string>();
   const accepted: Course[] = [];
   let rejected = 0;
 
   for (const candidate of catalog.courses) {
-    const course = toCourse(candidate);
-    if (!course || ids.has(course.id)) {
+    const parsed = toCourse(candidate);
+    if (!parsed || ids.has(parsed.course.id)) {
       rejected += 1;
       continue;
     }
-    ids.add(course.id);
-    accepted.push(course);
+    ids.add(parsed.course.id);
+    accepted.push(parsed.course);
+    studioCoursePublicationMetadataById.set(parsed.course.id, parsed.publication);
   }
 
   studioCatalogStatus.acceptedCourseCount = accepted.length;
