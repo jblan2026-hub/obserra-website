@@ -2,11 +2,13 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 
 const CANONICAL_HOST = "www.obserrallc.com";
-const PREVIEW_NOINDEX = "noindex, nofollow, noarchive, nosnippet";
+const PRIVATE_NOINDEX = "noindex, nofollow, noarchive, nosnippet";
 
 const isProtected = createRouteMatcher([
   "/admin(.*)",
   "/portal(.*)",
+  "/command-center(.*)",
+  "/api/command-center(.*)",
   "/academy/admin(.*)",
   "/academy/learn(.*)",
   "/academy/certificate(.*)",
@@ -55,9 +57,6 @@ function isLocalHost(host: string | undefined) {
 function canonicalRedirect(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase().split(":")[0];
   if (isLocalHost(host) || host === CANONICAL_HOST) return null;
-
-  // Every production request is canonicalized to the public www host.
-  // Preview deployments remain on their protected Vercel URL for owner review only.
   if (process.env.VERCEL_ENV !== "production") return null;
 
   const url = new URL(request.url);
@@ -66,25 +65,46 @@ function canonicalRedirect(request: NextRequest) {
   return NextResponse.redirect(url, 308);
 }
 
-function withPreviewNoIndex(response: NextResponse, request: NextRequest) {
+function isOwnerPath(pathname: string) {
+  return pathname.startsWith("/command-center") || pathname.startsWith("/api/command-center") || pathname.startsWith("/owner-access");
+}
+
+function withPrivateHeaders(response: NextResponse, request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase().split(":")[0];
   const isPreviewHost = Boolean(host && host.endsWith(".vercel.app"));
   if (process.env.VERCEL_ENV !== "production" && isPreviewHost) {
-    response.headers.set("X-Robots-Tag", PREVIEW_NOINDEX);
+    response.headers.set("X-Robots-Tag", PRIVATE_NOINDEX);
+  }
+  if (isOwnerPath(request.nextUrl.pathname)) {
+    response.headers.set("Cache-Control", "private, no-store, max-age=0");
+    response.headers.set("Referrer-Policy", "no-referrer");
+    response.headers.set("X-Content-Type-Options", "nosniff");
+    response.headers.set("X-Frame-Options", "DENY");
+    response.headers.set("X-Robots-Tag", PRIVATE_NOINDEX);
   }
   return response;
 }
 
 function identityConfigurationResponse(request: NextRequest) {
   const url = new URL(request.url);
-  const isPreview = process.env.VERCEL_ENV === "preview";
+  const ownerApi = url.pathname.startsWith("/api/command-center");
+  const ownerPage = url.pathname.startsWith("/command-center");
 
-  // Vercel deployment protection is the identity boundary for owner preview routes.
-  // This keeps owner review usable even when Clerk preview keys are intentionally absent.
-  if (isPreview && url.pathname.startsWith("/academy/admin/review")) {
-    const response = withPreviewNoIndex(NextResponse.next(), request);
-    response.headers.set("X-Obserra-Owner-Review", "vercel-protected-preview");
-    return response;
+  if (ownerApi) {
+    return withPrivateHeaders(
+      NextResponse.json(
+        { error: "Owner identity service is not configured", code: "OWNER_IDENTITY_CONFIGURATION_REQUIRED" },
+        { status: 503 },
+      ),
+      request,
+    );
+  }
+
+  if (ownerPage) {
+    const destination = new URL("/owner-access", url);
+    destination.searchParams.set("redirect_url", `${url.pathname}${url.search}`);
+    destination.searchParams.set("status", "identity-configuration-required");
+    return withPrivateHeaders(NextResponse.redirect(destination), request);
   }
 
   const requiresAuthentication =
@@ -92,10 +112,10 @@ function identityConfigurationResponse(request: NextRequest) {
 
   if (requiresAuthentication) {
     const destination = new URL("/academy?identity=configuration-required", url);
-    return withPreviewNoIndex(NextResponse.redirect(destination), request);
+    return withPrivateHeaders(NextResponse.redirect(destination), request);
   }
 
-  const response = withPreviewNoIndex(NextResponse.next(), request);
+  const response = withPrivateHeaders(NextResponse.next(), request);
   response.headers.set("X-Obserra-Identity-Status", "configuration-required");
   return response;
 }
@@ -110,7 +130,7 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
 
   const handler = clerkMiddleware(async (auth, clerkRequest) => {
     if (isProtected(clerkRequest)) await auth.protect();
-    return withPreviewNoIndex(NextResponse.next(), clerkRequest);
+    return withPrivateHeaders(NextResponse.next(), clerkRequest);
   });
 
   return handler(request, event);
