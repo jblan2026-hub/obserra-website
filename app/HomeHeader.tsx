@@ -33,20 +33,20 @@ export default function HomeHeader() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [open]);
 
+  function closeNavigation() {
+    setOpen(false);
+  }
+
   return (
     <header className="obs-site-header">
       <div className="obs-site-header__brand-row">
-        <Link className="obs-site-header__brand" href="/" aria-label="Obserra home">
+        <Link className="obs-site-header__brand" href="/" aria-label="Obserra home" onClick={closeNavigation}>
           <ObserraMark />
           <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt="Obserra Executive Protection and Intelligence LLC" />
         </Link>
@@ -56,10 +56,10 @@ export default function HomeHeader() {
       </div>
       <nav id="primary-navigation" className={`obs-site-header__nav${open ? " is-open" : ""}`} aria-label="Primary navigation">
         {navigation.map((item) => (
-          <Link key={item.href} href={item.href} aria-current={pathname === item.href || pathname.startsWith(`${item.href}/`) ? "page" : undefined}>{item.label}</Link>
+          <Link key={item.href} href={item.href} onClick={closeNavigation} aria-current={pathname === item.href || pathname.startsWith(`${item.href}/`) ? "page" : undefined}>{item.label}</Link>
         ))}
-        <Link href="/contact">Contact</Link>
-        <Link className="obs-site-header__cta" href="/contact?interest=enterprise-consultation">Get in touch <span aria-hidden="true">→</span></Link>
+        <Link href="/contact" onClick={closeNavigation}>Contact</Link>
+        <Link className="obs-site-header__cta" href="/contact?interest=enterprise-consultation" onClick={closeNavigation}>Get in touch <span aria-hidden="true">→</span></Link>
       </nav>
     </header>
   );

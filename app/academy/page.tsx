@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import AcademyClient from "./AcademyClient";
-import { courses } from "./courseData";
+import { courses } from "./courseCatalog";
 import "./academy-commercial.css";
 import "./academy-world-class.css";
 

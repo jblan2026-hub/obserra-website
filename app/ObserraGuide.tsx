@@ -184,13 +184,10 @@ export default function ObserraGuide() {
   const context = useMemo(() => pageContext(pathname), [pathname]);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messagesByPath, setMessagesByPath] = useState<Record<string, Message[]>>({});
+  const messages = messagesByPath[pathname] ?? [{ from: "guide", text: context.welcome } satisfies Message];
   const messagesRef = useRef<HTMLDivElement | null>(null);
   const excluded = excludedPaths.some((path) => pathname.startsWith(path));
-
-  useEffect(() => {
-    setMessages([{ from: "guide", text: context.welcome }]);
-  }, [context.welcome]);
 
   useEffect(() => {
     if (pathname !== "/" || excluded) return;
@@ -208,24 +205,31 @@ export default function ObserraGuide() {
 
   if (excluded) return null;
 
+  function currentMessages() {
+    return messagesByPath[pathname] ?? [{ from: "guide", text: context.welcome } satisfies Message];
+  }
+
+  function appendExchange(question: string) {
+    setMessagesByPath((byPath) => ({
+      ...byPath,
+      [pathname]: [
+        ...(byPath[pathname] ?? [{ from: "guide", text: context.welcome } satisfies Message]),
+        { from: "visitor", text: question },
+        response(question, pathname),
+      ],
+    }));
+  }
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const question = input.trim();
     if (!question) return;
-    setMessages((items) => [
-      ...items,
-      { from: "visitor", text: question },
-      response(question, pathname),
-    ]);
+    appendExchange(question);
     setInput("");
   }
 
   function quickAsk(question: string) {
-    setMessages((items) => [
-      ...items,
-      { from: "visitor", text: question },
-      response(question, pathname),
-    ]);
+    appendExchange(question);
     setOpen(true);
   }
 
@@ -233,6 +237,8 @@ export default function ObserraGuide() {
     setOpen(false);
     window.sessionStorage.setItem("obserrian-auto-open-dismissed", "1");
   }
+
+  void currentMessages;
 
   return (
     <aside className={styles.guide} aria-label="Obserrian Executive Intelligence Advisor">

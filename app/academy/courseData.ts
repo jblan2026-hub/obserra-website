@@ -104,7 +104,7 @@ const specs: CourseSpec[] = [
 ];
 
 function createModules(title: string, focus: string, level: CourseLevel): Course["modules"] {
-  const minutes = level === "Foundation" ? [24, 26, 28, 30, 42] : level === "Professional" ? [38, 44, 48, 54, 56] : level === "Advanced" ? [60, 72, 78, 84, 126] : level === "Executive Intensive" ? [84, 96, 102, 114, 144] : [108, 120, 132, 144, 156];
+  const minutes = level === "Foundation" ? [24, 26, 28, 30, 42] : level === "Professional" ? [38, 44, 48, 54, 86] : level === "Advanced" ? [60, 72, 78, 84, 126] : level === "Executive Intensive" ? [84, 96, 102, 114, 144] : [108, 120, 132, 144, 156];
   const phases = ["Decision context", "Evidence and risk", "Control and authority", "Scenario practice", "Action and improvement"];
   return phases.map((phase, index) => ({
     title: `${phase}: ${index === 0 ? title : focus}`,

@@ -20,7 +20,6 @@ export default async function LearnCoursePage({ params }: { params: Promise<{ co
   const lessons = course.modules
     .map((_, index) => lessonBrief(course.id, index))
     .filter((lesson): lesson is NonNullable<typeof lesson> => Boolean(lesson));
-  const watermark = "PAID OBSERRA ACADEMY ACCESS · OBSERRA PROPRIETARY";
 
   return (
     <CoursePlayer
@@ -28,7 +27,7 @@ export default async function LearnCoursePage({ params }: { params: Promise<{ co
       initialProgress={state.progress[courseId] ?? { completedLessons: [] }}
       lessons={lessons}
       assessment={finalAssessmentQuestions(course.id)}
-      watermark={watermark}
+      watermark="PAID OBSERRA ACADEMY ACCESS · OBSERRA PROPRIETARY"
     />
   );
 }
