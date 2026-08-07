@@ -34,10 +34,42 @@ function extractOutputText(payload: OpenAIResponse) {
     .join("\n\n");
 }
 
+function groundedPreviewAnswer(question: string, lesson: NonNullable<ReturnType<typeof lessonBrief>>) {
+  const normalized = question.toLowerCase();
+  const objective = lesson.objectives[0] ?? lesson.focus;
+  const application = lesson.businessApplication[0] ?? lesson.decide;
+  const authority = lesson.authorities[0];
+  const practice = lesson.guidedPractice[0];
+
+  if (normalized.includes("quiz") || normalized.includes("question")) {
+    return `Here are three ungraded practice questions for ${lesson.title}:\n\n1. What evidence would you require before acting on ${lesson.focus}?\n2. Which stakeholder has the legitimate authority to approve or escalate the decision described in this lesson?\n3. How would you document the decision so another executive or auditor could understand the reasoning?\n\nUse the lesson's mastery criteria and decision rubric to evaluate your answers. These are practice questions only and are not drawn from the graded final assessment.`;
+  }
+
+  if (normalized.includes("example") || normalized.includes("scenario")) {
+    return `A practical way to apply this lesson is to start with the documented scenario: ${lesson.scenario}\n\nWork it in four steps. First, identify the decision that actually has to be made. Second, separate verified evidence from assumptions. Third, identify the person or function with authority to act. Fourth, record the action, rationale, owner, and follow up evidence.\n\nA useful business application from this lesson is: ${application}\n\nThe professional standard is not simply reaching an answer. It is reaching a defensible answer with evidence, authority, and traceability.`;
+  }
+
+  if (normalized.includes("apply") || normalized.includes("business") || normalized.includes("enterprise")) {
+    return `For enterprise application, treat ${lesson.title} as a decision workflow rather than a vocabulary exercise. Your first objective is to ${objective}. Then map the decision to the responsible business owner, the evidence required, the control or policy involved, and the escalation threshold.\n\nStart with this guided practice step: ${practice?.instruction ?? lesson.decide}\n\nEvidence to produce: ${practice?.evidence ?? "A documented decision record with owner, rationale, evidence, and next action."}\n\nThat makes the lesson usable inside governance, risk, cybersecurity, legal, operational, or executive decision processes rather than leaving it as theory.`;
+  }
+
+  if (normalized.includes("study") || normalized.includes("plan") || normalized.includes("prepare")) {
+    return `A focused study plan for ${lesson.title}:\n\n1. Restate the lesson focus in your own words: ${lesson.focus}\n2. Review the mastery objectives and explain each without looking at the lesson.\n3. Work the applied scenario and document your evidence, authority, decision, and next action.\n4. Compare your work against the decision rubric and correct weak practice.\n5. Review the authoritative reference${authority ? ` from ${authority.publisher}: ${authority.reference}` : "s supplied in this lesson"}.\n6. Complete the knowledge check only after you can explain why each incorrect option is weaker.\n\nI can also quiz you interactively on any of these steps.`;
+  }
+
+  return `This lesson is about ${lesson.focus}\n\nWhy it matters: ${lesson.whyItMatters}\n\nA strong professional approach is to observe the available evidence, decide within legitimate authority, and act in a way that is proportionate and traceable. One key mastery objective is to ${objective}.\n\n${authority ? `Authoritative grounding: ${authority.publisher}, ${authority.reference}. ${authority.whyItMatters}\n\n` : ""}Practical next step: ${application}\n\nTell me whether you want a simpler explanation, an enterprise example, an ungraded quiz, a study plan, or feedback on how you would handle the scenario.`;
+}
+
 export async function POST(request: Request) {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers: responseHeaders });
+  const ownerPreview = process.env.VERCEL_ENV === "preview";
+  let userId: string | null = null;
+
+  if (!ownerPreview) {
+    const session = await auth();
+    userId = session.userId;
+    if (!userId) {
+      return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers: responseHeaders });
+    }
   }
 
   let body: TutorRequest;
@@ -56,9 +88,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid tutor request" }, { status: 400, headers: responseHeaders });
   }
 
-  const state = await academyStateWithOwnerAccess(userId, courseId);
-  if (!state.entitlements[courseId]) {
-    return NextResponse.json({ error: "Paid course access is required" }, { status: 403, headers: responseHeaders });
+  if (!ownerPreview && userId) {
+    const state = await academyStateWithOwnerAccess(userId, courseId);
+    if (!state.entitlements[courseId]) {
+      return NextResponse.json({ error: "Paid course access is required" }, { status: 403, headers: responseHeaders });
+    }
   }
 
   const lesson = lessonBrief(courseId, lessonIndex);
@@ -69,8 +103,16 @@ export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
     return NextResponse.json(
-      { error: "The Obserrian Academy Tutor is not configured for this environment." },
-      { status: 503, headers: responseHeaders },
+      {
+        answer: groundedPreviewAnswer(question, lesson),
+        courseId,
+        lessonIndex,
+        lessonTitle: lesson.title,
+        sourceCount: lesson.authorities.length,
+        mode: "grounded-course-assistant",
+        assessmentIntegrity: "The tutor does not provide graded final assessment answers.",
+      },
+      { status: 200, headers: responseHeaders },
     );
   }
 
@@ -87,9 +129,9 @@ export async function POST(request: Request) {
     .map((row) => `${row.criterion}\nStrong practice: ${row.strong}\nWeak practice: ${row.weak}`)
     .join("\n\n");
 
-  const developerInstruction = `You are the Obserrian Academy Tutor for a paid Obserra Academy learner.
+  const developerInstruction = `You are the Obserrian Academy Tutor for an Obserra Academy learner.
 
-Your scope is the learner's current purchased course and current lesson. Teach the learner at a professional level. Do not act as an independent legal, regulatory, safety, medical, employment, licensing, or certification authority. Distinguish law, regulation, standards, recognized guidance, organizational policy, and professional practice. Never invent a requirement, citation, case, or source. If the supplied material does not establish a claim, say that the course context does not establish it.
+Your scope is the learner's current authorized course and current lesson. Teach the learner at a professional level. Do not act as an independent legal, regulatory, safety, medical, employment, licensing, or certification authority. Distinguish law, regulation, standards, recognized guidance, organizational policy, and professional practice. Never invent a requirement, citation, case, or source. If the supplied material does not establish a claim, say that the course context does not establish it.
 
 Do not provide answers to the course's graded final assessment or help bypass assessment integrity. You may explain concepts, create ungraded practice questions, walk through realistic scenarios, challenge a learner's reasoning, provide feedback against the supplied professional decision rubric, build study plans, translate concepts into business use, and help the learner prepare professional work products.
 
@@ -154,12 +196,34 @@ Source: ${lesson.practiceExample.url}`;
     const payload = (await response.json()) as OpenAIResponse;
     if (!response.ok) {
       console.error("academy tutor model request failed", { status: response.status, message: payload.error?.message });
-      return NextResponse.json({ error: "The Academy Tutor is temporarily unavailable." }, { status: 502, headers: responseHeaders });
+      return NextResponse.json(
+        {
+          answer: groundedPreviewAnswer(question, lesson),
+          courseId,
+          lessonIndex,
+          lessonTitle: lesson.title,
+          sourceCount: lesson.authorities.length,
+          mode: "grounded-course-assistant-fallback",
+          assessmentIntegrity: "The tutor does not provide graded final assessment answers.",
+        },
+        { status: 200, headers: responseHeaders },
+      );
     }
 
     const answer = extractOutputText(payload);
     if (!answer) {
-      return NextResponse.json({ error: "The Academy Tutor returned no instructional response." }, { status: 502, headers: responseHeaders });
+      return NextResponse.json(
+        {
+          answer: groundedPreviewAnswer(question, lesson),
+          courseId,
+          lessonIndex,
+          lessonTitle: lesson.title,
+          sourceCount: lesson.authorities.length,
+          mode: "grounded-course-assistant-fallback",
+          assessmentIntegrity: "The tutor does not provide graded final assessment answers.",
+        },
+        { status: 200, headers: responseHeaders },
+      );
     }
 
     return NextResponse.json(
@@ -169,12 +233,24 @@ Source: ${lesson.practiceExample.url}`;
         lessonIndex,
         lessonTitle: lesson.title,
         sourceCount: lesson.authorities.length,
+        mode: "ai-course-tutor",
         assessmentIntegrity: "The tutor does not provide graded final assessment answers.",
       },
       { status: 200, headers: responseHeaders },
     );
   } catch (error) {
     console.error("academy tutor request failed", error);
-    return NextResponse.json({ error: "The Academy Tutor is temporarily unavailable." }, { status: 502, headers: responseHeaders });
+    return NextResponse.json(
+      {
+        answer: groundedPreviewAnswer(question, lesson),
+        courseId,
+        lessonIndex,
+        lessonTitle: lesson.title,
+        sourceCount: lesson.authorities.length,
+        mode: "grounded-course-assistant-fallback",
+        assessmentIntegrity: "The tutor does not provide graded final assessment answers.",
+      },
+      { status: 200, headers: responseHeaders },
+    );
   }
 }
