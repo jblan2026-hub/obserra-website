@@ -56,9 +56,9 @@ function canonicalRedirect(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase().split(":")[0];
   if (isLocalHost(host) || host === CANONICAL_HOST) return null;
 
-  const isApexProductionHost = host === "obserrallc.com";
-  const isProductionVercelHost = process.env.VERCEL_ENV === "production" && Boolean(host?.endsWith(".vercel.app"));
-  if (!isApexProductionHost && !isProductionVercelHost) return null;
+  // Every production request is canonicalized to the public www host.
+  // Preview deployments remain on their protected Vercel URL for owner review only.
+  if (process.env.VERCEL_ENV !== "production") return null;
 
   const url = new URL(request.url);
   url.protocol = "https:";
@@ -77,6 +77,16 @@ function withPreviewNoIndex(response: NextResponse, request: NextRequest) {
 
 function identityConfigurationResponse(request: NextRequest) {
   const url = new URL(request.url);
+  const isPreview = process.env.VERCEL_ENV === "preview";
+
+  // Vercel deployment protection is the identity boundary for owner preview routes.
+  // This keeps owner review usable even when Clerk preview keys are intentionally absent.
+  if (isPreview && url.pathname.startsWith("/academy/admin/review")) {
+    const response = withPreviewNoIndex(NextResponse.next(), request);
+    response.headers.set("X-Obserra-Owner-Review", "vercel-protected-preview");
+    return response;
+  }
+
   const requiresAuthentication =
     isProtected(request) || url.pathname.startsWith("/sign-in") || url.pathname.startsWith("/sign-up");
 
