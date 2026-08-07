@@ -102,17 +102,14 @@ export async function POST(request: Request) {
 
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
+    console.error("academy tutor unavailable: OPENAI_API_KEY is not configured");
     return NextResponse.json(
       {
-        answer: groundedPreviewAnswer(question, lesson),
-        courseId,
-        lessonIndex,
-        lessonTitle: lesson.title,
-        sourceCount: lesson.authorities.length,
-        mode: "grounded-course-assistant",
-        assessmentIntegrity: "The tutor does not provide graded final assessment answers.",
+        error: "Academy AI tutor is temporarily unavailable",
+        code: "ACADEMY_TUTOR_UNAVAILABLE",
+        retryable: true,
       },
-      { status: 200, headers: responseHeaders },
+      { status: 503, headers: responseHeaders },
     );
   }
 
