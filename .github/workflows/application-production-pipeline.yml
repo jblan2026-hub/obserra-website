@@ -3,7 +3,9 @@ name: Application Production Pipeline
 on:
   workflow_dispatch:
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - agent/sitewide-governance-auto-academy
     paths:
       - "app/apps/**"
       - "app/api/apps/**"
@@ -21,7 +23,9 @@ on:
       - "package-lock.json"
       - ".github/workflows/application-production-pipeline.yml"
   push:
-    branches: [main]
+    branches:
+      - main
+      - agent/application-production-pipeline
     paths:
       - "app/apps/**"
       - "app/api/apps/**"
@@ -37,6 +41,7 @@ on:
       - "docs/APPLICATION-PRODUCTION-PIPELINE.md"
       - "package.json"
       - "package-lock.json"
+      - ".github/workflows/application-production-pipeline.yml"
 
 permissions:
   contents: read
@@ -67,6 +72,10 @@ jobs:
         env:
           OBSERRA_APPLICATION_WORKER_ID: ${{ matrix.worker }}
           OBSERRA_APPLICATION_WORKER_COUNT: 30
+          OBSERRA_APPLICATION_RUN_ID: ${{ github.run_id }}
+          OBSERRA_APPLICATION_RUN_ATTEMPT: ${{ github.run_attempt }}
+          OBSERRA_APPLICATION_COMMIT_SHA: ${{ github.sha }}
+          OBSERRA_APPLICATION_REF: ${{ github.ref }}
         run: node scripts/application-production-worker.mjs
       - name: Upload worker evidence
         uses: actions/upload-artifact@v4
