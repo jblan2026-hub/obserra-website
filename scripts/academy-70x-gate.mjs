@@ -51,15 +51,17 @@ const expectedDurations = {
   "CISO Masterclass": 660,
 };
 
-const minuteBlocks = [...courseData.matchAll(/^\s*(Foundation|Professional|Advanced|"Executive Intensive"|"CISO Masterclass"):\s*\[([^\]]+)\]/gm)];
-const parsedMinutes = Object.fromEntries(minuteBlocks.map((match) => {
-  const level = match[1].replaceAll('"', "");
-  const minutes = match[2].split(",").map((value) => Number.parseInt(value.trim(), 10));
-  return [level, minutes];
-}));
+const durationPatterns = {
+  Foundation: /level === "Foundation" \? \[([^\]]+)\]/,
+  Professional: /level === "Professional" \? \[([^\]]+)\]/,
+  Advanced: /level === "Advanced" \? \[([^\]]+)\]/,
+  "Executive Intensive": /level === "Executive Intensive" \? \[([^\]]+)\]/,
+  "CISO Masterclass": /: \[([^\]]+)\];\s*\n\s*const phases/,
+};
 
 for (const [level, expected] of Object.entries(expectedDurations)) {
-  const minutes = parsedMinutes[level] ?? [];
+  const match = courseData.match(durationPatterns[level]);
+  const minutes = match?.[1].split(",").map((value) => Number.parseInt(value.trim(), 10)) ?? [];
   check(`${level} defines five published lessons`, minutes.length === 5);
   check(`${level} lesson minutes are positive integers`, minutes.every((value) => Number.isInteger(value) && value > 0));
   check(`${level} published duration reconciles`, minutes.reduce((sum, value) => sum + value, 0) === expected);
