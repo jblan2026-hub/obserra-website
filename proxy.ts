@@ -7,7 +7,6 @@ const PRIVATE_NOINDEX = "noindex, nofollow, noarchive, nosnippet, noimageindex";
 const PROTECTED_PATH_PREFIXES = [
   "/admin",
   "/portal",
-  "/command-center",
   "/academy/admin",
   "/academy/learn",
   "/academy/certificate",
@@ -109,10 +108,10 @@ function identityConfigurationResponse(request: NextRequest) {
     requiresAuthentication(request) || url.pathname.startsWith("/sign-in") || url.pathname.startsWith("/sign-up");
 
   if (protectedOrIdentityRoute) {
-    const destination = pathMatchesPrefix(url.pathname, "/command-center")
-      ? new URL("/?owner=identity-configuration-required", url)
-      : new URL("/academy?identity=configuration-required", url);
-    return applyRouteSecurityHeaders(NextResponse.redirect(destination), request);
+    return applyRouteSecurityHeaders(
+      NextResponse.redirect(new URL("/academy?identity=configuration-required", url)),
+      request,
+    );
   }
 
   const response = applyRouteSecurityHeaders(NextResponse.next(), request);
