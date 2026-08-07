@@ -3,10 +3,12 @@ import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server
 
 const CANONICAL_HOST = "www.obserrallc.com";
 const PREVIEW_NOINDEX = "noindex, nofollow, noarchive, nosnippet";
+const PRIVATE_NOINDEX = "noindex, nofollow, noarchive, nosnippet, noimageindex";
 
 const isProtected = createRouteMatcher([
   "/admin(.*)",
   "/portal(.*)",
+  "/command-center(.*)",
   "/academy/admin(.*)",
   "/academy/learn(.*)",
   "/academy/certificate(.*)",
@@ -55,9 +57,6 @@ function isLocalHost(host: string | undefined) {
 function canonicalRedirect(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase().split(":")[0];
   if (isLocalHost(host) || host === CANONICAL_HOST) return null;
-
-  // Every production request is canonicalized to the public www host.
-  // Preview deployments remain on their protected Vercel URL for owner review only.
   if (process.env.VERCEL_ENV !== "production") return null;
 
   const url = new URL(request.url);
@@ -66,36 +65,41 @@ function canonicalRedirect(request: NextRequest) {
   return NextResponse.redirect(url, 308);
 }
 
-function withPreviewNoIndex(response: NextResponse, request: NextRequest) {
+function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest) {
+  const url = new URL(request.url);
   const host = request.headers.get("host")?.toLowerCase().split(":")[0];
   const isPreviewHost = Boolean(host && host.endsWith(".vercel.app"));
+
   if (process.env.VERCEL_ENV !== "production" && isPreviewHost) {
     response.headers.set("X-Robots-Tag", PREVIEW_NOINDEX);
   }
+
+  if (url.pathname.startsWith("/command-center")) {
+    response.headers.set("X-Robots-Tag", PRIVATE_NOINDEX);
+    response.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
+    response.headers.set("Referrer-Policy", "no-referrer");
+    response.headers.set("X-Frame-Options", "DENY");
+    response.headers.set("X-Content-Type-Options", "nosniff");
+  }
+
   return response;
 }
 
 function identityConfigurationResponse(request: NextRequest) {
   const url = new URL(request.url);
-  const isPreview = process.env.VERCEL_ENV === "preview";
-
-  // Vercel deployment protection is the identity boundary for owner preview routes.
-  // This keeps owner review usable even when Clerk preview keys are intentionally absent.
-  if (isPreview && url.pathname.startsWith("/academy/admin/review")) {
-    const response = withPreviewNoIndex(NextResponse.next(), request);
-    response.headers.set("X-Obserra-Owner-Review", "vercel-protected-preview");
-    return response;
-  }
-
   const requiresAuthentication =
     isProtected(request) || url.pathname.startsWith("/sign-in") || url.pathname.startsWith("/sign-up");
 
   if (requiresAuthentication) {
-    const destination = new URL("/academy?identity=configuration-required", url);
-    return withPreviewNoIndex(NextResponse.redirect(destination), request);
+    const destination = url.pathname.startsWith("/command-center")
+      ? new URL("/?owner=identity-configuration-required", url)
+      : new URL("/academy?identity=configuration-required", url);
+    return applyRouteSecurityHeaders(NextResponse.redirect(destination), request);
   }
 
-  const response = withPreviewNoIndex(NextResponse.next(), request);
+  const response = applyRouteSecurityHeaders(NextResponse.next(), request);
   response.headers.set("X-Obserra-Identity-Status", "configuration-required");
   return response;
 }
@@ -110,7 +114,7 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
 
   const handler = clerkMiddleware(async (auth, clerkRequest) => {
     if (isProtected(clerkRequest)) await auth.protect();
-    return withPreviewNoIndex(NextResponse.next(), clerkRequest);
+    return applyRouteSecurityHeaders(NextResponse.next(), clerkRequest);
   });
 
   return handler(request, event);
