@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect } from "react";
 
 const credly = [
@@ -57,7 +58,9 @@ export default function VerifiedCredentials() {
       <div className="verified-credentials-grid">
         {credly.map(([name, fullName, issuer, badgeId]) => (
           <article className="verified-credential-card" key={badgeId}>
-            <div className="verified-credential-embed" data-iframe-width="150" data-iframe-height="270" data-share-badge-id={badgeId} data-share-badge-host="https://www.credly.com" />
+            <div className="verified-credential-embed" data-iframe-width="150" data-iframe-height="270" data-share-badge-id={badgeId} data-share-badge-host="https://www.credly.com">
+              <div className="credential-loading-mark" aria-hidden="true"><span>{issuer}</span><strong>{name}</strong><small>Verified credential</small></div>
+            </div>
             <div className="verified-credential-detail"><span>{issuer}</span><strong>{name}</strong><p>{fullName}</p></div>
           </article>
         ))}
@@ -68,7 +71,7 @@ export default function VerifiedCredentials() {
         {ec.map(([name, fullName, image, verify]) => (
           <article className="verified-credential-card ec-council-credential-card" key={name}>
             <a className="ec-council-badge-artwork protected-credential-artwork" href={verify} target="_blank" rel="noreferrer" aria-label={`Verify ${name}`} onContextMenu={(event) => event.preventDefault()} onDragStart={(event) => event.preventDefault()}>
-              <img src={image} alt={`${name} official EC-Council badge`} loading="lazy" draggable={false} />
+              <Image src={image} alt={`${name} official EC-Council badge`} width={190} height={190} sizes="(max-width: 480px) 180px, (max-width: 760px) 164px, 190px" draggable={false} />
               <span className="credential-artwork-watermark">VERIFIED · OBSERRA</span>
             </a>
             <div className="verified-credential-detail"><span>EC-Council</span><strong>{name}</strong><p>{fullName}</p><a className="verified-credential-verify-link" href={verify} target="_blank" rel="noreferrer">Verify credential</a></div>
