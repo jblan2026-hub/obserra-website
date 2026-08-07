@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0",
+  "legalEntity": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "workerPool": {
+    "logicalWorkers": 30,
+    "assignment": "deterministic-modulo",
+    "failClosed": true,
+    "note": "GitHub account concurrency limits may reduce simultaneous execution without changing the 30-worker logical pool."
+  },
+  "lifecycle": [
+    "intake",
+    "design",
+    "development",
+    "security-review",
+    "quality-review",
+    "staged",
+    "owner-review",
+    "approved",
+    "production",
+    "maintenance",
+    "retired"
+  ],
+  "changeTypes": [
+    "new-application",
+    "feature",
+    "revision",
+    "maintenance",
+    "security-update",
+    "dependency-update",
+    "support-fix",
+    "configuration-change",
+    "rollback"
+  ],
+  "requiredGates": [
+    "source-integrity",
+    "dependency-assurance",
+    "secret-scan",
+    "static-analysis",
+    "unit-tests",
+    "integration-tests",
+    "authorization-tests",
+    "tenant-isolation-tests",
+    "secure-defaults",
+    "build",
+    "sbom",
+    "artifact-integrity",
+    "staging-smoke",
+    "rollback-readiness",
+    "owner-approval"
+  ],
+  "productionRules": {
+    "noPlaceholderArtifacts": true,
+    "noSyntheticProductionStatus": true,
+    "noAutomaticOwnerApproval": true,
+    "directRuntimeVerificationRequired": true,
+    "rollbackRequired": true,
+    "documentationUpdateRequired": true,
+    "auditEvidenceRequired": true
+  },
+  "securityBaseline": {
+    "secureByDesign": true,
+    "secureByDefault": true,
+    "leastPrivilege": true,
+    "zeroTrust": true,
+    "mfaForOwnerPromotion": true,
+    "serverSideAuthorization": true,
+    "encryptedSecrets": true,
+    "tamperEvidentAudit": true,
+    "nistCsf20Aligned": true,
+    "nistSsdfAligned": true,
+    "nistSp80053ApplicableControls": true
+  }
+}
