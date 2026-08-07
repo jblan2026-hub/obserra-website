@@ -23,6 +23,92 @@
   line-height: 1.7;
 }
 
+.lesson-session-map,
+.lesson-objectives,
+.guided-practice,
+.decision-rubric,
+.failure-modes,
+.mastery-review,
+.instruction-stack,
+.authority-section,
+.practice-example,
+.application-lab,
+.learning-materials,
+.academy-tutor {
+  margin-top: 24px;
+}
+
+.lesson-session-map {
+  padding: 20px;
+  border: 1px solid #5fbde14b;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #061c30, #082c48);
+}
+
+.lesson-session-map h2 {
+  margin: 2px 0 0;
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.lesson-session-map > ol {
+  display: grid;
+  gap: 9px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lesson-session-map > ol > li {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid #74cce432;
+}
+
+.lesson-session-map > ol > li:first-child {
+  border-top: 0;
+}
+
+.lesson-session-map li > span {
+  color: #f4c76c;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.lesson-session-map li strong {
+  color: #eefaff;
+  font-size: 14px;
+}
+
+.lesson-session-map li p {
+  margin: 5px 0 0;
+  color: #aacbda;
+  line-height: 1.55;
+}
+
+.lesson-transcript {
+  margin-top: 14px;
+  border-top: 1px solid #74cce432;
+  padding-top: 14px;
+}
+
+.lesson-transcript summary {
+  color: #93ddf8;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.lesson-transcript p {
+  margin: 12px 0 0;
+  padding-left: 14px;
+  border-left: 2px solid #f1c46840;
+  color: #bcd9e6;
+  line-height: 1.62;
+}
+
 .why-it-matters {
   margin-top: 20px;
   padding: 18px;
@@ -44,13 +130,30 @@
   line-height: 1.68;
 }
 
-.instruction-stack,
-.authority-section,
-.practice-example,
-.application-lab,
-.learning-materials,
-.academy-tutor {
-  margin-top: 24px;
+.lesson-objectives {
+  padding: 20px;
+  border: 1px solid #73c9e64a;
+  border-radius: 13px;
+  background: #071f35;
+}
+
+.lesson-objectives h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 21px;
+}
+
+.lesson-objectives ol {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding-left: 22px;
+  color: #c6e2ee;
+}
+
+.lesson-objectives li {
+  padding-left: 5px;
+  line-height: 1.58;
 }
 
 .instruction-stack {
@@ -90,7 +193,11 @@
 .practice-example h3,
 .application-lab h3,
 .learning-materials h3,
-.academy-tutor h3 {
+.academy-tutor h3,
+.guided-practice h3,
+.decision-rubric h3,
+.failure-modes h3,
+.mastery-review h3 {
   margin: 0;
   color: #ffffff;
   font-size: 22px;
@@ -102,7 +209,11 @@
 .practice-example p,
 .application-lab p,
 .learning-materials p,
-.academy-tutor p {
+.academy-tutor p,
+.guided-practice p,
+.decision-rubric p,
+.failure-modes p,
+.mastery-review p {
   color: #bfddeb;
   line-height: 1.66;
 }
@@ -118,6 +229,130 @@
 
 .section-heading {
   margin-bottom: 12px;
+}
+
+.guided-practice {
+  padding: 20px;
+  border: 1px solid #72cce956;
+  border-radius: 14px;
+  background: #071d31;
+}
+
+.guided-practice > ol {
+  display: grid;
+  gap: 11px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guided-practice > ol > li {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #66bedb3a;
+  border-radius: 11px;
+  background: #092940;
+}
+
+.guided-practice li > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #0c3854;
+  color: #f5c76a;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.guided-practice h4,
+.failure-modes h4 {
+  margin: 0;
+  color: #edf9ff;
+  font-size: 17px;
+}
+
+.guided-practice strong,
+.failure-modes strong {
+  display: block;
+  margin-top: 10px;
+  color: #f5c667;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.decision-rubric {
+  padding: 20px;
+  border: 1px solid #72cce950;
+  border-radius: 14px;
+  background: #061b2d;
+}
+
+.rubric-table {
+  overflow-x: auto;
+  margin-top: 14px;
+  border: 1px solid #73c8e43b;
+  border-radius: 11px;
+}
+
+.rubric-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.8fr) minmax(240px, 1.4fr) minmax(240px, 1.4fr);
+  min-width: 720px;
+  border-top: 1px solid #72c6e234;
+}
+
+.rubric-row:first-child {
+  border-top: 0;
+}
+
+.rubric-row > * {
+  margin: 0;
+  padding: 13px;
+  border-left: 1px solid #72c6e234;
+}
+
+.rubric-row > *:first-child {
+  border-left: 0;
+}
+
+.rubric-head {
+  background: #0b314d;
+}
+
+.rubric-head span {
+  color: #f5c76a;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.rubric-row strong {
+  color: #edf9ff;
+  font-size: 13px;
+}
+
+.rubric-row p {
+  font-size: 13px;
+}
+
+.failure-modes > div:last-child {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.failure-modes article {
+  padding: 18px;
+  border: 1px solid #db9c6750;
+  border-radius: 12px;
+  background: #2b1d18;
 }
 
 .authority-grid,
@@ -197,13 +432,15 @@
   text-transform: uppercase;
 }
 
-.application-lab {
+.application-lab,
+.mastery-review {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
-.application-lab > div {
+.application-lab > div,
+.mastery-review > div {
   padding: 20px;
   border: 1px solid #69c6e64c;
   border-radius: 13px;
@@ -211,16 +448,29 @@
 }
 
 .application-lab ol,
-.material-grid ul {
+.material-grid ul,
+.mastery-review ul,
+.mastery-review ol {
   margin: 14px 0 0;
   padding-left: 20px;
   color: #c5e1ee;
 }
 
 .application-lab li,
-.material-grid li {
+.material-grid li,
+.mastery-review li {
   margin-top: 8px;
   line-height: 1.55;
+}
+
+.mastery-review > div:first-child {
+  border-color: #54c68452;
+  background: #0b3127;
+}
+
+.mastery-review > div:last-child {
+  border-color: #f0c46847;
+  background: #2a261c;
 }
 
 .material-grid article p {
@@ -392,17 +642,24 @@
 @media (max-width: 900px) {
   .authority-grid,
   .material-grid,
-  .application-lab {
+  .application-lab,
+  .mastery-review,
+  .failure-modes > div:last-child {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 640px) {
-  .instruction-stack article {
+  .instruction-stack article,
+  .guided-practice > ol > li,
+  .lesson-session-map > ol > li {
     grid-template-columns: 1fr;
   }
 
-  .academy-tutor {
+  .academy-tutor,
+  .lesson-session-map,
+  .guided-practice,
+  .decision-rubric {
     padding: 16px;
   }
 }
