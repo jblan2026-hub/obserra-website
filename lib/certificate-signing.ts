@@ -6,7 +6,7 @@ export const CERTIFICATE_SIGNATURE_ALGORITHM = "Ed25519" as const;
 export const CERTIFICATE_SIGNER_NAME = "Dr. Jody Blanchard" as const;
 export const CERTIFICATE_ISSUER = "Obserra Executive Protection & Intelligence, LLC" as const;
 
-export type CertificateClaim = {
+export type LegacyCertificateClaim = {
   schemaVersion: "1.0";
   certificateId: string;
   courseId: string;
@@ -16,7 +16,19 @@ export type CertificateClaim = {
   issuer: typeof CERTIFICATE_ISSUER;
 };
 
-export type SignedCertificateClaim = CertificateClaim & {
+export type CertificateClaim = {
+  schemaVersion: "1.1";
+  certificateId: string;
+  courseId: string;
+  courseTitle: string;
+  courseVersion: string;
+  completedAt: string;
+  assessmentScore: number;
+  signerName: typeof CERTIFICATE_SIGNER_NAME;
+  issuer: typeof CERTIFICATE_ISSUER;
+};
+
+export type SignedCertificateClaim = (LegacyCertificateClaim | CertificateClaim) & {
   signatureAlgorithm: typeof CERTIFICATE_SIGNATURE_ALGORITHM;
   signature: string;
   publicKeyFingerprint: string;
@@ -28,11 +40,24 @@ function normalizePem(value: string | undefined, variableName: string) {
   return normalized;
 }
 
-function canonicalClaim(claim: CertificateClaim) {
+function canonicalClaim(claim: LegacyCertificateClaim | CertificateClaim) {
+  if (claim.schemaVersion === "1.0") {
+    return JSON.stringify({
+      schemaVersion: claim.schemaVersion,
+      certificateId: claim.certificateId,
+      courseId: claim.courseId,
+      completedAt: claim.completedAt,
+      assessmentScore: claim.assessmentScore,
+      signerName: claim.signerName,
+      issuer: claim.issuer,
+    });
+  }
   return JSON.stringify({
     schemaVersion: claim.schemaVersion,
     certificateId: claim.certificateId,
     courseId: claim.courseId,
+    courseTitle: claim.courseTitle,
+    courseVersion: claim.courseVersion,
     completedAt: claim.completedAt,
     assessmentScore: claim.assessmentScore,
     signerName: claim.signerName,
@@ -67,9 +92,11 @@ export function certificateSigningReady() {
 
 export function signCertificateClaim(input: Omit<CertificateClaim, "schemaVersion" | "signerName" | "issuer">): SignedCertificateClaim {
   const claim: CertificateClaim = {
-    schemaVersion: "1.0",
+    schemaVersion: "1.1",
     certificateId: input.certificateId,
     courseId: input.courseId,
+    courseTitle: input.courseTitle,
+    courseVersion: input.courseVersion,
     completedAt: input.completedAt,
     assessmentScore: input.assessmentScore,
     signerName: CERTIFICATE_SIGNER_NAME,
@@ -85,21 +112,14 @@ export function signCertificateClaim(input: Omit<CertificateClaim, "schemaVersio
 }
 
 export function verifyCertificateClaim(claim: SignedCertificateClaim) {
+  if (claim.schemaVersion !== "1.0" && claim.schemaVersion !== "1.1") return false;
   if (claim.signatureAlgorithm !== CERTIFICATE_SIGNATURE_ALGORITHM) return false;
   if (claim.signerName !== CERTIFICATE_SIGNER_NAME || claim.issuer !== CERTIFICATE_ISSUER) return false;
   if (claim.publicKeyFingerprint !== publicKeyFingerprint()) return false;
-  const unsigned: CertificateClaim = {
-    schemaVersion: claim.schemaVersion,
-    certificateId: claim.certificateId,
-    courseId: claim.courseId,
-    completedAt: claim.completedAt,
-    assessmentScore: claim.assessmentScore,
-    signerName: claim.signerName,
-    issuer: claim.issuer,
-  };
+  if (claim.schemaVersion === "1.1" && (!claim.courseTitle?.trim() || !/^\d+\.\d+\.\d+$/.test(claim.courseVersion))) return false;
   return verify(
     null,
-    Buffer.from(canonicalClaim(unsigned), "utf8"),
+    Buffer.from(canonicalClaim(claim), "utf8"),
     configuredPublicKey(),
     Buffer.from(claim.signature, "base64url"),
   );
