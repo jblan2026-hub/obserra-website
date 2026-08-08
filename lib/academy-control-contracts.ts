@@ -115,12 +115,12 @@ export type AcademyOwnerVerificationResponse = {
 export function defaultAcademyCourseControl(courseId: string): AcademyCourseControl {
   return {
     courseId,
-    lifecycle: "published",
-    publicVisible: true,
-    purchaseEnabled: true,
+    lifecycle: "unpublished",
+    publicVisible: false,
+    purchaseEnabled: false,
     preserveExistingEntitlements: true,
     revision: 0,
     updatedAt: null,
-    reason: null,
+    reason: "Authoritative Academy control state is unavailable; public visibility and new purchases fail closed.",
   };
 }
