@@ -2,7 +2,7 @@
 
 **Owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC  
 **Status:** Active engineering baseline  
-**Last reconciled:** 2026-08-07
+**Last reconciled:** 2026-08-08
 
 ## Purpose
 
@@ -10,11 +10,20 @@ The Application Production Pipeline governs how Obserra applications move from i
 
 The website `/apps` marketplace remains the public commercial surface. Application source, staging evidence, support data, build artifacts, security evidence, rollback assets, and owner operations remain protected.
 
-## 30-worker operating model
+## Portfolio worker allocation
 
-The pipeline defines 30 logical workers. Every marketplace application is deterministically assigned to one worker by application slug. The GitHub Actions matrix uses `max-parallel: 30`; actual simultaneous execution can be lower when account or runner concurrency limits apply. A lower platform concurrency limit does not change the governed 30-worker logical model.
+The authoritative Obserra production allocation is **36 logical workers total**:
 
-Workers validate only their assigned application records and write immutable workflow evidence. They do not approve releases, change commercial status, or deploy directly to production.
+- **20 application workers** assigned to application development, maintenance, validation, release preparation, and operational support.
+- **16 course workers** reserved for Academy course authoring, assessment production, protected package generation, validation, and LCMS preparation.
+
+Cross-pool borrowing is disabled by default. Changing the 20/16 allocation requires an explicit owner-approved policy change across the Application Production Pipeline, Academy Production Studio, and EIOS Worker Operations control plane.
+
+## 20-worker application operating model
+
+The pipeline defines 20 logical application workers. Every marketplace application is deterministically assigned to one worker by application slug. The GitHub Actions matrix uses `max-parallel: 20`; actual simultaneous execution can be lower when account or runner concurrency limits apply. A lower platform concurrency limit does not change the governed 20-worker application allocation.
+
+Workers validate only their assigned application records and write attributable workflow evidence. They do not approve releases, change commercial status, or deploy directly to production.
 
 ## Lifecycle
 
@@ -66,7 +75,8 @@ The private owner Command Center is the control surface for application operatio
 - current production and staging versions;
 - open revisions and maintenance work;
 - worker assignment and pipeline health;
-- GitHub branch/PR/CI evidence;
+- the fixed portfolio allocation of 20 application workers and 16 course workers;
+- GitHub branch, pull request, and CI evidence;
 - Vercel or other hosting deployment status;
 - dependency and vulnerability findings;
 - customer-impacting incidents and support work;
@@ -99,15 +109,16 @@ Production applications remain inside the pipeline after launch. Security update
 
 ## Current implementation
 
-The repository already contains an application marketplace, customer application portal, release delivery logic, controlled download/access routes, release bundle generation, and synchronization tooling. This pipeline adds a 30-worker validation and staging layer around those existing capabilities rather than replacing them.
+The repository already contains an application marketplace, customer application portal, release delivery logic, controlled download and access routes, release bundle generation, and synchronization tooling. This pipeline adds a 20-worker validation and staging layer around those existing capabilities rather than replacing them. The previous 30-worker application matrix is superseded and must not be treated as the current allocation.
 
 The first production implementation files are:
 
 - `config/application-production-policy.json`
+- `config/application-worker-scaling-policy.json`
 - `scripts/application-production-worker.mjs`
 - `.github/workflows/application-production-pipeline.yml`
 - `scripts/generate-app-release-bundle.mjs`
 - `scripts/sync-final-apps.mjs`
 - `lib/release-delivery.ts`
 
-This document must be reconciled whenever lifecycle, release, security, owner-control, staging, deployment, or support behavior changes.
+This document must be reconciled whenever worker allocation, lifecycle, release, security, owner-control, staging, deployment, or support behavior changes.
