@@ -15,6 +15,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const CLAIM_POLICY = "purchaser-email-match-v1";
+const INITIAL_COURSE_VERSION = "1.0.0";
 
 function unavailableRedirect(requestUrl: URL, reason: string) {
   const response = NextResponse.redirect(new URL(`/academy?enrollment=${reason}`, requestUrl));
@@ -57,6 +58,9 @@ export async function GET(request: Request) {
     const studioCourse = studioCourseIsApproved(course.id) ? studioCourseForId(course.id) : null;
     const license = studioLicenseMetadata(course.id);
     const certificate = studioCertificateMetadata(course.id);
+    const courseVersion = studioCourse?.version && /^\d+\.\d+\.\d+$/.test(studioCourse.version)
+      ? studioCourse.version
+      : INITIAL_COURSE_VERSION;
     const successUrl = new URL("/academy/success", requestUrl);
     successUrl.searchParams.set("course", course.id);
     successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
@@ -66,6 +70,8 @@ export async function GET(request: Request) {
 
     const metadata = {
       courseId: course.id,
+      courseTitle: course.title,
+      courseVersion,
       clerkUserId: identity.userId ?? "",
       purchaserReference,
       identityMode,
@@ -80,7 +86,6 @@ export async function GET(request: Request) {
       certificateIssuer: certificate.issuer,
       isProfessionalCertification: String(certificate.isProfessionalCertification),
       isComplianceEvidence: String(certificate.isComplianceEvidence),
-      courseVersion: studioCourse?.version ?? "website-catalog",
       studioManaged: String(Boolean(studioCourse)),
       catalogParityVerified: String(Boolean(studioCourse)),
       courseLifecycle: runtimeCourse.control.lifecycle,
@@ -105,6 +110,7 @@ export async function GET(request: Request) {
               description: course.description,
               metadata: {
                 obserraCourseId: course.id,
+                courseVersion,
                 department: course.department,
                 level: course.level,
                 entitlementCode: license.entitlementCode,
@@ -121,7 +127,10 @@ export async function GET(request: Request) {
       customer_creation: "always",
       client_reference_id: purchaserReference,
       metadata,
-      payment_intent_data: { metadata },
+      payment_intent_data: {
+        metadata,
+        description: `${course.title} | Course Version v${courseVersion}`,
+      },
       success_url: successUrl.toString(),
       cancel_url: cancelUrl.toString(),
       billing_address_collection: "auto",
@@ -133,14 +142,14 @@ export async function GET(request: Request) {
     response.headers.set("x-obserra-commerce-mode", identityMode);
     response.headers.set("x-obserra-claim-policy", CLAIM_POLICY);
     response.headers.set("x-obserra-catalog-parity", studioCourse ? "governed-studio" : "baseline-fallback");
+    response.headers.set("x-obserra-course-version", courseVersion);
     response.headers.set("x-obserra-course-lifecycle", runtimeCourse.control.lifecycle);
     response.headers.set("x-obserra-course-control-revision", String(runtimeCourse.control.revision));
     response.headers.set("x-obserra-existing-entitlements", "preserved");
     response.headers.set("x-obserra-webhook-verification", "required");
     response.headers.set("cache-control", "private, no-store, max-age=0");
     return response;
-  } catch (error) {
-    console.error("academy checkout failed", error);
+  } catch {
     const response = NextResponse.redirect(
       new URL(`/academy/${course.id}?enrollment=checkout-unavailable`, requestUrl),
     );
