@@ -2,6 +2,7 @@ import "server-only";
 
 import { clerkClient } from "@clerk/nextjs/server";
 import { courses } from "../app/academy/courseData";
+import { studioCoursePublicationMetadataById } from "../app/academy/studioCatalog";
 import {
   certificateSigningReady,
   signCertificateClaim,
@@ -27,6 +28,11 @@ const emptyState = (): AcademyState => ({ entitlements: {}, progress: {} });
 
 export function courseForId(courseId: string) {
   return courses.find((course) => course.id === courseId);
+}
+
+function governedCourseVersion(courseId: string) {
+  const version = studioCoursePublicationMetadataById.get(courseId)?.version?.trim();
+  return version && /^\d+\.\d+\.\d+$/.test(version) ? version : "1.0.0";
 }
 
 export function academyStateFromUser(user: { privateMetadata: Record<string, unknown> }): AcademyState {
@@ -87,7 +93,14 @@ export async function recordAssessment(userId: string, courseId: string, score: 
     completion = {
       completedAt,
       certificateId,
-      signedCertificate: signCertificateClaim({ certificateId, courseId, completedAt, assessmentScore: score }),
+      signedCertificate: signCertificateClaim({
+        certificateId,
+        courseId,
+        courseTitle: course.title,
+        courseVersion: governedCourseVersion(courseId),
+        completedAt,
+        assessmentScore: score,
+      }),
     };
   }
 
@@ -149,19 +162,24 @@ export async function findVerifiedCertificate(certificateId: string) {
         const course = courseForId(courseId);
         if (!course) return null;
         const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+        const signed = progress.signedCertificate;
+        const courseTitle = signed.schemaVersion === "1.1" ? signed.courseTitle : course.title;
+        const courseVersion = signed.schemaVersion === "1.1" ? signed.courseVersion : governedCourseVersion(courseId);
         return {
           valid: true as const,
           certificateId: progress.certificateId,
           learnerName: fullName || "Obserra Academy Learner",
           courseId,
-          courseTitle: course.title,
+          courseTitle,
+          courseVersion,
           completedAt: progress.completedAt,
           assessmentScore: progress.assessmentScore,
           trainingHours: course.duration,
-          signerName: progress.signedCertificate.signerName,
-          issuer: progress.signedCertificate.issuer,
-          signatureAlgorithm: progress.signedCertificate.signatureAlgorithm,
-          publicKeyFingerprint: progress.signedCertificate.publicKeyFingerprint,
+          signerName: signed.signerName,
+          issuer: signed.issuer,
+          signatureAlgorithm: signed.signatureAlgorithm,
+          publicKeyFingerprint: signed.publicKeyFingerprint,
+          claimSchemaVersion: signed.schemaVersion,
         };
       }
     }
