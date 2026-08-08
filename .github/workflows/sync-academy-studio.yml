@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: academy-studio-sync
@@ -26,11 +27,11 @@ jobs:
           ACADEMY_STUDIO_TOKEN: ${{ secrets.ACADEMY_STUDIO_TOKEN }}
         run: test -n "$ACADEMY_STUDIO_TOKEN"
 
-      - name: Checkout website
+      - name: Checkout website production baseline
         uses: actions/checkout@v4
         with:
           ref: main
-          token: ${{ secrets.ACADEMY_STUDIO_TOKEN }}
+          fetch-depth: 0
 
       - name: Checkout Academy Production Studio
         uses: actions/checkout@v4
@@ -54,10 +55,17 @@ jobs:
         run: |
           node <<'NODE'
           const catalog = require('./app/academy/generated/studio-catalog.json');
-          if (catalog.schemaVersion !== '1.2') throw new Error('Academy catalog schemaVersion must equal 1.2');
+          const supportedSchemaVersions = new Set(['1.2', '1.3', '1.4']);
+          if (!supportedSchemaVersions.has(catalog.schemaVersion)) {
+            throw new Error(`Unsupported Academy catalog schemaVersion: ${catalog.schemaVersion ?? 'missing'}`);
+          }
           if (!Array.isArray(catalog.courses)) throw new Error('Academy catalog courses must be an array');
+          const acceptedIds = new Set();
           for (const course of catalog.courses) {
             if (!course.id || !course.title || !course.duration) throw new Error(`Invalid course identity: ${course.id ?? 'unknown'}`);
+            if (acceptedIds.has(course.id)) throw new Error(`Duplicate approved course ID: ${course.id}`);
+            acceptedIds.add(course.id);
+            if (!Array.isArray(course.outcomes) || course.outcomes.length === 0) throw new Error(`Course ${course.id} has no learning outcomes`);
             if (!Array.isArray(course.modules) || course.modules.length === 0) throw new Error(`Course ${course.id} has no modules`);
             if (!course.commerce || !course.licensing || !course.completion || !course.certificate) throw new Error(`Course ${course.id} is missing governed commercial metadata`);
             if (!course.branding || !course.tags || !course.disclaimer || course.acknowledgementRequired !== true) throw new Error(`Course ${course.id} is missing branding, tags, or legal policy`);
@@ -66,16 +74,53 @@ jobs:
           }
           NODE
 
-      - name: Commit published catalog
+      - name: Detect catalog change
+        id: catalog_change
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name "obserra-academy-bot"
-          git config user.email "academy-bot@obserrallc.com"
           git add app/academy/generated/studio-catalog.json
           if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Academy catalog is already current"
           else
-            git commit -m "Publish approved Academy Studio catalog"
-            git push origin main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Create governed synchronization branch
+        if: steps.catalog_change.outputs.changed == 'true'
+        id: sync_branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="automation/academy-studio-catalog-${GITHUB_RUN_ID}"
+          git config user.name "obserra-academy-bot"
+          git config user.email "academy-bot@obserrallc.com"
+          git switch -c "$branch"
+          git commit -m "Sync approved Academy Studio catalog"
+          git push --set-upstream origin "$branch"
+          echo "name=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Open draft owner-review pull request
+        if: steps.catalog_change.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SYNC_BRANCH: ${{ steps.sync_branch.outputs.name }}
+          STUDIO_REF: ${{ github.event.client_payload.ref || inputs.studio_ref || 'main' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body_file="$(mktemp)"
+          cat > "$body_file" <<EOF
+          Synchronizes the approved Academy Studio public catalog from governed Studio ref \`$STUDIO_REF\`.
+
+          The synchronization workflow validates supported catalog schema, unique course IDs, learning outcomes, modules, commercial and licensing metadata, completion rules, certificate designation, branding, legal policy, acknowledgement, and approved or published release status before creating this branch.
+
+          This pull request is intentionally draft. It must pass website CI and owner review before merge. The workflow does not push Studio catalog changes directly to \`main\`.
+          EOF
+          gh pr create \
+            --base main \
+            --head "$SYNC_BRANCH" \
+            --draft \
+            --title "Sync approved Academy Studio catalog" \
+            --body-file "$body_file"

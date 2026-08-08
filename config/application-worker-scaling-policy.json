@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "1.1",
+  "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "portfolioAllocation": {
+    "totalWorkers": 36,
+    "applicationWorkers": 20,
+    "courseWorkers": 16,
+    "crossPoolBorrowingAllowed": false
+  },
+  "pool": {
+    "baselineWorkers": 20,
+    "minimumWorkers": 1,
+    "maximumWorkers": 20,
+    "targetApplicationsPerWorker": 2,
+    "targetQueuedTasksPerWorker": 4,
+    "scaleUpThresholdPercent": 75,
+    "scaleDownThresholdPercent": 25,
+    "scaleDownCooldownMinutes": 30
+  },
+  "authorization": {
+    "ownerApprovalReferenceRequiredAboveBaseline": true,
+    "ownerApprovalReferenceMinimumLength": 8,
+    "automaticProductionDeploymentAllowed": false,
+    "automaticPricingChangeAllowed": false,
+    "automaticCreditPurchaseAllowed": false
+  },
+  "cost": {
+    "defaultRunBudgetUsd": 25,
+    "maximumRunBudgetUsd": 250,
+    "hardStopOnBudgetExhaustion": true,
+    "reservedCriticalOperationsPercent": 20
+  },
+  "security": {
+    "leastPrivilegeWorkerIdentityRequired": true,
+    "isolatedJobExecutionRequired": true,
+    "immutableEvidenceRequired": true,
+    "secretInjectionFromApprovedStoreOnly": true,
+    "crossRepositoryWriteDeniedByDefault": true,
+    "ownerEmergencyStopRequired": true
+  },
+  "truthBoundary": "The application pool is capped at 20 logical workers within the fixed 36-worker portfolio allocation. Sixteen workers are reserved for Academy course production. A planned worker is not an active worker, and a dispatched job is not successful until workflow evidence is complete."
+}

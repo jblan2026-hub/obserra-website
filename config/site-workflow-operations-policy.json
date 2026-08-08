@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "1.0",
+  "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "scope": [
+    "public-website",
+    "owner-command-center",
+    "academy-storefront",
+    "academy-protected-learning",
+    "application-marketplace",
+    "customer-portal",
+    "application-production-pipeline",
+    "github-actions",
+    "vercel-deployments",
+    "supabase-backend",
+    "stripe-commerce",
+    "clerk-identity"
+  ],
+  "workerResponsibilities": [
+    "monitor-site-health",
+    "monitor-workflow-health",
+    "triage-build-failures",
+    "repair-ci-cd",
+    "maintain-dependencies",
+    "review-security-advisories",
+    "validate-deployments",
+    "maintain-release-scripts",
+    "maintain-tests",
+    "maintain-observability",
+    "maintain-runbooks",
+    "maintain-rollback-assets",
+    "maintain-documentation",
+    "support-incident-response",
+    "support-customer-impacting-defects",
+    "verify-domain-and-route-health",
+    "verify-authentication-and-authorization",
+    "verify-commerce-flows",
+    "verify-backend-integrations"
+  ],
+  "operationalObjectives": {
+    "productionHealthCheckMinutes": 5,
+    "criticalWorkflowFailureTriageMinutes": 15,
+    "criticalSiteIncidentTriageMinutes": 15,
+    "highSeveritySecurityTriageHours": 4,
+    "dependencyReviewDays": 7,
+    "runbookReviewDays": 30,
+    "rollbackVerificationDays": 30
+  },
+  "changeControls": {
+    "ownerApprovalRequiredForProductionPromotion": true,
+    "directRuntimeVerificationRequired": true,
+    "rollbackRequired": true,
+    "documentationUpdateRequired": true,
+    "auditEvidenceRequired": true,
+    "noPlaceholderProductionClaims": true,
+    "noSyntheticHealthClaims": true
+  }
+}

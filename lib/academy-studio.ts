@@ -66,12 +66,14 @@ export type StudioCourseRecord = {
 };
 
 type StudioCatalog = {
-  schemaVersion: "1.2";
+  schemaVersion: "1.2" | "1.3" | "1.4";
   courses: StudioCourseRecord[];
 };
 
 const governedCatalog = catalog as StudioCatalog;
-const records = governedCatalog.courses ?? [];
+const records = (governedCatalog.courses ?? []).filter(
+  (course) => course.releaseStatus === "approved" || course.releaseStatus === "published",
+);
 
 export function studioCourseForId(courseId: string) {
   return records.find((course) => course.id === courseId) ?? null;
@@ -82,8 +84,7 @@ export function studioCourses() {
 }
 
 export function studioCourseIsApproved(courseId: string) {
-  const course = studioCourseForId(courseId);
-  return Boolean(course && (course.releaseStatus === "approved" || course.releaseStatus === "published"));
+  return studioCourseForId(courseId) !== null;
 }
 
 export function studioLicenseMetadata(courseId: string) {

@@ -1,0 +1,102 @@
+name: Application Release Validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - agent/sitewide-governance-auto-academy
+    paths:
+      - "app/apps/**"
+      - "app/api/apps/**"
+      - "app/portal/applications/**"
+      - "lib/release-delivery.ts"
+      - "scripts/application-market-brain.mjs"
+      - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/validate-application-staging.mjs"
+      - "scripts/sync-final-apps.mjs"
+      - "config/application-market-intelligence-policy.json"
+      - "config/application-production-policy.json"
+      - "config/application-worker-scaling-policy.json"
+      - "config/site-workflow-operations-policy.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/application-release-validation.yml"
+  push:
+    branches:
+      - agent/application-production-pipeline
+    paths:
+      - "app/apps/**"
+      - "app/api/apps/**"
+      - "app/portal/applications/**"
+      - "lib/release-delivery.ts"
+      - "scripts/application-market-brain.mjs"
+      - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/validate-application-staging.mjs"
+      - "scripts/sync-final-apps.mjs"
+      - "config/application-market-intelligence-policy.json"
+      - "config/application-production-policy.json"
+      - "config/application-worker-scaling-policy.json"
+      - "config/site-workflow-operations-policy.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/application-release-validation.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: application-release-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-validation:
+    name: Validate governed application release staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install supported npm major
+        run: |
+          npm install --global npm@11 --no-audit --no-fund
+          test "$(npm --version | cut -d. -f1)" = "11"
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verify lockfile remains immutable
+        run: git diff --exit-code -- package-lock.json
+      - name: Generate controlled staging manifests
+        run: npm run release:apps -- release/application-production
+      - name: Validate staging identity and artifact boundary
+        run: npm run validate:application-staging
+      - name: Generate governed market guidance
+        run: npm run market:apps
+      - name: Run repository tests
+        run: npm test
+      - name: Run lint
+        run: npm run lint
+      - name: Build production website
+        run: npm run build
+      - name: Validate market guidance coverage
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const catalog = JSON.parse(fs.readFileSync(path.join('release', 'application-production', 'release-catalog.json'), 'utf8'));
+          const market = JSON.parse(fs.readFileSync(path.join('release', 'application-market-intelligence', 'portfolio-pricing-plan.json'), 'utf8'));
+          if (!Array.isArray(market.applications) || market.applications.length !== catalog.applications.length) {
+            throw new Error('market guidance does not cover the complete staged application catalog');
+          }
+          console.log(`Market guidance covers all ${catalog.applications.length} staged applications.`);
+          NODE
+      - name: Upload independently validated staging evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-release-validation-${{ github.sha }}
+          path: |
+            release/application-production/**
+            release/application-market-intelligence/**
+          if-no-files-found: error
+          retention-days: 180

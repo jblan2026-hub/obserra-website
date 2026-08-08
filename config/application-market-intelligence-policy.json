@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "1.0",
+  "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "purpose": "Provide governed market intelligence, pricing recommendations, packaging guidance, application maintenance competencies, and support prioritization for the Obserra application portfolio.",
+  "pricingAuthority": {
+    "workersMayResearch": true,
+    "workersMayRecommend": true,
+    "workersMayWriteStagingPricing": true,
+    "workersMayChangeProductionPricing": false,
+    "productionPriceChangeRequiresOwnerApproval": true,
+    "productionPriceChangeRequiresAuditEvent": true,
+    "productionPriceChangeRequiresRollback": true
+  },
+  "marketSignals": [
+    "competitive-packaging",
+    "public-list-pricing",
+    "custom-enterprise-pricing",
+    "per-seat-pricing",
+    "per-asset-pricing",
+    "per-vendor-pricing",
+    "per-workload-pricing",
+    "usage-based-pricing",
+    "platform-base-fee",
+    "deployment-premium",
+    "support-tier",
+    "implementation-complexity",
+    "integration-count",
+    "regulatory-scope",
+    "buyer-segment",
+    "time-to-value",
+    "measurable-risk-reduction",
+    "competitive-differentiation",
+    "gross-margin-target",
+    "support-cost",
+    "customer-retention"
+  ],
+  "pricingMotions": {
+    "enterprise-platform": {
+      "preferred": ["annual-platform", "custom-enterprise"],
+      "optional": ["usage", "asset-volume", "seat-volume", "implementation-fee"]
+    },
+    "pilot": {
+      "preferred": ["fixed-term-paid-pilot"],
+      "optional": ["implementation-fee", "conversion-credit"]
+    },
+    "saas-seat": {
+      "preferred": ["per-seat-annual"],
+      "optional": ["platform-minimum", "usage"]
+    },
+    "asset-risk": {
+      "preferred": ["asset-volume-annual"],
+      "optional": ["platform-minimum", "premium-connectors"]
+    },
+    "third-party-risk": {
+      "preferred": ["vendor-volume-annual"],
+      "optional": ["platform-minimum", "assessment-volume"]
+    }
+  },
+  "internalPlanningBandsUsdAnnual": {
+    "Cybersecurity": { "floor": 30000, "target": 75000, "ceiling": 180000 },
+    "Executive Protection": { "floor": 30000, "target": 80000, "ceiling": 200000 },
+    "Identity": { "floor": 25000, "target": 65000, "ceiling": 150000 },
+    "GRC": { "floor": 25000, "target": 70000, "ceiling": 175000 },
+    "AI Governance": { "floor": 40000, "target": 95000, "ceiling": 225000 },
+    "Operations": { "floor": 20000, "target": 55000, "ceiling": 140000 },
+    "Intelligence": { "floor": 50000, "target": 125000, "ceiling": 300000 }
+  },
+  "adjustments": {
+    "Private Cloud": 0.2,
+    "Hybrid": 0.25,
+    "On-Premises": 0.35,
+    "integrationAfterFirstTwo": 0.04,
+    "pilotMultiplier": 0.35,
+    "comingSoonMultiplier": 0.0
+  },
+  "developerCompetencies": [
+    "product-architecture",
+    "frontend-engineering",
+    "backend-engineering",
+    "api-design",
+    "database-engineering",
+    "identity-and-access-management",
+    "secure-coding",
+    "threat-modeling",
+    "application-security",
+    "cloud-security",
+    "devsecops",
+    "ci-cd",
+    "infrastructure-as-code",
+    "observability",
+    "performance-engineering",
+    "reliability-engineering",
+    "incident-response",
+    "dependency-maintenance",
+    "vulnerability-remediation",
+    "data-protection",
+    "privacy-engineering",
+    "accessibility",
+    "ux-maintenance",
+    "integration-engineering",
+    "test-automation",
+    "regression-testing",
+    "release-engineering",
+    "rollback-and-recovery",
+    "technical-documentation",
+    "customer-support-engineering"
+  ],
+  "maintenanceSlo": {
+    "criticalSecurityHours": 4,
+    "highSecurityHours": 24,
+    "productionOutageMinutesToTriage": 15,
+    "customerBlockingDefectHoursToTriage": 4,
+    "dependencyReviewCadenceDays": 7,
+    "pricingReviewCadenceDays": 30,
+    "marketReviewCadenceDays": 30
+  },
+  "truthfulness": {
+    "planningBandsAreNotPublishedListPrices": true,
+    "recommendationsRequireSourceTimestamp": true,
+    "recommendationsRequireConfidence": true,
+    "recommendationsRequireRationale": true,
+    "recommendationsRequireOwnerReviewBeforeProduction": true
+  }
+}

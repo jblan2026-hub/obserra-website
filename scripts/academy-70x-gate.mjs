@@ -114,13 +114,40 @@ const requiredFiles = [
 ];
 for (const file of requiredFiles) check(`required file exists: ${file}`, exists(file));
 
-check("catalog requires all 60 live courses before Studio authority", /liveCourses\.length !== 60/.test(courseCatalog));
-check("catalog requires full commercial contract parity", /normalizedCommercialContract/.test(courseCatalog) && /studioCatalogHasLiveParity/.test(courseCatalog));
+check(
+  "catalog preserves reviewed baseline and additive governed Studio merge",
+  /mergedCourses/.test(courseCatalog)
+    && /additive-governed-merge/.test(courseCatalog)
+    && /baseline-fallback/.test(courseCatalog),
+);
+check(
+  "catalog exposes accepted and rejected Studio publication evidence",
+  /acceptedStudioCourses/.test(courseCatalog)
+    && /rejectedStudioCourses/.test(courseCatalog)
+    && /schemaSupported/.test(courseCatalog),
+);
 check("catalog fails closed to live production contract", /live-production-contract/.test(courseCatalog));
-check("checkout requires catalog parity before Studio price id", /academyCatalogParity\.matched \? studioCourseForId/.test(checkoutRoute));
+check(
+  "checkout uses only approved Studio records and protects overridden pricing",
+  /studioCourseIsApproved\(course\.id\)/.test(checkoutRoute)
+    && /useGovernedStripePrice/.test(checkoutRoute)
+    && /course\.price === baseCourse\.price/.test(checkoutRoute)
+    && /course\.title === baseCourse\.title/.test(checkoutRoute),
+);
 check("checkout live fallback charges website course price", /unit_amount: Math\.round\(course\.price \* 100\)/.test(checkoutRoute));
 check("checkout live fallback uses website title", /name: course\.title/.test(checkoutRoute));
 check("checkout emits catalog parity evidence", /x-obserra-catalog-parity/.test(checkoutRoute));
+check(
+  "checkout consults the authoritative course control plane",
+  /publicAcademyCourse\(baseCourse\)/.test(checkoutRoute)
+    && /runtimeCourse\.controlPlane !== "operational"/.test(checkoutRoute),
+);
+check(
+  "checkout blocks new purchases while preserving committed entitlements",
+  /!runtimeCourse\.control\.purchaseEnabled/.test(checkoutRoute)
+    && /x-obserra-existing-entitlements/.test(checkoutRoute)
+    && /preserved/.test(checkoutRoute),
+);
 
 check("public Academy states 60 published courses", /60 published courses/.test(academyClient));
 check("public Academy markets AI native training", /AI native training/.test(academyClient));
@@ -128,7 +155,16 @@ check("public Academy says AI tutor requires access", /unlocked only with author
 check("public course page exposes published lesson count", /course\.modules\.length/.test(coursePage));
 check("public course page exposes published duration", /\{course\.duration\}/.test(coursePage));
 check("public course page exposes AI tutor after access", /Obserrian AI Tutor after authorized access/.test(coursePage));
-check("public course page preserves 80 percent standard", /80 percent completion standard/.test(coursePage));
+check(
+  "public course page renders the governed percent completion standard",
+  /publication\.passingScore/.test(coursePage) && /percent completion standard/.test(coursePage),
+);
+check(
+  "public course page preserves existing learner access when sales are paused",
+  /Existing learner access/.test(coursePage)
+    && /Existing learner access is preserved/.test(coursePage)
+    && /does not revoke a learner entitlement/.test(coursePage),
+);
 
 check("assessment generates 25 questions", /Array\.from\(\{ length: 25 \}/.test(experience));
 check("assessment answer keys remain server side", /finalAssessmentQuestions/.test(experience) && /finalAssessment\(body\.courseId\)/.test(assessmentRoute));

@@ -1,10 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { academyCatalogParity } from "../../../academy/courseCatalog";
 import { courseForId } from "../../../../lib/academy";
+import { publicAcademyCourse } from "../../../../lib/academy-control";
 import {
   studioCertificateMetadata,
   studioCourseForId,
+  studioCourseIsApproved,
   studioLicenseMetadata,
 } from "../../../../lib/academy-studio";
 import { safeIdentity } from "../../../../lib/identity-runtime";
@@ -15,24 +16,45 @@ export const maxDuration = 60;
 
 const CLAIM_POLICY = "purchaser-email-match-v1";
 
+function unavailableRedirect(requestUrl: URL, reason: string) {
+  const response = NextResponse.redirect(new URL(`/academy?enrollment=${reason}`, requestUrl));
+  response.headers.set("x-obserra-commerce-status", reason);
+  response.headers.set("x-obserra-webhook-verification", "required");
+  response.headers.set("cache-control", "private, no-store, max-age=0");
+  return response;
+}
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  const course = courseForId(requestUrl.searchParams.get("course") ?? "");
+  const baseCourse = courseForId(requestUrl.searchParams.get("course") ?? "");
 
-  if (!course || !process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
-    const response = NextResponse.redirect(new URL("/academy?enrollment=not-ready", requestUrl));
-    response.headers.set("x-obserra-commerce-status", "configuration-required");
-    response.headers.set("x-obserra-webhook-verification", "required");
-    response.headers.set("cache-control", "private, no-store, max-age=0");
+  if (!baseCourse || !process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
+    return unavailableRedirect(requestUrl, "configuration-required");
+  }
+
+  const runtimeCourse = await publicAcademyCourse(baseCourse);
+  if (
+    runtimeCourse.controlPlane !== "operational" ||
+    !runtimeCourse.course ||
+    !runtimeCourse.control.purchaseEnabled
+  ) {
+    const reason = runtimeCourse.controlPlane === "operational"
+      ? "course-unavailable"
+      : "purchase-authorization-unavailable";
+    const response = unavailableRedirect(requestUrl, reason);
+    response.headers.set("x-obserra-course-lifecycle", runtimeCourse.control.lifecycle);
+    response.headers.set("x-obserra-existing-entitlements", "preserved");
     return response;
   }
+
+  const course = runtimeCourse.course;
 
   try {
     const identity = await safeIdentity();
     const purchaserReference = identity.userId ?? `guest_${randomUUID()}`;
     const identityMode = identity.userId ? "authenticated" : "guest-email";
     const stripe = getStripe();
-    const studioCourse = academyCatalogParity.matched ? studioCourseForId(course.id) : null;
+    const studioCourse = studioCourseIsApproved(course.id) ? studioCourseForId(course.id) : null;
     const license = studioLicenseMetadata(course.id);
     const certificate = studioCertificateMetadata(course.id);
     const successUrl = new URL("/academy/success", requestUrl);
@@ -60,10 +82,18 @@ export async function GET(request: Request) {
       isComplianceEvidence: String(certificate.isComplianceEvidence),
       courseVersion: studioCourse?.version ?? "website-catalog",
       studioManaged: String(Boolean(studioCourse)),
-      catalogParityVerified: String(academyCatalogParity.matched),
+      catalogParityVerified: String(Boolean(studioCourse)),
+      courseLifecycle: runtimeCourse.control.lifecycle,
+      courseControlRevision: String(runtimeCourse.control.revision),
+      existingEntitlementsPreserved: "true",
     };
 
-    const lineItem = studioCourse?.commerce.stripePriceId
+    const useGovernedStripePrice = Boolean(
+      studioCourse?.commerce.stripePriceId &&
+      course.price === baseCourse.price &&
+      course.title === baseCourse.title,
+    );
+    const lineItem = useGovernedStripePrice && studioCourse?.commerce.stripePriceId
       ? { price: studioCourse.commerce.stripePriceId, quantity: 1 }
       : {
           quantity: 1,
@@ -79,6 +109,7 @@ export async function GET(request: Request) {
                 level: course.level,
                 entitlementCode: license.entitlementCode,
                 credentialType: metadata.credentialType,
+                courseControlRevision: metadata.courseControlRevision,
               },
             },
           },
@@ -101,14 +132,20 @@ export async function GET(request: Request) {
     const response = NextResponse.redirect(session.url, { status: 303 });
     response.headers.set("x-obserra-commerce-mode", identityMode);
     response.headers.set("x-obserra-claim-policy", CLAIM_POLICY);
-    response.headers.set("x-obserra-catalog-parity", academyCatalogParity.matched ? "verified" : "live-contract-fallback");
+    response.headers.set("x-obserra-catalog-parity", studioCourse ? "governed-studio" : "baseline-fallback");
+    response.headers.set("x-obserra-course-lifecycle", runtimeCourse.control.lifecycle);
+    response.headers.set("x-obserra-course-control-revision", String(runtimeCourse.control.revision));
+    response.headers.set("x-obserra-existing-entitlements", "preserved");
     response.headers.set("x-obserra-webhook-verification", "required");
     response.headers.set("cache-control", "private, no-store, max-age=0");
     return response;
   } catch (error) {
     console.error("academy checkout failed", error);
-    const response = NextResponse.redirect(new URL(`/academy/${course.id}?enrollment=checkout-unavailable`, requestUrl));
+    const response = NextResponse.redirect(
+      new URL(`/academy/${course.id}?enrollment=checkout-unavailable`, requestUrl),
+    );
     response.headers.set("x-obserra-commerce-status", "checkout-unavailable");
+    response.headers.set("x-obserra-existing-entitlements", "preserved");
     response.headers.set("cache-control", "private, no-store, max-age=0");
     return response;
   }
