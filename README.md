@@ -6,7 +6,9 @@ Private Next.js website for **Obserra Executive Protection & Intelligence LLC**.
 
 The website follows the [Automated Maintenance and Private EIOS Boundary](docs/AUTOMATED_MAINTENANCE_AND_EIOS_BOUNDARY.md).
 
-Approved dependencies, compatibility-coupled packages, security configuration, runtime components, and deployment infrastructure may be patched automatically after locked-source verification, preview or sandbox testing, route, authentication, commerce, webhook, accessibility, security, canary, and rollback gates pass. Owner approval is required only when a dependency or patch retains material predicted outage risk after the staged safety controls are evaluated.
+Approved Obserra-owned dependencies, compatibility-coupled packages, security configuration, runtime components, source, and deployment infrastructure may be patched automatically after locked-source verification, preview or sandbox testing, route, authentication, commerce, webhook, accessibility, security, canary, and rollback gates pass. Owner approval is required only when a first-party dependency or patch retains material predicted outage risk after the staged safety controls are evaluated.
+
+Autonomous patch authority never extends through the website to learners, students, customers, visitors, vendors, or connected third-party services. Their devices, browsers, accounts, networks, tenants, and vendor-managed platforms remain observe-only for security remediation. Connection, enrollment, telemetry, or API credentials do not establish ownership, and human approval cannot override this boundary.
 
 The public website never contains private EIOS execution authority, endpoint data, vulnerability evidence, incident data, credentials, internal APIs, or customer-system control. Private operational status may be reported through protected backend integrations, but public browser code does not calculate authoritative risk or dispatch administrative actions.
 
@@ -32,6 +34,6 @@ Protected learning and certificate routes are private, non-indexable, and sent w
 npm run build
 ```
 
-Before a production deployment, verify public routes, protected Academy routes, Stripe signature rejection, navigation links, robots, sitemap, headers, dependency state, preview health, and rollback readiness. Deploy only the `main` branch through the `obserra-integrated-services` project, then alias the validated production deployment to `www.obserrallc.com`.
+Before a production deployment, verify public routes, protected Academy routes, Stripe signature rejection, navigation links, robots, sitemap, headers, dependency state, preview health, first-party ownership scope, and rollback readiness. Deploy only the `main` branch through the `obserra-integrated-services` project, then alias the validated production deployment to `www.obserrallc.com`.
 
 Documentation and release notes must distinguish target, implemented, verified, deployed, operating, and effective states. Automated-maintenance direction alone is not evidence that a patch was applied in production.
