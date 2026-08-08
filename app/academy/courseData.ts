@@ -20,11 +20,11 @@ export type Course = {
 type CourseSpec = readonly [id: string, title: string, level: CourseLevel, department: Department, track: string, focus: string];
 
 const prices: Record<CourseLevel, number> = {
-  Foundation: 149,
-  Professional: 249,
-  Advanced: 349,
-  "Executive Intensive": 499,
-  "CISO Masterclass": 699,
+  Foundation: 99,
+  Professional: 149,
+  Advanced: 199,
+  "Executive Intensive": 249,
+  "CISO Masterclass": 299,
 };
 
 const durations: Record<CourseLevel, string> = {
