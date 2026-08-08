@@ -2,6 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { assignApplicationsEvenly } from "./application-worker-performance.mjs";
+
+const startedAt = Date.now();
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const sourcePath = path.join(root, "app", "apps", "appsData.ts");
 const policyPath = path.join(root, "config", "application-production-policy.json");
@@ -44,21 +47,22 @@ for (const match of source.matchAll(appPattern)) {
 
 if (!apps.length) throw new Error("No applications were discovered in app/apps/appsData.ts.");
 
-function hashSlug(slug) {
-  let hash = 2166136261;
-  for (const char of slug) {
-    hash ^= char.charCodeAt(0);
-    hash = Math.imul(hash, 16777619) >>> 0;
-  }
-  return hash;
-}
-
-const assigned = apps.filter((app) => (hashSlug(app.slug) % workerCount) + 1 === workerId);
+const workerAssignments = assignApplicationsEvenly(apps, workerCount);
+const assignment = workerAssignments.find((item) => item.workerId === workerId);
+if (!assignment) throw new Error(`No deterministic assignment record was produced for worker ${workerId}.`);
+const assigned = assignment.applications;
 const allowedStatuses = new Set(["Available", "Pilot", "Coming Soon"]);
 const allowedDeployments = new Set(["SaaS", "Private Cloud", "Hybrid", "On-Premises"]);
 const findings = [];
+const statusCounts = {};
+const categoryCounts = {};
+const deploymentCounts = {};
 
 for (const app of assigned) {
+  statusCounts[app.status] = (statusCounts[app.status] ?? 0) + 1;
+  categoryCounts[app.category] = (categoryCounts[app.category] ?? 0) + 1;
+  for (const model of app.deployment) deploymentCounts[model] = (deploymentCounts[model] ?? 0) + 1;
+
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(app.slug)) findings.push(`${app.slug}: invalid slug`);
   if (!app.name.trim()) findings.push(`${app.slug}: missing application name`);
   if (!allowedStatuses.has(app.status)) findings.push(`${app.slug}: unsupported marketplace status ${app.status}`);
@@ -73,24 +77,45 @@ for (const app of assigned) {
   }
 }
 
+const completedAt = Date.now();
 const evidence = {
-  schemaVersion: "1.1",
+  schemaVersion: "1.2",
   portfolioWorkerCount: allocation.totalLogicalWorkers,
   applicationWorkerAllocation: allocation.applicationWorkers,
   courseWorkerAllocation: allocation.courseWorkers,
   workerId,
   workerCount,
+  schedulingPolicy: "largest-estimated-work-first-balanced",
   assignedApplications: assigned.map((app) => app.slug),
+  assignedApplicationDetails: assigned.map((app) => ({
+    slug: app.slug,
+    status: app.status,
+    category: app.category,
+    deployment: app.deployment,
+    estimatedWork: app.estimatedWork,
+  })),
+  assignedWorkWeight: assignment.totalWeight,
   checkedApplications: assigned.length,
+  statusCounts,
+  categoryCounts,
+  deploymentCounts,
   findings,
   passed: findings.length === 0,
-  generatedAt: new Date().toISOString(),
+  sourceBytes: Buffer.byteLength(source, "utf8"),
+  startedAt: new Date(startedAt).toISOString(),
+  completedAt: new Date(completedAt).toISOString(),
+  elapsedMs: completedAt - startedAt,
+  generatedAt: new Date(completedAt).toISOString(),
+  claimBoundary: "This worker validates assigned catalog records only. It does not implement, sign, deploy, price, publish, sell, or support an application.",
 };
 
 const outputDir = path.join(root, "release", "application-pipeline-evidence");
 fs.mkdirSync(outputDir, { recursive: true });
-fs.writeFileSync(path.join(outputDir, `worker-${String(workerId).padStart(2, "0")}.json`), JSON.stringify(evidence, null, 2));
+fs.writeFileSync(
+  path.join(outputDir, `worker-${String(workerId).padStart(2, "0")}.json`),
+  `${JSON.stringify(evidence, null, 2)}\n`,
+);
 
-console.log(`[Application Production] worker ${workerId}/${workerCount}: ${assigned.length} assigned application(s); portfolio allocation 20 application + 16 course = 36 total.`);
-for (const app of assigned) console.log(`- ${app.slug}: ${app.status} · ${app.deployment.join(", ")}`);
+console.log(`[Application Production] worker ${workerId}/${workerCount}: ${assigned.length} assigned application(s); workWeight=${assignment.totalWeight}; elapsedMs=${evidence.elapsedMs}; portfolio allocation 20 application + 16 course = 36 total.`);
+for (const app of assigned) console.log(`- ${app.slug}: ${app.status} · ${app.deployment.join(", ")} · work=${app.estimatedWork}`);
 if (findings.length) throw new Error(findings.join("\n"));
