@@ -17,6 +17,7 @@ on:
       - "scripts/sync-final-apps.mjs"
       - "config/application-market-intelligence-policy.json"
       - "config/application-production-policy.json"
+      - "config/application-worker-scaling-policy.json"
       - "config/site-workflow-operations-policy.json"
       - "package.json"
       - "package-lock.json"
@@ -35,6 +36,7 @@ on:
       - "scripts/sync-final-apps.mjs"
       - "config/application-market-intelligence-policy.json"
       - "config/application-production-policy.json"
+      - "config/application-worker-scaling-policy.json"
       - "config/site-workflow-operations-policy.json"
       - "package.json"
       - "package-lock.json"
@@ -83,7 +85,7 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           const catalog = JSON.parse(fs.readFileSync(path.join('release', 'application-production', 'release-catalog.json'), 'utf8'));
-          const market = JSON.parse(fs.readFileSync(path.join('release', 'application-market-intelligence', 'market-guidance.json'), 'utf8'));
+          const market = JSON.parse(fs.readFileSync(path.join('release', 'application-market-intelligence', 'portfolio-pricing-plan.json'), 'utf8'));
           if (!Array.isArray(market.applications) || market.applications.length !== catalog.applications.length) {
             throw new Error('market guidance does not cover the complete staged application catalog');
           }
