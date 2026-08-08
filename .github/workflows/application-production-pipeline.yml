@@ -52,64 +52,106 @@ concurrency:
   group: application-production-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  NPM_CONFIG_AUDIT: "false"
+  NPM_CONFIG_FUND: "false"
+  NPM_CONFIG_PROGRESS: "false"
+  NPM_CONFIG_UPDATE_NOTIFIER: "false"
+
 jobs:
   application-workers:
-    name: Application worker ${{ matrix.worker }}
+    name: Run 20 logical application workers efficiently
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      max-parallel: 20
-      matrix:
-        worker: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - name: Install locked dependencies
-        run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Validate assigned application workload
+      - name: Run all logical worker validations in parallel
+        shell: bash
         env:
           OBSERRA_PORTFOLIO_WORKER_COUNT: 36
-          OBSERRA_APPLICATION_WORKER_ID: ${{ matrix.worker }}
           OBSERRA_APPLICATION_WORKER_COUNT: 20
           OBSERRA_COURSE_WORKER_COUNT: 16
           OBSERRA_APPLICATION_RUN_ID: ${{ github.run_id }}
           OBSERRA_APPLICATION_RUN_ATTEMPT: ${{ github.run_attempt }}
           OBSERRA_APPLICATION_COMMIT_SHA: ${{ github.sha }}
           OBSERRA_APPLICATION_REF: ${{ github.ref }}
-        run: node scripts/application-production-worker.mjs
-      - name: Upload worker evidence
+        run: |
+          set -euo pipefail
+          mkdir -p release/application-pipeline-evidence/logs
+          pids=()
+          for worker in $(seq 1 20); do
+            (
+              export OBSERRA_APPLICATION_WORKER_ID="$worker"
+              node scripts/application-production-worker.mjs \
+                >"release/application-pipeline-evidence/logs/worker-$(printf '%02d' "$worker").log" 2>&1
+            ) &
+            pids+=("$!")
+          done
+
+          failed=0
+          for index in "${!pids[@]}"; do
+            worker=$((index + 1))
+            if ! wait "${pids[$index]}"; then
+              echo "Application worker $worker failed."
+              failed=1
+            fi
+          done
+
+          for log in release/application-pipeline-evidence/logs/*.log; do
+            echo "===== $log ====="
+            cat "$log"
+          done
+
+          test "$(find release/application-pipeline-evidence -maxdepth 1 -name 'worker-*.json' | wc -l)" -eq 20
+          if [ "$failed" -ne 0 ]; then exit 1; fi
+      - name: Upload consolidated worker evidence
         uses: actions/upload-artifact@v4
         with:
-          name: application-worker-${{ matrix.worker }}-${{ github.sha }}
-          path: release/application-pipeline-evidence/worker-*.json
+          name: application-worker-pool-${{ github.sha }}
+          path: release/application-pipeline-evidence/**
           if-no-files-found: error
           retention-days: 90
+          compression-level: 6
 
   application-staging-gate:
     name: Application staging gate
     needs: application-workers
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+      - name: Restore Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-next-${{ hashFiles('package-lock.json') }}-${{ hashFiles('app/**', 'components/**', 'lib/**', 'public/**') }}
+          restore-keys: |
+            ${{ runner.os }}-next-${{ hashFiles('package-lock.json') }}-
       - name: Install locked dependencies
-        run: npm ci --ignore-scripts --no-audit --no-fund
+        run: npm ci --ignore-scripts --no-audit --no-fund --prefer-offline
       - name: Generate governed staging manifests
         run: npm run release:apps -- release/application-production
       - name: Generate market and maintenance guidance
         run: npm run market:apps
-      - name: Run repository tests
-        run: npm test
-      - name: Run lint
-        run: npm run lint
+      - name: Run tests and lint in parallel
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm test > /tmp/application-tests.log 2>&1 & test_pid=$!
+          npm run lint > /tmp/application-lint.log 2>&1 & lint_pid=$!
+          failed=0
+          wait "$test_pid" || failed=1
+          wait "$lint_pid" || failed=1
+          cat /tmp/application-tests.log
+          cat /tmp/application-lint.log
+          if [ "$failed" -ne 0 ]; then exit 1; fi
       - name: Build production website
         run: npm run build
       - name: Prohibit unsigned production application claims
@@ -136,6 +178,7 @@ jobs:
             release/application-market-intelligence/**
           if-no-files-found: error
           retention-days: 180
+          compression-level: 6
 
   final-publication-contract:
     name: Final signed-artifact publication contract
