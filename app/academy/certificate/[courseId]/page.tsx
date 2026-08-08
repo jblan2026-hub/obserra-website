@@ -3,11 +3,15 @@ import { notFound, redirect } from "next/navigation";
 import CertificateView from "./CertificateView";
 import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
 import { verifyCertificateClaim } from "../../../../lib/certificate-signing";
+import { publicationForCourse } from "../../coursePublication";
 
 export default async function CertificatePage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
   const course = courseForId(courseId);
   if (!course) notFound();
+
+  const publication = publicationForCourse(courseId);
+  const courseVersion = publication.version || "1.0.0";
 
   const { userId } = await auth();
   if (!userId) {
@@ -38,6 +42,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
     <CertificateView
       learnerName={learnerName}
       courseTitle={course.title}
+      courseVersion={courseVersion}
       department={course.department}
       trainingHours={course.duration}
       completedAt={progress.completedAt}
