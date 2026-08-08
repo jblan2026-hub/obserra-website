@@ -1,11 +1,18 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "legalEntity": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "portfolioWorkerAllocation": {
+    "totalLogicalWorkers": 36,
+    "applicationWorkers": 20,
+    "courseWorkers": 16,
+    "crossPoolBorrowingAllowed": false,
+    "allocationChangeRequiresOwnerApproval": true
+  },
   "workerPool": {
-    "logicalWorkers": 30,
+    "logicalWorkers": 20,
     "assignment": "deterministic-modulo",
     "failClosed": true,
-    "note": "GitHub account concurrency limits may reduce simultaneous execution without changing the 30-worker logical pool."
+    "note": "The application pipeline owns 20 of the fixed 36-worker Obserra portfolio allocation. Sixteen workers are reserved for Academy course production. Platform concurrency limits may reduce simultaneous execution without changing the governed 20-worker application pool."
   },
   "lifecycle": [
     "intake",
