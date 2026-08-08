@@ -10,9 +10,6 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
   const course = courseForId(courseId);
   if (!course) notFound();
 
-  const publication = publicationForCourse(courseId);
-  const courseVersion = publication.version || "1.0.0";
-
   const { userId } = await auth();
   if (!userId) {
     redirect(`/sign-in?redirect_url=${encodeURIComponent(`/academy/certificate/${courseId}`)}`);
@@ -34,6 +31,11 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
     redirect(`/academy/learn/${courseId}?certificate=signature-required`);
   }
 
+  const signed = progress.signedCertificate;
+  const publication = publicationForCourse(courseId);
+  const courseTitle = signed.schemaVersion === "1.1" ? signed.courseTitle : course.title;
+  const courseVersion = signed.schemaVersion === "1.1" ? signed.courseVersion : (publication.version || "1.0.0");
+
   const user = await (await clerkClient()).users.getUser(userId);
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
   const learnerName = fullName || user.emailAddresses[0]?.emailAddress || "Obserra Academy Learner";
@@ -41,14 +43,14 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
   return (
     <CertificateView
       learnerName={learnerName}
-      courseTitle={course.title}
+      courseTitle={courseTitle}
       courseVersion={courseVersion}
       department={course.department}
       trainingHours={course.duration}
       completedAt={progress.completedAt}
       certificateId={progress.certificateId}
-      signatureAlgorithm={progress.signedCertificate.signatureAlgorithm}
-      publicKeyFingerprint={progress.signedCertificate.publicKeyFingerprint}
+      signatureAlgorithm={signed.signatureAlgorithm}
+      publicKeyFingerprint={signed.publicKeyFingerprint}
     />
   );
 }
