@@ -4,6 +4,9 @@ import test from "node:test";
 
 const route = fs.readFileSync("app/api/academy/certificate/verify/route.ts", "utf8");
 const academy = fs.readFileSync("lib/academy.ts", "utf8");
+const signing = fs.readFileSync("lib/certificate-signing.ts", "utf8");
+const certificatePage = fs.readFileSync("app/academy/certificate/[courseId]/page.tsx", "utf8");
+const certificateView = fs.readFileSync("app/academy/certificate/[courseId]/CertificateView.tsx", "utf8");
 
 test("certificate verification rejects malformed IDs before expensive lookup", () => {
   assert.match(route, /CERTIFICATE_ID_PATTERN/);
@@ -41,15 +44,42 @@ test("certificate verification fails closed when the backing identity service is
   assert.match(route, /private, no-store, max-age=0/);
 });
 
-test("public certificate verification minimizes learner data", () => {
+test("public certificate verification minimizes learner data while preserving course identity", () => {
   const publicPayloadStart = route.indexOf("const publicCertificate = {");
   const publicPayloadEnd = route.indexOf("};", publicPayloadStart);
   assert.ok(publicPayloadStart >= 0 && publicPayloadEnd > publicPayloadStart);
   const publicPayload = route.slice(publicPayloadStart, publicPayloadEnd);
   assert.match(publicPayload, /learnerName/);
   assert.match(publicPayload, /courseTitle/);
+  assert.match(publicPayload, /courseVersion/);
   assert.match(publicPayload, /completedAt/);
   assert.doesNotMatch(publicPayload, /assessmentScore/);
+  assert.doesNotMatch(publicPayload, /email/);
+  assert.doesNotMatch(publicPayload, /paymentReference/);
+});
+
+test("new signed certificate claims bind canonical course title and semantic version", () => {
+  assert.match(signing, /schemaVersion: "1\.1"/);
+  assert.match(signing, /courseTitle: string/);
+  assert.match(signing, /courseVersion: string/);
+  assert.match(signing, /courseTitle: claim\.courseTitle/);
+  assert.match(signing, /courseVersion: claim\.courseVersion/);
+  assert.match(signing, /\^\\d\+\\\.\\d\+\\\.\\d\+\$/);
+  assert.match(academy, /courseTitle: course\.title/);
+  assert.match(academy, /courseVersion: governedCourseVersion\(courseId\)/);
+});
+
+test("legacy schema 1.0 certificates remain explicitly supported", () => {
+  assert.match(signing, /schemaVersion: "1\.0"/);
+  assert.match(signing, /claim\.schemaVersion !== "1\.0" && claim\.schemaVersion !== "1\.1"/);
+  assert.match(academy, /signed\.schemaVersion === "1\.1" \? signed\.courseTitle : course\.title/);
+});
+
+test("certificate presentation renders signed title and version and uses canonical credential name", () => {
+  assert.match(certificatePage, /signed\.schemaVersion === "1\.1" \? signed\.courseTitle : course\.title/);
+  assert.match(certificatePage, /signed\.schemaVersion === "1\.1" \? signed\.courseVersion/);
+  assert.match(certificateView, /Certificate of Course Completion/);
+  assert.match(certificateView, /Course Version/);
 });
 
 test("legacy certificate lookup retains an explicit bounded user scan", () => {
