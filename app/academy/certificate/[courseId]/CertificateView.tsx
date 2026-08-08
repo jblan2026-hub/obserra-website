@@ -6,10 +6,12 @@ import "./brand-certificate.css";
 
 const LEGAL_NAME = "Obserra Executive Protection & Intelligence, LLC";
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
+const CREDENTIAL_NAME = "Certificate of Course Completion";
 
 type CertificateProps = {
   learnerName: string;
   courseTitle: string;
+  courseVersion: string;
   department: string;
   trainingHours: string;
   completedAt: string;
@@ -21,6 +23,7 @@ type CertificateProps = {
 export default function CertificateView({
   learnerName,
   courseTitle,
+  courseVersion,
   department,
   trainingHours,
   completedAt,
@@ -34,6 +37,7 @@ export default function CertificateView({
     year: "numeric",
   }).format(new Date(completedAt));
   const verificationUrl = `/api/academy/certificate/verify?certificateId=${encodeURIComponent(certificateId)}`;
+  const normalizedVersion = courseVersion.startsWith("v") ? courseVersion : `v${courseVersion}`;
 
   return (
     <main className="certificate-page">
@@ -56,16 +60,17 @@ export default function CertificateView({
         </div>
 
         <div className="certificate-rule" />
-        <p className="certificate-label">Certificate of Training Completion</p>
+        <p className="certificate-label">{CREDENTIAL_NAME}</p>
         <p className="certificate-kicker">Cryptographically signed professional development record of {LEGAL_NAME}</p>
         <h1>This certifies that</h1>
         <h2>{learnerName}</h2>
-        <p className="certificate-copy">has successfully completed the Obserra Academy professional training program of {LEGAL_NAME}</p>
+        <p className="certificate-copy">has successfully completed the following Obserra Academy course:</p>
         <h3>{courseTitle}</h3>
-        <p className="certificate-copy certificate-copy-strong">Completion included every required learning experience and a final assessment score of 80 percent or higher.</p>
+        <p className="certificate-copy certificate-copy-strong">Completion included every required learning experience and the required final assessment.</p>
 
         <div className="certificate-meta">
           <span>Academy division<strong>{department} Department</strong></span>
+          <span>Course version<strong>{normalizedVersion}</strong></span>
           <span>Instructional hours<strong>{trainingHours}</strong></span>
           <span>Verification ID<strong>{certificateId}</strong></span>
         </div>
@@ -87,14 +92,15 @@ export default function CertificateView({
 
         <div className="certificate-verification">
           <span>Completion date <b>{completionDate}</b></span>
+          <span>Course version <b>{normalizedVersion}</b></span>
           <span>Signature algorithm <b>{signatureAlgorithm}</b></span>
           <span>Signing key fingerprint <b>{publicKeyFingerprint.slice(0, 16)}...{publicKeyFingerprint.slice(-16)}</b></span>
           <span>Verify online <b><a href={verificationUrl}>Certificate verification record</a></b></span>
         </div>
 
         <footer>
-          <b>Issued by {LEGAL_NAME}</b>
-          <small>Property of {LEGAL_NAME}. This signed record confirms completion of an Obserra Academy professional training program. It is not a government license, occupational authorization, accredited academic credit, or third party professional certification.</small>
+          <b>Issued by Obserra Academy, a training division of {LEGAL_NAME}</b>
+          <small>This signed record confirms completion of an Obserra Academy course. It is not a government license, occupational authorization, accredited academic credit, or third-party professional certification.</small>
         </footer>
       </section>
     </main>
