@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0",
+  "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "continuousUntilOwnerProductionAcceptance": true,
+  "productionAcceptanceMarker": "owner-production-accepted",
+  "portfolio": {
+    "totalWorkers": 36,
+    "applicationWorkers": 20,
+    "academyWorkers": 16,
+    "crossPoolBorrowingAllowed": false
+  },
+  "workers": [
+    {"workerId": 1, "area": "Command Center information architecture and interactive dashboards", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 100},
+    {"workerId": 2, "area": "Live EKG worker heartbeat and performance monitor", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 100},
+    {"workerId": 3, "area": "AI usage, credits, tokens, cost, and latency intelligence", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 98},
+    {"workerId": 4, "area": "Device enrollment, inventory, heartbeat, and network analysis", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 100},
+    {"workerId": 5, "area": "HTTPS and HTML website monitoring", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 96},
+    {"workerId": 6, "area": "Remediation, block, quarantine, and rollback adapters", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 98},
+    {"workerId": 7, "area": "Immutable owner identity, MFA, sessions, and authorization", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 100},
+    {"workerId": 8, "area": "Private owner deployment, DNS, TLS, and denied-access verification", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 100},
+    {"workerId": 9, "area": "EIOS backend, APIs, migrations, persistence, and regression", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 100},
+    {"workerId": 10, "area": "EIOS frontend build, accessibility, and live interactions", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 99},
+    {"workerId": 11, "area": "Desktop installer, startup, updates, and runtime performance", "repository": "jblan2026-hub/obserra-academy-production-studio", "priority": 97},
+    {"workerId": 12, "area": "Application development, maintenance, staging, and support", "repository": "jblan2026-hub/obserra-website", "priority": 94},
+    {"workerId": 13, "area": "Stripe, store, purchases, pricing synchronization, and entitlements", "repository": "jblan2026-hub/obserra-website", "priority": 98},
+    {"workerId": 14, "area": "Logs, metrics, traces, alerts, evidence, and status reporting", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 95},
+    {"workerId": 15, "area": "Security, privacy, accessibility, regulatory, and assurance gates", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 99},
+    {"workerId": 16, "area": "Backup, restore, rollback, disaster recovery, and emergency stop", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 97},
+    {"workerId": 17, "area": "Verified connectors and automatic registration", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 97},
+    {"workerId": 18, "area": "Performance, load, resilience, and build efficiency", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 93},
+    {"workerId": 19, "area": "Build guides, architecture, evidence, and operational documentation", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 91},
+    {"workerId": 20, "area": "Cross-project release management, go-live verification, and owner acceptance", "repository": "jblan2026-hub/obserra-eios-enterprise", "priority": 100}
+  ],
+  "truthBoundary": "This file assigns persistent logical responsibilities. A worker is not live until an approved execution adapter authenticates, produces a fresh healthy heartbeat, accepts a task, and supplies execution evidence."
+}
