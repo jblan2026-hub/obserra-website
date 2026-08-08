@@ -5,13 +5,15 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const defaultReleaseRoot = "C:\\Users\\jblan\\OneDrive\\Desktop\\Final Production Release Apps";
-const releaseRoot = path.resolve(process.argv[2] || defaultReleaseRoot);
+const args = process.argv.slice(2);
+const dryRun = args.includes("--dry-run");
+const releaseRootArgument = args.find((argument) => !argument.startsWith("--"));
+const releaseRoot = path.resolve(releaseRootArgument || defaultReleaseRoot);
 const catalogPath = path.join(repoRoot, "app", "apps", "store-catalog.json");
 const marketingCatalogPath = path.join(repoRoot, "app", "apps", "marketing-catalog.json");
 const appsDataPath = path.join(repoRoot, "app", "apps", "appsData.ts");
 const bucket = process.env.OBSERRA_RELEASE_BUCKET;
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.obserrallc.com").replace(/\/$/, "");
-const dryRun = process.argv.includes("--dry-run");
 const generatedStart = "  // OBSERRA GENERATED STORE APPS START";
 const generatedEnd = "  // OBSERRA GENERATED STORE APPS END";
 
@@ -188,7 +190,7 @@ const generatedAt = new Date().toISOString();
 fs.writeFileSync(catalogPath, `${JSON.stringify({ schemaVersion: "1.1", generatedAt, releaseRoot, applications }, null, 2)}\n`);
 fs.writeFileSync(marketingCatalogPath, `${JSON.stringify({ schemaVersion: "1.0", generatedAt, campaigns: marketingCampaigns }, null, 2)}\n`);
 updateMarketplaceData(applications);
-console.log(`[Obserra Publisher] Synced ${applications.length} applications and ${marketingCampaigns.length} governed marketing campaign packs`);
+console.log(`[Obserra Publisher] Synced ${applications.length} applications and ${marketingCampaigns.length} governed marketing campaign packs${dryRun ? " in dry-run mode" : ""}`);
 
 if (!dryRun && process.env.OBSERRA_MARKETING_WEBHOOK_URL) {
   const response = await fetch(process.env.OBSERRA_MARKETING_WEBHOOK_URL, {
