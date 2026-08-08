@@ -145,6 +145,7 @@ export async function GET(request: Request) {
       learnerName: certificate.learnerName,
       courseId: certificate.courseId,
       courseTitle: certificate.courseTitle,
+      courseVersion: certificate.courseVersion,
       completedAt: certificate.completedAt,
       trainingHours: certificate.trainingHours,
       signerName: certificate.signerName,
