@@ -187,7 +187,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Verify final publisher remains separate and fail closed
+      - name: Verify final publisher remains separate, integrity-bound, and fail closed
         run: |
           node - <<'NODE'
           const fs = require('fs');
@@ -197,11 +197,25 @@ jobs:
             throw new Error('final signed-artifact publication command is missing or unsafe');
           }
           const publisher = fs.readFileSync('scripts/sync-final-apps.mjs', 'utf8');
-          for (const required of ['findArtifact', 'package_sha256', 'OBSERRA_RELEASE_BUCKET', 'aws', 's3']) {
+          for (const required of [
+            'findArtifact',
+            'createHash("sha256")',
+            'checksums.json',
+            'artifactSha256',
+            'timingSafeEqual',
+            'OBSERRA_RELEASE_BUCKET',
+            'aws',
+            's3',
+          ]) {
             if (!publisher.includes(required)) throw new Error(`final publisher missing required control: ${required}`);
           }
-          if (!publisher.includes('Release root not found') || !publisher.includes('No publishable FINAL releases found')) {
-            throw new Error('final publisher does not fail closed without signed artifacts');
+          for (const boundary of [
+            'Release root not found',
+            'No publishable FINAL releases found',
+            'requires release.artifactSha256 or a checksums.json SHA-256 entry',
+            'SHA-256 verification failed',
+          ]) {
+            if (!publisher.includes(boundary)) throw new Error(`final publisher missing fail-closed boundary: ${boundary}`);
           }
-          console.log('Final publication remains a separate signed-artifact gate.');
+          console.log('Final publication remains separate, SHA-256 verified, and fail closed.');
           NODE
