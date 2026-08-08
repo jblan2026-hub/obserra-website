@@ -1,0 +1,221 @@
+name: Application Production Pipeline
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - agent/sitewide-governance-auto-academy
+    paths:
+      - "app/apps/**"
+      - "app/api/apps/**"
+      - "app/portal/applications/**"
+      - "lib/release-delivery.ts"
+      - "scripts/application-production-worker.mjs"
+      - "scripts/application-market-brain.mjs"
+      - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/sync-final-apps.mjs"
+      - "config/application-production-policy.json"
+      - "config/application-market-intelligence-policy.json"
+      - "config/application-worker-scaling-policy.json"
+      - "config/site-workflow-operations-policy.json"
+      - "docs/APPLICATION-PRODUCTION-PIPELINE.md"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/application-production-pipeline.yml"
+  push:
+    branches:
+      - main
+      - agent/application-production-pipeline
+    paths:
+      - "app/apps/**"
+      - "app/api/apps/**"
+      - "app/portal/applications/**"
+      - "lib/release-delivery.ts"
+      - "scripts/application-production-worker.mjs"
+      - "scripts/application-market-brain.mjs"
+      - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/sync-final-apps.mjs"
+      - "config/application-production-policy.json"
+      - "config/application-market-intelligence-policy.json"
+      - "config/application-worker-scaling-policy.json"
+      - "config/site-workflow-operations-policy.json"
+      - "docs/APPLICATION-PRODUCTION-PIPELINE.md"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/application-production-pipeline.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: application-production-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NPM_CONFIG_AUDIT: "false"
+  NPM_CONFIG_FUND: "false"
+  NPM_CONFIG_PROGRESS: "false"
+  NPM_CONFIG_UPDATE_NOTIFIER: "false"
+
+jobs:
+  application-workers:
+    name: Run 20 logical application workers efficiently
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run all logical worker validations in parallel
+        shell: bash
+        env:
+          OBSERRA_PORTFOLIO_WORKER_COUNT: 36
+          OBSERRA_APPLICATION_WORKER_COUNT: 20
+          OBSERRA_COURSE_WORKER_COUNT: 16
+          OBSERRA_APPLICATION_RUN_ID: ${{ github.run_id }}
+          OBSERRA_APPLICATION_RUN_ATTEMPT: ${{ github.run_attempt }}
+          OBSERRA_APPLICATION_COMMIT_SHA: ${{ github.sha }}
+          OBSERRA_APPLICATION_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          mkdir -p release/application-pipeline-evidence/logs
+          pids=()
+          for worker in $(seq 1 20); do
+            (
+              export OBSERRA_APPLICATION_WORKER_ID="$worker"
+              node scripts/application-production-worker.mjs \
+                >"release/application-pipeline-evidence/logs/worker-$(printf '%02d' "$worker").log" 2>&1
+            ) &
+            pids+=("$!")
+          done
+
+          failed=0
+          for index in "${!pids[@]}"; do
+            worker=$((index + 1))
+            if ! wait "${pids[$index]}"; then
+              echo "Application worker $worker failed."
+              failed=1
+            fi
+          done
+
+          for log in release/application-pipeline-evidence/logs/*.log; do
+            echo "===== $log ====="
+            cat "$log"
+          done
+
+          test "$(find release/application-pipeline-evidence -maxdepth 1 -name 'worker-*.json' | wc -l)" -eq 20
+          if [ "$failed" -ne 0 ]; then exit 1; fi
+      - name: Upload consolidated worker evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-worker-pool-${{ github.sha }}
+          path: release/application-pipeline-evidence/**
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 6
+
+  application-staging-gate:
+    name: Application staging gate
+    needs: application-workers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Restore Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-next-${{ hashFiles('package-lock.json') }}-${{ hashFiles('app/**', 'components/**', 'lib/**', 'public/**') }}
+          restore-keys: |
+            ${{ runner.os }}-next-${{ hashFiles('package-lock.json') }}-
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --prefer-offline
+      - name: Generate governed staging manifests
+        run: npm run release:apps -- release/application-production
+      - name: Generate market and maintenance guidance
+        run: npm run market:apps
+      - name: Run tests and lint in parallel
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm test > /tmp/application-tests.log 2>&1 & test_pid=$!
+          npm run lint > /tmp/application-lint.log 2>&1 & lint_pid=$!
+          failed=0
+          wait "$test_pid" || failed=1
+          wait "$lint_pid" || failed=1
+          cat /tmp/application-tests.log
+          cat /tmp/application-lint.log
+          if [ "$failed" -ne 0 ]; then exit 1; fi
+      - name: Build production website
+        run: npm run build
+      - name: Prohibit unsigned production application claims
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const root = path.join(process.cwd(), 'release', 'application-production');
+          const catalog = JSON.parse(fs.readFileSync(path.join(root, 'release-catalog.json'), 'utf8'));
+          if (!Array.isArray(catalog.applications) || catalog.applications.length === 0) throw new Error('application release catalog is empty');
+          for (const app of catalog.applications) {
+            if (app.release?.artifactStatus !== 'awaiting-signed-artifact') {
+              throw new Error(`${app.product?.slug}: unexpected artifact state ${app.release?.artifactStatus}`);
+            }
+          }
+          console.log(`Validated ${catalog.applications.length} governed application release records without false production-artifact claims.`);
+          NODE
+      - name: Upload governed staging evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-production-staging-${{ github.sha }}
+          path: |
+            release/application-production/**
+            release/application-market-intelligence/**
+          if-no-files-found: error
+          retention-days: 180
+          compression-level: 6
+
+  final-publication-contract:
+    name: Final signed-artifact publication contract
+    needs: application-staging-gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify final publisher remains separate, integrity-bound, and fail closed
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const command = packageJson.scripts?.['sync:apps'] || '';
+          if (!command.includes('sync-final-apps.mjs') || !command.includes('--dry-run')) {
+            throw new Error('final signed-artifact publication command is missing or unsafe');
+          }
+          const publisher = fs.readFileSync('scripts/sync-final-apps.mjs', 'utf8');
+          for (const required of [
+            'findArtifact',
+            'createHash("sha256")',
+            'checksums.json',
+            'artifactSha256',
+            'timingSafeEqual',
+            'OBSERRA_RELEASE_BUCKET',
+            'aws',
+            's3',
+          ]) {
+            if (!publisher.includes(required)) throw new Error(`final publisher missing required control: ${required}`);
+          }
+          for (const boundary of [
+            'Release root not found',
+            'No publishable FINAL releases found',
+            'requires release.artifactSha256 or a checksums.json SHA-256 entry',
+            'SHA-256 verification failed',
+          ]) {
+            if (!publisher.includes(boundary)) throw new Error(`final publisher missing fail-closed boundary: ${boundary}`);
+          }
+          console.log('Final publication remains separate, SHA-256 verified, and fail closed.');
+          NODE

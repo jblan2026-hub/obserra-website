@@ -15,7 +15,12 @@
     "verify:academy-release": "npm run lint && npm test && npm run test:academy-alignment && npm run test:academy-70x && npm run test:academy-500x && npm run test:academy-1000x-remediation && npm run test:academy-2000x-resilience && npm run build",
     "test:production": "node --test scripts/production-smoke.mjs",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
-    "sync:apps": "node scripts/sync-final-apps.mjs --dry-run"
+    "sync:apps": "node scripts/sync-final-apps.mjs --dry-run",
+    "validate:application-staging": "node scripts/validate-application-staging.mjs release/application-production",
+    "market:apps": "node scripts/application-market-brain.mjs",
+    "test:application-worker": "node scripts/application-production-worker.mjs",
+    "verify:application-staging": "npm run release:apps -- release/application-production && npm run validate:application-staging && npm run market:apps && npm test && npm run lint && npm run build",
+    "verify:application-release": "npm run sync:apps && npm test && npm run lint && npm run build"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.6.4",

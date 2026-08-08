@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
@@ -5,15 +6,18 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const defaultReleaseRoot = "C:\\Users\\jblan\\OneDrive\\Desktop\\Final Production Release Apps";
-const releaseRoot = path.resolve(process.argv[2] || defaultReleaseRoot);
+const args = process.argv.slice(2);
+const dryRun = args.includes("--dry-run");
+const releaseRootArgument = args.find((argument) => !argument.startsWith("--"));
+const releaseRoot = path.resolve(releaseRootArgument || defaultReleaseRoot);
 const catalogPath = path.join(repoRoot, "app", "apps", "store-catalog.json");
 const marketingCatalogPath = path.join(repoRoot, "app", "apps", "marketing-catalog.json");
 const appsDataPath = path.join(repoRoot, "app", "apps", "appsData.ts");
 const bucket = process.env.OBSERRA_RELEASE_BUCKET;
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.obserrallc.com").replace(/\/$/, "");
-const dryRun = process.argv.includes("--dry-run");
 const generatedStart = "  // OBSERRA GENERATED STORE APPS START";
 const generatedEnd = "  // OBSERRA GENERATED STORE APPS END";
+const SHA256_PATTERN = /^[a-f0-9]{64}$/i;
 
 function fail(message) {
   console.error(`[Obserra Publisher] ${message}`);
@@ -28,21 +32,128 @@ function readJson(filePath) {
   }
 }
 
+function resolveInside(directory, relativePath, label) {
+  const resolvedDirectory = path.resolve(directory);
+  const resolved = path.resolve(resolvedDirectory, relativePath);
+  const relation = path.relative(resolvedDirectory, resolved);
+  if (!relation || relation.startsWith("..") || path.isAbsolute(relation)) {
+    fail(`${label} must resolve to a file inside ${resolvedDirectory}`);
+  }
+  return resolved;
+}
+
 function findArtifact(finalDir, manifest) {
   const configured = manifest?.release?.artifactFile;
   if (configured) {
-    const configuredPath = path.join(finalDir, configured);
-    if (!fs.existsSync(configuredPath)) fail(`Artifact ${configured} is missing from ${finalDir}`);
+    const configuredPath = resolveInside(finalDir, String(configured), "release.artifactFile");
+    if (!fs.existsSync(configuredPath) || !fs.statSync(configuredPath).isFile()) {
+      fail(`Artifact ${configured} is missing from ${finalDir}`);
+    }
     return configuredPath;
   }
 
   const candidates = fs.readdirSync(finalDir, { withFileTypes: true })
     .filter((entry) => entry.isFile())
     .map((entry) => entry.name)
-    .filter((name) => !name.endsWith(".md") && !["release-manifest.json", "checksums.json", "sbom.json"].includes(name));
+    .filter((name) => !name.endsWith(".md") && ![
+      "release-manifest.json",
+      "checksums.json",
+      "sbom.json",
+    ].includes(name));
 
-  if (candidates.length !== 1) fail(`${finalDir} must contain exactly one distributable artifact or define release.artifactFile`);
+  if (candidates.length !== 1) {
+    fail(`${finalDir} must contain exactly one distributable artifact or define release.artifactFile`);
+  }
   return path.join(finalDir, candidates[0]);
+}
+
+function sha256File(filePath) {
+  const hash = crypto.createHash("sha256");
+  const descriptor = fs.openSync(filePath, "r");
+  const buffer = Buffer.allocUnsafe(1024 * 1024);
+  try {
+    while (true) {
+      const bytesRead = fs.readSync(descriptor, buffer, 0, buffer.length, null);
+      if (bytesRead === 0) break;
+      hash.update(buffer.subarray(0, bytesRead));
+    }
+  } finally {
+    fs.closeSync(descriptor);
+  }
+  return hash.digest("hex");
+}
+
+function normalizedSha256(value, label) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!SHA256_PATTERN.test(normalized)) fail(`${label} must be a 64-character SHA-256 digest`);
+  return normalized;
+}
+
+function checksumEntries(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (!payload || typeof payload !== "object") return [];
+  for (const key of ["files", "artifacts", "entries", "checksums"]) {
+    const value = payload[key];
+    if (Array.isArray(value)) return value;
+    if (value && typeof value === "object") {
+      return Object.entries(value).map(([file, digest]) => ({ file, sha256: digest }));
+    }
+  }
+  return Object.entries(payload).map(([file, digest]) => ({ file, sha256: digest }));
+}
+
+function expectedArtifactSha256(finalDir, manifest, artifactFile) {
+  const manifestDigest = manifest?.release?.artifactSha256 || manifest?.release?.sha256 || null;
+  const checksumPath = path.join(finalDir, "checksums.json");
+  let checksumDigest = null;
+
+  if (fs.existsSync(checksumPath)) {
+    const entries = checksumEntries(readJson(checksumPath));
+    const entry = entries.find((item) => {
+      const file = item && typeof item === "object"
+        ? item.file || item.path || item.name || item.artifactFile
+        : null;
+      return file && path.basename(String(file)) === artifactFile;
+    });
+    if (!entry) fail(`checksums.json does not contain an entry for ${artifactFile}`);
+    checksumDigest = entry.sha256 || entry.sha256sum || entry.hash || entry.digest;
+  }
+
+  if (!manifestDigest && !checksumDigest) {
+    fail(`${artifactFile} requires release.artifactSha256 or a checksums.json SHA-256 entry before publication`);
+  }
+
+  const normalizedManifestDigest = manifestDigest
+    ? normalizedSha256(manifestDigest, "release.artifactSha256")
+    : null;
+  const normalizedChecksumDigest = checksumDigest
+    ? normalizedSha256(checksumDigest, `checksums.json entry for ${artifactFile}`)
+    : null;
+
+  if (
+    normalizedManifestDigest
+    && normalizedChecksumDigest
+    && normalizedManifestDigest !== normalizedChecksumDigest
+  ) {
+    fail(`Manifest and checksums.json disagree for ${artifactFile}`);
+  }
+
+  return normalizedManifestDigest || normalizedChecksumDigest;
+}
+
+function verifyArtifactIntegrity(finalDir, manifest, artifactPath) {
+  const artifactFile = path.basename(artifactPath);
+  const expected = expectedArtifactSha256(finalDir, manifest, artifactFile);
+  const actual = sha256File(artifactPath);
+  const expectedBuffer = Buffer.from(expected, "hex");
+  const actualBuffer = Buffer.from(actual, "hex");
+  if (
+    expectedBuffer.length !== actualBuffer.length
+    || !crypto.timingSafeEqual(expectedBuffer, actualBuffer)
+  ) {
+    fail(`SHA-256 verification failed for ${artifactFile}: expected ${expected}, received ${actual}`);
+  }
+  return actual;
 }
 
 function quote(value) {
@@ -151,6 +262,7 @@ for (const entry of fs.readdirSync(releaseRoot, { withFileTypes: true })) {
 
   const artifactPath = findArtifact(finalDir, manifest);
   const artifactFile = path.basename(artifactPath);
+  const artifactSha256 = verifyArtifactIntegrity(finalDir, manifest, artifactPath);
   const objectKey = `${slug}/${version}/${artifactFile}`;
 
   if (!dryRun) {
@@ -165,6 +277,7 @@ for (const entry of fs.readdirSync(releaseRoot, { withFileTypes: true })) {
     category,
     version,
     artifactFile,
+    artifactSha256,
     objectKey,
     deployment: manifest?.delivery?.deploymentModels || ["SaaS"],
     pricing: manifest?.commerce?.pricing || "Subscription pricing",
@@ -185,10 +298,10 @@ marketingCampaigns.sort((a, b) => a.productName.localeCompare(b.productName));
 if (!applications.length) fail(`No publishable FINAL releases found under ${releaseRoot}`);
 
 const generatedAt = new Date().toISOString();
-fs.writeFileSync(catalogPath, `${JSON.stringify({ schemaVersion: "1.1", generatedAt, releaseRoot, applications }, null, 2)}\n`);
+fs.writeFileSync(catalogPath, `${JSON.stringify({ schemaVersion: "1.2", generatedAt, releaseRoot, applications }, null, 2)}\n`);
 fs.writeFileSync(marketingCatalogPath, `${JSON.stringify({ schemaVersion: "1.0", generatedAt, campaigns: marketingCampaigns }, null, 2)}\n`);
 updateMarketplaceData(applications);
-console.log(`[Obserra Publisher] Synced ${applications.length} applications and ${marketingCampaigns.length} governed marketing campaign packs`);
+console.log(`[Obserra Publisher] Synced ${applications.length} integrity-verified applications and ${marketingCampaigns.length} governed marketing campaign packs${dryRun ? " in dry-run mode" : ""}`);
 
 if (!dryRun && process.env.OBSERRA_MARKETING_WEBHOOK_URL) {
   const response = await fetch(process.env.OBSERRA_MARKETING_WEBHOOK_URL, {
@@ -205,9 +318,9 @@ if (!dryRun && process.env.OBSERRA_MARKETING_WEBHOOK_URL) {
 if (!dryRun && process.env.OBSERRA_AUTO_GIT_PUSH === "true") {
   const generatedFiles = ["app/apps/store-catalog.json", "app/apps/marketing-catalog.json", "app/apps/appsData.ts"];
   execFileSync("git", ["add", ...generatedFiles], { cwd: repoRoot, stdio: "inherit" });
-  const status = execFileSync("git", ["status", "--porcelain", ...generatedFiles], { cwd: repoRoot, encoding: "utf8" }).trim();
-  if (status) {
-    execFileSync("git", ["commit", "-m", `Publish SaaS catalog and campaign packs (${applications.length} apps)`], { cwd: repoRoot, stdio: "inherit" });
+  const gitStatus = execFileSync("git", ["status", "--porcelain", ...generatedFiles], { cwd: repoRoot, encoding: "utf8" }).trim();
+  if (gitStatus) {
+    execFileSync("git", ["commit", "-m", `Publish integrity-verified SaaS catalog and campaign packs (${applications.length} apps)`], { cwd: repoRoot, stdio: "inherit" });
     execFileSync("git", ["push", "origin", "main"], { cwd: repoRoot, stdio: "inherit" });
   }
 }
