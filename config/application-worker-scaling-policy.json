@@ -1,10 +1,16 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "portfolioAllocation": {
+    "totalWorkers": 36,
+    "applicationWorkers": 20,
+    "courseWorkers": 16,
+    "crossPoolBorrowingAllowed": false
+  },
   "pool": {
-    "baselineWorkers": 30,
+    "baselineWorkers": 20,
     "minimumWorkers": 1,
-    "maximumWorkers": 120,
+    "maximumWorkers": 20,
     "targetApplicationsPerWorker": 2,
     "targetQueuedTasksPerWorker": 4,
     "scaleUpThresholdPercent": 75,
@@ -32,5 +38,5 @@
     "crossRepositoryWriteDeniedByDefault": true,
     "ownerEmergencyStopRequired": true
   },
-  "truthBoundary": "A planned worker is not an active worker. A dispatched job is not successful until its workflow evidence is complete. Scaling policy does not authorize production deployment, pricing changes, billing purchases, or bypass of release gates."
+  "truthBoundary": "The application pool is capped at 20 logical workers within the fixed 36-worker portfolio allocation. Sixteen workers are reserved for Academy course production. A planned worker is not an active worker, and a dispatched job is not successful until workflow evidence is complete."
 }
