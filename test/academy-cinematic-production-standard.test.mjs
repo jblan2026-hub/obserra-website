@@ -116,8 +116,8 @@ test("cinematic masters meet enterprise video, audio, accessibility, and LearnWo
 });
 
 test("production standard document prohibits robotic and low quality course patterns", () => {
-  assert.match(productionDocument, /not a robotic avatar presentation/i);
-  assert.match(productionDocument, /no single presenter shot/i);
+  assert.match(productionDocument, /robotic avatar presentation/i);
+  assert.match(productionDocument, /no uninterrupted avatar segment may exceed 20 seconds/i);
   assert.match(productionDocument, /full course videos consisting only of a talking avatar/i);
   assert.match(productionDocument, /robotic narration over static slides/i);
   assert.match(productionDocument, /learnworlds learner experience/i);
