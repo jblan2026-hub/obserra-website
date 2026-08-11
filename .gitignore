@@ -1,14 +1,71 @@
-.vercel
-.env*
+# Deployment and build output
+.vercel/
+.next/
+node_modules/
+coverage/
+dist/
+out/
+*.log
+.DS_Store
+
+# Runtime secrets and local configuration
+.env
+.env.*
 !.env.example
-!.env.example
-.next
-node_modules
+*.local
+
+# Private keys, certificates, credential stores, and signing material
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.kdbx
+*.crt
+*.cer
+*.der
+
+# Database files, exports, backups, and forensic copies
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.backup
+*.bak
+*.sql.gz
+*.sql.zip
+
+# Raw identity, avatar, voice, and production media source
+*.wav
+*.flac
+*.m4a
+*.aiff
+*.aif
+*.mov
+*.psd
+*.aep
+*.prproj
+
+# Private Academy intellectual property and customer data
+/private/
+/confidential/
+/internal-only/
+/course-source/
+/course-manuscripts/
+/source-material/
+/unreleased-course-content/
+/raw-media/
+/avatar-source/
+/voice-clones/
+/customer-data/
+/database-backups/
+/security-evidence/private/
+/release/private/
+
+# Local production packages and proprietary working files
 /Obserra_*.zip
 /Obserra_*.docx
 /Academy_Proprietary_Use_Tags.md
 /EIOS_Proprietary_Tags.md
 /eios-brand.css
-
-.vercel
-.env*
