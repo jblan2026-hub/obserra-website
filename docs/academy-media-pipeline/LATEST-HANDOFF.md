@@ -10,41 +10,127 @@ Pull request: `55`
 
 Last updated: 2026-08-11
 
+Security closure: Not complete
+
 Academy production cutover: Not authorized
 
 Website cinematic media activation: Not authorized
 
 ## Read this first
 
-This file is the canonical current-state pointer for the Obserra Academy, LearnWorlds, HeyGen, Pollo AI, learner dashboard, website cinematic media, and website advertising work.
+This file is the canonical current state pointer for Obserra Academy security, Supabase, LearnWorlds, HeyGen, Pollo AI, learner dashboard, website cinematic media, and website advertising work.
 
-A future session must read this file before making recommendations, changing code, creating course media, creating website media, merging the pull request, or representing any course, shell transfer, website asset, or production release as complete.
+Security remediation now has priority over course production, shell transfer, media activation, merge, and publication.
 
-Then read:
+A future session must read these sources in order:
 
-1. `docs/OBSERRA-ACADEMY-RESTART-HERE.md`
-2. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`
-3. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-CINEMATIC-ENTERPRISE-STANDARD.md`
-4. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-WEBSITE-CINEMATIC-ADS.md`
-5. `docs/academy-media-pipeline/ACTIVITY-LEDGER.md`
-6. `docs/academy-media-pipeline/FAILURE-REGISTER.md`
-7. `docs/academy-media-pipeline/OBSERRA-CINEMATIC-FORTUNE-500-PRODUCTION-STANDARD.md`
-8. `docs/academy-media-pipeline/canary/CYBERSECURITY-FOUNDATIONS-PRODUCTION-PACK.md`
-9. `docs/pollo-website-campaigns/POLLO-WEBSITE-INTERACTIVE-ADS-PRODUCTION-PACK.md`
-10. Pull request `55`
+1. `docs/academy-media-pipeline/LATEST-HANDOFF.md`
+2. `docs/OBSERRA-ACADEMY-SUPABASE-SECURITY-HANDOFF.md`
+3. `docs/OBSERRA-ACADEMY-RESTART-HERE.md`
+4. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`
+5. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-CINEMATIC-ENTERPRISE-STANDARD.md`
+6. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-WEBSITE-CINEMATIC-ADS.md`
+7. `docs/academy-media-pipeline/ACTIVITY-LEDGER.md`
+8. `docs/academy-media-pipeline/FAILURE-REGISTER.md`
+9. `docs/academy-media-pipeline/OBSERRA-CINEMATIC-FORTUNE-500-PRODUCTION-STANDARD.md`
+10. `docs/academy-media-pipeline/canary/CYBERSECURITY-FOUNDATIONS-PRODUCTION-PACK.md`
+11. `docs/pollo-website-campaigns/POLLO-WEBSITE-INTERACTIVE-ADS-PRODUCTION-PACK.md`
+12. Pull request `55`
+
+Do not represent the complete environment as secure, uncompromised, production ready, merged, published, or activated until the corresponding evidence is complete.
+
+## Current security incident state
+
+The owner reported a Supabase notice that an Obserra Academy table was publicly accessible and directed that all Academy data and intellectual property be protected from unauthorized access, theft, copying, or exfiltration.
+
+No evidence currently proves that data was taken. No completed forensic review rules out unauthorized access.
+
+### Emergency database containment applied
+
+Supabase project:
+
+```text
+Project: Obserra Academy
+Project reference: nwxnyqlyzyufgoadtqxs
+Region: us-east-1
+Status: ACTIVE_HEALTHY
+```
+
+Applied migrations:
+
+```text
+20260811223159 emergency_private_database_lockdown_v2
+20260811224121 disable_unused_public_api_surfaces
+```
+
+Verified database state:
+
+```text
+Public schema base tables: 58
+RLS enabled tables: 58
+RLS forced tables: 58
+Anonymous public schema usage: false
+Authenticated public schema usage: false
+Anonymous or authenticated public table grants: 0
+Anonymous or authenticated public function grants: 0
+Public views: 9
+Security invoker public views: 9
+Non security invoker public views: 0
+Supabase Storage buckets: 0
+```
+
+The current Supabase security advisor reports only informational `RLS Enabled No Policy` notices. Under the present design, no policies means direct API roles remain denied by default.
+
+### Academy catalog Edge Function containment
+
+`academy-public-catalog` is now version 2 with:
+
+```text
+Platform JWT verification: enabled
+Required caller role: service_role
+Wildcard CORS: removed
+Cache policy: private and no store
+Unauthorized response: 404
+Missing control default: unpublished and not purchasable
+```
+
+### Critical pending security repairs
+
+1. The website server currently calls the private catalog function without service role authorization.
+2. The website control fallback currently exposes the baseline catalog with default published controls when the control service fails. This is fail open behavior.
+3. Twelve active Edge Functions still have platform JWT verification disabled and require individual authentication and necessity review.
+4. Supabase retains platform managed grants on parts of Storage, Realtime, and GraphQL. Project level review remains required.
+5. Supabase credential rotation is not complete.
+6. Database, API, Auth, and Edge Function forensic log review is not complete.
+7. The GitHub repository is public and contains internal implementation and production planning material.
+8. Public Git history, forks, clones, collaborators, deploy keys, applications, and credential exposure have not been fully reviewed.
+
+The complete security evidence and next actions are recorded in:
+
+```text
+docs/OBSERRA-ACADEMY-SUPABASE-SECURITY-HANDOFF.md
+```
 
 ## Current verified architecture
 
 ```text
 Obserra website
--> marketing, catalog, learner shell dashboard, official-brand campaign ads, and governed enrollment routing
--> feature-flagged Pollo cinematic website media with official poster fallbacks
+-> server only Academy control access through approved secrets
+-> marketing, catalog, learner shell dashboard, official brand campaign ads, and governed enrollment routing
+-> feature flagged Pollo cinematic website media with official poster fallbacks
 -> LearnWorlds checkout and learner delivery
 -> HeyGen authorized presenter layer
 -> Pollo cinematic visual layer
 -> governed media intake and validation
 -> assessment, completion, certificate, and reporting
+
+Supabase
+-> deny by default public schema
+-> service role access only for approved backend operations
+-> no direct browser database access
 ```
+
+The server only Supabase control path is the required target architecture. The current website adapter has not yet been repaired to meet it.
 
 The retired custom Windows worker farm is not the approved commercial production path.
 
@@ -103,7 +189,7 @@ Manifest ID:
 obserra-website-pollo-cinematic-v1
 ```
 
-The homepage now contains feature-flagged cinematic media slots for:
+The homepage contains feature flagged cinematic media slots for:
 
 1. EIOS intelligence hero loop.
 2. EIOS platform loop.
@@ -123,7 +209,7 @@ Implemented behavior:
 7. Official Obserra logo overlay controlled by the website.
 8. Responsive desktop, tablet, and mobile layouts.
 9. Direct campaign calls to action.
-10. No provider key or automatic spend authorization in the website code.
+10. No provider key or automatic spend authorization in website code.
 
 Feature flag:
 
@@ -131,11 +217,13 @@ Feature flag:
 NEXT_PUBLIC_OBSERRA_CINEMATIC_MEDIA_ENABLED=false
 ```
 
-The flag must remain false until every referenced active MP4 exists, passes technical and brand review, passes desktop and mobile review, and receives owner approval.
+The flag remains false until every referenced active MP4 exists, passes technical and brand review, passes desktop and mobile review, passes security review, and receives owner approval.
 
 ## Current repository state
 
 ```text
+Repository visibility: public
+Security handoff: created
 Learner dashboard shells: implemented on branch
 60 course LearnWorlds Draft shell plan: implemented
 Cinematic course media factory: implemented
@@ -145,7 +233,7 @@ Provider readiness adapter: implemented
 Media receipt and intake validator: implemented
 Website cinematic media component: implemented
 Homepage hero and platform video slots: implemented
-Four official-brand website campaign ads: implemented
+Four official brand website campaign ads: implemented
 Website cinematic asset manifest: implemented
 Pollo website prompt and shot pack: implemented
 Website cinematic validation tests: implemented
@@ -153,9 +241,18 @@ Current pull request: open and Draft
 Pull request merged: no
 ```
 
+The public repository is a blocking intellectual property risk. It must be changed to private and reviewed before merge or production use.
+
 ## Current external truth
 
 ```text
+Direct public access to Supabase public schema: blocked
+Full Supabase security closure: no
+Forensic compromise assessment: incomplete
+Supabase credential rotation: incomplete
+Remaining Edge Function review: incomplete
+GitHub repository private: no
+GitHub public history review: incomplete
 LearnWorlds Cybersecurity Foundations shell: proven to exist
 Remaining LearnWorlds course shells: not proven uploaded
 HeyGen avatar and voice: owner still refining
@@ -176,71 +273,73 @@ A repository manifest, CSV, website learner shell, prompt pack, media slot, or p
 
 ## Current validation state
 
-The expanded cinematic course factory has passed its direct factory tests, including:
+### Supabase containment validation
 
 ```text
-60 courses
-17 assets per course
-1020 total assets
-420 HeyGen assets
-600 Pollo assets
-Five module anchor films per course
-Five module visual packs per course
+58 of 58 public base tables have RLS enabled and forced
+0 anonymous or authenticated public table grants
+0 anonymous or authenticated public function grants
+9 of 9 public views use security invoker
+academy-public-catalog requires platform verified service role JWT
+Security advisor errors: 0
+Security advisor warnings: 0
 ```
+
+### Course and website validation
+
+The expanded cinematic course factory passed direct factory tests for 60 courses, 17 assets per course, 1020 total assets, 420 HeyGen assets, 600 Pollo assets, five module anchor films per course, and five module visual packs per course.
 
 A prior full suite at commit `89fdbdad274d11480f3a7de72cf7f5dded53e9d6` reported 78 passed and 1 failed because a documentation assertion expected one exact connective phrase. The assertion was corrected in commit `a04576292044ddc11122b0d08905b6f4987cd9a0`.
 
-The new website cinematic implementation adds tests for feature flag behavior, poster fallback, error fallback, reduced motion, viewport playback, pause and play, campaign coverage, official logo use, governed asset paths, poster availability, and credential boundaries.
+Complete current head GitHub Actions validation is required after the security and documentation changes.
 
-Complete current-head GitHub Actions validation is required before the latest course, website, and audit changes can be represented as passing.
+## Mandatory next actions
 
-## Current blockers
+Security work must occur before production work:
 
-1. Complete current-head GitHub Actions validation.
-2. Finish and approve the HeyGen likeness and voice canary.
-3. Create and approve the 16 by 9 and 9 by 16 HeyGen master templates.
-4. Confirm the private Pollo workspace and governed visual presets.
-5. Generate and approve the Cybersecurity Foundations cinematic welcome, five module films, and five module visual packs.
-6. Load the real course activities, assessment, transcript, captions, and completion rules into LearnWorlds.
-7. Validate LearnWorlds desktop and mobile playback.
-8. Validate assessment, certificate, and complete Sandbox learner journey.
-9. Remove all placeholder and legacy LearnWorlds branding and content.
-10. Generate the six governed Pollo website assets.
-11. Upload the approved MP4 files to their exact repository paths.
-12. Validate seamless loops, official branding, desktop, mobile, reduced motion, and performance.
-13. Keep the website cinematic feature flag false until owner approval.
-14. Obtain explicit owner approval before merge, Academy publication, website cinematic activation, or portfolio scale out.
+1. Repair the website Academy control adapter to send service role authorization from server only code.
+2. Change Academy control failures to fail closed, hide unavailable or unpublished courses, and disable purchasing.
+3. Add tests proving no secret reaches browser code, logs, responses, or bundles.
+4. Review all twelve remaining Edge Functions and harden, restrict, disable, or delete each one.
+5. Review Supabase Storage, Realtime, GraphQL, Auth, API, network, and logging settings.
+6. Review the prior twenty four hours of Supabase logs for suspicious access.
+7. Rotate Supabase and dependent deployment credentials in a controlled sequence.
+8. Change the GitHub repository to private.
+9. Review GitHub collaborators, applications, deploy keys, forks, clones, and history exposure.
+10. Run current head GitHub Actions and security regression tests.
+11. Finish and approve the HeyGen likeness and voice canary.
+12. Generate and approve the Cybersecurity Foundations course media.
+13. Complete LearnWorlds playback, assessment, certificate, and Sandbox learner acceptance.
+14. Generate and validate the six governed Pollo website assets.
+15. Obtain explicit owner approval before merge, publication, website activation, shell transfer, or portfolio scale out.
 
 ## Merge, shell transfer, and website activation boundary
 
-Do not merge pull request 55 while current-head CI is red or pending.
+Do not merge pull request 55 until:
+
+1. The repository is private.
+2. Public history and access exposure review is complete.
+3. Supabase application compatibility is repaired with fail closed behavior.
+4. Remaining Edge Functions are reviewed.
+5. Key rotation and forensic log review are complete or formally risk accepted by the owner.
+6. Current head CI and security tests pass.
+7. The HeyGen and course media canaries pass.
+8. LearnWorlds learner, assessment, certificate, and playback acceptance pass.
+9. Every active Pollo website asset exists and passes security, technical, and brand review.
+10. Explicit owner approval is recorded.
 
 Do not claim the remaining LearnWorlds shells are uploaded until authenticated LearnWorlds evidence exists.
 
-Do not claim Pollo website assets are rendered, uploaded, active, or deployed until the actual approved MP4 files exist and the feature flag is enabled in a validated deployment.
-
-After the course canary, website assets, and current-head validation pass, the controlled sequence is:
-
-```text
-owner approval
--> mark pull request ready
--> merge validated branch
--> verify production deployment
--> transfer or create Draft LearnWorlds shells
--> capture every LearnWorlds course identifier
--> keep incomplete courses private
--> load approved course media and activities in governed batches
--> upload approved Pollo website MP4 files
--> validate website fallback and playback behavior
--> enable the website cinematic feature flag
--> verify production website behavior
-```
+Do not claim Pollo website assets are rendered, uploaded, active, or deployed until the approved MP4 files exist and the feature flag is enabled in a validated deployment.
 
 ## Latest audit and implementation locations
 
 ```text
 Canonical latest handoff:
 docs/academy-media-pipeline/LATEST-HANDOFF.md
+
+Supabase security incident and containment handoff:
+docs/OBSERRA-ACADEMY-SUPABASE-SECURITY-HANDOFF.md
 
 Restart and continuation instructions:
 docs/OBSERRA-ACADEMY-RESTART-HERE.md
@@ -297,8 +396,23 @@ Website cinematic automated tests:
 test/website-cinematic-media.test.mjs
 ```
 
+## Continuous record rule
+
+After every action, update:
+
+```text
+docs/OBSERRA-ACADEMY-SUPABASE-SECURITY-HANDOFF.md
+docs/academy-media-pipeline/LATEST-HANDOFF.md
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md
+docs/OBSERRA-ACADEMY-RESTART-HERE.md
+docs/academy-media-pipeline/ACTIVITY-LEDGER.md
+docs/academy-media-pipeline/FAILURE-REGISTER.md
+```
+
+Record both successes and failures immediately.
+
 ## Continuation instruction
 
 ```text
-Read docs/academy-media-pipeline/LATEST-HANDOFF.md first on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Then read every file listed under Read this first. Continue from the first incomplete blocker. Preserve every failure, update the activity ledger after every action, update the failure register after every failed action, and never claim LearnWorlds upload, Pollo rendering, media acceptance, merge, website activation, publication, or production release without direct evidence.
+Read docs/academy-media-pipeline/LATEST-HANDOFF.md first on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Then read docs/OBSERRA-ACADEMY-SUPABASE-SECURITY-HANDOFF.md and every file listed under Read this first. Continue from the first incomplete security action. Preserve every failure. Never claim security closure, LearnWorlds upload, Pollo rendering, media acceptance, merge, website activation, publication, or production release without direct evidence.
 ```
