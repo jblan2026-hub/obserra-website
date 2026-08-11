@@ -5,8 +5,8 @@
   "schoolUrl": "https://obserraepillc.learnworlds.com",
   "authorDashboardUrl": "https://obserraepillc.learnworlds.com/author/dashboard",
   "customDomain": "https://academy.obserrallc.com",
-  "domainStatus": "dns-created-pending-learnworlds-verification",
+  "domainStatus": "cname-created-pending-learnworlds-verification",
   "stripeStatus": "connected-sandbox-validation-required",
-  "apiStatus": "keys-created-secrets-not-stored-in-repository",
+  "apiStatus": "keys-and-access-token-created-secrets-not-stored-in-repository",
   "products": []
 }
