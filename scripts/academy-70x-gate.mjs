@@ -46,11 +46,11 @@ check("Professional catalog count is 15", courseLevels.filter((value) => value =
 check("Advanced catalog count is 15", courseLevels.filter((value) => value === "Advanced").length === 15);
 check("Executive Intensive catalog count is 11", courseLevels.filter((value) => value === "Executive Intensive").length === 11);
 check("CISO Masterclass catalog count is 9", courseLevels.filter((value) => value === "CISO Masterclass").length === 9);
-check("live Foundation price remains 149", /Foundation: 149,/.test(courseData));
-check("live Professional price remains 249", /Professional: 249,/.test(courseData));
-check("live Advanced price remains 349", /Advanced: 349,/.test(courseData));
-check("live Executive Intensive price remains 499", /"Executive Intensive": 499,/.test(courseData));
-check("live CISO Masterclass price remains 699", /"CISO Masterclass": 699,/.test(courseData));
+check("live Foundation price remains 99", /Foundation: 99,/.test(courseData));
+check("live Professional price remains 149", /Professional: 149,/.test(courseData));
+check("live Advanced price remains 199", /Advanced: 199,/.test(courseData));
+check("live Executive Intensive price remains 249", /"Executive Intensive": 249,/.test(courseData));
+check("live CISO Masterclass price remains 299", /"CISO Masterclass": 299,/.test(courseData));
 check("live Foundation duration remains 2.5 hours", /Foundation: "2\.5 hours",/.test(courseData));
 check("live Professional duration remains 4.5 hours", /Professional: "4\.5 hours",/.test(courseData));
 check("live Advanced duration remains 7 hours", /Advanced: "7 hours",/.test(courseData));
