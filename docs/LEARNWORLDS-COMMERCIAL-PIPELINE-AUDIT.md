@@ -15,13 +15,14 @@
 6. Stripe connected.
 7. LearnWorlds API keys created.
 8. LearnWorlds access token created.
-9. Custom-domain CNAME created for `academy.obserrallc.com`.
-10. Canary Obserra course ID: `cybersecurity-foundations`.
-11. LearnWorlds course ID: `cybersecurity-foundations-for-new-professionals`.
-12. LearnWorlds store product ID: `cybersecurity_foundations_for_new_professionals`.
-13. LearnWorlds package ID: `package_6a7b2d3710387`.
-14. Public course URL: `https://obserraepillc.learnworlds.com/course/cybersecurity-foundations-for-new-professionals`.
-15. Direct checkout URL and cart URL supplied by the owner and recorded in the governed mapping.
+9. LearnWorlds API URL: `https://obserraepillc.learnworlds.com/admin/api/`.
+10. Custom-domain CNAME created for `academy.obserrallc.com`.
+11. Canary Obserra course ID: `cybersecurity-foundations`.
+12. LearnWorlds course ID: `cybersecurity-foundations-for-new-professionals`.
+13. LearnWorlds store product ID: `cybersecurity_foundations_for_new_professionals`.
+14. LearnWorlds package ID: `package_6a7b2d3710387`.
+15. Public course URL: `https://obserraepillc.learnworlds.com/course/cybersecurity-foundations-for-new-professionals`.
+16. Direct checkout URL and cart URL supplied by the owner and recorded in the governed mapping.
 
 ## Actions completed
 
@@ -44,7 +45,11 @@
 17. Added deterministic checks binding the public, checkout, and cart URLs to the governed LearnWorlds course and package identifiers.
 18. Added duplicate course, store product, and package prevention.
 19. Added exact canary mapping regression tests.
-20. Triggered a fresh workflow cycle from the corrected branch head.
+20. Added the LearnWorlds API URL as governed non-secret configuration.
+21. Added API hostname and `/admin/api` path validation.
+22. Reduced Vercel secret entry to the Client ID, Client Secret, and access token.
+23. Corrected stale Academy release-gate price assertions to match the governed catalog and dedicated pricing parity tests.
+24. Triggered a fresh workflow cycle from the corrected branch head.
 
 ## Failures, corrections, and prevention rules
 
@@ -64,7 +69,7 @@
 
 **Impact:** The owner-only readiness endpoint will report `apiEnvironmentReady=false` until the secrets are entered in the deployment environment.
 
-**Required correction:** Enter the four LearnWorlds values directly in the Vercel secret store. Never place them in chat or source control.
+**Required correction:** Enter the LearnWorlds Client ID, Client Secret, and access token directly in the Vercel secret store. Never place them in chat or source control. The API URL is governed non-secret configuration and does not require secret entry.
 
 ### Failure 3: Container-side repository testing unavailable
 
@@ -106,9 +111,29 @@
 
 **Prevention:** All future course mappings must pass the same host, path, product type, course ID, package ID, uniqueness, and sandbox or publication-state controls.
 
+### Failure 7: Academy release gate asserted obsolete price tiers
+
+**Evidence:** The Academy 70x workflow expected Foundation through CISO Masterclass prices of 149, 249, 349, 499, and 699, while `courseData.ts`, the pricing parity tests, and the approved launch pricing use 99, 149, 199, 249, and 299.
+
+**Impact:** The Academy production gate failed five assertions even though the catalog pricing matched its current governed source and dedicated regression tests.
+
+**Correction:** Updated only the stale price assertions in `scripts/academy-70x-gate.mjs` to match the governed launch tiers. No course price was changed.
+
+**Prevention:** Pricing gates must derive from or remain synchronized with the canonical pricing contract. A release test may not silently preserve superseded price assumptions.
+
+### Failure 8: API URL was treated as an unset secret-like deployment value
+
+**Evidence:** The initial environment template left `LEARNWORLDS_API_URL` empty even though the owner supplied a stable non-secret school API endpoint.
+
+**Impact:** Vercel setup required an unnecessary fourth manual value and readiness could fail despite correct credentials.
+
+**Correction:** Added `https://obserraepillc.learnworlds.com/admin/api/` to governed configuration and the environment template, with host and path validation. Runtime readiness now requires only the three actual secret values.
+
+**Prevention:** Stable non-secret integration endpoints belong in governed configuration; secrets remain only in the deployment secret store.
+
 ## Current blockers
 
-1. LearnWorlds secret values have not been proven present in the Vercel deployment environment.
+1. LearnWorlds Client ID, Client Secret, and access token have not been proven present in the Vercel deployment environment.
 2. The current pull-request CI cycle has not yet been proven green.
 3. The custom domain CNAME has been created but LearnWorlds HTTPS verification has not yet been proven complete.
 4. A sandbox checkout, learner enrollment, course access, assessment, and certificate acceptance test has not yet been completed.
@@ -116,4 +141,4 @@
 
 ## Truth boundary
 
-The branch contains implemented integration code and a governed sandbox canary mapping. LearnWorlds commerce is not live. No secret is stored in the repository. No production checkout cutover is authorized. The next factual milestone is successful CI, deployment secret configuration, and a complete sandbox purchase and learner-access test.
+The branch contains implemented integration code, a governed API endpoint, and a governed sandbox canary mapping. LearnWorlds commerce is not live. No secret is stored in the repository. No production checkout cutover is authorized. The next factual milestone is successful CI, deployment secret configuration, and a complete sandbox purchase and learner-access test.
