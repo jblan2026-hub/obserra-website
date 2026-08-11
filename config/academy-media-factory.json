@@ -4,8 +4,9 @@
   "annualPlan": {
     "targetCoursesPerMonth": 5,
     "targetCourseCount": 60,
-    "targetHeyGenAssets": 360,
-    "targetPolloAssets": 300,
+    "targetHeyGenAssets": 250,
+    "targetPolloAssets": 335,
+    "targetTotalAssets": 585,
     "reviewCadence": "weekly",
     "publicationCadence": "monthly"
   },
