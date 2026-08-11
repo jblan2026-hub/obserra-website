@@ -1,4 +1,4 @@
-# Obserra Academy: Restart Here
+# Obserra Academy and Website: Restart Here
 
 **Owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC  
 **Business email:** `info@obserrallc.com`  
@@ -6,7 +6,8 @@
 **Working branch:** `feature/learnworlds-commercial-pipeline`  
 **Pull request:** `#55`  
 **Last updated:** 2026-08-11  
-**Production cutover:** Not authorized
+**Academy production cutover:** Not authorized  
+**Website cinematic activation:** Not authorized
 
 ## Mandatory restart instruction
 
@@ -16,23 +17,27 @@ Every future session must read these sources before making recommendations or ch
 2. `docs/OBSERRA-ACADEMY-RESTART-HERE.md`
 3. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`
 4. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-CINEMATIC-ENTERPRISE-STANDARD.md`
-5. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-LEARNER-DASHBOARD-COURSE-SHELLS.md`
-6. `docs/academy-media-pipeline/ACTIVITY-LEDGER.md`
-7. `docs/academy-media-pipeline/FAILURE-REGISTER.md`
-8. `docs/academy-media-pipeline/OBSERRA-CINEMATIC-FORTUNE-500-PRODUCTION-STANDARD.md`
-9. `docs/academy-media-pipeline/canary/HEYGEN-15-SECOND-LIKENESS-CANARY.md`
-10. `docs/academy-media-pipeline/canary/CYBERSECURITY-FOUNDATIONS-PRODUCTION-PACK.md`
-11. Pull request `#55`
+5. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-WEBSITE-CINEMATIC-ADS.md`
+6. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-LEARNER-DASHBOARD-COURSE-SHELLS.md`
+7. `docs/academy-media-pipeline/ACTIVITY-LEDGER.md`
+8. `docs/academy-media-pipeline/FAILURE-REGISTER.md`
+9. `docs/academy-media-pipeline/OBSERRA-CINEMATIC-FORTUNE-500-PRODUCTION-STANDARD.md`
+10. `docs/academy-media-pipeline/canary/HEYGEN-15-SECOND-LIKENESS-CANARY.md`
+11. `docs/academy-media-pipeline/canary/CYBERSECURITY-FOUNDATIONS-PRODUCTION-PACK.md`
+12. `docs/pollo-website-campaigns/POLLO-WEBSITE-INTERACTIVE-ADS-PRODUCTION-PACK.md`
+13. Pull request `#55`
 
 Use this continuation instruction:
 
 ```text
-Read docs/academy-media-pipeline/LATEST-HANDOFF.md first on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Then read every source listed under Mandatory restart instruction. Continue from the first incomplete action. Record every action and every failure immediately. Never claim LearnWorlds shell upload, media acceptance, merge, publication, or production release without direct evidence.
+Read docs/academy-media-pipeline/LATEST-HANDOFF.md first on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Then read every source listed under Mandatory restart instruction. Continue from the first incomplete action. Record every action and every failure immediately. Never claim LearnWorlds shell upload, Pollo rendering, media acceptance, merge, website activation, publication, or production release without direct evidence.
 ```
 
 ## Executive truth
 
-The commercial Sandbox plumbing works. Learner dashboard course shells and the cinematic production system are implemented on the working branch. The owner is still refining the authorized HeyGen avatar and voice. The complete course has not passed the cinematic media, LearnWorlds playback, assessment, certificate, and learner acceptance gates.
+The LearnWorlds Sandbox commerce path works. Learner dashboard shells, the cinematic course production system, the LearnWorlds Draft shell plan, and the feature-flagged website cinematic media and advertising system are implemented on the branch.
+
+The owner is still refining the authorized HeyGen avatar and voice. The complete course, remaining LearnWorlds shells, six Pollo website videos, and production activation have not passed acceptance.
 
 ```text
 LearnWorlds Sandbox checkout: passed
@@ -41,35 +46,41 @@ Invoice generation: passed
 Learner enrollment: passed
 LearnWorlds canary shell opens: passed
 Authenticated website learner shells: implemented
-Cinematic production standard: implemented
+60 course LearnWorlds Draft shell plan: implemented
+Cinematic course production standard: implemented
 Same quality standard across all courses: implemented
+Website cinematic component: implemented
+Homepage hero and platform slots: implemented
+Four official-brand website ads: implemented
+Six governed Pollo website assets: planned
 HeyGen avatar and voice: owner refining
 15 second likeness canary: not yet accepted
 Full Cybersecurity Foundations cinematic media: not yet accepted
-Five LearnWorlds module experiences loaded and validated: not proven
-Final assessment: not proven
-Certificate: not proven
-Remaining LearnWorlds shells: not yet proven uploaded
+Remaining LearnWorlds shells: not proven uploaded
+Six Pollo website MP4 files: not rendered or uploaded
+Website cinematic feature flag: false
 Pull request merged: no
 Production ready course: no
+Production website activation: no
 ```
 
-No response may describe Cybersecurity Foundations or the Academy catalog as published, usable, commercially ready, complete, or transferred into LearnWorlds until the corresponding evidence passes.
+No response may describe Cybersecurity Foundations, the Academy catalog, the remaining LearnWorlds shells, or the website cinematic assets as published, usable, uploaded, active, commercially ready, or complete until the corresponding evidence passes.
 
 ## Approved architecture
 
 ```text
 Obserra website
--> marketing, search, catalog, learner dashboard shells, and sales discovery
+-> marketing, search, catalog, learner shells, official-brand ads, and feature-flagged cinematic media
 -> governed LearnWorlds checkout
--> LearnWorlds learner identity and enrollment
--> LearnWorlds video and course delivery
+-> LearnWorlds learner identity and course delivery
+-> HeyGen authorized presenter layer
+-> Pollo cinematic course and website visual layer
 -> assessment
 -> certificate
 -> reporting
 ```
 
-HeyGen is the authoritative presenter layer. Pollo AI is the cinematic visual layer. LearnWorlds is the authoritative LMS, learner delivery, assessment, certificate, and reporting system. The retired local worker farm and custom Windows controller are not the approved commercial production path.
+LearnWorlds is the authoritative LMS. HeyGen is the authoritative presenter layer. Pollo AI is the cinematic visual layer. The retired local worker farm is not the approved production path.
 
 ## LearnWorlds account and canary
 
@@ -91,106 +102,127 @@ Sandbox launch offer: $99
 Discount: $50
 ```
 
-## Current learner shell implementation
-
-The protected `/portal` route displays every governed website Academy shell.
-
-Status resolution:
-
-```text
-Verified Clerk entitlement -> Enrolled
-Published LearnWorlds mapping -> Available
-Sandbox LearnWorlds mapping -> Pilot shell
-No released mapping -> In production
-```
-
-The shell dashboard contains no direct checkout and does not create enrollment, unlock lessons, mark completion, or prove publication.
-
-The repository also generates a governed 60 course LearnWorlds Draft shell manifest. That manifest is not proof that the remaining shells were uploaded. Authenticated LearnWorlds evidence is required for every created shell.
-
-## Current cinematic production standard
+## Current course production standard
 
 ```text
 Standard ID: obserra-cinematic-enterprise-v1
 HeyGen assets per course: 7
 Pollo assets per course: 10
 Total assets per course: 17
-Current 60 course portfolio target: 1020 assets
+Current 60 course target: 1020 assets
 Minimum finished video per course: 27 minutes
 Target finished video per course: approximately 37 minutes
 Maximum uninterrupted avatar segment: 20 seconds
-Minimum module anchor films per course: 5
-Minimum module visual packs per course: 5
+Module anchor films per course: 5
+Module visual packs per course: 5
 Minimum master: 1920 by 1080
 Audio: 48 kHz
 Release score: no category below 4 and average at least 4.5
 ```
 
-The owner rejected robotic, static, low quality presentation. Every course must use the same cinematic enterprise standard regardless of tier.
+The owner rejected robotic, static, low quality course production. Every course must meet the same standard.
+
+## Current website cinematic advertising system
+
+```text
+Manifest ID: obserra-website-pollo-cinematic-v1
+Manifest: config/website-cinematic-media.json
+Feature flag: NEXT_PUBLIC_OBSERRA_CINEMATIC_MEDIA_ENABLED=false
+```
+
+The homepage contains planned cinematic media for:
+
+1. EIOS intelligence hero.
+2. EIOS platform visualization.
+3. EIOS advertisement.
+4. Academy advertisement.
+5. Protection and Intelligence advertisement.
+6. Cybersecurity Advisory advertisement.
+
+The system uses existing official Obserra images as poster fallbacks, muted viewport-aware playback, user pause and play, reduced motion fallback, video error fallback, official logo overlays, and responsive layouts.
+
+No Pollo plugin or authenticated authoring connector was available in this environment. The owner must render the assets in the existing annual Pollo account.
+
+Required output paths:
+
+```text
+public/media/pollo/site/obserra-eios-intelligence-hero-loop-12s.mp4
+public/media/pollo/site/obserra-eios-platform-loop-12s.mp4
+public/media/pollo/ads/obserra-eios-executive-intelligence-15s.mp4
+public/media/pollo/ads/obserra-academy-cinematic-learning-15s.mp4
+public/media/pollo/ads/obserra-protection-intelligence-15s.mp4
+public/media/pollo/ads/obserra-cybersecurity-executive-risk-15s.mp4
+```
 
 ## Exact next actions
 
 1. Complete current-head GitHub Actions validation.
-2. Finish the authorized HeyGen avatar and voice.
-3. Render the 15 second likeness canary.
-4. Review likeness, voice, pronunciation, lip sync, eye contact, blinking, gestures, and audio.
-5. Record owner approval or repair only the smallest defective layer.
-6. Produce the Cybersecurity Foundations 75 second cinematic welcome using the timed scene plan.
-7. Produce five module anchor films and five Pollo module visual packs.
-8. Load approved media into LearnWorlds with captions, transcript, thumbnail, chapters, knowledge checks, and completion rules.
-9. Import the 25 question final assessment and set the passing score to 80 percent.
-10. Validate desktop and mobile playback, Sandbox learner completion, assessment, and certificate.
-11. Obtain explicit owner approval.
-12. Mark pull request 55 ready and merge the validated branch.
-13. Verify production deployment.
-14. Create or transfer remaining LearnWorlds Draft shells from the validated master template using an authenticated supported method.
-15. Capture each LearnWorlds course identifier and retain incomplete courses as private Drafts.
-16. Build and publish remaining courses only after course specific acceptance.
+2. Resolve every test, lint, build, or contract failure and record it.
+3. Finish the authorized HeyGen avatar and voice.
+4. Render and approve the 15 second likeness canary.
+5. Produce the Cybersecurity Foundations 75 second welcome.
+6. Produce five module anchor films and five Pollo module visual packs.
+7. Load approved course media into LearnWorlds with captions, transcript, thumbnail, chapters, knowledge checks, and completion rules.
+8. Import the 25 question assessment and set the passing score to 80 percent.
+9. Validate desktop and mobile playback, Sandbox learner completion, assessment, and certificate.
+10. Open the Pollo website production pack.
+11. Generate the two website loops and four official-brand advertisements.
+12. Reject generated text, third party marks, public figures, morphing, weak brand match, or unrealistic motion.
+13. Download the approved H.264 MP4 files and place them at their exact paths.
+14. Record provider asset IDs, prompts, hashes, and owner approval.
+15. Validate website desktop, mobile, loop seam, poster fallback, pause, reduced motion, and performance.
+16. Keep the feature flag false until all active files pass.
+17. Obtain explicit owner approval.
+18. Mark pull request 55 ready and merge the validated branch.
+19. Verify production deployment.
+20. Create or transfer remaining LearnWorlds Draft shells through an authenticated supported method.
+21. Capture every LearnWorlds course identifier and keep incomplete courses private.
+22. Enable the website cinematic feature flag only after approved assets are deployed and validated.
 
 ## Current preserved defects and failures
 
-1. The canary course is not yet proven to contain all approved LearnWorlds learning activities.
-2. The final assessment and certificate remain unproven.
-3. The public LearnWorlds page previously contained placeholder and unsupported template content.
+1. The canary course is not yet proven to contain all approved LearnWorlds activities.
+2. Assessment and certificate remain unproven.
+3. The public LearnWorlds page previously contained placeholder content.
 4. The purchase-success footer previously contained `Driving Data` branding.
-5. Course images and thumbnails require acceptance.
-6. Website and LearnWorlds pricing require final parity validation.
-7. A legacy direct Stripe checkout remains a rollback and commercial risk concern.
-8. Custom domain and HTTPS acceptance are not yet proven.
-9. The prior PMP video style was rejected as robotic and below the new standard.
-10. Direct repository clone was unavailable in the build environment.
-11. One dependency drift was corrected.
-12. One pull request metadata call used an invalid same repository option and was corrected.
-13. One Vercel scope remains inaccessible for root cause inspection.
-14. Intermediate CI runs cancelled by later commits are not passing evidence.
-15. A secret boundary test inspected implementation source instead of response shape and was corrected.
-16. A cinematic configuration update used a stale blob SHA and was corrected.
-17. A cinematic test create action targeted an existing path and was corrected.
-18. A documentation assertion failed on equivalent wording and was corrected.
-19. A failure register update encountered an advancing branch SHA and was retried without losing prior records.
-20. The 60 shell manifest has not been executed as an authenticated LearnWorlds authoring action.
+5. Website and LearnWorlds pricing require final parity validation.
+6. A legacy direct Stripe checkout remains a rollback and commercial risk concern.
+7. Custom domain and HTTPS acceptance are not proven.
+8. The prior PMP video style was rejected as robotic.
+9. Remaining LearnWorlds shells are planned but not proven uploaded.
+10. Six Pollo website videos are planned but not rendered or uploaded.
+11. The website feature flag remains false.
+12. Direct repository clone was unavailable.
+13. Dependency drift was corrected.
+14. One pull request metadata call was invalid and corrected.
+15. One Vercel scope remains inaccessible.
+16. Cancelled CI runs are not passing evidence.
+17. A secret-boundary test was corrected.
+18. Stale file SHAs caused conflicts and were corrected.
+19. A documentation wording assertion failed and was corrected.
+20. No direct LearnWorlds authoring connector was available.
+21. No direct Pollo rendering plugin or connector was available.
 
-Read `docs/academy-media-pipeline/FAILURE-REGISTER.md` for the complete evidence, impact, correction, and prevention rule for every failure.
+Read `docs/academy-media-pipeline/FAILURE-REGISTER.md` for the complete evidence, correction, and prevention rule.
 
-## Non-negotiable merge and publication blockers
+## Non-negotiable merge and activation blockers
 
-Do not merge, cut over production, upload remaining LearnWorlds shells as released products, or publish courses until:
+Do not merge, publish courses, claim remaining LearnWorlds shells are uploaded, or activate website cinematic media until:
 
 1. Current-head CI passes.
-2. The 15 second likeness canary passes.
-3. The complete Cybersecurity Foundations cinematic media package passes.
+2. The HeyGen likeness canary passes.
+3. The complete Cybersecurity Foundations media package passes.
 4. All five module experiences work in LearnWorlds.
 5. Captions, transcripts, thumbnails, chapters, and knowledge checks are complete.
-6. The final assessment contains exactly 25 verified questions.
-7. The passing score is 80 percent.
-8. Completion rules work.
-9. The certificate is issued correctly.
-10. No placeholder or legacy branding remains.
-11. Website and LearnWorlds pricing match.
-12. The legacy Stripe canary route is blocked or retired with entitlement preservation.
-13. A Sandbox learner completes the full course.
-14. The master LearnWorlds shell template is validated.
-15. Explicit owner approval is documented.
+6. The assessment contains exactly 25 verified questions and passes at 80 percent.
+7. Completion and certificate work.
+8. Placeholder and legacy branding are removed.
+9. Website and LearnWorlds pricing match.
+10. A Sandbox learner completes the real course.
+11. The master LearnWorlds shell method is validated.
+12. Every active Pollo website MP4 exists and passes technical and official brand review.
+13. Poster fallback, pause, reduced motion, desktop, mobile, and performance checks pass.
+14. Explicit owner approval is documented.
 
 ## Continuous audit rule
 
