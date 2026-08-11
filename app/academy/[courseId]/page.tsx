@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { courseForId } from "../../../lib/academy";
 import { publicAcademyCourse } from "../../../lib/academy-control";
 import { publicationForCourse } from "../coursePublication";
+import { courseOfferForCourse } from "../courseOffers";
 import "./course-page.css";
 
 const LEGAL_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
@@ -63,7 +64,14 @@ export default async function AcademyCoursePage({
 
   const course = runtime.course;
   const publication = publicationForCourse(course.id);
-  const purchaseAvailable = runtime.controlPlane === "operational" && runtime.control.purchaseEnabled;
+  const offer = courseOfferForCourse(course);
+  const purchaseAvailable = Boolean(
+    runtime.controlPlane === "operational" &&
+    runtime.control.purchaseEnabled &&
+    offer.livePurchaseEnabled &&
+    offer.contentState === "approved" &&
+    offer.commerceState === "published",
+  );
   const passingScoreLabel = `${publication.passingScore} percent completion standard`;
   const assessmentLabel = publication.assessmentRequired
     ? publication.assessmentDuration
@@ -88,7 +96,7 @@ export default async function AcademyCoursePage({
     audience: { "@type": "Audience", audienceType: course.audience },
     offers: {
       "@type": "Offer",
-      price: course.price,
+      price: offer.offerPrice,
       priceCurrency: "USD",
       availability: purchaseAvailable ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       url: `https://www.obserrallc.com/academy/${course.id}`,
@@ -106,7 +114,7 @@ export default async function AcademyCoursePage({
           <b>ACADEMY</b>
         </a>
         <nav aria-label="Course navigation">
-          <a href="/academy#courses">All courses</a>
+          <a href="/academy#courses">Course roadmap</a>
           <a href="/catalog">Catalog</a>
           <a href="/contact">Contact</a>
         </nav>
@@ -115,97 +123,98 @@ export default async function AcademyCoursePage({
       <section className="academy-course-hero">
         <div className="academy-course-eyebrow-row">
           <p>{course.track} · {course.level}</p>
-          <span>{purchaseAvailable ? "Paid enrollment" : "Enrollment paused"}</span>
+          <span>{purchaseAvailable ? "Live enrollment approved" : offer.statusLabel}</span>
         </div>
 
         <div className="academy-course-grid">
           <div className="academy-course-copy">
-            <p className="academy-course-kicker">AI NATIVE PROFESSIONAL TRAINING</p>
+            <p className="academy-course-kicker">GOVERNED COURSE BUILD</p>
             <h1>{course.title}</h1>
             <p className="academy-course-description">{course.description}</p>
 
             <div className="academy-course-pills" aria-label="Course summary">
               <span>{course.duration}</span>
-              <span>{course.modules.length} original lessons</span>
+              <span>{course.modules.length} planned instructional modules</span>
               <span>{assessmentLabel}</span>
               {publication.assessmentRequired ? <span>{passingScoreLabel}</span> : null}
               <span>{certificateLabel}</span>
-              <span>Obserrian AI Tutor after authorized access</span>
+              <span>{offer.contentState === "approved" ? "Content approved" : "Content not yet approved for live sale"}</span>
               <span>{course.audience}</span>
             </div>
 
             <div className="academy-course-actions">
               {purchaseAvailable ? (
                 <a className="academy-course-checkout" href={`/api/academy/checkout?course=${course.id}`}>
-                  Purchase secure enrollment · {money.format(course.price)}
+                  Enroll through LearnWorlds · {money.format(offer.offerPrice)}
                 </a>
               ) : (
                 <span className="academy-course-checkout" aria-disabled="true">
-                  New enrollment is temporarily unavailable
+                  Live enrollment opens after course approval
                 </span>
               )}
-              <a className="academy-course-secondary" href="#curriculum">See curriculum</a>
+              <a className="academy-course-secondary" href="#curriculum">Review planned curriculum</a>
+              <a className="academy-course-secondary" href="/contact?interest=academy-launch">Join launch updates</a>
               <a className="academy-course-secondary" href={`/academy/learn/${course.id}`}>Existing learner access</a>
             </div>
 
             {!purchaseAvailable ? (
               <div className="academy-course-assurance">
                 <div>
-                  <strong>Existing learner access is preserved</strong>
+                  <strong>No live sale of an empty or unapproved course shell</strong>
                   <span>
-                    Pausing or unpublishing a course blocks new purchases but does not revoke a learner entitlement,
-                    progress record, assessment history, or certificate already committed.
+                    Checkout, pricing, enrollment, and learner access were tested in LearnWorlds Sandbox. Live
+                    sales remain disabled until the actual course, assessment, accessibility evidence, completion
+                    rules, and certificate have passed validation.
                   </span>
                 </div>
               </div>
             ) : null}
 
             <div className="academy-course-assurance">
-              <div><strong>Secure Stripe Checkout</strong><span>Buy once and return directly to authorized paid course access.</span></div>
-              <div><strong>Substantive professional instruction</strong><span>Every lesson teaches the published course subject, why it matters, how it is applied, and how decisions are documented.</span></div>
-              <div><strong>Authoritative grounding</strong><span>Relevant laws, regulations, standards, government guidance, and professional frameworks are connected directly to the lesson where applicable.</span></div>
-              <div><strong>Obserrian Academy Tutor</strong><span>The course-aware AI tutor unlocks with authorized access and can explain concepts, create ungraded practice, and translate the lesson into business use.</span></div>
-              <div><strong>Governed completion standard</strong><span>{publication.assessmentRequired ? `Complete every required lesson and achieve ${publication.passingScore} percent or higher on the protected final assessment.` : "Complete every required lesson and the governed completion activities defined for this course."}</span></div>
+              <div><strong>Authoritative LearnWorlds checkout</strong><span>After approval, enrollment will use the governed LearnWorlds product and learner identity system.</span></div>
+              <div><strong>Substantive professional instruction required</strong><span>Every module must contain complete instruction, practice, knowledge checks, learner materials, and evidence before publication.</span></div>
+              <div><strong>Authoritative grounding</strong><span>Relevant standards and government guidance are connected to the course without presenting nonbinding guidance as law.</span></div>
+              <div><strong>Governed completion standard</strong><span>{publication.assessmentRequired ? `Complete every required activity and achieve ${publication.passingScore} percent or higher on the approved final assessment.` : "Complete every required activity defined in the approved course contract."}</span></div>
             </div>
           </div>
 
           <aside className="academy-course-card">
-            <p>Course investment</p>
-            <strong>{money.format(course.price)}</strong>
-            <span>per learner</span>
+            <p>{offer.offerLabel}</p>
+            <strong>{money.format(offer.offerPrice)}</strong>
+            <span>{offer.savings > 0 ? `${money.format(offer.listPrice)} list · save ${money.format(offer.savings)}` : "planned price per learner"}</span>
             <dl>
               <div><dt>Duration</dt><dd>{course.duration}</dd></div>
-              <div><dt>Lessons</dt><dd>{course.modules.length}</dd></div>
+              <div><dt>Modules</dt><dd>{course.modules.length}</dd></div>
               <div><dt>Audience</dt><dd>{course.audience}</dd></div>
-              <div><dt>Format</dt><dd>Self paced online, AI native</dd></div>
+              <div><dt>Content state</dt><dd>{offer.contentState}</dd></div>
+              <div><dt>Commerce state</dt><dd>{offer.commerceState}</dd></div>
               <div><dt>Assessment</dt><dd>{assessmentLabel}</dd></div>
-              <div><dt>AI support</dt><dd>Obserrian Academy Tutor with authorized access</dd></div>
               {publication.version ? <div><dt>Course version</dt><dd>{publication.version}</dd></div> : null}
             </dl>
             {purchaseAvailable ? (
               <a className="academy-course-checkout academy-course-card-cta" href={`/api/academy/checkout?course=${course.id}`}>
-                Buy secure enrollment
+                Enroll through LearnWorlds
               </a>
             ) : (
               <span className="academy-course-checkout academy-course-card-cta" aria-disabled="true">
-                New purchases paused
+                Build in progress
               </span>
             )}
-            <small>Enterprise-ready training with authoritative grounding, applied scenarios, governed assessment controls where required, and a completion record issued by {LEGAL_NAME}.</small>
+            <small>The displayed offer is aligned with the governed LearnWorlds canary: {money.format(offer.listPrice)} list price, {money.format(offer.offerPrice)} launch offer, and {money.format(offer.savings)} savings where applicable.</small>
           </aside>
         </div>
       </section>
 
       <section className="academy-course-proof">
-        <article><span>01</span><h2>What this course teaches</h2><p>The instruction is derived from the published course description and outcomes, then developed into professional concepts, applied methods, scenarios, and decision practices.</p></article>
-        <article><span>02</span><h2>Why the instruction is defensible</h2><p>Lessons identify the relevant authoritative basis and distinguish legal requirements, regulations, standards, recognized guidance, organizational policy, and professional practice.</p></article>
-        <article><span>03</span><h2>How learners apply it</h2><p>Documented public examples, realistic business scenarios, job aids, knowledge checks, and the Obserrian Tutor connect the material to professional use.</p></article>
+        <article><span>01</span><h2>What must be built</h2><p>Complete instructional modules, narrated presentations, transcripts, scenarios, exercises, knowledge checks, workbook, assessment, source register, and certificate rules.</p></article>
+        <article><span>02</span><h2>What must be verified</h2><p>Content accuracy, accessibility, branding, duration, price parity, LearnWorlds import, learner completion, assessment scoring, and certificate issuance.</p></article>
+        <article><span>03</span><h2>What authorizes sale</h2><p>Evidence that every required deliverable exists and works, followed by explicit owner approval and a controlled change from Sandbox build to published.</p></article>
       </section>
 
       <section className="academy-course-content" id="curriculum">
         <div className="academy-course-outcomes">
-          <p className="academy-course-kicker">WHAT YOU WILL LEARN</p>
-          <h2>Practical learning tied directly to this published course description and intended professional audience.</h2>
+          <p className="academy-course-kicker">PLANNED LEARNING OUTCOMES</p>
+          <h2>The course build must produce evidence that learners can perform these outcomes.</h2>
           <ul>{course.outcomes.map((outcome) => <li key={outcome}>{outcome}</li>)}</ul>
           {publication.prerequisites.length > 0 ? (
             <>
@@ -228,14 +237,14 @@ export default async function AcademyCoursePage({
 
       <section className="academy-course-certificate">
         <div>
-          <p className="academy-course-kicker">COMPLETION</p>
-          <h2>{publication.certificateIssued ? "Receive a governed Certificate of Course Completion." : "Receive a governed course completion record."}</h2>
-          <p>{publication.assessmentRequired ? `Complete every required lesson and achieve ${publication.passingScore} percent or higher on the protected final assessment. The Obserrian Tutor is available during learning and practice but is paused during the graded final assessment.` : "Complete every required lesson and the course-specific completion activities. The Obserrian Tutor remains subject to the course access and assessment rules."} {publication.certificateIssued ? `The completion certificate is issued by ${LEGAL_NAME}.` : `The completion record is maintained by ${LEGAL_NAME}.`}</p>
+          <p className="academy-course-kicker">COMPLETION GATE</p>
+          <h2>{publication.certificateIssued ? "Certificate issuance remains blocked until the complete course works." : "The completion record remains blocked until the complete course works."}</h2>
+          <p>{publication.assessmentRequired ? `The learner must complete every required activity and achieve ${publication.passingScore} percent or higher on the approved final assessment. Assessment and certificate behavior cannot be accepted while the LearnWorlds course contains no instructional content.` : "The learner must complete every approved course activity before any completion record is issued."}</p>
           {publication.credentialDisclaimer ? <p>{publication.credentialDisclaimer}</p> : null}
         </div>
         <aside>
-          <strong>Buyer-safe details</strong>
-          <p>One governed purchase route, one published duration, one course-specific lesson path, and completion requirements derived from the approved course contract rather than a sitewide hardcoded template.</p>
+          <strong>Current factual status</strong>
+          <p>Sandbox checkout, invoice, entitlement, and course-shell access passed. Actual course content, assessment, completion, and certificate remain incomplete.</p>
         </aside>
       </section>
     </main>
