@@ -5,6 +5,7 @@ import test from "node:test";
 const checkoutRoute = fs.readFileSync("app/api/academy/checkout/route.ts", "utf8");
 const statusRoute = fs.readFileSync("app/api/admin/learnworlds/status/route.ts", "utf8");
 const adapter = fs.readFileSync("lib/learnworlds.ts", "utf8");
+const offers = fs.readFileSync("app/academy/courseOffers.ts", "utf8");
 const environment = fs.readFileSync(".env.example", "utf8");
 const configuration = JSON.parse(fs.readFileSync("config/learnworlds-products.json", "utf8"));
 
@@ -53,20 +54,38 @@ test("LearnWorlds adapter locks checkout mappings to governed hosts and identifi
   assert.match(adapter, /return null/);
 });
 
-test("Academy checkout chooses LearnWorlds before requiring website Stripe secrets", () => {
-  const providerBranch = checkoutRoute.indexOf('academyCommerceProvider() === "learnworlds"');
+test("Academy checkout routes the governed LearnWorlds Sandbox canary before website Stripe secrets", () => {
+  const providerDeclaration = checkoutRoute.indexOf("const provider = academyCommerceProvider()");
+  const sandboxAuthorization = checkoutRoute.indexOf('provider === "learnworlds" && learnWorldsSandboxMode()');
+  const learnWorldsBranch = checkoutRoute.indexOf('if (provider === "learnworlds")');
   const stripeConfiguration = checkoutRoute.indexOf("!process.env.STRIPE_SECRET_KEY");
-  assert.ok(providerBranch >= 0, "LearnWorlds provider branch is missing");
-  assert.ok(stripeConfiguration > providerBranch, "Website Stripe secrets are incorrectly required before LearnWorlds routing");
+  assert.ok(providerDeclaration >= 0, "Governed commerce provider declaration is missing");
+  assert.ok(sandboxAuthorization > providerDeclaration, "LearnWorlds Sandbox authorization is missing");
+  assert.ok(learnWorldsBranch > sandboxAuthorization, "LearnWorlds provider branch is missing");
+  assert.ok(stripeConfiguration > learnWorldsBranch, "Website Stripe secrets are incorrectly required before LearnWorlds routing");
   assert.match(checkoutRoute, /learnworlds-product-unavailable/);
   assert.match(checkoutRoute, /x-obserra-learnworlds-product-id/);
   assert.match(checkoutRoute, /status: 303/);
 });
 
-test("legacy website Stripe checkout remains available until governed cutover", () => {
+test("live Academy commerce fails closed until course content is approved", () => {
+  assert.match(offers, /contentState: "not-loaded"/);
+  assert.match(offers, /livePurchaseEnabled: false/);
+  assert.match(offers, /courseIsLiveForPurchase/);
+  assert.match(checkoutRoute, /courseIsLiveForPurchase\(course\.id\)/);
+  assert.match(checkoutRoute, /course-build-in-progress/);
+  assert.match(checkoutRoute, /x-obserra-course-content-readiness", "not-approved"/);
+  assert.match(checkoutRoute, /x-obserra-live-purchase", "blocked"/);
+});
+
+test("legacy website Stripe checkout remains present only as a governed rollback path", () => {
   assert.match(checkoutRoute, /stripe\.checkout\.sessions\.create/);
   assert.match(checkoutRoute, /x-obserra-commerce-provider", "website-stripe"/);
   assert.match(checkoutRoute, /x-obserra-webhook-verification", "required"/);
+  assert.ok(
+    checkoutRoute.indexOf("courseIsLiveForPurchase(course.id)") < checkoutRoute.indexOf("stripe.checkout.sessions.create"),
+    "Website Stripe checkout is reachable before content-readiness enforcement",
+  );
 });
 
 test("owner readiness endpoint fails closed and exposes no secrets", () => {
