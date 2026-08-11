@@ -3,6 +3,7 @@
 import { track } from "@vercel/analytics";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import AcademyCinematicCampaigns from "./AcademyCinematicCampaigns";
 import type { Course, CourseLevel, Department } from "./courseData";
 import { courseOfferForCourse } from "./courseOffers";
 
@@ -62,9 +63,11 @@ function offerSummary(course: Course) {
 export default function AcademyControlledClient({
   courses,
   controlPlane,
+  cinematicMediaEnabled,
 }: {
   courses: Course[];
   controlPlane: "operational" | "degraded";
+  cinematicMediaEnabled: boolean;
 }) {
   const [department, setDepartment] = useState<Department | "All">("All");
   const [collection, setCollection] = useState<Collection>("All");
@@ -168,6 +171,8 @@ export default function AcademyControlledClient({
           </p>
         ) : null}
       </section>
+
+      <AcademyCinematicCampaigns enabled={cinematicMediaEnabled} />
 
       <section className="purchase-journey" aria-label="Academy production and launch journey">
         <article><span>01</span><h2>Build</h2><p>Create the complete course, learner materials, assessments, and source evidence.</p></article>
