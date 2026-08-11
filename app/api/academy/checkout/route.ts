@@ -9,6 +9,11 @@ import {
   studioLicenseMetadata,
 } from "../../../../lib/academy-studio";
 import { safeIdentity } from "../../../../lib/identity-runtime";
+import {
+  academyCommerceProvider,
+  learnWorldsEnrollmentUrl,
+  learnWorldsProductForCourse,
+} from "../../../../lib/learnworlds";
 import { getStripe } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
@@ -25,13 +30,32 @@ function unavailableRedirect(requestUrl: URL, reason: string) {
   return response;
 }
 
+function learnWorldsRedirect(requestUrl: URL, courseId: string) {
+  const product = learnWorldsProductForCourse(courseId);
+  const target = learnWorldsEnrollmentUrl(courseId);
+  if (!product || !target) {
+    const response = unavailableRedirect(requestUrl, "learnworlds-product-unavailable");
+    response.headers.set("x-obserra-commerce-provider", "learnworlds");
+    response.headers.set("x-obserra-learnworlds-mapping", product ? product.status : "missing");
+    return response;
+  }
+
+  const response = NextResponse.redirect(target, { status: 303 });
+  response.headers.set("x-obserra-commerce-provider", "learnworlds");
+  response.headers.set("x-obserra-commerce-mode", "learnworlds-managed");
+  response.headers.set("x-obserra-learnworlds-product-id", product.productId);
+  response.headers.set("x-obserra-learnworlds-product-status", product.status);
+  response.headers.set("x-obserra-existing-entitlements", "legacy-entitlements-preserved");
+  response.headers.set("x-obserra-webhook-verification", "learnworlds-managed");
+  response.headers.set("cache-control", "private, no-store, max-age=0");
+  return response;
+}
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const baseCourse = courseForId(requestUrl.searchParams.get("course") ?? "");
 
-  if (!baseCourse || !process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
-    return unavailableRedirect(requestUrl, "configuration-required");
-  }
+  if (!baseCourse) return unavailableRedirect(requestUrl, "course-unavailable");
 
   const runtimeCourse = await publicAcademyCourse(baseCourse);
   if (
@@ -49,6 +73,13 @@ export async function GET(request: Request) {
   }
 
   const course = runtimeCourse.course;
+  if (academyCommerceProvider() === "learnworlds") {
+    return learnWorldsRedirect(requestUrl, course.id);
+  }
+
+  if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
+    return unavailableRedirect(requestUrl, "configuration-required");
+  }
 
   try {
     const identity = await safeIdentity();
@@ -139,6 +170,7 @@ export async function GET(request: Request) {
     if (!session.url) throw new Error("Stripe did not return a checkout URL");
 
     const response = NextResponse.redirect(session.url, { status: 303 });
+    response.headers.set("x-obserra-commerce-provider", "website-stripe");
     response.headers.set("x-obserra-commerce-mode", identityMode);
     response.headers.set("x-obserra-claim-policy", CLAIM_POLICY);
     response.headers.set("x-obserra-catalog-parity", studioCourse ? "governed-studio" : "baseline-fallback");
