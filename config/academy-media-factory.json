@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0.0",
+  "minimumExpectedCatalogCourses": 60,
+  "annualPlan": {
+    "targetCoursesPerMonth": 5,
+    "targetCourseCount": 60,
+    "targetHeyGenAssets": 360,
+    "targetPolloAssets": 300,
+    "reviewCadence": "weekly",
+    "publicationCadence": "monthly"
+  },
+  "brand": {
+    "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "presenterLowerThird": "Dr. Jody Blanchard | Founder and Cybersecurity Executive",
+    "palette": ["#050B18", "#0B1730", "#C9A227", "#FFFFFF", "#53B7FF"],
+    "syntheticMediaDisclosure": "This video uses the authorized digital likeness or synthetic media tools approved by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC.",
+    "defaultCallToAction": "Explore the complete course at Obserra Academy."
+  },
+  "flagshipCourseIds": [
+    "cybersecurity-foundations",
+    "ai-risk-ethics-governance",
+    "board-communication-cybersecurity",
+    "becoming-a-strategic-ciso",
+    "executive-protection-fundamentals",
+    "ransomware-readiness",
+    "ai-data-privacy-ip",
+    "business-continuity-cyber-resilience",
+    "ciso-leadership-playbook",
+    "executive-travel-risk"
+  ],
+  "standardCourseIds": [
+    "generative-ai-business-leaders",
+    "llms-for-leaders",
+    "ai-ready-workforce",
+    "zero-trust-strategy",
+    "cloud-security-executives",
+    "identity-security-access-governance",
+    "vulnerability-management",
+    "incident-response-leadership",
+    "third-party-cyber-risk",
+    "cyber-risk-assessment",
+    "building-security-program",
+    "cybersecurity-executive-metrics",
+    "ethical-leadership-ai",
+    "leading-through-cyber-crisis",
+    "data-driven-risk-intelligence"
+  ],
+  "qualityGates": {
+    "common": [
+      "approved-source-script",
+      "course-title-and-identity-match",
+      "obserra-branding-applied",
+      "captions-and-transcript-required",
+      "accessibility-review-passed",
+      "rights-and-likeness-authorization-recorded",
+      "synthetic-media-disclosure-present",
+      "owner-approval-recorded",
+      "no-unapproved-third-party-logos",
+      "no-fabricated-claims-or-case-facts"
+    ],
+    "heygen": [
+      "authorized-avatar-and-voice-only",
+      "lip-sync-and-pronunciation-review-passed",
+      "natural-pacing-and-executive-tone",
+      "1080p-master-exported",
+      "clean-audio-and-no-clipping"
+    ],
+    "pollo": [
+      "visual-consistency-review-passed",
+      "no-text-generated-inside-scene",
+      "no-real-person-impersonation",
+      "no-unlicensed-music-or-stock-assets",
+      "reduced-motion-alternative-available"
+    ]
+  }
+}
