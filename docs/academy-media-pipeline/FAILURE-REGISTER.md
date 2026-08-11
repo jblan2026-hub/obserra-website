@@ -4,6 +4,8 @@ Owner: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 
 Recorded: 2026-08-11
 
+Last updated: 2026-08-11
+
 Status: Permanent audit record
 
 ## Failure 1: Direct repository clone unavailable in the build environment
@@ -270,8 +272,121 @@ The new test content was not written on the first attempt. No existing test was 
 
 Before creating a file in an actively changing branch, verify whether the exact path already exists. Use `update_file` with the current blob SHA when it does.
 
+## Failure 9: Cinematic documentation assertion failed on equivalent wording
+
+### Action
+
+Strengthened the cinematic production document and its automated contract test.
+
+### Result
+
+At commit `89fdbdad274d11480f3a7de72cf7f5dded53e9d6`, GitHub Actions executed 79 tests:
+
+```text
+Passed: 78
+Failed: 1
+```
+
+The failing assertion expected:
+
+```text
+not a robotic avatar presentation
+```
+
+The document stated:
+
+```text
+must not feel like a robotic avatar presentation
+```
+
+### Root cause
+
+The test asserted one exact connective phrase instead of the durable policy concept. The document still prohibited robotic avatar presentation, static avatar only course videos, robotic narration over static slides, and uninterrupted avatar segments longer than 20 seconds.
+
+### Impact
+
+Website CI, Academy 70x, Application Release Validation, and the shared application pipeline reported failure or remained blocked. No merge, provider generation, LearnWorlds upload, or production cutover occurred.
+
+### Correction
+
+Updated the documentation assertions to validate the durable semantic requirements:
+
+```text
+robotic avatar presentation
+no uninterrupted avatar segment may exceed 20 seconds
+full course videos consisting only of a talking avatar
+robotic narration over static slides
+```
+
+Correction commit:
+
+```text
+a04576292044ddc11122b0d08905b6f4987cd9a0
+```
+
+### Prevention rule
+
+Documentation contract tests must validate stable policy language and required concepts. They must not fail a release because a grammatically equivalent sentence uses a different connective phrase.
+
+## Failure 10: LearnWorlds shell manifests do not equal uploaded LearnWorlds courses
+
+### Action
+
+Created a governed 60 course LearnWorlds shell manifest, CSV, validation record, and controlled clone plan.
+
+### Result
+
+The repository can generate and validate all 60 Draft shell definitions, but this environment has not executed an authenticated LearnWorlds course creation or clone operation. The owner screenshot still proves only the existing Cybersecurity Foundations course in the LearnWorlds course manager.
+
+### Root cause
+
+No direct authenticated LearnWorlds authoring connector is available in this conversation. Current connector access has not established a supported course creation operation that can be safely executed from here.
+
+### Impact
+
+The shell plan is ready, but the remaining LearnWorlds course shells are not claimed uploaded. Website learner shell visibility and repository manifests must not be confused with LearnWorlds authoring state.
+
+### Correction
+
+The repository keeps every planned shell in Draft and provides deterministic manifests for controlled cloning or a supported import. Actual LearnWorlds creation remains an authenticated owner or verified API execution step. The pipeline will record every created LearnWorlds course identifier and publication state when execution is proven.
+
+### Prevention rule
+
+Never claim LearnWorlds shells are uploaded because a CSV, manifest, portal card, or local package exists. Require authenticated LearnWorlds evidence for every created course shell.
+
+## Failure 11: Failure register update also encountered an advancing branch SHA
+
+### Action
+
+Attempted to append Failures 7 through 10 to this register using the blob SHA read before additional automated handoff commits completed.
+
+### Result
+
+GitHub returned:
+
+```text
+409 Conflict
+FAILURE-REGISTER.md does not match the supplied SHA
+```
+
+### Root cause
+
+The branch continued to receive related cinematic and handoff commits during the documentation update.
+
+### Impact
+
+The first register replacement did not apply. No prior failure record was lost.
+
+### Correction
+
+Refetched the latest pull request head and this file, preserved all existing failures, and applied the complete replacement using the current blob SHA.
+
+### Prevention rule
+
+Treat audit files as concurrency sensitive. Refetch both the branch head and exact file blob immediately before replacing an authoritative handoff, activity ledger, or failure register.
+
 ## Current truth boundary
 
-The learner dashboard shells, deterministic media factory, common cinematic enterprise standard, provider readiness adapter, owner-only status route, asset intake pipeline, tests, canary production pack, and audit documentation exist on the working branch. The cinematic changes require current-head CI before they can be treated as validated.
+The learner dashboard shells, deterministic media factory, common cinematic enterprise standard, provider readiness adapter, owner-only status route, asset intake pipeline, LearnWorlds shell plan, tests, canary production pack, and audit documentation exist on the working branch. The latest correction requires current-head GitHub Actions validation before it can be represented as passing.
 
 No HeyGen likeness canary, complete Cybersecurity Foundations cinematic package, remaining LearnWorlds shell transfer, LearnWorlds publication, website production cutover, or customer release is claimed complete.
