@@ -121,12 +121,71 @@ Catalog courses: 35
 
 Created the annual media handoff addendum, dedicated failure register, and dedicated activity ledger. All known failed actions and corrections are recorded.
 
+## Activity 16: Owner-managed credit refill decision applied
+
+Recorded that the owner will manually refill HeyGen and Pollo web-subscription credits when needed. Updated the production model to remain quality first while retaining explicit owner control over every refill and any future separately billed API usage.
+
+## Activity 17: Governed service connection configuration implemented
+
+Added `config/academy-media-services.json` with provider roles, exact governed HTTPS endpoints, required manual evidence, required API environment variables, probe timeouts, and fail-closed security controls.
+
+## Activity 18: Media service readiness adapter implemented
+
+Added `lib/academy-media-services.ts`. The adapter defaults HeyGen and Pollo to manual mode, validates exact provider hosts, evaluates manual and API readiness, supports bounded optional probes, and never returns API keys or secret values.
+
+## Activity 19: Owner-only media readiness endpoint implemented
+
+Added `app/api/admin/academy-media/status/route.ts`. The endpoint uses Clerk owner authorization, returns 404 to unauthorized callers, applies no-store and noindex headers, and supports an explicit `?probe=1` sanitized connection check.
+
+## Activity 20: Secure deployment variables documented
+
+Updated `.env.example` with manual-first and separately authorized API variables for HeyGen and Pollo. No credential value was added to source control.
+
+## Activity 21: Governed media receipt and intake pipeline implemented
+
+Added:
+
+```text
+config/academy-media-asset-receipt.schema.json
+scripts/academy-media-intake.mjs
+```
+
+The pipeline creates receipt templates and validates downloaded media, SHA-256 hashes, path containment, captions, transcripts, rights evidence, quality gates, owner approval, synthetic-media disclosure, resolution, duration, streams, and 48 kHz presenter audio.
+
+## Activity 22: Connection and intake tests implemented
+
+Added:
+
+```text
+test/academy-media-services.test.mjs
+test/academy-media-intake.test.mjs
+```
+
+The tests cover provider endpoint governance, secret boundaries, manual-first operation, owner-only status, deterministic receipt preparation, accepted asset validation, unapproved asset rejection, SHA-256 validation, path containment, and optional FFprobe evidence.
+
+## Activity 23: Package commands expanded
+
+Added:
+
+```text
+npm run prepare:academy-media-intake
+npm run validate:academy-media-intake
+npm run validate:academy-media-canary
+```
+
+These commands prepare the complete asset intake tree and enforce the final canary or portfolio acceptance gate after assets are generated and downloaded.
+
 ## Current state
 
 ```text
-Repository implementation: complete on draft branch
-Core code CI: passed on cited commit
+Repository implementation: expanded on draft branch
+Previously cited core CI: passed
 Current head CI: required before merge
+HeyGen avatar and voice: owner in progress
+HeyGen templates: pending
+Pollo private workspace and presets: pending
+Media service readiness endpoint: implemented
+Media asset intake validator: implemented
 HeyGen canary generation: not started
 Pollo canary generation: not started
 LearnWorlds media upload: not started
