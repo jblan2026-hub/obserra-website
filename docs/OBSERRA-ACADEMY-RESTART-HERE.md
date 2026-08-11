@@ -15,13 +15,14 @@ Every future session must read these files before making recommendations or chan
 1. `docs/OBSERRA-ACADEMY-RESTART-HERE.md`
 2. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`
 3. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT.md`
-4. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE.md`
-5. Pull request `#55`
+4. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT-ADDENDUM-CANARY-PURCHASE-EMPTY-COURSE.md`
+5. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE.md`
+6. Pull request `#55`
 
 Use this exact continuation instruction:
 
 ```text
-Read docs/OBSERRA-ACADEMY-RESTART-HERE.md, docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md, and docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT.md on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Continue from the first incomplete action. Preserve all failures and update the handoff after every action.
+Read docs/OBSERRA-ACADEMY-RESTART-HERE.md, docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md, docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT.md, and docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT-ADDENDUM-CANARY-PURCHASE-EMPTY-COURSE.md on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Continue from the first incomplete action. Preserve all failures and update the handoff after every action.
 ```
 
 ## Executive truth
@@ -147,7 +148,8 @@ Latest retest on 2026-08-11:
 ```text
 Obserra team visible: yes
 Team ID: team_xpUE1GefY2JHuFFCqbAdnZAj
-Projects returned: 0
+Projects returned by team ID: 0
+Projects returned by team slug: 0
 Direct get_project(obserra-website-live): 404 Not Found
 Direct ChatGPT Vercel project authority: not established
 ```
