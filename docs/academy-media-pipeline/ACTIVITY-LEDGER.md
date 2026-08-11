@@ -385,20 +385,133 @@ This file is now the first source every future session must read. It contains th
 
 Updated `docs/OBSERRA-ACADEMY-RESTART-HERE.md` so the canonical latest handoff is read first and every failure, shell transfer boundary, cinematic requirement, and merge blocker remains visible after any conversation reset.
 
+## Activity 45: Website Pollo enhancement scope approved
+
+Recorded the owner direction to use Pollo AI for interactive website enhancements on `www.obserrallc.com`, replace selected static images with cinematic loops, and create official-brand website advertisements.
+
+## Activity 46: Direct Pollo plugin discovery completed
+
+Searched the installable plugin catalog for Pollo AI video generation. No Pollo plugin was returned. Failure 12 records the limitation and prevention rule.
+
+The absence of a plugin does not block repository implementation. It means direct provider rendering cannot be claimed from this environment.
+
+## Activity 47: Accessible cinematic media component implemented
+
+Added:
+
+```text
+app/components/marketing/CinematicMedia.tsx
+```
+
+The component supports static poster fallback, muted loop playback, viewport play and pause, user pause and play, reduced motion fallback, and video error fallback.
+
+## Activity 48: Official-brand campaign advertisements implemented
+
+Added:
+
+```text
+app/components/marketing/WebsiteCampaignAds.tsx
+```
+
+The homepage campaign set includes:
+
+1. Obserra EIOS.
+2. Obserra Academy.
+3. Protection and Intelligence.
+4. Cybersecurity Advisory.
+
+Each advertisement uses an official Obserra poster image, official logo overlay, governed headline, body copy, call to action, and Pollo MP4 path.
+
+## Activity 49: Homepage cinematic media slots implemented
+
+Updated:
+
+```text
+app/page.tsx
+app/cinematic-media.css
+```
+
+The homepage now contains governed video slots for:
+
+1. The main EIOS intelligence hero.
+2. The EIOS platform visualization.
+3. Four campaign advertisements.
+
+The official static images remain the active fallback until approved MP4 assets exist and the feature flag is enabled.
+
+## Activity 50: Website media manifest and fail-closed feature flag implemented
+
+Added:
+
+```text
+config/website-cinematic-media.json
+public/media/pollo/README.md
+```
+
+Updated:
+
+```text
+.env.example
+```
+
+Feature flag:
+
+```text
+NEXT_PUBLIC_OBSERRA_CINEMATIC_MEDIA_ENABLED=false
+```
+
+The manifest governs six initial assets and keeps every asset in `planned` state. The flag remains false until approved files are present, validated, and owner approved.
+
+## Activity 51: Production-ready Pollo website ad pack created
+
+Added:
+
+```text
+docs/pollo-website-campaigns/POLLO-WEBSITE-INTERACTIVE-ADS-PRODUCTION-PACK.md
+```
+
+The pack contains official brand rules, six shot sequences, paste-ready Pollo prompts, four website advertisements, two interactive loops, optional social voiceovers, exact output filenames, and a sixteen point acceptance checklist.
+
+## Activity 52: Website cinematic media validation added
+
+Added:
+
+```text
+test/website-cinematic-media.test.mjs
+```
+
+The tests validate fail-closed activation, poster fallback, video error fallback, viewport playback, user controls, reduced motion, official logo use, campaign coverage, six governed assets, poster availability, and absence of provider credentials or automatic spend authorization.
+
+## Activity 53: Website cinematic ads handoff addendum created
+
+Added:
+
+```text
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-WEBSITE-CINEMATIC-ADS.md
+```
+
+The addendum records the implementation, provider limitation, official brand rules, exact asset paths, current state, next actions, acceptance boundary, and latest file locations.
+
 ## Current state
 
 ```text
 Learner dashboard shells: implemented and previously validated
 60 course LearnWorlds Draft shell manifest: implemented
 Remaining LearnWorlds shells uploaded: not yet proven
-Cinematic enterprise standard: implemented on branch
-Same quality standard across all courses: implemented
-Current portfolio target: 1020 media assets across 60 courses
-Cybersecurity Foundations cinematic production pack: updated
+Cinematic enterprise course standard: implemented
+Current course media target: 1020 assets across 60 courses
+Website cinematic media component: implemented
+Homepage hero and platform video slots: implemented
+Four official-brand website advertisements: implemented
+Six governed Pollo website assets: planned
+Pollo website MP4 files rendered: no
+Pollo website MP4 files uploaded: no
+Website cinematic feature flag: false
 HeyGen avatar and voice: owner still refining
 15 second likeness canary: not yet accepted
-Full Cybersecurity Foundations media canary: not yet generated and accepted
-Current-head GitHub Actions: required after latest documentation commits
+Full Cybersecurity Foundations media canary: not yet accepted
+Current-head GitHub Actions: required after latest website and audit changes
 Pull request merged: no
-Production cutover: not authorized
+Website production activation: no
+Academy production cutover: not authorized
 ```
