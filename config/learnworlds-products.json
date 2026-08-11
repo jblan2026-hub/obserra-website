@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "schoolId": "6a7a693d353feb69c94c7654",
+  "schoolName": "Obserra EPI Academy",
+  "schoolUrl": "https://obserraepillc.learnworlds.com",
+  "authorDashboardUrl": "https://obserraepillc.learnworlds.com/author/dashboard",
+  "customDomain": "https://academy.obserrallc.com",
+  "domainStatus": "dns-created-pending-learnworlds-verification",
+  "stripeStatus": "connected-sandbox-validation-required",
+  "apiStatus": "keys-created-secrets-not-stored-in-repository",
+  "products": []
+}
