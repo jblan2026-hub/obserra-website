@@ -26,7 +26,7 @@ Recorded that annual web subscriptions do not automatically authorize separate A
 
 Defined a five-course-per-month, twelve-month operating model with ten flagship courses, fifteen standard courses, and thirty-five catalog courses.
 
-Baseline governed output target:
+Baseline governed output target at that stage:
 
 ```text
 HeyGen assets: 250
@@ -48,7 +48,7 @@ Added tests that:
 
 1. Generate a full synthetic 60-course portfolio.
 2. Reject catalogs below the minimum expected size.
-3. Validate the real Academy catalog and exact 585-asset totals.
+3. Validate the real Academy catalog and exact governed asset totals.
 
 ## Activity 9: Repository release gate updated
 
@@ -70,12 +70,12 @@ Created the multiplatform README, account setup checklist, annual pipeline desig
 Created the Cybersecurity Foundations production pack containing:
 
 1. A complete HeyGen welcome script.
-2. Five module-summary briefs.
+2. Five module briefs.
 3. A HeyGen sales trailer script.
-4. Six Pollo cinematic prompts.
+4. Pollo cinematic prompts.
 5. Three vertical short themes.
 6. A LinkedIn executive clip brief.
-7. A twelve-point acceptance checklist.
+7. An acceptance checklist.
 
 ## Activity 12: Pull request expanded
 
@@ -101,21 +101,9 @@ Existing lint warnings: 1
 Production build: passed
 ```
 
-The two media-factory tests included in that run passed.
+## Activity 14: Real catalog validation strengthened
 
-## Activity 14: Real-catalog validation strengthened
-
-Added a third media-factory test that runs against the real `app/academy/courseData.ts` catalog and requires:
-
-```text
-Courses: 60
-Total jobs: 585
-HeyGen jobs: 250
-Pollo jobs: 335
-Flagship courses: 10
-Standard courses: 15
-Catalog courses: 35
-```
+Added a media-factory test that runs against the real `app/academy/courseData.ts` catalog and requires the governed course, provider, and tier totals.
 
 ## Activity 15: Audit records completed
 
@@ -150,7 +138,7 @@ config/academy-media-asset-receipt.schema.json
 scripts/academy-media-intake.mjs
 ```
 
-The pipeline creates receipt templates and validates downloaded media, SHA-256 hashes, path containment, captions, transcripts, rights evidence, quality gates, owner approval, synthetic-media disclosure, resolution, duration, streams, and 48 kHz presenter audio.
+The pipeline creates receipt templates and validates downloaded media, SHA 256 hashes, path containment, captions, transcripts, rights evidence, quality gates, owner approval, synthetic-media disclosure, resolution, duration, streams, and 48 kHz presenter audio.
 
 ## Activity 22: Connection and intake tests implemented
 
@@ -161,7 +149,7 @@ test/academy-media-services.test.mjs
 test/academy-media-intake.test.mjs
 ```
 
-The tests cover provider endpoint governance, secret boundaries, manual-first operation, owner-only status, deterministic receipt preparation, accepted asset validation, unapproved asset rejection, SHA-256 validation, path containment, and optional FFprobe evidence.
+The tests cover provider endpoint governance, secret boundaries, manual-first operation, owner-only status, deterministic receipt preparation, accepted asset validation, unapproved asset rejection, SHA 256 validation, path containment, and optional FFprobe evidence.
 
 ## Activity 23: Package commands expanded
 
@@ -190,27 +178,15 @@ No deployment, provider generation, billing event, or production cutover occurre
 
 ## Activity 25: Secret-boundary test corrected
 
-Replaced the broad source slice with a precise assertion over the sanitized probe-result object shape. The correction now verifies:
-
-1. The result shape contains only reachability, authorization, counts, status codes, and errors.
-2. The result shape contains no API-key, access-token, client-secret, or webhook-secret field.
-3. The adapter returns exactly `{ status, probe: result }`.
-4. The owner route separately contains no HeyGen or Pollo API-key reference.
+Replaced the broad source slice with a precise assertion over the sanitized probe-result object shape. The correction verifies allowed result fields and excludes credential fields.
 
 ## Activity 26: Failure recorded and CI restarted
 
-Recorded Failure 6 in the permanent failure register with the exact CI output, root cause, impact, correction, and prevention rule. Committed the corrected test to the governed branch.
+Recorded Failure 6 in the permanent failure register with the exact CI output, root cause, impact, correction, and prevention rule.
 
-## Activity 27: Corrected current-head validation passed
+## Activity 27: Corrected validation passed
 
-GitHub Actions validated commit `50fea832849c3456626f4ffb0b75627b27bf2c16` and reported all four workflows successful:
-
-```text
-Website CI: passed
-Academy 70x Production Gate: passed
-Application Production Pipeline: passed
-Application Release Validation: passed
-```
+GitHub Actions validated commit `50fea832849c3456626f4ffb0b75627b27bf2c16` and reported all four workflows successful.
 
 Website CI evidence:
 
@@ -225,14 +201,6 @@ Generated application routes: 134
 Owner-site separation smoke: passed
 ```
 
-The production build includes the new protected route:
-
-```text
-/api/admin/academy-media/status
-```
-
-This proves the deterministic factory, provider-readiness adapter, protected status route, receipt preparation, asset intake validation, existing commerce behavior, and production build compile together. It does not prove external account connection, media generation, LearnWorlds upload, or production publication.
-
 ## Activity 28: Governed 15-second HeyGen likeness canary added
 
 Added:
@@ -241,34 +209,138 @@ Added:
 docs/academy-media-pipeline/canary/HEYGEN-15-SECOND-LIKENESS-CANARY.md
 ```
 
-The canary record contains:
-
-1. Exact Avatar V settings.
-2. The approved single-scene cinematic description.
-3. The exact fifteen-second likeness and voice test script.
-4. A governed output filename.
-5. A twelve-point owner acceptance checklist.
-6. A smallest-defect repair rule.
-7. Required provider ID, avatar ID, voice ID, media hash, and approval evidence.
-
 The likeness canary must pass before the longer Cybersecurity Foundations welcome video or any portfolio presenter batch is generated.
+
+## Activity 29: Authenticated learner course shells implemented
+
+Added every governed Academy course shell to the protected `/portal` dashboard. The shell view groups courses by department and displays title, track, level, duration, module count, and governed release state.
+
+## Activity 30: Learner shell authorization controls implemented
+
+Shell state resolves in this order:
+
+```text
+Verified Clerk entitlement -> Enrolled
+Published LearnWorlds mapping -> Available
+Sandbox LearnWorlds mapping -> Pilot shell
+No released mapping -> In production
+```
+
+The learner shell dashboard contains no checkout action and does not fabricate enrollment or course readiness.
+
+## Activity 31: Learner shell validation passed
+
+Current-head validation for the learner shell implementation reported:
+
+```text
+Tests: 66
+Passed: 66
+Failed: 0
+Lint errors: 0
+Production build: passed
+Website CI: passed
+Academy 70x Production Gate: passed
+Application Production Pipeline: passed
+Application Release Validation: passed
+```
+
+## Activity 32: Owner rejected robotic and low quality production
+
+Recorded the direction that every course must use realistic, cinematic, Hollywood-caliber craft and Fortune 500 executive communication quality. The existing PMP style was rejected as robotic and below the required professional standard.
+
+The phrase describes a production-quality target. It does not claim affiliation with a film studio or Fortune 500 company.
+
+## Activity 33: Machine-readable cinematic standard implemented
+
+Added:
+
+```text
+config/academy-cinematic-production-standard.json
+```
+
+Standard ID:
+
+```text
+obserra-cinematic-enterprise-v1
+```
+
+The standard applies equally to every course, course level, and department. Tier may change release priority only. Tier may not reduce quality.
+
+## Activity 34: Media architecture standardized across every course
+
+Updated the factory configuration and generator so every course receives:
+
+```text
+HeyGen course welcome: 1
+HeyGen module anchor films: 5
+HeyGen course trailer host: 1
+Pollo module cinematic visual packs: 5
+Pollo website hero loop: 1
+Pollo vertical campaign clips: 3
+Pollo LinkedIn executive clip: 1
+Total assets per course: 17
+```
+
+Updated portfolio target:
+
+```text
+HeyGen assets: 420
+Pollo assets: 600
+Total assets: 1020
+```
+
+## Activity 35: Anti-robotic and cinematic controls enforced
+
+The factory now requires:
+
+1. No uninterrupted avatar segment longer than 20 seconds.
+2. Presenter screen time from 35 to 55 percent.
+3. Cinematic visual time from 45 to 65 percent.
+4. Five module anchor films and five module visual packs per course.
+5. Scene plan, shot list, storyboard, and edit decision list.
+6. 1920 by 1080 minimum master, Rec.709 color, and 48 kHz audio.
+7. Captions, transcript, owner approval, rights evidence, and LearnWorlds playback validation.
+
+## Activity 36: Cinematic standard and canary documentation upgraded
+
+Updated:
+
+```text
+docs/academy-media-pipeline/OBSERRA-CINEMATIC-FORTUNE-500-PRODUCTION-STANDARD.md
+docs/academy-media-pipeline/canary/CYBERSECURITY-FOUNDATIONS-PRODUCTION-PACK.md
+```
+
+The canary now contains a 75 second welcome, scene-by-scene edit plan, five 5 to 8 minute module film briefs, five Pollo module visual packs, LearnWorlds activity requirements, and a 15 category quality scorecard.
+
+## Activity 37: Concurrent file conflicts recorded and corrected
+
+The first configuration update used a stale blob SHA and returned GitHub HTTP 409. A subsequent test create action targeted a path that already existed and returned GitHub HTTP 422.
+
+Both actions were corrected by re-reading the current path and using the current blob SHA. Failures 7 and 8 record exact causes and prevention rules.
+
+## Activity 38: Cinematic handoff addendum created
+
+Added:
+
+```text
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-CINEMATIC-ENTERPRISE-STANDARD.md
+```
+
+The addendum records the standard, asset totals, provider roles, LearnWorlds controls, current blockers, merge boundary, shell transfer boundary, and latest file locations.
 
 ## Current state
 
 ```text
-Repository implementation: expanded on draft branch
-Current validated commit: 50fea832849c3456626f4ffb0b75627b27bf2c16
-Current validated tests: 61 passed, 0 failed
-Current validated workflows: 4 passed, 0 failed
-15-second HeyGen likeness canary: documented and ready for owner generation
-HeyGen avatar and voice: owner in progress
-HeyGen templates: pending
-Pollo private workspace and presets: pending
-Media service readiness endpoint: implemented and build validated
-Media asset intake validator: implemented and test validated
-HeyGen canary generation: not started
-Pollo canary generation: not started
-LearnWorlds media upload: not started
+Learner dashboard shells: implemented and previously validated
+Cinematic enterprise standard: implemented on branch
+Same quality standard across all courses: implemented
+Current portfolio target: 1020 media assets across 60 courses
+Cybersecurity Foundations cinematic production pack: updated
+HeyGen avatar and voice: owner still refining
+15 second likeness canary: not yet accepted
+Full Cybersecurity Foundations media canary: not yet generated and accepted
+Remaining LearnWorlds shells uploaded: not yet proven
+Current cinematic branch CI: pending
+Pull request merged: no
 Production cutover: not authorized
-Portfolio generation: not authorized
 ```
