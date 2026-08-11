@@ -8,10 +8,11 @@ const adapter = fs.readFileSync("lib/learnworlds.ts", "utf8");
 const environment = fs.readFileSync(".env.example", "utf8");
 const configuration = JSON.parse(fs.readFileSync("config/learnworlds-products.json", "utf8"));
 
-test("LearnWorlds school identity is governed without secrets", () => {
+test("LearnWorlds school identity and API endpoint are governed without secrets", () => {
   assert.equal(configuration.schoolId, "6a7a693d353feb69c94c7654");
   assert.equal(configuration.schoolName, "Obserra EPI Academy");
   assert.equal(configuration.schoolUrl, "https://obserraepillc.learnworlds.com");
+  assert.equal(configuration.apiUrl, "https://obserraepillc.learnworlds.com/admin/api/");
   assert.equal(configuration.customDomain, "https://academy.obserrallc.com");
   assert.ok(Array.isArray(configuration.products));
   assert.doesNotMatch(JSON.stringify(configuration), /client[_-]?secret|access[_-]?token|stripe[_-]?secret/i);
@@ -38,9 +39,11 @@ test("Cybersecurity Foundations canary is mapped to the owner supplied LearnWorl
   assert.equal(product.status, "sandbox");
 });
 
-test("LearnWorlds adapter locks checkout mappings to governed hosts and identifiers", () => {
+test("LearnWorlds adapter locks API and checkout mappings to governed hosts and identifiers", () => {
   assert.match(adapter, /httpsUrl\(/);
   assert.match(adapter, /requireAllowedHost\(/);
+  assert.match(adapter, /learnWorldsApiUrl\(/);
+  assert.match(adapter, /\/admin\/api/);
   assert.match(adapter, /validateCommerceUrl\(/);
   assert.match(adapter, /product_id/);
   assert.match(adapter, /packageId/);
@@ -75,11 +78,14 @@ test("owner readiness endpoint fails closed and exposes no secrets", () => {
   assert.doesNotMatch(statusRoute, /CLIENT_SECRET|ACCESS_TOKEN|STRIPE_SECRET_KEY/);
 });
 
-test("deployment template requires secrets to remain outside source control", () => {
+test("deployment template keeps the API URL nonsecret and secrets outside source control", () => {
+  assert.match(
+    environment,
+    /^LEARNWORLDS_API_URL=https:\/\/obserraepillc\.learnworlds\.com\/admin\/api\/$/m,
+  );
   for (const variable of [
     "ACADEMY_COMMERCE_PROVIDER",
     "LEARNWORLDS_SANDBOX_MODE",
-    "LEARNWORLDS_API_URL",
     "LEARNWORLDS_CLIENT_ID",
     "LEARNWORLDS_CLIENT_SECRET",
     "LEARNWORLDS_ACCESS_TOKEN",
