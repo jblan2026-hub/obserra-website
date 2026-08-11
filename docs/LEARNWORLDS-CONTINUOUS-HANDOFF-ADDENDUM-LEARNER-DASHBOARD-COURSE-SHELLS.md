@@ -64,18 +64,38 @@ A new regression test requires:
 5. The shell dashboard to contain no direct checkout route or `Enroll securely` action.
 6. Responsive course-shell styles to remain present.
 
+## Repository validation
+
+GitHub Actions validated branch head:
+
+```text
+b5ac906a20a7e85021085eab9084ba6f83cbd976
+```
+
+Results:
+
+```text
+Website CI: passed
+Academy 70x Production Gate: passed
+Application Production Pipeline: passed
+Application Release Validation: passed
+```
+
+Website CI completed unit and catalog contract tests, lint, production compilation, TypeScript validation, static page generation, and owner-site separation smoke testing. The learner-shell regression tests passed inside the shared test suite.
+
 ## Current factual state
 
 ```text
 Course-shell source: governed website Academy catalog
-Authenticated learner dashboard implementation: committed
-Verified entitlement logic: implemented
-LearnWorlds status logic: implemented
-Direct checkout from shell dashboard: prohibited
+Authenticated learner dashboard implementation: committed and CI validated
+Verified entitlement logic: implemented and tested
+LearnWorlds status logic: implemented and tested
+Direct checkout from shell dashboard: prohibited and tested
 HeyGen avatar and voice: owner in progress
 HeyGen canary video: not yet accepted
 Pollo canary visual package: not yet accepted
 LearnWorlds course publication: not authorized
+Production deployment of this branch: not yet proven
 Production cutover: not authorized
 ```
 
