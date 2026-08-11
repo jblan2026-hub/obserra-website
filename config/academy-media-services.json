@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "manual-first-api-ready",
+  "heygen": {
+    "role": "authoritative-presenter",
+    "defaultIntegrationMode": "manual",
+    "apiBaseUrl": "https://api.heygen.com",
+    "templatesPath": "/v2/templates",
+    "generatePath": "/v2/video/generate",
+    "statusPath": "/v1/video_status.get",
+    "apiKeyHeader": "X-Api-Key",
+    "officialDocumentation": "https://docs.heygen.com/",
+    "requiredManualEvidence": [
+      "approved-avatar",
+      "approved-voice",
+      "approved-16x9-template",
+      "approved-9x16-template",
+      "owner-consent-record"
+    ],
+    "requiredApiEnvironment": [
+      "HEYGEN_API_KEY",
+      "HEYGEN_AVATAR_ID",
+      "HEYGEN_VOICE_ID"
+    ],
+    "optionalApiEnvironment": [
+      "HEYGEN_TEMPLATE_16X9_ID",
+      "HEYGEN_TEMPLATE_9X16_ID"
+    ]
+  },
+  "pollo": {
+    "role": "cinematic-visual-and-campaign",
+    "defaultIntegrationMode": "manual",
+    "apiBaseUrl": "https://pollo.ai/api/platform",
+    "creditBalancePath": "/credit/balance",
+    "generationStatusPathTemplate": "/generation/{taskId}/status",
+    "defaultGenerationPath": "/generation/pollo/pollo-v2-0",
+    "apiKeyHeader": "x-api-key",
+    "officialDocumentation": "https://docs.pollo.ai/",
+    "requiredManualEvidence": [
+      "private-workspace-confirmed",
+      "approved-brand-references",
+      "approved-16x9-preset",
+      "approved-9x16-preset",
+      "rights-and-retention-policy-reviewed"
+    ],
+    "requiredApiEnvironment": [
+      "POLLO_API_KEY"
+    ],
+    "optionalApiEnvironment": [
+      "POLLO_DEFAULT_MODEL_PATH",
+      "POLLO_WEBHOOK_SECRET"
+    ]
+  },
+  "learnworlds": {
+    "role": "course-delivery-commerce-and-learner-system",
+    "defaultIntegrationMode": "api",
+    "officialDocumentation": "https://www.learnworlds.dev/",
+    "requiredApiEnvironment": [
+      "LEARNWORLDS_CLIENT_ID",
+      "LEARNWORLDS_CLIENT_SECRET",
+      "LEARNWORLDS_ACCESS_TOKEN"
+    ]
+  },
+  "security": {
+    "secretsInSourceControl": false,
+    "ownerOnlyReadinessEndpoint": true,
+    "automaticProviderSpending": false,
+    "automaticCreditRefill": false,
+    "failClosedOnInvalidProviderUrl": true,
+    "probeTimeoutMilliseconds": 8000,
+    "downloadExternalMediaImmediately": true,
+    "externalProviderRetentionIsNotArchive": true
+  }
+}
