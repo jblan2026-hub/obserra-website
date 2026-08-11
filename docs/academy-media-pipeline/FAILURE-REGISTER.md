@@ -385,8 +385,46 @@ Refetched the latest pull request head and this file, preserved all existing fai
 
 Treat audit files as concurrency sensitive. Refetch both the branch head and exact file blob immediately before replacing an authoritative handoff, activity ledger, or failure register.
 
+## Failure 12: No direct Pollo rendering plugin or authenticated connector was available
+
+### Action
+
+Searched the available plugin catalog for a Pollo AI video generation integration so the website assets could be rendered directly from this environment.
+
+### Result
+
+```text
+Plugins returned: 0
+```
+
+### Root cause
+
+No installable Pollo AI plugin or authenticated Pollo authoring connector is exposed in the current environment.
+
+### Impact
+
+The repository implementation, website media slots, official brand ad copy, Pollo prompts, governed filenames, poster fallbacks, feature flag, and automated tests can be completed here. Direct authenticated rendering inside the owner's Pollo account cannot be claimed.
+
+The six planned MP4 files remain unrendered and unuploaded. The website feature flag remains disabled, so the official static posters continue to display.
+
+### Correction
+
+1. Implemented a manual-web-subscription production path.
+2. Created paste-ready Pollo prompts and shot sequences.
+3. Created exact governed output filenames and repository paths.
+4. Added official poster fallbacks.
+5. Added reduced motion, pause, viewport playback, and error fallback controls.
+6. Added a fail-closed feature flag that remains false until all active assets exist and are owner approved.
+7. Added automated tests for the website media contract.
+
+### Prevention rule
+
+Never claim a Pollo asset was rendered, downloaded, uploaded, or activated without authenticated provider evidence and the actual approved MP4 file. Keep the feature flag disabled until every referenced active file is present and validated.
+
 ## Current truth boundary
 
-The learner dashboard shells, deterministic media factory, common cinematic enterprise standard, provider readiness adapter, owner-only status route, asset intake pipeline, LearnWorlds shell plan, tests, canary production pack, and audit documentation exist on the working branch. The latest correction requires current-head GitHub Actions validation before it can be represented as passing.
+The learner dashboard shells, deterministic media factory, common cinematic enterprise standard, provider readiness adapter, owner-only status route, asset intake pipeline, LearnWorlds shell plan, website cinematic media slots, four official-brand website advertisements, Pollo production prompts, poster fallbacks, feature flag, tests, canary production pack, and audit documentation exist on the working branch.
 
-No HeyGen likeness canary, complete Cybersecurity Foundations cinematic package, remaining LearnWorlds shell transfer, LearnWorlds publication, website production cutover, or customer release is claimed complete.
+Current-head GitHub Actions validation is required before the latest website implementation can be represented as passing.
+
+No HeyGen likeness canary, complete Cybersecurity Foundations cinematic package, remaining LearnWorlds shell transfer, Pollo website MP4 render, Pollo website MP4 upload, cinematic website activation, LearnWorlds publication, production cutover, or customer release is claimed complete.
