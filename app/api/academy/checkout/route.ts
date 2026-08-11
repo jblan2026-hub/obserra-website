@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import { courseIsLiveForPurchase } from "../../../academy/courseOffers";
 import { courseForId } from "../../../../lib/academy";
 import { publicAcademyCourse } from "../../../../lib/academy-control";
 import {
@@ -13,6 +14,7 @@ import {
   academyCommerceProvider,
   learnWorldsEnrollmentUrl,
   learnWorldsProductForCourse,
+  learnWorldsSandboxMode,
 } from "../../../../lib/learnworlds";
 import { getStripe } from "../../../../lib/stripe";
 
@@ -42,7 +44,7 @@ function learnWorldsRedirect(requestUrl: URL, courseId: string) {
 
   const response = NextResponse.redirect(target, { status: 303 });
   response.headers.set("x-obserra-commerce-provider", "learnworlds");
-  response.headers.set("x-obserra-commerce-mode", "learnworlds-managed");
+  response.headers.set("x-obserra-commerce-mode", learnWorldsSandboxMode() ? "learnworlds-sandbox" : "learnworlds-managed");
   response.headers.set("x-obserra-learnworlds-product-id", product.productId);
   response.headers.set("x-obserra-learnworlds-product-status", product.status);
   response.headers.set("x-obserra-existing-entitlements", "legacy-entitlements-preserved");
@@ -73,7 +75,19 @@ export async function GET(request: Request) {
   }
 
   const course = runtimeCourse.course;
-  if (academyCommerceProvider() === "learnworlds") {
+  const provider = academyCommerceProvider();
+  const sandboxCanaryAuthorized = provider === "learnworlds" && learnWorldsSandboxMode();
+
+  if (!sandboxCanaryAuthorized && !courseIsLiveForPurchase(course.id)) {
+    const response = unavailableRedirect(requestUrl, "course-build-in-progress");
+    response.headers.set("x-obserra-commerce-provider", provider);
+    response.headers.set("x-obserra-course-content-readiness", "not-approved");
+    response.headers.set("x-obserra-live-purchase", "blocked");
+    response.headers.set("x-obserra-existing-entitlements", "preserved");
+    return response;
+  }
+
+  if (provider === "learnworlds") {
     return learnWorldsRedirect(requestUrl, course.id);
   }
 
