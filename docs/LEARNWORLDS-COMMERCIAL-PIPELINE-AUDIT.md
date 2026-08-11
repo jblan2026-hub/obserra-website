@@ -2,6 +2,7 @@
 
 **Owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC  
 **Branch:** `feature/learnworlds-commercial-pipeline`  
+**Pull request:** `#55`  
 **Status:** Build in progress, sandbox cutover not authorized  
 
 ## Recorded owner inputs
@@ -29,10 +30,13 @@
 9. Added configuration and routing regression tests.
 10. Added a configuration validator to the Academy release gate.
 11. Recorded domain and API setup status.
+12. Opened draft pull request 55 for governed review and continuous integration.
+13. Inspected the first pull-request workflow failures and corrected both identified defects.
+14. Triggered a fresh workflow cycle from the corrected branch head.
 
-## Current failures and blockers
+## Failures, corrections, and prevention rules
 
-### Blocker 1: Canary Product ID is not mapped
+### Failure 1: Canary Product ID is not mapped
 
 **Evidence:** `config/learnworlds-products.json` has an empty `products` array.
 
@@ -42,7 +46,7 @@
 
 **Prevention:** The release validator rejects malformed, duplicate, credential-bearing, or unsupported product mappings. Sandbox products are accepted only when `LEARNWORLDS_SANDBOX_MODE=true`.
 
-### Blocker 2: Deployment secrets are not yet in the Vercel runtime
+### Failure 2: Deployment secrets are not yet in the Vercel runtime
 
 **Evidence:** API keys and access token exist in LearnWorlds, but no Vercel project connection or secret-entry proof is available in this branch.
 
@@ -50,7 +54,7 @@
 
 **Required correction:** Enter the four LearnWorlds values directly in the Vercel secret store. Never place them in chat or source control.
 
-### Blocker 3: Container-side repository testing unavailable
+### Failure 3: Container-side repository testing unavailable
 
 **Evidence:** The build container could not resolve `github.com` when attempting to clone the branch.
 
@@ -59,6 +63,30 @@
 **Correction:** Repository validation is enforced through committed Node tests, the LearnWorlds validator, existing Academy quality gates, and the pull-request CI path.
 
 **Prevention:** Do not claim a passing build until GitHub or deployment CI reports the exact branch checks as successful.
+
+### Failure 4: Public status wording triggered the secret-marker test
+
+**Evidence:** The first Website CI run failed because `apiStatus` contained the phrase `access-token-created`, which matched the test pattern intended to detect secret-bearing configuration.
+
+**Impact:** Unit tests failed before lint and build execution.
+
+**Correction:** Replaced the public status value with `credentials-created-secrets-not-stored-in-repository` while retaining the actual access-token fact only in protected operational documentation.
+
+**Prevention:** Public configuration status values must not contain names that resemble secret fields, even when no secret value is present.
+
+### Failure 5: Existing certificate label regression blocked the pull request
+
+**Evidence:** The first Website CI run also failed an existing certificate test requiring the exact label `Course Version`; the component rendered `Course version`.
+
+**Impact:** Unit tests failed independently of the LearnWorlds integration.
+
+**Correction:** Restored the exact governed label `Course Version` in both certificate presentation locations.
+
+**Prevention:** Preserve exact certificate identity labels covered by regression tests. Do not treat capitalization changes as cosmetic when the certificate contract governs them.
+
+## Current workflow state
+
+A new pull-request workflow cycle was triggered after the corrections. Website CI, Academy 70x Production Gate, Application Release Validation, and Application Production Pipeline are running or queued against the corrected branch head. No successful build is claimed until those checks complete successfully.
 
 ## Truth boundary
 
