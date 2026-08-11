@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "1.0.0",
+  "standardId": "obserra-cinematic-enterprise-v1",
+  "standardName": "Obserra Cinematic Enterprise Learning Standard",
+  "qualityClass": "cinematic-enterprise",
+  "appliesTo": {
+    "allAcademyCourses": true,
+    "allDepartments": true,
+    "allCourseLevels": true,
+    "legacyCourseRebuilds": true,
+    "qualityTierDowngradeAllowed": false
+  },
+  "intent": {
+    "targetExperience": "Cinematic executive learning with realistic human delivery, Fortune 500 presentation discipline, and film-quality visual storytelling.",
+    "comparisonBoundary": "The standard uses cinematic craft and executive communication quality as design targets. It does not claim affiliation with a film studio, production company, or Fortune 500 company.",
+    "primaryFailureToPrevent": "Robotic avatar delivery, static presenter footage, generic stock montage, weak audio, repetitive scenes, and low-quality template production."
+  },
+  "courseVideoArchitecture": {
+    "requiredInstructionalModules": 5,
+    "courseWelcomeSeconds": {
+      "minimum": 60,
+      "target": 75,
+      "maximum": 90
+    },
+    "moduleAnchorFilmSeconds": {
+      "minimum": 300,
+      "target": 420,
+      "maximum": 480
+    },
+    "courseTrailerSeconds": {
+      "minimum": 45,
+      "target": 55,
+      "maximum": 60
+    },
+    "moduleVisualPackSeconds": {
+      "minimum": 45,
+      "target": 60,
+      "maximum": 90
+    },
+    "minimumFinishedVideoMinutesPerCourse": 27,
+    "targetFinishedVideoMinutesPerCourse": 37,
+    "presenterScreenTimePercent": {
+      "minimum": 35,
+      "maximum": 55
+    },
+    "cinematicVisualTimePercent": {
+      "minimum": 45,
+      "maximum": 65
+    },
+    "maximumUnbrokenAvatarSeconds": 20,
+    "minimumMeaningfulSceneChangesPerMinute": 6,
+    "minimumDistinctVisualContextsPerModule": 4,
+    "chapterStructureRequired": true,
+    "scenePlanRequired": true,
+    "shotListRequired": true,
+    "editDecisionListRequired": true
+  },
+  "storyAndInstruction": {
+    "requiredModuleArc": [
+      "executive or operational hook",
+      "business and mission context",
+      "evidence and uncertainty",
+      "decision authority and tradeoffs",
+      "realistic instructional scenario",
+      "applied action and reflection"
+    ],
+    "requiredCourseElements": [
+      "course-specific welcome",
+      "five cinematic module anchor films",
+      "five module visual packs",
+      "practical scenario in every module",
+      "knowledge check after every module",
+      "final assessment",
+      "captions",
+      "verified transcript",
+      "learner workbook or job aid",
+      "source and rights register"
+    ],
+    "unsupportedClaimsProhibited": true,
+    "fictionalScenarioDisclosureRequired": true,
+    "bindingAndAdvisorySourceDistinctionRequired": true
+  },
+  "presenterPerformance": {
+    "authorizedAvatarAndVoiceOnly": true,
+    "naturalBlinkingRequired": true,
+    "naturalBreathingAndMicroMovementRequired": true,
+    "directEyeContactRequired": true,
+    "restrainedExecutiveGesturesRequired": true,
+    "sentenceLevelPacingVariationRequired": true,
+    "naturalPausesRequired": true,
+    "pronunciationGlossaryRequired": true,
+    "roboticCadenceProhibited": true,
+    "continuousMonologueWithoutVisualReliefProhibited": true,
+    "lipSyncReviewRequired": true,
+    "likenessReviewRequired": true,
+    "voiceSimilarityReviewRequired": true
+  },
+  "visualMaster": {
+    "container": "MP4",
+    "videoCodec": "H.264",
+    "minimumWidthPixels": 1920,
+    "minimumHeightPixels": 1080,
+    "defaultAspectRatio": "16:9",
+    "acceptedFrameRates": [23.976, 24, 25, 29.97, 30],
+    "colorSpace": "Rec.709",
+    "scanType": "progressive",
+    "cameraLanguage": [
+      "motivated slow push or pull",
+      "controlled medium close-up",
+      "establishing shot",
+      "detail insert",
+      "over-the-shoulder decision shot",
+      "environmental cutaway"
+    ],
+    "visualStyle": [
+      "realistic enterprise environments",
+      "dark navy and black base",
+      "restrained gold accents",
+      "subtle holographic blue where appropriate",
+      "motivated cinematic lighting",
+      "shallow depth of field where appropriate",
+      "clean composition with safe text space"
+    ],
+    "staticSlideMaximumSeconds": 10,
+    "generatedTextInsideSceneProhibited": true,
+    "thirdPartyLogosProhibited": true,
+    "publicFigureLikenessProhibited": true,
+    "genericStockMontageAsPrimaryVisualProhibited": true
+  },
+  "audioMaster": {
+    "sampleRateHz": 48000,
+    "channels": 2,
+    "targetIntegratedLufs": -16,
+    "acceptableIntegratedLufsRange": {
+      "minimum": -18,
+      "maximum": -14
+    },
+    "maximumTruePeakDbtp": -1,
+    "dialoguePriority": true,
+    "cleanAudioRequired": true,
+    "clippingProhibited": true,
+    "backgroundMusicOptional": true,
+    "backgroundMusicMustNotMaskDialogue": true,
+    "licensedOrOriginalMusicOnly": true,
+    "musicFreeMasterRequired": true
+  },
+  "editingAndMotion": {
+    "openingHookSeconds": 5,
+    "visualResetIntervalSeconds": {
+      "minimum": 4,
+      "maximum": 12
+    },
+    "transitions": "restrained and motivated",
+    "rapidTemplateTransitionsProhibited": true,
+    "gratuitousCameraMotionProhibited": true,
+    "lowerThirdMaximumAppearancesPerVideo": 2,
+    "lowerThirdSafeAreaRequired": true,
+    "brandStingMaximumSeconds": 3,
+    "endCardMaximumSeconds": 5
+  },
+  "learnWorldsDelivery": {
+    "videoLearningActivityRequired": true,
+    "selectableCaptionsRequired": true,
+    "verifiedTranscriptRequired": true,
+    "chapterMarkersRequired": true,
+    "thumbnailRequired": true,
+    "knowledgeCheckAfterModuleVideoRequired": true,
+    "mobilePlaybackRequired": true,
+    "desktopPlaybackRequired": true,
+    "reducedMotionAlternativeRequired": true,
+    "downloadableTranscriptRequired": true,
+    "videoCompletionRuleRequired": true,
+    "coursePlayerBrandReviewRequired": true,
+    "placeholderTemplateContentProhibited": true
+  },
+  "accessibility": {
+    "wcagTarget": "2.2 AA",
+    "captionAccuracyPercentMinimum": 99,
+    "speakerIdentificationWhenNeeded": true,
+    "meaningfulSoundDescriptionRequired": true,
+    "flashingContentProhibited": true,
+    "colorOnlyMeaningProhibited": true,
+    "textSafeAreaRequired": true
+  },
+  "automatedValidation": {
+    "sha256Required": true,
+    "videoStreamRequired": true,
+    "audioStreamRequiredForPresenterVideo": true,
+    "minimumResolutionRequired": true,
+    "durationRangeRequired": true,
+    "audioSampleRateRequired": true,
+    "pathContainmentRequired": true,
+    "captionFileRequiredForPresenterVideo": true,
+    "transcriptFileRequiredForPresenterVideo": true
+  },
+  "manualValidation": {
+    "ownerApprovalRequired": true,
+    "likenessApprovalRequired": true,
+    "voiceApprovalRequired": true,
+    "pronunciationApprovalRequired": true,
+    "lipSyncApprovalRequired": true,
+    "cinematicRealismApprovalRequired": true,
+    "instructionalAccuracyApprovalRequired": true,
+    "brandApprovalRequired": true,
+    "rightsAndProvenanceApprovalRequired": true,
+    "learnWorldsPlaybackApprovalRequired": true
+  },
+  "releaseProhibitions": [
+    "single static avatar for an entire module",
+    "robotic or evenly metered speech",
+    "unreviewed synthetic voice",
+    "placeholder people or template copy",
+    "generic stock footage unrelated to the learning objective",
+    "unsupported facts or invented case claims",
+    "embedded illegible text generated inside scenes",
+    "unlicensed music or third-party assets",
+    "publication without captions and transcript",
+    "publication without owner approval",
+    "quality reduction based on credit balance"
+  ]
+}
