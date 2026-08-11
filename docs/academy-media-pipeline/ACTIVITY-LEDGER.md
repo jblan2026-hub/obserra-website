@@ -233,6 +233,26 @@ The production build includes the new protected route:
 
 This proves the deterministic factory, provider-readiness adapter, protected status route, receipt preparation, asset intake validation, existing commerce behavior, and production build compile together. It does not prove external account connection, media generation, LearnWorlds upload, or production publication.
 
+## Activity 28: Governed 15-second HeyGen likeness canary added
+
+Added:
+
+```text
+docs/academy-media-pipeline/canary/HEYGEN-15-SECOND-LIKENESS-CANARY.md
+```
+
+The canary record contains:
+
+1. Exact Avatar V settings.
+2. The approved single-scene cinematic description.
+3. The exact fifteen-second likeness and voice test script.
+4. A governed output filename.
+5. A twelve-point owner acceptance checklist.
+6. A smallest-defect repair rule.
+7. Required provider ID, avatar ID, voice ID, media hash, and approval evidence.
+
+The likeness canary must pass before the longer Cybersecurity Foundations welcome video or any portfolio presenter batch is generated.
+
 ## Current state
 
 ```text
@@ -240,6 +260,7 @@ Repository implementation: expanded on draft branch
 Current validated commit: 50fea832849c3456626f4ffb0b75627b27bf2c16
 Current validated tests: 61 passed, 0 failed
 Current validated workflows: 4 passed, 0 failed
+15-second HeyGen likeness canary: documented and ready for owner generation
 HeyGen avatar and voice: owner in progress
 HeyGen templates: pending
 Pollo private workspace and presets: pending
