@@ -492,9 +492,140 @@ docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-WEBSITE-CINEMATIC-ADS.md
 
 The addendum records the implementation, provider limitation, official brand rules, exact asset paths, current state, next actions, acceptance boundary, and latest file locations.
 
+## Activity 54: Supabase public exposure notice treated as a security incident
+
+The owner reported a Supabase notice that an Obserra Academy table was publicly accessible and directed that all Academy data and intellectual property be made inaccessible to unauthorized parties.
+
+The incident was treated as a potential confidentiality and database compromise risk. No conclusion was made that data had been taken, and no conclusion was made that the environment was uncompromised.
+
+## Activity 55: Supabase project and exposure inventory completed
+
+Confirmed the active project:
+
+```text
+Project: Obserra Academy
+Project reference: nwxnyqlyzyufgoadtqxs
+Region: us-east-1
+Status: ACTIVE_HEALTHY
+```
+
+The initial security advisor and catalog inspection identified public schema tables without RLS, direct anonymous and authenticated grants, security definer views, public security definer RPC execution, a mutable function search path, and a publicly callable Academy catalog Edge Function using a service role client.
+
+## Activity 56: Emergency private database lockdown applied
+
+Applied migration:
+
+```text
+20260811223159 emergency_private_database_lockdown_v2
+```
+
+The migration revoked direct public schema, table, sequence, function, and type privileges from public API roles, preserved service role access, enabled and forced RLS on every public base table, changed public views to security invoker behavior, pinned the mutable function search path, and established deny by default privileges for future database objects.
+
+## Activity 57: Unused public database surfaces restricted
+
+Applied migration:
+
+```text
+20260811224121 disable_unused_public_api_surfaces
+```
+
+The migration attempted to remove anonymous and ordinary authenticated access from unused Storage, Realtime, and GraphQL database surfaces. Supabase retains platform managed grants in these schemas, so the residual platform surface remains an open review item.
+
+Current Storage facts:
+
+```text
+Storage buckets: 0
+Storage RLS: enabled
+Storage policies: 0
+```
+
+## Activity 58: Emergency database containment verified
+
+Post migration verification produced:
+
+```text
+Public schema base tables: 58
+RLS enabled tables: 58
+RLS forced tables: 58
+Anonymous public schema usage: false
+Authenticated public schema usage: false
+Anonymous or authenticated public table grants: 0
+Anonymous or authenticated public function grants: 0
+Public views: 9
+Security invoker public views: 9
+Non security invoker public views: 0
+```
+
+## Activity 59: Supabase security advisor rerun completed
+
+The security advisor was rerun after containment. The prior security errors and warnings were cleared. The remaining notices are informational `RLS Enabled No Policy` findings, consistent with the current deny by default direct API posture.
+
+## Activity 60: Academy catalog Edge Function hardened
+
+Deployed `academy-public-catalog` version 2 with:
+
+```text
+Platform JWT verification: enabled
+Caller role: service_role only
+Wildcard CORS: removed
+Cache policy: private and no store
+Unauthorized response: 404
+Default missing control state: unpublished and not purchasable
+```
+
+The function is no longer intended for direct browser or anonymous access.
+
+## Activity 61: Application compatibility and fail open defect identified
+
+The website server currently calls `academy-public-catalog` without an Authorization header. The new service role requirement blocks that call.
+
+The current website fallback also returns the baseline catalog with default published controls when the control service is unavailable. This is a fail open condition for course visibility and purchase behavior and is the next critical code repair.
+
+## Activity 62: Remaining Edge Function posture inventoried
+
+Current active Edge Functions:
+
+```text
+Total active functions: 13
+Platform JWT verification enabled: 1
+Platform JWT verification disabled: 12
+```
+
+`academy-owner-control` contains custom Clerk JWT and owner identity verification. Every remaining function requires individual authentication and necessity review before security closure.
+
+## Activity 63: Public GitHub intellectual property risk confirmed
+
+Confirmed that `jblan2026-hub/obserra-website` is currently public. Pull request 55 contains internal implementation and production planning material.
+
+The repository must be changed to private, access reviewed, public history exposure assessed, and affected credentials rotated where necessary before merge or production use.
+
+## Activity 64: Dedicated Supabase security handoff created
+
+Added:
+
+```text
+docs/OBSERRA-ACADEMY-SUPABASE-SECURITY-HANDOFF.md
+```
+
+The document records the incident trigger, initial findings, migrations, verification evidence, current containment state, application impact, Edge Function review boundary, GitHub exposure, credential boundary, unresolved risks, next actions, and truth boundary.
+
 ## Current state
 
 ```text
+Direct anonymous public schema access: blocked
+Direct authenticated public schema access: blocked
+Public schema base tables with RLS enabled and forced: 58 of 58
+Anonymous or authenticated public table grants: 0
+Anonymous or authenticated public function grants: 0
+Public views using security invoker: 9 of 9
+Academy catalog Edge Function: service role only
+Website private catalog integration: not yet repaired
+Website control fallback: fail open and must be corrected
+Remaining Edge Functions reviewed: no
+Supabase credential rotation: not complete
+Forensic access review: not complete
+GitHub repository visibility: public
+GitHub public history review: not complete
 Learner dashboard shells: implemented and previously validated
 60 course LearnWorlds Draft shell manifest: implemented
 Remaining LearnWorlds shells uploaded: not yet proven
@@ -510,8 +641,8 @@ Website cinematic feature flag: false
 HeyGen avatar and voice: owner still refining
 15 second likeness canary: not yet accepted
 Full Cybersecurity Foundations media canary: not yet accepted
-Current-head GitHub Actions: required after latest website and audit changes
 Pull request merged: no
 Website production activation: no
 Academy production cutover: not authorized
+Full security closure: no
 ```
