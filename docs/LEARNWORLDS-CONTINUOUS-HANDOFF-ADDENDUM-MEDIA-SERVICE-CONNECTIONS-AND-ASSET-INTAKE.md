@@ -159,7 +159,7 @@ The tests verify:
 
 ## Current-head CI incident and correction
 
-GitHub Actions executed the expanded test suite and reported:
+The first expanded current-head run reported:
 
 ```text
 Tests: 61
@@ -167,13 +167,7 @@ Passed: 60
 Failed: 1
 ```
 
-The single failure was:
-
-```text
-media service probe is bounded and returns no provider secrets
-```
-
-The runtime adapter did not return a provider secret. The test inspected a broad source-code slice that included the internal outbound request line referencing `process.env.POLLO_API_KEY`. The source scan therefore confused credential use inside an authorized request header with credential exposure in the returned status object.
+The runtime adapter did not return a provider secret. The failing test inspected a broad source-code slice that included the internal outbound request line referencing `process.env.POLLO_API_KEY`. The source scan therefore confused credential use inside an authorized request header with credential exposure in the returned status object.
 
 Correction completed:
 
@@ -182,25 +176,54 @@ Correction completed:
 3. Asserted that the return boundary is exactly `{ status, probe: result }`.
 4. Retained the separate owner-route assertions that no HeyGen or Pollo key reference exists in the response route.
 5. Recorded the incident as Failure 6 in the permanent failure register.
-6. Restarted current-head CI after the correction.
 
-No provider generation, API spending, deployment cutover, or publication occurred during the failed CI run.
+## Corrected validation evidence
+
+GitHub Actions validated commit:
+
+```text
+50fea832849c3456626f4ffb0b75627b27bf2c16
+```
+
+Results:
+
+```text
+Tests: 61
+Passed: 61
+Failed: 0
+Website CI: passed
+Academy 70x Production Gate: passed
+Application Production Pipeline: passed
+Application Release Validation: passed
+Lint errors: 0
+Existing lint warnings: 1
+Production build: passed
+Owner-site separation smoke: passed
+```
+
+The production build generated 134 application routes and includes:
+
+```text
+/api/admin/academy-media/status
+```
+
+No provider generation, API spending, deployment cutover, or publication occurred during validation.
 
 ## Current state
 
 ```text
+Validated implementation commit: 50fea832849c3456626f4ffb0b75627b27bf2c16
+Validated tests: 61 passed, 0 failed
+Validated workflows: 4 passed, 0 failed
 HeyGen avatar creation: owner in progress
 HeyGen voice creation: owner in progress
 HeyGen 16:9 template: pending
 HeyGen 9:16 template: pending
 Pollo private workspace confirmation: pending
 Pollo presets: pending
-Media connection adapter: implemented
-Owner readiness endpoint: implemented
-Asset intake pipeline: implemented
-Connection and intake test attempt: 60 passed, 1 failed
-Failure 6 correction: committed
-Corrected current-head CI: running or pending
+Media connection adapter: implemented and build validated
+Owner readiness endpoint: implemented and build validated
+Asset intake pipeline: implemented and test validated
 Canary assets generated: not yet
 Canary assets accepted: not yet
 LearnWorlds media upload: not yet
