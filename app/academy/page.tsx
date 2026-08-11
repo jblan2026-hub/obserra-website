@@ -3,8 +3,10 @@ import { publicAcademyCatalog } from "../../lib/academy-control";
 import AcademyControlledClient from "./AcademyControlledClient";
 import { courses as sourceCourses } from "./courseCatalog";
 import { courseIsLiveForPurchase, courseOfferForCourse } from "./courseOffers";
+import "../cinematic-media.css";
 import "./academy-commercial.css";
 import "./academy-world-class.css";
+import "./academy-cinematic-campaigns.css";
 
 export const revalidate = 10;
 
@@ -31,6 +33,7 @@ export const metadata: Metadata = {
 export default async function AcademyPage() {
   const runtime = await publicAcademyCatalog(sourceCourses);
   const publicCourses = runtime.controlPlane === "operational" ? runtime.courses : [];
+  const cinematicMediaEnabled = process.env.NEXT_PUBLIC_OBSERRA_ACADEMY_CINEMATIC_MEDIA_ENABLED === "true";
   const catalogSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -76,7 +79,11 @@ export default async function AcademyPage() {
 
   return (
     <>
-      <AcademyControlledClient courses={publicCourses} controlPlane={runtime.controlPlane} />
+      <AcademyControlledClient
+        courses={publicCourses}
+        controlPlane={runtime.controlPlane}
+        cinematicMediaEnabled={cinematicMediaEnabled}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(catalogSchema) }}
