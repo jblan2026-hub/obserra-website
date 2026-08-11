@@ -1,14 +1,25 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.0.1",
   "minimumExpectedCatalogCourses": 60,
   "annualPlan": {
-    "targetCoursesPerMonth": 5,
+    "productionMode": "quality-first-owner-managed-refill",
+    "baselineCoursesPerMonth": 5,
+    "acceleratedCoursesPerMonthAfterCanary": 10,
     "targetCourseCount": 60,
     "targetHeyGenAssets": 250,
     "targetPolloAssets": 335,
     "targetTotalAssets": 585,
     "reviewCadence": "weekly",
     "publicationCadence": "monthly"
+  },
+  "creditPolicy": {
+    "ownerManagedRefillAuthorized": true,
+    "creditAvailabilityBlocksPlanning": false,
+    "qualityMayNotBeReducedToSaveCredits": true,
+    "automaticRefillAuthorized": false,
+    "apiCreditPurchasesAuthorized": false,
+    "manualWebApplicationProduction": true,
+    "decisionRule": "Use the best approved HeyGen or Pollo production mode for the asset. The owner will manually refill subscription credits when needed. Do not downgrade required quality, accessibility, rights, or owner-review gates because of credit balance."
   },
   "brand": {
     "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
