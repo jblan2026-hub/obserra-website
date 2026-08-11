@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.1",
+  "schemaVersion": "1.1.0",
   "minimumExpectedCatalogCourses": 60,
   "annualPlan": {
     "productionMode": "quality-first-owner-managed-refill",
@@ -20,6 +20,49 @@
     "apiCreditPurchasesAuthorized": false,
     "manualWebApplicationProduction": true,
     "decisionRule": "Use the best approved HeyGen or Pollo production mode for the asset. The owner will manually refill subscription credits when needed. Do not downgrade required quality, accessibility, rights, or owner-review gates because of credit balance."
+  },
+  "productionStandard": {
+    "standardName": "Obserra Cinematic Executive Learning Standard",
+    "targetAesthetic": "cinematic-fortune-500-executive-documentary",
+    "minimumMasterResolution": "1920x1080",
+    "preferredFlagshipMasterResolution": "3840x2160",
+    "landscapeAspectRatio": "16:9",
+    "verticalAspectRatio": "9:16",
+    "linkedinAspectRatio": "4:5",
+    "audioSampleRateHz": 48000,
+    "maximumContinuousPresenterSeconds": 75,
+    "minimumDistinctVisualSetupsPerFiveMinutes": 8,
+    "presenterScreenTimeTargetPercent": [30, 45],
+    "cinematicVisualTargetPercent": [30, 45],
+    "motionGraphicsTargetPercent": [10, 20],
+    "learnerInteractionTargetPercent": [10, 20],
+    "requiredStoryBeats": [
+      "opening-question-decision-or-consequence",
+      "why-the-issue-matters",
+      "evidence-context-or-governing-principle",
+      "realistic-scenario-or-decision-point",
+      "practical-action-or-framework",
+      "learner-reflection-or-knowledge-check",
+      "intentional-transition-to-next-activity"
+    ],
+    "forbiddenPatterns": [
+      "full-course-talking-avatar-only",
+      "robotic-narration-over-static-slides",
+      "single-presenter-framing-for-entire-lesson",
+      "generic-unrelated-stock-footage",
+      "constant-cyberpunk-neon-imagery",
+      "morphing-faces-hands-text-or-objects",
+      "unsupported-claims-presented-as-facts",
+      "synthetic-case-subject-presented-as-real",
+      "unlicensed-third-party-assets",
+      "publication-without-captions-transcript-rights-and-approval"
+    ],
+    "releaseScore": {
+      "flagshipMinimumAverage": 4.5,
+      "standardMinimumAverage": 4.2,
+      "minimumCategoryScore": 4,
+      "scaleMaximum": 5
+    }
   },
   "brand": {
     "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
@@ -68,21 +111,42 @@
       "synthetic-media-disclosure-present",
       "owner-approval-recorded",
       "no-unapproved-third-party-logos",
-      "no-fabricated-claims-or-case-facts"
+      "no-fabricated-claims-or-case-facts",
+      "cinematic-story-arc-approved",
+      "shot-list-and-storyboard-approved",
+      "no-robotic-slide-deck-pacing",
+      "no-uninterrupted-avatar-monologue-over-75-seconds",
+      "scene-variety-and-editorial-rhythm-passed",
+      "executive-documentary-visual-standard-passed",
+      "professional-sound-mix-passed",
+      "learnworlds-player-experience-passed"
     ],
     "heygen": [
       "authorized-avatar-and-voice-only",
       "lip-sync-and-pronunciation-review-passed",
       "natural-pacing-and-executive-tone",
       "1080p-master-exported",
-      "clean-audio-and-no-clipping"
+      "clean-audio-and-no-clipping",
+      "natural-breathing-pauses-and-emphasis",
+      "realistic-eye-contact-blinks-and-gestures",
+      "presenter-cutaways-mask-avatar-repetition",
+      "multiple-framing-options-approved",
+      "no-uncanny-valley-artifacts",
+      "4k-preferred-for-flagship-1080p-minimum"
     ],
     "pollo": [
       "visual-consistency-review-passed",
       "no-text-generated-inside-scene",
       "no-real-person-impersonation",
       "no-unlicensed-music-or-stock-assets",
-      "reduced-motion-alternative-available"
+      "reduced-motion-alternative-available",
+      "physically-plausible-motion-and-lighting",
+      "cinematic-camera-language-and-continuity",
+      "consistent-characters-locations-and-props",
+      "no-generic-looping-stock-look",
+      "no-morphing-anatomy-or-object-errors",
+      "no-excessive-neon-or-science-fiction-gimmicks",
+      "editorial-safe-head-and-tail-handles"
     ]
   }
 }
