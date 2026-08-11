@@ -6,15 +6,17 @@ Status: Mandatory production standard
 
 Effective date: 2026-08-11
 
-Applies to: Every Obserra Academy course, trailer, module video, learner introduction, website hero, social campaign asset, and LearnWorlds video activity
+Standard ID: `obserra-cinematic-enterprise-v1`
+
+Applies to: Every Obserra Academy course, course trailer, module film, learner introduction, website hero, social campaign asset, and LearnWorlds video activity
 
 ## Purpose
 
-Obserra Academy course media must feel like premium executive education and a professionally edited documentary, not a robotic avatar presentation, automated slide deck, generic stock video sequence, or repetitive synthetic monologue.
+Obserra Academy media must feel like premium executive education and a professionally edited documentary. It must not feel like a robotic avatar presentation, automated slide deck, generic stock sequence, repetitive synthetic monologue, or low quality template course.
 
-The target is a cinematic, credible, Fortune 500 executive learning experience using the authorized likeness and voice of Dr. Jody Blanchard, realistic enterprise environments, disciplined storytelling, professional sound, varied camera language, strong editorial pacing, and practical learner engagement.
+The target is cinematic craft comparable to premium corporate documentary work and Fortune 500 executive communication. This is a design and quality target. It does not claim affiliation with a film studio, production company, or Fortune 500 company.
 
-This standard is inspired by high quality corporate documentary and executive education production. It does not represent that a course was produced by a Hollywood studio or endorsed by any third party.
+The same cinematic quality standard applies to every course. Course tier may change production order, marketing investment, or release priority. Course tier may not reduce presenter realism, instructional depth, visual quality, audio quality, accessibility, rights controls, or owner approval requirements.
 
 ## Mandatory provider roles
 
@@ -24,30 +26,31 @@ HeyGen is the authoritative presenter system for:
 
 1. Dr. Jody Blanchard course welcomes.
 2. Instructor explanations.
-3. Module openings and closings.
+3. Five module anchor films for every course.
 4. Decision framing.
 5. Course trailers.
 6. Webinar and campaign host segments.
 7. Approved localization.
 
-HeyGen presenter footage must be treated as one production layer, not the entire course video.
+HeyGen presenter footage is one production layer. It is never the entire lesson. No course may use a single static avatar for the full module or the full course.
 
 ### Pollo AI
 
 Pollo AI is the cinematic visual system for:
 
-1. Realistic enterprise environments.
-2. Cyber operations and incident response scenes.
-3. Executive decision environments.
-4. AI governance and data risk visualizations.
-5. Executive protection and travel risk scenarios.
-6. Manufacturing, healthcare, cloud, software, identity, and resilience scenes.
-7. Website hero loops and campaign footage.
-8. Establishing shots, transitions, cutaways, and visual metaphors.
+1. Five module specific visual packs for every course.
+2. Realistic enterprise environments.
+3. Cyber operations and incident response scenes.
+4. Executive decision environments.
+5. AI governance and data risk visualizations.
+6. Executive protection and travel risk scenarios.
+7. Manufacturing, healthcare, cloud, software, identity, and resilience scenes.
+8. Website hero loops and campaign footage.
+9. Establishing shots, transitions, cutaways, and visual metaphors.
 
 ### LearnWorlds
 
-LearnWorlds is the learner delivery system for:
+LearnWorlds is the authoritative learner delivery system for:
 
 1. Video activities.
 2. Chapters and table of contents.
@@ -59,49 +62,58 @@ LearnWorlds is the learner delivery system for:
 8. Certificates.
 9. Learner progress and reporting.
 
-## Production character
+## Required course video architecture
 
-Every course must demonstrate:
+Every course receives the same minimum media architecture:
 
-1. Executive credibility.
-2. Natural human pacing.
-3. Clear narrative progression.
-4. Realistic environments and motion.
-5. Visual variety without distraction.
-6. Professional sound design.
-7. Accurate captions and transcripts.
-8. Practical application and decision relevance.
-9. Consistent Obserra visual identity.
-10. A clear distinction between factual instruction, illustrative scenarios, and synthetic visualizations.
+1. One cinematic course welcome lasting 60 to 90 seconds.
+2. Five cinematic module anchor films.
+3. Each module anchor film lasts 5 to 8 minutes, with a 7 minute target.
+4. Five module specific Pollo visual packs.
+5. Each visual pack contains at least four distinct visual contexts.
+6. One cinematic course trailer lasting 45 to 60 seconds.
+7. One website hero loop.
+8. Three vertical campaign clips.
+9. One LinkedIn executive clip.
+10. Captions, transcript, thumbnail, rights record, source record, and approval record.
+
+The minimum finished video volume is 27 minutes per course. The target is approximately 37 minutes per course. This video supports the complete instructional design. It does not replace scenarios, exercises, workbooks, knowledge checks, assessment, or reflection.
+
+Across the current 60 course governed catalog, the baseline media register is:
+
+```text
+HeyGen assets: 420
+Pollo assets: 600
+Total governed media assets: 1020
+```
 
 ## Required visual composition
 
-The target editorial mix for a standard course video is:
+The target editorial mix for each module anchor film is:
 
 ```text
-Authorized presenter footage: 30 to 45 percent
-Cinematic scenario and environmental footage: 30 to 45 percent
-Motion graphics, diagrams, and evidence visuals: 10 to 20 percent
-Learner prompts, questions, and interaction: 10 to 20 percent
+Authorized presenter footage: 35 to 55 percent
+Cinematic scenario, environment, evidence, and concept footage: 45 to 65 percent
 ```
 
-No single presenter shot should normally remain uninterrupted for more than 75 seconds. Long explanations must use purposeful cutaways, alternate framing, diagrams, scenario footage, or evidence visuals.
+No uninterrupted avatar segment may exceed 20 seconds. Longer explanations must use purposeful cutaways, alternate framing, diagrams, scenario footage, evidence views, environmental shots, or learner interaction.
 
-Each five minutes of finished instruction should contain at least eight distinct visual setups. A visual setup may be a new camera framing, environment, scenario shot, diagram, evidence view, interface demonstration, animated concept, or learner interaction.
+Each module must include at least four distinct visual contexts. Each finished minute should normally contain at least six meaningful visual changes. A visual change must advance meaning. Random movement or decorative transitions do not satisfy this requirement.
 
 ## Required story structure
 
-Every major lesson video must include:
+Every module anchor film must include:
 
-1. A strong opening question, decision, consequence, or operational problem.
-2. A clear statement of why the issue matters.
-3. Evidence, context, or governing principles.
-4. A realistic scenario or decision point.
-5. A practical action or framework.
-6. A concise learner reflection or knowledge check.
-7. A clear transition to the next activity.
+1. An opening question, decision, consequence, or operational problem.
+2. A clear explanation of why the issue matters to the mission or business.
+3. Evidence, context, uncertainty, or governing principles.
+4. Decision authority, accountability, and tradeoffs.
+5. A realistic instructional scenario or decision point.
+6. A practical action, framework, or next step.
+7. A learner reflection prompt.
+8. A clear transition into the LearnWorlds knowledge check or next activity.
 
-Flagship videos should also include a cinematic cold open before the instructor introduction.
+Every scenario must be identified as instructional when it is fictional or composite. Synthetic visuals must never imply that a fictional person, event, company, or incident is real.
 
 ## Presenter realism standard
 
@@ -111,9 +123,9 @@ The authorized Dr. Jody Blanchard avatar and voice must demonstrate:
 2. Accurate voice character and pronunciation.
 3. Natural breathing pauses.
 4. Varied emphasis and sentence rhythm.
-5. Direct but not fixed eye contact.
+5. Direct but not frozen eye contact.
 6. Natural blinking.
-7. Restrained, context appropriate gestures.
+7. Restrained and context appropriate gestures.
 8. Stable facial geometry and hands.
 9. Appropriate emotional tone.
 10. Consistent wardrobe, lighting, and executive presence.
@@ -121,15 +133,17 @@ The authorized Dr. Jody Blanchard avatar and voice must demonstrate:
 The following are release blockers:
 
 1. Robotic cadence.
-2. Monotone delivery.
-3. Frozen facial expression.
-4. Unnatural blinking or eye movement.
-5. Lip synchronization errors.
-6. Repetitive gestures.
-7. Visible facial or hand distortion.
-8. Incorrect pronunciation.
-9. Abrupt sentence joins.
-10. Presenter footage that appears pasted over an unrelated background.
+2. Evenly metered speech.
+3. Monotone delivery.
+4. Frozen facial expression.
+5. Unnatural blinking or eye movement.
+6. Lip synchronization errors.
+7. Repetitive gestures.
+8. Facial or hand distortion.
+9. Incorrect pronunciation.
+10. Abrupt sentence joins.
+11. Presenter footage that appears pasted over an unrelated background.
+12. Any unbroken avatar shot longer than 20 seconds.
 
 ## Cinematic camera language
 
@@ -138,15 +152,16 @@ Approved visual language includes:
 1. Controlled medium close ups.
 2. Wide establishing shots.
 3. Over the shoulder decision scenes.
-4. Slow push ins and restrained tracking movement.
-5. Detail shots of evidence, controls, devices, documents, facilities, and operations.
-6. Realistic depth of field.
-7. Motivated lighting.
-8. Natural parallax and physically plausible motion.
-9. Consistent screen direction.
-10. Clean head and tail handles for editing.
+4. Slow motivated push or pull movement.
+5. Restrained tracking movement.
+6. Detail shots of evidence, controls, devices, documents, facilities, and operations.
+7. Realistic depth of field.
+8. Motivated lighting.
+9. Natural parallax and physically plausible motion.
+10. Consistent screen direction.
+11. Clean editorial head and tail handles.
 
-Avoid constant floating camera motion, excessive lens effects, rapid cuts, fake handheld shake, exaggerated holograms, unnecessary science fiction imagery, and repeated generic server room footage.
+Avoid constant floating camera motion, excessive lens effects, rapid template cuts, fake handheld shake, exaggerated holograms, unnecessary science fiction imagery, repeated server room footage, and visual movement that does not support instruction.
 
 ## Obserra visual identity
 
@@ -160,37 +175,43 @@ White
 Restrained holographic blue
 Premium enterprise environments
 Subtle cinematic contrast
-Clean typography added in postproduction
+Clean typography added in controlled postproduction
 ```
 
-Generated scenes must not render critical text, statistics, legal requirements, course titles, or captions into the image. Those elements must be added in controlled postproduction so they remain accurate and editable.
+Generated scenes must not render critical text, statistics, legal requirements, course titles, captions, or assessment content into the image. Those elements must be added in controlled postproduction so they remain accurate, editable, accessible, and reviewable.
 
 ## Audio standard
 
-Every course master must include:
+Every presenter master must include:
 
 1. Clean dialogue with no clipping.
 2. 48 kHz audio.
-3. Consistent loudness across scenes.
-4. Dialogue prioritized over music and effects.
-5. Restrained cinematic underscore where appropriate.
-6. Licensed, owned, or platform authorized music only.
-7. No distracting synthetic sound effects.
-8. Clean transitions and room tone.
-9. Accurate pronunciation of technical and proprietary terms.
-10. A music free alternate master when required for accessibility or reuse.
+3. Stereo delivery unless a specific accessibility requirement dictates otherwise.
+4. Target integrated loudness near minus 16 LUFS.
+5. Acceptable integrated loudness from minus 18 to minus 14 LUFS.
+6. Maximum true peak of minus 1 dBTP.
+7. Dialogue prioritized over music and effects.
+8. Restrained cinematic underscore only where appropriate.
+9. Licensed, owned, or platform authorized music only.
+10. Clean transitions and room tone.
+11. Accurate pronunciation of technical and proprietary terms.
+12. A music free alternate master.
 
 ## Resolution and export standard
 
 ```text
 Minimum course master: 1920 by 1080
-Preferred flagship master: 3840 by 2160 when the selected provider and plan support it
+Preferred flagship master: 3840 by 2160 when supported
 Standard landscape frame: 16 by 9
 Vertical social frame: 9 by 16
 LinkedIn executive frame: 4 by 5 or 16 by 9
+Video container: MP4
+Video codec: H.264
+Color space: Rec.709
+Scan type: progressive
 Audio sample rate: 48 kHz
 Captions: SRT or VTT
-Transcript: UTF 8 text or PDF
+Transcript: UTF 8 text or accessible PDF
 ```
 
 ## LearnWorlds learner experience
@@ -199,46 +220,34 @@ Each approved video uploaded to LearnWorlds must include:
 
 1. A professional thumbnail.
 2. A descriptive activity title.
-3. Captions.
-4. A transcript.
-5. Chapters or table of contents for longer videos.
-6. At least one purposeful interaction or knowledge check for substantive videos.
+3. Selectable captions.
+4. A verified transcript.
+5. Chapters or a table of contents for longer videos.
+6. A purposeful interaction or knowledge check after each module film.
 7. Completion rules aligned to the activity.
-8. A mobile playback check.
-9. A desktop playback check.
-10. A clear transition to the workbook, scenario, knowledge check, or next module.
+8. Mobile playback validation.
+9. Desktop playback validation.
+10. A reduced motion alternative where required.
+11. A downloadable transcript.
+12. A clear transition to the workbook, scenario, knowledge check, or next module.
+13. Complete removal of placeholder template people, copy, metrics, images, and branding.
 
-LearnWorlds interactive overlays must support the instruction. They must not make the production feel like a cluttered template or interrupt the narrative without educational purpose.
-
-## Standard course media package
-
-Every course receives at minimum:
-
-1. One cinematic course opening.
-2. One authorized instructor welcome.
-3. Module opening or summary segments.
-4. Scenario and environmental footage.
-5. Evidence or concept visuals.
-6. One course trailer.
-7. One website hero or promotional loop.
-8. Vertical social variants.
-9. Captions and transcript.
-10. Rights, provenance, approval, and replacement records.
-
-Flagship courses receive additional cinematic cold opens, expanded scenarios, higher shot variety, additional motion graphics, and premium trailer treatments.
+LearnWorlds interactive overlays must support instruction. They must not make the production feel like a cluttered template or interrupt the narrative without educational purpose.
 
 ## Editing and pacing rules
 
 1. Cut on meaning, not on a fixed timer.
 2. Use B roll to clarify ideas, not merely cover edits.
 3. Use on screen text sparingly.
-4. Keep text concise and readable.
+4. Keep text concise, editable, and readable.
 5. Use transitions that preserve continuity.
 6. Avoid repetitive dissolves and template animations.
 7. Vary shot size and composition.
 8. Preserve natural pauses.
 9. Remove awkward silence, filler, and duplicated phrases.
 10. End each sequence with an intentional learner action.
+11. Maintain a visual reset interval generally between 4 and 12 seconds.
+12. Do not leave a static slide on screen for more than 10 seconds without meaningful change.
 
 ## Forbidden production patterns
 
@@ -254,6 +263,9 @@ The following patterns are prohibited:
 8. Artificial case subjects presented as real people.
 9. Unlicensed third party logos, music, footage, or trademarks.
 10. Publishing without captions, transcript, rights evidence, quality review, and owner approval.
+11. Publishing any course with placeholder template content.
+12. Reducing quality because subscription credits are low.
+13. Using a lower production standard for nonflagship courses.
 
 ## Quality review scorecard
 
@@ -279,11 +291,38 @@ Release requires:
 
 ```text
 No category below 4
-Average score of at least 4.5 for flagship content
-Average score of at least 4.2 for standard content
+Average score of at least 4.5 for every course
 No unresolved release blocker
 Owner approval recorded
 ```
+
+## Automated and manual validation
+
+Automated validation must verify:
+
+1. SHA 256 integrity.
+2. Video stream presence.
+3. Audio stream presence for presenter video.
+4. Resolution.
+5. Duration.
+6. Audio sample rate.
+7. Path containment.
+8. Caption file presence.
+9. Transcript file presence.
+
+Manual validation must verify:
+
+1. Likeness.
+2. Voice similarity.
+3. Pronunciation.
+4. Lip synchronization.
+5. Cinematic realism.
+6. Instructional accuracy.
+7. Brand quality.
+8. Rights and provenance.
+9. LearnWorlds desktop playback.
+10. LearnWorlds mobile playback.
+11. Owner approval.
 
 ## Repair rule
 
@@ -294,13 +333,13 @@ When a video fails, repair the smallest defective layer:
 3. Avatar defect: adjust framing, motion, expression, or regenerate the affected presenter segment.
 4. Visual defect: regenerate only the affected Pollo shot.
 5. Edit defect: replace the shot or transition without regenerating the full program.
-6. LearnWorlds defect: correct the activity settings, caption file, transcript, or completion rule.
+6. LearnWorlds defect: correct the activity settings, caption file, transcript, thumbnail, or completion rule.
 
 Do not regenerate an entire course because of one localized defect unless the defect is systemic.
 
 ## Publication boundary
 
-No course is commercially ready merely because its shell exists, its avatar renders, or its media uploads successfully.
+A course is not commercially ready merely because its shell exists, its avatar renders, its media uploads, or its checkout works.
 
 Commercial publication requires:
 
@@ -314,3 +353,5 @@ Commercial publication requires:
 8. Sandbox learner acceptance.
 9. Website and checkout validation.
 10. Explicit owner approval.
+
+The learner dashboard may display governed course shells before release. Shell visibility does not grant enrollment, unlock lessons, initiate checkout, or prove course completion.
