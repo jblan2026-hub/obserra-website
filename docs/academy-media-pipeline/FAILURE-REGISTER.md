@@ -137,6 +137,46 @@ Retained the successful CI evidence from the code-bearing commit and added a rea
 
 Do not represent cancelled workflow runs as successful validation. Cite the exact commit SHA associated with each passing result.
 
+## Failure 6: Secret-return regression test inspected implementation source instead of returned result shape
+
+### Action
+
+Added a regression test intended to prove that the optional HeyGen and Pollo readiness probe never returns provider credentials.
+
+### Result
+
+GitHub Actions executed 61 tests. Sixty passed and one failed:
+
+```text
+media service probe is bounded and returns no provider secrets
+Expected source slice not to match /API_KEY/
+Found: process.env.POLLO_API_KEY in outbound request construction
+```
+
+All four pull-request workflows failed at the shared `npm test` gate because they consume the same repository test suite.
+
+### Root cause
+
+The runtime adapter did not return a secret. The test took a broad source-code slice immediately before the return statement. That slice legitimately contained the secure outbound request header construction using the environment-variable name `POLLO_API_KEY`. The assertion therefore tested implementation text rather than the shape of the object returned to the owner endpoint.
+
+### Impact
+
+The current-head CI was red and lint, build, application validation, and release promotion did not proceed. No production deployment or external provider generation occurred.
+
+### Correction
+
+Replaced the broad source-slice assertion with a precise test that isolates the declared sanitized `result` object shape, verifies that shape contains no credential fields, and separately confirms the return boundary is exactly:
+
+```text
+return { status, probe: result } as const
+```
+
+The existing owner-route test continues to verify that neither `HEYGEN_API_KEY` nor `POLLO_API_KEY` appears in the public response route.
+
+### Prevention rule
+
+Secret-boundary tests must inspect serialized return schemas, route response objects, or isolated result-shape declarations. Do not infer a response leak from a broad source slice that includes internal request construction.
+
 ## Current truth boundary
 
-The deterministic media factory, configuration, tests, canary production pack, and audit documentation exist on the draft branch. No HeyGen asset, Pollo asset, LearnWorlds publication, website cutover, production purchase, or customer access is claimed complete.
+The deterministic media factory, provider readiness adapter, asset intake pipeline, tests, canary production pack, and audit documentation exist on the draft branch. No HeyGen asset, Pollo asset, LearnWorlds publication, website cutover, production purchase, or customer access is claimed complete. Current-head CI must pass after the Failure 6 correction before merge or deployment promotion.
