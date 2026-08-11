@@ -3,7 +3,7 @@
 **Owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC  
 **Branch:** `feature/learnworlds-commercial-pipeline`  
 **Pull request:** `#55`  
-**Status:** Canary mapped, build validation in progress, sandbox cutover not authorized  
+**Status:** Canary mapped, preview configuration entered, sandbox cutover not authorized  
 
 ## Recorded owner inputs
 
@@ -23,6 +23,9 @@
 14. LearnWorlds package ID: `package_6a7b2d3710387`.
 15. Public course URL: `https://obserraepillc.learnworlds.com/course/cybersecurity-foundations-for-new-professionals`.
 16. Direct checkout URL and cart URL supplied by the owner and recorded in the governed mapping.
+17. Required Obserra business email: `info@obserrallc.com`.
+18. The personal address `jblan006@icloud.com` is prohibited from business-facing Academy checkout, school contact, support, sales, and invoice presentation.
+19. The owner reported that all LearnWorlds Preview environment variables were entered in Vercel.
 
 ## Actions completed
 
@@ -49,7 +52,9 @@
 21. Added API hostname and `/admin/api` path validation.
 22. Reduced Vercel secret entry to the Client ID, Client Secret, and access token.
 23. Corrected stale Academy release-gate price assertions to match the governed catalog and dedicated pricing parity tests.
-24. Triggered a fresh workflow cycle from the corrected branch head.
+24. Triggered fresh workflow cycles from corrected branch heads.
+25. Recorded the owner-reported completion of Preview environment-variable entry.
+26. Reviewed the owner-provided LearnWorlds checkout screenshot and identified the personal-email and legacy-branding defects before any production purchase.
 
 ## Failures, corrections, and prevention rules
 
@@ -63,13 +68,15 @@
 
 **Prevention:** The release validator requires the `cybersecurity-foundations` canary, rejects malformed or duplicate identifiers, and verifies every URL against the governed host, path, course ID, product type, and package ID.
 
-### Failure 2: Deployment secrets are not yet in the Vercel runtime
+### Failure 2: Deployment secrets were not yet proven in the Vercel runtime
 
-**Evidence:** API keys and access token exist in LearnWorlds, but no Vercel project secret-entry proof is available in this branch.
+**Evidence:** API keys and access token existed in LearnWorlds, but no Vercel project secret-entry proof was initially available.
 
-**Impact:** The owner-only readiness endpoint will report `apiEnvironmentReady=false` until the secrets are entered in the deployment environment.
+**Impact:** The owner-only readiness endpoint reports `apiEnvironmentReady=false` until the three secret values are present in the deployed Preview environment.
 
-**Required correction:** Enter the LearnWorlds Client ID, Client Secret, and access token directly in the Vercel secret store. Never place them in chat or source control. The API URL is governed non-secret configuration and does not require secret entry.
+**Correction:** The owner reported entering the LearnWorlds Client ID, Client Secret, and access token in the Vercel Preview environment. This remains owner-reported until the deployed readiness endpoint proves it.
+
+**Prevention:** Never place these values in chat or source control. Deployment readiness must be verified through the owner-only status endpoint.
 
 ### Failure 3: Container-side repository testing unavailable
 
@@ -131,14 +138,36 @@
 
 **Prevention:** Stable non-secret integration endpoints belong in governed configuration; secrets remain only in the deployment secret store.
 
+### Failure 9: Personal email exposed on the business checkout
+
+**Evidence:** The owner-provided LearnWorlds payment-screen screenshot displayed `jblan006@icloud.com` in User details.
+
+**Impact:** A personal address would be associated with the business test purchase and could appear in purchaser, receipt, enrollment, or account records.
+
+**Correction required:** Change the LearnWorlds school-owner or test-user email to `info@obserrallc.com`, verify the new email, sign out, sign back in, and repeat the sandbox checkout. Also set the LearnWorlds school Contact, Support, and Sales email fields to `info@obserrallc.com`.
+
+**Prevention:** Business acceptance testing must use a business-controlled account. Personal email addresses are prohibited from Academy purchaser, school-contact, support, sales, invoice, and test-enrollment records.
+
+### Failure 10: Checkout still shows legacy `Driving Data` branding
+
+**Evidence:** The payment screenshot displays `Driving Data` in the topbar and footer rather than Obserra EPI Academy.
+
+**Impact:** The checkout is not production-ready and could confuse buyers or weaken commercial trust.
+
+**Correction required:** Replace the topbar and footer logos, school logo, favicon, color theme, and payment-page branding with the approved Obserra identity before live checkout.
+
+**Prevention:** A visual acceptance gate must confirm Obserra name, logo, colors, contact email, product title, price, and legal footer on the public course page, cart, checkout, receipt, learner account, and certificate.
+
 ## Current blockers
 
-1. LearnWorlds Client ID, Client Secret, and access token have not been proven present in the Vercel deployment environment.
-2. The current pull-request CI cycle has not yet been proven green.
-3. The custom domain CNAME has been created but LearnWorlds HTTPS verification has not yet been proven complete.
-4. A sandbox checkout, learner enrollment, course access, assessment, and certificate acceptance test has not yet been completed.
-5. Owner approval for production publication and live checkout has not been given.
+1. The deployed owner-only readiness endpoint has not yet proven the Vercel Preview secret configuration.
+2. The LearnWorlds school-owner or test-user email must be changed from `jblan006@icloud.com` to `info@obserrallc.com` and verified.
+3. LearnWorlds Contact, Support, and Sales email fields must be set to `info@obserrallc.com`.
+4. Legacy `Driving Data` branding must be removed from the checkout topbar, footer, logo, favicon, and theme.
+5. The custom domain CNAME has been created but LearnWorlds HTTPS verification has not yet been proven complete.
+6. A sandbox checkout, learner enrollment, course access, assessment, and certificate acceptance test has not yet been completed with the corrected business identity.
+7. Owner approval for production publication and live checkout has not been given.
 
 ## Truth boundary
 
-The branch contains implemented integration code, a governed API endpoint, and a governed sandbox canary mapping. LearnWorlds commerce is not live. No secret is stored in the repository. No production checkout cutover is authorized. The next factual milestone is successful CI, deployment secret configuration, and a complete sandbox purchase and learner-access test.
+The branch contains implemented integration code, a governed API endpoint, and a governed sandbox canary mapping. LearnWorlds commerce is not live. No secret is stored in the repository. No production checkout cutover is authorized. The next factual milestone is corrected business identity and branding, deployed readiness proof, and a complete sandbox purchase and learner-access test.
