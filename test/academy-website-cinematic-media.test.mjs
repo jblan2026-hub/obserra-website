@@ -22,22 +22,16 @@ test("Obserra Academy cinematic media remains disabled until approved files are 
 });
 
 test("Academy cinematic campaigns have no database, API, identity, or payment runtime path", () => {
+  const imports = [...campaigns.matchAll(/^import\s+.+?\s+from\s+"([^"]+)";$/gm)].map((match) => match[1]);
+  assert.deepEqual(imports, ["next/image", "next/link", "../components/marketing/CinematicMedia"]);
+
   for (const forbidden of [
     /fetch\s*\(/,
-    /axios/i,
-    /prisma/i,
-    /supabase/i,
-    /drizzle/i,
-    /sequelize/i,
-    /typeorm/i,
-    /postgres/i,
-    /mysql/i,
-    /mongodb/i,
-    /database/i,
+    /XMLHttpRequest/,
+    /WebSocket/,
+    /EventSource/,
+    /sendBeacon/,
     /\/api\//,
-    /stripe/i,
-    /clerk/i,
-    /learnworlds/i,
     /process\.env/,
     /<iframe/i,
     /<script/i,
@@ -46,11 +40,13 @@ test("Academy cinematic campaigns have no database, API, identity, or payment ru
     /sessionStorage/,
     /document\.cookie/,
   ]) {
-    assert.doesNotMatch(campaigns, forbidden, `Academy campaign source violates static media boundary: ${forbidden}`);
+    assert.doesNotMatch(campaigns, forbidden, `Academy campaign runtime violates static media boundary: ${forbidden}`);
   }
+
   assert.match(campaigns, /data-security-boundary="public-static-media-only"/);
   assert.match(campaigns, /No database access/);
   assert.match(campaigns, /No external embeds/);
+  assert.match(campaigns, /They do not query, write,/);
 });
 
 test("Academy media manifest explicitly denies data-plane access", () => {
@@ -123,15 +119,17 @@ test("Academy cinematic playback preserves accessibility and fallback controls",
   assert.match(styles, /academy-cinematic__security-note/);
 });
 
-test("Academy cinematic configuration contains no credentials", () => {
+test("Academy cinematic configuration contains no credential values", () => {
   const source = JSON.stringify(manifest);
   for (const marker of [
-    /api[_-]?key\s*:/i,
-    /access[_-]?token\s*:/i,
-    /client[_-]?secret\s*:/i,
-    /database[_-]?url\s*:/i,
-    /password\s*:/i,
-    /sk[-_][a-z0-9]/i,
+    /sk_live_[a-z0-9]{16,}/i,
+    /rk_live_[a-z0-9]{16,}/i,
+    /whsec_[a-z0-9]{16,}/i,
+    /ghp_[a-z0-9]{30,}/i,
+    /github_pat_[a-z0-9_]{30,}/i,
+    /AKIA[0-9A-Z]{16}/,
+    /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,
+    /(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?):\/\/[^:\s]+:[^@\s]+@/i,
   ]) {
     assert.doesNotMatch(source, marker);
   }
