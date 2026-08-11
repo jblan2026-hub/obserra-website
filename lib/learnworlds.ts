@@ -25,6 +25,7 @@ type LearnWorldsConfiguration = {
   schoolName: string;
   schoolUrl: string;
   authorDashboardUrl: string;
+  apiUrl: string;
   customDomain: string;
   domainStatus: string;
   stripeStatus: string;
@@ -164,12 +165,17 @@ function validateConfiguration(value: unknown): LearnWorldsConfiguration {
   const schoolName = normalized(candidate.schoolName, 240);
   const schoolUrl = httpsUrl(candidate.schoolUrl, "school");
   const authorDashboardUrl = httpsUrl(candidate.authorDashboardUrl, "author dashboard");
+  const apiUrl = httpsUrl(candidate.apiUrl, "API");
   const customDomain = httpsUrl(candidate.customDomain, "custom domain");
   const allowedHosts = new Set([
     schoolUrl.hostname.toLowerCase(),
     customDomain.hostname.toLowerCase(),
   ]);
   requireAllowedHost(authorDashboardUrl, allowedHosts, "author dashboard");
+  requireAllowedHost(apiUrl, allowedHosts, "API");
+  if (normalizedPath(apiUrl) !== "/admin/api") {
+    throw new Error("LearnWorlds API URL must use the governed /admin/api path.");
+  }
 
   const products = Array.isArray(candidate.products)
     ? candidate.products.map((product) => validateProduct(product, allowedHosts))
@@ -194,6 +200,7 @@ function validateConfiguration(value: unknown): LearnWorldsConfiguration {
     schoolName,
     schoolUrl: schoolUrl.origin,
     authorDashboardUrl: authorDashboardUrl.toString(),
+    apiUrl: apiUrl.toString(),
     customDomain: customDomain.origin,
     domainStatus: normalized(candidate.domainStatus, 120),
     stripeStatus: normalized(candidate.stripeStatus, 120),
@@ -212,6 +219,20 @@ export function academyCommerceProvider(): "learnworlds" | "website-stripe" {
 
 export function learnWorldsSandboxMode(): boolean {
   return normalized(process.env.LEARNWORLDS_SANDBOX_MODE, 20).toLowerCase() === "true";
+}
+
+export function learnWorldsApiUrl(): URL {
+  const configured = normalized(process.env.LEARNWORLDS_API_URL, 2000);
+  const target = httpsUrl(configured || configuration.apiUrl, "API");
+  const allowedHosts = new Set([
+    new URL(configuration.schoolUrl).hostname.toLowerCase(),
+    new URL(configuration.customDomain).hostname.toLowerCase(),
+  ]);
+  requireAllowedHost(target, allowedHosts, "API");
+  if (normalizedPath(target) !== "/admin/api") {
+    throw new Error("LearnWorlds API URL must use the governed /admin/api path.");
+  }
+  return target;
 }
 
 export function learnWorldsProductForCourse(courseId: string): LearnWorldsProduct | null {
@@ -233,12 +254,19 @@ export function learnWorldsEnrollmentUrl(courseId: string): URL | null {
 }
 
 export function learnWorldsConfigurationStatus() {
+  let apiUrlReady = false;
+  try {
+    apiUrlReady = Boolean(learnWorldsApiUrl());
+  } catch {
+    apiUrlReady = false;
+  }
   return {
     provider: academyCommerceProvider(),
     sandboxMode: learnWorldsSandboxMode(),
     schoolId: configuration.schoolId,
     schoolName: configuration.schoolName,
     schoolUrl: configuration.schoolUrl,
+    apiUrl: configuration.apiUrl,
     customDomain: configuration.customDomain,
     domainStatus: configuration.domainStatus,
     stripeStatus: configuration.stripeStatus,
@@ -247,7 +275,7 @@ export function learnWorldsConfigurationStatus() {
     publishedProducts: configuration.products.filter((product) => product.status === "published").length,
     sandboxProducts: configuration.products.filter((product) => product.status === "sandbox").length,
     apiEnvironmentReady: Boolean(
-      normalized(process.env.LEARNWORLDS_API_URL, 2000) &&
+      apiUrlReady &&
       normalized(process.env.LEARNWORLDS_CLIENT_ID, 500) &&
       normalized(process.env.LEARNWORLDS_CLIENT_SECRET, 2000) &&
       normalized(process.env.LEARNWORLDS_ACCESS_TOKEN, 4000),
