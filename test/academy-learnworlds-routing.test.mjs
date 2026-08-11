@@ -3,6 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 const checkoutRoute = fs.readFileSync("app/api/academy/checkout/route.ts", "utf8");
+const statusRoute = fs.readFileSync("app/api/admin/learnworlds/status/route.ts", "utf8");
 const adapter = fs.readFileSync("lib/learnworlds.ts", "utf8");
 const environment = fs.readFileSync(".env.example", "utf8");
 const configuration = JSON.parse(fs.readFileSync("config/learnworlds-products.json", "utf8"));
@@ -38,6 +39,14 @@ test("legacy website Stripe checkout remains available until governed cutover", 
   assert.match(checkoutRoute, /stripe\.checkout\.sessions\.create/);
   assert.match(checkoutRoute, /x-obserra-commerce-provider", "website-stripe"/);
   assert.match(checkoutRoute, /x-obserra-webhook-verification", "required"/);
+});
+
+test("owner readiness endpoint fails closed and exposes no secrets", () => {
+  assert.match(statusRoute, /ownerEmailAllowed/);
+  assert.match(statusRoute, /return NextResponse\.json\(\{ error: "Not found" \}, \{ status: 404 \}\)/);
+  assert.match(statusRoute, /readyForSandboxCanary/);
+  assert.match(statusRoute, /private, no-store, max-age=0/);
+  assert.doesNotMatch(statusRoute, /CLIENT_SECRET|ACCESS_TOKEN|STRIPE_SECRET_KEY/);
 });
 
 test("deployment template requires secrets to remain outside source control", () => {
