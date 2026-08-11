@@ -175,12 +175,40 @@ npm run validate:academy-media-canary
 
 These commands prepare the complete asset intake tree and enforce the final canary or portfolio acceptance gate after assets are generated and downloaded.
 
+## Activity 24: Current-head CI executed and exact failure captured
+
+GitHub Actions ran the expanded branch. The shared test suite executed 61 tests:
+
+```text
+Passed: 60
+Failed: 1
+```
+
+All four workflows stopped at the same test failure. The failing regression test scanned a broad source-code region and incorrectly treated the internal `process.env.POLLO_API_KEY` request-header reference as evidence that the probe returned a credential.
+
+No deployment, provider generation, billing event, or production cutover occurred.
+
+## Activity 25: Secret-boundary test corrected
+
+Replaced the broad source slice with a precise assertion over the sanitized probe-result object shape. The correction now verifies:
+
+1. The result shape contains only reachability, authorization, counts, status codes, and errors.
+2. The result shape contains no API-key, access-token, client-secret, or webhook-secret field.
+3. The adapter returns exactly `{ status, probe: result }`.
+4. The owner route separately contains no HeyGen or Pollo API-key reference.
+
+## Activity 26: Failure recorded and CI restarted
+
+Recorded Failure 6 in the permanent failure register with the exact CI output, root cause, impact, correction, and prevention rule. Committed the corrected test to the governed branch. Current-head CI is required to prove the correction and the production build.
+
 ## Current state
 
 ```text
 Repository implementation: expanded on draft branch
 Previously cited core CI: passed
-Current head CI: required before merge
+Connection and intake CI attempt: 60 passed, 1 failed
+Failure 6 correction: committed
+Corrected current-head CI: running or pending
 HeyGen avatar and voice: owner in progress
 HeyGen templates: pending
 Pollo private workspace and presets: pending
