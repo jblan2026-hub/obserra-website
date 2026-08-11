@@ -2,6 +2,7 @@
   "schemaVersion": "1.0",
   "schoolId": "6a7a693d353feb69c94c7654",
   "schoolName": "Obserra EPI Academy",
+  "contactEmail": "info@obserrallc.com",
   "schoolUrl": "https://obserraepillc.learnworlds.com",
   "authorDashboardUrl": "https://obserraepillc.learnworlds.com/author/dashboard",
   "apiUrl": "https://obserraepillc.learnworlds.com/admin/api/",
