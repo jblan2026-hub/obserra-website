@@ -199,21 +199,52 @@ Replaced the broad source slice with a precise assertion over the sanitized prob
 
 ## Activity 26: Failure recorded and CI restarted
 
-Recorded Failure 6 in the permanent failure register with the exact CI output, root cause, impact, correction, and prevention rule. Committed the corrected test to the governed branch. Current-head CI is required to prove the correction and the production build.
+Recorded Failure 6 in the permanent failure register with the exact CI output, root cause, impact, correction, and prevention rule. Committed the corrected test to the governed branch.
+
+## Activity 27: Corrected current-head validation passed
+
+GitHub Actions validated commit `50fea832849c3456626f4ffb0b75627b27bf2c16` and reported all four workflows successful:
+
+```text
+Website CI: passed
+Academy 70x Production Gate: passed
+Application Production Pipeline: passed
+Application Release Validation: passed
+```
+
+Website CI evidence:
+
+```text
+Tests: 61
+Passed: 61
+Failed: 0
+Lint errors: 0
+Existing lint warnings: 1
+Production build: passed
+Generated application routes: 134
+Owner-site separation smoke: passed
+```
+
+The production build includes the new protected route:
+
+```text
+/api/admin/academy-media/status
+```
+
+This proves the deterministic factory, provider-readiness adapter, protected status route, receipt preparation, asset intake validation, existing commerce behavior, and production build compile together. It does not prove external account connection, media generation, LearnWorlds upload, or production publication.
 
 ## Current state
 
 ```text
 Repository implementation: expanded on draft branch
-Previously cited core CI: passed
-Connection and intake CI attempt: 60 passed, 1 failed
-Failure 6 correction: committed
-Corrected current-head CI: running or pending
+Current validated commit: 50fea832849c3456626f4ffb0b75627b27bf2c16
+Current validated tests: 61 passed, 0 failed
+Current validated workflows: 4 passed, 0 failed
 HeyGen avatar and voice: owner in progress
 HeyGen templates: pending
 Pollo private workspace and presets: pending
-Media service readiness endpoint: implemented
-Media asset intake validator: implemented
+Media service readiness endpoint: implemented and build validated
+Media asset intake validator: implemented and test validated
 HeyGen canary generation: not started
 Pollo canary generation: not started
 LearnWorlds media upload: not started
