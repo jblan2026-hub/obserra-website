@@ -421,10 +421,187 @@ The six planned MP4 files remain unrendered and unuploaded. The website feature 
 
 Never claim a Pollo asset was rendered, downloaded, uploaded, or activated without authenticated provider evidence and the actual approved MP4 file. Keep the feature flag disabled until every referenced active file is present and validated.
 
+## Failure 13: Supabase public database exposure condition existed
+
+### Trigger
+
+The owner received a Supabase notice that an Obserra Academy table was publicly accessible.
+
+### Verified condition
+
+The initial security advisor and direct privilege inventory identified:
+
+1. Multiple public schema tables without RLS.
+2. Anonymous and authenticated privileges on exposed Academy production and operational objects.
+3. Security definer views using owner privileges.
+4. Security definer functions executable by anonymous or ordinary authenticated roles.
+5. A publicly callable Academy catalog Edge Function that used a service role client internally.
+
+### Impact
+
+The condition created a credible risk of unauthorized database access, modification, operational disruption, or intellectual property exposure.
+
+There is currently no evidence sufficient to claim that data was taken. There is also no forensic evidence sufficient to rule out unauthorized access.
+
+### Correction
+
+Applied the emergency lockdown migrations, forced RLS on all public base tables, removed direct public schema object privileges, changed views to security invoker, hardened the Academy catalog Edge Function, and blocked production release pending full review.
+
+### Prevention rule
+
+Every new public schema table must be deny by default at creation. Every Edge Function must have an explicit authentication classification. Security advisor review and direct privilege verification must be part of every database migration and release gate.
+
+## Failure 14: Security inventory verification query used an invalid information schema column
+
+### Action
+
+Ran a consolidated grant verification query using `schema_name` against `information_schema.role_usage_grants`.
+
+### Result
+
+Postgres returned:
+
+```text
+ERROR 42703: column schema_name does not exist
+```
+
+### Root cause
+
+`role_usage_grants` exposes `object_schema`, not `schema_name`.
+
+### Impact
+
+The first verification query did not complete. It made no database change and did not weaken containment.
+
+### Correction
+
+Inspected the information schema column names and reran the query using `object_schema`. Subsequent verification completed successfully.
+
+### Prevention rule
+
+Before writing consolidated catalog queries, verify the exact information schema columns for each source view. Treat a failed verification query as no evidence until a corrected query succeeds.
+
+## Failure 15: Storage, Realtime, and GraphQL grants could not be fully removed by SQL migration
+
+### Action
+
+Applied migration `disable_unused_public_api_surfaces` to revoke anonymous and authenticated access from Storage, Realtime, and GraphQL schemas.
+
+### Result
+
+The migration succeeded, but post migration inspection still showed Supabase platform managed grants and schema usage on parts of Storage, Realtime, and GraphQL.
+
+### Root cause
+
+Supabase maintains system level privileges and role relationships for managed platform services. Database SQL revocation alone does not guarantee that every platform managed grant disappears.
+
+### Impact
+
+The unused service surfaces require additional project level configuration and application review. Direct access to the Obserra `public` schema remains independently blocked.
+
+No Storage buckets currently exist, and Storage RLS is enabled with no permissive policies.
+
+### Correction
+
+Recorded the residual platform surface as unresolved. Planned review includes Supabase API settings, Storage, Realtime, GraphQL, network restrictions, and disabling or avoiding unused client surfaces.
+
+### Prevention rule
+
+Do not equate a successful revoke migration with complete managed service shutdown. Verify effective privileges and platform settings after every migration.
+
+## Failure 16: Private Academy catalog hardening broke the existing unauthenticated website call
+
+### Action
+
+Upgraded `academy-public-catalog` to require a platform validated service role JWT.
+
+### Result
+
+The current website server request does not send an Authorization header, so the new private function rejects it.
+
+### Root cause
+
+The original integration treated the Academy catalog control function as a public endpoint. The security model changed before the website server adapter was updated.
+
+### Impact
+
+The control plane is contained but degraded. The website cannot retrieve Supabase control data through the existing path.
+
+More importantly, the website catch path currently falls back to baseline courses and default published controls. This is fail open behavior for course visibility and purchasing.
+
+### Correction status
+
+Not yet complete. The next code change must add server only service role authorization and change every control service failure to fail closed.
+
+### Prevention rule
+
+Security boundary changes and application compatibility changes must be planned together. Any control plane failure must hide unpublished content and disable purchasing rather than exposing a default published state.
+
+## Failure 17: Twelve active Edge Functions remain without platform JWT verification
+
+### Verified condition
+
+After hardening `academy-public-catalog`, the project contains:
+
+```text
+Active Edge Functions: 13
+Platform JWT verification enabled: 1
+Platform JWT verification disabled: 12
+```
+
+### Impact
+
+Some functions may implement custom authentication, but that has not yet been verified function by function. Any function lacking effective custom authentication could expose operational or intellectual property data or allow unauthorized action.
+
+### Correction status
+
+Not yet complete. Each function must be reviewed and either retained with verified custom authentication, redeployed with platform JWT verification, restricted to service role only, disabled, or deleted.
+
+### Prevention rule
+
+Every Edge Function requires a documented authentication mode, caller population, data scope, authorization test, and retirement decision. Default to platform JWT verification unless a verified custom authentication design requires otherwise.
+
+## Failure 18: GitHub repository containing internal Academy material is public
+
+### Verified condition
+
+```text
+Repository: jblan2026-hub/obserra-website
+Visibility: public
+Pull request 55: open and Draft
+```
+
+### Impact
+
+Internal implementation, system architecture, production planning, prompts, course structures, security controls, and other intellectual property may be copied from current or historical public repository content.
+
+No secret value was intentionally identified in the current review. Public intellectual property exposure and public history exposure remain material risks even without committed credentials.
+
+### Correction status
+
+Not yet complete. The repository must be made private, access and forks reviewed, public history assessed, and affected credentials rotated if exposure is suspected.
+
+### Prevention rule
+
+Confidential Obserra development must use private repositories by default. Repository visibility, collaborators, installed applications, deploy keys, branch protection, and secret scanning must be verified before confidential work is committed.
+
 ## Current truth boundary
+
+The emergency Supabase containment is implemented and verified for the exposed `public` schema:
+
+```text
+Public base tables: 58
+RLS enabled and forced: 58
+Anonymous public schema usage: false
+Authenticated public schema usage: false
+Anonymous or authenticated public table grants: 0
+Anonymous or authenticated public function grants: 0
+Public views using security invoker: 9 of 9
+Academy catalog Edge Function: service role only
+```
+
+The environment is not yet eligible to be described as fully secure. Website fail closed integration, remaining Edge Function review, managed API surface review, key rotation, forensic log review, and GitHub privacy remediation are incomplete.
 
 The learner dashboard shells, deterministic media factory, common cinematic enterprise standard, provider readiness adapter, owner-only status route, asset intake pipeline, LearnWorlds shell plan, website cinematic media slots, four official-brand website advertisements, Pollo production prompts, poster fallbacks, feature flag, tests, canary production pack, and audit documentation exist on the working branch.
 
-Current-head GitHub Actions validation is required before the latest website implementation can be represented as passing.
-
-No HeyGen likeness canary, complete Cybersecurity Foundations cinematic package, remaining LearnWorlds shell transfer, Pollo website MP4 render, Pollo website MP4 upload, cinematic website activation, LearnWorlds publication, production cutover, or customer release is claimed complete.
+No HeyGen likeness canary, complete Cybersecurity Foundations cinematic package, remaining LearnWorlds shell transfer, Pollo website MP4 render, Pollo website MP4 upload, cinematic website activation, LearnWorlds publication, production cutover, customer release, or full security closure is claimed complete.
