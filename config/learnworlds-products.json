@@ -7,6 +7,6 @@
   "customDomain": "https://academy.obserrallc.com",
   "domainStatus": "cname-created-pending-learnworlds-verification",
   "stripeStatus": "connected-sandbox-validation-required",
-  "apiStatus": "keys-and-access-token-created-secrets-not-stored-in-repository",
+  "apiStatus": "credentials-created-secrets-not-stored-in-repository",
   "products": []
 }
