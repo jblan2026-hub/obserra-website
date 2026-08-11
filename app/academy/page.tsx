@@ -2,19 +2,20 @@ import type { Metadata } from "next";
 import { publicAcademyCatalog } from "../../lib/academy-control";
 import AcademyControlledClient from "./AcademyControlledClient";
 import { courses as sourceCourses } from "./courseCatalog";
+import { courseIsLiveForPurchase, courseOfferForCourse } from "./courseOffers";
 import "./academy-commercial.css";
 import "./academy-world-class.css";
 
 export const revalidate = 10;
 
 export const metadata: Metadata = {
-  title: "Obserra Academy | Cybersecurity, Intelligence, Protection and AI Training",
-  description: "Search and enroll in professional Obserra Academy courses covering cybersecurity, executive protection, intelligence, AI governance, and secure technology leadership.",
+  title: "Obserra Academy | Governed Cybersecurity, Intelligence, Protection and AI Course Roadmap",
+  description: "Review the governed Obserra Academy course-development roadmap and the controlled production status of cybersecurity, executive protection, intelligence, AI governance, and technology training.",
   alternates: { canonical: "/academy" },
-  keywords: ["cybersecurity training", "executive protection training", "AI governance training", "intelligence training", "CISO education"],
+  keywords: ["cybersecurity training roadmap", "executive protection training", "AI governance training", "intelligence training", "CISO education"],
   openGraph: {
-    title: "Obserra Academy | Professional Security and Executive Training",
-    description: "Secure, account based professional training with assessments and Obserra Certificates of Training.",
+    title: "Obserra Academy | Governed Professional Training Roadmap",
+    description: "Course products enter live enrollment only after content, assessment, accessibility, commerce, certificate, and owner-approval gates pass.",
     url: "https://www.obserrallc.com/academy",
     type: "website",
     images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: "Obserra Academy" }],
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Obserra Academy",
-    description: "Professional training with secure enrollment, assessments, and completion certificates.",
+    description: "A governed professional-training development roadmap with controlled commercial release gates.",
     images: ["/brand/visuals/obserra-cybersecurity.png"],
   },
 };
@@ -35,29 +36,33 @@ export default async function AcademyPage() {
     "@graph": [
       {
         "@type": "ItemList",
-        name: "Obserra Academy professional course catalog",
+        name: "Obserra Academy governed course roadmap",
         numberOfItems: publicCourses.length,
-        itemListElement: publicCourses.map((course, index) => ({
-          "@type": "ListItem",
-          position: index + 1,
-          item: {
-            "@type": "Course",
-            name: course.title,
-            description: course.description,
-            url: `https://www.obserrallc.com/academy/${course.id}`,
-            provider: {
-              "@type": "Organization",
-              name: "Obserra Academy",
-              url: "https://www.obserrallc.com/academy",
+        itemListElement: publicCourses.map((course, index) => {
+          const offer = courseOfferForCourse(course);
+          const livePurchase = courseIsLiveForPurchase(course.id);
+          return {
+            "@type": "ListItem",
+            position: index + 1,
+            item: {
+              "@type": "Course",
+              name: course.title,
+              description: course.description,
+              url: `https://www.obserrallc.com/academy/${course.id}`,
+              provider: {
+                "@type": "Organization",
+                name: "Obserra Academy",
+                url: "https://www.obserrallc.com/academy",
+              },
+              offers: {
+                "@type": "Offer",
+                price: offer.offerPrice,
+                priceCurrency: "USD",
+                availability: livePurchase ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+              },
             },
-            offers: {
-              "@type": "Offer",
-              price: course.price,
-              priceCurrency: "USD",
-              availability: "https://schema.org/InStock",
-            },
-          },
-        })),
+          };
+        }),
       },
       {
         "@type": "BreadcrumbList",
