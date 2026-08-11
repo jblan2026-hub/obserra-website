@@ -157,6 +157,35 @@ The tests verify:
 3. Rejection of unapproved generated receipts.
 4. Path containment, SHA-256, FFprobe, duration, resolution, and audio evidence controls.
 
+## Current-head CI incident and correction
+
+GitHub Actions executed the expanded test suite and reported:
+
+```text
+Tests: 61
+Passed: 60
+Failed: 1
+```
+
+The single failure was:
+
+```text
+media service probe is bounded and returns no provider secrets
+```
+
+The runtime adapter did not return a provider secret. The test inspected a broad source-code slice that included the internal outbound request line referencing `process.env.POLLO_API_KEY`. The source scan therefore confused credential use inside an authorized request header with credential exposure in the returned status object.
+
+Correction completed:
+
+1. Isolated the declared sanitized probe-result object shape.
+2. Asserted that the result shape has no API-key, access-token, client-secret, or webhook-secret field.
+3. Asserted that the return boundary is exactly `{ status, probe: result }`.
+4. Retained the separate owner-route assertions that no HeyGen or Pollo key reference exists in the response route.
+5. Recorded the incident as Failure 6 in the permanent failure register.
+6. Restarted current-head CI after the correction.
+
+No provider generation, API spending, deployment cutover, or publication occurred during the failed CI run.
+
 ## Current state
 
 ```text
@@ -169,6 +198,9 @@ Pollo presets: pending
 Media connection adapter: implemented
 Owner readiness endpoint: implemented
 Asset intake pipeline: implemented
+Connection and intake test attempt: 60 passed, 1 failed
+Failure 6 correction: committed
+Corrected current-head CI: running or pending
 Canary assets generated: not yet
 Canary assets accepted: not yet
 LearnWorlds media upload: not yet
