@@ -50,15 +50,21 @@ test("media service adapter defaults to manual mode and blocks automatic spendin
   assert.match(adapter, /x-api-key/);
 });
 
-test("media service probe is bounded and returns no provider secrets", () => {
+test("media service probe is bounded and returns only sanitized result fields", () => {
   assert.match(adapter, /AbortController/);
   assert.match(adapter, /probeTimeoutMilliseconds/);
   assert.match(adapter, /cache: "no-store"/);
-  const resultStart = adapter.indexOf("return { status, probe: result }");
-  assert.ok(resultStart > 0);
-  const resultBlock = adapter.slice(Math.max(0, resultStart - 900), resultStart + 100);
-  assert.doesNotMatch(resultBlock, /API_KEY/);
-  assert.doesNotMatch(resultBlock, /ACCESS_TOKEN/);
+  const resultObjectStart = adapter.indexOf("const result = {");
+  const probeLogicStart = adapter.indexOf(
+    "if (status.heygen.mode === \"api\"",
+    resultObjectStart,
+  );
+  assert.ok(resultObjectStart >= 0 && probeLogicStart > resultObjectStart);
+  const resultShape = adapter.slice(resultObjectStart, probeLogicStart);
+  assert.doesNotMatch(resultShape, /API_KEY|ACCESS_TOKEN|CLIENT_SECRET|WEBHOOK_SECRET/);
+  assert.match(resultShape, /templatesAvailable/);
+  assert.match(resultShape, /availableCredits/);
+  assert.match(adapter, /return \{ status, probe: result \} as const/);
 });
 
 test("media status endpoint is owner only, noncacheable, and nonindexable", () => {
