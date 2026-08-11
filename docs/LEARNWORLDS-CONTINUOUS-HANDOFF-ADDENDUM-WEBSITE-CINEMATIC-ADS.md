@@ -1,0 +1,311 @@
+# LearnWorlds Continuous Handoff Addendum: Pollo Website Cinematic Ads
+
+**Date:** 2026-08-11  
+**Repository:** `jblan2026-hub/obserra-website`  
+**Branch:** `feature/learnworlds-commercial-pipeline`  
+**Pull request:** `#55`  
+**Website production activation:** Not authorized  
+**Pollo renders:** Pending owner generation and approval
+
+## Owner direction
+
+The owner directed that Pollo AI be used to replace selected static images on `www.obserrallc.com` with interactive cinematic media and to create official-brand advertisements for the website.
+
+The owner also reaffirmed that:
+
+1. Handoff and failure records must be updated continuously.
+2. Future sessions must not relearn completed work.
+3. The final response must identify the latest handoff and implementation locations.
+4. Official Obserra branding must govern every advertisement and media asset.
+
+## Implementation completed
+
+### Accessible cinematic media component
+
+Added:
+
+```text
+app/components/marketing/CinematicMedia.tsx
+```
+
+The component provides:
+
+1. Official static poster fallback.
+2. Muted loop playback.
+3. Playback only while the asset is visible.
+4. Automatic pause when the asset leaves the viewport.
+5. User controlled pause and play.
+6. Reduced motion fallback to the official static image.
+7. Video error fallback to the official static image.
+8. No automatic sound.
+9. No direct provider credential use.
+
+### Website campaign advertisements
+
+Added:
+
+```text
+app/components/marketing/WebsiteCampaignAds.tsx
+```
+
+The homepage now contains four official-brand campaign cards:
+
+1. Obserra EIOS.
+2. Obserra Academy.
+3. Protection and Intelligence.
+4. Cybersecurity Advisory.
+
+Each card includes:
+
+1. A governed Pollo MP4 path.
+2. An existing official Obserra image as poster fallback.
+3. The official Obserra logo as a controlled website overlay.
+4. Campaign headline and body copy.
+5. A direct call to action.
+6. Responsive desktop, tablet, and mobile behavior.
+
+### Homepage interactive replacements
+
+Updated:
+
+```text
+app/page.tsx
+```
+
+The homepage now has governed cinematic media slots for:
+
+1. The main EIOS intelligence hero.
+2. The EIOS platform visualization.
+3. Four campaign advertisements.
+
+The existing official static images remain the default until approved MP4 files are present and the feature flag is enabled.
+
+### Official brand styling
+
+Added:
+
+```text
+app/cinematic-media.css
+```
+
+The implementation uses the official Obserra dark navy, black, gold, white, and restrained holographic blue visual language. It includes focus states, reduced motion controls, responsive campaign grids, official logo overlays, and premium enterprise presentation.
+
+### Governed asset manifest
+
+Added:
+
+```text
+config/website-cinematic-media.json
+```
+
+Manifest ID:
+
+```text
+obserra-website-pollo-cinematic-v1
+```
+
+The manifest governs six initial assets:
+
+```text
+Homepage EIOS hero loop: 1
+Homepage EIOS platform loop: 1
+EIOS website advertisement: 1
+Academy website advertisement: 1
+Protection and Intelligence website advertisement: 1
+Cybersecurity website advertisement: 1
+```
+
+Every asset remains `planned`. No MP4 is claimed rendered, approved, uploaded, or activated.
+
+### Feature flag and fail closed behavior
+
+Updated:
+
+```text
+.env.example
+```
+
+Feature flag:
+
+```text
+NEXT_PUBLIC_OBSERRA_CINEMATIC_MEDIA_ENABLED=false
+```
+
+The flag must remain false until every referenced active MP4:
+
+1. Exists at the governed path.
+2. Passes technical validation.
+3. Passes official brand review.
+4. Passes cinematic realism review.
+5. Passes desktop and mobile performance review.
+6. Receives owner approval.
+
+When false, the website uses the current official poster images and does not request the planned video assets.
+
+### Pollo output locations
+
+Added:
+
+```text
+public/media/pollo/README.md
+```
+
+Required output paths:
+
+```text
+public/media/pollo/site/obserra-eios-intelligence-hero-loop-12s.mp4
+public/media/pollo/site/obserra-eios-platform-loop-12s.mp4
+public/media/pollo/ads/obserra-eios-executive-intelligence-15s.mp4
+public/media/pollo/ads/obserra-academy-cinematic-learning-15s.mp4
+public/media/pollo/ads/obserra-protection-intelligence-15s.mp4
+public/media/pollo/ads/obserra-cybersecurity-executive-risk-15s.mp4
+```
+
+### Production ready Pollo prompts and ad scripts
+
+Added:
+
+```text
+docs/pollo-website-campaigns/POLLO-WEBSITE-INTERACTIVE-ADS-PRODUCTION-PACK.md
+```
+
+The pack contains:
+
+1. Official brand rules.
+2. Technical master requirements.
+3. Exact output filenames.
+4. Shot by shot sequences.
+5. Paste ready Pollo prompts.
+6. Website headlines and body copy.
+7. Calls to action.
+8. Optional social voiceovers.
+9. Website integration behavior.
+10. A sixteen point acceptance checklist.
+
+The ads do not require a personal photograph. The official Obserra logo is applied by the website or controlled postproduction layer rather than generated by Pollo.
+
+### Automated validation
+
+Added:
+
+```text
+test/website-cinematic-media.test.mjs
+```
+
+The tests validate:
+
+1. Fail closed feature flag behavior.
+2. Static poster fallback.
+3. Video error fallback.
+4. Viewport playback control.
+5. User pause and play.
+6. Reduced motion support.
+7. Homepage cinematic media paths.
+8. Four campaign cards and official logo use.
+9. Six governed assets.
+10. Existing poster file availability.
+11. No provider credentials or automatic refill authorization.
+
+## External provider limitation recorded
+
+Plugin discovery was performed for Pollo AI. No installable Pollo plugin was returned in this environment.
+
+Impact:
+
+1. The repository integration, prompts, filenames, validation, and website activation path are implemented.
+2. Direct authenticated Pollo rendering cannot be claimed from this conversation.
+3. The owner must render and download the six assets through the existing annual Pollo account.
+4. The MP4 files must then be placed at the governed paths and validated before activation.
+
+No API key or account credential should be sent in chat or committed to GitHub.
+
+## Official brand and rights controls
+
+Every website asset must:
+
+1. Use the dark navy, black, gold, white, and restrained holographic blue palette.
+2. Use realistic enterprise documentary visuals.
+3. Use motivated lighting and controlled camera movement.
+4. Leave clean negative space for website copy.
+5. Add the official logo only in the website or controlled postproduction layer.
+6. Contain no generated official logo.
+7. Contain no generated critical text.
+8. Contain no third party logo.
+9. Contain no public figure likeness.
+10. Contain no customer, regulated, secret, or unpublished sensitive information.
+11. Contain no morphing people, hands, objects, vehicles, or interfaces.
+12. Receive owner approval before activation.
+
+## Current factual status
+
+```text
+Cinematic website component: implemented
+Homepage hero video slot: implemented
+Homepage platform video slot: implemented
+Four official brand campaign ads: implemented
+Official static poster fallbacks: implemented
+Pause and reduced motion controls: implemented
+Pollo asset manifest: implemented
+Pollo production prompts: implemented
+Automated tests: implemented
+Six MP4 files rendered: no
+Six MP4 files uploaded: no
+Feature flag enabled: no
+Website production activation: no
+Current-head GitHub Actions: pending after latest changes
+```
+
+## Exact next actions
+
+1. Complete current-head GitHub Actions validation.
+2. Open the production pack in `docs/pollo-website-campaigns`.
+3. Generate the six assets in the owner-controlled Pollo account.
+4. Reject any morphing, unrealistic motion, generated text, third party marks, or weak brand match.
+5. Download approved H.264 MP4 masters.
+6. Place each file at its exact governed path.
+7. Record provider asset identifiers, prompts, hashes, and owner approval.
+8. Re-run repository tests and production build.
+9. Review desktop, tablet, mobile, and reduced motion behavior.
+10. Enable `NEXT_PUBLIC_OBSERRA_CINEMATIC_MEDIA_ENABLED=true` only after every active asset passes.
+11. Verify the deployed website.
+12. Keep the static posters available as permanent fallbacks.
+
+## Latest locations
+
+```text
+Canonical current handoff:
+docs/academy-media-pipeline/LATEST-HANDOFF.md
+
+This website cinematic ads addendum:
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-WEBSITE-CINEMATIC-ADS.md
+
+Pollo prompts, scripts, and shot plans:
+docs/pollo-website-campaigns/POLLO-WEBSITE-INTERACTIVE-ADS-PRODUCTION-PACK.md
+
+Website media manifest:
+config/website-cinematic-media.json
+
+Website cinematic component:
+app/components/marketing/CinematicMedia.tsx
+
+Website campaign ads component:
+app/components/marketing/WebsiteCampaignAds.tsx
+
+Homepage integration:
+app/page.tsx
+
+Official brand and responsive styling:
+app/cinematic-media.css
+
+Pollo output path instructions:
+public/media/pollo/README.md
+
+Automated validation:
+test/website-cinematic-media.test.mjs
+
+Chronological activity ledger:
+docs/academy-media-pipeline/ACTIVITY-LEDGER.md
+
+Permanent failure register:
+docs/academy-media-pipeline/FAILURE-REGISTER.md
+```
