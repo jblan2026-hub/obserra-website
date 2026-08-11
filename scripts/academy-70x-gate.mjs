@@ -15,8 +15,10 @@ const courseCatalog = read("app/academy/courseCatalog.ts");
 const curriculum = read("app/academy/courseCurriculum.ts");
 const experience = read("app/academy/courseExperience.ts");
 const grounding = read("app/academy/courseGrounding.ts");
-const academyClient = read("app/academy/AcademyClient.tsx");
+const academyClient = read("app/academy/AcademyControlledClient.tsx");
 const coursePage = read("app/academy/[courseId]/page.tsx");
+const courseOffers = read("app/academy/courseOffers.ts");
+const catalogPage = read("app/catalog/page.tsx");
 const player = read("app/academy/learn/CoursePlayer.tsx");
 const learnerLayout = read("app/academy/learn/layout.tsx");
 const assessmentRoute = read("app/api/academy/assessment/route.ts");
@@ -32,34 +34,34 @@ const courseLevels = courseMatches.map((match) => match[3]);
 const courseDepartments = courseMatches.map((match) => match[4]);
 const curriculumProfileIds = [...curriculum.matchAll(/^\s{2}"([a-z0-9-]+)": \{/gm)].map((match) => match[1]);
 
-check("catalog contains exactly 60 live courses", courseIds.length === 60);
+check("catalog contains exactly 60 governed roadmap courses", courseIds.length === 60);
 check("course ids are unique", new Set(courseIds).size === courseIds.length);
 check("course titles are unique", new Set(courseTitles).size === courseTitles.length);
 check("all five course levels are represented", new Set(courseLevels).size === 5);
-check("all four live departments are represented", new Set(courseDepartments).size === 4);
-check("live Cyber catalog count is 26", courseDepartments.filter((value) => value === "Cyber").length === 26);
-check("live Protection catalog count is 8", courseDepartments.filter((value) => value === "Protection").length === 8);
-check("live Intelligence catalog count is 5", courseDepartments.filter((value) => value === "Intelligence").length === 5);
-check("live Technologies catalog count is 21", courseDepartments.filter((value) => value === "Technologies").length === 21);
-check("Foundation catalog count is 10", courseLevels.filter((value) => value === "Foundation").length === 10);
-check("Professional catalog count is 15", courseLevels.filter((value) => value === "Professional").length === 15);
-check("Advanced catalog count is 15", courseLevels.filter((value) => value === "Advanced").length === 15);
-check("Executive Intensive catalog count is 11", courseLevels.filter((value) => value === "Executive Intensive").length === 11);
-check("CISO Masterclass catalog count is 9", courseLevels.filter((value) => value === "CISO Masterclass").length === 9);
-check("live Foundation price remains 99", /Foundation: 99,/.test(courseData));
-check("live Professional price remains 149", /Professional: 149,/.test(courseData));
-check("live Advanced price remains 199", /Advanced: 199,/.test(courseData));
-check("live Executive Intensive price remains 249", /"Executive Intensive": 249,/.test(courseData));
-check("live CISO Masterclass price remains 299", /"CISO Masterclass": 299,/.test(courseData));
-check("live Foundation duration remains 2.5 hours", /Foundation: "2\.5 hours",/.test(courseData));
-check("live Professional duration remains 4.5 hours", /Professional: "4\.5 hours",/.test(courseData));
-check("live Advanced duration remains 7 hours", /Advanced: "7 hours",/.test(courseData));
-check("live Executive Intensive duration remains 9 hours", /"Executive Intensive": "9 hours",/.test(courseData));
-check("live CISO Masterclass duration remains 11 hours", /"CISO Masterclass": "11 hours",/.test(courseData));
-check("curriculum contains exactly 60 course specific profiles", curriculumProfileIds.length === 60);
+check("all four course departments are represented", new Set(courseDepartments).size === 4);
+check("Cyber roadmap count is 26", courseDepartments.filter((value) => value === "Cyber").length === 26);
+check("Protection roadmap count is 8", courseDepartments.filter((value) => value === "Protection").length === 8);
+check("Intelligence roadmap count is 5", courseDepartments.filter((value) => value === "Intelligence").length === 5);
+check("Technologies roadmap count is 21", courseDepartments.filter((value) => value === "Technologies").length === 21);
+check("Foundation roadmap count is 10", courseLevels.filter((value) => value === "Foundation").length === 10);
+check("Professional roadmap count is 15", courseLevels.filter((value) => value === "Professional").length === 15);
+check("Advanced roadmap count is 15", courseLevels.filter((value) => value === "Advanced").length === 15);
+check("Executive Intensive roadmap count is 11", courseLevels.filter((value) => value === "Executive Intensive").length === 11);
+check("CISO Masterclass roadmap count is 9", courseLevels.filter((value) => value === "CISO Masterclass").length === 9);
+check("fallback Foundation planned price remains 99", /Foundation: 99,/.test(courseData));
+check("fallback Professional planned price remains 149", /Professional: 149,/.test(courseData));
+check("fallback Advanced planned price remains 199", /Advanced: 199,/.test(courseData));
+check("fallback Executive Intensive planned price remains 249", /"Executive Intensive": 249,/.test(courseData));
+check("fallback CISO Masterclass planned price remains 299", /"CISO Masterclass": 299,/.test(courseData));
+check("Foundation duration remains 2.5 hours", /Foundation: "2\.5 hours",/.test(courseData));
+check("Professional duration remains 4.5 hours", /Professional: "4\.5 hours",/.test(courseData));
+check("Advanced duration remains 7 hours", /Advanced: "7 hours",/.test(courseData));
+check("Executive Intensive duration remains 9 hours", /"Executive Intensive": "9 hours",/.test(courseData));
+check("CISO Masterclass duration remains 11 hours", /"CISO Masterclass": "11 hours",/.test(courseData));
+check("curriculum contains exactly 60 course-specific profiles", curriculumProfileIds.length === 60);
 check("curriculum profile ids are unique", new Set(curriculumProfileIds).size === curriculumProfileIds.length);
-check("every live course has a course specific curriculum", courseIds.every((id) => curriculumProfileIds.includes(id)));
-check("curriculum has no unpublished course profile", curriculumProfileIds.every((id) => courseIds.includes(id)));
+check("every roadmap course has course-specific curriculum", courseIds.every((id) => curriculumProfileIds.includes(id)));
+check("curriculum has no unknown course profile", curriculumProfileIds.every((id) => courseIds.includes(id)));
 
 for (const id of courseIds) {
   check(`course id ${id} is route safe`, /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id));
@@ -86,19 +88,21 @@ const durationPatterns = {
 for (const [level, expected] of Object.entries(expectedDurations)) {
   const match = courseData.match(durationPatterns[level]);
   const minutes = match?.[1].split(",").map((value) => Number.parseInt(value.trim(), 10)) ?? [];
-  check(`${level} defines five published lessons`, minutes.length === 5);
-  check(`${level} lesson minutes are positive integers`, minutes.every((value) => Number.isInteger(value) && value > 0));
-  check(`${level} published duration reconciles`, minutes.reduce((sum, value) => sum + value, 0) === expected);
+  check(`${level} defines five planned modules`, minutes.length === 5);
+  check(`${level} module minutes are positive integers`, minutes.every((value) => Number.isInteger(value) && value > 0));
+  check(`${level} planned duration reconciles`, minutes.reduce((sum, value) => sum + value, 0) === expected);
 }
 
 const requiredFiles = [
   "app/academy/page.tsx",
   "app/academy/AcademyClient.tsx",
+  "app/academy/AcademyControlledClient.tsx",
   "app/academy/courseData.ts",
   "app/academy/courseCatalog.ts",
   "app/academy/courseCurriculum.ts",
   "app/academy/courseExperience.ts",
   "app/academy/courseGrounding.ts",
+  "app/academy/courseOffers.ts",
   "app/academy/[courseId]/page.tsx",
   "app/academy/learn/CoursePlayer.tsx",
   "app/academy/learn/layout.tsx",
@@ -110,6 +114,7 @@ const requiredFiles = [
   "app/api/academy/tutor/route.ts",
   "app/api/academy/checkout/route.ts",
   "app/api/webhook/stripe/route.ts",
+  "app/catalog/page.tsx",
   "lib/academy.ts",
 ];
 for (const file of requiredFiles) check(`required file exists: ${file}`, exists(file));
@@ -134,8 +139,8 @@ check(
     && /course\.price === baseCourse\.price/.test(checkoutRoute)
     && /course\.title === baseCourse\.title/.test(checkoutRoute),
 );
-check("checkout live fallback charges website course price", /unit_amount: Math\.round\(course\.price \* 100\)/.test(checkoutRoute));
-check("checkout live fallback uses website title", /name: course\.title/.test(checkoutRoute));
+check("legacy Stripe fallback charges the governed website course price", /unit_amount: Math\.round\(course\.price \* 100\)/.test(checkoutRoute));
+check("legacy Stripe fallback uses the website course title", /name: course\.title/.test(checkoutRoute));
 check("checkout emits catalog parity evidence", /x-obserra-catalog-parity/.test(checkoutRoute));
 check(
   "checkout consults the authoritative course control plane",
@@ -148,23 +153,42 @@ check(
     && /x-obserra-existing-entitlements/.test(checkoutRoute)
     && /preserved/.test(checkoutRoute),
 );
+check(
+  "checkout requires approved content for non-Sandbox commerce",
+  /courseIsLiveForPurchase\(course\.id\)/.test(checkoutRoute)
+    && /course-build-in-progress/.test(checkoutRoute)
+    && /x-obserra-course-content-readiness/.test(checkoutRoute)
+    && /x-obserra-live-purchase/.test(checkoutRoute),
+);
+check(
+  "LearnWorlds Sandbox canary remains explicitly bounded",
+  /provider === "learnworlds" && learnWorldsSandboxMode\(\)/.test(checkoutRoute)
+    && /learnworlds-sandbox/.test(checkoutRoute),
+);
+check("course offers record canary list price 149", /listPrice: 149/.test(courseOffers));
+check("course offers record canary launch price 99", /offerPrice: 99/.test(courseOffers));
+check("course offers record canary savings 50", /savings: 50/.test(courseOffers));
+check("course offers identify canary content as not loaded", /contentState: "not-loaded"/.test(courseOffers));
+check("course offers disable live canary purchase", /livePurchaseEnabled: false/.test(courseOffers));
+check("course offers require published and approved state", /offer\.commerceState === "published"/.test(courseOffers) && /offer\.contentState === "approved"/.test(courseOffers));
 
-check("public Academy states 60 published courses", /60 published courses/.test(academyClient));
-check("public Academy markets AI native training", /AI native training/.test(academyClient));
-check("public Academy says AI tutor requires access", /unlocked only with authorized course access/.test(academyClient));
-check("public course page exposes published lesson count", /course\.modules\.length/.test(coursePage));
-check("public course page exposes published duration", /\{course\.duration\}/.test(coursePage));
-check("public course page exposes AI tutor after access", /Obserrian AI Tutor after authorized access/.test(coursePage));
-check(
-  "public course page renders the governed percent completion standard",
-  /publication\.passingScore/.test(coursePage) && /percent completion standard/.test(coursePage),
-);
-check(
-  "public course page preserves existing learner access when sales are paused",
-  /Existing learner access/.test(coursePage)
-    && /Existing learner access is preserved/.test(coursePage)
-    && /does not revoke a learner entitlement/.test(coursePage),
-);
+check("public Academy identifies the 60-course catalog as a roadmap", /60-course catalog is a governed development roadmap/.test(academyClient));
+check("public Academy denies that 60 courses are completed", /not a claim that 60 completed courses are/.test(academyClient));
+check("public Academy identifies Cybersecurity Foundations as the canary", /Cybersecurity Foundations for New Professionals is the first controlled production course/.test(academyClient));
+check("public Academy states live enrollment remains disabled", /live enrollment remains disabled until the real course/.test(academyClient));
+check("public Academy uses planned course catalog language", /PLANNED COURSE CATALOG/.test(academyClient));
+check("public Academy contains no direct checkout CTA", !/\/api\/academy\/checkout\?course=/.test(academyClient));
+check("public Academy offers launch updates instead of live sale", /Join launch updates/.test(academyClient));
+check("enterprise catalog contains no direct Academy checkout CTA", !/\/api\/academy\/checkout\?course=/.test(catalogPage));
+check("enterprise catalog labels Academy as a roadmap", /ACADEMY COURSE ROADMAP/.test(catalogPage));
+check("public course page exposes planned module count", /course\.modules\.length/.test(coursePage));
+check("public course page exposes planned duration", /\{course\.duration\}/.test(coursePage));
+check("public course page gates purchase on approved offer state", /offer\.livePurchaseEnabled/.test(coursePage) && /offer\.contentState === "approved"/.test(coursePage));
+check("public course page states content is not approved for live sale", /Content not yet approved for live sale/.test(coursePage));
+check("public course page renders the governed percent completion standard", /publication\.passingScore/.test(coursePage) && /percent completion standard/.test(coursePage));
+check("public course page preserves existing learner access", /Existing learner access/.test(coursePage));
+check("public course page prohibits live sale of an empty shell", /No live sale of an empty or unapproved course shell/.test(coursePage));
+check("public course page aligns to LearnWorlds list and launch prices", /offer\.listPrice/.test(coursePage) && /offer\.offerPrice/.test(coursePage) && /offer\.savings/.test(coursePage));
 
 check("assessment generates 25 questions", /Array\.from\(\{ length: 25 \}/.test(experience));
 check("assessment answer keys remain server side", /finalAssessmentQuestions/.test(experience) && /finalAssessment\(body\.courseId\)/.test(assessmentRoute));
@@ -193,7 +217,7 @@ check("player prevents casual copy", /onCopy=/.test(player));
 check("player prevents casual cut", /onCut=/.test(player));
 check("player includes learner watermark", /learner-watermark/.test(player));
 check("player does not return null when assessment is active", /if \(!assessmentActive && !lesson\) return null/.test(player));
-check("player exposes entitlement gated AI tutor", /Obserrian Academy Tutor/.test(player) && /\/api\/academy\/tutor/.test(player));
+check("player exposes entitlement-gated AI tutor", /Obserrian Academy Tutor/.test(player) && /\/api\/academy\/tutor/.test(player));
 check("player pauses tutor during graded assessment", /Tutor is paused during the graded assessment/.test(player));
 check("player presents guided lesson plan", /Guided lesson plan/.test(player));
 check("player presents why this matters", /Why this matters/.test(player));
@@ -207,9 +231,9 @@ check("player presents business application", /How to use this in an organizatio
 check("player presents mastery criteria", /Mastery criteria/.test(player));
 check("player presents reflection transfer", /Reflection and transfer/.test(player));
 
-check("course experience requires course specific curriculum", /curriculumForCourse/.test(experience));
-check("course experience uses lesson specific subjects", /curriculum\.lessonSubjects\[index\]/.test(experience));
-check("course experience uses lesson specific work products", /curriculum\.workProducts\[index\]/.test(experience));
+check("course experience requires course-specific curriculum", /curriculumForCourse/.test(experience));
+check("course experience uses lesson-specific subjects", /curriculum\.lessonSubjects\[index\]/.test(experience));
+check("course experience uses lesson-specific work products", /curriculum\.workProducts\[index\]/.test(experience));
 check("course experience creates five lesson objectives", /function createObjectives/.test(experience));
 check("course experience creates six guided practice steps", /function createGuidedPractice/.test(experience) && /Test the recommendation/.test(experience));
 check("course experience creates professional decision rubric", /function createDecisionRubric/.test(experience));
@@ -219,28 +243,28 @@ check("course experience defines transfer reflection", /function createReflectio
 check("course experience includes guided lesson chapters", /videoChapters/.test(experience));
 check("course experience includes transcripts", /transcript/.test(experience));
 check("course experience includes training materials", /materials/.test(experience));
-check("course experience includes observe decide act model", /observe:/.test(experience) && /decide:/.test(experience) && /act:/.test(experience));
+check("course experience includes observe-decide-act model", /observe:/.test(experience) && /decide:/.test(experience) && /act:/.test(experience));
 check("course experience includes knowledge checks", /KnowledgeCheck/.test(experience));
 check("course experience includes authoritative references", /authorities:/.test(experience) && /Authoritative basis/.test(experience));
 check("course experience includes documented practice", /practiceExample/.test(experience));
 check("course experience includes enterprise application", /businessApplication/.test(experience));
-check("course descriptions preserve live non certification language", /not third-party certification material/.test(courseData));
+check("course descriptions preserve non-certification language", /not third-party certification material/.test(courseData));
 
 check("Python course teaches Python fundamentals", /Python fundamentals for reliable security automation/.test(curriculum));
 check("API course teaches HTTP and API contracts", /HTTP methods, resources, requests and responses/.test(curriculum));
 check("Zero Trust course teaches no implicit trust", /no implicit trust based on network location/.test(curriculum));
 check("LLM course teaches tokenization and transformer concepts", /tokenization, embeddings, transformer based next token prediction/.test(curriculum));
 check("cloud course teaches shared responsibility", /Cloud service and deployment models, shared responsibility/.test(curriculum));
-check("identity course teaches joiner mover leaver lifecycle", /joiner, mover, leaver events/.test(curriculum));
+check("identity course teaches joiner-mover-leaver lifecycle", /joiner, mover, leaver events/.test(curriculum));
 check("vulnerability course teaches CISA KEV prioritization", /CISA KEV/.test(curriculum));
 check("incident course teaches enterprise crisis leadership", /difference between technical response and enterprise crisis leadership/.test(curriculum));
-check("protective course preserves non tactical planning boundary", /without teaching offensive tactics/.test(curriculum));
+check("protective course preserves non-tactical planning boundary", /without teaching offensive tactics/.test(curriculum));
 check("insider course prohibits profiling", /avoid profiling or unsupported accusations/.test(curriculum));
 check("board course teaches oversight rather than operations", /distinction between board oversight and operational management/.test(curriculum));
 check("executive metrics course teaches numerator and denominator", /numerator and denominator/.test(curriculum));
-check("AI native apps course teaches bounded authorization", /authorization at the action layer/.test(curriculum));
+check("AI-native apps course teaches bounded authorization", /authorization at the action layer/.test(curriculum));
 check("SSDL course teaches software supply chain controls", /protect the software supply chain/.test(curriculum));
-check("data driven intelligence course teaches provenance", /Data driven risk intelligence from decision question to evidence/.test(curriculum));
+check("data-driven intelligence course teaches provenance", /Data driven risk intelligence from decision question to evidence/.test(curriculum));
 
 check("grounding includes NIST CSF", /NIST CSF 2\.0/.test(grounding));
 check("grounding includes NIST AI RMF", /NIST AI RMF 1\.0/.test(grounding));
@@ -273,7 +297,7 @@ check("tutor fails closed without API key", /OPENAI_API_KEY/.test(tutorRoute) &&
 check("tutor protects graded assessment integrity", /Do not provide answers to the course's graded final assessment/.test(tutorRoute));
 check("tutor limits question length", /question\.length > 1400/.test(tutorRoute));
 check("tutor disables caching", /private, no-store/.test(tutorRoute));
-check("learner layout loads AI native styles", /ai-native-learning\.css/.test(learnerLayout));
+check("learner layout loads AI-native styles", /ai-native-learning\.css/.test(learnerLayout));
 
 check("package exposes build command", typeof packageJson.scripts?.build === "string");
 check("package exposes lint command", typeof packageJson.scripts?.lint === "string");
