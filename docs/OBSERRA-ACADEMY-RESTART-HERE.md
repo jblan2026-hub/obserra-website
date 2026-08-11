@@ -12,21 +12,22 @@
 
 Every future session must read these sources before making recommendations or changes:
 
-1. `docs/OBSERRA-ACADEMY-RESTART-HERE.md`
-2. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`
-3. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-CINEMATIC-ENTERPRISE-STANDARD.md`
-4. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-LEARNER-DASHBOARD-COURSE-SHELLS.md`
-5. `docs/academy-media-pipeline/ACTIVITY-LEDGER.md`
-6. `docs/academy-media-pipeline/FAILURE-REGISTER.md`
-7. `docs/academy-media-pipeline/OBSERRA-CINEMATIC-FORTUNE-500-PRODUCTION-STANDARD.md`
-8. `docs/academy-media-pipeline/canary/HEYGEN-15-SECOND-LIKENESS-CANARY.md`
-9. `docs/academy-media-pipeline/canary/CYBERSECURITY-FOUNDATIONS-PRODUCTION-PACK.md`
-10. Pull request `#55`
+1. `docs/academy-media-pipeline/LATEST-HANDOFF.md`
+2. `docs/OBSERRA-ACADEMY-RESTART-HERE.md`
+3. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`
+4. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-CINEMATIC-ENTERPRISE-STANDARD.md`
+5. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-LEARNER-DASHBOARD-COURSE-SHELLS.md`
+6. `docs/academy-media-pipeline/ACTIVITY-LEDGER.md`
+7. `docs/academy-media-pipeline/FAILURE-REGISTER.md`
+8. `docs/academy-media-pipeline/OBSERRA-CINEMATIC-FORTUNE-500-PRODUCTION-STANDARD.md`
+9. `docs/academy-media-pipeline/canary/HEYGEN-15-SECOND-LIKENESS-CANARY.md`
+10. `docs/academy-media-pipeline/canary/CYBERSECURITY-FOUNDATIONS-PRODUCTION-PACK.md`
+11. Pull request `#55`
 
 Use this continuation instruction:
 
 ```text
-Read docs/OBSERRA-ACADEMY-RESTART-HERE.md and docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md first on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Then read the cinematic handoff addendum, learner shell addendum, activity ledger, failure register, cinematic production standard, HeyGen likeness canary, Cybersecurity Foundations production pack, and pull request 55. Continue from the first incomplete action. Record every action and every failure immediately.
+Read docs/academy-media-pipeline/LATEST-HANDOFF.md first on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Then read every source listed under Mandatory restart instruction. Continue from the first incomplete action. Record every action and every failure immediately. Never claim LearnWorlds shell upload, media acceptance, merge, publication, or production release without direct evidence.
 ```
 
 ## Executive truth
@@ -105,6 +106,8 @@ No released mapping -> In production
 
 The shell dashboard contains no direct checkout and does not create enrollment, unlock lessons, mark completion, or prove publication.
 
+The repository also generates a governed 60 course LearnWorlds Draft shell manifest. That manifest is not proof that the remaining shells were uploaded. Authenticated LearnWorlds evidence is required for every created shell.
+
 ## Current cinematic production standard
 
 ```text
@@ -127,21 +130,22 @@ The owner rejected robotic, static, low quality presentation. Every course must 
 
 ## Exact next actions
 
-1. Finish the authorized HeyGen avatar and voice.
-2. Render the 15 second likeness canary.
-3. Review likeness, voice, pronunciation, lip sync, eye contact, blinking, gestures, and audio.
-4. Record owner approval or repair only the smallest defective layer.
-5. Produce the Cybersecurity Foundations 75 second cinematic welcome using the timed scene plan.
-6. Produce five module anchor films and five Pollo module visual packs.
-7. Load approved media into LearnWorlds with captions, transcript, thumbnail, chapters, knowledge checks, and completion rules.
-8. Import the 25 question final assessment and set the passing score to 80 percent.
-9. Validate desktop and mobile playback, Sandbox learner completion, assessment, and certificate.
-10. Re-run current-head CI.
+1. Complete current-head GitHub Actions validation.
+2. Finish the authorized HeyGen avatar and voice.
+3. Render the 15 second likeness canary.
+4. Review likeness, voice, pronunciation, lip sync, eye contact, blinking, gestures, and audio.
+5. Record owner approval or repair only the smallest defective layer.
+6. Produce the Cybersecurity Foundations 75 second cinematic welcome using the timed scene plan.
+7. Produce five module anchor films and five Pollo module visual packs.
+8. Load approved media into LearnWorlds with captions, transcript, thumbnail, chapters, knowledge checks, and completion rules.
+9. Import the 25 question final assessment and set the passing score to 80 percent.
+10. Validate desktop and mobile playback, Sandbox learner completion, assessment, and certificate.
 11. Obtain explicit owner approval.
-12. Merge pull request 55.
+12. Mark pull request 55 ready and merge the validated branch.
 13. Verify production deployment.
-14. Create or transfer remaining LearnWorlds Draft shells from the validated master template.
-15. Build and publish remaining courses only after course-specific acceptance.
+14. Create or transfer remaining LearnWorlds Draft shells from the validated master template using an authenticated supported method.
+15. Capture each LearnWorlds course identifier and retain incomplete courses as private Drafts.
+16. Build and publish remaining courses only after course specific acceptance.
 
 ## Current preserved defects and failures
 
@@ -151,17 +155,20 @@ The owner rejected robotic, static, low quality presentation. Every course must 
 4. The purchase-success footer previously contained `Driving Data` branding.
 5. Course images and thumbnails require acceptance.
 6. Website and LearnWorlds pricing require final parity validation.
-7. A legacy direct Stripe checkout remains a rollback and commercial-risk concern.
-8. Custom-domain and HTTPS acceptance are not yet proven.
+7. A legacy direct Stripe checkout remains a rollback and commercial risk concern.
+8. Custom domain and HTTPS acceptance are not yet proven.
 9. The prior PMP video style was rejected as robotic and below the new standard.
 10. Direct repository clone was unavailable in the build environment.
 11. One dependency drift was corrected.
-12. One pull-request metadata call used an invalid same-repository option and was corrected.
-13. One Vercel scope remains inaccessible for root-cause inspection.
+12. One pull request metadata call used an invalid same repository option and was corrected.
+13. One Vercel scope remains inaccessible for root cause inspection.
 14. Intermediate CI runs cancelled by later commits are not passing evidence.
-15. A secret-boundary test inspected implementation source instead of response shape and was corrected.
+15. A secret boundary test inspected implementation source instead of response shape and was corrected.
 16. A cinematic configuration update used a stale blob SHA and was corrected.
 17. A cinematic test create action targeted an existing path and was corrected.
+18. A documentation assertion failed on equivalent wording and was corrected.
+19. A failure register update encountered an advancing branch SHA and was retried without losing prior records.
+20. The 60 shell manifest has not been executed as an authenticated LearnWorlds authoring action.
 
 Read `docs/academy-media-pipeline/FAILURE-REGISTER.md` for the complete evidence, impact, correction, and prevention rule for every failure.
 
@@ -190,6 +197,7 @@ Do not merge, cut over production, upload remaining LearnWorlds shells as releas
 After every action, update:
 
 ```text
+docs/academy-media-pipeline/LATEST-HANDOFF.md
 docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md
 docs/academy-media-pipeline/ACTIVITY-LEDGER.md
 docs/academy-media-pipeline/FAILURE-REGISTER.md
