@@ -173,10 +173,31 @@ return { status, probe: result } as const
 
 The existing owner-route test continues to verify that neither `HEYGEN_API_KEY` nor `POLLO_API_KEY` appears in the public response route.
 
+### Verification evidence
+
+GitHub Actions validated commit:
+
+```text
+50fea832849c3456626f4ffb0b75627b27bf2c16
+```
+
+Results:
+
+```text
+Tests: 61
+Passed: 61
+Failed: 0
+Website CI: passed
+Academy 70x Production Gate: passed
+Application Production Pipeline: passed
+Application Release Validation: passed
+Production build: passed
+```
+
 ### Prevention rule
 
 Secret-boundary tests must inspect serialized return schemas, route response objects, or isolated result-shape declarations. Do not infer a response leak from a broad source slice that includes internal request construction.
 
 ## Current truth boundary
 
-The deterministic media factory, provider readiness adapter, asset intake pipeline, tests, canary production pack, and audit documentation exist on the draft branch. No HeyGen asset, Pollo asset, LearnWorlds publication, website cutover, production purchase, or customer access is claimed complete. Current-head CI must pass after the Failure 6 correction before merge or deployment promotion.
+The deterministic media factory, provider readiness adapter, owner-only status route, asset intake pipeline, tests, canary production pack, and audit documentation exist on the draft branch and were validated together at commit `50fea832849c3456626f4ffb0b75627b27bf2c16`. No HeyGen asset, Pollo asset, LearnWorlds publication, website cutover, production purchase, or customer access is claimed complete.
