@@ -70,7 +70,7 @@ export default function CertificateView({
 
         <div className="certificate-meta">
           <span>Academy division<strong>{department} Department</strong></span>
-          <span>Course version<strong>{normalizedVersion}</strong></span>
+          <span>Course Version<strong>{normalizedVersion}</strong></span>
           <span>Instructional hours<strong>{trainingHours}</strong></span>
           <span>Verification ID<strong>{certificateId}</strong></span>
         </div>
@@ -92,7 +92,7 @@ export default function CertificateView({
 
         <div className="certificate-verification">
           <span>Completion date <b>{completionDate}</b></span>
-          <span>Course version <b>{normalizedVersion}</b></span>
+          <span>Course Version <b>{normalizedVersion}</b></span>
           <span>Signature algorithm <b>{signatureAlgorithm}</b></span>
           <span>Signing key fingerprint <b>{publicKeyFingerprint.slice(0, 16)}...{publicKeyFingerprint.slice(-16)}</b></span>
           <span>Verify online <b><a href={verificationUrl}>Certificate verification record</a></b></span>
