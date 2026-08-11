@@ -198,6 +198,80 @@ Production build: passed
 
 Secret-boundary tests must inspect serialized return schemas, route response objects, or isolated result-shape declarations. Do not infer a response leak from a broad source slice that includes internal request construction.
 
+## Failure 7: Cinematic configuration update used a stale blob SHA
+
+### Action
+
+Attempted to replace `config/academy-media-factory.json` after reading an earlier revision.
+
+### Result
+
+GitHub returned:
+
+```text
+409 Conflict
+config/academy-media-factory.json does not match the supplied SHA
+```
+
+### Root cause
+
+The actively changing branch received another committed update after the earlier read. The first replacement therefore used a stale blob SHA.
+
+### Impact
+
+The first cinematic configuration replacement did not apply. No configuration data was lost and no production action occurred.
+
+### Correction
+
+1. Re-read the current file and blob SHA.
+2. Preserved the already committed cinematic controls.
+3. Merged the stricter common quality standard, 20 second presenter limit, five module films, five visual packs, and updated portfolio totals.
+4. Updated the file using the current SHA.
+
+### Prevention rule
+
+Re-read the exact target file immediately before every sequential update on an actively changing branch. A prior read is not sufficient when another commit may have modified the path.
+
+## Failure 8: Cinematic test create action targeted a path that already existed
+
+### Action
+
+Attempted to create:
+
+```text
+test/academy-cinematic-production-standard.test.mjs
+```
+
+### Result
+
+GitHub returned:
+
+```text
+422 Invalid request
+sha was not supplied
+```
+
+### Root cause
+
+The path already existed from another committed action. A create request was therefore invalid for the existing file.
+
+### Impact
+
+The new test content was not written on the first attempt. No existing test was deleted or overwritten.
+
+### Correction
+
+1. Fetched the existing file and current blob SHA.
+2. Replaced it through `update_file`.
+3. Preserved the original cinematic test intent.
+4. Aligned the assertions to the machine-readable standard, 20 second avatar limit, 1020 asset portfolio, same-quality rule, and LearnWorlds playback controls.
+
+### Prevention rule
+
+Before creating a file in an actively changing branch, verify whether the exact path already exists. Use `update_file` with the current blob SHA when it does.
+
 ## Current truth boundary
 
-The deterministic media factory, provider readiness adapter, owner-only status route, asset intake pipeline, tests, canary production pack, and audit documentation exist on the draft branch and were validated together at commit `50fea832849c3456626f4ffb0b75627b27bf2c16`. No HeyGen asset, Pollo asset, LearnWorlds publication, website cutover, production purchase, or customer access is claimed complete.
+The learner dashboard shells, deterministic media factory, common cinematic enterprise standard, provider readiness adapter, owner-only status route, asset intake pipeline, tests, canary production pack, and audit documentation exist on the working branch. The cinematic changes require current-head CI before they can be treated as validated.
+
+No HeyGen likeness canary, complete Cybersecurity Foundations cinematic package, remaining LearnWorlds shell transfer, LearnWorlds publication, website production cutover, or customer release is claimed complete.
