@@ -5,211 +5,253 @@
 **Pull request:** `#55`  
 **Last updated:** 2026-08-11  
 **Production cutover:** Not authorized  
+**Current state:** Commercial checkout and learner access work in LearnWorlds Sandbox, but the actual course has not been built or loaded.
+
+## Restart instruction
+
+A future session must read this file first, then read:
+
+1. `docs/OBSERRA-ACADEMY-RESTART-HERE.md`
+2. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT.md`
+3. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE.md`
+4. Pull request `#55`
+
+Do not treat the LearnWorlds course shell, purchase record, or learner entitlement as proof that a usable course exists.
 
 ## Authoritative current state
 
-1. The LearnWorlds school is `Obserra EPI Academy` with school ID `6a7a693d353feb69c94c7654`.
-2. The primary school URL is `https://obserraepillc.learnworlds.com`.
-3. The governed API URL is `https://obserraepillc.learnworlds.com/admin/api/`.
-4. The owner confirmed a LearnWorlds premium subscription, Stripe connection, API credentials, an access token, and the custom-domain CNAME.
-5. The owner confirmed that the required LearnWorlds Preview environment variables were entered in Vercel. Secret values were not disclosed in chat or committed to GitHub.
-6. The canonical Academy business and owner email is `info@obserrallc.com`. The consumer address `jblan006@icloud.com` is prohibited from governed Academy configuration and business-facing Academy records.
-7. The Cybersecurity Foundations canary is mapped to the owner-supplied LearnWorlds course, store product, package, public page, direct checkout page, and cart page.
-8. The owner reached the correct LearnWorlds course payment page from the integration flow. This proves that the Preview route and governed product mapping can reach LearnWorlds checkout.
-9. The email displayed on the LearnWorlds payment page came from the currently signed-in LearnWorlds user session. It is not populated by the Obserra website mapping or by a Vercel owner-email variable.
-10. The LearnWorlds checkout still displays legacy `Driving Data` branding. Production publication is blocked until the topbar, footer, logos, favicon, colors, contact identity, and legal presentation are corrected.
-11. Website CI, the Academy 70x Production Gate, and the Application Production Pipeline passed on prior corrected branch heads. Pull request 55 remains draft and unmerged pending the complete sandbox acceptance test.
-12. The owner supplied the official Obserra logo in the conversation. It remains the required source brand asset. It has not yet been applied in the LearnWorlds visual builder.
+### Platform and account
 
-## Repository implementation completed
+1. The LearnWorlds school is `Obserra EPI Academy`.
+2. School ID: `6a7a693d353feb69c94c7654`.
+3. Primary school URL: `https://obserraepillc.learnworlds.com`.
+4. Governed API URL: `https://obserraepillc.learnworlds.com/admin/api/`.
+5. Custom-domain CNAME was created for `academy.obserrallc.com`; final custom-domain and HTTPS acceptance still requires verification.
+6. LearnWorlds premium subscription is active according to the owner.
+7. Stripe is connected in LearnWorlds.
+8. LearnWorlds API credentials and an access token exist. Secret values remain outside GitHub and chat.
+9. The canonical Academy business email is `info@obserrallc.com`.
+10. The official Obserra logo supplied by the owner is the required brand source.
 
-The branch currently contains:
-
-1. A non-secret LearnWorlds school, API, business-email, and product-mapping configuration.
-2. A fail-closed server-side LearnWorlds configuration adapter.
-3. Governed direct-checkout routing from the Obserra website to LearnWorlds.
-4. Validation of approved hosts, API path, product path, course identity, store-product identity, package identity, business email, and uniqueness.
-5. A website-managed Stripe rollback path retained until owner-approved cutover.
-6. An owner-only readiness endpoint.
-7. Deployment environment templates that keep secrets outside source control.
-8. LearnWorlds routing, API, mapping, email, and secret-boundary tests.
-9. LearnWorlds configuration validation in the Academy release gate.
-10. Continuous implementation and failure-audit documentation.
-
-## Canonical business identity
-
-The repository governs:
+### Governed canary mapping
 
 ```text
-contactEmail=info@obserrallc.com
-OBSERRA_OWNER_EMAIL=info@obserrallc.com
+Obserra course ID: cybersecurity-foundations
+LearnWorlds course ID: cybersecurity-foundations-for-new-professionals
+LearnWorlds store product ID: cybersecurity_foundations_for_new_professionals
+LearnWorlds package ID: package_6a7b2d3710387
+Public URL: https://obserraepillc.learnworlds.com/course/cybersecurity-foundations-for-new-professionals
+Checkout URL: https://obserraepillc.learnworlds.com/payment?product_id=cybersecurity-foundations-for-new-professionals&type=course&packageId=package_6a7b2d3710387
+Status in repository mapping: sandbox
 ```
 
-The configuration validator and regression tests reject `@icloud.com` addresses in the LearnWorlds integration configuration.
-
-The LearnWorlds account itself must be corrected separately because LearnWorlds is the authoritative identity system for the signed-in owner and learner account. The owner must update the school-owner or test-user account under `Users -> All Users -> Edit User`, or use a signed-out private browser session for a distinct learner test.
-
-## Authorized integration model
-
-The approved authorization method is a private, least-privilege API bridge rather than sharing passwords or secret values in chat.
+### Commercial offer currently proven in LearnWorlds
 
 ```text
-ChatGPT
--> private Obserra LearnWorlds Admin Bridge
--> LearnWorlds API
--> Obserra EPI Academy
+List price: $149
+Special-offer price: $99
+Discount: $50
+Payment mode used for acceptance: LearnWorlds Sandbox
 ```
 
-### Existing authorization
+Unless the owner changes the commercial decision, the Obserra website must display the same list price, special-offer price, discount context, and checkout destination.
 
-1. GitHub is connected and permits repository, branch, pull-request, and CI work.
-2. LearnWorlds credentials exist and are reportedly stored in the Vercel Preview environment.
-3. The Vercel ChatGPT app is installed and advertises read and write capabilities.
-4. The Vercel ChatGPT app currently follows the global permission mode `Allow low-risk actions`. This is acceptable. `Never ask` is not required and should not be enabled.
-5. No LearnWorlds, Stripe, Vercel, or GitHub secret is stored in the repository, chat, screenshots, or this handoff.
+## Verified working
 
-## Latest Vercel authorization evidence
+The following results were proven by owner-supplied screenshots:
 
-The owner displayed the Vercel app capability screen in ChatGPT. A direct connector verification was then performed.
+1. The Obserra website integration reaches the governed LearnWorlds checkout.
+2. The corrected LearnWorlds checkout displays Obserra branding.
+3. The checkout displays `info@obserrallc.com` for the business-controlled test account.
+4. The checkout identifies the correct Cybersecurity Foundations product.
+5. LearnWorlds explicitly displayed Sandbox payment fields.
+6. A Sandbox purchase completed successfully.
+7. A paid Sandbox invoice was generated for the correct business identity and course.
+8. The purchase-success screen displayed the course and a `Start learning` action.
+9. The learner entitlement was created and the course player opened.
+10. Website CI, the Academy production gate, and related branch checks have passed on corrected branch heads. Current branch checks must still be reviewed after each documentation or code change.
 
-### Proven results
+## Critical truth: the course does not exist as instructional content
+
+The LearnWorlds course player displays:
 
 ```text
-Vercel app installed: yes
-Vercel app advertises writes: yes
-ChatGPT app permission: Use my default
-Global app permission: Allow low-risk actions
-Obserra team discovered: yes
-Obserra team ID: team_xpUE1GefY2JHuFFCqbAdnZAj
-Projects returned for Obserra team: 0
-Direct lookup of obserra-website-live: 404 Not Found
+No contents yet for this course!
 ```
 
-### Finding
+The owner confirmed that a course was never actually built. The current LearnWorlds object is only a commercial and enrollment shell. It contains no validated instructional modules, lessons, videos, transcripts, exercises, assessments, learner materials, or certificate-completion path.
 
-The screenshot proves that the Vercel app exists and has tool capabilities. It does not prove that the OAuth installation is authorized for any Vercel project. The connector can see the Obserra team but still cannot list or retrieve `obserra-website-live`.
-
-### Required correction
-
-In the Vercel dashboard, under the Obserra team:
+Current factual completion status:
 
 ```text
-Team Settings
--> Integrations or Installed Apps
--> Vercel MCP or ChatGPT connection
--> Configure or Manage Access
--> Project access
--> Select obserra-website-live, or All Projects
--> Save
+Checkout route: working
+Sandbox purchase: working
+Invoice generation: working
+Learner enrollment: working
+Course shell access: working
+Actual course content loaded: no
+Usable instructional course: no
+Assessment proven: no
+Certificate proven: no
+Production-ready product: no
 ```
 
-Then disconnect and reconnect the Vercel app in ChatGPT so the new project scope is issued to the connector.
+No future response may describe Cybersecurity Foundations as complete, published, usable, or commercially ready until the content and completion gates pass.
 
-The ChatGPT app permission may remain at `Allow low-risk actions` or `Any changes`. Do not enable unrestricted `Never ask` authority.
+## Current visual and commercial defects
 
-## Private LearnWorlds Admin Bridge requirements
+### LearnWorlds public course page
 
-After Vercel project discovery succeeds, the bridge will be deployed with these controls:
+The public landing page still contains unsupported template material, including:
 
-1. Read LearnWorlds credentials only from the Vercel secret store.
-2. Lock all requests to school ID `6a7a693d353feb69c94c7654`.
-3. Lock business identity to `info@obserrallc.com`.
-4. Restrict outbound requests to the governed LearnWorlds host and `/admin/api` path.
-5. Expose only named allowlisted operations.
-6. Permit read operations without destructive authority.
-7. Require owner approval for every write or important action.
-8. Block deletion, live publication, financial changes, user-identity changes, and production cutover by default.
-9. Redact credentials and personal data from logs and responses.
-10. Record every action, result, and failure in an append-only audit ledger and this continuous handoff.
-11. Support immediate token revocation.
+- placeholder instructor names and photographs
+- `Add your short course description here`
+- unsupported learner, assignment, hour, and video statistics
+- generic template layout elements unrelated to the actual Obserra course
 
-Initial read-only bridge operations:
+These items must be removed or replaced before public launch.
+
+### LearnWorlds branding
+
+1. The checkout topbar shows Obserra branding, but the logo placement appears duplicated or poorly positioned.
+2. The purchase-success page footer still displays `Driving Data` branding and template copy.
+3. The course thumbnail is blank.
+4. The learner-facing course page and certificate experience have not completed a full Obserra visual acceptance gate.
+
+### Website price and checkout mismatch
+
+The Obserra website currently presents the course at `$149`, while the proved LearnWorlds offer charges `$99` after a `$50` special-offer discount.
+
+The website must be changed to one authoritative presentation. Recommended current presentation:
 
 ```text
-get_school_status
-get_course
-list_courses
-get_product_mapping
-get_user
-verify_enrollment
-verify_payment
-verify_completion
-verify_certificate
+List price: $149
+Current launch offer: $99
+Savings: $50
+Enrollment destination: governed LearnWorlds checkout
 ```
 
-Write operations will be added individually only after the relevant LearnWorlds API operation is proven and owner approval controls are in place.
+### Legacy website Stripe route
 
-## UI-only limitations
+A separate legacy Stripe checkout was observed with:
 
-No evidence currently proves that the LearnWorlds public API can modify all of these items:
+- `ZenBusiness` branding
+- the personal iCloud email
+- a `$149` charge
+- a direct Stripe payment path that is separate from LearnWorlds
+
+That route is not the approved Academy checkout. It must not remain available to customers after LearnWorlds cutover. The website should route Academy purchases only to the governed LearnWorlds product unless the owner explicitly approves a separate, correctly branded commerce architecture.
+
+## Governing architecture
+
+The approved architecture is:
 
 ```text
-school-owner email
-topbar logo
-footer logo
-theme
-favicon
-payment-page visual layout
-legacy Driving Data branding
+Obserra website
+-> course marketing and SEO
+-> governed Academy enrollment route
+-> LearnWorlds checkout
+-> LearnWorlds learner identity and enrollment
+-> LearnWorlds course delivery
+-> assessment
+-> certificate
+-> reporting
 ```
 
-Until a supported API endpoint is proven, these remain one-time LearnWorlds dashboard actions performed by the owner or another authorized human administrator in a logged-in browser session.
+LearnWorlds is the authoritative LMS, checkout, enrollment, learner-progress, and certificate platform for this commercial pivot. The Obserra website is the authoritative marketing and discovery surface.
 
-## Important sandbox boundary
+## Immediate build order
 
-`LEARNWORLDS_SANDBOX_MODE=true` is an Obserra routing control. It allows a product marked `sandbox` to be routed from the Preview website. It does not independently place the LearnWorlds Stripe gateway into test mode.
+### Step 1: Build the real Cybersecurity Foundations course
 
-Do not complete the payment until the LearnWorlds payment gateway itself is confirmed in Sandbox or Test mode. A real `$99` checkout may otherwise create a real charge.
+Create and load the actual 2.5-hour course before performing any broader catalog rollout. Minimum required deliverables:
 
-## Acceptance sequence
+1. Five complete instructional modules.
+2. Substantive lesson content for every module.
+3. Video, narrated-slide, or equivalent media for approved lessons.
+4. Captions and transcripts.
+5. Practical scenarios and exercises.
+6. Module knowledge checks.
+7. A 25-question final assessment with an 80 percent passing threshold.
+8. Learner workbook and job aids.
+9. Source and reference register.
+10. Accessibility review.
+11. Certificate-completion rule.
+12. Owner review and approval.
 
-1. Grant the Vercel connector project access to `obserra-website-live` and retest project discovery.
-2. Correct the LearnWorlds school-owner or test-user email to `info@obserrallc.com`.
-3. Set LearnWorlds Contact, Support, and Sales email fields to `info@obserrallc.com`.
-4. Replace all `Driving Data` branding with the official Obserra identity.
-5. Confirm LearnWorlds Stripe Sandbox or Test mode.
-6. Verify the custom domain and HTTPS.
-7. Deploy the private LearnWorlds Admin Bridge and connect it as a private ChatGPT custom app.
-8. Run a read-only school, course, and product verification through the bridge.
-9. Redeploy the Preview branch with the confirmed environment values.
-10. Open the Preview Academy course page and start enrollment.
-11. Confirm the redirect reaches the governed LearnWorlds direct-checkout URL.
-12. Complete one sandbox purchase.
-13. Confirm the test learner exists under the intended business-controlled email.
-14. Confirm the learner receives enrollment and can open the course.
-15. Complete the assessment and verify certificate issuance.
-16. Record the complete evidence before changing the course mapping from `sandbox` to `published`.
+### Step 2: Remove LearnWorlds template content
 
-## Failure and prevention summary
+Replace all placeholder people, photographs, metrics, descriptions, footer copy, and unsupported claims with approved Obserra content.
 
-### Wrong email displayed at checkout
+### Step 3: Complete branding
 
-**Evidence:** `jblan006@icloud.com` appeared instead of `info@obserrallc.com`.
+Apply the official Obserra logo consistently to:
 
-**Root cause:** The active LearnWorlds browser session belonged to the personal-email user.
+- school header
+- topbar
+- footer
+- favicon
+- course thumbnail
+- checkout
+- purchase confirmation
+- invoice presentation where supported
+- learner account
+- certificate
 
-**Prevention:** Third-party user identity must be corrected in the authoritative identity system. Deployment variables do not overwrite a signed-in LearnWorlds profile.
+### Step 4: Align website commerce
 
-### Legacy branding displayed at checkout
+1. Update the public website to show the LearnWorlds-authoritative current offer.
+2. Route all Academy enrollment buttons to LearnWorlds.
+3. Disable or retire the legacy website Stripe Academy checkout after rollback and entitlement impact analysis.
+4. Preserve existing legitimate entitlements and payment records.
+5. Add automated price-parity and checkout-destination tests.
 
-**Evidence:** The checkout page displayed `Driving Data` in the topbar and footer.
+### Step 5: Complete the canary acceptance test
 
-**Prevention:** Production publication requires a visual acceptance gate covering school name, logo, favicon, colors, business email, product identity, price, footer, receipt, learner account, and certificate.
+The canary passes only when:
 
-### Obserra sandbox flag mistaken for payment sandbox
+1. The real course content is loaded.
+2. No template or placeholder content remains.
+3. Website and LearnWorlds pricing match.
+4. Branding is consistent across the complete journey.
+5. A Sandbox learner can buy, enroll, open, and complete the course.
+6. The final assessment works.
+7. The certificate is issued and displays correct business identity.
+8. No real charge occurs during Sandbox validation.
+9. Owner approval is recorded.
 
-**Evidence:** The route reached a priced payment page.
+### Step 6: Scale the catalog
 
-**Prevention:** Commercial acceptance requires separate proof of route sandbox state and payment-provider test state.
+Only after the canary passes should the remaining courses be built in controlled batches. Each batch must use the same content, accessibility, commerce, branding, assessment, certificate, and audit gates.
 
-### Vercel app installed without project visibility
+## Current blockers
 
-**Evidence:** The connector sees the Obserra team but returns zero projects and a 404 for `obserra-website-live`.
+1. No actual Cybersecurity Foundations course content is loaded in LearnWorlds.
+2. The public LearnWorlds page contains unsupported template content.
+3. The purchase-success footer still contains `Driving Data` branding.
+4. Course thumbnail and visual presentation are incomplete.
+5. Website and LearnWorlds prices are not aligned.
+6. A legacy website Stripe Academy path remains a commercial-risk concern.
+7. Assessment and certificate behavior have not been proven.
+8. Production publication and live-payment cutover are not authorized.
 
-**Root cause:** The app capability installation is present, but project-level OAuth scope is absent or incomplete.
+## Production boundary
 
-**Prevention:** Always verify `list_projects` and `get_project` through the connector before claiming Vercel project authority.
+Do not:
 
-## Truth boundary
+- merge pull request `#55` as a production cutover solely because checkout works
+- mark the canary `published`
+- disable Sandbox controls
+- represent the course as completed
+- sell the empty course shell to real customers
+- activate the remaining 60-course rollout
 
-The LearnWorlds checkout route is reached. The canonical email and canary mapping are governed in code. GitHub changes and CI inspection can be performed. The Vercel connector still lacks project access, and direct LearnWorlds UI control is not available in this chat. A sandbox transaction, enrollment, course access, assessment, and certificate have not yet been proven. Production cutover and pull-request merge remain blocked until those acceptance gates pass.
+until the actual course and full acceptance gates pass.
+
+## Resume command for a future chat
+
+Use this instruction verbatim:
+
+```text
+Read the current Obserra Academy handoff at docs/OBSERRA-ACADEMY-RESTART-HERE.md and docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Continue from the first incomplete action. Preserve all failures and update the handoff after every action.
+```
