@@ -17,11 +17,37 @@ test("LearnWorlds school identity is governed without secrets", () => {
   assert.doesNotMatch(JSON.stringify(configuration), /client[_-]?secret|access[_-]?token|stripe[_-]?secret/i);
 });
 
-test("LearnWorlds adapter validates HTTPS product mappings and fails closed", () => {
+test("Cybersecurity Foundations canary is mapped to the owner supplied LearnWorlds identifiers", () => {
+  const product = configuration.products.find((item) => item.courseId === "cybersecurity-foundations");
+  assert.ok(product, "Cybersecurity Foundations mapping is missing");
+  assert.equal(product.learnWorldsCourseId, "cybersecurity-foundations-for-new-professionals");
+  assert.equal(product.productId, "cybersecurity_foundations_for_new_professionals");
+  assert.equal(product.packageId, "package_6a7b2d3710387");
+  assert.equal(
+    product.publicUrl,
+    "https://obserraepillc.learnworlds.com/course/cybersecurity-foundations-for-new-professionals",
+  );
+  assert.equal(
+    product.checkoutUrl,
+    "https://obserraepillc.learnworlds.com/payment?product_id=cybersecurity-foundations-for-new-professionals&type=course&packageId=package_6a7b2d3710387",
+  );
+  assert.equal(
+    product.cartUrl,
+    "https://obserraepillc.learnworlds.com/cart?product_id=cybersecurity-foundations-for-new-professionals&type=course&packageId=package_6a7b2d3710387",
+  );
+  assert.equal(product.status, "sandbox");
+});
+
+test("LearnWorlds adapter locks checkout mappings to governed hosts and identifiers", () => {
   assert.match(adapter, /httpsUrl\(/);
+  assert.match(adapter, /requireAllowedHost\(/);
+  assert.match(adapter, /validateCommerceUrl\(/);
+  assert.match(adapter, /product_id/);
+  assert.match(adapter, /packageId/);
   assert.match(adapter, /Duplicate LearnWorlds mapping/);
   assert.match(adapter, /product\.status === "published"/);
   assert.match(adapter, /product\.status === "sandbox" && learnWorldsSandboxMode\(\)/);
+  assert.match(adapter, /product\.checkoutUrl/);
   assert.match(adapter, /return null/);
 });
 
