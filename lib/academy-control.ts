@@ -5,7 +5,7 @@ import type { Course } from "../app/academy/courseData";
 import type { KnowledgeCheck, LessonBrief } from "../app/academy/courseExperience";
 import {
   ACADEMY_OWNER_CONTROL_URL,
-  ACADEMY_PUBLIC_CATALOG_URL,
+  ACADEMY_PRIVATE_CATALOG_URL,
   defaultAcademyCourseControl,
   type AcademyCourseControl,
   type AcademyCourseDocument,
@@ -25,6 +25,9 @@ const LEVELS = new Set([
   "CISO Masterclass",
 ]);
 const MAX_OWNER_TOKEN_CHARS = 16_000;
+const MAX_SERVICE_ROLE_KEY_CHARS = 4_096;
+const PRIVATE_CATALOG_HOST = "nwxnyqlyzyufgoadtqxs.supabase.co";
+const PRIVATE_CATALOG_PATH = "/functions/v1/academy-public-catalog";
 
 export class AcademyControlError extends Error {
   constructor(
@@ -200,18 +203,88 @@ function isLessonBrief(value: unknown): value is LessonBrief {
   );
 }
 
-const loadPublicCatalog = cache(async (): Promise<AcademyPublicCatalogResponse> => {
-  const response = await fetch(ACADEMY_PUBLIC_CATALOG_URL, {
-    headers: { accept: "application/json" },
-    next: { revalidate: 10 },
+function academyServiceRoleKey() {
+  const value = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
+  if (
+    !value ||
+    value.length > MAX_SERVICE_ROLE_KEY_CHARS ||
+    /\s/.test(value) ||
+    value.split(".").length !== 3
+  ) {
+    throw new AcademyControlError(
+      "Academy private control credentials are unavailable.",
+      503,
+      "ACADEMY_CONTROL_CREDENTIALS_UNAVAILABLE",
+    );
+  }
+  return value;
+}
+
+function privateCatalogUrl(courseId?: string) {
+  const url = new URL(ACADEMY_PRIVATE_CATALOG_URL);
+  if (
+    url.protocol !== "https:" ||
+    url.username ||
+    url.password ||
+    url.port ||
+    url.hostname !== PRIVATE_CATALOG_HOST ||
+    url.pathname !== PRIVATE_CATALOG_PATH ||
+    url.search ||
+    url.hash
+  ) {
+    throw new AcademyControlError(
+      "Academy private control endpoint is invalid.",
+      500,
+      "ACADEMY_CONTROL_ENDPOINT_INVALID",
+    );
+  }
+  if (courseId) url.searchParams.set("courseId", courseId);
+  return url;
+}
+
+async function privateCatalogRequest<ResponseBody>(url: URL): Promise<ResponseBody> {
+  const serviceRoleKey = academyServiceRoleKey();
+  const response = await fetch(url, {
+    method: "GET",
+    cache: "no-store",
+    redirect: "error",
+    headers: {
+      accept: "application/json",
+      apikey: serviceRoleKey,
+      authorization: `Bearer ${serviceRoleKey}`,
+      "x-obserra-request-id": crypto.randomUUID(),
+    },
     signal: AbortSignal.timeout(8_000),
   });
-  const payload = await response.json().catch(() => null) as AcademyPublicCatalogResponse | null;
-  if (!response.ok || !payload || payload.schemaVersion !== "1.0") {
+  const payload = await response.json().catch(() => null) as (ResponseBody & {
+    error?: string;
+    code?: string;
+  }) | null;
+
+  if (!response.ok || !payload) {
     throw new AcademyControlError(
-      "Academy public control state is unavailable.",
+      "Academy private control state is unavailable.",
       response.status || 503,
-      "ACADEMY_CONTROL_UNAVAILABLE",
+      payload?.code ?? "ACADEMY_CONTROL_UNAVAILABLE",
+    );
+  }
+  return payload;
+}
+
+function reportControlFailure(context: string, error: unknown) {
+  const code = error instanceof AcademyControlError
+    ? error.code
+    : "UNEXPECTED_ACADEMY_CONTROL_FAILURE";
+  console.error(context, { code });
+}
+
+const loadPublicCatalog = cache(async (): Promise<AcademyPublicCatalogResponse> => {
+  const payload = await privateCatalogRequest<AcademyPublicCatalogResponse>(privateCatalogUrl());
+  if (payload.schemaVersion !== "1.0") {
+    throw new AcademyControlError(
+      "Academy private catalog response is invalid.",
+      502,
+      "INVALID_ACADEMY_CONTROL_RESPONSE",
     );
   }
   return payload;
@@ -222,17 +295,12 @@ const loadPublicCourse = cache(async (courseId: string): Promise<AcademyPublicCo
     throw new AcademyControlError("Invalid course identifier.", 400, "INVALID_COURSE_ID");
   }
 
-  const response = await fetch(`${ACADEMY_PUBLIC_CATALOG_URL}?courseId=${encodeURIComponent(courseId)}`, {
-    headers: { accept: "application/json" },
-    next: { revalidate: 10 },
-    signal: AbortSignal.timeout(8_000),
-  });
-  const payload = await response.json().catch(() => null) as AcademyPublicCourseResponse | null;
-  if (!response.ok || !payload || payload.schemaVersion !== "1.0") {
+  const payload = await privateCatalogRequest<AcademyPublicCourseResponse>(privateCatalogUrl(courseId));
+  if (payload.schemaVersion !== "1.0") {
     throw new AcademyControlError(
-      "Academy course control state is unavailable.",
-      response.status || 503,
-      "ACADEMY_CONTROL_UNAVAILABLE",
+      "Academy private course control response is invalid.",
+      502,
+      "INVALID_ACADEMY_CONTROL_RESPONSE",
     );
   }
   return payload;
@@ -301,9 +369,9 @@ export async function publicAcademyCatalog(baseCourses: readonly Course[]) {
       requestId: payload.requestId,
     };
   } catch (error) {
-    console.error("Academy public catalog control degraded", error);
+    reportControlFailure("Academy private catalog control degraded", error);
     return {
-      courses: [...baseCourses],
+      courses: [],
       controls: Object.fromEntries(baseCourses.map((course) => [
         course.id,
         defaultAcademyCourseControl(course.id),
@@ -327,9 +395,9 @@ export async function publicAcademyCourse(baseCourse: Course) {
       requestId: payload.requestId,
     };
   } catch (error) {
-    console.error(`Academy control degraded for ${baseCourse.id}`, error);
+    reportControlFailure(`Academy private control degraded for ${baseCourse.id}`, error);
     return {
-      course: baseCourse,
+      course: null,
       control: defaultAcademyCourseControl(baseCourse.id),
       controlPlane: "degraded" as const,
       requestId: null,
