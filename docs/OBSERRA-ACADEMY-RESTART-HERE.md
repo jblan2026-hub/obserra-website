@@ -16,18 +16,19 @@ Every future session must read these files before making recommendations or chan
 2. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`
 3. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT.md`
 4. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT-ADDENDUM-CANARY-PURCHASE-EMPTY-COURSE.md`
-5. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE.md`
-6. Pull request `#55`
+5. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-COURSE-OUTLINE-READY-FOR-IMPORT.md`
+6. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-ASSESSMENT-IMPORT-FIX-v2.0.1.md`
+7. Pull request `#55`
 
 Use this exact continuation instruction:
 
 ```text
-Read docs/OBSERRA-ACADEMY-RESTART-HERE.md, docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md, docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT.md, and docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT-ADDENDUM-CANARY-PURCHASE-EMPTY-COURSE.md on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Continue from the first incomplete action. Preserve all failures and update the handoff after every action.
+Read docs/OBSERRA-ACADEMY-RESTART-HERE.md, docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md, docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT.md, docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT-ADDENDUM-CANARY-PURCHASE-EMPTY-COURSE.md, docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-COURSE-OUTLINE-READY-FOR-IMPORT.md, and docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-ASSESSMENT-IMPORT-FIX-v2.0.1.md on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Continue from the first incomplete action. Preserve every failure and update the handoff after every action.
 ```
 
 ## Executive truth
 
-The commercial plumbing works in LearnWorlds Sandbox, but the course product does not yet exist.
+The commercial plumbing works in LearnWorlds Sandbox. The complete instructional package exists as versioned files, but the course has not yet been loaded into LearnWorlds.
 
 ```text
 LearnWorlds Sandbox checkout: passed
@@ -35,19 +36,20 @@ Sandbox purchase: passed
 Invoice generation: passed
 Learner enrollment: passed
 Course shell opens: passed
-Actual course content loaded: failed
-Assessment: blocked
+Five governed SCORM packages built: passed
+Final-assessment source built: passed
+Five LearnWorlds sections named: passed
+SCORM activities loaded in LearnWorlds: not proven
+Final-assessment section created: not proven
+Original exam workbook upload: failed
+Corrected exam workbook v2.0.1 built: passed
+Corrected exam workbook imported: not proven
+Assessment configuration: blocked
 Certificate: blocked
 Production-ready course: no
 ```
 
-The LearnWorlds course player displayed:
-
-```text
-No contents yet for this course!
-```
-
-The owner confirmed that the course was never built. No response may describe Cybersecurity Foundations as complete, published, usable, or commercially ready until the actual content and completion gates pass.
+No response may describe Cybersecurity Foundations as published, usable, commercially ready, or complete until the LearnWorlds activities, assessment, completion rules, certificate, branding, and owner acceptance are proven.
 
 ## Approved architecture
 
@@ -62,9 +64,9 @@ Obserra website
 -> reporting
 ```
 
-LearnWorlds is the authoritative LMS and Academy checkout platform. The old local worker farm and custom Windows controller are not the approved commercial production path.
+LearnWorlds is the authoritative LMS and Academy checkout platform. The retired local worker farm and custom Windows controller are not the approved commercial production path.
 
-## LearnWorlds account
+## LearnWorlds account and canary
 
 ```text
 School: Obserra EPI Academy
@@ -73,11 +75,7 @@ School URL: https://obserraepillc.learnworlds.com
 API URL: https://obserraepillc.learnworlds.com/admin/api/
 Preferred custom domain: https://academy.obserrallc.com
 Business email: info@obserrallc.com
-```
 
-## Canary mapping
-
-```text
 Obserra course ID: cybersecurity-foundations
 LearnWorlds course ID: cybersecurity-foundations-for-new-professionals
 Store product ID: cybersecurity_foundations_for_new_professionals
@@ -90,68 +88,100 @@ Discount: $50
 
 ## Proven evidence
 
-Owner-supplied screenshots proved:
+Owner-supplied screenshots prove:
 
 1. Correct LearnWorlds Sandbox checkout.
 2. Correct business email at checkout.
 3. Correct canary product.
 4. Explicit Sandbox card fields.
 5. Successful purchase confirmation.
-6. Invoice `INV-00001` showing the course, business identity, $149 list price, $50 discount, and $99 total.
+6. Invoice `INV-00001` showing $149 list price, $50 discount, and $99 total.
 7. Learner access to the course shell.
-8. Empty course player with no contents.
+8. The original player contained no content.
+9. The Course outline now contains five correctly named Draft sections:
+   - Security and Business Risk
+   - Identity, Access, and Authentication
+   - Threat Recognition and Safe Response
+   - Incident Reporting and Evidence Preservation
+   - Secure Habits and Continuous Improvement
+10. No activity was visible inside those sections in the latest screenshot.
+11. The sixth section, `Final Assessment and Completion`, was not visible.
+12. The owner reported that the exam spreadsheet did not upload.
 
-## Current defects
+## Current import package
 
-1. No instructional course content exists in LearnWorlds.
-2. Public LearnWorlds sales page still contains stock people, placeholder copy, and unsupported metrics.
-3. Purchase-success footer still contains `Driving Data` branding and unrelated copy.
-4. Course images and thumbnails are blank.
-5. Website displays `$149` only while LearnWorlds uses a `$99` special offer.
-6. A legacy direct Stripe checkout was observed with `ZenBusiness` branding, personal email, and a `$149` charge.
-7. The old Stripe route must be traced and disabled for the mapped course before production cutover.
-8. Assessment and certificate behavior cannot be tested until a real course is loaded.
+Use this package, not the superseded v2.0.0 package:
+
+```text
+Obserra-Cybersecurity-Foundations-LearnWorlds-Import-v2.0.1.zip
+```
+
+Primary assessment workbook:
+
+```text
+learnworlds-upload/exam_Cybersecurity_Foundations_Final_Assessment-v2.0.1.xlsx
+```
+
+Fallback data-only workbook:
+
+```text
+admin/LearnWorlds-Questions-Data-Only-v2.0.1.xlsx
+```
+
+The corrected workbook has three tabs, 25 questions, exact published column headings, letter-based groups, `TMC` types, 1-based correct answers, and no formulas, macros, tables, merged cells, external links, or auto-filters.
+
+## Exact next action
+
+1. Add a sixth Draft section named `Final Assessment and Completion`.
+2. Under that section select `Add activity`.
+3. Create an `Exam` named `Cybersecurity Foundations Final Assessment`.
+4. Select `Save and Edit`.
+5. Inside the Exam editor select `Add/Import` -> `Import Questions` -> `From XLS`.
+6. Upload `exam_Cybersecurity_Foundations_Final_Assessment-v2.0.1.xlsx`.
+7. Confirm that 25 questions are visible.
+8. Set passing score to 80 percent and keep attempts controlled.
+9. If LearnWorlds rejects the corrected workbook, download the current template from that exact import dialog and copy the 25 data rows from `LearnWorlds-Questions-Data-Only-v2.0.1.xlsx` into its unchanged `Questions` tab.
+10. Load and launch-test the five numbered SCORM ZIPs, one per matching module section.
+11. Keep the course private and in Sandbox.
+
+## Current defects and preserved failures
+
+1. The course is not yet proven to contain any visible LearnWorlds activities.
+2. The final assessment is not yet imported or configured.
+3. The public LearnWorlds sales page contains placeholder and unsupported template content.
+4. The purchase-success footer previously contained `Driving Data` branding.
+5. Course images and thumbnails require acceptance.
+6. Website and LearnWorlds pricing previously conflicted.
+7. A legacy direct Stripe checkout displayed ZenBusiness branding, a personal email, and a $149 charge.
+8. The legacy website Stripe route must not remain a canary purchase path after controlled cutover.
 9. Custom-domain and HTTPS acceptance are not yet proven.
-10. Vercel ChatGPT connector access still returns zero projects and a 404 for `obserra-website-live`.
-
-## Immediate build order
-
-1. Build the complete five-module, approximately 2.5-hour Cybersecurity Foundations course.
-2. Produce module activities, scenarios, knowledge checks, transcripts, workbook, source register, and accessibility evidence.
-3. Produce and configure the governed 25-question final assessment with an 80 percent passing threshold.
-4. Configure the Obserra certificate and completion rules.
-5. Remove all LearnWorlds placeholder content and unsupported claims.
-6. Complete Obserra branding across checkout, success, footer, learner account, course, email, invoice where supported, and certificate.
-7. Align website pricing to `$149` list and `$99` launch offer.
-8. Route every canary CTA to LearnWorlds and disable the legacy website Stripe route after impact analysis.
-9. Repeat the full Sandbox test through course completion and certificate issuance.
-10. Scale the remaining catalog only after the canary passes.
+10. Direct ChatGPT Vercel project authority remains unavailable, but GitHub-to-Vercel deployment works.
+11. A purchasable empty course shell existed before instructional content was loaded.
+12. The original assessment workbook did not upload and is superseded by v2.0.1.
 
 ## Non-negotiable production blockers
 
 Do not merge or cut over production until:
 
-- the complete course is loaded
-- no placeholder content remains
-- branding is consistent
+- all five SCORM activities are loaded and launch successfully
+- the final Exam contains exactly 25 verified questions
+- the passing score is 80 percent
+- completion rules work
+- the certificate is issued correctly
+- no placeholder or legacy branding remains
 - website and LearnWorlds pricing match
-- the legacy Stripe path is disabled for the course
-- learner completes the real course
-- final assessment works
-- certificate is issued correctly
+- the legacy Stripe canary route is blocked or retired with entitlement preservation
+- a Sandbox learner completes the full real course
 - owner approval is documented
 
 ## Vercel connector status
 
-Latest retest on 2026-08-11:
-
 ```text
 Obserra team visible: yes
 Team ID: team_xpUE1GefY2JHuFFCqbAdnZAj
-Projects returned by team ID: 0
-Projects returned by team slug: 0
+Projects returned by ChatGPT Vercel connector: 0
 Direct get_project(obserra-website-live): 404 Not Found
 Direct ChatGPT Vercel project authority: not established
 ```
 
-This does not block GitHub-based implementation or existing Git-to-Vercel deployments. Do not spend more owner time on the unrelated Vercel Connect token-resource screen.
+This does not block repository implementation, pull-request CI, or existing Git-to-Vercel deployments.
