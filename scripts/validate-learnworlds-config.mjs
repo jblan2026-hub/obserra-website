@@ -43,11 +43,14 @@ if (configuration.schoolId !== "6a7a693d353feb69c94c7654") findings.push("school
 if (configuration.schoolName !== "Obserra EPI Academy") findings.push("school-name:mismatch");
 const schoolUrl = httpsUrl(configuration.schoolUrl, "school-url");
 const authorDashboardUrl = httpsUrl(configuration.authorDashboardUrl, "author-dashboard-url");
+const apiUrl = httpsUrl(configuration.apiUrl, "api-url");
 const customDomain = httpsUrl(configuration.customDomain, "custom-domain");
 const allowedHosts = new Set(
   [schoolUrl?.hostname, customDomain?.hostname].filter(Boolean).map((host) => host.toLowerCase()),
 );
 requireAllowedHost(authorDashboardUrl, allowedHosts, "author-dashboard-url");
+requireAllowedHost(apiUrl, allowedHosts, "api-url");
+if (apiUrl && normalizedPath(apiUrl) !== "/admin/api") findings.push("api-url:invalid-path");
 
 const products = Array.isArray(configuration.products) ? configuration.products : [];
 if (!Array.isArray(configuration.products)) findings.push("products:not-array");
@@ -113,6 +116,7 @@ console.log(JSON.stringify({
   passed: true,
   path,
   schoolId: configuration.schoolId,
+  apiUrl: configuration.apiUrl,
   mappedProducts: products.length,
   sandboxProducts: products.filter((product) => product.status === "sandbox").length,
   publishedProducts: products.filter((product) => product.status === "published").length,
