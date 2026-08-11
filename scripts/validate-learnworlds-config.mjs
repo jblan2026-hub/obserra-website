@@ -6,6 +6,7 @@ const findings = [];
 const courseIdPattern = /^[a-z0-9][a-z0-9-]{1,120}$/;
 const productIdPattern = /^[a-zA-Z0-9._:-]{2,200}$/;
 const packageIdPattern = /^package_[a-zA-Z0-9._:-]{4,200}$/;
+const canonicalContactEmail = "info@obserrallc.com";
 
 function httpsUrl(value, label) {
   try {
@@ -41,6 +42,9 @@ function validateCommerceUrl(url, expectedPath, courseId, packageId, prefix) {
 if (configuration.schemaVersion !== "1.0") findings.push("schema-version:unsupported");
 if (configuration.schoolId !== "6a7a693d353feb69c94c7654") findings.push("school-id:mismatch");
 if (configuration.schoolName !== "Obserra EPI Academy") findings.push("school-name:mismatch");
+if (String(configuration.contactEmail ?? "").trim().toLowerCase() !== canonicalContactEmail) {
+  findings.push("contact-email:mismatch");
+}
 const schoolUrl = httpsUrl(configuration.schoolUrl, "school-url");
 const authorDashboardUrl = httpsUrl(configuration.authorDashboardUrl, "author-dashboard-url");
 const apiUrl = httpsUrl(configuration.apiUrl, "api-url");
@@ -97,6 +101,9 @@ if (!canary) findings.push("canary:mapping-missing");
 else if (!["sandbox", "published"].includes(canary.status)) findings.push("canary:not-routable");
 
 const serialized = JSON.stringify(configuration);
+if (/jblan006@icloud\.com/i.test(serialized) || /@icloud\.com/i.test(serialized)) {
+  findings.push("contact-email:consumer-address-prohibited");
+}
 for (const marker of [
   /client[_-]?secret/i,
   /access[_-]?token/i,
@@ -116,6 +123,7 @@ console.log(JSON.stringify({
   passed: true,
   path,
   schoolId: configuration.schoolId,
+  contactEmail: configuration.contactEmail,
   apiUrl: configuration.apiUrl,
   mappedProducts: products.length,
   sandboxProducts: products.filter((product) => product.status === "sandbox").length,
