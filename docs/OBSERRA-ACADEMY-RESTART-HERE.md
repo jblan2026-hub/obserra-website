@@ -10,61 +10,65 @@
 
 ## Mandatory restart instruction
 
-Every future session must read these files before making recommendations or changes:
+Every future session must read these sources before making recommendations or changes:
 
 1. `docs/OBSERRA-ACADEMY-RESTART-HERE.md`
 2. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`
-3. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT.md`
-4. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT-ADDENDUM-CANARY-PURCHASE-EMPTY-COURSE.md`
-5. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-COURSE-OUTLINE-READY-FOR-IMPORT.md`
-6. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-ASSESSMENT-IMPORT-FIX-v2.0.1.md`
-7. Pull request `#55`
+3. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-CINEMATIC-ENTERPRISE-STANDARD.md`
+4. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-LEARNER-DASHBOARD-COURSE-SHELLS.md`
+5. `docs/academy-media-pipeline/ACTIVITY-LEDGER.md`
+6. `docs/academy-media-pipeline/FAILURE-REGISTER.md`
+7. `docs/academy-media-pipeline/OBSERRA-CINEMATIC-FORTUNE-500-PRODUCTION-STANDARD.md`
+8. `docs/academy-media-pipeline/canary/HEYGEN-15-SECOND-LIKENESS-CANARY.md`
+9. `docs/academy-media-pipeline/canary/CYBERSECURITY-FOUNDATIONS-PRODUCTION-PACK.md`
+10. Pull request `#55`
 
-Use this exact continuation instruction:
+Use this continuation instruction:
 
 ```text
-Read docs/OBSERRA-ACADEMY-RESTART-HERE.md, docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md, docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT.md, docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT-ADDENDUM-CANARY-PURCHASE-EMPTY-COURSE.md, docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-COURSE-OUTLINE-READY-FOR-IMPORT.md, and docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-ASSESSMENT-IMPORT-FIX-v2.0.1.md on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Continue from the first incomplete action. Preserve every failure and update the handoff after every action.
+Read docs/OBSERRA-ACADEMY-RESTART-HERE.md and docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md first on branch feature/learnworlds-commercial-pipeline in jblan2026-hub/obserra-website. Then read the cinematic handoff addendum, learner shell addendum, activity ledger, failure register, cinematic production standard, HeyGen likeness canary, Cybersecurity Foundations production pack, and pull request 55. Continue from the first incomplete action. Record every action and every failure immediately.
 ```
 
 ## Executive truth
 
-The commercial plumbing works in LearnWorlds Sandbox. The complete instructional package exists as versioned files, but the course has not yet been loaded into LearnWorlds.
+The commercial Sandbox plumbing works. Learner dashboard course shells and the cinematic production system are implemented on the working branch. The owner is still refining the authorized HeyGen avatar and voice. The complete course has not passed the cinematic media, LearnWorlds playback, assessment, certificate, and learner acceptance gates.
 
 ```text
 LearnWorlds Sandbox checkout: passed
 Sandbox purchase: passed
 Invoice generation: passed
 Learner enrollment: passed
-Course shell opens: passed
-Five governed SCORM packages built: passed
-Final-assessment source built: passed
-Five LearnWorlds sections named: passed
-SCORM activities loaded in LearnWorlds: not proven
-Final-assessment section created: not proven
-Original exam workbook upload: failed
-Corrected exam workbook v2.0.1 built: passed
-Corrected exam workbook imported: not proven
-Assessment configuration: blocked
-Certificate: blocked
-Production-ready course: no
+LearnWorlds canary shell opens: passed
+Authenticated website learner shells: implemented
+Cinematic production standard: implemented
+Same quality standard across all courses: implemented
+HeyGen avatar and voice: owner refining
+15 second likeness canary: not yet accepted
+Full Cybersecurity Foundations cinematic media: not yet accepted
+Five LearnWorlds module experiences loaded and validated: not proven
+Final assessment: not proven
+Certificate: not proven
+Remaining LearnWorlds shells: not yet proven uploaded
+Pull request merged: no
+Production ready course: no
 ```
 
-No response may describe Cybersecurity Foundations as published, usable, commercially ready, or complete until the LearnWorlds activities, assessment, completion rules, certificate, branding, and owner acceptance are proven.
+No response may describe Cybersecurity Foundations or the Academy catalog as published, usable, commercially ready, complete, or transferred into LearnWorlds until the corresponding evidence passes.
 
 ## Approved architecture
 
 ```text
 Obserra website
--> marketing, search, catalog, and sales discovery
+-> marketing, search, catalog, learner dashboard shells, and sales discovery
 -> governed LearnWorlds checkout
 -> LearnWorlds learner identity and enrollment
--> LearnWorlds course delivery
+-> LearnWorlds video and course delivery
 -> assessment
 -> certificate
 -> reporting
 ```
 
-LearnWorlds is the authoritative LMS and Academy checkout platform. The retired local worker farm and custom Windows controller are not the approved commercial production path.
+HeyGen is the authoritative presenter layer. Pollo AI is the cinematic visual layer. LearnWorlds is the authoritative LMS, learner delivery, assessment, certificate, and reporting system. The retired local worker farm and custom Windows controller are not the approved commercial production path.
 
 ## LearnWorlds account and canary
 
@@ -86,102 +90,109 @@ Sandbox launch offer: $99
 Discount: $50
 ```
 
-## Proven evidence
+## Current learner shell implementation
 
-Owner-supplied screenshots prove:
+The protected `/portal` route displays every governed website Academy shell.
 
-1. Correct LearnWorlds Sandbox checkout.
-2. Correct business email at checkout.
-3. Correct canary product.
-4. Explicit Sandbox card fields.
-5. Successful purchase confirmation.
-6. Invoice `INV-00001` showing $149 list price, $50 discount, and $99 total.
-7. Learner access to the course shell.
-8. The original player contained no content.
-9. The Course outline now contains five correctly named Draft sections:
-   - Security and Business Risk
-   - Identity, Access, and Authentication
-   - Threat Recognition and Safe Response
-   - Incident Reporting and Evidence Preservation
-   - Secure Habits and Continuous Improvement
-10. No activity was visible inside those sections in the latest screenshot.
-11. The sixth section, `Final Assessment and Completion`, was not visible.
-12. The owner reported that the exam spreadsheet did not upload.
-
-## Current import package
-
-Use this package, not the superseded v2.0.0 package:
+Status resolution:
 
 ```text
-Obserra-Cybersecurity-Foundations-LearnWorlds-Import-v2.0.1.zip
+Verified Clerk entitlement -> Enrolled
+Published LearnWorlds mapping -> Available
+Sandbox LearnWorlds mapping -> Pilot shell
+No released mapping -> In production
 ```
 
-Primary assessment workbook:
+The shell dashboard contains no direct checkout and does not create enrollment, unlock lessons, mark completion, or prove publication.
+
+## Current cinematic production standard
 
 ```text
-learnworlds-upload/exam_Cybersecurity_Foundations_Final_Assessment-v2.0.1.xlsx
+Standard ID: obserra-cinematic-enterprise-v1
+HeyGen assets per course: 7
+Pollo assets per course: 10
+Total assets per course: 17
+Current 60 course portfolio target: 1020 assets
+Minimum finished video per course: 27 minutes
+Target finished video per course: approximately 37 minutes
+Maximum uninterrupted avatar segment: 20 seconds
+Minimum module anchor films per course: 5
+Minimum module visual packs per course: 5
+Minimum master: 1920 by 1080
+Audio: 48 kHz
+Release score: no category below 4 and average at least 4.5
 ```
 
-Fallback data-only workbook:
+The owner rejected robotic, static, low quality presentation. Every course must use the same cinematic enterprise standard regardless of tier.
 
-```text
-admin/LearnWorlds-Questions-Data-Only-v2.0.1.xlsx
-```
+## Exact next actions
 
-The corrected workbook has three tabs, 25 questions, exact published column headings, letter-based groups, `TMC` types, 1-based correct answers, and no formulas, macros, tables, merged cells, external links, or auto-filters.
+1. Finish the authorized HeyGen avatar and voice.
+2. Render the 15 second likeness canary.
+3. Review likeness, voice, pronunciation, lip sync, eye contact, blinking, gestures, and audio.
+4. Record owner approval or repair only the smallest defective layer.
+5. Produce the Cybersecurity Foundations 75 second cinematic welcome using the timed scene plan.
+6. Produce five module anchor films and five Pollo module visual packs.
+7. Load approved media into LearnWorlds with captions, transcript, thumbnail, chapters, knowledge checks, and completion rules.
+8. Import the 25 question final assessment and set the passing score to 80 percent.
+9. Validate desktop and mobile playback, Sandbox learner completion, assessment, and certificate.
+10. Re-run current-head CI.
+11. Obtain explicit owner approval.
+12. Merge pull request 55.
+13. Verify production deployment.
+14. Create or transfer remaining LearnWorlds Draft shells from the validated master template.
+15. Build and publish remaining courses only after course-specific acceptance.
 
-## Exact next action
+## Current preserved defects and failures
 
-1. Add a sixth Draft section named `Final Assessment and Completion`.
-2. Under that section select `Add activity`.
-3. Create an `Exam` named `Cybersecurity Foundations Final Assessment`.
-4. Select `Save and Edit`.
-5. Inside the Exam editor select `Add/Import` -> `Import Questions` -> `From XLS`.
-6. Upload `exam_Cybersecurity_Foundations_Final_Assessment-v2.0.1.xlsx`.
-7. Confirm that 25 questions are visible.
-8. Set passing score to 80 percent and keep attempts controlled.
-9. If LearnWorlds rejects the corrected workbook, download the current template from that exact import dialog and copy the 25 data rows from `LearnWorlds-Questions-Data-Only-v2.0.1.xlsx` into its unchanged `Questions` tab.
-10. Load and launch-test the five numbered SCORM ZIPs, one per matching module section.
-11. Keep the course private and in Sandbox.
-
-## Current defects and preserved failures
-
-1. The course is not yet proven to contain any visible LearnWorlds activities.
-2. The final assessment is not yet imported or configured.
-3. The public LearnWorlds sales page contains placeholder and unsupported template content.
+1. The canary course is not yet proven to contain all approved LearnWorlds learning activities.
+2. The final assessment and certificate remain unproven.
+3. The public LearnWorlds page previously contained placeholder and unsupported template content.
 4. The purchase-success footer previously contained `Driving Data` branding.
 5. Course images and thumbnails require acceptance.
-6. Website and LearnWorlds pricing previously conflicted.
-7. A legacy direct Stripe checkout displayed ZenBusiness branding, a personal email, and a $149 charge.
-8. The legacy website Stripe route must not remain a canary purchase path after controlled cutover.
-9. Custom-domain and HTTPS acceptance are not yet proven.
-10. Direct ChatGPT Vercel project authority remains unavailable, but GitHub-to-Vercel deployment works.
-11. A purchasable empty course shell existed before instructional content was loaded.
-12. The original assessment workbook did not upload and is superseded by v2.0.1.
+6. Website and LearnWorlds pricing require final parity validation.
+7. A legacy direct Stripe checkout remains a rollback and commercial-risk concern.
+8. Custom-domain and HTTPS acceptance are not yet proven.
+9. The prior PMP video style was rejected as robotic and below the new standard.
+10. Direct repository clone was unavailable in the build environment.
+11. One dependency drift was corrected.
+12. One pull-request metadata call used an invalid same-repository option and was corrected.
+13. One Vercel scope remains inaccessible for root-cause inspection.
+14. Intermediate CI runs cancelled by later commits are not passing evidence.
+15. A secret-boundary test inspected implementation source instead of response shape and was corrected.
+16. A cinematic configuration update used a stale blob SHA and was corrected.
+17. A cinematic test create action targeted an existing path and was corrected.
 
-## Non-negotiable production blockers
+Read `docs/academy-media-pipeline/FAILURE-REGISTER.md` for the complete evidence, impact, correction, and prevention rule for every failure.
 
-Do not merge or cut over production until:
+## Non-negotiable merge and publication blockers
 
-- all five SCORM activities are loaded and launch successfully
-- the final Exam contains exactly 25 verified questions
-- the passing score is 80 percent
-- completion rules work
-- the certificate is issued correctly
-- no placeholder or legacy branding remains
-- website and LearnWorlds pricing match
-- the legacy Stripe canary route is blocked or retired with entitlement preservation
-- a Sandbox learner completes the full real course
-- owner approval is documented
+Do not merge, cut over production, upload remaining LearnWorlds shells as released products, or publish courses until:
 
-## Vercel connector status
+1. Current-head CI passes.
+2. The 15 second likeness canary passes.
+3. The complete Cybersecurity Foundations cinematic media package passes.
+4. All five module experiences work in LearnWorlds.
+5. Captions, transcripts, thumbnails, chapters, and knowledge checks are complete.
+6. The final assessment contains exactly 25 verified questions.
+7. The passing score is 80 percent.
+8. Completion rules work.
+9. The certificate is issued correctly.
+10. No placeholder or legacy branding remains.
+11. Website and LearnWorlds pricing match.
+12. The legacy Stripe canary route is blocked or retired with entitlement preservation.
+13. A Sandbox learner completes the full course.
+14. The master LearnWorlds shell template is validated.
+15. Explicit owner approval is documented.
+
+## Continuous audit rule
+
+After every action, update:
 
 ```text
-Obserra team visible: yes
-Team ID: team_xpUE1GefY2JHuFFCqbAdnZAj
-Projects returned by ChatGPT Vercel connector: 0
-Direct get_project(obserra-website-live): 404 Not Found
-Direct ChatGPT Vercel project authority: not established
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md
+docs/academy-media-pipeline/ACTIVITY-LEDGER.md
+docs/academy-media-pipeline/FAILURE-REGISTER.md
 ```
 
-This does not block repository implementation, pull-request CI, or existing Git-to-Vercel deployments.
+Record failed actions immediately. Do not wait until the end of a session.
