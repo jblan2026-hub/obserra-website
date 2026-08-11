@@ -4,6 +4,7 @@
   "schoolName": "Obserra EPI Academy",
   "schoolUrl": "https://obserraepillc.learnworlds.com",
   "authorDashboardUrl": "https://obserraepillc.learnworlds.com/author/dashboard",
+  "apiUrl": "https://obserraepillc.learnworlds.com/admin/api/",
   "customDomain": "https://academy.obserrallc.com",
   "domainStatus": "cname-created-pending-learnworlds-verification",
   "stripeStatus": "connected-sandbox-validation-required",
