@@ -1,72 +1,67 @@
-# LearnWorlds Continuous Handoff Addendum: Owner Moved Rejected Project to Trash
+# Superseded Record: Incorrect Claim That Rejected HeyGen Project Was Moved to Trash
 
-**Date:** 2026-08-12  
+**Date corrected:** 2026-08-12  
 **Branch:** `feature/learnworlds-commercial-pipeline`  
 **Pull request:** `#55`  
 **Course:** Cybersecurity Foundations for New Professionals  
-**Publication:** Not authorized
+**Publication:** Not authorized  
+**Status:** SUPERSEDED AND NOT AUTHORITATIVE
 
-## Owner-confirmed current HeyGen state
+The filename is retained only to preserve the audit trail. Its former assertion that the owner moved the rejected project to Trash was incorrect.
 
-The owner supplied a current HeyGen My Projects screenshot. It shows exactly two approved projects:
+## Correct screenshot evidence
 
-1. `Professional man speaking to camera` - Video Upscaler - controlled project reference `9cde7d534d2c4332bd30c5e587a88003`.
-2. `Confident_Cybersecurity_Leadership` - Speech Cleanup - controlled video reference `ae7539dc419c4b89971ba6d092452a55`.
-
-The owner confirms that both approved projects contain his exact face and exact voice.
-
-The rejected wrong-person `Owner Review Video` project was moved to Trash by the owner. It is absent from the current My Projects screenshot.
-
-## Exact truth boundary
+The owner-supplied HeyGen My Projects screenshot with SHA-256:
 
 ```text
-Owner moved rejected project to Trash: yes
-Rejected project visible in current My Projects screenshot: no
-Approved projects visible in current My Projects screenshot: exactly two
-Permanent deletion or provider purge from Trash: not independently verified
-Deletion or purge performed by this assistant: no
-Rejected project authorized for any use: no
-Approved owner projects preserved: yes
+68316b82e22f922fe27a2019babb64965d9e0d69a8c908c4e5c898f434291d13
 ```
 
-Do not describe the rejected project as permanently purged unless the provider or a later owner action directly verifies permanent deletion from Trash. A connector 404, an absent list result, or the absence of the card from My Projects is not sufficient proof of permanent purge.
+shows three visible project cards:
 
-## Sole approved owner attribution
+1. `Owner Review Video` - rejected wrong-person Video Agent project or session card - still visible.
+2. `Professional man speaking to camera.` - owner-approved exact-face and exact-voice project.
+3. `Confident_Cybersecurity_Leadership` - owner-approved exact-face and exact-voice project.
+
+The screenshot does not show the rejected project in Trash and does not show only two projects.
+
+## Exact provider state
+
+```text
+Incorrect underlying generated video record: deleted
+Incorrect underlying video retrievable: no
+Associated Owner Review Video project or session card visible in My Projects: yes
+Project or session card moved to Trash: no evidence
+Project or session card deleted: no
+Only two approved projects remain visible: no
+Approved owner sources preserved: yes
+```
+
+The connected HeyGen tool surface does not expose a delete-project or delete-session action. Removal of the visible rejected card is therefore incomplete and must not be claimed.
+
+## Nonnegotiable owner and business identity
 
 ```text
 Dr. Jody Blanchard
 Founder and CEO
 OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-www.obserrallc.com
-```
-
-No alternate or additional title is authorized. Current employer names, former employer names, employer logos, outside job titles, and employment history are prohibited from every learner-facing Academy and LearnWorlds artifact.
-
-The owner resume is internal factual grounding only. It does not override this rule.
-
-## Registered business identity
-
-```text
 Academy: Obserra EPI Academy
 Short business name: Obserra EPI
 EPI: Executive Protection & Intelligence
-Legal company: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-Website: https://www.obserrallc.com
+Official website: https://www.obserrallc.com
 ```
 
-The registered names, official logo, website, and approved colors may not change.
+No alternate title, additional title, employer name, employer logo, employment history, wrong company, wrong owner, or substitute face or voice is authorized.
 
-## Credit-control rule
+## Authoritative sources
 
-No additional HeyGen owner-video credit may be spent until:
+Use these records instead of the former contents of this file:
 
-1. the deterministic exact owner face path is proven;
-2. the deterministic exact owner voice path is proven;
-3. the course-specific script is frozen;
-4. the official title card, logo treatment, and lower third are frozen;
-5. the owner explicitly authorizes one controlled review render;
-6. unconstrained presenter substitution is technically prevented.
+```text
+docs/academy-media-pipeline/LATEST-HANDOFF.md
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-REGISTERED-BRAND-LOCK.md
+docs/academy-media-pipeline/OWNER-IDENTITY-ATTRIBUTION-ACTIVITY-ADDENDUM.md
+docs/academy-media-pipeline/OWNER-IDENTITY-ATTRIBUTION-FAILURE-ADDENDUM.md
+```
 
-## First-course continuation
-
-Rebuild the complete Cybersecurity Foundations course package under the corrected identity, title, no-employer, registered-brand, authoritative-resource, native-activity, assessment, completion, and accessibility rules. Load it into the existing LearnWorlds Draft course through an authenticated supported path and obtain owner review before any additional course production.
+No additional owner-video generation or credit expenditure is authorized until the exact deterministic owner avatar or source path and exact owner voice path are proven and Dr. Jody Blanchard explicitly authorizes one controlled render.
