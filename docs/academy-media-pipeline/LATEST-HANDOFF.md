@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Continuation Notice v12.1.0
+# Obserra EPI Academy Public Continuation Notice v12.2.0
 
 Owner and presenter: Dr. Jody Blanchard
 
@@ -14,11 +14,15 @@ EPI meaning: Executive Protection & Intelligence
 
 Official website: https://www.obserrallc.com
 
-Status: The authoritative handoff is v12.1.0. The validated first-course package is `Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Review-v4.1.0.zip`. The course remains Draft. Authenticated LearnWorlds loading, exact-owner media acceptance, learner-journey validation, and owner approval remain incomplete. Publication and production release are not authorized.
+Status: The authoritative handoff is v12.2.0. The validated first-course package is `Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Review-v4.1.0.zip`. The course remains Draft. Authenticated LearnWorlds loading, exact-owner media acceptance, learner-journey validation, and owner approval remain incomplete. Publication and production release are not authorized.
+
+## Standing owner directive
+
+Continue work in this first-course priority without drifting to unrelated work. Update the protected and sanitized handoff documents after every substantive action, decision, validation result, failure, provider-state change, package change, or owner approval. This directive remains in force until Dr. Jody Blanchard explicitly changes the priority.
 
 ## Authority and supersession
 
-This v12.1.0 continuation notice supersedes earlier current-state statements that identified the v3.0.0 package as the active course package, authorized parallel production of additional courses, or treated a provider-completed render as accepted owner media.
+This v12.2.0 continuation notice supersedes earlier current-state statements that identified the v3.0.0 package as the active course package, authorized parallel production of additional courses, or treated a provider-completed render as accepted owner media.
 
 Historical records remain preserved for audit. They do not override this current state.
 
