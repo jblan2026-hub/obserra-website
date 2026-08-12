@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "standardId": "obserra-cinematic-enterprise-v1",
-  "standardName": "Obserra Cinematic Enterprise Learning Standard",
+  "standardName": "Obserra EPI Academy Cinematic Enterprise Learning Standard",
   "qualityClass": "cinematic-enterprise",
   "appliesTo": {
     "allAcademyCourses": true,
@@ -12,16 +12,31 @@
   },
   "intent": {
     "targetExperience": "Cinematic executive learning with realistic human delivery, Fortune 500 presentation discipline, and film-quality visual storytelling.",
-    "comparisonBoundary": "The standard uses cinematic craft and executive communication quality as design targets. It does not claim affiliation with a film studio, production company, or Fortune 500 company.",
-    "primaryFailureToPrevent": "Robotic avatar delivery, static presenter footage, generic stock montage, weak audio, repetitive scenes, low-quality template production, and unbranded course openings."
+    "comparisonBoundary": "The standard uses cinematic craft and executive communication quality as design targets. It does not claim affiliation with a film studio, production company, employer, or Fortune 500 company.",
+    "primaryFailureToPrevent": "Wrong-person attribution, wrong voice attribution, robotic avatar delivery, static presenter footage, generic stock montage, weak audio, repetitive scenes, low-quality template production, and unbranded course openings."
   },
   "brand": {
     "academyName": "Obserra EPI Academy",
+    "shortBusinessName": "Obserra EPI",
+    "epiMeaning": "Executive Protection & Intelligence",
     "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "officialWebsite": "https://www.obserrallc.com",
+    "officialWebsiteDisplay": "www.obserrallc.com",
     "officialLogoPath": "/brand/obserra-logo.png",
     "presenterName": "Dr. Jody Blanchard",
-    "presenterTitle": "Founder and Cybersecurity Executive",
+    "presenterTitle": "Founder and CEO",
+    "canonicalPortraitPath": "/leadership/dr-jody-blanchard-executive.webp",
+    "approvedLowerThird": [
+      "Dr. Jody Blanchard",
+      "Founder and CEO",
+      "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "www.obserrallc.com"
+    ],
     "palette": ["#050B18", "#0B1730", "#C9A227", "#FFFFFF", "#53B7FF"],
+    "standaloneObserraAllowedAsAcademyOrBusinessName": false,
+    "alternateOwnerTitleAllowed": false,
+    "additionalOwnerTitleAllowed": false,
+    "currentOrFormerEmployerReferenceAllowed": false,
     "logoModificationProhibited": true,
     "officialLogoRequiredOnTitlePage": true,
     "presenterLowerThirdRequired": true
@@ -57,7 +72,7 @@
       "final1080pOnlyIntroProhibitedWhen4KSupported": true
     },
     "commonLearnerDisclaimer": "Obserra EPI Academy courses provide educational and professional-development content. They do not constitute legal, regulatory, medical, investigative, or organization-specific advice; do not authorize action outside the learner's role; and do not confer professional certification, licensure, accreditation, or regulatory approval. Scenarios may be fictional or composite. Learners must follow applicable law, policy, contractual obligations, and authorized escalation procedures.",
-    "syntheticMediaDisclosure": "This course uses the authorized digital likeness or synthetic media tools approved by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC.",
+    "syntheticMediaDisclosure": "This course may use the authorized digital likeness and voice of Dr. Jody Blanchard only when his exact owner-approved face and exact owner-approved voice are used by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC.",
     "intellectualPropertyNotice": "Copyright OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC. All course content, media, frameworks, assessments, and learner materials are proprietary unless expressly identified otherwise.",
     "courseSpecificDisclaimerRequired": true,
     "disclaimerMustBeInTranscript": true,
@@ -116,7 +131,7 @@
     "requiredCourseElements": [
       "official branded course title page",
       "learner disclaimer and acknowledgement",
-      "course-specific on-camera introduction from Dr. Jody Blanchard",
+      "course-specific on-camera introduction from Dr. Jody Blanchard using the exact approved face and voice",
       "five cinematic module anchor films",
       "five module visual packs",
       "practical scenario in every module",
@@ -133,6 +148,10 @@
   },
   "presenterPerformance": {
     "authorizedAvatarAndVoiceOnly": true,
+    "exactOwnerFaceRequiredWhenOwnerNameOrTitleAppears": true,
+    "exactOwnerVoiceRequiredWhenOwnerNameOrTitleAppears": true,
+    "ownerName": "Dr. Jody Blanchard",
+    "soleApprovedOwnerTitle": "Founder and CEO",
     "identityPreservationRequired": true,
     "voiceIdentityPreservationRequired": true,
     "recognizableAppearancePreservationRequired": true,
@@ -140,6 +159,9 @@
     "wardrobeMayChangeByCourse": true,
     "backgroundMayChangeByCourse": true,
     "lightingAndFramingMayChangeByCourse": true,
+    "poseMayChangeByCourse": true,
+    "alternateOrAdditionalOwnerTitlesProhibited": true,
+    "currentOrFormerEmployerReferencesProhibited": true,
     "faceReshapingProhibited": true,
     "beautificationAndSkinSmoothingProhibited": true,
     "ageOrHairModificationProhibited": true,
@@ -155,7 +177,8 @@
     "continuousMonologueWithoutVisualReliefProhibited": true,
     "lipSyncReviewRequired": true,
     "likenessReviewRequired": true,
-    "voiceSimilarityReviewRequired": true
+    "exactVoiceReviewRequired": true,
+    "ownerVisualAndAuditoryApprovalAuthoritative": true
   },
   "visualMaster": {
     "container": "MP4",
@@ -204,7 +227,9 @@
     "backgroundMusicOptional": true,
     "backgroundMusicMustNotMaskDialogue": true,
     "licensedOrOriginalMusicOnly": true,
-    "musicFreeMasterRequired": true
+    "musicFreeMasterRequired": true,
+    "speechCleanupRequired": true,
+    "speechCleanupMustNotAlterVoiceIdentity": true
   },
   "editingAndMotion": {
     "openingHookSeconds": 5,
@@ -257,6 +282,8 @@
     "titlePageAssetRequired": true,
     "disclaimerAssetRequired": true,
     "officialLogoReferenceRequired": true,
+    "ownerNameTitleCompanyWebsiteParityRequired": true,
+    "exactOwnerIdentityEvidenceRequired": true,
     "durationRangeRequired": true,
     "audioSampleRateRequired": true,
     "pathContainmentRequired": true,
@@ -266,7 +293,7 @@
   "manualValidation": {
     "ownerApprovalRequired": true,
     "likenessApprovalRequired": true,
-    "voiceApprovalRequired": true,
+    "exactVoiceApprovalRequired": true,
     "pronunciationApprovalRequired": true,
     "lipSyncApprovalRequired": true,
     "cinematicRealismApprovalRequired": true,
@@ -280,6 +307,13 @@
     "course lessons begin before the required branded opening sequence",
     "course intro final master below 3840 by 2160 when 4K is supported",
     "missing official title page, learner disclaimer, or instructor introduction",
+    "Dr. Jody Blanchard name or Founder and CEO title displayed over any person other than the exact approved owner",
+    "any voice other than the exact approved owner voice used with Dr. Jody Blanchard's name or title",
+    "alternate or additional owner title",
+    "current or former employer name, logo, or identifiable reference",
+    "standalone Obserra used as the Academy or short business name",
+    "wrong legal company name or wrong website",
+    "registered logo or palette changed",
     "single static avatar for an entire module",
     "robotic or evenly metered speech",
     "unreviewed synthetic voice",
