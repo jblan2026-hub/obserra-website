@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Continuous Handoff v13.0.0
+# Obserra EPI Academy Public Continuous Handoff v13.1.0
 
 The authoritative sanitized operational record is `docs/academy-media-pipeline/LATEST-HANDOFF.md`.
 
@@ -21,105 +21,92 @@ No alternate title, employer reference, employment history, substitute identity,
 
 Every claimed result must be provable by direct evidence. Plans, outlines, manuscripts, manifests, checklists, activity maps, scripts, placeholders, mockups, file names, package labels, expected runtimes, intended configurations, and ZIP creation are not proof of completion. If direct evidence does not exist, status must be `NOT PROVEN`, `PENDING`, `BLOCKED`, or `FAILED`.
 
+## Owner directive: no further AI video generation
+
+On 2026-08-12, Dr. Jody Blanchard directed that ChatGPT must not build or generate additional course videos. The owner will produce and supply the instructional videos. This instruction is immediate and permanent until the owner explicitly changes it.
+
+```text
+New HeyGen or other paid video generation: PROHIBITED
+Additional video-credit spend: PROHIBITED
+Automated avatar/module video production: PROHIBITED
+Owner introduction already produced: preserved
+Owner-supplied future course videos: permitted after owner delivery and validation
+Non-video course production and validation: authorized
+```
+
+A cinematic Module 1 Video Agent generation had already completed before this directive was received. It is retained only as an unapproved provider artifact and must not be represented as accepted course media. No additional module-video generation is authorized.
+
+The earlier short/robotic module videos and the v0.2.0 media assembly package are rejected as learner-facing production media. They may remain only as failure/evidence records. Do not reuse them as the production visual standard.
+
 ## No-drift/no-mockup rule
 
 Academy production must not drift from the governed standard, misrepresent status, or substitute mockups/placeholders for real deliverables. Deficiencies must be preserved and corrected rather than relabeled.
 
 ## Website duration and instructional alignment
 
-The website catalog is authoritative for course level and nominal instructional duration. Foundation courses are 2.5 hours and use the governed module timing pattern in `app/academy/courseData.ts`: 24, 26, 28, 30, and 42 minutes. Content and activity evidence must support the advertised duration through substantive instruction, actual narrated/video material where required, readings, scenarios, exercises, guided practice, knowledge checks, and applied work.
+The website catalog is authoritative for course level and nominal instructional duration. Foundation courses are 2.5 hours and use the governed module timing pattern in `app/academy/courseData.ts`: 24, 26, 28, 30, and 42 minutes. Duration must be supported by measured learner activities, not labels. Owner-supplied videos will be incorporated into the duration matrix when delivered.
 
 ## Required complete-course production standard
 
-Before any course can be classified COMPLETE, its protected package must include and prove at minimum: official branded opening; disclaimers/acknowledgement; approved exact-owner introduction; full duration-sized manuscript; instructional narration scripts; real branded slide materials; real SCORM with valid manifests/launch content; LearnWorlds activity/runtime evidence; scenarios/exercises; workbook; multiple job aids; module checks; 25-question final at 80 percent; authoritative references/resource handout; final captions/transcripts; accessibility evidence; thumbnail/visual assets; completion runtime evidence; certificate configuration and issuance evidence; instructor guide where appropriate; LearnWorlds implementation instructions; desktop/mobile QA; owner evidence checklist; manifest/extraction/hash evidence; and a requirement-by-requirement evidence matrix.
+Before any course can be classified COMPLETE, its protected package must include and prove at minimum: official branded opening; disclaimers/acknowledgement; approved exact-owner introduction; full duration-sized manuscript; instructional narration/video integration specifications; real branded slide materials; real SCORM with valid manifests/launch content; LearnWorlds activity/runtime evidence; scenarios/exercises; workbook; multiple job aids; module checks; 25-question final at 80 percent; authoritative references/resource handout; final captions/transcripts for owner-supplied media; accessibility evidence; thumbnail/visual assets; completion runtime evidence; certificate configuration and issuance evidence; instructor guide where appropriate; LearnWorlds implementation instructions; desktop/mobile QA; owner evidence checklist; manifest/extraction/hash evidence; and a requirement-by-requirement evidence matrix.
 
-## Cybersecurity Foundations media assembly checkpoint — 2026-08-12
+## Cybersecurity Foundations package evidence
 
-A protected Cybersecurity Foundations media assembly evidence package was created and stored:
+A structurally validated LearnWorlds upload package exists:
 
 ```text
-Package: Obserra-Cybersecurity-Foundations-Media-Assembly-Evidence-v0.2.0.zip
-SHA-256: e54bc89dd58bc4d80231f0731da92fb28444ade2c05d0fd16b514a2d64ba54a6
-Library path: /Obserra EPI Academy/Course Review Packages/Obserra-Cybersecurity-Foundations-Media-Assembly-Evidence-v0.2.0.zip
-Clean ZIP test: PASS
+Package: Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Final-Upload-v5.3.0.zip
+SHA-256: 0a9a6d1275676efcc0789a7f1b021c74b3777d20111c0765843f83c288dbe987
+Size: 63,654,568 bytes
+Members: 97
+Clean extraction: PASS
+Activities: 65 total / 65 marked ready in package metadata
+SCORM packages: 6
+DOCX: 3 documents / 46 rendered pages
+PDF: 39 documents / 119 rendered pages
+Workbooks: 9 / 120 rendered spreadsheet pages
+Approved owner-introduction binary: embedded and byte-identical to standalone copy
+LearnWorlds upload performed: NO
+Publication performed: NO
 ```
 
-The package contains direct media evidence for five learner-facing instructional module videos:
+These are package/build results only. They do not prove LearnWorlds runtime, learner completion, assessment behavior, certificate issuance, accessibility in the LMS, desktop/mobile operation, or owner acceptance.
+
+## Current truthful Cybersecurity Foundations classification
 
 ```text
-Module 1 Security and Business Risk: actual MP4 copied from prior production-factory evidence
-Module 2 Identity, Access, and Authentication: actual MP4 copied from prior production-factory evidence
-Module 3 Threat Recognition and Safe Response: actual MP4 copied from prior production-factory evidence
-Module 4 Incident Reporting and Evidence Preservation: actual MP4 copied from prior production-factory evidence
-Module 5 Secure Habits and Continuous Improvement: actual MP4 generated in this checkpoint with transcript, VTT, audio description, and rights ledger
-Total instructional video seconds in evidence matrix: 837.963 seconds
-```
-
-The package also includes or preserves the production-factory supporting artifacts available in the working evidence source, including instructor manuscript, learner guide, learner workbook, source register, assessment bank, framework alignment, applicability matrix, accessibility plan, certificate templates, media transcripts, VTT files, audio descriptions, rights ledgers, and media evidence files.
-
-## Owner introduction evidence state
-
-Direct authenticated HeyGen account evidence proves the owner introduction exists as an actual completed provider video:
-
-```text
-Title: Obserra EPI Academy - Cybersecurity Foundations Owner Introduction - Controlled Review
-HeyGen video ID: d91443085f4249b699ec9ca6920e2787
-Provider status: completed
-Provider duration: 74.24 seconds
-Provider failure code: none
-Provider failure message: none
-Owner statement: intro video is done
-Evidence classification: PASS for provider existence/completion of owner-introduction media
-```
-
-However, the owner-introduction MP4 binary was not successfully downloaded and packaged in v0.2.0. Preserved download failures: container direct download rejected because the URL had not been viewed in the conversation; web opening of the signed provider URL was blocked; direct Python URL retrieval failed due temporary DNS resolution failure. Therefore the owner intro is provider-proven but not yet packaged as a binary artifact in the media assembly package.
-
-## Current Cybersecurity Foundations evidence classification
-
-```text
-Owner introduction provider completion: PASS
-Owner introduction binary packaged: FAILED / PENDING
-Module 1 instructional video file: PASS
-Module 2 instructional video file: PASS
-Module 3 instructional video file: PASS
-Module 4 instructional video file: PASS
-Module 5 instructional video file: PASS
-Five-module instructional media evidence package: PASS for file existence and clean ZIP extraction
-Website 150-minute learner-duration alignment: NOT PROVEN, because activity timing, SCORM/reading/exercise/assessment learner journey, and LearnWorlds runtime evidence are still required
-Real branded PowerPoint slide decks: NOT PROVEN; no actual PPTX deck has been packaged and rendered/validated yet
+Non-video production package: UNDER ACTIVE FILE-BY-FILE AUDIT
+Owner introduction: provider and package evidence exists; final owner acceptance remains governed
+Instructional videos: OWNER-SUPPLIED / PENDING
+Prior robotic module videos: REJECTED
+Cinematic Module 1 generated before freeze: UNAPPROVED / NOT ACCEPTED
+PowerPoint slide decks: audit/rebuild required until actual PPTX render evidence passes
+SCORM structure: package evidence exists; independent manifest/launch audit required
+Handouts/workbooks/references/assessment: package evidence exists; independent content/format audit required
+Website 150-minute alignment: PENDING owner video durations plus measured activity matrix
 LearnWorlds runtime acceptance: NOT PROVEN
-Assessment/completion runtime behavior: NOT PROVEN
-Certificate issuance: NOT PROVEN
+Assessment/completion/certificate runtime: NOT PROVEN
 Desktop/mobile learner journey: NOT PROVEN
 Final complete course: NOT PROVEN
 ```
 
-Do not call Cybersecurity Foundations final/complete until the owner intro binary is packaged or otherwise directly available to the course, PowerPoint/slide materials are actually created and validated where required, the full course is assembled/loaded in LearnWorlds, and the learner journey proves duration alignment, launch, completion, final assessment, certificate, accessibility, desktop, and mobile behavior.
+## Current controlled work order
+
+1. Audit Cybersecurity Foundations v5.3.0 file-by-file against the complete-course and LearnWorlds submission standard.
+2. Rebuild or correct every failed non-video asset: SCORM, slide decks, handouts, workbook, references, assessments, accessibility artifacts, metadata, implementation instructions, evidence matrix, and duration model.
+3. Produce a clean validated non-video submission package with explicit owner-video insertion points and technical media requirements.
+4. Accept owner-supplied video files only after direct technical and quality validation; then integrate captions/transcripts and update duration evidence.
+5. Load the final package into the existing LearnWorlds Draft course through an authenticated authoring path and run runtime acceptance.
+6. Do not move to the next course until Cybersecurity Foundations meets the evidenced standard or the owner explicitly reprioritizes.
 
 ## Preserved failures and corrections
 
-- Earlier descriptions overstated completeness for Executive Travel Risk Management and Digital Exposure and Executive Privacy. Preserved as a governance/status failure.
-- Earlier Cybersecurity status did not clearly distinguish the proven owner introduction from the unproven five instructional module videos. Corrected in v12.9.0 and advanced in this v13.0.0 checkpoint.
-- A separate non-authoritative Generative AI v1.0.0 draft must not supersede authoritative r2 evidence.
-- A stale-SHA handoff update returned HTTP 409 and remains preserved.
-- An Executive Travel build execution reset remains preserved.
-- During the Cybersecurity media assembly, earlier video-generation/build attempts timed out before full completion. Only the final v0.2.0 package and its clean ZIP test are authoritative for this checkpoint.
-- Owner-intro binary download attempts failed as described above; provider completion is preserved separately from binary packaging.
-
-## Current controlled work order
-
-STOP expanding into new catalog courses until the first six course packages are reconciled against the evidence-based complete-course standard.
-
-Immediate priority:
-
-1. Cybersecurity Foundations: finish evidence-based assembly by packaging/placing the owner intro binary, creating and validating actual branded PPTX/slide materials where required, integrating the complete package into the governed course structure, and validating LearnWorlds runtime.
-2. Generative AI Fundamentals: full evidence audit/correction.
-3. LLMs Explained for Leaders: full evidence audit/correction.
-4. Security Awareness for High Risk Employees: full evidence audit/correction.
-5. Executive Travel Risk Management: rebuild skeleton to evidenced production standard.
-6. Digital Exposure and Executive Privacy: rebuild skeleton to evidenced production standard.
-
-For every course, inventory actual files, verify real SCORM/PPTX/handout/media/reference/assessment assets, map duration to real instructional activities, identify missing/unproven requirements, build real missing assets, produce an evidence matrix/validation report, preserve failures, and only then assign truthful status.
+- Prior module media was short, robotic, and rejected by the owner.
+- Course/package status was repeatedly overstated before runtime evidence existed.
+- Additional video generation was initiated before a sufficiently controlled acceptance sample was approved, causing time and potential credit waste. Paid video generation is now frozen.
+- A cinematic Module 1 generation completed before the freeze; it remains unapproved and is not accepted course media.
+- Earlier Executive Travel and Digital Exposure packages were incorrectly described as complete; both remain content skeletons.
+- All prior download, stale-SHA, timeout, and provider-state failures remain preserved in earlier records.
 
 ## Security boundary
 
