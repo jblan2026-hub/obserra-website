@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Continuation Notice v12.4.0
+# Obserra EPI Academy Public Continuation Notice v12.5.0
 
 Owner and presenter: Dr. Jody Blanchard
 
@@ -14,16 +14,18 @@ EPI meaning: Executive Protection & Intelligence
 
 Official website: https://www.obserrallc.com
 
-Status: Cybersecurity Foundations v4.1.0 remains under owner review. Dr. Jody Blanchard is finalizing its owner-welcome video. The authorized next three review-stage course packages are complete and independently validated. LearnWorlds publication, live checkout, production merge, production cutover, certificate acceptance, and owner-media acceptance remain blocked.
+Status: Cybersecurity Foundations remains under owner review. The owner has explicitly superseded the prior next-three-only build cap and authorized continuous construction of complete protected review-stage packages for the full governed Academy catalog while he reviews prior courses. LearnWorlds publication, live checkout, production merge/cutover, certificate acceptance, and owner-media acceptance remain blocked unless separately approved.
 
 ## Standing owner directive
 
 Maintain two controlled workstreams:
 
 1. Preserve Cybersecurity Foundations for New Professionals as the first-course LearnWorlds acceptance workstream.
-2. Present the completed next-three review set for owner audit while keeping every course-specific owner-welcome activity blocked.
+2. Continue building complete protected review-stage packages for all remaining catalog courses in governed catalog order while the owner reviews completed packages.
 
-Update protected and sanitized handoff records after every substantive action, validation result, failure, provider-state change, package change, integrity result, or owner decision.
+Do not stop after the former next-three set. That restriction is superseded by the owner's August 12, 2026 instruction to build out all courses while he reviews.
+
+Update protected and sanitized handoff records immediately after every substantive action, validation result, failure, provider-state change, package creation/version change, integrity result, or owner decision.
 
 ## Nonnegotiable owner identity and attribution
 
@@ -34,112 +36,53 @@ OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 www.obserrallc.com
 ```
 
-No alternate title, additional title, current or former employer name, employer logo, outside job title, employment history, wrong company, substitute face, or unapproved voice is authorized in learner-facing content. The owner resume is internal factual grounding only.
+No alternate title, current/former employer reference, employer logo, employment history, substitute identity, or unapproved voice is authorized in learner-facing content.
 
 ## Registered brand lock
 
 ```text
 Academy: Obserra EPI Academy
-Short business name: Obserra EPI
+Short business: Obserra EPI
 EPI: Executive Protection & Intelligence
 Legal company: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 Official website: https://www.obserrallc.com
 ```
 
-The official logo and approved dark navy, black, gold, white, and approved blue palette may not be redrawn, regenerated, recolored, distorted, or replaced.
+## Completed validated review packages already authoritative
 
-## Workstream A - Cybersecurity Foundations
+1. Cybersecurity Foundations for New Professionals — current first-course package v4.1.0; owner-welcome acceptance pending.
+2. Generative AI Fundamentals for Business Leaders — authoritative r2 review package complete and validated.
+3. Large Language Models, LLMs, Explained for Leaders — authoritative r2 review package complete and validated.
+4. Security Awareness for High Risk Employees — authoritative r2 review package complete and validated.
 
-```text
-Course: Cybersecurity Foundations for New Professionals
-Package: Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Review-v4.1.0.zip
-SHA-256: d11af1a50ddcaa2b9b5214e666e795853e0a41927f7c97806b2ef69195640cfa
-State: Draft
-Mapped activities: 65
-Ready: 64
-Blocked: 1 exact-owner welcome video
-Final assessment: 25 questions
-Passing score: 80 percent
-```
+The prior combined next-three review set remains valid evidence for courses 2–4.
 
-Owner video status: finalization in progress. The final file has not been received, accepted, or integrated in this handoff update. Do not infer rejection or acceptance. When supplied, verify exact face, exact voice, Founder and CEO attribution, official logo and legal company treatment, approved script, pronunciation, captions, transcript, 4K quality, and professional presentation before integration.
+## Current next build
 
-Authenticated LearnWorlds loading and runtime acceptance remain pending.
-
-## Workstream B - completed next-three review set
-
-### Generative AI Fundamentals for Business Leaders
+The first catalog course not already represented by an authoritative completed review package is:
 
 ```text
-Package: Obserra-EPI-Academy-Generative-AI-Fundamentals-Business-Leaders-LearnWorlds-Review-v1.0.0-r2.zip
-SHA-256: 29d5405b5cfb86f1c6d498f483265fccce8d7e6473c49918d3745183abd823a6
-Activities: 66 total / 65 READY / 1 BLOCKED
-SCORM: 6
-Official resources: 13
-Final assessment: 25 questions / 80 percent passing
-Validation: PASS
+Executive Travel Risk Management
+Level: Foundation
+Department: Protection
+Track: Executive Protection and Intelligence Academy
+Catalog focus: travel risk planning, changing conditions, and safe escalation
 ```
 
-### Large Language Models, LLMs, Explained for Leaders
-
-```text
-Package: Obserra-EPI-Academy-LLMs-Explained-for-Leaders-LearnWorlds-Review-v1.0.0-r2.zip
-SHA-256: 126c5938f48ed9075b55f0f636490bb007881238aad01a067ceb092a894f8b81
-Activities: 66 total / 65 READY / 1 BLOCKED
-SCORM: 6
-Official resources: 13
-Final assessment: 25 questions / 80 percent passing
-Validation: PASS
-```
-
-### Security Awareness for High Risk Employees
-
-```text
-Package: Obserra-EPI-Academy-Security-Awareness-High-Risk-Employees-LearnWorlds-Review-v1.0.0-r2.zip
-SHA-256: 3ae1346778a286469c01ad74532b2dbc2e8d6906e92f2d9dfcecffdfbe1a3398
-Activities: 66 total / 65 READY / 1 BLOCKED
-SCORM: 6
-Official resources: 13
-Final assessment: 25 questions / 80 percent passing
-Validation: PASS
-```
-
-Combined review set:
-
-```text
-Package: Obserra-EPI-Academy-Next-Three-Courses-Review-Set-v1.0.0.zip
-SHA-256: da198a241c3e9929dbf704b34a0f0b0883dea2e30db7e2f04b26bd07356914a3
-Clean extraction and integrity: PASS
-```
-
-The r2 packages correct audit metadata so the owner's current Cybersecurity Foundations video finalization is not confused with course-specific welcomes for the next three courses. No owner media is included or accepted in these packages, and no new owner-video generation or provider-credit expenditure occurred.
-
-## Current controlled actions
-
-1. Owner completes and supplies the Cybersecurity Foundations video.
-2. Record acceptance or every failure immediately after controlled review.
-3. If accepted, integrate video, captions, and transcript and increment the first-course package version and hash.
-4. Load and validate Cybersecurity Foundations in authenticated LearnWorlds Draft when a supported authoring path is available.
-5. Present the next-three set for owner audit.
-6. Do not build courses beyond the authorized next-three set without a new owner instruction.
+Build it to the established complete-package standard: official branding/title page; learner disclosures and acknowledgement; course-specific Dr. Jody Blanchard welcome script with exact-owner media activity blocked until separately produced/approved; five substantive modules; guided scenarios; workbook/job aids; authoritative primary resources; mapped LearnWorlds activity plan; module knowledge checks; 25-question final assessment with 80 percent passing; completion/certificate requirements; accessibility controls; owner review checklist; manifest; clean-extraction/integrity validation; protected storage.
 
 ## Release boundary
 
-```text
-Next-three review packages: built and validated
-Owner video received or accepted: no
-LearnWorlds upload: not performed
-Publication: blocked
-Live checkout: blocked
-Production merge: blocked
-Production cutover: blocked
-Courses beyond authorized set: not authorized
-```
+Continuous package drafting is authorized. Publication and production are not. No course may be represented as LearnWorlds-runtime accepted, certificate accepted, publicly released, or production-ready without direct evidence and explicit owner approval.
 
-## Mandatory handoff discipline
+## Security boundary
 
-Every substantive action, validation result, provider-state change, course package version, integrity result, failure, LearnWorlds change, and owner approval must be recorded as it occurs. Failures are preserved and never erased.
+This repository is public. Complete course manuscripts, assessment answer material, protected media, provider identifiers, learner data, and security evidence remain in protected storage. Public repository records contain sanitized governance/status information only.
 
-## Public repository warning
+## Preserved failures
 
-This repository is public. Confidential provider identifiers, source media, voice material, complete course manuscripts, assessment answer material, learner data, and security evidence must remain in protected storage. Public records contain sanitized governance and status information only.
+Historical wrong-person owner media remains prohibited. Prior provider/API object mismatches and any new failures remain permanently preserved in governed records; later success does not erase them.
+
+## Continuation rule
+
+After Executive Travel Risk Management is built and validated, record package name/hash and immediately continue to the next catalog course that does not already have an authoritative package. Repeat until the governed catalog is fully packaged or the owner explicitly changes direction.
