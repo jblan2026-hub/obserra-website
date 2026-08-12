@@ -131,14 +131,14 @@ export default function AcademyControlledClient({
   return (
     <main>
       <header className="masthead">
-        <a href="/" className="brand" aria-label="Obserra home">
+        <a href="/" className="brand" aria-label="Obserra EPI home">
           <Image
             src="/brand/obserra-logo.png"
-            alt="Obserra Executive Protection and Intelligence LLC"
+            alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC"
             width={286}
             height={55}
           />
-          <span className="product-label">ACADEMY</span>
+          <span className="product-label">EPI ACADEMY</span>
         </a>
         <div className="masthead-actions">
           <a href="/services" className="nav-link">Services</a>
@@ -149,7 +149,7 @@ export default function AcademyControlledClient({
       </header>
 
       <section className="hero">
-        <p className="kicker">OBSERRA ACADEMY</p>
+        <p className="kicker">OBSERRA EPI ACADEMY</p>
         <h1>Professional training being built for high consequence cybersecurity, intelligence, protection, and technology decisions.</h1>
         <p>
           The 60-course catalog is a governed development roadmap, not a claim that 60 completed courses are
@@ -262,7 +262,7 @@ export default function AcademyControlledClient({
           </label>
         </div>
 
-        <nav className="academy-category-rail" aria-label="Browse Academy roadmap categories">
+        <nav className="academy-category-rail" aria-label="Browse Obserra EPI Academy roadmap categories">
           {departments.map((item) => (
             <button
               key={item}
@@ -346,10 +346,10 @@ export default function AcademyControlledClient({
 
       <section className="certificate">
         <div>
-          <p className="kicker">COMPLETION RECOGNITION</p><h2>Approved courses will issue an Obserra Certificate of Course Completion.</h2>
+          <p className="kicker">COMPLETION RECOGNITION</p><h2>Approved courses will issue an Obserra EPI Academy Certificate of Course Completion.</h2>
           <p>Certificate issuance requires completion of every required activity and the governed passing standard for the approved final assessment.</p>
         </div>
-        <p className="fine-print">An Obserra completion certificate is a proprietary training record. It is not a state license, occupational authorization, accredited academic credit, or third-party professional certification.</p>
+        <p className="fine-print">An Obserra EPI Academy completion certificate is a proprietary training record. It is not a state license, occupational authorization, accredited academic credit, or third-party professional certification.</p>
       </section>
 
       <section className="academy-purchase-assurance">
@@ -363,8 +363,8 @@ export default function AcademyControlledClient({
       </section>
 
       <footer className="site-footer">
-        <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={180} height={35} />
-        <p>Obserra Academy is a learning product of Obserra Executive Protection &amp; Intelligence LLC. Course availability is controlled by documented content, assessment, accessibility, commerce, and owner-approval gates.</p>
+        <Image src="/brand/obserra-logo.png" alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" width={180} height={35} />
+        <p>Obserra EPI Academy is a learning product of OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC. Course availability is controlled by documented content, assessment, accessibility, commerce, and owner-approval gates.</p>
       </footer>
     </main>
   );
