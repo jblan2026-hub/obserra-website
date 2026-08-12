@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Continuation Notice v12.3.1
+# Obserra EPI Academy Public Continuation Notice v12.3.2
 
 Owner and presenter: Dr. Jody Blanchard
 
@@ -14,187 +14,161 @@ EPI meaning: Executive Protection & Intelligence
 
 Official website: https://www.obserrallc.com
 
-Status: The validated Cybersecurity Foundations v4.1.0 package remains under owner review. Dr. Jody Blanchard is currently finalizing the exact-owner course-introduction video. Parallel protected review-stage production of the next three governed courses is authorized. LearnWorlds publication, live checkout, production merge, production cutover, and claims of course acceptance remain blocked.
+Status: Cybersecurity Foundations v4.1.0 remains under owner review. Dr. Jody Blanchard is currently finalizing its exact-owner course-introduction video. The corrected Generative AI and LLM review-stage course packages have passed their current build, accessibility, interaction, integrity, and clean-extraction gates. Security Awareness for High Risk Employees is the active build. LearnWorlds publication, live checkout, production merge, production cutover, and claims of course acceptance remain blocked.
 
 ## Current owner-media activity
 
-Dr. Jody Blanchard reported that he is currently finalizing the Cybersecurity Foundations owner-introduction video.
+Dr. Jody Blanchard reported that he is finalizing the Cybersecurity Foundations owner-introduction video. This status does not constitute acceptance. No assistant-generated replacement, provider-credit expenditure, or alternate-media action is authorized or being performed.
 
-This status is owner-reported and does not yet constitute media acceptance. No assistant-generated replacement, provider-credit expenditure, or alternate-media action is authorized or being performed.
+When supplied or identified, the video must be reviewed for exact approved face, exact approved voice, sole `Founder and CEO` title, official branding, approved transcript and pronunciation, identity-preserving speech cleanup, 3840 x 2160 master quality where supported, correct lower third, captions, transcript, audio quality, professionalism, and owner visual and auditory approval.
 
-When the owner supplies or identifies the finalized media, the controlled review must verify:
-
-1. Exact approved face.
-2. Exact approved voice.
-3. `Dr. Jody Blanchard` and `Founder and CEO` attribution only.
-4. Official Obserra EPI Academy logo, names, colors, and website.
-5. Approved course-specific transcript and pronunciation.
-6. Speech clarity and identity-preserving cleanup.
-7. 3840 x 2160 master quality where technically supported.
-8. Correct lower third, captions, transcript, audio quality, and music-free master.
-9. Professional presentation and suitability for LearnWorlds.
-10. Owner visual and auditory approval before use.
-
-The owner-welcome LearnWorlds activity remains blocked until this review and approval are complete.
+The Cybersecurity Foundations owner-welcome activity remains blocked until review and approval are complete.
 
 ## Standing owner directive
 
-Continue two controlled workstreams in parallel:
+Continue two controlled workstreams:
 
 1. Preserve Cybersecurity Foundations for New Professionals as the first-course review and LearnWorlds acceptance workstream.
-2. Build the next three complete review-stage course packages in governed catalog order while the owner reviews and finalizes the first-course media.
+2. Complete the authorized next three protected review-stage packages while the owner reviews and finalizes the first-course media.
 
-Update the protected and sanitized handoff documents after every substantive action, decision, validation result, failure, provider-state change, package change, integrity result, or owner approval. This directive remains in force until Dr. Jody Blanchard explicitly changes it.
+Update protected and sanitized handoffs after every substantive action, validation result, failure, package version, integrity result, provider-state change, LearnWorlds change, or owner approval.
 
-## Authority and supersession
-
-This v12.3.1 continuation notice supersedes v12.3.0 only for the current owner-media status. All v12.3.0 course-production authorization, identity controls, brand controls, quality controls, and release boundaries remain in force.
-
-Historical records remain preserved for audit. The protected private handoff remains authoritative for confidential evidence and provider details.
-
-## Nonnegotiable owner attribution
+## Nonnegotiable owner and brand controls
 
 ```text
 Dr. Jody Blanchard
 Founder and CEO
 OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 www.obserrallc.com
-```
 
-No alternate title, additional title, current employer name, former employer name, employer logo, outside job title, employment history, wrong company, or wrong owner attribution may appear in learner-facing Academy or LearnWorlds content.
-
-The owner resume is internal factual grounding only. It is not permission to add other titles, employers, logos, or career history.
-
-## Exact owner identity lock
-
-Any video that displays or speaks Dr. Jody Blanchard's name or title must use his exact approved face and exact approved voice.
-
-The course-specific script, professional wardrobe, background, set, lighting, framing, pose, restrained natural movement, official graphics, captions, identity-preserving speech cleanup, and identity-preserving 4K processing may change. The person, face, voice, name, and sole approved title may not change.
-
-A different person, similar person, regenerated face, substitute avatar, substitute voice, merely similar voice, facial reshaping, beautification, skin smoothing, age modification, or misleading attribution is prohibited.
-
-No assistant-generated owner-media render or provider-credit expenditure is authorized while the owner is finalizing the video.
-
-## Registered brand lock
-
-```text
 Academy: Obserra EPI Academy
 Short business name: Obserra EPI
 EPI: Executive Protection & Intelligence
-Legal company: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-Official website: https://www.obserrallc.com
 ```
 
-The official registered logo and approved dark navy, black, gold, white, and approved blue palette may not be redrawn, regenerated, recolored, distorted, or replaced. Standalone `Obserra` is not the approved Academy or short business name.
+No alternate or additional title, current or former employer name, employer logo, outside job title, employment history, wrong company, substitute face, or unapproved voice is authorized in learner-facing content. The resume is internal factual grounding only.
 
-## Workstream A - first-course review and LearnWorlds acceptance
+Any owner-named video must use the exact approved face and exact approved voice. The official registered logo and approved dark navy, black, gold, white, and approved blue palette may not be redrawn, regenerated, recolored, distorted, or replaced.
+
+## Workstream A - Cybersecurity Foundations
 
 ```text
 Course: Cybersecurity Foundations for New Professionals
-Course ID: cybersecurity-foundations-for-new-professionals
 Package: Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Review-v4.1.0.zip
 SHA-256: d11af1a50ddcaa2b9b5214e666e795853e0a41927f7c97806b2ef69195640cfa
 Course state: Draft
-Mapped LearnWorlds activities: 65
-Activities ready: 64
-Activities blocked: 1 exact-owner welcome video
-Owner video status: owner finalizing media; acceptance pending
+Mapped activities: 65
+Ready: 64
+Blocked: 1 exact-owner welcome video
 Final assessment: 25 questions
 Passing score: 80 percent
+Owner video status: owner finalizing; acceptance pending
 ```
 
-Authenticated LearnWorlds loading and runtime acceptance have not been completed. Keep the owner welcome blocked until exact-owner media is supplied, reviewed, and approved.
+Authenticated LearnWorlds loading and runtime acceptance have not been completed.
 
-## Workstream B - next governed course set
+## Workstream B - validated next-course packages
 
-Build these three courses in order:
+### 1. Generative AI Fundamentals for Business Leaders
 
-1. `Generative AI Fundamentals for Business Leaders`
-   - Course ID: `generative-ai-business-leaders`
-   - Level: Foundation
-   - Department: Technologies
-   - Track: AI and LLM Academy
-   - Focus: responsible business adoption of generative AI
+```text
+Package: Obserra-EPI-Academy-Generative-AI-Fundamentals-Business-Leaders-LearnWorlds-Review-v1.0.1.zip
+SHA-256: 3a89d033a3913cb0809e8909deea5b71702b73b9d8431bc22efdccd2abb2a2b2
+Files: 78
+PDFs: 39
+PDF pages reviewed: 109
+DOCX: 3
+DOCX accessibility: 0 high / 0 medium / 0 low
+XLSX: 9
+Rendered spreadsheet sheets: 19
+SCORM packages: 6 navigable and keyboard-accessible packages
+Mapped activities: 66
+Ready: 65
+Blocked: 1 owner-video placeholder
+Official sources: 13
+Final assessment: 25 questions
+Passing score: 80 percent
+Clean extraction and hash verification: passed
+Owner media included or generated: no
+LearnWorlds upload or publication: no
+```
 
-2. `Large Language Models, LLMs, Explained for Leaders`
-   - Course ID: `llms-for-leaders`
-   - Level: Foundation
-   - Department: Technologies
-   - Track: AI and LLM Academy
-   - Focus: how language models work, where they help, and where oversight is required
+The initial v1.0.0 attempt was quarantined after enhanced QA found insufficient SCORM interaction validation, non-deterministic download labels, a wrong initial activity count, and package/hash inconsistency. The corrected v1.0.1 package supersedes it.
 
-3. `Security Awareness for High Risk Employees`
-   - Course ID: `security-awareness-high-risk`
-   - Level: Foundation
-   - Department: Cyber
-   - Track: Cyber Defense Academy
-   - Focus: high-consequence decisions involving access, data, payments, and social engineering
+### 2. Large Language Models, LLMs, Explained for Leaders
 
-Each package must meet or exceed the Cybersecurity Foundations review-stage quality baseline:
+```text
+Package: Obserra-EPI-Academy-LLMs-Explained-for-Leaders-LearnWorlds-Review-v1.0.1.zip
+SHA-256: eadeffaeb112748377712c997c799ee2fdc20bf70e0640bb75c9d400ec5e7631
+Files: 78
+PDFs: 39
+PDF pages reviewed: 108
+DOCX: 3
+DOCX accessibility: 0 high / 0 medium / 0 low
+XLSX: 9
+Rendered spreadsheet sheets: 19
+SCORM packages: 6 navigable and keyboard-accessible packages
+Mapped activities: 66
+Ready: 65
+Blocked: 1 owner-video placeholder
+Official sources: 13
+Final assessment: 25 questions
+Passing score: 80 percent
+Clean extraction and hash verification: passed
+Owner media included or generated: no
+LearnWorlds upload or publication: no
+```
 
-- Official Obserra EPI Academy branding and registered identity.
-- Course-specific owner welcome script and media contract, with no owner media included unless separately approved.
-- Learner disclosures, acknowledgement, purpose, outcomes, and orientation.
-- Five substantive modules.
-- Interactive SCORM or HTML5 instruction where it adds measurable value.
-- Guided scenarios, applied exercises, workbook tools, job aids, self-assessments, and knowledge checks.
-- Authoritative primary-source register with direct official URLs.
-- Twenty-five-question final assessment with an 80 percent passing control.
-- LearnWorlds Draft activity map, completion rules, certificate controls, accessibility requirements, desktop and mobile acceptance criteria, owner review checklist, manifest, validation report, and package hash.
-- No placeholder activities, empty shells, decorative filler, copied certification content, or unsupported claims.
+Manual source inspection found that an earlier LLM v1.0.1 candidate had valid SCORM records but lacked the enhanced multi-screen interaction standard. That candidate was not released. The package was rebuilt and revalidated with screen navigation, keyboard support, progress, focus management, responsive layout, reduced-motion handling, completion gating, accessible feedback, actual-score reporting, exact file mapping, current accessibility evidence, one immutable ZIP, and clean-extraction verification.
 
-## Current production status
+### 3. Security Awareness for High Risk Employees
 
-The first Generative AI package build reached the enhanced quality gate. The initial package was quarantined because the stronger audit identified insufficient SCORM interaction validation, non-deterministic digital-download labels, an incorrect initial activity count, and post-build package/hash inconsistency.
-
-The corrected Generative AI package is now being rebuilt with:
-
-1. Stronger screen navigation and keyboard-accessible SCORM behavior.
-2. Exact package-relative digital-download paths.
-3. Dynamic truthful activity counts.
-4. One immutable final ZIP and SHA-256.
-5. Validation and clean-extraction evidence generated from the same final ZIP.
-
-No defective package is authorized for delivery.
+```text
+Status: active corrected build
+Package acceptance: pending
+Owner media: not included or generated
+```
 
 ## Current production sequence
 
-1. Complete and validate the corrected Generative AI Fundamentals for Business Leaders package.
-2. Update protected and sanitized handoffs with package version, contents, validation, and hash.
-3. Build and validate Large Language Models, LLMs, Explained for Leaders.
-4. Update all records.
-5. Build and validate Security Awareness for High Risk Employees.
-6. Update all records and package the next-course set for owner audit.
-7. Review the finalized Cybersecurity Foundations owner video when the owner supplies or identifies it.
+1. Complete and validate Security Awareness for High Risk Employees.
+2. Record its package version, SHA-256, accessibility, SCORM, activity, assessment, source, and clean-extraction evidence.
+3. Create and validate the combined next-three-course review-set ZIP.
+4. Update all protected and sanitized records.
+5. Deliver the three course packages and combined review set for owner audit.
+6. Review the finalized Cybersecurity Foundations owner video when the owner supplies or identifies it.
 
 ## Release boundary
 
 ```text
 Protected review-stage production of next three courses: authorized
+Generative AI package: validated review package
+LLM package: validated review package
+Security Awareness package: in progress
 Owner finalizing first-course video: yes
 Owner media accepted: no
 LearnWorlds publication: blocked
 Live checkout: blocked
 Production merge: blocked
 Production cutover: blocked
-First-course LearnWorlds runtime acceptance: pending
-Additional courses beyond this three-course set: not authorized by this directive
+Courses beyond this authorized three-course set: not authorized
 Public release of protected course intellectual property: prohibited
 ```
 
 ## Mandatory handoff discipline
 
-Every substantive action, validation result, provider-state change, course package version, integrity result, failure, LearnWorlds change, and owner approval must be recorded as it occurs. Failures are preserved and never erased. Later corrections supersede prior current-state assertions but do not delete the audit trail.
+Every substantive action, validation result, course package version, integrity result, failure, provider-state change, LearnWorlds change, and owner approval must be recorded as it occurs. Failures are preserved and never erased. Later corrections supersede prior current-state assertions but do not delete the audit trail.
 
 ## Required continuation sources
 
 1. `docs/academy-media-pipeline/LATEST-HANDOFF.md`
 2. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`
 3. `docs/OBSERRA-ACADEMY-RESTART-HERE.md`
-4. `app/academy/courseData.ts`
-5. `config/academy-owner-identity-attribution-policy.json`
-6. `config/academy-course-opening-standard.json`
-7. The protected private handoff and validated course packages.
+4. `docs/academy-media-pipeline/FAILURE-REGISTER-ADDENDUM-IDENTITY-TITLE-BRAND-CREDIT-DRIFT.md`
+5. `app/academy/courseData.ts`
+6. `config/academy-owner-identity-attribution-policy.json`
+7. `config/academy-course-opening-standard.json`
+8. The protected private handoff and validated course packages.
 
 ## Public repository warning
 
