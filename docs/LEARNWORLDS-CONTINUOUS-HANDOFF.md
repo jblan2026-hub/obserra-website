@@ -14,7 +14,7 @@ EPI meaning: Executive Protection & Intelligence
 
 Official website: https://www.obserrallc.com
 
-Status: Complete first-course review package v3.0.0 has been built in protected artifact storage. Owner-introduction media review and LearnWorlds runtime acceptance remain incomplete. Production release is not authorized.
+Status: Complete first-course review package v3.0.0 has been built in protected artifact storage. The controlled 4K owner-introduction render has completed and is awaiting owner quality/identity approval. LearnWorlds runtime acceptance remains incomplete. Production release is not authorized.
 
 ## Mandatory continuous-handoff discipline
 
@@ -28,7 +28,7 @@ Protected/private records remain authoritative for provider identifiers, source 
 
 Complete `Cybersecurity Foundations for New Professionals` inside the existing LearnWorlds Draft course and present it to Dr. Jody Blanchard for end-to-end review before producing additional courses or redesigning the broader LearnWorlds site.
 
-The existing `Obserra-Cybersecurity-Foundations-LearnWorlds-Import-v2.0.0.zip` is an intermediate import package only and is superseded for final owner review by the v3.0.0 complete review package described below.
+The existing `Obserra-Cybersecurity-Foundations-LearnWorlds-Import-v2.0.0.zip` is an intermediate import package only and is superseded for final owner review by the v3.0.0 complete review package.
 
 ## Owner identity and attribution lock
 
@@ -61,39 +61,39 @@ The owner supplied and approved the `Professional man speaking to camera.` HeyGe
 
 Preserved failure: a direct authenticated standard-video lookup using the dashboard project/upscale identifier returned HTTP 404. The identifier is therefore not treated as a standard API video ID. This does not invalidate the owner-approved project.
 
-Controlled action: after explicit owner direction to continue, one 4K 16:9 controlled review render was started from the owner-supplied approved project's upscaled source frame using the authenticated private voice explicitly labeled as the approved exact-source owner voice. The provider accepted the render and returned `waiting`. The render remains unapproved until exact identity, exact voice, speech clarity, visual quality, captions, and overall professionalism are reviewed.
+Controlled action: one 4K 16:9 review render was created from the owner-supplied approved project's upscaled source frame using the authenticated private voice explicitly labeled as the approved exact-source owner voice.
+
+Current provider result:
+
+```text
+Render status: completed
+Duration: 72.5682 seconds
+Output: MP4
+Resolution requested: 4K
+Aspect ratio requested: 16:9
+Sidecar subtitle artifact: generated
+Provider failure code: none
+Provider failure message: none
+Owner approval: pending
+```
+
+The completed render must not be treated as accepted merely because provider generation succeeded. Dr. Jody Blanchard must review exact facial identity, exact voice, pronunciation, speech clarity, motion quality, 4K visual quality, professionalism, and overall suitability. If any identity or quality element fails, preserve the failure and correct it before LearnWorlds use.
 
 ## Complete review package v3.0.0 built
 
-A superseding protected review package has now been built:
+Protected review package:
 
 ```text
 Obserra-Cybersecurity-Foundations-Complete-Review-v3.0.0.zip
 ```
 
-The package is stored in the owner's protected ChatGPT Library under:
+Protected storage:
 
 ```text
 /Obserra EPI Academy/Course Review Packages/
 ```
 
-The package contains the complete review-stage course manuscript and implementation artifacts, including:
-
-1. Complete five-module course manuscript with substantive instruction.
-2. Official Obserra EPI Academy title/identity block.
-3. Learner notice, disclaimer, and non-certification/non-compliance language.
-4. Course purpose, outcomes, orientation, and controlled owner-introduction transcript.
-5. Guided scenarios and reflection prompts throughout all five modules.
-6. Learner workbook with risk, access, phishing-triage, incident-reporting, and secure-habits exercises.
-7. Suspicious-activity job aid.
-8. Initial-incident-report job aid.
-9. Authoritative source register centered on NIST and CISA primary guidance.
-10. Five module knowledge checks totaling 25 module-check questions.
-11. Native final-assessment workbook containing 25 final questions and an 80 percent passing control.
-12. LearnWorlds Draft implementation map defining the opening section, five modules, assessment, completion, certificate, and accessibility requirements.
-13. Owner-introduction transcript and draft subtitle artifact; final timestamps must be replaced by provider-generated/final-media timing.
-14. Owner review/release checklist with evidence-required gates.
-15. Machine-readable manifest and package integrity information.
+The package contains the complete five-module review-stage manuscript, official identity/title block, learner notice and disclaimers, course orientation, owner-introduction transcript, guided scenarios, learner workbook, job aids, authoritative NIST/CISA source register, module knowledge checks, 25-question final assessment with 80 percent passing control, LearnWorlds Draft implementation map, accessibility requirements, subtitle/transcript artifacts, owner review checklist, and manifest/integrity information.
 
 The package is a review release. It does not claim LearnWorlds runtime acceptance, certificate issuance, final media acceptance, or publication readiness.
 
@@ -113,8 +113,8 @@ Module knowledge checks: built for review
 Final assessment: 25 questions / 80 percent control built for review
 LearnWorlds implementation map: built for review
 Accessibility acceptance requirements: documented; runtime validation pending
-Exact-owner course introduction: controlled 4K review render waiting
-Final owner-intro captions/timing: pending completed media
+Exact-owner course introduction: 4K render completed; owner identity/quality approval pending
+Provider subtitle artifact: generated; final acceptance pending owner media review
 LearnWorlds content load: pending
 Completion controls runtime test: pending
 Certificate runtime validation: pending
@@ -129,12 +129,12 @@ The repository is public. Confidential course manuscripts, protected media, asse
 
 ## First incomplete controlled action
 
-1. Poll and inspect the controlled owner-introduction render when complete.
-2. Reject or correct it if exact owner identity, exact voice, speech clarity, 4K quality, or professional presentation does not pass.
-3. Once owner media is accepted, insert the final video/captions/transcript into the protected v3 package and increment the package version/hash.
+1. Owner reviews the completed controlled 4K introduction.
+2. Reject or correct it if exact owner identity, exact voice, speech clarity, pronunciation, 4K quality, or professional presentation does not pass.
+3. Once owner media is explicitly accepted, insert the final video/captions/transcript into the protected package and increment the package version/hash.
 4. Load the complete package into the existing LearnWorlds Draft course through an authenticated supported path.
 5. Validate opening acknowledgement, all five modules, activities, assessment, 80 percent pass rule, completion, certificate, resources, accessibility, desktop, and mobile behavior.
-6. Obtain explicit owner approval before any publication, live checkout, template reuse, additional-course production, or production cutover.
+6. Obtain explicit owner approval before publication, live checkout, template reuse, additional-course production, or production cutover.
 
 ## Continuation sources
 
