@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Restart Notice v13.2.0
+# Obserra EPI Academy Public Restart Notice v13.3.0
 
 Owner and presenter: Dr. Jody Blanchard
 
@@ -14,17 +14,80 @@ EPI meaning: Executive Protection & Intelligence
 
 Official website: https://www.obserrallc.com
 
-Status: The owner has prohibited all additional assistant-generated course video and will produce all final course videos. Four complete materials-and-scripts packages have been delivered and validated with no video files included. Continuous non-video course production is authorized. LearnWorlds runtime acceptance and publication remain unproven and blocked.
+Status: The owner has imposed a mandatory no-exceptions actual-site verification gate before any content is generated. Assistant-generated course video is prohibited. The generated LearnWorlds assessment workbooks are blocked from upload until they are rebuilt inside the exact current template downloaded from the actual target assessment and successfully test-imported in the Draft course.
 
 ## Mandatory restart sequence
 
 1. Read `docs/academy-media-pipeline/LATEST-HANDOFF.md`.
 2. Read `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`.
-3. Retrieve the protected private handoff.
-4. Preserve the current materials-and-scripts package versions and SHA-256 records.
-5. Enforce the permanent no-assistant-video directive.
-6. Continue the governed catalog in non-video mode beginning with `Executive Travel Risk Management`.
-7. Update protected and sanitized records after every substantive action, package version, script set, validation result, integrity result, failure, LearnWorlds change, or owner decision.
+3. Read `docs/academy-media-pipeline/ACTUAL-SITE-VERIFICATION-GATE.md`.
+4. Read `config/academy-actual-site-verification-policy.json`.
+5. Retrieve the protected private handoff and current verification evidence.
+6. Identify the exact actual sites, platform objects, templates, and official sources that control the requested work.
+7. Open and inspect those actual current sites before generating anything.
+8. Download or export the exact current template/schema when the output is platform-dependent.
+9. Preserve and hash the untouched original.
+10. Record the verification result as `PASSED`, `BLOCKED`, or `FAILED`.
+11. Generate only after the verification result is `PASSED`.
+12. Recheck the actual site before import, upload, publication, or release.
+13. Update protected and sanitized handoffs after every verification, discrepancy, failure, corrected template, package version, import result, or owner decision.
+
+## No-exceptions rule
+
+```text
+Actual current site checked before generation: REQUIRED
+Authenticated target object checked when account-specific: REQUIRED
+Exact current template/export obtained when applicable: REQUIRED
+Current official documentation checked: REQUIRED
+Current official Obserra site/brand checked: REQUIRED
+Current official primary sources checked: REQUIRED
+Generation without passed verification: PROHIBITED
+Use of memory, assumptions, generic templates, or old files as substitute evidence: PROHIBITED
+No exceptions: ENFORCED
+```
+
+If the actual site, exact target object, exact current template, or current official source cannot be checked, stop. Record the work as:
+
+```text
+BLOCKED - DO NOT GENERATE OR REPRESENT AS UPLOAD-READY
+```
+
+## LearnWorlds assessment hard stop
+
+The owner reported that the generated assessment is not in the required LearnWorlds upload template. Treat that report as authoritative.
+
+```text
+Cybersecurity Foundations assessment workbook: REJECTED FOR UPLOAD / BLOCKED
+Other generated assessment workbooks: NOT LIVE-TEMPLATE VERIFIED / BLOCKED
+Existing questions: draft content only
+Exact current school template preserved: NO
+Authenticated import test: NOT PERFORMED
+Upload-ready claim: WITHDRAWN
+```
+
+Before correcting the assessment:
+
+1. Open the actual Cybersecurity Foundations Draft assessment activity in the authenticated Obserra EPI LearnWorlds school.
+2. Select the current import-from-XLS workflow.
+3. Download the exact template from that activity.
+4. Preserve the original unchanged and record its SHA-256.
+5. Populate a copy without renaming, reordering, adding, deleting, merging, or restyling required tabs, columns, or headings.
+6. Import the populated copy into the actual Draft assessment.
+7. Record successful question count, groups, question types, scoring, pass mark, warnings, and save result.
+8. Only then classify the workbook as LearnWorlds-template compliant.
+
+Current official LearnWorlds guidance checked:
+
+- https://support.learnworlds.com/support/solutions/articles/12000087253-how-to-import-questions-to-an-assessment-from-an-xls-file
+- https://support.learnworlds.com/support/solutions/articles/12000101758-how-to-bulk-upload-course-content
+
+The actual current template downloaded from the owner's target school remains controlling. A workbook that merely resembles the published example is not sufficient.
+
+## Actual Obserra-site check
+
+The current public site at https://www.obserrallc.com must be checked before generating Academy identity, public positioning, course descriptions, or brand-related content.
+
+The site currently contains at least one `Obserra Academy` label. The owner-approved registered naming remains `Obserra EPI Academy` and `Obserra EPI`. Record the site wording as a discrepancy; do not copy it into generated content unless the owner explicitly changes the naming directive.
 
 ## Nonnegotiable owner attribution
 
@@ -47,7 +110,7 @@ Legal company: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 Official website: https://www.obserrallc.com
 ```
 
-The official logo and approved dark navy, black, gold, white, and approved blue palette may not be redrawn, regenerated, recolored, distorted, or replaced. Standalone `Obserra` is not the approved Academy or short business name.
+The official logo and approved dark navy, black, gold, white, and approved blue palette may not be redrawn, regenerated, recolored, distorted, or replaced.
 
 ## Permanent video-production directive
 
@@ -59,104 +122,25 @@ Avatar, clone, lip-sync, substitute presenter, or synthetic owner media: PROHIBI
 Final video production and approval: Dr. Jody Blanchard
 ```
 
-The assistant may create all required non-video production artifacts, including:
+The assistant may create non-video production artifacts only after the applicable actual-site verification gate passes. Every video activity remains `OWNER PRODUCTION REQUIRED` until the owner supplies the final file.
 
-- course manuscripts and lesson copy;
-- owner welcome, module, and course-close scripts;
-- teleprompter files;
-- storyboards and shot lists;
-- on-screen text and lower-third specifications;
-- caption and transcript standards;
-- SCORM/HTML5 learning activities;
-- workbooks, job aids, scenarios, assignments, and reflections;
-- module knowledge checks and final assessments;
-- authoritative resource libraries;
-- LearnWorlds activity maps and completion rules;
-- certificate controls and non-certification language;
-- accessibility, desktop, mobile, technical-delivery, and QA requirements;
-- manifests, integrity hashes, validation reports, and release packages.
+## Current controlled action
 
-Every video activity must remain `OWNER PRODUCTION REQUIRED` until the owner supplies the final file. Do not use a placeholder, provider record, generated sample, script, or mockup as completed video.
-
-## Current delivered packages
-
-```text
-Master materials and scripts:
-Obserra-EPI-Academy-Materials-and-Scripts-Master-Set-v1.0.0.zip
-SHA-256: 708f05b4f55ac6e509f23802b47d069c1af3f8a038c5bb3366ebd2fae118fc98
-Clean extraction: PASS, 92 of 92 files
-
-Scripts only:
-Obserra-EPI-Academy-Video-Scripts-Only-v1.0.0.zip
-SHA-256: 8e39843035b3d6ecf9274a55f3fbfb409d97e5f126140bd16c37f39b845bc598
-Clean extraction: PASS, 68 of 68 files
-
-Courses: 4
-Complete video scripts: 28
-Video files included: 0
-Recursive video scan: 0 findings
-DOCX accessibility: 0 high / 0 medium / 0 low
-DOCX visual QA: PASS, 117 pages reviewed
-Spreadsheet QA: PASS
-```
-
-### Course packages
-
-```text
-Cybersecurity Foundations for New Professionals
-Materials package SHA-256: 89c53e51d677a170b33e88e27272ce696e885fe6270ef1fff981fdeef9bc8718
-Non-video source package SHA-256: be6b4f089b24acf306a1919aa4741d8f80eb8c410005931b719a411f963d4f4c
-
-Generative AI Fundamentals for Business Leaders
-Materials package SHA-256: e208f0b937f7ddd9785e77e4e5a71dff51499b4f72006d8f1c3069d2e5d5fc99
-
-Large Language Models, LLMs, Explained for Leaders
-Materials package SHA-256: 84346f9d936065afa1faf80c4788eef2a390f4444970fd06820489c1e2b192b5
-
-Security Awareness for High Risk Employees
-Materials package SHA-256: d3ecaa1d50636988dd7939aa08a23e3fecb7688f1534d35f72b4b10ed1492cef
-```
-
-## Complete-package standard
-
-Each course package must contain and validate:
-
-1. Official title page, metadata, branding, disclosures, acknowledgement, purpose, outcomes, and orientation.
-2. Course-specific owner welcome script and exact identity media contract.
-3. Five substantive modules.
-4. Interactive SCORM/HTML5 instruction usable without embedded video.
-5. Seven complete owner-production scripts: welcome, five modules, and course close.
-6. Storyboard, shot, visual-support, on-screen text, and lower-third direction.
-7. Guided scenarios, applied exercises, learner workbook, job aids, self-assessments, and reflections.
-8. Five module knowledge checks.
-9. Twenty-five-question final assessment with an 80 percent passing requirement.
-10. Authoritative primary-source library with official URLs.
-11. LearnWorlds Draft activity map, completion rules, certificate controls, accessibility requirements, and desktop/mobile criteria.
-12. Video-delivery file naming, caption/transcript requirements, owner delivery checklist, traceability matrix, QA, manifest, hashes, and clean-extraction evidence.
-
-No placeholder activities, empty shells, obsolete embedded video, copied certification content, or unsupported claims are permitted.
-
-## Current next action
-
-Build `Executive Travel Risk Management` as a complete non-video course package:
-
-```text
-Level: Foundation
-Department: Protection
-Track: Executive Protection and Intelligence Academy
-Focus: travel risk planning, changing conditions, and safe escalation
-```
-
-Create all documents, scripts, SCORM, scenarios, workbook tools, job aids, assessments, authoritative resources, production specifications, accessibility evidence, QA records, manifests, and hashes. Do not generate any video. Mark every video insertion point as `OWNER PRODUCTION REQUIRED`.
+1. Obtain the exact current LearnWorlds assessment template from the actual Cybersecurity Foundations Draft exam.
+2. Rebuild and test-import the final assessment in that controlling template.
+3. Audit every other LearnWorlds-specific artifact against the actual current school interface and exact downloaded templates.
+4. Before generating the next course, check the actual current Obserra catalog/course page, actual LearnWorlds activity options and templates, and current official primary sources.
+5. Continue `Executive Travel Risk Management` only after the verification record is `PASSED`.
+6. Do not generate video.
+7. Preserve every discrepancy and failure.
 
 ## Evidence and release boundary
 
-Plans, scripts, manifests, package labels, mockups, placeholders, and intended settings do not prove video production, LearnWorlds operation, assessment behavior, learner completion, certificate issuance, accessibility in the LMS, desktop/mobile performance, or publication.
-
 ```text
-Continuous non-video package production: AUTHORIZED
+Actual-site verification: MANDATORY / NO EXCEPTIONS
+Assessment import files: BLOCKED pending exact live template
+Continuous non-video production: CONDITIONAL ON PASSED VERIFICATION
 Assistant-generated video: PROHIBITED
-Owner-produced videos: PENDING BY COURSE
 LearnWorlds runtime acceptance: NOT PROVEN
 Certificate issuance acceptance: NOT PROVEN
 Publication: BLOCKED
@@ -167,9 +151,9 @@ Production merge/cutover: BLOCKED
 ## Continuation command
 
 ```text
-Read the v13.2.0 Obserra EPI Academy handoff before acting. Use only Dr. Jody Blanchard, Founder and CEO; Obserra EPI Academy; Obserra EPI; Executive Protection & Intelligence; OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC; and www.obserrallc.com. Do not use employer references, outside titles, substitute identity, or unapproved voice. Do not generate any course video or spend video-provider credits. The owner will produce all videos. Build all course documents, scripts, teleprompter files, storyboards, on-screen text, SCORM, workbooks, exercises, assessments, authoritative resources, production matrices, caption/transcript specifications, delivery checklists, accessibility artifacts, QA evidence, manifests, hashes, and release packages. Preserve the four delivered package hashes and continue next with Executive Travel Risk Management in non-video mode. Mark all video insertion points OWNER PRODUCTION REQUIRED. Update protected and sanitized handoffs after every substantive action and never claim LearnWorlds or publication acceptance without direct evidence.
+Read the v13.3.0 Obserra EPI Academy handoff and the Actual-Site Verification Gate before acting. Check the actual current applicable sites, authenticated target objects, exact current templates, current official vendor documentation, official Obserra website/brand, and current official primary-source pages before generating any content. No exceptions. If the actual target or exact template cannot be checked, stop and record BLOCKED. The previously generated assessment workbooks are not upload-ready. Obtain the exact current LearnWorlds template from the actual Cybersecurity Foundations Draft assessment, preserve and hash the original, populate a copy without structural changes, test-import it, and record direct evidence. Use only Dr. Jody Blanchard, Founder and CEO; Obserra EPI Academy; Obserra EPI; Executive Protection & Intelligence; OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC; and www.obserrallc.com. Do not generate any course video. Update protected and sanitized handoffs after every verification, discrepancy, result, failure, package change, or owner decision.
 ```
 
 ## Public repository warning
 
-This repository is public. Complete manuscripts, assessment answers, owner media, provider identifiers, learner data, and security evidence must remain in protected storage. Public records contain sanitized governance and status evidence only.
+This repository is public. Complete manuscripts, assessment answers, authenticated screenshots, downloaded school-specific templates, owner media, provider identifiers, learner data, and security evidence must remain in protected storage. Public records contain sanitized governance and status evidence only.
