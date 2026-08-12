@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "policyId": "obserra-epi-academy-owner-identity-attribution-v1",
   "policyName": "Obserra EPI Academy Owner Identity and Attribution Policy",
   "appliesTo": [
@@ -39,9 +39,12 @@
     "shortBusinessName": "Obserra EPI",
     "epiMeaning": "Executive Protection & Intelligence",
     "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "officialWebsite": "https://www.obserrallc.com",
+    "officialWebsiteDisplay": "www.obserrallc.com",
     "standaloneObserraAllowedAsOrganizationName": false,
     "otherCompanyNamesAllowed": false,
-    "wrongOwnerAttributionAllowed": false
+    "wrongOwnerAttributionAllowed": false,
+    "wrongWebsiteAllowed": false
   },
   "brand": {
     "officialLogoPath": "/brand/obserra-logo.png",
@@ -57,12 +60,14 @@
     "logoRecoloringAllowed": false,
     "logoDistortionAllowed": false,
     "nameVariationAllowed": false,
+    "websiteVariationAllowed": false,
     "paletteDeviationAllowed": false
   },
   "approvedOwnerLowerThird": [
     "Dr. Jody Blanchard",
     "Founder and CEO",
-    "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC"
+    "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "www.obserrallc.com"
   ],
   "approvedSpokenIdentification": "I am Dr. Jody Blanchard, Founder and CEO of Obserra Executive Protection and Intelligence, L.L.C.",
   "permittedProductionChanges": [
@@ -91,6 +96,7 @@
     "employment history",
     "wrong company name",
     "wrong owner attribution",
+    "wrong website",
     "unapproved logo",
     "unapproved colors"
   ],
@@ -100,6 +106,7 @@
     "attributionMismatchRequiresImmediateRejection": true,
     "brandMismatchRequiresImmediateRejection": true,
     "incorrectMediaMustBeDeleted": true,
+    "deletionMayBeClaimedOnlyAfterProviderVerification": true,
     "learnWorldsUploadBlockedUntilOwnerApproval": true,
     "publicationBlockedUntilOwnerApproval": true
   }
