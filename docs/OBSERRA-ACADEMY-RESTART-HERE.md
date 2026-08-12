@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Restart Notice v13.6.0
+# Obserra EPI Academy Public Restart Notice v13.7.0
 
 Owner and presenter: Dr. Jody Blanchard
 
@@ -14,7 +14,7 @@ EPI meaning: Executive Protection & Intelligence
 
 Official website: https://www.obserrallc.com
 
-Status: The no-exceptions actual-site verification gate is mandatory. Every learner-facing substantive section of every current and future course must contain the complete verified LearnWorlds activity-category stack and its own native-template assessment. Course packages are grouped first by activity category and then by section. Cybersecurity Foundations has an eight-file section-assessment package; authenticated import and full section-level runtime acceptance remain pending. Assistant-generated course video is prohibited.
+Status: Actual-site verification, the complete per-section LearnWorlds activity stack, the every-section native-template assessment requirement, the current category-first folder schema, and the owner-only video-production rule are mandatory. Cybersecurity Foundations v6.2.0 contains substantial usable source assets and passes ZIP extraction, but it fails the current folder architecture and its own structural acceptance boolean. It must be corrected before owner review. LearnWorlds runtime acceptance and publication remain unproven and blocked.
 
 ## Mandatory restart sequence
 
@@ -23,68 +23,29 @@ Status: The no-exceptions actual-site verification gate is mandatory. Every lear
 3. Read `docs/academy-media-pipeline/ACTUAL-SITE-VERIFICATION-GATE.md`.
 4. Read `docs/academy-media-pipeline/PER-SECTION-LEARNWORLDS-ACTIVITY-ARCHITECTURE.md`.
 5. Read `docs/academy-media-pipeline/COURSE-SECTION-ASSESSMENT-STANDARD.md`.
-6. Read `docs/academy-media-pipeline/LEARNWORLDS-ASSESSMENT-NATIVE-TEMPLATE-CORRECTION-2026-08-12.md`.
-7. Read `config/academy-actual-site-verification-policy.json`.
-8. Read `config/academy-per-section-learnworlds-activity-standard.json`.
-9. Read `config/academy-course-section-assessment-policy.json`.
-10. Retrieve the protected private handoff and current verification evidence.
-11. Identify and inspect the actual current target sites, authenticated objects, native templates, and official sources before generating anything.
-12. Preserve and hash every untouched native template or export.
-13. Generate only after verification is `PASSED`.
-14. Recheck the actual site before import, upload, publication, or release.
-15. Update protected and sanitized handoffs after every site check, build, import result, discrepancy, failure, package version, or owner decision.
+6. Read `docs/academy-media-pipeline/CYBERSECURITY-V6-2-CORRECTIVE-PACKAGE-AUDIT-2026-08-12.md`.
+7. Read the related machine-readable policies.
+8. Retrieve the protected handoff and exact current source package.
+9. Check the actual current target sites, authenticated objects, native templates, official vendor documentation, official Obserra site/brand, and current official primary sources.
+10. Preserve and hash every untouched native template/export.
+11. Generate only after verification is `PASSED`.
+12. Update protected and sanitized handoffs after every audit, build, discrepancy, failure, package version, import result, or owner decision.
 
-## Permanent per-section activity rule
+## Permanent architecture
 
-```text
-Every learner-facing substantive section has the complete LearnWorlds activity-category stack: REQUIRED
-Every learner-facing section has its own assessment: REQUIRED
-Course package grouped by activity category and then by section: REQUIRED
-No exceptions: ENFORCED
-```
+Every substantive learner-facing section must contain:
 
-Verified categories:
+- Ebook overview/objectives, main content, FAQ/key terms, and summary/takeaways;
+- SCORM/HTML5, PDF handout/job aid, PPTX and PDF presentation, audio-ready narration/transcript, approved visual asset, and `OWNER PRODUCTION REQUIRED` video slot;
+- five-question native-template knowledge check, answer rationale, scoring/attempt/remediation controls, and applied text/file assignment with rubric;
+- self-assessment, reflection/goals, upload-your-work when applicable, and a section form;
+- Think and Share, Ask questions and discuss, Self-Reflection, and Assessment discussion when graded assessment is used;
+- verified official external resource or approved embed;
+- meaningful completion gate, accessibility alternatives, and QA evidence.
 
-```text
-Multimedia
-Ebook
-Exams
-Self-Assessment
-Forms
-Certificates
-Social
-Embed
-```
+Certificates and Course completion remain course-level lifecycle activities unless the owner later approves a verified module credential.
 
-Each substantive section must include:
-
-1. Section overview/objectives.
-2. Substantive main content.
-3. FAQ/key terms.
-4. Summary/takeaways.
-5. SCORM/HTML5 instruction.
-6. PDF learner handout or job aid.
-7. PPTX presentation and PDF export.
-8. Audio-ready narration script and transcript.
-9. Owner-video insertion point labeled `OWNER PRODUCTION REQUIRED`.
-10. Approved visual asset.
-11. Five-question native-template knowledge check or validated Graded SCORM.
-12. Applied Text assignment or File assignment with rubric.
-13. Self-assessment.
-14. Reflection/goals activity.
-15. Upload-your-work activity when applicable.
-16. Section form.
-17. Think and Share.
-18. Ask questions and discuss.
-19. Self-Reflection.
-20. Assessment discussion when graded assessment is used.
-21. Verified official external resource or embed.
-22. Meaningful completion gate.
-23. Accessibility alternatives and QA evidence.
-
-Certificates and Course completion remain course-level lifecycle activities unless Dr. Jody Blanchard later approves a verified module-credential design.
-
-## Mandatory package folder architecture
+## Required current package root
 
 ```text
 00_COURSE_ADMINISTRATION
@@ -102,107 +63,71 @@ Certificates and Course completion remain course-level lifecycle activities unle
 12_QA_EVIDENCE_AND_RELEASE
 ```
 
-Each category contains course-opening, every substantive section/module, and course-closing subfolders where applicable.
+Each category must contain the applicable course-opening, module, final-completion, and resource-section subfolders. Unused verified platform options require `NOT-USED-RATIONALE.md`.
 
-## Every-section assessment pattern
-
-For a standard five-module course:
-
-```text
-Welcome and orientation: 5-question baseline self-assessment
-Module 1: 5-question graded knowledge check
-Module 2: 5-question graded knowledge check
-Module 3: 5-question graded knowledge check
-Module 4: 5-question graded knowledge check
-Module 5: 5-question graded knowledge check
-Final assessment and completion: 25-question cumulative exam
-Authoritative resource library: 5-question source-literacy self-assessment
-```
-
-Graded section checks and the final assessment use an 80 percent pass mark unless the owner changes it.
-
-## Native LearnWorlds template
+## Native assessment standard
 
 ```text
 Template: Question Bank Template.xlsx
 SHA-256: 23e591abe440b3c05139a44543d9626ef17c251d42f30881e6e49f51e027ad7e
 Worksheets: Instructions, Examples, Questions
+Required headings: Group, Type, Question, CorAns, Answer1 through Answer10, CorrectExplanation, IncorrectExplanation
 ```
 
-Exact `Questions` headings:
+For a standard five-module course: five-question Welcome baseline, five-question checks for Modules 1-5, twenty-five-question final exam, and five-question resource-literacy self-assessment. Graded checks and final use an 80 percent pass mark unless the owner changes it.
+
+## Cybersecurity v6.2.0 corrective state
 
 ```text
-Group
-Type
-Question
-CorAns
-Answer1
-Answer2
-Answer3
-Answer4
-Answer5
-Answer6
-Answer7
-Answer8
-Answer9
-Answer10
-CorrectExplanation
-IncorrectExplanation
+Package: Obserra-EPI-Academy-Cybersecurity-Foundations-Category-First-Video-Ready-v6.2.0.zip
+SHA-256: 788d5a36204725849cc623159ddcde16c8259f566e1169e92d13d3a094ab01b5
+Bytes: 63,077,096
+Members: 219
+Clean extraction: PASS
+Current authoritative folder schema: FAIL
+Internal structural acceptance boolean: FAIL
+Active validation-evidence cleanup: REQUIRED
+Owner module videos: PENDING
+Authenticated LearnWorlds runtime acceptance: NOT PROVEN
+Final owner-review package: NOT READY
 ```
 
-Graded files use `exam_`. Non-graded self-assessments use `selfassessment_`. Native tabs, headings, order, formatting, and plain-text requirements must remain exact.
+Eleven required current root categories are absent and eleven legacy categories appear instead. The internal report sets `passedCategoryFirstNonVideoStructuralGate` to false and lists stale prohibited terms in active validation evidence.
 
-## Cybersecurity Foundations current assessment evidence
-
-```text
-Package: Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Section-Assessments-v2.2.0.zip
-SHA-256: f80171e10b612d85d3d48d8ba467e529fb1b0677bafc994eccf84021083002c5
-Learner-facing sections: 8
-Assessment workbooks: 8
-Total questions: 60
-Native-template structural validation: PASSED
-Clean extraction: PASSED
-Authenticated import: NOT PERFORMED
-Runtime acceptance: NOT PROVEN
-```
-
-## Actual-site verification rule
-
-Before generating any section artifact, check the actual current target course and activity options, exact native templates, official LearnWorlds documentation, official Obserra site/brand, and current official primary sources. If verification cannot be completed, stop and record `BLOCKED`.
-
-## Permanent video-production directive
+## Permanent video boundary
 
 ```text
 ChatGPT-generated course video: PROHIBITED
-Connected-provider course video generation: PROHIBITED
+Connected-provider course-video generation: PROHIBITED
 Additional provider-credit expenditure: PROHIBITED
 Final video production and approval: Dr. Jody Blanchard
 ```
 
-Every video activity remains `OWNER PRODUCTION REQUIRED` until the owner supplies the final file.
+All video positions remain `OWNER PRODUCTION REQUIRED` until the owner supplies the final files.
 
 ## Current controlled action
 
-1. Import the eight Cybersecurity Foundations assessment workbooks into the matching Draft sections.
-2. Verify question counts, groups, correct-answer mapping, feedback, pass marks, attempts, remediation, save/reopen persistence, and desktop/mobile learner behavior.
-3. Audit and rebuild every Cybersecurity section against the complete activity-category stack.
-4. Reissue the full course package using the category-first folder architecture.
-5. Retrofit Generative AI, LLMs, and High-Risk Employees section by section.
-6. Apply the standard to Executive Travel Risk Management and every future course only after actual-site and primary-source verification passes.
-7. Do not generate video.
-8. Preserve every discrepancy and failure.
+1. Rebuild Cybersecurity Foundations to the exact current category-first and per-section architecture.
+2. Migrate all usable source assets into their controlling categories and sections.
+3. Add every missing artifact, activity configuration, completion rule, accessibility alternative, evidence record, and controlled not-used rationale.
+4. Retain and validate exact native-template assessments.
+5. Remove or isolate stale prohibited strings from active release evidence.
+6. Generate one immutable corrected ZIP with new manifest, hash, validation, and clean-extraction records.
+7. Deliver the corrected Cybersecurity package for owner review.
+8. Continue in order to Generative AI, LLMs for Leaders, High-Risk Employee Awareness, Executive Travel Risk Management, and the remaining catalog.
+9. Do not generate video.
+10. Never claim LearnWorlds readiness without authenticated import/runtime evidence.
 
 ## Release boundary
 
 ```text
 Actual-site verification: MANDATORY / NO EXCEPTIONS
-Complete activity stack in every learner-facing section: MANDATORY
-Assessment in every learner-facing section: MANDATORY / NO EXCEPTIONS
-Cybersecurity section-assessment package: STRUCTURALLY PASSED / IMPORT PENDING
-All courses: FULL SECTION RETROFIT REQUIRED
+Complete per-section activity stack: MANDATORY
+Assessment in every learner-facing section: MANDATORY
+Cybersecurity v6.2.0: CORRECTIVE SOURCE / NOT FINAL
+Other courses: RETROFIT AND REISSUE REQUIRED
 Assistant-generated video: PROHIBITED
 LearnWorlds runtime acceptance: NOT PROVEN
-Certificate issuance acceptance: NOT PROVEN
 Publication: BLOCKED
 Live checkout: BLOCKED
 Production merge/cutover: BLOCKED
@@ -211,9 +136,9 @@ Production merge/cutover: BLOCKED
 ## Continuation command
 
 ```text
-Read the v13.6.0 restart notice, Latest Handoff, Actual-Site Verification Gate, Per-Section LearnWorlds Activity Architecture, and Course Section Assessment Standard before acting. Every learner-facing substantive section of every course must include the full verified LearnWorlds category stack and its own native-template assessment. Group package folders first by activity category and then by section. Use the exact owner-supplied Question Bank Template with SHA-256 23e591abe440b3c05139a44543d9626ef17c251d42f30881e6e49f51e027ad7e. Do not claim readiness until authenticated import and runtime behavior are verified. Use only Dr. Jody Blanchard, Founder and CEO; Obserra EPI Academy; Obserra EPI; Executive Protection & Intelligence; OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC; and www.obserrallc.com. Do not generate course video. Update protected and sanitized records after every site check, build, import, discrepancy, failure, package change, or owner decision.
+Read the v13.7.0 restart notice, Latest Handoff, Continuous Handoff, Actual-Site Verification Gate, Per-Section LearnWorlds Activity Architecture, Course Section Assessment Standard, and Cybersecurity v6.2 corrective audit before acting. Correct Cybersecurity Foundations to the exact current root schema and per-section category stack. Preserve the exact native assessment template. Do not generate video. Deliver only after one immutable corrected ZIP passes schema, content, identity, brand, assessment, accessibility, manifest, hash, and clean-extraction checks. Then continue to the next courses in the governed order. Update protected and sanitized records after every substantive action or failure.
 ```
 
 ## Public repository warning
 
-This repository is public. Complete manuscripts, assessment answers, authenticated screenshots, downloaded school-specific templates, owner media, provider identifiers, learner data, and security evidence remain in protected storage. Public records contain sanitized governance and status evidence only.
+This repository is public. Complete manuscripts, assessment answers, authenticated screenshots, downloaded school-specific templates, owner media, provider identifiers, learner data, and protected Academy intellectual property remain outside the public repository. Public records contain sanitized governance and status evidence only.
