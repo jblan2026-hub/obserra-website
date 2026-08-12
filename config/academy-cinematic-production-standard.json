@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "standardId": "obserra-cinematic-enterprise-v1",
   "standardName": "Obserra Cinematic Enterprise Learning Standard",
   "qualityClass": "cinematic-enterprise",
@@ -13,7 +13,56 @@
   "intent": {
     "targetExperience": "Cinematic executive learning with realistic human delivery, Fortune 500 presentation discipline, and film-quality visual storytelling.",
     "comparisonBoundary": "The standard uses cinematic craft and executive communication quality as design targets. It does not claim affiliation with a film studio, production company, or Fortune 500 company.",
-    "primaryFailureToPrevent": "Robotic avatar delivery, static presenter footage, generic stock montage, weak audio, repetitive scenes, and low-quality template production."
+    "primaryFailureToPrevent": "Robotic avatar delivery, static presenter footage, generic stock montage, weak audio, repetitive scenes, low-quality template production, and unbranded course openings."
+  },
+  "brand": {
+    "academyName": "Obserra EPI Academy",
+    "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "officialLogoPath": "/brand/obserra-logo.png",
+    "presenterName": "Dr. Jody Blanchard",
+    "presenterTitle": "Founder and Cybersecurity Executive",
+    "palette": ["#050B18", "#0B1730", "#C9A227", "#FFFFFF", "#53B7FF"],
+    "logoModificationProhibited": true,
+    "officialLogoRequiredOnTitlePage": true,
+    "presenterLowerThirdRequired": true
+  },
+  "courseOpening": {
+    "requiredForEveryCourse": true,
+    "mustOccurBeforeInstruction": true,
+    "sequence": [
+      "official-branded-course-title-page",
+      "required-learner-disclaimer",
+      "on-camera-dr-jody-blanchard-introduction",
+      "course-orientation-and-transition-to-module-one"
+    ],
+    "titlePageSeconds": {
+      "minimum": 3,
+      "target": 5,
+      "maximum": 7
+    },
+    "disclaimerSeconds": {
+      "minimum": 8,
+      "target": 10,
+      "maximum": 15
+    },
+    "introMaster": {
+      "minimumWidthPixels": 3840,
+      "minimumHeightPixels": 2160,
+      "aspectRatio": "16:9",
+      "highestProviderQualityRequired": true,
+      "upscaleWhenSourceBelow4K": true,
+      "upscaleMayNotAlterIdentity": true,
+      "upscaleMayNotRetouchFace": true,
+      "upscaleMayNotChangeVoice": true,
+      "final1080pOnlyIntroProhibitedWhen4KSupported": true
+    },
+    "commonLearnerDisclaimer": "Obserra EPI Academy courses provide educational and professional-development content. They do not constitute legal, regulatory, medical, investigative, or organization-specific advice; do not authorize action outside the learner's role; and do not confer professional certification, licensure, accreditation, or regulatory approval. Scenarios may be fictional or composite. Learners must follow applicable law, policy, contractual obligations, and authorized escalation procedures.",
+    "syntheticMediaDisclosure": "This course uses the authorized digital likeness or synthetic media tools approved by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC.",
+    "intellectualPropertyNotice": "Copyright OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC. All course content, media, frameworks, assessments, and learner materials are proprietary unless expressly identified otherwise.",
+    "courseSpecificDisclaimerRequired": true,
+    "disclaimerMustBeInTranscript": true,
+    "disclaimerMustBeInCourseMetadata": true,
+    "learnerAcknowledgementRequired": true
   },
   "courseVideoArchitecture": {
     "requiredInstructionalModules": 5,
@@ -65,7 +114,9 @@
       "applied action and reflection"
     ],
     "requiredCourseElements": [
-      "course-specific welcome",
+      "official branded course title page",
+      "learner disclaimer and acknowledgement",
+      "course-specific on-camera introduction from Dr. Jody Blanchard",
       "five cinematic module anchor films",
       "five module visual packs",
       "practical scenario in every module",
@@ -82,6 +133,17 @@
   },
   "presenterPerformance": {
     "authorizedAvatarAndVoiceOnly": true,
+    "identityPreservationRequired": true,
+    "voiceIdentityPreservationRequired": true,
+    "recognizableAppearancePreservationRequired": true,
+    "scriptMayChangeByCourse": true,
+    "wardrobeMayChangeByCourse": true,
+    "backgroundMayChangeByCourse": true,
+    "lightingAndFramingMayChangeByCourse": true,
+    "faceReshapingProhibited": true,
+    "beautificationAndSkinSmoothingProhibited": true,
+    "ageOrHairModificationProhibited": true,
+    "voiceSubstitutionProhibited": true,
     "naturalBlinkingRequired": true,
     "naturalBreathingAndMicroMovementRequired": true,
     "directEyeContactRequired": true,
@@ -160,6 +222,10 @@
   },
   "learnWorldsDelivery": {
     "videoLearningActivityRequired": true,
+    "openingSequenceBeforeLessonsRequired": true,
+    "titlePageActivityRequired": true,
+    "disclaimerAcknowledgementRequired": true,
+    "instructorIntroActivityRequired": true,
     "selectableCaptionsRequired": true,
     "verifiedTranscriptRequired": true,
     "chapterMarkersRequired": true,
@@ -187,6 +253,10 @@
     "videoStreamRequired": true,
     "audioStreamRequiredForPresenterVideo": true,
     "minimumResolutionRequired": true,
+    "courseIntro4KResolutionRequired": true,
+    "titlePageAssetRequired": true,
+    "disclaimerAssetRequired": true,
+    "officialLogoReferenceRequired": true,
     "durationRangeRequired": true,
     "audioSampleRateRequired": true,
     "pathContainmentRequired": true,
@@ -202,13 +272,18 @@
     "cinematicRealismApprovalRequired": true,
     "instructionalAccuracyApprovalRequired": true,
     "brandApprovalRequired": true,
+    "disclaimerApprovalRequired": true,
     "rightsAndProvenanceApprovalRequired": true,
     "learnWorldsPlaybackApprovalRequired": true
   },
   "releaseProhibitions": [
+    "course lessons begin before the required branded opening sequence",
+    "course intro final master below 3840 by 2160 when 4K is supported",
+    "missing official title page, learner disclaimer, or instructor introduction",
     "single static avatar for an entire module",
     "robotic or evenly metered speech",
     "unreviewed synthetic voice",
+    "face reshaping, beautification, skin smoothing, age change, or voice substitution",
     "placeholder people or template copy",
     "generic stock footage unrelated to the learning objective",
     "unsupported facts or invented case claims",
