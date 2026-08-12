@@ -8,6 +8,9 @@ const standard = JSON.parse(
 const configuration = JSON.parse(
   fs.readFileSync("config/academy-media-factory.json", "utf8"),
 );
+const openingStandard = JSON.parse(
+  fs.readFileSync("config/academy-course-opening-standard.json", "utf8"),
+);
 const factory = fs.readFileSync("scripts/academy-media-factory.mjs", "utf8");
 const productionDocument = fs.readFileSync(
   "docs/academy-media-pipeline/OBSERRA-CINEMATIC-FORTUNE-500-PRODUCTION-STANDARD.md",
@@ -17,10 +20,11 @@ const productionDocument = fs.readFileSync(
 const commonGates = new Set(configuration.qualityGates.common);
 const heygenGates = new Set(configuration.qualityGates.heygen);
 const polloGates = new Set(configuration.qualityGates.pollo);
-const standardText = JSON.stringify(standard);
+const standardText = JSON.stringify({ standard, configuration, openingStandard });
 
 test("cinematic enterprise standard applies equally to every Academy course", () => {
-  assert.equal(configuration.schemaVersion, "1.2.0");
+  assert.equal(configuration.schemaVersion, "1.3.0");
+  assert.equal(standard.schemaVersion, "1.1.0");
   assert.equal(standard.standardId, "obserra-cinematic-enterprise-v1");
   assert.equal(standard.qualityClass, "cinematic-enterprise");
   assert.equal(standard.appliesTo.allAcademyCourses, true);
@@ -29,6 +33,28 @@ test("cinematic enterprise standard applies equally to every Academy course", ()
   assert.equal(configuration.productionStandard.tierMayChangeReleasePriorityOnly, true);
   assert.equal(configuration.productionStandard.tierMayNotReduceVideoQuality, true);
   assert.equal(configuration.productionStandard.standardId, standard.standardId);
+  assert.equal(openingStandard.standardId, "obserra-course-opening-v1");
+  assert.equal(openingStandard.appliesTo.allAcademyCourses, true);
+});
+
+test("every course begins with official branding, disclosures, and a 4K owner introduction", () => {
+  assert.equal(standard.courseOpening.requiredForEveryCourse, true);
+  assert.equal(standard.courseOpening.mustOccurBeforeInstruction, true);
+  assert.deepEqual(standard.courseOpening.sequence, [
+    "official-branded-course-title-page",
+    "required-learner-disclaimer",
+    "on-camera-dr-jody-blanchard-introduction",
+    "course-orientation-and-transition-to-module-one",
+  ]);
+  assert.equal(standard.courseOpening.introMaster.minimumWidthPixels, 3840);
+  assert.equal(standard.courseOpening.introMaster.minimumHeightPixels, 2160);
+  assert.equal(standard.courseOpening.introMaster.highestProviderQualityRequired, true);
+  assert.equal(standard.courseOpening.introMaster.upscaleWhenSourceBelow4K, true);
+  assert.equal(standard.courseOpening.introMaster.upscaleMayNotAlterIdentity, true);
+  assert.equal(configuration.productionStandard.allCourseIntros4KRequired, true);
+  assert.equal(configuration.productionStandard.officialTitlePageRequired, true);
+  assert.equal(configuration.productionStandard.learnerDisclaimerRequired, true);
+  assert.equal(configuration.productionStandard.onCameraOwnerIntroBeforeLessonsRequired, true);
 });
 
 test("course architecture requires five cinematic module films and prevents robotic avatar-only production", () => {
@@ -47,8 +73,13 @@ test("course architecture requires five cinematic module films and prevents robo
   assert.match(factory, /module-cinematic-visual-pack-/);
 });
 
-test("all media jobs inherit cinematic, anti robotic, and LearnWorlds playback gates", () => {
+test("all media jobs inherit cinematic, opening, anti robotic, and LearnWorlds playback gates", () => {
   for (const gate of [
+    "official-obserra-title-page-applied",
+    "learner-disclaimer-and-acknowledgement-present",
+    "dr-jody-blanchard-intro-before-lessons",
+    "course-intro-4k-uhd-master-required",
+    "highest-supported-intro-quality-selected",
     "cinematic-enterprise-standard-applied",
     "cinematic-story-arc-approved",
     "scene-plan-shot-list-and-storyboard-approved",
@@ -64,13 +95,20 @@ test("all media jobs inherit cinematic, anti robotic, and LearnWorlds playback g
   assert.match(factory, /const common = \[\.\.\.config\.qualityGates\.common\]/);
 });
 
-test("HeyGen gates require realistic human delivery and short presenter segments", () => {
+test("HeyGen gates require realistic human delivery, identity preservation, and 4K course intros", () => {
   for (const gate of [
+    "authorized-avatar-and-voice-only",
+    "presenter-identity-and-recognizable-appearance-locked",
+    "voice-identity-accent-and-cadence-character-locked",
+    "script-may-change-by-course",
+    "wardrobe-background-lighting-and-framing-may-change",
+    "face-reshaping-beautification-skin-smoothing-and-age-change-prohibited",
     "likeness-and-voice-similarity-review-passed",
     "natural-pacing-pauses-and-executive-tone",
     "robotic-cadence-prohibited",
     "maximum-20-seconds-unbroken-avatar",
     "presenter-screen-time-between-35-and-55-percent",
+    "course-intro-3840x2160-rec709-master-exported",
     "natural-breathing-pauses-and-emphasis",
     "realistic-eye-contact-blinks-and-gestures",
     "presenter-cutaways-mask-avatar-repetition",
@@ -103,10 +141,16 @@ test("cinematic masters meet enterprise video, audio, accessibility, and LearnWo
   assert.equal(standard.visualMaster.videoCodec, "H.264");
   assert.equal(standard.visualMaster.minimumWidthPixels, 1920);
   assert.equal(standard.visualMaster.minimumHeightPixels, 1080);
+  assert.equal(standard.courseOpening.introMaster.minimumWidthPixels, 3840);
+  assert.equal(standard.courseOpening.introMaster.minimumHeightPixels, 2160);
   assert.equal(standard.visualMaster.colorSpace, "Rec.709");
   assert.equal(standard.audioMaster.sampleRateHz, 48000);
   assert.equal(standard.audioMaster.maximumTruePeakDbtp, -1);
   assert.equal(standard.audioMaster.musicFreeMasterRequired, true);
+  assert.equal(standard.learnWorldsDelivery.openingSequenceBeforeLessonsRequired, true);
+  assert.equal(standard.learnWorldsDelivery.titlePageActivityRequired, true);
+  assert.equal(standard.learnWorldsDelivery.disclaimerAcknowledgementRequired, true);
+  assert.equal(standard.learnWorldsDelivery.instructorIntroActivityRequired, true);
   assert.equal(standard.learnWorldsDelivery.selectableCaptionsRequired, true);
   assert.equal(standard.learnWorldsDelivery.verifiedTranscriptRequired, true);
   assert.equal(standard.learnWorldsDelivery.knowledgeCheckAfterModuleVideoRequired, true);
@@ -124,7 +168,7 @@ test("production standard document prohibits robotic and low quality course patt
   assert.match(productionDocument, /same cinematic quality standard/i);
 });
 
-test("cinematic configuration and standard contain no credential values", () => {
+test("cinematic configuration and standards contain no credential values", () => {
   for (const marker of [
     /api[_-]?key["']?\s*:\s*["'][^"']+/i,
     /access[_-]?token["']?\s*:\s*["'][^"']+/i,
