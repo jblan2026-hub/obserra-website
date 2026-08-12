@@ -14,7 +14,7 @@ EPI meaning: Executive Protection & Intelligence
 
 Official website: https://www.obserrallc.com
 
-Status: Controlled first-course rebuild is in progress. First-course, media, security, LearnWorlds acceptance, and production acceptance are incomplete.
+Status: Complete first-course review package v3.0.0 has been built in protected artifact storage. Owner-introduction media review and LearnWorlds runtime acceptance remain incomplete. Production release is not authorized.
 
 ## Mandatory continuous-handoff discipline
 
@@ -22,21 +22,19 @@ Every substantive action, decision, validation result, evidence item, blocker, a
 
 This rule is permanent and exists specifically so a restarted chat cannot forget prior actions, failures, owner approvals, identity constraints, provider state, package status, or the first incomplete controlled action.
 
-Protected/private records remain authoritative for provider identifiers, source media, security evidence, private prompts, and other confidential material. This public handoff contains only the sanitized operational boundary.
+Protected/private records remain authoritative for provider identifiers, source media, security evidence, private prompts, and confidential course material. This public handoff contains only the sanitized operational boundary.
 
 ## Current first-course priority
 
 Complete `Cybersecurity Foundations for New Professionals` inside the existing LearnWorlds Draft course and present it to Dr. Jody Blanchard for end-to-end review before producing additional courses or redesigning the broader LearnWorlds site.
 
-The course must include substantive five-module instruction, official branding, a professional course description, official branded title page, learner disclosures and acknowledgement, the exact owner welcome before Module 1, course orientation, pedagogically appropriate LearnWorlds activities, guided practice, knowledge checks, official NIST and other authoritative primary resources, downloadable learner tools, a 25-question final assessment, an 80 percent passing rule, completion controls, accessibility artifacts, and certificate validation.
-
-The existing `Obserra-Cybersecurity-Foundations-LearnWorlds-Import-v2.0.0.zip` is explicitly classified as an intermediate import package, not the final governed course package. Earlier structural build/validation results do not constitute full course acceptance because the complete opening sequence, approved owner introduction, accessibility, certificate/completion evidence, and end-to-end LearnWorlds acceptance were not yet satisfied.
+The existing `Obserra-Cybersecurity-Foundations-LearnWorlds-Import-v2.0.0.zip` is an intermediate import package only and is superseded for final owner review by the v3.0.0 complete review package described below.
 
 ## Owner identity and attribution lock
 
 Any video that uses Dr. Jody Blanchard's name or title must use his exact approved face and exact approved voice.
 
-The only approved learner-facing attribution is:
+Approved learner-facing attribution:
 
 ```text
 Dr. Jody Blanchard
@@ -46,8 +44,6 @@ www.obserrallc.com
 ```
 
 No alternate title, additional title, current employer name, former employer name, employer logo, outside job title, employment history, wrong company, or wrong owner attribution may appear in Academy or LearnWorlds content.
-
-The script, professional wardrobe, background, set, lighting, framing, pose, restrained natural movement, official graphics, captions, identity-preserving speech cleanup, and identity-preserving 4K processing may change. The person and voice may not change.
 
 ## Registered brand lock
 
@@ -59,80 +55,88 @@ Legal company: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 Official website: https://www.obserrallc.com
 ```
 
-Standalone `Obserra` is not an approved Academy or short business name. The registered names, official logo, approved colors, and official website may not be changed.
+## HeyGen controlled owner-introduction state
 
-## Current HeyGen owner-source state
+The owner supplied and approved the `Professional man speaking to camera.` HeyGen project as the canonical owner-video source.
 
-The owner directly supplied the approved HeyGen `Professional man speaking to camera.` project URL and confirmed that this project is the canonical owner-video source for the Academy introduction. No generated alternate look may be substituted merely because it belongs to the same avatar group.
+Preserved failure: a direct authenticated standard-video lookup using the dashboard project/upscale identifier returned HTTP 404. The identifier is therefore not treated as a standard API video ID. This does not invalidate the owner-approved project.
 
-### Preserved provider failure
+Controlled action: after explicit owner direction to continue, one 4K 16:9 controlled review render was started from the owner-supplied approved project's upscaled source frame using the authenticated private voice explicitly labeled as the approved exact-source owner voice. The provider accepted the render and returned `waiting`. The render remains unapproved until exact identity, exact voice, speech clarity, visual quality, captions, and overall professionalism are reviewed.
 
-A direct authenticated HeyGen video lookup using the owner-supplied project/upscale identifier returned HTTP 404. This proves that the dashboard project/upscale identifier is not directly retrievable as a standard HeyGen API video ID through the connected `get_video` endpoint. The failure is preserved and must not be represented as proof that the approved project is absent or invalid.
+## Complete review package v3.0.0 built
 
-### Controlled review render started
-
-After the owner explicitly directed continuation and had already approved the exact project source, one controlled review render was started using the owner-supplied approved project's upscaled thumbnail/source frame plus the private voice explicitly labeled as the approved exact-source owner voice in the authenticated HeyGen account.
-
-The render is configured for:
-
-- 3840x2160 4K;
-- 16:9 MP4;
-- restrained executive motion;
-- professional course-specific script;
-- sidecar captions;
-- approved sole title `Founder and CEO`;
-- no employer names, outside titles, or employment history;
-- owner review before any release or LearnWorlds use.
-
-The provider accepted the render request and returned status `waiting`. The exact render identifier is retained in the protected private handoff and omitted from this public record. The render is not approved merely because generation was accepted; exact face, exact voice, visual quality, speech clarity, captions, and identity preservation must be reviewed after completion.
-
-## Intro production requirements
-
-The Cybersecurity Foundations owner introduction is governed to appear before Module 1; use the exact approved owner source only; use the sole approved title `Founder and CEO`; contain no current or former employer names, logos, outside titles, or employment history; use a professional course-specific welcome script; master at 3840x2160, 16:9, highest supported production quality; use identity-preserving 4K processing; use precision speech cleanup without changing voice identity; apply background-noise reduction, dialogue leveling, and de-click/de-ess when needed; use clean audio; include captions, transcript, and thumbnail; and retain owner review and approval before release.
-
-## Current package-rebuild action
-
-The owner directed that the first course be completed as a superseding governed package because the prior package did not meet all requirements. The rebuild must close every requirement from the commercial audit, course-opening standard, identity/brand rules, accessibility requirements, assessment/completion contract, and owner-introduction media standard.
-
-Because this repository is public and its own security boundary prohibits confidential course manuscripts and protected media from being committed here, the complete learner-facing course package must be produced in protected/private artifact storage. GitHub receives sanitized governance, status, validation, and failure evidence only.
-
-Current acceptance state:
+A superseding protected review package has now been built:
 
 ```text
-Prior v2.0.0 package: intermediate only; superseded for final acceptance
-Five-module instructional structure: exists in prior package; governed completeness review in progress
-Official branded title page: required; final package acceptance pending
-Learner disclosures and acknowledgement: required; final package acceptance pending
-Exact-owner course introduction: controlled 4K review render started; provider status waiting
-Course orientation: required; final package acceptance pending
-Authoritative resources and source register: required; final package acceptance pending
-Learner workbook and job aids: required; final package acceptance pending
-Module knowledge checks and guided practice: required; final package acceptance pending
-Final assessment: 25 questions, 80 percent passing; LearnWorlds acceptance pending
-Captions/transcripts/accessibility artifacts: required; final acceptance pending
-Completion controls: pending
-Certificate validation: pending
-LearnWorlds content load evidence: pending
+Obserra-Cybersecurity-Foundations-Complete-Review-v3.0.0.zip
+```
+
+The package is stored in the owner's protected ChatGPT Library under:
+
+```text
+/Obserra EPI Academy/Course Review Packages/
+```
+
+The package contains the complete review-stage course manuscript and implementation artifacts, including:
+
+1. Complete five-module course manuscript with substantive instruction.
+2. Official Obserra EPI Academy title/identity block.
+3. Learner notice, disclaimer, and non-certification/non-compliance language.
+4. Course purpose, outcomes, orientation, and controlled owner-introduction transcript.
+5. Guided scenarios and reflection prompts throughout all five modules.
+6. Learner workbook with risk, access, phishing-triage, incident-reporting, and secure-habits exercises.
+7. Suspicious-activity job aid.
+8. Initial-incident-report job aid.
+9. Authoritative source register centered on NIST and CISA primary guidance.
+10. Five module knowledge checks totaling 25 module-check questions.
+11. Native final-assessment workbook containing 25 final questions and an 80 percent passing control.
+12. LearnWorlds Draft implementation map defining the opening section, five modules, assessment, completion, certificate, and accessibility requirements.
+13. Owner-introduction transcript and draft subtitle artifact; final timestamps must be replaced by provider-generated/final-media timing.
+14. Owner review/release checklist with evidence-required gates.
+15. Machine-readable manifest and package integrity information.
+
+The package is a review release. It does not claim LearnWorlds runtime acceptance, certificate issuance, final media acceptance, or publication readiness.
+
+## Current acceptance state
+
+```text
+Prior v2.0.0 package: superseded for final review
+Complete protected review package v3.0.0: built
+Five-module substantive instruction: built for review
+Official branded title/identity block: built for review
+Learner disclosures/non-certification language: built for review
+Course orientation: built for review
+Guided scenarios/reflections: built for review
+Learner workbook/job aids: built for review
+Authoritative source register: built for review
+Module knowledge checks: built for review
+Final assessment: 25 questions / 80 percent control built for review
+LearnWorlds implementation map: built for review
+Accessibility acceptance requirements: documented; runtime validation pending
+Exact-owner course introduction: controlled 4K review render waiting
+Final owner-intro captions/timing: pending completed media
+LearnWorlds content load: pending
+Completion controls runtime test: pending
+Certificate runtime validation: pending
 Desktop/mobile validation: pending
 Owner end-to-end approval: pending
 Production merge/live checkout/publication: blocked
 ```
 
-## Current public status
+## Security boundary
 
-```text
-Repository visibility: public; confidential provider data and course manuscripts must remain out of repository
-Pull request: Draft
-Exact approved owner source: identified by owner
-Direct API lookup of project/upscale ID: failed with 404; preserved
-Corrected exact-owner 4K introduction: controlled review render waiting
-Superseding first-course package: rebuild in progress in protected artifact storage
-LearnWorlds first-course loading: pending
-Assessment, resources, completion, certificate, accessibility, desktop, and mobile acceptance: pending
-Production merge, live checkout, additional-course rollout, and publication: blocked
-```
+The repository is public. Confidential course manuscripts, protected media, assessment answer material, provider identifiers, and other protected Academy intellectual property must not be committed here. GitHub receives sanitized governance and validation evidence only. The complete v3.0.0 learner package is retained in protected artifact storage.
 
-## Continuation
+## First incomplete controlled action
+
+1. Poll and inspect the controlled owner-introduction render when complete.
+2. Reject or correct it if exact owner identity, exact voice, speech clarity, 4K quality, or professional presentation does not pass.
+3. Once owner media is accepted, insert the final video/captions/transcript into the protected v3 package and increment the package version/hash.
+4. Load the complete package into the existing LearnWorlds Draft course through an authenticated supported path.
+5. Validate opening acknowledgement, all five modules, activities, assessment, 80 percent pass rule, completion, certificate, resources, accessibility, desktop, and mobile behavior.
+6. Obtain explicit owner approval before any publication, live checkout, template reuse, additional-course production, or production cutover.
+
+## Continuation sources
 
 Read:
 
@@ -144,6 +148,6 @@ Read:
 6. `docs/academy-media-pipeline/FAILURE-REGISTER-ADDENDUM-IDENTITY-TITLE-BRAND-CREDIT-DRIFT.md`
 7. `config/academy-owner-identity-attribution-policy.json`
 8. `config/academy-course-opening-standard.json`
-9. The protected private handoff.
+9. The protected private handoff and protected v3.0.0 course review package.
 
-Continue from the first incomplete course-build action and poll the controlled owner-introduction render as appropriate. Preserve the exact approved owner source, sole Founder and CEO title, no-employer rule, registered brand, official website, complete opening sequence, 4K speech-cleaned owner introduction, five substantive modules, authoritative resources, learner tools, assessment, completion, accessibility, certificate, and owner-review gates. Update the handoff immediately after every substantive action or failure. Do not claim LearnWorlds acceptance, publication, merge, live checkout, or production cutover without direct evidence and explicit owner approval.
+Update this handoff immediately after every substantive action or failure. Do not claim LearnWorlds acceptance, publication, merge, live checkout, or production cutover without direct evidence and explicit owner approval.
