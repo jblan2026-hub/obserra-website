@@ -21,11 +21,19 @@ export type CourseOpening = {
     versionLabel: string;
   };
   introduction: {
+    purpose: "owner-course-welcome";
     requiredBeforeFirstLesson: true;
     script: string;
     transcript: string[];
     spokenPronunciation: {
       cybersecurity: "cyber security";
+    };
+    ownerSignature: {
+      name: "Dr. Jody Blanchard";
+      title: "Founder and Cybersecurity Executive";
+      company: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
+      placement: "bottom-of-course-welcome-script";
+      spoken: false;
     };
     video: {
       status: "awaiting-owner-approved-master" | "approved";
@@ -54,31 +62,30 @@ export type CourseOpening = {
 const academyName = "Obserra EPI Academy" as const;
 const legalName = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" as const;
 const officialLogoPath = "/brand/obserra-logo.png" as const;
+const presenterName = "Dr. Jody Blanchard" as const;
+const presenterTitle = "Founder and Cybersecurity Executive" as const;
 
-function cybersecurityFoundationsScript() {
+function cybersecurityFoundationsWelcomeScript() {
   return [
-    "Welcome to Obserra EPI Academy.",
-    "I am Dr. Jody Blanchard, founder and cyber security executive at Obserra Executive Protection and Intelligence, L.L.C.",
-    "You are beginning Cybersecurity Foundations for New Professionals.",
-    "This course is designed to help you understand cyber security as a business and mission responsibility, recognize common indicators of risk, apply identity and control fundamentals, report suspicious activity safely, and build repeatable habits that strengthen resilience.",
-    "Three principles will guide your work. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Document a defensible next step so another professional can review it.",
-    "Use the scenarios, guided practice, knowledge checks, workbook activities, and final assessment to apply what you learn.",
-    "Examples may be fictional or composite. Follow applicable law, organizational policy, privacy requirements, and approved escalation procedures.",
-    "Welcome to the course. Let us begin.",
+    "Welcome to Obserra EPI Academy and to Cybersecurity Foundations for New Professionals.",
+    "I created this course to help you build the judgment, discipline, and practical habits needed to recognize cyber security risk, make accountable decisions, and act safely within your role.",
+    "Cyber security is not only a technical responsibility. It is a business, mission, and leadership responsibility shared by every professional who handles information, systems, identities, operations, or trust.",
+    "As you progress through the course, you will work through realistic scenarios, guided practice, knowledge checks, workbook activities, and a final assessment.",
+    "Keep three principles in view. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Document a defensible next step that another professional can review.",
+    "The examples in this course may be fictional or composite. Apply the instruction in accordance with applicable law, organizational policy, privacy requirements, and approved escalation procedures.",
+    "Thank you for investing in your professional development. Welcome to the course. Let us begin.",
   ];
 }
 
-function defaultCourseScript(course: Course) {
+function defaultCourseWelcomeScript(course: Course) {
   const primaryOutcome = course.outcomes[0]?.replace(/^Frame\s+/i, "frame ") ?? "apply the course subject in business context";
   return [
-    "Welcome to Obserra EPI Academy.",
-    "I am Dr. Jody Blanchard, founder and cyber security executive at Obserra Executive Protection and Intelligence, L.L.C.",
-    `You are beginning ${course.title}.`,
-    `This course is designed to help you ${primaryOutcome}, evaluate evidence and uncertainty before acting, apply authority and proportionate escalation, and document a defensible next action.`,
-    "Three principles will guide your work. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Define how the result will be verified.",
-    "Use the scenarios, guided practice, knowledge checks, course materials, and final assessment to apply what you learn.",
-    "Examples may be fictional or composite. Follow applicable law, organizational policy, privacy requirements, and approved escalation procedures.",
-    "Welcome to the course. Let us begin.",
+    `Welcome to Obserra EPI Academy and to ${course.title}.`,
+    `I created this course to help you ${primaryOutcome}, evaluate evidence and uncertainty before acting, apply decision authority and proportionate escalation, and document a defensible next action.`,
+    "Throughout the course, you will use realistic scenarios, guided practice, knowledge checks, course materials, and a final assessment to apply what you learn.",
+    "Keep three principles in view. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Define how the result will be verified.",
+    "The examples in this course may be fictional or composite. Apply the instruction in accordance with applicable law, organizational policy, privacy requirements, and approved escalation procedures.",
+    "Thank you for investing in your professional development. Welcome to the course. Let us begin.",
   ];
 }
 
@@ -124,8 +131,8 @@ function disclaimers(): CourseOpeningDisclaimer[] {
 
 export function courseOpeningForCourse(course: Course): CourseOpening {
   const transcript = course.id === "cybersecurity-foundations"
-    ? cybersecurityFoundationsScript()
-    : defaultCourseScript(course);
+    ? cybersecurityFoundationsWelcomeScript()
+    : defaultCourseWelcomeScript(course);
 
   return {
     standardId: "obserra-course-opening-v1",
@@ -133,8 +140,8 @@ export function courseOpeningForCourse(course: Course): CourseOpening {
     legalName,
     officialLogoPath,
     presenter: {
-      name: "Dr. Jody Blanchard",
-      title: "Founder and Cybersecurity Executive",
+      name: presenterName,
+      title: presenterTitle,
     },
     titlePage: {
       courseTitle: course.title,
@@ -142,11 +149,19 @@ export function courseOpeningForCourse(course: Course): CourseOpening {
       versionLabel: "Governed review build · release version assigned at approval",
     },
     introduction: {
+      purpose: "owner-course-welcome",
       requiredBeforeFirstLesson: true,
       script: transcript.join(" "),
       transcript,
       spokenPronunciation: {
         cybersecurity: "cyber security",
+      },
+      ownerSignature: {
+        name: presenterName,
+        title: presenterTitle,
+        company: legalName,
+        placement: "bottom-of-course-welcome-script",
+        spoken: false,
       },
       video: {
         status: "awaiting-owner-approved-master",
