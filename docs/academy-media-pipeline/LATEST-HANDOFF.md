@@ -6,11 +6,13 @@ Academy: Obserra EPI Academy
 
 Short business name: Obserra EPI
 
+EPI meaning: Executive Protection & Intelligence
+
 Status: Security remediation and controlled first-course production are in progress. Production release is not authorized.
 
 ## Public truth boundary
 
-A database-access concern was identified and emergency containment was applied. Detailed incident evidence, internal architecture, function history, forensic observations, credentials, exact provider asset lineage, and confidential operating records are maintained only in the protected private security record system.
+A database-access concern was identified and emergency containment was applied. Detailed incident evidence, internal architecture, function history, forensic observations, credentials, exact provider asset lineage, and confidential operating records are maintained only in the protected private security and production record system.
 
 This public repository must not contain:
 
@@ -37,14 +39,16 @@ The registered name, official logo, and official colors are immutable brand asse
 
 ## Owner identity boundary
 
-Every owner introduction must use Dr. Jody Blanchard's exact owner-approved face and exact owner-approved voice. The transcript, wardrobe, background, lighting, framing, pose, and approved graphics may change by course. The person, face, name, professional identity, and voice may not change.
+Every owner introduction must use Dr. Jody Blanchard's exact owner-approved face and exact owner-approved voice.
+
+The transcript, professional wardrobe, restrained pose, background, executive set, lighting, framing, official graphics, and identity-preserving speech cleanup may change by course. The person, face, name, age, skin tone, defining appearance, personal identity, and voice may not change.
 
 Any video showing a different person, a regenerated or modified owner face, or a merely similar voice is rejected and must not be loaded into LearnWorlds.
 
 Public implementation details are recorded in:
 
 ```text
-docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-BRAND-LOCK.md
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-REGISTERED-BRAND-LOCK.md
 ```
 
 Exact accepted provider references remain only in the protected handoff.
@@ -54,9 +58,13 @@ Exact accepted provider references remain only in the protected handoff.
 ```text
 Pull request: Draft
 Cybersecurity Foundations course: Draft
+Complete first-course LearnWorlds loading: pending
 Exact owner introduction approval: pending
+Assessment, completion, certificate, resource, accessibility, desktop, and mobile acceptance: pending
+Additional course production: blocked pending first-course approval
 Production merge: blocked
 Course publication: blocked
+Live checkout: blocked
 LearnWorlds portfolio transfer: blocked
 Website cinematic activation: blocked
 Security closure: incomplete
@@ -64,14 +72,16 @@ Security closure: incomplete
 
 ## Required continuation order
 
-1. Use the protected private security handoff as the authoritative record.
-2. Preserve the exact owner identity and registered Obserra EPI brand boundary.
-3. Complete the Cybersecurity Foundations Draft course for owner review.
-4. Complete current-head CI and protected runtime validation.
-5. Complete credential rotation and forensic review.
-6. Change this repository to private and review public-history exposure.
-7. Complete course-media, LMS, assessment, resource, certificate, accessibility, desktop, mobile, and learner acceptance.
-8. Obtain explicit owner approval before merge or publication.
+1. Read the owner identity and registered brand lock addendum.
+2. Use the protected private security and production handoff as the authoritative record.
+3. Preserve the exact owner face and voice while changing only permitted production variables.
+4. Complete the corrected 4K owner introduction with the approved transcript, official logo, lower third, professional speech cleanup, captions, and verified transcript.
+5. Complete the robust Cybersecurity Foundations Draft course in LearnWorlds using appropriate native activities and authoritative resources.
+6. Validate instruction, interactions, assessment, completion, certificate, resources, accessibility, desktop, and mobile behavior.
+7. Complete current-head CI and protected runtime validation.
+8. Complete credential rotation and forensic review.
+9. Change this repository to private and review public-history exposure.
+10. Obtain explicit owner approval before template reuse, additional course production, merge, live checkout, or publication.
 
 ## Public repository warning
 
