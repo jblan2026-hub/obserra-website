@@ -19,14 +19,15 @@ Status: First-course rebuild, media acceptance, LearnWorlds acceptance, security
 ## Mandatory restart sequence
 
 1. Read `docs/academy-media-pipeline/LATEST-HANDOFF.md`.
-2. Read `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-MOVED-REJECTED-PROJECT-TO-TRASH.md`.
+2. Read `docs/academy-media-pipeline/OWNER-IDENTITY-BRAND-HEYGEN-AND-COURSE-AUDIT-2026-08-12.md`.
 3. Read `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-REGISTERED-BRAND-LOCK.md`.
-4. Read `docs/academy-media-pipeline/ACTIVITY-LEDGER-ADDENDUM-OWNER-TRASH-AND-COURSE-REBUILD.md`.
-5. Read `docs/academy-media-pipeline/FAILURE-REGISTER-ADDENDUM-IDENTITY-TITLE-BRAND-CREDIT-DRIFT.md`.
-6. Read `config/academy-owner-identity-attribution-policy.json` and `config/academy-course-opening-standard.json`.
-7. Retrieve the authoritative private security and production handoff from the protected Obserra EPI record system.
-8. Continue from the first incomplete controlled action.
-9. Update protected and sanitized handoff records after every substantive action.
+4. Read `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-MOVED-REJECTED-PROJECT-TO-TRASH.md` only as a superseded failure record.
+5. Read `docs/academy-media-pipeline/ACTIVITY-LEDGER-ADDENDUM-OWNER-TRASH-AND-COURSE-REBUILD.md`; its filename is retained for audit continuity and its content is corrected.
+6. Read `docs/academy-media-pipeline/FAILURE-REGISTER-ADDENDUM-IDENTITY-TITLE-BRAND-CREDIT-DRIFT.md`.
+7. Read `config/academy-owner-identity-attribution-policy.json`, `config/academy-course-opening-standard.json`, `config/academy-cinematic-production-standard.json`, and `config/academy-media-factory.json`.
+8. Retrieve the authoritative private security and production handoff from the protected Obserra EPI record system.
+9. Continue from the first incomplete controlled action.
+10. Update protected and sanitized handoff records after every substantive action.
 
 ## Current first-course objective
 
@@ -61,33 +62,52 @@ Do not use `Obserra` alone as the Academy or short business name. The registered
 
 ## Current HeyGen state
 
-The owner-supplied current My Projects screenshot shows exactly two approved projects:
+The owner-supplied current My Projects screenshot shows three visible cards:
 
 ```text
-Professional man speaking to camera - Video Upscaler
-Controlled project reference: 9cde7d534d2c4332bd30c5e587a88003
+Owner Review Video
+Rejected wrong-person project or session card
+Still visible
 
-Confident_Cybersecurity_Leadership - Speech Cleanup
-Controlled video reference: ae7539dc419c4b89971ba6d092452a55
+Professional man speaking to camera.
+Approved owner project
+Video Upscaler
+
+Confident_Cybersecurity_Leadership
+Approved owner project
+Speech Cleanup
 ```
 
-The owner confirms both contain his exact face and exact voice.
+The owner confirms that the two approved projects contain his exact face and exact voice. Exact provider identifiers are retained only in the protected private handoff.
 
-The rejected wrong-person `Owner Review Video` project was moved to Trash by the owner and is absent from the current My Projects screenshot. Permanent purge from Trash is not independently verified. Deletion or purge by this assistant is not claimed.
+Current verified state:
 
-Do not reuse, export, upload, publish, market, or clone the rejected project.
+```text
+Rejected underlying generated video record: deleted
+Rejected underlying video retrievable: no
+Rejected Owner Review Video project or session card visible in My Projects: yes
+Rejected project moved to Trash: no evidence
+Rejected project or session card deleted: no
+Only two approved projects remain visible: no
+Connected delete-project or delete-session action available: no
+```
+
+Do not reuse, export, upload, publish, market, clone, or use the rejected project as a template. Deletion of the underlying video record is not deletion of the visible project or session card.
 
 ## Current incomplete actions
 
-1. Rebuild and validate the complete first-course package under the exact identity, sole title, no-employer, registered-brand, authoritative-resource, activity, assessment, completion, and accessibility rules.
-2. Do not generate another owner video or spend additional HeyGen credits until the deterministic exact face and voice path is proven and explicitly authorized.
-3. Produce and approve the corrected 4K owner introduction using the exact owner face and voice.
-4. Load the complete first course into the existing LearnWorlds Draft course through an authenticated supported path.
-5. Validate assessment, resources, completion, certificate, accessibility, desktop, and mobile behavior.
-6. Obtain explicit owner approval before producing additional courses, merging, enabling live checkout, or publishing.
+1. Remove the visible rejected `Owner Review Video` project or session card through the authenticated HeyGen web interface or a provider-supported deletion function.
+2. Verify that only the two approved owner projects remain visible.
+3. Update the protected private handoff, sanitized public handoff, activity record, failure record, and audit record with direct evidence.
+4. Rebuild and validate the complete first-course package under the exact identity, sole title, no-employer, registered-brand, authoritative-resource, activity, assessment, completion, and accessibility rules.
+5. Do not generate another owner video or spend additional HeyGen credits until the deterministic exact face and voice path is proven and explicitly authorized.
+6. Produce and approve the corrected 4K owner introduction using the exact owner face and voice.
+7. Load the complete first course into the existing LearnWorlds Draft course through an authenticated supported path.
+8. Validate assessment, resources, completion, certificate, accessibility, desktop, and mobile behavior.
+9. Obtain explicit owner approval before producing additional courses, merging, enabling live checkout, or publishing.
 
 ## Continuation command
 
 ```text
-Use the private Obserra EPI Academy handoff as the authoritative record. Preserve the exact owner face and voice, sole Founder and CEO title, no-employer rule, registered brand, official website, and two approved HeyGen projects. The rejected Owner Review Video project was moved to Trash by the owner and is absent from My Projects; do not claim permanent purge. Rebuild Cybersecurity Foundations for New Professionals for LearnWorlds Draft owner review. Do not spend additional owner-video credits until the deterministic exact identity path is proven and explicitly authorized. Update every handoff record after each substantive action and preserve every failure.
+Use the private Obserra EPI Academy handoff as the authoritative provider record. Preserve Dr. Jody Blanchard's exact face and exact voice, the sole Founder and CEO title, the no-employer rule, the registered Obserra EPI Academy brand, the official website, and the two approved owner projects. The rejected Owner Review Video project or session card is still visible in My Projects even though its underlying video record was deleted. Do not claim Trash state, project deletion, or permanent purge. Remove the visible rejected card through an authenticated supported HeyGen path and verify only the two approved projects remain. Then rebuild Cybersecurity Foundations for New Professionals for LearnWorlds Draft owner review. Do not spend additional owner-video credits until the deterministic exact identity path is proven and explicitly authorized. Update every handoff record after each substantive action and preserve every failure.
 ```
