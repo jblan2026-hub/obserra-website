@@ -1,33 +1,90 @@
-# Cybersecurity Foundations Cinematic Media Canary
+# Cybersecurity Foundations for New Professionals: Media Production Pack
 
 Course ID: `cybersecurity-foundations`
 
-Course title: Cybersecurity Foundations for New Professionals
+Academy: Obserra EPI Academy
+
+EPI meaning: Executive Protection & Intelligence
+
+Legal company: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
+
+Official website: https://www.obserrallc.com
+
+Owner and presenter: Dr. Jody Blanchard
+
+Sole approved Academy title: Founder and CEO
 
 Production standard: `obserra-cinematic-enterprise-v1`
 
-Status: Cinematic script, scene, shot, and prompt pack ready for owner generation and review
+Status: Controlled production specification. Generation is blocked until the exact approved owner avatar look and exact approved owner voice are selected and verified.
 
-## Canary purpose
+## Nonnegotiable owner identity rule
 
-This course is the production canary for the complete Academy. It must prove that the authorized Dr. Jody Blanchard avatar, cloned voice, Pollo visuals, editorial pacing, captions, transcript, LearnWorlds playback, and learner interactions meet the same cinematic enterprise standard required for every remaining course.
+Any video that displays or speaks Dr. Jody Blanchard's name or title must use his exact approved face and exact approved voice.
 
-The canary must not resemble the robotic, static, low quality presentation previously observed in the PMP course. It must use natural human delivery, short presenter segments, realistic enterprise visuals, purposeful editing, professional sound, and a clear instructional narrative.
+The following are immutable:
 
-## Required package
+1. Person and recognizable facial identity.
+2. Exact approved voice identity and vocal character.
+3. Name: Dr. Jody Blanchard.
+4. Sole approved Academy title: Founder and CEO.
+5. Full legal company attribution.
+
+The following may change within the official standard:
+
+1. Course-specific script.
+2. Professional wardrobe.
+3. Background and executive set.
+4. Lighting and framing.
+5. Pose and restrained natural movement.
+6. Official title cards, lower thirds, captions, and logo placement.
+7. Identity-preserving speech cleanup and 4K processing.
+
+A similar person, substitute avatar, regenerated face, different voice, alternate title, additional title, employer reference, or employment history is prohibited.
+
+## Registered brand rule
 
 ```text
-HeyGen course welcome: 1
-HeyGen module anchor films: 5
-HeyGen course trailer host: 1
-Pollo module cinematic visual packs: 5
-Pollo website hero loop: 1
-Pollo vertical campaign clips: 3
-Pollo LinkedIn executive clip: 1
-Total governed assets: 17
+Academy name: Obserra EPI Academy
+Short business name: Obserra EPI
+EPI meaning: Executive Protection & Intelligence
+Legal company: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
+Official website: https://www.obserrallc.com
+Official logo: /brand/obserra-logo.png
+Approved palette: dark navy, black, gold, white, and approved blue
 ```
 
-## HeyGen course welcome
+The logo, names, website, and colors may not be redrawn, regenerated, recolored, distorted, cropped, replaced, or interpreted as flexible creative elements.
+
+## Current HeyGen cleanup state
+
+```text
+Underlying wrong-person video asset: deleted
+Underlying wrong-person video retrievable: no
+Wrong Video Agent project or session card visible in Projects: yes
+Visible wrong project card removed: no
+Only the two approved owner projects remain: not yet verified
+Approved owner sources modified or deleted: no
+```
+
+The remaining wrong project or session card is prohibited from reuse, export, LearnWorlds upload, publication, marketing, or template use. Production may not use that project.
+
+## Required governed media package
+
+```text
+Owner course welcome: 1
+Module anchor films: 5
+Course trailer: 1
+Module cinematic visual packs: 5
+Course homepage hero loop: 1
+Optional vertical learning clips: 3
+Optional professional network clip: 1
+Total planned governed assets: 17
+```
+
+No asset is complete merely because a project card or provider job exists. Each asset requires content, identity, brand, technical, accessibility, rights, playback, and owner acceptance.
+
+## Owner course welcome
 
 Target duration: 75 seconds
 
@@ -35,273 +92,216 @@ Allowed duration: 60 to 90 seconds
 
 Aspect ratio: 16:9
 
-Minimum master: 1920 by 1080
+Final source master: 3840 x 2160 at the highest supported quality
 
-Presenter lower third:
+LMS derivative: 1920 x 1080 only after the 4K source master is approved
+
+### Exact lower third
 
 ```text
 Dr. Jody Blanchard
-Founder and Cybersecurity Executive, Obserra
+Founder and CEO
+OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
+www.obserrallc.com
 ```
 
 ### Approved welcome script
 
 ```text
-Cybersecurity decisions affect more than technology. They affect trust, safety, operations, and the mission.
+Welcome to Obserra EPI Academy and to Cybersecurity Foundations for New Professionals.
 
-Welcome to Cybersecurity Foundations for New Professionals. I am Dr. Jody Blanchard, founder of Obserra, a cybersecurity executive, and a retired United States Army officer.
+I am Dr. Jody Blanchard, Founder and CEO of Obserra Executive Protection and Intelligence, L.L.C.
 
-I designed this course to help you build the judgment, habits, and practical understanding needed to begin working confidently in cybersecurity.
+I created this course to help you build the judgment, discipline, and practical habits needed to recognize cyber security risk, make accountable decisions, and act safely within your role.
 
-As you move through the course, keep three principles in mind. Connect security decisions to the business. Evaluate evidence before acting. Understand who owns the decision, when to escalate, and how to document a defensible next action.
+Cyber security is not only a technical responsibility. It is a business, mission, and leadership responsibility shared by every professional who handles information, systems, identities, operations, or trust.
 
-Use the scenarios, workbook activities, knowledge checks, and final assessment to apply what you learn.
+As you progress through the five modules, you will work through realistic scenarios, guided practice, knowledge checks, workbook activities, and a final assessment.
 
-Welcome to Obserra Academy. Let us begin with Module 1.
+Keep three principles in view. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Document a defensible next step that another professional can review.
+
+The examples in this course may be fictional or composite. Apply the instruction in accordance with applicable law, organizational policy, privacy requirements, and approved escalation procedures.
+
+Thank you for investing in your professional development. Welcome to the course. Let us begin.
 ```
 
-### Welcome scene and edit plan
+### Required visual sequence
 
-| Time | Visual and edit direction | Audio |
-|---|---|---|
-| 0 to 5 seconds | Cinematic cold open. Executive office, operations center, and employee decision moments. Three fast but controlled shots. No presenter. | First sentence as voiceover. No music at first word, then restrained underscore enters. |
-| 5 to 18 seconds | Medium close up of Dr. Blanchard with direct eye contact and slow motivated camera push. | Welcome and identity statement. |
-| 18 to 28 seconds | Cut to realistic business and cybersecurity collaboration. Show trust, safety, operations, and mission context. | Course purpose continues as voiceover. |
-| 28 to 42 seconds | Return to presenter using a slightly different framing. Maximum continuous presenter segment is 14 seconds. | Introduce the three principles. |
-| 42 to 58 seconds | Three cinematic visual beats, one for business context, one for evidence, one for decision ownership. | Complete the three principles as voiceover. |
-| 58 to 68 seconds | Presenter medium close up. Natural pause before the final sentence. | Direct learners to scenarios, workbook, checks, and assessment. |
-| 68 to 75 seconds | Obserra course title treatment and transition into Module 1. Use controlled postproduction text, not generated scene text. | Welcome to Obserra Academy and transition. |
+1. Four-second official title card using the unmodified logo, Obserra EPI Academy name, course title, owner name, Founder and CEO title, full legal company name, and official website.
+2. Exact approved owner presenter segment using restrained executive delivery.
+3. Small official logo mark in the upper-right title-safe area.
+4. Exact four-line lower third displayed long enough to read on desktop and mobile.
+5. Three-second closing card using the official logo, Obserra EPI Academy, course title, official website, and `Let Us Begin`.
 
-### Welcome performance controls
+### Performance controls
 
-1. No presenter segment longer than 20 seconds.
-2. Natural breathing, pauses, blinking, and restrained gestures.
-3. Accurate pronunciation of Obserra and Blanchard.
-4. No background that appears pasted behind the presenter.
-5. Presenter screen time between 35 and 55 percent.
-6. Cinematic visual time between 45 and 65 percent.
-7. Selectable captions and verified transcript.
-8. Music free alternate master.
-9. 48 kHz audio.
-10. Owner likeness and voice approval before module production.
+1. Exact owner face and voice are mandatory.
+2. Stable eye focus and direct executive delivery.
+3. Natural blinking and subtle breathing.
+4. Restrained head movement and gestures.
+5. No exaggerated expression, eyebrow movement, smiling, or animation.
+6. Accurate pronunciation of `Dr. Jody Blanchard`, `Obserra EPI Academy`, and the course title.
+7. No facial reshaping, beautification, skin smoothing, age modification, or invented facial detail.
+8. No alternate or additional title.
+9. No current or former employer name, logo, or employment history.
+10. No generic presenter, stock avatar, or inferred professional likeness.
+
+### Audio and technical controls
+
+```text
+Resolution: 3840 x 2160
+Aspect ratio: 16:9
+Color: Rec.709
+Audio: 48 kHz stereo
+Target loudness: approximately minus 16 LUFS integrated
+Maximum true peak: minus 1 dBTP
+Speech cleanup: precision mode
+Background noise reduction: required
+Dialogue leveling: required
+De-click and de-ess: only when needed
+Voice identity change: prohibited
+Captions: selectable SRT required
+Verified transcript: required
+Music-free master: required
+Owner approval: required
+```
 
 ## Module anchor films
 
-Each module receives one 5 to 8 minute cinematic anchor film with a 7 minute target. Each module must include at least four distinct visual contexts, no avatar segment longer than 20 seconds, a realistic instructional scenario, and a transition to the LearnWorlds knowledge check.
+Each module receives one substantive anchor film. A five-to-eight-minute target may be used when the content supports it. No arbitrary length requirement may create filler.
 
-### Module 1: Security and business risk
+Each film must include:
 
-Story arc:
+1. Clear learning objectives.
+2. Owner or instructor presence only when the exact approved identity is used.
+3. Realistic enterprise visual contexts.
+4. A clearly labeled fictional or composite scenario.
+5. Evidence, decision authority, escalation, and documentation concepts.
+6. Purposeful on-screen graphics added in controlled postproduction.
+7. Selectable captions and a verified transcript.
+8. A direct transition to a LearnWorlds activity, exercise, or knowledge check.
 
-1. Open with an operational consequence caused by a small security decision.
-2. Explain mission, business, people, data, systems, and trust.
-3. Introduce assets, threats, vulnerabilities, controls, and consequences.
-4. Show an executive and technical team identifying the accountable decision owner.
-5. Use an instructional scenario involving a business process that depends on identity, data, or operational continuity.
-6. Close with a learner reflection: identify one business process whose failure would affect trust, safety, revenue, or operations.
+### Module 1: Cybersecurity as business and mission risk
 
-Required visual contexts:
+Required learning arc:
 
-1. Enterprise operations environment.
-2. Executive decision setting.
-3. Technical control environment.
-4. Employee workflow affected by risk.
+1. Connect cybersecurity to trust, safety, operations, revenue, and mission outcomes.
+2. Explain assets, threats, vulnerabilities, controls, consequences, and governance.
+3. Identify the accountable business decision owner.
+4. Map one business or mission process and its dependencies.
+5. Complete a knowledge check and applied worksheet.
 
-### Module 2: Evidence and risk
+### Module 2: Identity, access, and authentication
 
-Story arc:
+Required learning arc:
 
-1. Open with incomplete evidence and a premature conclusion.
-2. Distinguish observations, indicators, assumptions, likelihood, impact, and uncertainty.
-3. Show why professionals must not overstate evidence.
-4. Compare two decision paths, one based on assumptions and one based on verified evidence.
-5. Use a realistic scenario involving suspicious activity that requires more information before action.
-6. Close with a learner reflection: what additional evidence is needed before escalation?
+1. Explain identity, authentication, authorization, and least privilege.
+2. Evaluate an urgent access request.
+3. Apply multifactor authentication and access governance concepts.
+4. Identify approval, monitoring, expiration, and escalation requirements.
+5. Complete a branching scenario and knowledge check.
 
-Required visual contexts:
+### Module 3: Threat recognition and safe response
 
-1. Evidence review room.
-2. Analyst investigation workflow.
-3. Business impact discussion.
-4. Decision briefing with uncertainty clearly represented.
+Required learning arc:
 
-### Module 3: Identity, control, and authority
+1. Recognize suspicious messages, account events, endpoint warning signs, data exposure, and social engineering indicators.
+2. Separate observations from assumptions.
+3. Identify evidence that is available and evidence that is missing.
+4. Use safe pause, verification, and approved reporting channels.
+5. Complete a suspicious activity exercise and knowledge check.
 
-Story arc:
+### Module 4: Incident reporting and evidence preservation
 
-1. Open with an unexpected access request.
-2. Explain preventive, detective, corrective, and recovery controls.
-3. Connect identity, least privilege, authentication, and access governance.
-4. Show who owns the risk decision and when escalation is required.
-5. Use a realistic scenario involving urgent access, operational pressure, and incomplete approval.
-6. Close with a learner reflection: identify the accountable owner for the access decision.
+Required learning arc:
 
-Required visual contexts:
-
-1. Identity authentication moment.
-2. Access approval workflow.
-3. Privileged system environment.
-4. Leadership decision and escalation setting.
-
-### Module 4: Threat recognition and incident reporting
-
-Story arc:
-
-1. Open with a suspicious message or abnormal account event.
-2. Show safe pause, evidence preservation, and reporting.
-3. Explain containment boundaries and why unapproved action can cause harm.
-4. Show coordinated triage and escalation.
-5. Use an instructional scenario that clearly states it is fictional or composite.
-6. Close with a learner reflection: what should be preserved, reported, and escalated first?
-
-Required visual contexts:
-
-1. Employee workstation decision.
-2. Secure reporting channel.
-3. Security operations triage.
-4. Executive incident coordination.
+1. Preserve relevant evidence without conducting unauthorized investigation or containment.
+2. Communicate what is known, unknown, and assumed.
+3. Select the approved reporting and escalation path.
+4. Understand decision authority and role boundaries.
+5. Complete an incident report exercise and knowledge check.
 
 ### Module 5: Secure habits and continuous improvement
 
-Story arc:
+Required learning arc:
 
-1. Open with the cumulative consequence of routine decisions.
-2. Connect secure habits, reporting, lessons learned, and measurable improvement.
-3. Show how individuals, teams, and leaders share responsibility.
-4. Demonstrate a short after action review.
-5. Prepare the learner for the workbook and final assessment.
-6. Close with a personal action commitment.
+1. Connect everyday behavior to organizational resilience.
+2. Use lessons learned and corrective action.
+3. Identify ownership, evidence, metrics, and review dates.
+4. Build a thirty-day secure habits action plan.
+5. Complete a post-course reflection and knowledge check.
 
-Required visual contexts:
+## Course trailer
 
-1. Everyday secure work habits.
-2. Team learning environment.
-3. After action review.
-4. Measurable improvement and resilience setting.
+Target duration: 45 to 60 seconds
 
-## HeyGen course trailer host script
+The trailer may use the exact approved owner identity. A trailer must never use the owner's name over a different person or voice.
 
-Target duration: 55 seconds
-
-Allowed duration: 45 to 60 seconds
+Approved trailer script:
 
 ```text
-Cybersecurity is not only a technical responsibility. It is a business, leadership, and trust responsibility.
+Cybersecurity is not only a technical responsibility. It is a business, leadership, mission, and trust responsibility.
 
 Cybersecurity Foundations for New Professionals gives you a practical starting point for understanding cyber risk, identity protection, evidence, controls, incident reporting, and accountable decisions.
 
-You will work through realistic instructional scenarios, applied exercises, knowledge checks, and a final assessment designed to help you explain not only what action to take, but why it is defensible.
+You will work through realistic instructional scenarios, guided exercises, knowledge checks, and a final assessment designed to help you explain not only what action to take, but why it is defensible.
 
-Start building the judgment and confidence required for a career in cybersecurity. Explore the complete course at Obserra Academy.
+Begin building the judgment and confidence required for responsible cybersecurity work with Obserra EPI Academy.
 ```
 
-Trailer editing rule: use presenter segments of 8 to 15 seconds separated by cinematic visual sequences. Do not present the script as one continuous avatar shot.
+## Cinematic visual packs
 
-## Pollo module cinematic visual packs
+Generate realistic enterprise footage without embedded text, third-party logos, public-figure likenesses, unlicensed music, or misleading technical interfaces. Maintain continuity of people, wardrobe, location, props, lighting, camera direction, and screen geography within each module.
 
-Generate each pack as original, realistic, enterprise footage without embedded text, third party logos, recognizable public figures, public figure likenesses, or unlicensed music. Maintain consistent people, wardrobe, locations, props, lighting, and screen direction within each module.
-
-### Module 1 visual pack
-
-```text
-Premium cinematic enterprise documentary footage showing business operations, a cybersecurity team, and executive leaders evaluating how a security failure could affect trust, safety, revenue, and continuity. Use realistic offices and operations environments, motivated practical lighting, controlled camera movement, dark navy and black architecture, restrained gold and subtle blue accents, diverse professionals acting naturally, no visible brands, no generated text, no science fiction effects, 16:9, editorial head and tail handles.
-```
-
-### Module 2 visual pack
-
-```text
-Cinematic evidence and risk analysis sequence. Show an analyst separating observations from assumptions, comparing incomplete indicators, requesting additional evidence, and briefing leaders on uncertainty and business impact. Realistic enterprise investigation environment, physically plausible screens without readable sensitive text, controlled depth of field, restrained camera movement, no logos, no public figures, no morphing objects, 16:9.
-```
-
-### Module 3 visual pack
-
-```text
-Cinematic identity and access governance sequence. Show multifactor authentication, an urgent access request, an approval decision, privileged system access, and a leader confirming accountability and escalation. Realistic enterprise settings, physically plausible motion, consistent people and wardrobe, no readable credentials, no third party interfaces, dark navy and gold visual language, 16:9.
-```
-
-### Module 4 visual pack
-
-```text
-Professional employee notices a suspicious message and pauses before acting, preserves evidence, reports through a secure channel, and supports coordinated triage by a security operations team and executive incident leaders. Realistic workplace and operations center, calm professional behavior, motivated lighting, no readable email content, no logos, no exaggerated hacking imagery, 16:9.
-```
-
-### Module 5 visual pack
-
-```text
-Cinematic continuous improvement sequence showing secure daily work habits, a team after action review, lessons learned, updated controls, measurable improvement, and safe recovery from a disruption. Realistic enterprise environments, optimistic but credible tone, restrained Obserra palette, physically plausible motion and lighting, no generated text, no logos, 16:9.
-```
-
-## Website and campaign assets
-
-### Website hero loop
-
-```text
-Eight second seamless silent cinematic loop for Cybersecurity Foundations. Show a realistic enterprise decision environment connecting people, operations, identity, and cyber resilience. Use slow motivated movement, negative space for web copy, dark navy and black base, restrained gold and subtle blue accents, no text, no logos, no rapid motion, and a reduced motion still alternative.
-```
-
-### Vertical campaign clips
-
-Create three 9:16 clips:
-
-1. The first cybersecurity habit every professional needs.
-2. Why evidence matters before escalation.
-3. What to do when something feels wrong.
-
-Each clip must have:
-
-1. A visual hook in the first two seconds.
-2. One defensible learning point.
-3. Captions added in controlled postproduction.
-4. A final Obserra Academy call to action.
-5. A maximum duration of 35 seconds.
-6. No generated scene text.
-7. No generic looping stock appearance.
-
-### LinkedIn executive clip
-
-Aspect ratio: 4:5
-
-Target duration: 45 seconds
-
-Theme:
-
-```text
-Cybersecurity maturity begins when employees, leaders, and technology teams understand evidence, authority, escalation, and accountability as one operating system rather than separate responsibilities.
-```
+Visuals must support instruction. Generic decorative footage, exaggerated hacking imagery, science-fiction effects, morphing objects, unreadable fake dashboards, and irrelevant stock loops are prohibited.
 
 ## LearnWorlds activity requirements
 
-For each of the five module films:
+For each module:
 
-1. Upload as a LearnWorlds video learning activity.
-2. Add a professional thumbnail.
-3. Add selectable captions.
-4. Add the verified transcript.
-5. Add chapters or a table of contents.
-6. Add a purposeful knowledge check immediately after the film.
-7. Configure the completion rule.
-8. Verify desktop playback.
-9. Verify mobile playback.
-10. Remove all placeholder template content.
-11. Confirm the next activity transition.
-12. Keep the course in Draft or Sandbox until all acceptance gates pass.
+1. Use a branded section title and module description.
+2. Upload the approved lesson video with a professional thumbnail.
+3. Add selectable captions and a verified transcript.
+4. Add chapters where they improve navigation.
+5. Add a formatted eBook or substantive text lesson.
+6. Add an authoritative reference activity.
+7. Add a guided practice exercise or assignment.
+8. Add a reflection, form, self-assessment, or discussion where pedagogically appropriate.
+9. Add a purposeful knowledge check.
+10. Configure completion rules.
+11. Verify desktop and mobile playback.
+12. Verify keyboard navigation and accessibility.
+13. Remove all placeholders, empty activities, and zero-duration shells.
+14. Keep the course in Draft until all acceptance gates pass.
+
+## Authoritative resource requirements
+
+The course resource library must use current final primary sources. The initial approved set includes:
+
+1. NIST Cybersecurity Framework 2.0.
+2. NIST SP 800-53 Revision 5.
+3. NIST SP 800-61 Revision 3.
+4. NIST SP 800-63-4.
+5. NIST SP 800-63B-4.
+
+Do not upload superseded revisions when a newer final revision is available. External links and downloaded PDFs must be validated immediately before LearnWorlds upload.
 
 ## Acceptance scorecard
 
 Score each category from 1 to 5:
 
-1. Presenter likeness.
-2. Voice realism.
+1. Exact owner likeness.
+2. Exact owner voice.
 3. Lip synchronization.
 4. Natural movement.
-5. Narrative strength.
-6. Visual realism.
-7. Shot variety.
-8. Editorial pacing.
-9. Sound quality.
-10. Brand consistency.
-11. Instructional clarity.
-12. Learner engagement.
+5. Owner title accuracy.
+6. Company and Academy name accuracy.
+7. Logo and color accuracy.
+8. Narrative strength.
+9. Instructional clarity.
+10. Visual realism.
+11. Editorial pacing.
+12. Sound quality.
 13. Accessibility.
 14. Rights and provenance.
 15. LearnWorlds playback.
@@ -310,11 +310,11 @@ Release requires:
 
 ```text
 No category below 4
-Average score of at least 4.5
-No unresolved release blocker
-Owner approval recorded
+Average score at least 4.5
+No unresolved identity, brand, content, accessibility, rights, or delivery blocker
+Explicit owner approval recorded
 ```
 
 ## Publication boundary
 
-The course shell, checkout, avatar, or uploaded video does not prove a commercially ready course. Publication requires approved course content, five approved module films, five approved visual packs, captions, transcript, assessment, workbook, accessibility, rights, completion, certificate, Sandbox learner validation, website validation, and explicit owner approval.
+A course shell, provider project, generated video, or uploaded file does not prove a commercially ready course. Publication requires approved owner media, complete substantive course content, valid authoritative resources, all LearnWorlds activities, captions, transcripts, assessment, workbook, accessibility, completion, certificate, desktop and mobile validation, sandbox learner acceptance, and explicit approval by Dr. Jody Blanchard.
