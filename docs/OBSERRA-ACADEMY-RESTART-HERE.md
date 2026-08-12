@@ -20,10 +20,12 @@ Status: Security remediation, first-course acceptance, and production acceptance
 
 1. Read `docs/academy-media-pipeline/LATEST-HANDOFF.md`.
 2. Read `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-REGISTERED-BRAND-LOCK.md`.
-3. Read `config/academy-owner-identity-attribution-policy.json`.
-4. Retrieve the authoritative private security and production handoff from the protected Obserra EPI record system.
-5. Continue from the first incomplete controlled action.
-6. Update protected and sanitized handoff records after every substantive action.
+3. Read `docs/academy-media-pipeline/OWNER-IDENTITY-ATTRIBUTION-ACTIVITY-ADDENDUM.md`.
+4. Read `docs/academy-media-pipeline/OWNER-IDENTITY-ATTRIBUTION-FAILURE-ADDENDUM.md`.
+5. Read `config/academy-owner-identity-attribution-policy.json`.
+6. Retrieve the authoritative private security and production handoff from the protected Obserra EPI record system.
+7. Continue from the first incomplete controlled action.
+8. Update protected and sanitized handoff records after every substantive action.
 
 ## Current first-course objective
 
