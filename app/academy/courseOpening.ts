@@ -12,6 +12,8 @@ export type CourseOpening = {
   shortBusinessName: "Obserra EPI";
   epiMeaning: "Executive Protection & Intelligence";
   legalName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
+  officialWebsite: "https://www.obserrallc.com";
+  officialWebsiteDisplay: "www.obserrallc.com";
   officialLogoPath: "/brand/obserra-logo.png";
   presenter: {
     name: "Dr. Jody Blanchard";
@@ -19,11 +21,14 @@ export type CourseOpening = {
     exactOwnerIdentityRequired: true;
     substituteFaceAllowed: false;
     substituteVoiceAllowed: false;
+    additionalTitlesAllowed: false;
+    employerReferencesAllowed: false;
   };
   titlePage: {
     courseTitle: string;
     trackAndLevel: string;
     versionLabel: string;
+    officialWebsite: "www.obserrallc.com";
   };
   introduction: {
     purpose: "owner-course-welcome";
@@ -37,6 +42,7 @@ export type CourseOpening = {
       name: "Dr. Jody Blanchard";
       title: "Founder and CEO";
       company: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
+      website: "www.obserrallc.com";
       placement: "bottom-safe-area-lower-third";
       spoken: true;
     };
@@ -50,6 +56,9 @@ export type CourseOpening = {
       apparentAgeMayChange: false;
       skinToneMayChange: false;
       facialStructureMayChange: false;
+      additionalTitlesAllowed: false;
+      employerReferencesAllowed: false;
+      resumeBackgroundMayOverridePresentationRules: false;
       transcriptMayChangeByCourse: true;
       wardrobeMayChange: true;
       backgroundMayChange: true;
@@ -75,6 +84,7 @@ export type CourseOpening = {
       transcriptRequired: true;
       musicFreeMasterRequired: true;
       officialLogoInsertsRequired: true;
+      wrongPersonOutputRejected: true;
       ownerApprovalRequired: true;
     };
   };
@@ -88,6 +98,8 @@ const shortBusinessName = "Obserra EPI" as const;
 const epiMeaning = "Executive Protection & Intelligence" as const;
 const legalName = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" as const;
 const spokenLegalName = "Obserra Executive Protection and Intelligence, L.L.C.";
+const officialWebsite = "https://www.obserrallc.com" as const;
+const officialWebsiteDisplay = "www.obserrallc.com" as const;
 const officialLogoPath = "/brand/obserra-logo.png" as const;
 const presenterName = "Dr. Jody Blanchard" as const;
 const presenterTitle = "Founder and CEO" as const;
@@ -148,7 +160,7 @@ function disclaimers(): CourseOpeningDisclaimer[] {
     {
       id: "authorized-synthetic-media",
       title: "Authorized presenter media",
-      body: "The course may use the authorized digital likeness and voice of Dr. Jody Blanchard. The exact owner face and exact owner voice are required. Presenter media is subject to identity, voice, facial-motion, speech-cleanup, accessibility, and owner-approval controls.",
+      body: "The course may use the authorized digital likeness and voice of Dr. Jody Blanchard only when the exact owner-approved face and exact owner-approved voice are used. No substitute person, substitute voice, additional title, or employer reference is authorized.",
     },
     {
       id: "proprietary-material",
@@ -169,6 +181,8 @@ export function courseOpeningForCourse(course: Course): CourseOpening {
     shortBusinessName,
     epiMeaning,
     legalName,
+    officialWebsite,
+    officialWebsiteDisplay,
     officialLogoPath,
     presenter: {
       name: presenterName,
@@ -176,11 +190,14 @@ export function courseOpeningForCourse(course: Course): CourseOpening {
       exactOwnerIdentityRequired: true,
       substituteFaceAllowed: false,
       substituteVoiceAllowed: false,
+      additionalTitlesAllowed: false,
+      employerReferencesAllowed: false,
     },
     titlePage: {
       courseTitle: course.title,
       trackAndLevel: `${course.track} · ${course.level}`,
       versionLabel: "Governed review build · release version assigned at approval",
+      officialWebsite: officialWebsiteDisplay,
     },
     introduction: {
       purpose: "owner-course-welcome",
@@ -194,6 +211,7 @@ export function courseOpeningForCourse(course: Course): CourseOpening {
         name: presenterName,
         title: presenterTitle,
         company: legalName,
+        website: officialWebsiteDisplay,
         placement: "bottom-safe-area-lower-third",
         spoken: true,
       },
@@ -207,6 +225,9 @@ export function courseOpeningForCourse(course: Course): CourseOpening {
         apparentAgeMayChange: false,
         skinToneMayChange: false,
         facialStructureMayChange: false,
+        additionalTitlesAllowed: false,
+        employerReferencesAllowed: false,
+        resumeBackgroundMayOverridePresentationRules: false,
         transcriptMayChangeByCourse: true,
         wardrobeMayChange: true,
         backgroundMayChange: true,
@@ -232,6 +253,7 @@ export function courseOpeningForCourse(course: Course): CourseOpening {
         transcriptRequired: true,
         musicFreeMasterRequired: true,
         officialLogoInsertsRequired: true,
+        wrongPersonOutputRejected: true,
         ownerApprovalRequired: true,
       },
     },
