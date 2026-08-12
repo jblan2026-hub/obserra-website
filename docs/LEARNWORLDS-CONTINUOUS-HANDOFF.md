@@ -14,17 +14,23 @@ EPI meaning: Executive Protection & Intelligence
 
 Official website: https://www.obserrallc.com
 
-Status: Draft implementation. First-course, media, security, and production acceptance are incomplete.
+Status: Controlled first-course rebuild is in progress. First-course, media, security, LearnWorlds acceptance, and production acceptance are incomplete.
 
-## Authoritative record boundary
+## Mandatory continuous-handoff discipline
 
-Detailed provider identifiers, security evidence, private prompts, course-production records, failures, and audit history are stored in the protected private Obserra EPI record system. This public file contains only the sanitized operational boundary.
+Every substantive action, decision, validation result, evidence item, blocker, and failure must be recorded in the governed handoff as it occurs. Handoff updates may not be deferred until the end of a work session. Failures are preserved; they are never overwritten or silently removed. If a later action supersedes an earlier state, the earlier failure remains part of the audit trail and the new state is recorded as a correction or superseding event.
+
+This rule is permanent and exists specifically so a restarted chat cannot forget prior actions, failures, owner approvals, identity constraints, provider state, package status, or the first incomplete controlled action.
+
+Protected/private records remain authoritative for provider identifiers, source media, security evidence, private prompts, and other confidential material. This public handoff contains only the sanitized operational boundary.
 
 ## Current first-course priority
 
 Complete `Cybersecurity Foundations for New Professionals` inside the existing LearnWorlds Draft course and present it to Dr. Jody Blanchard for end-to-end review before producing additional courses or redesigning the broader LearnWorlds site.
 
-The Draft must include substantive five-module instruction, official branding, a professional course description, learner disclosures, the exact owner welcome before Module 1, appropriate native LearnWorlds activities, guided practice, knowledge checks, official NIST and other authoritative primary resources, downloadable tools, a 25-question final assessment, an 80 percent passing rule, completion controls, accessibility artifacts, and certificate validation.
+The course must include substantive five-module instruction, official branding, a professional course description, official branded title page, learner disclosures and acknowledgement, the exact owner welcome before Module 1, course orientation, pedagogically appropriate LearnWorlds activities, guided practice, knowledge checks, official NIST and other authoritative primary resources, downloadable learner tools, a 25-question final assessment, an 80 percent passing rule, completion controls, accessibility artifacts, and certificate validation.
+
+The existing `Obserra-Cybersecurity-Foundations-LearnWorlds-Import-v2.0.0.zip` is explicitly classified as an intermediate import package, not the final governed course package. Earlier structural build/validation results do not constitute full course acceptance because the complete opening sequence, approved owner introduction, accessibility, certificate/completion evidence, and end-to-end LearnWorlds acceptance were not yet satisfied.
 
 ## Owner identity and attribution lock
 
@@ -57,52 +63,70 @@ Official website: https://www.obserrallc.com
 
 Standalone `Obserra` is not an approved Academy or short business name. The registered names, official logo, approved colors, and official website may not be changed.
 
-## Current HeyGen project state
+## Current HeyGen owner-source state
 
-The incorrect generated owner-welcome project did not depict the exact owner and was rejected.
+The owner directly supplied the approved HeyGen `Professional man speaking to camera.` project URL and confirmed that this project is the canonical owner-video source for the Academy introduction. This project is the approved exact-owner visual/voice source and was previously processed with Video Upscaler. Exact controlled provider identifiers remain in the protected private handoff and are omitted from this public record.
 
-The owner-supplied My Projects screenshot shows three visible cards:
+No generated alternate look may be substituted merely because it belongs to the same avatar group.
 
-1. `Owner Review Video` - rejected wrong-person project or session card - still visible.
-2. `Professional man speaking to camera.` - approved owner project processed with Video Upscaler.
-3. `Confident_Cybersecurity_Leadership` - approved owner project processed with Speech Cleanup.
+The owner introduction may use a course-specific script, official branded graphics, precision speech cleanup, background-noise reduction, dialogue leveling, captions/transcript, and identity-preserving 4K processing. Face identity and voice identity may not change.
 
-The owner confirms that the two approved projects contain his exact face and exact voice. Exact controlled provider identifiers are retained only in the protected private handoff and are omitted from this public repository record.
+The rejected wrong-person `Owner Review Video` remains prohibited from reuse, export, LearnWorlds upload, publication, marketing, cloning, or template use. Its historical deletion/project-card state remains an unresolved provider housekeeping issue and must not be misrepresented as permanently purged without direct evidence.
 
-Current verified state:
+## Intro production requirements
+
+The Cybersecurity Foundations owner introduction is governed to:
+
+- appear before Module 1;
+- use the exact approved owner source only;
+- use the sole approved title `Founder and CEO`;
+- contain no current or former employer names, logos, outside titles, or employment history;
+- use a professional course-specific welcome script;
+- master at 3840x2160, 16:9, highest supported production quality;
+- use identity-preserving 4K upscale when required;
+- use precision speech cleanup without changing voice identity;
+- apply background-noise reduction, dialogue leveling, and de-click/de-ess when needed;
+- use clean 48 kHz audio;
+- include captions, transcript, and thumbnail;
+- retain owner review and approval before release.
+
+## Current package-rebuild action
+
+The owner directed that the first course be completed as a superseding governed package because the prior package did not meet all requirements. The rebuild must close every requirement from the commercial audit, course-opening standard, identity/brand rules, accessibility requirements, assessment/completion contract, and owner-introduction media standard.
+
+Current acceptance state:
 
 ```text
-Rejected underlying generated video record: deleted
-Rejected underlying video retrievable: no
-Rejected Owner Review Video project or session card visible in My Projects: yes
-Rejected project moved to Trash: no evidence
-Rejected project or session card deleted: no
-Only two approved projects remain visible: no
-Connected delete-project or delete-session action available: no
-Approved owner projects preserved: yes
+Prior v2.0.0 package: intermediate only; superseded for final acceptance
+Five-module instructional structure: exists in prior package; requires governed completeness review
+Official branded title page: required; final package acceptance pending
+Learner disclosures and acknowledgement: required; final package acceptance pending
+Exact-owner course introduction: source identified; corrected 4K render pending
+Course orientation: required; final package acceptance pending
+Authoritative resources and source register: required; final package acceptance pending
+Learner workbook and job aids: required; final package acceptance pending
+Module knowledge checks and guided practice: required; final package acceptance pending
+Final assessment: 25 questions, 80 percent passing; LearnWorlds acceptance pending
+Captions/transcripts/accessibility artifacts: required; final acceptance pending
+Completion controls: pending
+Certificate validation: pending
+LearnWorlds content load evidence: pending
+Desktop/mobile validation: pending
+Owner end-to-end approval: pending
+Production merge/live checkout/publication: blocked
 ```
-
-Deletion of the underlying video record did not delete the visible Video Agent project or session card. Provider 404 responses, absent list results, and incomplete connector listings are not proof of project deletion, Trash state, or permanent purge.
-
-The rejected project is prohibited from reuse, export, LearnWorlds upload, publication, marketing, cloning, or template use.
-
-## Credit-control rule
-
-No additional HeyGen owner-video credit may be spent until the deterministic exact face and exact voice path is proven, the script and official graphics are frozen, and Dr. Jody Blanchard explicitly authorizes one controlled review render.
 
 ## Current public status
 
 ```text
-Repository visibility: public and must be corrected
+Repository visibility: public; confidential provider data must remain out of repository
 Pull request: Draft
-Exact approved owner introduction: pending
-Rejected Owner Review Video project or session card: still visible
-Rejected underlying video: deleted and not retrievable
-Approved owner projects visible: two, alongside the rejected card
+Exact approved owner source: identified by owner
+Corrected exact-owner 4K introduction: pending
+Superseding first-course package: rebuild in progress
 LearnWorlds first-course loading: pending
 Assessment, resources, completion, certificate, accessibility, desktop, and mobile acceptance: pending
-Website cinematic activation: disabled
-Production merge, live checkout, and publication: blocked
+Production merge, live checkout, additional-course rollout, and publication: blocked
 ```
 
 ## Continuation
@@ -111,12 +135,12 @@ Read:
 
 1. `docs/academy-media-pipeline/LATEST-HANDOFF.md`
 2. `docs/academy-media-pipeline/OWNER-IDENTITY-BRAND-HEYGEN-AND-COURSE-AUDIT-2026-08-12.md`
-3. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-REGISTERED-BRAND-LOCK.md`
-4. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-MOVED-REJECTED-PROJECT-TO-TRASH.md`, which is retained only as a superseded failure record.
-5. `docs/academy-media-pipeline/ACTIVITY-LEDGER-ADDENDUM-OWNER-TRASH-AND-COURSE-REBUILD.md`, whose filename is retained for audit continuity and whose content is corrected.
-6. `docs/academy-media-pipeline/FAILURE-REGISTER-ADDENDUM-IDENTITY-TITLE-BRAND-CREDIT-DRIFT.md`.
-7. `config/academy-owner-identity-attribution-policy.json`.
-8. `config/academy-course-opening-standard.json`.
+3. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT.md`
+4. `docs/LEARNWORLDS-COMMERCIAL-PIPELINE-AUDIT-ADDENDUM-CANARY-PURCHASE-EMPTY-COURSE.md`
+5. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-REGISTERED-BRAND-LOCK.md`
+6. `docs/academy-media-pipeline/FAILURE-REGISTER-ADDENDUM-IDENTITY-TITLE-BRAND-CREDIT-DRIFT.md`
+7. `config/academy-owner-identity-attribution-policy.json`
+8. `config/academy-course-opening-standard.json`
 9. The protected private handoff.
 
-Continue from the first incomplete controlled action: remove the visible rejected project card through an authenticated supported HeyGen path, verify that only the two approved owner projects remain, and update all records. Then rebuild and validate the complete Cybersecurity Foundations course package to the corrected identity, title, no-employer, registered-brand, authoritative-resource, activity, assessment, completion, and accessibility standards. Do not generate another owner video or spend additional HeyGen credits until the deterministic exact identity path is proven and explicitly authorized. Do not claim owner-media acceptance, LearnWorlds acceptance, merge, publication, or production cutover without direct evidence and explicit owner approval.
+Continue from the first incomplete course-build action. Preserve the exact approved owner source, sole Founder and CEO title, no-employer rule, registered brand, official website, complete opening sequence, 4K speech-cleaned owner introduction, five substantive modules, authoritative resources, learner tools, assessment, completion, accessibility, certificate, and owner-review gates. Update the handoff immediately after every substantive action or failure. Do not claim LearnWorlds acceptance, publication, merge, live checkout, or production cutover without direct evidence and explicit owner approval.
