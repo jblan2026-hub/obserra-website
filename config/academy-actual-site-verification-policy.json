@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "enforced",
+  "ownerDirective": "Check the actual applicable sites before generating any content. No exceptions.",
+  "effectiveDate": "2026-08-12",
+  "scope": [
+    "course manuscripts",
+    "scripts and teleprompter copy",
+    "LearnWorlds upload files",
+    "assessment and question-bank imports",
+    "SCORM and HTML5 packages",
+    "workbooks and learner resources",
+    "course descriptions and metadata",
+    "certificate and completion configurations",
+    "website and course-card copy",
+    "brand and identity content",
+    "provider-specific media or integration artifacts",
+    "authoritative external references"
+  ],
+  "mandatoryVerificationOrder": [
+    "Open and inspect the actual current target site or authenticated target platform object.",
+    "Download or export the exact current template, schema, activity configuration, or page structure from that target site when the output depends on it.",
+    "Check the current official vendor documentation for the same feature and reconcile it with the observed target-site interface.",
+    "Check the official Obserra website and registered brand assets for names, positioning, course metadata, and visual identity.",
+    "Check current official publisher pages for every authoritative source used in course content."
+  ],
+  "hardStops": [
+    "The actual target site or authenticated object cannot be inspected.",
+    "The exact current import template or export cannot be downloaded or supplied.",
+    "The live field names, tabs, column order, activity type, completion options, or upload path are unknown.",
+    "The live interface conflicts with an older package, prior conversation, generic template, model memory, or unofficial guidance.",
+    "The owner reports that an artifact does not match the actual platform template or site.",
+    "A required official source page cannot be verified.",
+    "Brand, title, legal-name, website, logo, or color treatment conflicts with the actual official site or approved registered assets."
+  ],
+  "hardStopResult": "BLOCKED - DO NOT GENERATE OR REPRESENT AS UPLOAD-READY",
+  "evidenceRequired": {
+    "targetUrl": true,
+    "checkedAtUtc": true,
+    "platformOrSite": true,
+    "accountSchoolCourseOrObjectContext": true,
+    "screenshotOrExportReference": true,
+    "downloadedTemplateName": true,
+    "downloadedTemplateSha256": true,
+    "officialDocumentationUrl": true,
+    "observedConstraints": true,
+    "verificationStatus": ["PASSED", "BLOCKED", "FAILED"]
+  },
+  "learnWorldsAssessmentRules": {
+    "actualSchoolTemplateControls": true,
+    "downloadFromTargetAssessmentActivity": true,
+    "preserveUntouchedOriginalTemplate": true,
+    "workOnlyInCopiedTemplate": true,
+    "questionsWorksheetNameMustRemainExact": true,
+    "tabNamesAndColumnNamesMustRemainExact": true,
+    "columnOrderMustRemainExact": true,
+    "plainTextOnly": true,
+    "testImportInDraftRequired": true,
+    "successfulImportEvidenceRequiredBeforeUploadReadyClaim": true,
+    "currentKnownOfficialDocumentation": [
+      "https://support.learnworlds.com/support/solutions/articles/12000087253-how-to-import-questions-to-an-assessment-from-an-xls-file",
+      "https://support.learnworlds.com/support/solutions/articles/12000101758-how-to-bulk-upload-course-content"
+    ]
+  },
+  "reverificationTriggers": [
+    "before every new content-generation batch",
+    "before every platform-specific artifact is generated",
+    "before every upload or import",
+    "after any platform UI, template, plan, activity-type, or documentation change",
+    "after any owner-reported mismatch",
+    "when resuming work in a new chat or session"
+  ],
+  "prohibitedSubstitutes": [
+    "model memory",
+    "old screenshots used as current state",
+    "generic vendor templates",
+    "previously generated workbooks",
+    "unverified copied examples",
+    "file names or package labels",
+    "assumptions based on similar platforms",
+    "unofficial help articles when official documentation exists"
+  ],
+  "noExceptions": true
+}
