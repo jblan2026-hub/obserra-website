@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Continuous Handoff v13.7.0
+# Obserra EPI Academy Public Continuous Handoff v13.8.0
 
 The authoritative sanitized operational record is `docs/academy-media-pipeline/LATEST-HANDOFF.md`.
 
@@ -19,13 +19,14 @@ No alternate title, employer reference, employment history, substitute identity,
 
 ## Permanent no-exceptions controls
 
-1. Check the actual current target site and exact object before generation.
+1. Check the actual current target site and exact object before generating course-specific or platform-specific content.
 2. Use the authenticated target object when account-specific.
-3. Preserve and hash the exact native template/export when applicable.
-4. Check current official vendor documentation, the official Obserra site/brand, and current official primary sources.
+3. Preserve and hash the exact native template or export when applicable.
+4. Check current official vendor documentation, the official Obserra site and approved brand, and current official primary sources.
 5. Generate only after verification is `PASSED`.
 6. Recheck before import, upload, publication, or release.
-7. Never substitute memory, old files, generic templates, or assumptions.
+7. Never substitute memory, old files, generic templates, old screenshots, or assumptions.
+8. Update protected and sanitized handoffs after every substantive action, result, failure, source change, package version, import result, or owner decision.
 
 If direct verification cannot be completed, status is `BLOCKED`.
 
@@ -33,39 +34,25 @@ If direct verification cannot be completed, status is `BLOCKED`.
 
 Every learner-facing substantive section of every course must contain the complete verified LearnWorlds activity-category stack and its own native-template assessment.
 
-Required categories:
+Required activity categories and controls:
 
 ```text
 Multimedia
+Live Sessions controls
 Ebook
-Exams
+Exams and Assignments
 Self-Assessment
 Forms
-Certificates
+Certificates and Completion
 Social
-Embed
-Evidence and QA
+Embed and External Links
+Owner Video Production Required
+Authoritative Resources
+Accessibility, Transcripts and Captions
+QA Evidence and Release
 ```
 
-Required current package root:
-
-```text
-00_COURSE_ADMINISTRATION
-01_EBOOK
-02_MULTIMEDIA
-03_EXAMS_AND_ASSIGNMENTS
-04_SELF_ASSESSMENT
-05_FORMS
-06_SOCIAL
-07_EMBED_AND_EXTERNAL_LINKS
-08_CERTIFICATES_AND_COMPLETION
-09_OWNER_VIDEO_PRODUCTION_REQUIRED
-10_AUTHORITATIVE_RESOURCES
-11_ACCESSIBILITY_TRANSCRIPTS_AND_CAPTIONS
-12_QA_EVIDENCE_AND_RELEASE
-```
-
-Every mapped activity requires a real artifact, exact title, native activity type, completion rule, accessibility alternative, package-relative path, and evidence state. Unused verified options require `NOT-USED-RATIONALE.md`.
+Every mapped activity requires a real artifact, exact title, native activity type, completion rule, accessibility alternative, package-relative path, source evidence, and verification state. Unused verified options require `NOT-USED-RATIONALE.md`.
 
 ## Native assessment standard
 
@@ -90,38 +77,78 @@ Resource-library check: 5 questions
 Graded checks and final: 80 percent pass mark unless owner changes it
 ```
 
-## Cybersecurity Foundations current truthful state
-
-Persisted package:
+## Course 1 - Cybersecurity Foundations current state
 
 ```text
+Persisted source package:
 Obserra-EPI-Academy-Cybersecurity-Foundations-Category-First-Video-Ready-v6.2.0.zip
 SHA-256: 788d5a36204725849cc623159ddcde16c8259f566e1169e92d13d3a094ab01b5
 Bytes: 63,077,096
 Members: 219
 Clean extraction: PASS
-```
-
-Independent audit result:
-
-```text
-Substantive source assets: PRESENT
-Current authoritative folder schema: FAILED
-Internal validation boolean: FAILED
-Active validation-evidence cleanup: REQUIRED
-Owner module videos: PENDING
-LearnWorlds upload/runtime: NOT PERFORMED / NOT PROVEN
+Authoritative current folder architecture: FAIL
+Internal structural acceptance boolean: FAIL
 Final owner-review package: NOT READY
+LearnWorlds runtime acceptance: NOT PROVEN
 Publication: BLOCKED
 ```
 
-The package uses eleven legacy root categories instead of eleven currently required activity categories. Its internal report sets `passedCategoryFirstNonVideoStructuralGate` to false and identifies stale prohibited terms in active validation evidence. It is therefore a corrective-build source package, not a final release.
+Cybersecurity v6.2.0 remains a corrective-build source package. It must not be represented as final or LearnWorlds accepted.
 
 Corrective audit:
 
 ```text
 docs/academy-media-pipeline/CYBERSECURITY-V6-2-CORRECTIVE-PACKAGE-AUDIT-2026-08-12.md
 ```
+
+## Course 2 - Generative AI Fundamentals for Business Leaders
+
+The owner authorized continuation to the second course. The actual current Obserra catalog and current official primary-source pages were checked before the v2.4.0 correction and audit.
+
+```text
+Package:
+Obserra-EPI-Academy-Generative-AI-Fundamentals-for-Business-Leaders-LearnWorlds-Category-Complete-v2.4.0.zip
+
+SHA-256:
+97672c48ea057013be5f60becb8a1a2eef08f9fde84c9c1c1898a6e449a4ff41
+
+ZIP members: 686
+Learner-facing sections: 8
+Categories per section: 13
+SCORM 1.2 packages: 8
+Native-template assessments: 8
+Assessment questions: 60
+Presentations: 8 PPTX plus 8 PDF exports
+Video files: 0
+Prohibited identity/title/employer/website findings: 0
+Static package audit: PASS
+Clean extraction: PASS
+Authenticated LearnWorlds runtime: NOT PROVEN
+Publication: BLOCKED
+```
+
+The v2.4.0 package is approved only as a static owner-review package. It is not represented as imported, runtime accepted, certificate accepted, published, or production released.
+
+Audit record:
+
+```text
+docs/academy-media-pipeline/GENERATIVE-AI-V2-4-PACKAGE-AUDIT-2026-08-12.md
+```
+
+## Current official-source boundary for Course 2
+
+The package records that:
+
+1. NIST AI RMF 1.0 remains the published baseline and is being revised.
+2. NIST AI 600-1 remains the current published Generative AI Profile.
+3. NIST Privacy Framework 1.0 remains published while Privacy Framework 1.1 is identified as coming soon.
+4. NIST SP 800-218A remains published and is used with SP 800-218.
+5. OECD AI Principles were updated in May 2024.
+6. ISO/IEC 42001:2023 remains published.
+7. EU AI Act application is progressive, with major milestones applying from August 2, 2026 and later dates for specified high-risk categories.
+8. CISA's JCDC AI Cybersecurity Collaboration Playbook remains a voluntary coordination reference.
+
+Every source and actual platform object must be rechecked immediately before authenticated import, publication, or live learner use.
 
 ## Permanent owner-video directive
 
@@ -136,17 +163,13 @@ Every video position remains `OWNER PRODUCTION REQUIRED` until the owner supplie
 
 ## Current controlled work order
 
-1. Correct Cybersecurity Foundations to the exact current category-first and per-section architecture.
-2. Migrate each usable source asset into its controlling LearnWorlds category and section.
-3. Add missing materials, native activity copy/configuration, completion rules, accessibility alternatives, evidence, and controlled not-used rationales.
-4. Retain exact native-template assessments and validate them.
-5. Remove or isolate stale prohibited strings from active release evidence.
-6. Regenerate one immutable corrected ZIP, manifest, hashes, clean-extraction report, activity map, authoring guide, and validation report.
-7. Send the corrected Cybersecurity package to Dr. Jody Blanchard for review.
-8. Then build or retrofit in order: Generative AI; LLMs for Leaders; Security Awareness for High Risk Employees; Executive Travel Risk Management; remaining catalog.
-9. Do not generate course video.
-10. Do not claim LearnWorlds readiness or completion without authenticated import/runtime evidence.
-11. Update protected and sanitized records after every substantive action or failure.
+1. Deliver the Generative AI v2.4.0 static package for Dr. Jody Blanchard's review.
+2. Preserve Cybersecurity Foundations as a corrective source package and do not relabel it as final.
+3. Continue to `Large Language Models, LLMs, Explained for Leaders` under the identical actual-site, source-verification, per-section activity, native-assessment, no-video, and evidence standards.
+4. After LLMs, continue to Security Awareness for High Risk Employees, Executive Travel Risk Management, and the remaining governed catalog.
+5. Integrate owner-produced videos only after direct technical, identity, transcript, caption, branding, accessibility, and owner-approval validation.
+6. Claim LearnWorlds compatibility or completion only after authenticated import, save/reopen, runtime, desktop/mobile, accessibility, certificate, and owner acceptance evidence exists.
+7. Update protected and sanitized records after every substantive action or failure.
 
 ## Release boundary
 
@@ -154,10 +177,12 @@ Every video position remains `OWNER PRODUCTION REQUIRED` until the owner supplie
 Actual-site verification: MANDATORY / NO EXCEPTIONS
 Complete per-section activity stack: MANDATORY
 Assessment in every learner-facing section: MANDATORY
-Cybersecurity v6.2.0: SOURCE PACKAGE / CORRECTION REQUIRED
-Other courses: RETROFIT AND REISSUE REQUIRED
+Cybersecurity v6.2.0: CORRECTIVE SOURCE / NOT FINAL
+Generative AI v2.4.0: STATIC REVIEW PACKAGE PASSED / RUNTIME PENDING
 Assistant-generated video: PROHIBITED
 LearnWorlds runtime acceptance: NOT PROVEN
+Certificate issuance acceptance: NOT PROVEN
+Desktop/mobile learner journey: NOT PROVEN
 Publication: BLOCKED
 Live checkout: BLOCKED
 Production merge/cutover: BLOCKED
@@ -165,4 +190,4 @@ Production merge/cutover: BLOCKED
 
 ## Handoff rule
 
-Every new work session must read the Latest Handoff, Actual-Site Verification Gate, Per-Section LearnWorlds Activity Architecture, Course Section Assessment Standard, and v6.2 corrective audit before generating course content. Preserve every discrepancy and failure.
+Every new work session must read the Latest Handoff, Actual-Site Verification Gate, Per-Section LearnWorlds Activity Architecture, Course Section Assessment Standard, Cybersecurity corrective audit, and Generative AI v2.4 audit before generating course content. Preserve every discrepancy and failure.
