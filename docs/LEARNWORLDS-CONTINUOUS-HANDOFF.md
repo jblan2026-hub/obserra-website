@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Continuous Handoff v12.1.0
+# Obserra EPI Academy Public Continuous Handoff v12.2.0
 
 Owner and presenter: Dr. Jody Blanchard
 
@@ -16,9 +16,13 @@ Official website: https://www.obserrallc.com
 
 Status: `docs/academy-media-pipeline/LATEST-HANDOFF.md` is the current sanitized operational record. The authoritative first-course package is v4.1.0, the course remains Draft, and authenticated LearnWorlds loading and end-to-end owner acceptance remain incomplete.
 
+## Standing owner directive
+
+Continue work in the Cybersecurity Foundations first-course priority. Do not drift to unrelated work. Update the protected and sanitized handoff documents after every substantive action, decision, validation result, failure, provider-state change, package change, or owner approval. This standing directive remains active until Dr. Jody Blanchard explicitly changes it.
+
 ## Authority and supersession
 
-This v12.1.0 record supersedes earlier current-state language that treated the v3.0.0 package as active, authorized parallel additional-course production, or treated a provider-level render as accepted owner media.
+This v12.2.0 record supersedes earlier current-state language that treated the v3.0.0 package as active, authorized parallel additional-course production, or treated a provider-level render as accepted owner media.
 
 Historical evidence remains preserved. The protected private handoff remains authoritative for confidential provider and security details.
 
