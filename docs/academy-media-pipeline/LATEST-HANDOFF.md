@@ -12,13 +12,11 @@ Short business name: Obserra EPI
 
 EPI meaning: Executive Protection & Intelligence
 
-Official website: www.obserrallc.com
+Official website: https://www.obserrallc.com
 
 Status: Controlled first-course production is in progress. Production release is not authorized.
 
 ## Nonnegotiable owner attribution
-
-The only approved learner-facing attribution is:
 
 ```text
 Dr. Jody Blanchard
@@ -32,7 +30,9 @@ The owner resume is internal grounding only. It is not permission to add titles,
 
 ## Owner identity lock
 
-Every owner introduction must use Dr. Jody Blanchard's exact approved face and exact approved voice. The canonical website portrait is:
+Any video that uses Dr. Jody Blanchard's name or title must use his exact approved face and exact approved voice.
+
+The canonical website portrait is:
 
 ```text
 /leadership/dr-jody-blanchard-executive.webp
@@ -45,29 +45,45 @@ A similar person, substitute avatar, regenerated face, different voice, or simil
 ## Registered brand lock
 
 ```text
-Academy name: Obserra EPI Academy
+Academy: Obserra EPI Academy
 Short business name: Obserra EPI
-EPI meaning: Executive Protection & Intelligence
-Full legal name: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-Official website: www.obserrallc.com
+EPI: Executive Protection & Intelligence
+Legal company: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
+Official website: https://www.obserrallc.com
 ```
 
-Standalone `Obserra` is not an authorized Academy or business name. No other company may be presented as the Academy, business, owner, issuer, or course provider. The official logo, registered names, website, and approved colors may not be changed.
+Standalone `Obserra` is not an authorized Academy or short business name. No other company may be presented as the Academy, business, owner, issuer, or course provider. The official logo, registered names, website, and approved colors may not be changed.
 
-## Incorrect HeyGen draft disposition
+## Exact HeyGen state
 
-The connected HeyGen session identified the rejected owner-welcome draft as failed. The incorrect video was permanently deleted through the connected HeyGen deletion action. The provider returned a positive deletion confirmation.
+The incorrect generated owner-welcome video did not depict the exact owner and was rejected.
 
-The approved owner source was not deleted or modified. The rejected media may not be restored, uploaded into LearnWorlds, published, marketed, reused, or used as a template.
+Verified provider state:
 
-Detailed provider identifiers and deletion evidence are preserved only in the protected private handoff.
+```text
+Incorrect underlying video record: deleted through connected HeyGen action
+Incorrect underlying video retrievable: no
+Associated incorrect Video Agent project or session card: still visible according to owner
+Project or session deletion through connected tools: unavailable
+Approved owner source: preserved and unchanged
+Incorrect project authorized for use: no
+```
 
-## Governing implementation records
+The remaining project or session card must not be reused, exported, uploaded into LearnWorlds, published, marketed, or used as a template. Removal requires a HeyGen web-interface action or a provider-supported project or session deletion function.
+
+## Governing records
 
 ```text
 config/academy-owner-identity-attribution-policy.json
+config/academy-course-opening-standard.json
+app/academy/courseOpening.ts
+docs/OBSERRA-ACADEMY-RESTART-HERE.md
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-REGISTERED-BRAND-LOCK.md
 docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-BRAND-LOCK.md
 docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-INCORRECT-VIDEO-DELETED-AND-ATTRIBUTION-LOCK.md
+docs/academy-media-pipeline/ACTIVITY-LEDGER.md
+docs/academy-media-pipeline/FAILURE-REGISTER.md
 ```
 
 ## First-course LearnWorlds rule
@@ -83,8 +99,8 @@ Include authoritative references where they directly support learning objectives
 ```text
 Pull request: Draft
 Cybersecurity Foundations course: Draft
-Incorrect HeyGen owner-welcome draft: permanently deleted
-Approved owner source: preserved
+Incorrect underlying HeyGen video: deleted
+Incorrect HeyGen project or session card: remains visible according to owner
 Corrected 4K owner introduction: pending
 Complete first-course LearnWorlds loading: pending
 Assessment, completion, certificate, resource, accessibility, desktop, and mobile acceptance: pending
@@ -98,13 +114,14 @@ Security closure: incomplete
 ## Required continuation order
 
 1. Use the protected private handoff as the authoritative provider and evidence record.
-2. Preserve the exact approved owner face and voice.
+2. Preserve the exact approved owner face and exact approved owner voice.
 3. Use only Dr. Jody Blanchard, Founder and CEO, with the approved Obserra EPI business identity.
 4. Never use employer names, employer logos, outside titles, or employment history in learner-facing content.
-5. Produce the corrected 4K owner introduction with the approved transcript, official logo, exact lower third, professional speech cleanup, captions, and verified transcript.
-6. Complete the robust Cybersecurity Foundations Draft course in LearnWorlds using appropriate native activities and authoritative resources.
-7. Validate instruction, interactions, assessment, completion, certificate, resources, accessibility, desktop, and mobile behavior.
-8. Obtain explicit owner approval before template reuse, additional course production, merge, live checkout, or publication.
+5. Remove the remaining incorrect HeyGen project or session card only through an authorized supported path.
+6. Produce the corrected 4K owner introduction with the approved transcript, official logo, exact lower third, professional speech cleanup, captions, and verified transcript.
+7. Complete the robust Cybersecurity Foundations Draft course in LearnWorlds using appropriate native activities and authoritative resources.
+8. Validate instruction, interactions, assessment, completion, certificate, resources, accessibility, desktop, and mobile behavior.
+9. Obtain explicit owner approval before template reuse, additional course production, merge, live checkout, or publication.
 
 ## Handoff discipline
 
