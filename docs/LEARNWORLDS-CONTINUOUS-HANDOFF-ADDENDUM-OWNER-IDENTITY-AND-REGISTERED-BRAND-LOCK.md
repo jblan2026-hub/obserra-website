@@ -49,16 +49,11 @@ Every permitted production change remains subordinate to the immutable identity 
 
 A generated owner-welcome draft that depicted a different person was rejected. It is prohibited from LearnWorlds, publication, marketing, reuse, or use as a template. The approved transcript may be retained, but the rejected visual and vocal output may not be used.
 
-## Approved owner source
+## Approved owner source boundary
 
-The current approved owner source reference is:
+The exact owner-approved source-video, avatar, and voice identifiers are maintained only in the protected private handoff. The public repository records only the governing fact that the approved source depicts the owner with the correct face and exact voice.
 
-```text
-HeyGen video ID: ae7539dc419c4b89971ba6d092452a55
-Owner-supplied project reference: 9cde7d534d2c4332bd30c5e587a88003
-```
-
-These references identify the owner-approved face and voice characteristics. They are not authorization to use an inferred avatar or substitute voice. Production must select an exact deterministic owner identity asset or use precision lipsync from the approved owner source.
+Production may use only the exact protected owner source or a deterministic identity-controlled derivative. An inferred avatar, substitute voice, similar-looking person, or generic presenter is prohibited.
 
 ## Registered brand lock
 
