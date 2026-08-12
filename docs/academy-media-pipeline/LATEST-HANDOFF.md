@@ -82,9 +82,13 @@ docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md
 docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-REGISTERED-BRAND-LOCK.md
 docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-BRAND-LOCK.md
 docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-INCORRECT-VIDEO-DELETED-AND-ATTRIBUTION-LOCK.md
+docs/academy-media-pipeline/OWNER-IDENTITY-ATTRIBUTION-ACTIVITY-ADDENDUM.md
+docs/academy-media-pipeline/OWNER-IDENTITY-ATTRIBUTION-FAILURE-ADDENDUM.md
 docs/academy-media-pipeline/ACTIVITY-LEDGER.md
 docs/academy-media-pipeline/FAILURE-REGISTER.md
 ```
+
+The two owner-identity addenda are authoritative supplements to the base activity ledger and failure register. Historical records remain preserved for audit and are superseded where they conflict with the current Founder and CEO, employer-prohibition, exact-identity, registered-brand, website, or deletion state.
 
 ## First-course LearnWorlds rule
 
