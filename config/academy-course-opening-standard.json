@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "standardId": "obserra-course-opening-v1",
   "standardName": "Obserra EPI Academy Governed Course Opening Standard",
   "appliesTo": {
@@ -11,13 +11,69 @@
   },
   "brand": {
     "academyName": "Obserra EPI Academy",
+    "shortBusinessName": "Obserra EPI",
+    "epiMeaning": "Executive Protection & Intelligence",
     "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "spokenLegalName": "Obserra Executive Protection and Intelligence, L.L.C.",
     "officialLogoPath": "/brand/obserra-logo.png",
     "presenterName": "Dr. Jody Blanchard",
-    "presenterTitle": "Founder and Cybersecurity Executive",
+    "presenterTitle": "Owner, Founder, and Cybersecurity Executive",
     "palette": ["#050B18", "#0B1730", "#C9A227", "#FFFFFF", "#53B7FF"],
+    "namingRules": {
+      "academyReference": "Obserra EPI Academy",
+      "shortBusinessReference": "Obserra EPI",
+      "fullLegalReference": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "standaloneObserraAsOrganizationNameAllowed": false,
+      "registeredNameLogoAndColorsMayChange": false
+    },
     "logoModificationAllowed": false,
-    "generatedReplacementLogoAllowed": false
+    "generatedReplacementLogoAllowed": false,
+    "logoRecoloringAllowed": false,
+    "logoRedrawingAllowed": false,
+    "logoDistortionAllowed": false
+  },
+  "ownerIdentity": {
+    "presenter": "Dr. Jody Blanchard",
+    "ownerApprovedExactReferenceRequired": true,
+    "faceIdentityImmutable": true,
+    "voiceIdentityImmutable": true,
+    "nameImmutable": true,
+    "professionalIdentityImmutable": true,
+    "apparentAgeImmutable": true,
+    "skinToneImmutable": true,
+    "facialStructureImmutable": true,
+    "accentAndVocalCharacterImmutable": true,
+    "allowedControlledChanges": [
+      "course-specific transcript",
+      "wardrobe and outfit",
+      "background and set",
+      "lighting",
+      "framing",
+      "pose",
+      "restrained natural movement",
+      "official title cards",
+      "official lower thirds",
+      "official logo placement",
+      "captions",
+      "identity-preserving speech cleanup",
+      "identity-preserving 4K upscaling"
+    ],
+    "prohibitedChanges": [
+      "substitute person",
+      "substitute avatar",
+      "substitute voice",
+      "merely similar face or voice",
+      "face regeneration",
+      "facial reshaping",
+      "beautification",
+      "skin smoothing",
+      "age modification",
+      "de-aging",
+      "stylization",
+      "voice redesign",
+      "voice substitution"
+    ],
+    "ownerVisualAndAuditoryApprovalIsAuthoritative": true
   },
   "sequence": [
     {
@@ -27,11 +83,12 @@
       "required": true,
       "durationSeconds": 5,
       "requiredElements": [
-        "official Obserra logo",
+        "official registered Obserra EPI logo",
         "Obserra EPI Academy",
         "course title",
         "course track and level",
         "Presented by Dr. Jody Blanchard",
+        "Owner, Founder, and Cybersecurity Executive",
         "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
         "course version"
       ]
@@ -57,29 +114,51 @@
       "type": "presenter-video",
       "required": true,
       "requiredBeforeFirstLesson": true,
+      "scriptPurpose": "owner-course-welcome",
       "durationSeconds": {
         "minimum": 60,
         "target": 75,
         "maximum": 90
       },
       "presenter": "Dr. Jody Blanchard",
+      "presenterTitle": "Owner, Founder, and Cybersecurity Executive",
       "scriptMayChangeByCourse": true,
       "identityMayChange": false,
       "voiceIdentityMayChange": false,
       "facialIdentityMayChange": false,
+      "nameMayChange": false,
+      "professionalIdentityMayChange": false,
       "naturalFacialMovementCharacterMayChange": false,
       "wardrobeMayChange": true,
       "backgroundMayChange": true,
       "lightingMayChange": true,
       "framingMayChange": true,
-      "graphicsMayChange": true,
+      "poseMayChange": true,
+      "graphicsMayChangeWithinBrandStandard": true,
       "defaultSpeechSpeed": 0.92,
       "speechSpeedRequiresOwnerApproval": true,
       "speechCleanupRequired": true,
       "speechEnhancementMode": "precision",
       "cleanupMustNotAlterVoiceIdentity": true,
       "backgroundNoiseReductionRequired": true,
-      "pronunciationRule": "Use pronunciation-safe spoken wording when needed while preserving correct written terminology. Speak 'cyber security' as two words when the selected voice mispronounces 'cybersecurity'."
+      "pronunciationRule": "Use pronunciation-safe spoken wording when needed while preserving correct written terminology. Speak 'cyber security' as two words when the selected voice mispronounces 'cybersecurity'.",
+      "logoInserts": {
+        "required": true,
+        "officialRegisteredLogoOnly": true,
+        "modificationAllowed": false,
+        "openingTitleCard": true,
+        "presenterCornerMark": true,
+        "closingLogoCard": true
+      },
+      "lowerThird": {
+        "required": true,
+        "placement": "bottom-safe-area",
+        "line1": "Dr. Jody Blanchard",
+        "line2": "Owner, Founder, and Cybersecurity Executive",
+        "line3": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+        "fullLegalNameRequired": true,
+        "readableOnDesktopAndMobile": true
+      }
     },
     {
       "order": 4,
@@ -127,7 +206,9 @@
     "restrainedHeadMovementRequired": true,
     "restrainedGesturesRequired": true,
     "accurateLipSynchronizationRequired": true,
-    "voiceSimilarityRequired": true,
+    "exactOwnerFaceRequired": true,
+    "exactOwnerVoiceRequired": true,
+    "voiceSimilarityAloneInsufficient": true,
     "pronunciationApprovalRequired": true,
     "facialReshapingProhibited": true,
     "beautificationProhibited": true,
@@ -141,7 +222,7 @@
     "requiredActivityOrder": [
       "official title page",
       "learner disclosures and acknowledgement",
-      "Dr. Jody Blanchard course introduction",
+      "Dr. Jody Blanchard owner course welcome",
       "course orientation",
       "Module 1"
     ],
@@ -155,12 +236,15 @@
     "placeholderContentProhibited": true
   },
   "releaseGates": [
+    "registered-brand-name-logo-and-colors-approved",
     "official-title-page-approved",
     "required-disclaimers-present-and-readable",
     "learner-acknowledgement-configured",
+    "owner-welcome-script-approved",
     "owner-intro-present-before-first-lesson",
+    "exact-owner-face-approved",
+    "exact-owner-voice-approved",
     "presenter-likeness-approved",
-    "presenter-voice-approved",
     "facial-motion-realism-approved",
     "pronunciation-approved",
     "4k-intro-master-verified",
@@ -174,6 +258,10 @@
     "course begins directly with a lesson and no owner introduction",
     "missing official branded title page",
     "missing learner disclaimers or acknowledgement",
+    "standalone Obserra used as the organization or Academy name",
+    "registered name, logo, or colors changed",
+    "different person or regenerated owner face",
+    "similar but non-owner voice",
     "1080p-only final intro when 4K mastering is technically supported",
     "substitute or default voice not approved by the owner",
     "excessive or synthetic facial motion",
