@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "standardId": "obserra-course-opening-v1",
   "standardName": "Obserra EPI Academy Governed Course Opening Standard",
   "appliesTo": {
@@ -75,6 +75,10 @@
       "graphicsMayChange": true,
       "defaultSpeechSpeed": 0.92,
       "speechSpeedRequiresOwnerApproval": true,
+      "speechCleanupRequired": true,
+      "speechEnhancementMode": "precision",
+      "cleanupMustNotAlterVoiceIdentity": true,
+      "backgroundNoiseReductionRequired": true,
       "pronunciationRule": "Use pronunciation-safe spoken wording when needed while preserving correct written terminology. Speak 'cyber security' as two words when the selected voice mispronounces 'cybersecurity'."
     },
     {
@@ -103,6 +107,12 @@
     "audioChannels": 2,
     "targetIntegratedLufs": -16,
     "maximumTruePeakDbtp": -1,
+    "speechCleanupRequired": true,
+    "speechEnhancementMode": "precision",
+    "backgroundNoiseReductionRequired": true,
+    "deClickAndDeEssRequiredWhenNeeded": true,
+    "dialogueLevelingRequired": true,
+    "cleanupMustNotAlterVoiceIdentity": true,
     "musicFreeMasterRequired": true,
     "captionFileRequired": true,
     "transcriptRequired": true,
@@ -154,6 +164,7 @@
     "facial-motion-realism-approved",
     "pronunciation-approved",
     "4k-intro-master-verified",
+    "speech-cleanup-and-voice-identity-verified",
     "clean-48khz-audio-verified",
     "captions-and-transcript-verified",
     "learnworlds-desktop-and-mobile-playback-passed",
@@ -167,6 +178,7 @@
     "substitute or default voice not approved by the owner",
     "excessive or synthetic facial motion",
     "identity modification during generation or upscaling",
+    "speech cleanup that changes the approved voice identity",
     "publication without captions, transcript, and owner approval"
   ]
 }
