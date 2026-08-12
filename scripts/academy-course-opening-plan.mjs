@@ -62,23 +62,25 @@ function introScript(course) {
   if (course.id === 'cybersecurity-foundations') {
     return [
       'Welcome to Obserra EPI Academy.',
-      'I am Dr. Jody Blanchard, founder and cyber security executive at Obserra Executive Protection and Intelligence.',
+      'I am Dr. Jody Blanchard, founder and cyber security executive at Obserra Executive Protection and Intelligence, L.L.C.',
       'You are beginning Cybersecurity Foundations for New Professionals.',
       'This course will help you understand cyber security as a business and mission responsibility, recognize common indicators of risk, apply identity and control fundamentals, report suspicious activity safely, and build repeatable habits that strengthen resilience.',
-      'As you work through each module, evaluate evidence before acting, respect decision authority, preserve what matters, and document a defensible next step.',
+      'Three principles will guide your work. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Document a defensible next step so another professional can review it.',
+      'Use the scenarios, guided practice, knowledge checks, workbook activities, and final assessment to apply what you learn.',
       'The examples in this course are educational and may be fictional or composite. Follow applicable law, organizational policy, privacy requirements, and approved escalation procedures.',
-      'Welcome. Let us begin.',
+      'Welcome to the course. Let us begin.',
     ].join(' ');
   }
 
   return [
     'Welcome to Obserra EPI Academy.',
-    'I am Dr. Jody Blanchard, founder and cyber security executive at Obserra Executive Protection and Intelligence.',
+    'I am Dr. Jody Blanchard, founder and cyber security executive at Obserra Executive Protection and Intelligence, L.L.C.',
     `You are beginning ${course.title}.`,
     `This course is designed to help you apply ${course.focus} through evidence, accountable decisions, practical action, and measurable improvement.`,
-    'As you work through the course, evaluate evidence before acting, respect decision authority, communicate limitations honestly, and document a defensible next step.',
+    'Three principles will guide your work. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Define how the result will be verified.',
+    'Use the scenarios, guided practice, knowledge checks, course materials, and final assessment to apply what you learn.',
     'The examples in this course are educational and may be fictional or composite. Follow applicable law, organizational policy, privacy requirements, and approved escalation procedures.',
-    'Welcome. Let us begin.',
+    'Welcome to the course. Let us begin.',
   ].join(' ');
 }
 
@@ -160,6 +162,13 @@ function presenterIntro(course, standard) {
       volume: 1,
       ownerAuditoryApprovalRequired: true,
     },
+    speechCleanup: {
+      required: intro.speechCleanupRequired === true,
+      mode: intro.speechEnhancementMode,
+      backgroundNoiseReductionRequired: intro.backgroundNoiseReductionRequired === true,
+      cleanupMustNotAlterVoiceIdentity: intro.cleanupMustNotAlterVoiceIdentity === true,
+      ownerAuditoryApprovalRequired: true,
+    },
     providerOutput: {
       highestSupportedResolutionRequired: true,
       preferredProviderResolution: '4k',
@@ -175,6 +184,11 @@ function presenterIntro(course, standard) {
       audioSampleRateHz: standard.technicalMaster.audioSampleRateHz,
       targetIntegratedLufs: standard.technicalMaster.targetIntegratedLufs,
       maximumTruePeakDbtp: standard.technicalMaster.maximumTruePeakDbtp,
+      speechCleanupRequired: standard.technicalMaster.speechCleanupRequired,
+      speechEnhancementMode: standard.technicalMaster.speechEnhancementMode,
+      backgroundNoiseReductionRequired: standard.technicalMaster.backgroundNoiseReductionRequired,
+      dialogueLevelingRequired: standard.technicalMaster.dialogueLevelingRequired,
+      cleanupMustNotAlterVoiceIdentity: standard.technicalMaster.cleanupMustNotAlterVoiceIdentity,
       captionFileRequired: true,
       transcriptRequired: true,
       musicFreeMasterRequired: true,
@@ -236,9 +250,13 @@ function validate(openings, standard, allRequested) {
     if (intro?.identityControls?.facialIdentityLocked !== true || intro?.identityControls?.voiceIdentityLocked !== true) findings.push(`identity-not-locked:${opening.courseId}`);
     if (intro?.identityControls?.scriptMayChangeByCourse !== true) findings.push(`script-not-flexible:${opening.courseId}`);
     if (intro?.voiceSettings?.defaultSpeed !== 0.92) findings.push(`speech-speed-mismatch:${opening.courseId}`);
+    if (intro?.speechCleanup?.required !== true) findings.push(`speech-cleanup-not-required:${opening.courseId}`);
+    if (intro?.speechCleanup?.mode !== 'precision') findings.push(`speech-cleanup-mode-mismatch:${opening.courseId}`);
+    if (intro?.speechCleanup?.cleanupMustNotAlterVoiceIdentity !== true) findings.push(`speech-cleanup-voice-boundary-missing:${opening.courseId}`);
     if (!String(intro?.script ?? '').includes('Welcome to Obserra EPI Academy.')) findings.push(`intro-script-missing-academy:${opening.courseId}`);
     if (intro?.finalMaster?.widthPixels !== 3840 || intro?.finalMaster?.heightPixels !== 2160) findings.push(`intro-not-4k:${opening.courseId}`);
     if (intro?.finalMaster?.upscaleRequiredWhenSourceBelow4K !== true) findings.push(`intro-upscale-not-required:${opening.courseId}`);
+    if (intro?.finalMaster?.speechCleanupRequired !== true) findings.push(`intro-master-speech-cleanup-missing:${opening.courseId}`);
     if (transitionItem?.destination !== 'course orientation or Module 1') findings.push(`transition-destination-mismatch:${opening.courseId}`);
   }
 
@@ -258,7 +276,7 @@ function writeJson(filePath, value) {
 }
 
 function writeCsv(filePath, openings) {
-  const fields = ['courseId', 'courseTitle', 'track', 'level', 'standardId', 'status', 'introWidth', 'introHeight', 'introSpeed', 'titlePageRequired', 'disclaimerRequired', 'ownerIntroRequired'];
+  const fields = ['courseId', 'courseTitle', 'track', 'level', 'standardId', 'status', 'introWidth', 'introHeight', 'introSpeed', 'speechCleanupRequired', 'titlePageRequired', 'disclaimerRequired', 'ownerIntroRequired'];
   const quote = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`;
   const rows = openings.map((opening) => {
     const title = opening.sequence.find((item) => item.id === 'official-title-page');
@@ -274,6 +292,7 @@ function writeCsv(filePath, openings) {
       introWidth: intro?.finalMaster?.widthPixels,
       introHeight: intro?.finalMaster?.heightPixels,
       introSpeed: intro?.voiceSettings?.defaultSpeed,
+      speechCleanupRequired: intro?.speechCleanup?.required,
       titlePageRequired: Boolean(title),
       disclaimerRequired: Boolean(disclaimer),
       ownerIntroRequired: Boolean(intro),
@@ -308,7 +327,7 @@ if (!selected.length) fail(`Course not found: ${args.course}`);
 const openings = selected.map((course) => buildOpening(course, standard));
 const findings = validate(openings, standard, args.all);
 const manifest = {
-  schemaVersion: '1.0.0',
+  schemaVersion: '1.1.0',
   generatedAt: new Date().toISOString(),
   source: path.relative(ROOT, sourcePath).replaceAll('\\', '/'),
   standard: path.relative(ROOT, standardPath).replaceAll('\\', '/'),
@@ -319,6 +338,10 @@ const manifest = {
     const intro = item.sequence.find((entry) => entry.id === 'owner-course-introduction');
     return intro?.finalMaster?.widthPixels === 3840 && intro?.finalMaster?.heightPixels === 2160;
   }).length,
+  speechCleanupIntroCount: openings.filter((item) => {
+    const intro = item.sequence.find((entry) => entry.id === 'owner-course-introduction');
+    return intro?.speechCleanup?.required === true && intro?.speechCleanup?.mode === 'precision';
+  }).length,
   passed: findings.length === 0,
   findings,
   openings,
@@ -327,19 +350,20 @@ manifest.manifestSha256 = hash({ ...manifest, manifestSha256: undefined });
 
 if (args.mode === 'validate') {
   if (findings.length) fail(`Validation failed: ${findings.join(', ')}`);
-  console.log(`[academy-course-opening-plan] Validation passed for ${openings.length} course opening(s); every intro is governed as a 4K master before the first lesson.`);
+  console.log(`[academy-course-opening-plan] Validation passed for ${openings.length} course opening(s); every intro is governed as a speech-cleaned 4K master before the first lesson.`);
   process.exit(0);
 }
 
 writeJson(path.join(outputRoot, 'academy-course-opening-manifest.json'), manifest);
 writeCsv(path.join(outputRoot, 'academy-course-opening-register.csv'), openings);
 writeJson(path.join(outputRoot, 'academy-course-opening-validation.json'), {
-  schemaVersion: '1.0.0',
+  schemaVersion: '1.1.0',
   generatedAt: manifest.generatedAt,
   passed: findings.length === 0,
   findings,
   courseCount: manifest.courseCount,
   fourKIntroCount: manifest.fourKIntroCount,
+  speechCleanupIntroCount: manifest.speechCleanupIntroCount,
   standardId: standard.standardId,
   manifestSha256: manifest.manifestSha256,
 });
