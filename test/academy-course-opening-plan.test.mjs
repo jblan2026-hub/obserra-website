@@ -30,6 +30,7 @@ function run(output, extra = []) {
 }
 
 test("opening standard applies to every governed Academy course", () => {
+  assert.equal(standard.schemaVersion, "1.1.0");
   assert.equal(standard.standardId, "obserra-course-opening-v1");
   assert.equal(standard.appliesTo.allAcademyCourses, true);
   assert.equal(standard.appliesTo.requiredBeforeFirstLesson, true);
@@ -38,18 +39,23 @@ test("opening standard applies to every governed Academy course", () => {
   assert.equal(standard.technicalMaster.heightPixels, 2160);
   assert.equal(standard.technicalMaster.upscaleRequiredWhenSourceBelow4K, true);
   assert.equal(standard.technicalMaster.upscaleMustNotAlterIdentity, true);
+  assert.equal(standard.technicalMaster.speechCleanupRequired, true);
+  assert.equal(standard.technicalMaster.speechEnhancementMode, "precision");
+  assert.equal(standard.technicalMaster.cleanupMustNotAlterVoiceIdentity, true);
 });
 
-test("all 60 courses receive title page, disclaimers, owner intro, and transition", () => {
+test("all 60 courses receive title page, disclaimers, owner intro, speech cleanup, and transition", () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "obserra-course-openings-"));
   const output = path.join(temp, "release");
   const result = run(output);
   assert.equal(result.status, 0, result.stderr || result.stdout);
 
   const manifest = JSON.parse(fs.readFileSync(path.join(output, "academy-course-opening-manifest.json"), "utf8"));
+  assert.equal(manifest.schemaVersion, "1.1.0");
   assert.equal(manifest.courseCount, 60);
   assert.equal(manifest.openingCount, 60);
   assert.equal(manifest.fourKIntroCount, 60);
+  assert.equal(manifest.speechCleanupIntroCount, 60);
   assert.equal(manifest.passed, true);
   assert.deepEqual(manifest.findings, []);
 
@@ -75,10 +81,16 @@ test("all 60 courses receive title page, disclaimers, owner intro, and transitio
     assert.equal(intro.identityControls.naturalFacialMovementCharacterLocked, true, opening.courseId);
     assert.equal(intro.identityControls.scriptMayChangeByCourse, true, opening.courseId);
     assert.equal(intro.voiceSettings.defaultSpeed, 0.92, opening.courseId);
+    assert.equal(intro.speechCleanup.required, true, opening.courseId);
+    assert.equal(intro.speechCleanup.mode, "precision", opening.courseId);
+    assert.equal(intro.speechCleanup.backgroundNoiseReductionRequired, true, opening.courseId);
+    assert.equal(intro.speechCleanup.cleanupMustNotAlterVoiceIdentity, true, opening.courseId);
     assert.equal(intro.finalMaster.widthPixels, 3840, opening.courseId);
     assert.equal(intro.finalMaster.heightPixels, 2160, opening.courseId);
     assert.equal(intro.finalMaster.upscaleRequiredWhenSourceBelow4K, true, opening.courseId);
     assert.equal(intro.finalMaster.upscaleMustNotAlterIdentity, true, opening.courseId);
+    assert.equal(intro.finalMaster.speechCleanupRequired, true, opening.courseId);
+    assert.equal(intro.finalMaster.speechEnhancementMode, "precision", opening.courseId);
   }
 });
 
@@ -97,13 +109,13 @@ test("Cybersecurity Foundations uses the exact course title and pronunciation sa
   assert.match(intro.script, /Obserra Executive Protection and Intelligence/);
 });
 
-test("validation mode confirms 4K opening parity without writing outputs", () => {
+test("validation mode confirms speech-cleaned 4K opening parity without writing outputs", () => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "obserra-course-opening-validation-"));
   const output = path.join(temp, "release");
   const result = run(output, ["--mode", "validate"]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   assert.match(result.stdout, /Validation passed for 60 course opening/i);
-  assert.match(result.stdout, /4K master before the first lesson/i);
+  assert.match(result.stdout, /speech-cleaned 4K master before the first lesson/i);
   assert.equal(fs.existsSync(output), false);
 });
 
