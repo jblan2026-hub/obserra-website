@@ -174,7 +174,14 @@ test("cinematic configuration and standards contain no credential values", () =>
     /access[_-]?token["']?\s*:\s*["'][^"']+/i,
     /client[_-]?secret["']?\s*:\s*["'][^"']+/i,
     /webhook[_-]?secret["']?\s*:\s*["'][^"']+/i,
-    /sk[-_][a-z0-9]/i,
+    /sk_(?:live|test)_[a-z0-9]{16,}/i,
+    /rk_(?:live|test)_[a-z0-9]{16,}/i,
+    /whsec_[a-z0-9]{16,}/i,
+    /ghp_[a-z0-9]{30,}/i,
+    /github_pat_[a-z0-9_]{30,}/i,
+    /sb_secret_[a-z0-9_]{20,}/i,
+    /eyJhbGciOi/i,
+    /BEGIN PRIVATE KEY/i,
   ]) {
     assert.doesNotMatch(standardText, marker);
   }
