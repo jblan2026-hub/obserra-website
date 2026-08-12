@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.2.0",
+  "schemaVersion": "1.3.0",
   "minimumExpectedCatalogCourses": 60,
   "annualPlan": {
     "productionMode": "quality-first-owner-managed-refill",
@@ -32,8 +32,15 @@
     "tierMayChangeReleasePriorityOnly": true,
     "tierMayNotReduceVideoQuality": true,
     "targetAesthetic": "cinematic-fortune-500-executive-documentary",
-    "minimumMasterResolution": "1920x1080",
-    "preferredFlagshipMasterResolution": "3840x2160",
+    "minimumModuleMasterResolution": "1920x1080",
+    "courseIntroMasterResolution": "3840x2160",
+    "allCourseIntros4KRequired": true,
+    "highestProviderQualityRequiredForIntro": true,
+    "upscaleIntroWhenSourceBelow4K": true,
+    "upscaleMayNotAlterPresenterIdentity": true,
+    "officialTitlePageRequired": true,
+    "learnerDisclaimerRequired": true,
+    "onCameraOwnerIntroBeforeLessonsRequired": true,
     "landscapeAspectRatio": "16:9",
     "verticalAspectRatio": "9:16",
     "linkedinAspectRatio": "4:5",
@@ -47,6 +54,12 @@
     "moduleVisualPackTargetSeconds": 60,
     "minimumFinishedVideoMinutesPerCourse": 27,
     "targetFinishedVideoMinutesPerCourse": 37,
+    "requiredOpeningSequence": [
+      "official-branded-course-title-page",
+      "required-learner-disclaimer-and-acknowledgement",
+      "dr-jody-blanchard-on-camera-course-introduction",
+      "course-orientation-and-transition-to-module-one"
+    ],
     "requiredStoryBeats": [
       "opening-question-decision-or-consequence",
       "why-the-issue-matters",
@@ -57,12 +70,16 @@
       "intentional-transition-to-next-activity"
     ],
     "forbiddenPatterns": [
+      "lessons-begin-before-branded-opening-sequence",
+      "intro-final-master-below-4k-when-4k-supported",
+      "missing-course-title-page-disclaimer-or-owner-introduction",
       "full-course-talking-avatar-only",
       "robotic-narration-over-static-slides",
       "single-presenter-framing-for-entire-lesson",
       "generic-unrelated-stock-footage",
       "constant-cyberpunk-neon-imagery",
       "morphing-faces-hands-text-or-objects",
+      "face-reshaping-beautification-or-voice-substitution",
       "unsupported-claims-presented-as-facts",
       "synthetic-case-subject-presented-as-real",
       "unlicensed-third-party-assets",
@@ -76,11 +93,15 @@
     }
   },
   "brand": {
+    "academyName": "Obserra EPI Academy",
     "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "officialLogoPath": "/brand/obserra-logo.png",
     "presenterLowerThird": "Dr. Jody Blanchard | Founder and Cybersecurity Executive",
     "palette": ["#050B18", "#0B1730", "#C9A227", "#FFFFFF", "#53B7FF"],
+    "commonLearnerDisclaimer": "Obserra EPI Academy courses provide educational and professional-development content. They do not constitute legal, regulatory, medical, investigative, or organization-specific advice; do not authorize action outside the learner's role; and do not confer professional certification, licensure, accreditation, or regulatory approval. Scenarios may be fictional or composite. Learners must follow applicable law, policy, contractual obligations, and authorized escalation procedures.",
     "syntheticMediaDisclosure": "This video uses the authorized digital likeness or synthetic media tools approved by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC.",
-    "defaultCallToAction": "Explore the complete course at Obserra Academy."
+    "intellectualPropertyNotice": "Copyright OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC. All course content, media, frameworks, assessments, and learner materials are proprietary unless expressly identified otherwise.",
+    "defaultCallToAction": "Explore the complete course at Obserra EPI Academy."
   },
   "flagshipCourseIds": [
     "cybersecurity-foundations",
@@ -115,6 +136,11 @@
     "common": [
       "approved-source-script",
       "course-title-and-identity-match",
+      "official-obserra-title-page-applied",
+      "learner-disclaimer-and-acknowledgement-present",
+      "dr-jody-blanchard-intro-before-lessons",
+      "course-intro-4k-uhd-master-required",
+      "highest-supported-intro-quality-selected",
       "obserra-branding-applied",
       "cinematic-enterprise-standard-applied",
       "captions-and-transcript-required",
@@ -135,20 +161,25 @@
     ],
     "heygen": [
       "authorized-avatar-and-voice-only",
+      "presenter-identity-and-recognizable-appearance-locked",
+      "voice-identity-accent-and-cadence-character-locked",
+      "script-may-change-by-course",
+      "wardrobe-background-lighting-and-framing-may-change",
+      "face-reshaping-beautification-skin-smoothing-and-age-change-prohibited",
       "likeness-and-voice-similarity-review-passed",
       "lip-sync-and-pronunciation-review-passed",
       "natural-pacing-pauses-and-executive-tone",
       "robotic-cadence-prohibited",
       "maximum-20-seconds-unbroken-avatar",
       "presenter-screen-time-between-35-and-55-percent",
-      "1080p-rec709-master-exported",
+      "course-intro-3840x2160-rec709-master-exported",
+      "module-anchor-minimum-1920x1080-rec709-master-exported",
       "48khz-clean-audio-and-no-clipping",
       "natural-breathing-pauses-and-emphasis",
       "realistic-eye-contact-blinks-and-gestures",
       "presenter-cutaways-mask-avatar-repetition",
       "multiple-framing-options-approved",
-      "no-uncanny-valley-artifacts",
-      "4k-preferred-for-flagship-1080p-minimum"
+      "no-uncanny-valley-artifacts"
     ],
     "pollo": [
       "module-specific-cinematic-visual-pack",
