@@ -18,7 +18,7 @@ const academyCampaigns = [
     action: "View canary build",
     poster: "/brand/visuals/obserra-cybersecurity.png",
     video: "/media/pollo/academy/obserra-academy-cybersecurity-foundations-15s.mp4",
-    alt: "Obserra Academy cybersecurity learning visualization",
+    alt: "Obserra EPI Academy cybersecurity learning visualization",
   },
   {
     id: "ai-governance",
@@ -29,7 +29,7 @@ const academyCampaigns = [
     action: "View AI course roadmap",
     poster: "/brand/visuals/obserra-eios-intelligence-hero.png",
     video: "/media/pollo/academy/obserra-academy-ai-governance-leadership-15s.mp4",
-    alt: "Obserra Academy AI governance learning visualization",
+    alt: "Obserra EPI Academy AI governance learning visualization",
   },
   {
     id: "ciso-board-leadership",
@@ -40,7 +40,7 @@ const academyCampaigns = [
     action: "View leadership roadmap",
     poster: "/brand/visuals/obserra-core.png",
     video: "/media/pollo/academy/obserra-academy-ciso-board-leadership-15s.mp4",
-    alt: "Obserra Academy CISO and board leadership visualization",
+    alt: "Obserra EPI Academy CISO and board leadership visualization",
   },
   {
     id: "executive-protection-intelligence",
@@ -51,7 +51,7 @@ const academyCampaigns = [
     action: "View protection roadmap",
     poster: "/brand/visuals/obserra-protection-intelligence.png",
     video: "/media/pollo/academy/obserra-academy-executive-protection-intelligence-15s.mp4",
-    alt: "Obserra Academy protection and intelligence learning visualization",
+    alt: "Obserra EPI Academy protection and intelligence learning visualization",
   },
 ] as const;
 
@@ -67,7 +67,7 @@ export default function AcademyCinematicCampaigns({ enabled }: AcademyCinematicC
           <p className="kicker">CINEMATIC LEARNING DIRECTION</p>
           <h2 id="academy-cinematic-title">Professional education built around real decisions, not robotic presentation.</h2>
           <p>
-            Obserra Academy combines authorized instructor presence, realistic enterprise scenarios, evidence-based
+            Obserra EPI Academy combines authorized instructor presence, realistic enterprise scenarios, evidence-based
             instruction, practical exercises, assessment, and controlled LearnWorlds delivery. Course availability
             remains governed by content, accessibility, commerce, certificate, and owner-approval gates.
           </p>
@@ -83,12 +83,12 @@ export default function AcademyCinematicCampaigns({ enabled }: AcademyCinematicC
             enabled={enabled}
             src="/media/pollo/academy/obserra-academy-learning-hero-loop-12s.mp4"
             poster="/brand/visuals/obserra-academy.png"
-            alt="Obserra Academy cinematic professional learning visualization"
+            alt="Obserra EPI Academy cinematic professional learning visualization"
             sizes="(max-width: 900px) 100vw, 46vw"
           />
           <div className="academy-cinematic__brand" aria-hidden="true">
             <Image src="/brand/obserra-logo.png" alt="" width={190} height={37} />
-            <span>ACADEMY</span>
+            <span>EPI ACADEMY</span>
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function AcademyCinematicCampaigns({ enabled }: AcademyCinematicC
       </div>
 
       <p className="academy-cinematic__security-note">
-        These media elements load only versioned public files from the Obserra website. They do not query, write,
+        These media elements load only versioned public files from the Obserra EPI website. They do not query, write,
         expose, or connect to the learner, commerce, identity, assessment, certificate, or application databases.
       </p>
     </section>
