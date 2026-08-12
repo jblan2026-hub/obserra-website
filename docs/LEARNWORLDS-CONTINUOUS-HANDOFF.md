@@ -49,8 +49,6 @@ No alternate title, additional title, current employer name, former employer nam
 
 The script, professional wardrobe, background, set, lighting, framing, pose, restrained natural movement, official graphics, captions, identity-preserving speech cleanup, and identity-preserving 4K processing may change. The person and voice may not change.
 
-The uploaded resume is internal factual grounding only. It does not authorize learner-facing use of any other title, employer, logo, or employment history.
-
 ## Registered brand lock
 
 ```text
@@ -65,43 +63,47 @@ Standalone `Obserra` is not an approved Academy or short business name. The regi
 
 ## Current HeyGen owner-source state
 
-The owner directly supplied the approved HeyGen `Professional man speaking to camera.` project URL and confirmed that this project is the canonical owner-video source for the Academy introduction. This project is the approved exact-owner visual/voice source and was previously processed with Video Upscaler. Exact controlled provider identifiers remain in the protected private handoff and are omitted from this public record.
+The owner directly supplied the approved HeyGen `Professional man speaking to camera.` project URL and confirmed that this project is the canonical owner-video source for the Academy introduction. No generated alternate look may be substituted merely because it belongs to the same avatar group.
 
-No generated alternate look may be substituted merely because it belongs to the same avatar group.
+### Preserved provider failure
 
-The owner introduction may use a course-specific script, official branded graphics, precision speech cleanup, background-noise reduction, dialogue leveling, captions/transcript, and identity-preserving 4K processing. Face identity and voice identity may not change.
+A direct authenticated HeyGen video lookup using the owner-supplied project/upscale identifier returned HTTP 404. This proves that the dashboard project/upscale identifier is not directly retrievable as a standard HeyGen API video ID through the connected `get_video` endpoint. The failure is preserved and must not be represented as proof that the approved project is absent or invalid.
 
-The rejected wrong-person `Owner Review Video` remains prohibited from reuse, export, LearnWorlds upload, publication, marketing, cloning, or template use. Its historical deletion/project-card state remains an unresolved provider housekeeping issue and must not be misrepresented as permanently purged without direct evidence.
+### Controlled review render started
+
+After the owner explicitly directed continuation and had already approved the exact project source, one controlled review render was started using the owner-supplied approved project's upscaled thumbnail/source frame plus the private voice explicitly labeled as the approved exact-source owner voice in the authenticated HeyGen account.
+
+The render is configured for:
+
+- 3840x2160 4K;
+- 16:9 MP4;
+- restrained executive motion;
+- professional course-specific script;
+- sidecar captions;
+- approved sole title `Founder and CEO`;
+- no employer names, outside titles, or employment history;
+- owner review before any release or LearnWorlds use.
+
+The provider accepted the render request and returned status `waiting`. The exact render identifier is retained in the protected private handoff and omitted from this public record. The render is not approved merely because generation was accepted; exact face, exact voice, visual quality, speech clarity, captions, and identity preservation must be reviewed after completion.
 
 ## Intro production requirements
 
-The Cybersecurity Foundations owner introduction is governed to:
-
-- appear before Module 1;
-- use the exact approved owner source only;
-- use the sole approved title `Founder and CEO`;
-- contain no current or former employer names, logos, outside titles, or employment history;
-- use a professional course-specific welcome script;
-- master at 3840x2160, 16:9, highest supported production quality;
-- use identity-preserving 4K upscale when required;
-- use precision speech cleanup without changing voice identity;
-- apply background-noise reduction, dialogue leveling, and de-click/de-ess when needed;
-- use clean 48 kHz audio;
-- include captions, transcript, and thumbnail;
-- retain owner review and approval before release.
+The Cybersecurity Foundations owner introduction is governed to appear before Module 1; use the exact approved owner source only; use the sole approved title `Founder and CEO`; contain no current or former employer names, logos, outside titles, or employment history; use a professional course-specific welcome script; master at 3840x2160, 16:9, highest supported production quality; use identity-preserving 4K processing; use precision speech cleanup without changing voice identity; apply background-noise reduction, dialogue leveling, and de-click/de-ess when needed; use clean audio; include captions, transcript, and thumbnail; and retain owner review and approval before release.
 
 ## Current package-rebuild action
 
 The owner directed that the first course be completed as a superseding governed package because the prior package did not meet all requirements. The rebuild must close every requirement from the commercial audit, course-opening standard, identity/brand rules, accessibility requirements, assessment/completion contract, and owner-introduction media standard.
 
+Because this repository is public and its own security boundary prohibits confidential course manuscripts and protected media from being committed here, the complete learner-facing course package must be produced in protected/private artifact storage. GitHub receives sanitized governance, status, validation, and failure evidence only.
+
 Current acceptance state:
 
 ```text
 Prior v2.0.0 package: intermediate only; superseded for final acceptance
-Five-module instructional structure: exists in prior package; requires governed completeness review
+Five-module instructional structure: exists in prior package; governed completeness review in progress
 Official branded title page: required; final package acceptance pending
 Learner disclosures and acknowledgement: required; final package acceptance pending
-Exact-owner course introduction: source identified; corrected 4K render pending
+Exact-owner course introduction: controlled 4K review render started; provider status waiting
 Course orientation: required; final package acceptance pending
 Authoritative resources and source register: required; final package acceptance pending
 Learner workbook and job aids: required; final package acceptance pending
@@ -119,11 +121,12 @@ Production merge/live checkout/publication: blocked
 ## Current public status
 
 ```text
-Repository visibility: public; confidential provider data must remain out of repository
+Repository visibility: public; confidential provider data and course manuscripts must remain out of repository
 Pull request: Draft
 Exact approved owner source: identified by owner
-Corrected exact-owner 4K introduction: pending
-Superseding first-course package: rebuild in progress
+Direct API lookup of project/upscale ID: failed with 404; preserved
+Corrected exact-owner 4K introduction: controlled review render waiting
+Superseding first-course package: rebuild in progress in protected artifact storage
 LearnWorlds first-course loading: pending
 Assessment, resources, completion, certificate, accessibility, desktop, and mobile acceptance: pending
 Production merge, live checkout, additional-course rollout, and publication: blocked
@@ -143,4 +146,4 @@ Read:
 8. `config/academy-course-opening-standard.json`
 9. The protected private handoff.
 
-Continue from the first incomplete course-build action. Preserve the exact approved owner source, sole Founder and CEO title, no-employer rule, registered brand, official website, complete opening sequence, 4K speech-cleaned owner introduction, five substantive modules, authoritative resources, learner tools, assessment, completion, accessibility, certificate, and owner-review gates. Update the handoff immediately after every substantive action or failure. Do not claim LearnWorlds acceptance, publication, merge, live checkout, or production cutover without direct evidence and explicit owner approval.
+Continue from the first incomplete course-build action and poll the controlled owner-introduction render as appropriate. Preserve the exact approved owner source, sole Founder and CEO title, no-employer rule, registered brand, official website, complete opening sequence, 4K speech-cleaned owner introduction, five substantive modules, authoritative resources, learner tools, assessment, completion, accessibility, certificate, and owner-review gates. Update the handoff immediately after every substantive action or failure. Do not claim LearnWorlds acceptance, publication, merge, live checkout, or production cutover without direct evidence and explicit owner approval.
