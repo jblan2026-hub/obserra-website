@@ -25,19 +25,17 @@ The uploaded resume is internal factual grounding only. It does not authorize le
 
 Any video that uses Dr. Jody Blanchard's name or title must use his exact approved face and exact approved voice. A similar person, regenerated face, substitute avatar, substitute voice, or merely similar voice is prohibited.
 
-Approved owner projects currently visible in the owner-supplied My Projects screenshot:
+The owner-supplied My Projects screenshot contains two approved owner projects:
 
 ```text
-Professional man speaking to camera
+Professional man speaking to camera.
 Processing: Video Upscaler
-Controlled project reference: 9cde7d534d2c4332bd30c5e587a88003
 
 Confident_Cybersecurity_Leadership
 Processing: Speech Cleanup
-Controlled video reference: ae7539dc419c4b89971ba6d092452a55
 ```
 
-The owner confirms both contain his exact face and exact voice.
+The owner confirms that both approved projects contain his exact face and exact voice. Exact controlled provider identifiers are retained only in the protected private handoff and are omitted from this public repository record.
 
 The course-specific script, professional wardrobe, background, set, lighting, framing, pose, restrained natural movement, official graphics, captions, identity-preserving speech cleanup, and identity-preserving 4K processing may change. The person, face, voice, name, and sole approved title may not change.
 
@@ -61,33 +59,33 @@ Official website: https://www.obserrallc.com
 
 Standalone `Obserra` is not an approved Academy or short business name. No other company or owner may be presented as the Academy, course provider, issuer, or business. The registered names, official logo, approved colors, and official website may not be changed.
 
-## Rejected project and Trash state
+## Rejected project and exact provider state
 
 The incorrect generated owner-welcome project did not depict the exact owner and was rejected.
 
-Current owner-confirmed state:
+The owner-supplied My Projects screenshot shows three visible cards:
 
-1. The rejected project title is `Owner Review Video`.
-2. The owner moved the rejected project to Trash.
-3. The rejected project is absent from the current My Projects screenshot.
-4. Exactly the two approved owner projects listed above are visible in the current screenshot.
-5. Permanent deletion or provider purge from Trash is not independently verified.
-6. Deletion or purge by this assistant is not claimed.
-7. The rejected project is prohibited from reuse, export, LearnWorlds upload, publication, marketing, or template use.
+1. `Owner Review Video` - rejected wrong-person Video Agent project or session card - still visible.
+2. `Professional man speaking to camera.` - approved owner project.
+3. `Confident_Cybersecurity_Leadership` - approved owner project.
 
 Current controlled truth:
 
 ```text
-Rejected project moved to Trash by owner: yes
-Rejected project visible in current My Projects screenshot: no
-Approved owner projects visible: exactly two
-Permanent provider purge from Trash: not verified
-Deletion or purge performed by assistant: no
+Rejected underlying generated video record: deleted
+Rejected underlying video retrievable: no
+Rejected Owner Review Video project or session card visible in My Projects: yes
+Rejected project moved to Trash: no evidence
+Rejected project or session card deleted: no
+Only two approved projects remain visible: no
+Connected delete-project or delete-session action available: no
 Approved owner projects preserved: yes
-Incorrect project authorized for any use: no
+Rejected project authorized for any use: no
 ```
 
-A connector 404, an absent list result, or the absence of the project card from My Projects must not be represented as permanent purge from Trash.
+Deletion of an underlying generated video record is not deletion of its Video Agent project or session card. A connector 404, an absent list result, or an incomplete provider listing must not be represented as project deletion, Trash state, or permanent purge.
+
+The rejected project is prohibited from reuse, export, LearnWorlds upload, publication, marketing, cloning, or template use.
 
 ## Required owner introduction
 
@@ -106,7 +104,7 @@ The final introduction must be a highest-quality 3840 x 2160 master with identit
 
 ## Credit-control rule
 
-No additional owner-video credit may be spent until the deterministic exact owner face and exact owner voice path is proven, the course script and official graphics are frozen, and Dr. Jody Blanchard explicitly authorizes one controlled review render.
+No additional owner-video credit may be spent until the deterministic exact owner face and exact owner voice path is proven, the course script and official graphics are frozen, unconstrained presenter substitution is technically prevented, and Dr. Jody Blanchard explicitly authorizes one controlled review render.
 
 ## Machine-readable enforcement
 
@@ -115,12 +113,20 @@ The governing policies are:
 ```text
 config/academy-owner-identity-attribution-policy.json
 config/academy-course-opening-standard.json
+config/academy-cinematic-production-standard.json
+config/academy-media-factory.json
+```
+
+The consolidated public audit is:
+
+```text
+docs/academy-media-pipeline/OWNER-IDENTITY-BRAND-HEYGEN-AND-COURSE-AUDIT-2026-08-12.md
 ```
 
 ## Release rule
 
-The course remains Draft. LearnWorlds upload, owner-media acceptance, assessment, resources, completion, certificate, accessibility, desktop, mobile, template reuse, live checkout, merge, and publication remain blocked until directly verified and explicitly approved by Dr. Jody Blanchard.
+The course remains Draft. Removal of the visible rejected project card, owner-media acceptance, complete LearnWorlds loading, assessment, resources, completion, certificate, accessibility, desktop, mobile, template reuse, live checkout, merge, and publication remain blocked until directly verified and explicitly approved by Dr. Jody Blanchard.
 
 ## Handoff discipline
 
-Update the protected private handoff and sanitized public handoff after every substantive action. Preserve all failures and unresolved blockers. Never report My Projects visibility, Trash state, underlying video-record state, or permanent purge as equivalent conditions.
+Update the protected private handoff and sanitized public handoff after every substantive action. Preserve all failures and unresolved blockers. Never report My Projects visibility, underlying video-record state, project-card state, Trash state, or permanent purge as equivalent conditions.
