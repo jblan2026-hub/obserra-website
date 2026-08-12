@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Restart Notice v12.1.0
+# Obserra EPI Academy Public Restart Notice v12.2.0
 
 Owner and presenter: Dr. Jody Blanchard
 
@@ -16,11 +16,15 @@ Official website: https://www.obserrallc.com
 
 Status: The validated Cybersecurity Foundations v4.1.0 package is the current first-course source of truth. The LearnWorlds course remains Draft. Authenticated loading, exact-owner media acceptance, runtime validation, and owner end-to-end approval are incomplete.
 
+## Standing owner directive
+
+Continue work in the Cybersecurity Foundations first-course priority and do not drift to unrelated work. Update the protected and sanitized handoff documents after every substantive action, decision, validation result, failure, provider-state change, package change, or owner approval. This directive remains active until Dr. Jody Blanchard explicitly changes it.
+
 ## Mandatory restart sequence
 
 1. Read `docs/academy-media-pipeline/LATEST-HANDOFF.md`.
 2. Read `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`.
-3. Retrieve the protected private v12.1.0 handoff.
+3. Retrieve the protected private v12.2.0 handoff.
 4. Use the validated course package `Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Review-v4.1.0.zip`.
 5. Verify its SHA-256 is `d11af1a50ddcaa2b9b5214e666e795853e0a41927f7c97806b2ef69195640cfa`.
 6. Continue from authenticated loading and configuration of the existing LearnWorlds Draft course.
@@ -105,7 +109,7 @@ Owner end-to-end approval: not recorded
 ## Continuation command
 
 ```text
-Read the v12.1.0 Obserra EPI Academy handoff before acting. Use only Dr. Jody Blanchard, Founder and CEO; Obserra EPI Academy; Obserra EPI; Executive Protection & Intelligence; OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC; and www.obserrallc.com. Preserve the exact owner face and voice requirement, no-employer rule, official logo, and official colors. Use the validated Cybersecurity Foundations v4.1.0 package with SHA-256 d11af1a50ddcaa2b9b5214e666e795853e0a41927f7c97806b2ef69195640cfa. Continue from authenticated LearnWorlds Draft loading. Load 64 ready activities, keep the exact-owner welcome video blocked, validate the full learner journey, and obtain explicit owner approval before additional courses, redesign, merge, checkout, or publication. Update every handoff after every substantive action and preserve every failure.
+Read the v12.2.0 Obserra EPI Academy handoff before acting. Continue the Cybersecurity Foundations first-course priority and update all protected and sanitized handoff documents after every substantive action. Use only Dr. Jody Blanchard, Founder and CEO; Obserra EPI Academy; Obserra EPI; Executive Protection & Intelligence; OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC; and www.obserrallc.com. Preserve the exact owner face and voice requirement, no-employer rule, official logo, and official colors. Use the validated Cybersecurity Foundations v4.1.0 package with SHA-256 d11af1a50ddcaa2b9b5214e666e795853e0a41927f7c97806b2ef69195640cfa. Continue from authenticated LearnWorlds Draft loading. Load 64 ready activities, keep the exact-owner welcome video blocked, validate the full learner journey, and obtain explicit owner approval before additional courses, redesign, merge, checkout, or publication. Preserve every failure.
 ```
 
 ## Public repository warning
