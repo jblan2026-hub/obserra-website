@@ -28,10 +28,10 @@ export type CourseOpening = {
       cybersecurity: "cyber security";
     };
     video: {
-      status: "awaiting-owner-approved-master";
-      reviewMode: true;
-      mediaReady: false;
-      localAssetPath: null;
+      status: "awaiting-owner-approved-master" | "approved";
+      reviewMode: boolean;
+      mediaReady: boolean;
+      localAssetPath: string | null;
       masterResolution: "3840x2160";
       deliveryResolution: "1920x1080";
       highestSupportedProviderResolutionRequired: true;
