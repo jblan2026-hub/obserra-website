@@ -61,21 +61,30 @@ Standalone `Obserra` is not an approved Academy or short business name. The regi
 
 The incorrect generated owner-welcome project did not depict the exact owner and was rejected.
 
-The owner supplied a current HeyGen My Projects screenshot showing exactly two approved projects:
+The owner-supplied My Projects screenshot shows three visible cards:
+
+1. `Owner Review Video` - rejected wrong-person project or session card - still visible.
+2. `Professional man speaking to camera.` - approved owner project processed with Video Upscaler.
+3. `Confident_Cybersecurity_Leadership` - approved owner project processed with Speech Cleanup.
+
+The owner confirms that the two approved projects contain his exact face and exact voice. Exact controlled provider identifiers are retained only in the protected private handoff and are omitted from this public repository record.
+
+Current verified state:
 
 ```text
-Professional man speaking to camera - Video Upscaler
-Controlled project reference: 9cde7d534d2c4332bd30c5e587a88003
-
-Confident_Cybersecurity_Leadership - Speech Cleanup
-Controlled video reference: ae7539dc419c4b89971ba6d092452a55
+Rejected underlying generated video record: deleted
+Rejected underlying video retrievable: no
+Rejected Owner Review Video project or session card visible in My Projects: yes
+Rejected project moved to Trash: no evidence
+Rejected project or session card deleted: no
+Only two approved projects remain visible: no
+Connected delete-project or delete-session action available: no
+Approved owner projects preserved: yes
 ```
 
-The owner confirms both projects contain his exact face and exact voice.
+Deletion of the underlying video record did not delete the visible Video Agent project or session card. Provider 404 responses, absent list results, and incomplete connector listings are not proof of project deletion, Trash state, or permanent purge.
 
-The owner moved the rejected wrong-person `Owner Review Video` project to Trash. It is absent from the current My Projects screenshot. Permanent purge from Trash is not independently verified. Deletion or purge by this assistant is not claimed.
-
-The rejected project is prohibited from reuse, export, LearnWorlds upload, publication, marketing, or template use.
+The rejected project is prohibited from reuse, export, LearnWorlds upload, publication, marketing, cloning, or template use.
 
 ## Credit-control rule
 
@@ -87,10 +96,9 @@ No additional HeyGen owner-video credit may be spent until the deterministic exa
 Repository visibility: public and must be corrected
 Pull request: Draft
 Exact approved owner introduction: pending
-Rejected Owner Review Video project: moved to Trash by owner
-Rejected project visible in current My Projects screenshot: no
-Permanent purge from Trash: not verified
-Approved owner projects visible: exactly two
+Rejected Owner Review Video project or session card: still visible
+Rejected underlying video: deleted and not retrievable
+Approved owner projects visible: two, alongside the rejected card
 LearnWorlds first-course loading: pending
 Assessment, resources, completion, certificate, accessibility, desktop, and mobile acceptance: pending
 Website cinematic activation: disabled
@@ -102,12 +110,13 @@ Production merge, live checkout, and publication: blocked
 Read:
 
 1. `docs/academy-media-pipeline/LATEST-HANDOFF.md`
-2. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-MOVED-REJECTED-PROJECT-TO-TRASH.md`
+2. `docs/academy-media-pipeline/OWNER-IDENTITY-BRAND-HEYGEN-AND-COURSE-AUDIT-2026-08-12.md`
 3. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-IDENTITY-AND-REGISTERED-BRAND-LOCK.md`
-4. `docs/academy-media-pipeline/ACTIVITY-LEDGER-ADDENDUM-OWNER-TRASH-AND-COURSE-REBUILD.md`
-5. `docs/academy-media-pipeline/FAILURE-REGISTER-ADDENDUM-IDENTITY-TITLE-BRAND-CREDIT-DRIFT.md`
-6. `config/academy-owner-identity-attribution-policy.json`
-7. `config/academy-course-opening-standard.json`
-8. The protected private handoff
+4. `docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-OWNER-MOVED-REJECTED-PROJECT-TO-TRASH.md`, which is retained only as a superseded failure record.
+5. `docs/academy-media-pipeline/ACTIVITY-LEDGER-ADDENDUM-OWNER-TRASH-AND-COURSE-REBUILD.md`, whose filename is retained for audit continuity and whose content is corrected.
+6. `docs/academy-media-pipeline/FAILURE-REGISTER-ADDENDUM-IDENTITY-TITLE-BRAND-CREDIT-DRIFT.md`.
+7. `config/academy-owner-identity-attribution-policy.json`.
+8. `config/academy-course-opening-standard.json`.
+9. The protected private handoff.
 
-Continue from the first incomplete controlled action: rebuild and validate the complete Cybersecurity Foundations course package to the corrected identity, title, no-employer, registered-brand, authoritative-resource, activity, assessment, completion, and accessibility standards. Do not generate another owner video or spend additional HeyGen credits until the deterministic exact identity path is proven and explicitly authorized. Update protected and sanitized handoff records after every substantive action. Do not claim permanent purge, owner-media acceptance, LearnWorlds acceptance, merge, publication, or production cutover without direct evidence and explicit owner approval.
+Continue from the first incomplete controlled action: remove the visible rejected project card through an authenticated supported HeyGen path, verify that only the two approved owner projects remain, and update all records. Then rebuild and validate the complete Cybersecurity Foundations course package to the corrected identity, title, no-employer, registered-brand, authoritative-resource, activity, assessment, completion, and accessibility standards. Do not generate another owner video or spend additional HeyGen credits until the deterministic exact identity path is proven and explicitly authorized. Do not claim owner-media acceptance, LearnWorlds acceptance, merge, publication, or production cutover without direct evidence and explicit owner approval.
