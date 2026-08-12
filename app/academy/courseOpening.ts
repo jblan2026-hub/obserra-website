@@ -9,11 +9,16 @@ export type CourseOpeningDisclaimer = {
 export type CourseOpening = {
   standardId: "obserra-course-opening-v1";
   academyName: "Obserra EPI Academy";
+  shortBusinessName: "Obserra EPI";
+  epiMeaning: "Executive Protection & Intelligence";
   legalName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
   officialLogoPath: "/brand/obserra-logo.png";
   presenter: {
     name: "Dr. Jody Blanchard";
-    title: "Founder and Cybersecurity Executive";
+    title: "Owner, Founder, and Cybersecurity Executive";
+    exactOwnerIdentityRequired: true;
+    substituteFaceAllowed: false;
+    substituteVoiceAllowed: false;
   };
   titlePage: {
     courseTitle: string;
@@ -30,10 +35,28 @@ export type CourseOpening = {
     };
     ownerSignature: {
       name: "Dr. Jody Blanchard";
-      title: "Founder and Cybersecurity Executive";
+      title: "Owner, Founder, and Cybersecurity Executive";
       company: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
-      placement: "bottom-of-course-welcome-script";
-      spoken: false;
+      placement: "bottom-safe-area-lower-third";
+      spoken: true;
+    };
+    identityContract: {
+      exactOwnerFaceRequired: true;
+      exactOwnerVoiceRequired: true;
+      faceMayChange: false;
+      voiceMayChange: false;
+      nameMayChange: false;
+      professionalIdentityMayChange: false;
+      apparentAgeMayChange: false;
+      skinToneMayChange: false;
+      facialStructureMayChange: false;
+      transcriptMayChangeByCourse: true;
+      wardrobeMayChange: true;
+      backgroundMayChange: true;
+      lightingMayChange: true;
+      framingMayChange: true;
+      poseMayChange: true;
+      officialGraphicsMayChangeWithinBrandStandard: true;
     };
     video: {
       status: "awaiting-owner-approved-master" | "approved";
@@ -51,6 +74,7 @@ export type CourseOpening = {
       captionsRequired: true;
       transcriptRequired: true;
       musicFreeMasterRequired: true;
+      officialLogoInsertsRequired: true;
       ownerApprovalRequired: true;
     };
   };
@@ -60,17 +84,21 @@ export type CourseOpening = {
 };
 
 const academyName = "Obserra EPI Academy" as const;
+const shortBusinessName = "Obserra EPI" as const;
+const epiMeaning = "Executive Protection & Intelligence" as const;
 const legalName = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" as const;
+const spokenLegalName = "Obserra Executive Protection and Intelligence, L.L.C.";
 const officialLogoPath = "/brand/obserra-logo.png" as const;
 const presenterName = "Dr. Jody Blanchard" as const;
-const presenterTitle = "Founder and Cybersecurity Executive" as const;
+const presenterTitle = "Owner, Founder, and Cybersecurity Executive" as const;
 
 function cybersecurityFoundationsWelcomeScript() {
   return [
     "Welcome to Obserra EPI Academy and to Cybersecurity Foundations for New Professionals.",
+    `I am ${presenterName}, ${presenterTitle} of ${spokenLegalName}`,
     "I created this course to help you build the judgment, discipline, and practical habits needed to recognize cyber security risk, make accountable decisions, and act safely within your role.",
     "Cyber security is not only a technical responsibility. It is a business, mission, and leadership responsibility shared by every professional who handles information, systems, identities, operations, or trust.",
-    "As you progress through the course, you will work through realistic scenarios, guided practice, knowledge checks, workbook activities, and a final assessment.",
+    "As you progress through the five modules, you will work through realistic scenarios, guided practice, knowledge checks, workbook activities, and a final assessment.",
     "Keep three principles in view. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Document a defensible next step that another professional can review.",
     "The examples in this course may be fictional or composite. Apply the instruction in accordance with applicable law, organizational policy, privacy requirements, and approved escalation procedures.",
     "Thank you for investing in your professional development. Welcome to the course. Let us begin.",
@@ -80,7 +108,8 @@ function cybersecurityFoundationsWelcomeScript() {
 function defaultCourseWelcomeScript(course: Course) {
   const primaryOutcome = course.outcomes[0]?.replace(/^Frame\s+/i, "frame ") ?? "apply the course subject in business context";
   return [
-    `Welcome to Obserra EPI Academy and to ${course.title}.`,
+    `Welcome to ${academyName} and to ${course.title}.`,
+    `I am ${presenterName}, ${presenterTitle} of ${spokenLegalName}`,
     `I created this course to help you ${primaryOutcome}, evaluate evidence and uncertainty before acting, apply decision authority and proportionate escalation, and document a defensible next action.`,
     "Throughout the course, you will use realistic scenarios, guided practice, knowledge checks, course materials, and a final assessment to apply what you learn.",
     "Keep three principles in view. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Define how the result will be verified.",
@@ -114,12 +143,12 @@ function disclaimers(): CourseOpeningDisclaimer[] {
     {
       id: "source-boundary",
       title: "Sources and guidance",
-      body: "The course distinguishes binding requirements from standards, frameworks, recognized guidance, Obserra teaching methods, and organizational choices. Verify obligations for your jurisdiction and role.",
+      body: "The course distinguishes binding requirements from standards, frameworks, recognized guidance, Obserra EPI teaching methods, and organizational choices. Verify obligations for your jurisdiction and role.",
     },
     {
       id: "authorized-synthetic-media",
       title: "Authorized presenter media",
-      body: "The course may use the authorized digital likeness and voice of Dr. Jody Blanchard. Presenter media is subject to identity, voice, facial-motion, speech-cleanup, accessibility, and owner-approval controls.",
+      body: "The course may use the authorized digital likeness and voice of Dr. Jody Blanchard. The exact owner face and exact owner voice are required. Presenter media is subject to identity, voice, facial-motion, speech-cleanup, accessibility, and owner-approval controls.",
     },
     {
       id: "proprietary-material",
@@ -137,11 +166,16 @@ export function courseOpeningForCourse(course: Course): CourseOpening {
   return {
     standardId: "obserra-course-opening-v1",
     academyName,
+    shortBusinessName,
+    epiMeaning,
     legalName,
     officialLogoPath,
     presenter: {
       name: presenterName,
       title: presenterTitle,
+      exactOwnerIdentityRequired: true,
+      substituteFaceAllowed: false,
+      substituteVoiceAllowed: false,
     },
     titlePage: {
       courseTitle: course.title,
@@ -160,8 +194,26 @@ export function courseOpeningForCourse(course: Course): CourseOpening {
         name: presenterName,
         title: presenterTitle,
         company: legalName,
-        placement: "bottom-of-course-welcome-script",
-        spoken: false,
+        placement: "bottom-safe-area-lower-third",
+        spoken: true,
+      },
+      identityContract: {
+        exactOwnerFaceRequired: true,
+        exactOwnerVoiceRequired: true,
+        faceMayChange: false,
+        voiceMayChange: false,
+        nameMayChange: false,
+        professionalIdentityMayChange: false,
+        apparentAgeMayChange: false,
+        skinToneMayChange: false,
+        facialStructureMayChange: false,
+        transcriptMayChangeByCourse: true,
+        wardrobeMayChange: true,
+        backgroundMayChange: true,
+        lightingMayChange: true,
+        framingMayChange: true,
+        poseMayChange: true,
+        officialGraphicsMayChangeWithinBrandStandard: true,
       },
       video: {
         status: "awaiting-owner-approved-master",
@@ -179,6 +231,7 @@ export function courseOpeningForCourse(course: Course): CourseOpening {
         captionsRequired: true,
         transcriptRequired: true,
         musicFreeMasterRequired: true,
+        officialLogoInsertsRequired: true,
         ownerApprovalRequired: true,
       },
     },
