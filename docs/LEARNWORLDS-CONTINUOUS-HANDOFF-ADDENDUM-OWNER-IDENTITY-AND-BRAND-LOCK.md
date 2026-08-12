@@ -1,4 +1,4 @@
-# LearnWorlds Continuous Handoff Addendum: Owner Identity and Registered Brand Lock
+# LearnWorlds Continuous Handoff Addendum: Owner Identity, Official Title, Registered Brand, and Course Build Lock
 
 **Date:** 2026-08-12  
 **Branch:** `feature/learnworlds-commercial-pipeline`  
@@ -10,13 +10,17 @@
 
 Dr. Jody Blanchard designated one exact HeyGen source as the authoritative face and voice reference for every Obserra EPI Academy owner introduction. A similar face, regenerated face, substitute person, substitute avatar, default voice, redesigned voice, or merely similar voice is prohibited.
 
-The only approved course-facing owner title is:
+The wrong-person generated draft is rejected. It must not be uploaded into LearnWorlds, reused in another course, placed in marketing, or retained as an approved template. The exact rejected provider asset must be safely identified before deletion so the correct owner-approved reference is never removed by mistake.
+
+## Sole approved Academy title
+
+The only title that may be spoken or displayed for Dr. Jody Blanchard in any Obserra EPI Academy course introduction, title page, lower third, transcript, caption, course description, landing page, certificate, advertisement, metadata field, or learner resource is:
 
 ```text
 Founder and CEO
 ```
 
-No other professional title may be added to the title card, spoken introduction, lower third, transcript identification, caption identification, course homepage owner block, or certificate attribution unless Dr. Jody Blanchard explicitly changes this instruction.
+No other professional title may be added, substituted, combined, inferred from a resume, or used as a credibility enhancement. This rule has no automatic exception.
 
 ## Immutable owner identity
 
@@ -37,6 +41,12 @@ The following may change only as controlled production variables:
 6. Official title cards, lower thirds, logo placement, captions, and approved graphics.
 7. Identity-preserving speech cleanup and 4K upscaling.
 
+## Employer and resume boundary
+
+Current and former employer names, employer logos, named employer references, job titles from outside Obserra EPI, and identifiable employment history must not appear in Academy owner introductions, course descriptions, landing pages, learner materials, certificates, advertisements, captions, transcripts, metadata, or branded media.
+
+The owner resume is internal factual grounding only. It is not permission to add titles, employers, logos, or career history to learner-facing content. Any separate biography expansion requires a new, explicit owner instruction before use.
+
 ## Registered brand boundary
 
 The approved organization references are:
@@ -46,7 +56,7 @@ Academy name: Obserra EPI Academy
 Short business name: Obserra EPI
 EPI meaning: Executive Protection & Intelligence
 Full legal name: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-Official website: https://www.obserrallc.com
+Official website: www.obserrallc.com
 ```
 
 The standalone name `Obserra` must not be used as the organization or Academy name when the full legal name is not shown. The registered name, official logo, official website, and official color palette must not be renamed, redrawn, recolored, distorted, replaced, or treated as flexible creative elements.
@@ -66,13 +76,14 @@ The owner lower third must show exactly:
 Dr. Jody Blanchard
 Founder and CEO
 OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
+www.obserrallc.com
 ```
 
-The approved owner source remains preserved in the protected handoff. Exact provider identifiers are intentionally not repeated in this public repository.
+The lower third may appear only when the exact owner-approved face and voice are used. The approved owner source remains preserved in the protected handoff. Exact provider identifiers are intentionally not repeated in this public repository.
 
 ## Provider deletion reconciliation
 
-The owner confirmed that he retains full access to the HeyGen account and project library. The connected HeyGen API can retrieve the approved owner source, but deletion attempts for the unapproved or misidentified video records returned `404 video_not_found`.
+The owner confirmed that he retains full access to the HeyGen account and project library. The connected HeyGen API can retrieve the approved owner source, but deletion attempts for unapproved or misidentified video records returned `404 video_not_found`.
 
 Therefore:
 
@@ -86,12 +97,31 @@ Therefore:
 
 The final owner introduction must be delivered as a highest-quality 3840 x 2160 master with identity-preserving upscaling when required, precision speech cleanup, clean 48 kHz audio, selectable captions, a verified transcript, and a music-free master. Cleanup and upscaling may not change the approved face or voice.
 
+## First-course LearnWorlds build requirement
+
+Cybersecurity Foundations for New Professionals must be completed inside the existing LearnWorlds Draft course and presented for owner review before additional courses are produced.
+
+The course should use as many appropriate LearnWorlds native activity types as improve learning quality without adding empty or decorative content. The governed design should include, where appropriate:
+
+1. Branded section headers and orientation activities.
+2. The exact owner introduction video.
+3. Substantive lesson videos and interactive video elements.
+4. eBooks or formatted text lessons.
+5. Downloadable PDFs, worksheets, checklists, job aids, and reference guides.
+6. Authoritative external resources and reference links, including appropriate NIST publications and other official guidance.
+7. Knowledge checks, quizzes, self-assessments, scenario questions, and final assessment controls.
+8. Guided practice, reflection prompts, assignments, forms, or evidence activities when instructionally appropriate.
+9. SCORM or other interactive packages when they add measurable learner value.
+10. Completion rules, certificate controls, captions, transcripts, accessibility artifacts, and desktop and mobile acceptance.
+
+Placeholder activities, empty sections, zero-duration shells, generic filler, and resources that do not support a learning objective are prohibited.
+
 ## Release prevention rule
 
-Any result that depicts a different person, a regenerated or modified owner face, a merely similar voice, an unapproved title, an altered registered logo, or a wrong company or website reference is rejected and must not be uploaded into LearnWorlds.
+Any result that depicts a different person, uses a regenerated or modified owner face, uses a merely similar voice, adds an unapproved title, names an employer, changes the registered brand, or displays an incorrect website is rejected and must not be uploaded into LearnWorlds.
 
 The course remains Draft until the owner has visually and audibly approved the introduction and all course, assessment, resource, completion, certificate, accessibility, desktop, and mobile acceptance gates pass.
 
 ## Handoff continuity
 
-The protected handoff contains the exact approved provider references and the complete deletion-attempt evidence. Continue updating both the protected handoff and this public continuation record after every substantive production, provider, or LearnWorlds action.
+The protected handoff contains the exact approved provider references and the complete deletion-attempt evidence. Continue updating both the protected handoff and this public continuation record after every substantive production, identity, branding, course-authoring, LearnWorlds, assessment, resource, certificate, security, or release action. Successes, failures, provider identifiers, evidence, and unresolved blockers must be preserved so a new chat can continue from the first incomplete controlled action without asking the owner to repeat these rules.
