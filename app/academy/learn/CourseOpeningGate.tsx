@@ -28,7 +28,9 @@ export default function CourseOpeningGate({
   const [introCompleted, setIntroCompleted] = useState(!opening.introduction.video.mediaReady);
   const [courseStarted, setCourseStarted] = useState(false);
   const video = opening.introduction.video;
-  const canContinue = acknowledged && (video.reviewMode || introCompleted);
+  const acknowledgementRequired = opening.learnerAcknowledgementRequired;
+  const acknowledgementSatisfied = !acknowledgementRequired || acknowledged;
+  const canContinue = acknowledgementSatisfied && (video.reviewMode || introCompleted);
 
   if (courseStarted) {
     return (
@@ -158,17 +160,19 @@ export default function CourseOpeningGate({
           ))}
         </div>
 
-        <label className="course-opening-acknowledgement">
-          <input
-            type="checkbox"
-            checked={acknowledged}
-            onChange={(event) => setAcknowledged(event.target.checked)}
-          />
-          <span>
-            I have reviewed the course disclosures. I understand that this is a controlled course-review build and
-            that live release remains blocked until the owner-approved 4K introduction and all acceptance evidence exist.
-          </span>
-        </label>
+        {acknowledgementRequired ? (
+          <label className="course-opening-acknowledgement">
+            <input
+              type="checkbox"
+              checked={acknowledged}
+              onChange={(event) => setAcknowledged(event.target.checked)}
+            />
+            <span>
+              I have reviewed the course disclosures. I understand that this is a controlled course-review build and
+              that live release remains blocked until the owner-approved 4K introduction and all acceptance evidence exist.
+            </span>
+          </label>
+        ) : null}
 
         <button
           type="button"
@@ -179,7 +183,9 @@ export default function CourseOpeningGate({
           {opening.lessonTransitionLabel}
         </button>
 
-        {!acknowledged ? <p className="course-opening-help">Acknowledge the disclosures to continue.</p> : null}
+        {acknowledgementRequired && !acknowledged ? (
+          <p className="course-opening-help">Acknowledge the disclosures to continue.</p>
+        ) : null}
         {video.mediaReady && !introCompleted ? (
           <p className="course-opening-help">Complete the introduction video before continuing.</p>
         ) : null}
