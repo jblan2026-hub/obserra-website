@@ -1,6 +1,6 @@
-# Obserra EPI Academy Public Continuous Handoff v13.8.0
+# Obserra EPI Academy Public Continuous Handoff v14.0.0
 
-The authoritative sanitized operational record is `docs/academy-media-pipeline/LATEST-HANDOFF.md`.
+The authoritative sanitized operational record is `docs/academy-media-pipeline/LATEST-HANDOFF.md`. The consolidated restart snapshot is `docs/academy-media-pipeline/MASTER-HANDOFF-2026-08-12.md`.
 
 ## Canonical identity
 
@@ -15,26 +15,22 @@ Short business: Obserra EPI
 EPI: Executive Protection & Intelligence
 ```
 
-No alternate title, employer reference, employment history, substitute identity, unapproved voice, altered logo, or unapproved brand form is authorized in learner-facing content. The owner resume is internal factual grounding only.
+No alternate title, employer reference, employment history, substitute identity, unapproved voice, altered logo, or unapproved brand form is authorized in learner-facing content.
 
 ## Permanent no-exceptions controls
 
-1. Check the actual current target site and exact object before generating course-specific or platform-specific content.
-2. Use the authenticated target object when account-specific.
-3. Preserve and hash the exact native template or export when applicable.
-4. Check current official vendor documentation, the official Obserra site and approved brand, and current official primary sources.
-5. Generate only after verification is `PASSED`.
-6. Recheck before import, upload, publication, or release.
-7. Never substitute memory, old files, generic templates, old screenshots, or assumptions.
-8. Update protected and sanitized handoffs after every substantive action, result, failure, source change, package version, import result, or owner decision.
-
-If direct verification cannot be completed, status is `BLOCKED`.
+1. Verify the actual current target object and current official source before any account-specific import, publication, or release claim.
+2. Preserve and hash native templates and validated source packages.
+3. Generate only after verification passes.
+4. Preserve every defect, discrepancy, rejection, correction, package version, runtime result, and owner decision.
+5. Static package QA never equals LearnWorlds runtime acceptance.
+6. Final owner video is produced and approved only by Dr. Jody Blanchard.
+7. Use Windows-safe delivery names and short extraction roots.
+8. Keep every course in Draft until authenticated save/reopen, SCORM, assessment, completion, certificate, accessibility, desktop/mobile, and owner acceptance gates pass.
 
 ## Permanent course architecture
 
-Every learner-facing substantive section of every course must contain the complete verified LearnWorlds activity-category stack and its own native-template assessment.
-
-Required activity categories and controls:
+Every learner-facing substantive section contains the governed LearnWorlds activity-category stack and its own native-template assessment.
 
 ```text
 Multimedia
@@ -52,8 +48,6 @@ Accessibility, Transcripts and Captions
 QA Evidence and Release
 ```
 
-Every mapped activity requires a real artifact, exact title, native activity type, completion rule, accessibility alternative, package-relative path, source evidence, and verification state. Unused verified options require `NOT-USED-RATIONALE.md`.
-
 ## Native assessment standard
 
 ```text
@@ -63,124 +57,121 @@ Worksheets: Instructions, Examples, Questions
 Required headings: Group, Type, Question, CorAns, Answer1 through Answer10, CorrectExplanation, IncorrectExplanation
 ```
 
-For a standard five-module course:
+Standard five-module course assessment count:
 
 ```text
-Welcome baseline: 5 questions
-Module 1 check: 5 questions
-Module 2 check: 5 questions
-Module 3 check: 5 questions
-Module 4 check: 5 questions
-Module 5 check: 5 questions
-Final assessment: 25 questions
-Resource-library check: 5 questions
-Graded checks and final: 80 percent pass mark unless owner changes it
+Welcome baseline: 5
+Modules 1-5: 5 each
+Final assessment: 25
+Resource-library check: 5
+Total: 60
+Final pass mark: 80 percent unless owner changes it
 ```
 
-## Course 1 - Cybersecurity Foundations current state
+## Proven SCORM packaging pattern
+
+Course 1 originally failed LearnWorlds SCORM validation. The corrected packaging pattern is now mandatory:
+
+- standalone SCORM 1.2 ZIP per section;
+- `imsmanifest.xml` at ZIP root;
+- explicit SCORM 1.2 metadata;
+- valid SCO resource and launch reference;
+- launch file included;
+- no wrapper folder above the manifest;
+- clean CRC validation.
+
+Dr. Jody Blanchard reported that the corrected Course 1 S00 canary uploaded successfully to LearnWorlds. This proves the packaging pattern, not full-course runtime behavior.
+
+## Windows-safe delivery pattern
+
+Course 1 exposed a Windows path-too-long extraction failure. New deliveries must use a short external ZIP name, short internal root, and validated extraction near the drive root. Do not ship deep nested delivery roots that can exceed Windows path limits.
+
+## Course 1 - Cybersecurity Foundations for New Professionals
 
 ```text
-Persisted source package:
-Obserra-EPI-Academy-Cybersecurity-Foundations-Category-First-Video-Ready-v6.2.0.zip
-SHA-256: 788d5a36204725849cc623159ddcde16c8259f566e1169e92d13d3a094ab01b5
-Bytes: 63,077,096
-Members: 219
-Clean extraction: PASS
-Authoritative current folder architecture: FAIL
-Internal structural acceptance boolean: FAIL
-Final owner-review package: NOT READY
-LearnWorlds runtime acceptance: NOT PROVEN
+Package: C1.zip
+SHA-256: b9e822415a7d91f072f68789f2d533a7934c8cfa2e37ea61427c0bb0c49a9271
+Files: 774
+SCORM bundle: C1-SCORM-READY.zip
+SCORM SHA-256: 58d9082e7d4aa52f0bf36cce3625bef59e3157e87d4c3e4409ef32c1b37b1c0d
+S00 corrected SCORM upload: ACCEPTED BY LEARNWORLDS, owner reported
+Full authenticated runtime: NOT PROVEN
 Publication: BLOCKED
-```
-
-Cybersecurity v6.2.0 remains a corrective-build source package. It must not be represented as final or LearnWorlds accepted.
-
-Corrective audit:
-
-```text
-docs/academy-media-pipeline/CYBERSECURITY-V6-2-CORRECTIVE-PACKAGE-AUDIT-2026-08-12.md
 ```
 
 ## Course 2 - Generative AI Fundamentals for Business Leaders
 
-The owner authorized continuation to the second course. The actual current Obserra catalog and current official primary-source pages were checked before the v2.4.0 correction and audit.
-
 ```text
-Package:
-Obserra-EPI-Academy-Generative-AI-Fundamentals-for-Business-Leaders-LearnWorlds-Category-Complete-v2.4.0.zip
-
-SHA-256:
-97672c48ea057013be5f60becb8a1a2eef08f9fde84c9c1c1898a6e449a4ff41
-
-ZIP members: 686
-Learner-facing sections: 8
-Categories per section: 13
-SCORM 1.2 packages: 8
-Native-template assessments: 8
-Assessment questions: 60
-Presentations: 8 PPTX plus 8 PDF exports
-Video files: 0
-Prohibited identity/title/employer/website findings: 0
-Static package audit: PASS
-Clean extraction: PASS
-Authenticated LearnWorlds runtime: NOT PROVEN
+Integrated package: Obserra-EPI-Academy-Generative-AI-Fundamentals-for-Business-Leaders-Owner-Video-Integration-Ready-v3.1.0.zip
+SHA-256: aa1057c26a3e1ddcb401ae372c038242ff7a0a25afbbe8c84daae4002724185b
+Sections: 8
+Native assessments: 8
+Questions: 60
+Presentations: 8
+Owner-video kit: COMPLETE
+Authenticated runtime: NOT PROVEN
 Publication: BLOCKED
 ```
 
-The v2.4.0 package is approved only as a static owner-review package. It is not represented as imported, runtime accepted, certificate accepted, published, or production released.
+Course 2 predates discovery of the SCORM manifest defect. Before LearnWorlds upload, replace its eight inherited SCORM packages with the proven Course 1 SCORM 1.2 structure and issue a Windows-safe Course 2 package.
 
-Audit record:
+## Course 3 - Large Language Models, LLMs, Explained for Leaders
 
 ```text
-docs/academy-media-pipeline/GENERATIVE-AI-V2-4-PACKAGE-AUDIT-2026-08-12.md
+Package: C3-LLM.zip
+SHA-256: b7456c6ee369f798090ad8c010df591598c794a6f6382f88af94530b5e5d3138
+Members: 747
+SCORM bundle: C3-LLM-SCORM-READY.zip
+SCORM SHA-256: 4556814c0c8033b445370f7af6b611479e51b36fd12c064dc08005ed258e601a
+Owner-video production bible/scripts/matrix: COMPLETE
+Hardened SCORM pattern: YES
+Authenticated runtime: NOT PROVEN
+Publication: BLOCKED
 ```
 
-## Current official-source boundary for Course 2
+## Course 4 - Security Awareness for High Risk Employees
 
-The package records that:
+```text
+Package: C4-SAHR.zip
+SHA-256: 1a11db72bb52e1db82c1e5569d6f00bd92a6eb154c45f52ab115ba7dbfb0aa99
+Members: 708
+SCORM bundle: C4-SAHR-SCORM-READY.zip
+SCORM SHA-256: 70dbf4edd4f811190545f7c324dccb01add4c78ee77687492db511904223e87c
+Owner-video production bible/scripts/matrix: COMPLETE
+Hardened SCORM pattern: YES
+Authenticated runtime: NOT PROVEN
+Publication: BLOCKED
+```
 
-1. NIST AI RMF 1.0 remains the published baseline and is being revised.
-2. NIST AI 600-1 remains the current published Generative AI Profile.
-3. NIST Privacy Framework 1.0 remains published while Privacy Framework 1.1 is identified as coming soon.
-4. NIST SP 800-218A remains published and is used with SP 800-218.
-5. OECD AI Principles were updated in May 2024.
-6. ISO/IEC 42001:2023 remains published.
-7. EU AI Act application is progressive, with major milestones applying from August 2, 2026 and later dates for specified high-risk categories.
-8. CISA's JCDC AI Cybersecurity Collaboration Playbook remains a voluntary coordination reference.
-
-Every source and actual platform object must be rechecked immediately before authenticated import, publication, or live learner use.
+Preserved defect: the eight inherited Course 4 presentation PDFs were byte-identical and incorrectly showed the Resource Library deck. The distinct PPTX masters were used to regenerate correct PDFs. The failure remains documented.
 
 ## Permanent owner-video directive
 
 ```text
-Assistant-generated course video: PROHIBITED
-Connected-provider course-video generation: PROHIBITED
-Additional provider-credit expenditure: PROHIBITED
-Final videos: produced and approved by Dr. Jody Blanchard
+Assistant-generated final course video: PROHIBITED
+Connected-provider final course-video generation: PROHIBITED
+Final video production and approval: Dr. Jody Blanchard
 ```
 
-Every video position remains `OWNER PRODUCTION REQUIRED` until the owner supplies the final file. Scripts, storyboards, teleprompter copy, on-screen text, caption/transcript specifications, technical requirements, and insertion instructions remain authorized.
+Scripts, teleprompter copy, storyboards, shot lists, on-screen text, caption/transcript specifications, technical requirements, and insertion instructions remain authorized.
 
 ## Current controlled work order
 
-1. Deliver the Generative AI v2.4.0 static package for Dr. Jody Blanchard's review.
-2. Preserve Cybersecurity Foundations as a corrective source package and do not relabel it as final.
-3. Continue to `Large Language Models, LLMs, Explained for Leaders` under the identical actual-site, source-verification, per-section activity, native-assessment, no-video, and evidence standards.
-4. After LLMs, continue to Security Awareness for High Risk Employees, Executive Travel Risk Management, and the remaining governed catalog.
-5. Integrate owner-produced videos only after direct technical, identity, transcript, caption, branding, accessibility, and owner-approval validation.
-6. Claim LearnWorlds compatibility or completion only after authenticated import, save/reopen, runtime, desktop/mobile, accessibility, certificate, and owner acceptance evidence exists.
-7. Update protected and sanitized records after every substantive action or failure.
+1. Remediate Course 2 SCORM and Windows-safe packaging before its LearnWorlds upload.
+2. Continue to `Executive Travel Risk Management`.
+3. Then continue to `Digital Exposure and Executive Privacy`, `AI Ready Workforce`, `Coding for Cyber Leaders`, and the remaining governed catalog.
+4. Integrate owner-produced videos only after technical, identity, caption, transcript, brand, accessibility, and owner-approval validation.
+5. Never claim LearnWorlds completion or publication readiness without authenticated end-to-end runtime evidence.
 
 ## Release boundary
 
 ```text
-Actual-site verification: MANDATORY / NO EXCEPTIONS
-Complete per-section activity stack: MANDATORY
-Assessment in every learner-facing section: MANDATORY
-Cybersecurity v6.2.0: CORRECTIVE SOURCE / NOT FINAL
-Generative AI v2.4.0: STATIC REVIEW PACKAGE PASSED / RUNTIME PENDING
-Assistant-generated video: PROHIBITED
-LearnWorlds runtime acceptance: NOT PROVEN
+Course 1 content package: COMPLETE NONVIDEO / OWNER VIDEO READY
+Course 1 corrected S00 SCORM packaging: LEARNWORLDS ACCEPTED, OWNER REPORTED
+Course 2 content package: COMPLETE NONVIDEO / SCORM REMEDIATION REQUIRED BEFORE UPLOAD
+Course 3 content package: COMPLETE NONVIDEO / HARDENED SCORM / RUNTIME PENDING
+Course 4 content package: COMPLETE NONVIDEO / HARDENED SCORM / RUNTIME PENDING
+Authenticated full-course runtime: NOT PROVEN
 Certificate issuance acceptance: NOT PROVEN
 Desktop/mobile learner journey: NOT PROVEN
 Publication: BLOCKED
@@ -190,4 +181,4 @@ Production merge/cutover: BLOCKED
 
 ## Handoff rule
 
-Every new work session must read the Latest Handoff, Actual-Site Verification Gate, Per-Section LearnWorlds Activity Architecture, Course Section Assessment Standard, Cybersecurity corrective audit, and Generative AI v2.4 audit before generating course content. Preserve every discrepancy and failure.
+Every new work session must read the Master Handoff, Latest Handoff, Restart Here, Actual-Site Verification Gate, Per-Section LearnWorlds Activity Architecture, and Course Section Assessment Standard before generating or changing course assets. Preserve every discrepancy and failure.
