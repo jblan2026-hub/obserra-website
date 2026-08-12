@@ -19,11 +19,15 @@ test("every Academy learner route receives the governed course opening before Co
 });
 
 
-test("opening gate presents official title page, owner introduction, and required disclosures", () => {
+test("opening gate presents the exact owner identity, official title page, and required disclosures", () => {
   assert.match(opening, /Obserra EPI Academy/);
   assert.match(opening, /OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC/);
+  assert.match(opening, /www\.obserrallc\.com/);
   assert.match(opening, /Dr\. Jody Blanchard/);
-  assert.match(opening, /Founder and Cybersecurity Executive/);
+  assert.match(opening, /Founder and CEO/);
+  assert.doesNotMatch(opening, /Owner, Founder, and Cybersecurity Executive/);
+  assert.doesNotMatch(opening, /Founder and Cybersecurity Executive/);
+  assert.doesNotMatch(opening, /Two-Time Fortune 500 Chief Information Security Officer/);
   assert.match(opening, /Cybersecurity Foundations for New Professionals/);
   assert.match(opening, /cyber security/);
   assert.match(gate, /course-opening-title-card/);
@@ -35,6 +39,17 @@ test("opening gate presents official title page, owner introduction, and require
   assert.match(gate, /disabled=\{!canContinue\}/);
   assert.match(gate, /Acknowledge the disclosures to continue/);
   assert.match(gate, /introCompleted/);
+});
+
+
+test("owner identity contract forbids substitutions, additional titles, and employer references", () => {
+  assert.match(opening, /exactOwnerFaceRequired: true/);
+  assert.match(opening, /exactOwnerVoiceRequired: true/);
+  assert.match(opening, /substituteFaceAllowed: false/);
+  assert.match(opening, /substituteVoiceAllowed: false/);
+  assert.match(opening, /additionalTitlesAllowed: false/);
+  assert.match(opening, /employerReferencesAllowed: false/);
+  assert.match(opening, /wrongPersonOutputRejected: true/);
 });
 
 
@@ -66,7 +81,7 @@ test("opening media is same-origin and fail-closed while the approved master is 
 });
 
 
-test("course opening presentation is responsive and uses official Obserra visual language", () => {
+test("course opening presentation is responsive and uses official Obserra EPI visual language", () => {
   assert.match(styles, /#d6b253/i);
   assert.match(styles, /#030914/i);
   assert.match(styles, /course-opening-title-card/);
