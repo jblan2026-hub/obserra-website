@@ -58,29 +58,32 @@ function hash(value) {
   return crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 }
 
-function introScript(course) {
+function introScript(course, standard) {
+  const presenter = standard.brand.presenterName;
+  const title = standard.brand.presenterTitle;
+  const company = standard.brand.spokenLegalName;
+
   if (course.id === 'cybersecurity-foundations') {
     return [
-      'Welcome to Obserra EPI Academy.',
-      'I am Dr. Jody Blanchard, founder and cyber security executive at Obserra Executive Protection and Intelligence, L.L.C.',
-      'You are beginning Cybersecurity Foundations for New Professionals.',
-      'This course will help you understand cyber security as a business and mission responsibility, recognize common indicators of risk, apply identity and control fundamentals, report suspicious activity safely, and build repeatable habits that strengthen resilience.',
-      'Three principles will guide your work. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Document a defensible next step so another professional can review it.',
-      'Use the scenarios, guided practice, knowledge checks, workbook activities, and final assessment to apply what you learn.',
-      'The examples in this course are educational and may be fictional or composite. Follow applicable law, organizational policy, privacy requirements, and approved escalation procedures.',
-      'Welcome to the course. Let us begin.',
+      'Welcome to Obserra EPI Academy and to Cybersecurity Foundations for New Professionals.',
+      `I am ${presenter}, ${title} of ${company}`,
+      'I created this course to help you build the judgment, discipline, and practical habits needed to recognize cyber security risk, make accountable decisions, and act safely within your role.',
+      'Cyber security is not only a technical responsibility. It is a business, mission, and leadership responsibility shared by every professional who handles information, systems, identities, operations, or trust.',
+      'As you progress through the five modules, you will work through realistic scenarios, guided practice, knowledge checks, workbook activities, and a final assessment.',
+      'Keep three principles in view. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Document a defensible next step that another professional can review.',
+      'The examples in this course may be fictional or composite. Apply the instruction in accordance with applicable law, organizational policy, privacy requirements, and approved escalation procedures.',
+      'Thank you for investing in your professional development. Welcome to the course. Let us begin.',
     ].join(' ');
   }
 
   return [
-    'Welcome to Obserra EPI Academy.',
-    'I am Dr. Jody Blanchard, founder and cyber security executive at Obserra Executive Protection and Intelligence, L.L.C.',
-    `You are beginning ${course.title}.`,
-    `This course is designed to help you apply ${course.focus} through evidence, accountable decisions, practical action, and measurable improvement.`,
-    'Three principles will guide your work. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Define how the result will be verified.',
-    'Use the scenarios, guided practice, knowledge checks, course materials, and final assessment to apply what you learn.',
-    'The examples in this course are educational and may be fictional or composite. Follow applicable law, organizational policy, privacy requirements, and approved escalation procedures.',
-    'Welcome to the course. Let us begin.',
+    `Welcome to ${standard.brand.academyName} and to ${course.title}.`,
+    `I am ${presenter}, ${title} of ${company}`,
+    `I created this course to help you apply ${course.focus} through evidence, accountable decisions, practical action, and measurable improvement.`,
+    'Throughout the course, you will use realistic scenarios, guided practice, knowledge checks, course materials, and a final assessment to apply what you learn.',
+    'Keep three principles in view. Evaluate evidence before acting. Understand who owns the decision and when to escalate. Define how the result will be verified.',
+    'The examples in this course may be fictional or composite. Apply the instruction in accordance with applicable law, organizational policy, privacy requirements, and approved escalation procedures.',
+    'Thank you for investing in your professional development. Welcome to the course. Let us begin.',
   ].join(' ');
 }
 
@@ -102,7 +105,9 @@ function titleCard(course, standard) {
       courseTitle: course.title,
       trackAndLevel: `${course.track} · ${course.level}`,
       presenter: `Presented by ${standard.brand.presenterName}`,
+      presenterTitle: standard.brand.presenterTitle,
       legalName: standard.brand.legalName,
+      officialWebsite: standard.brand.officialWebsiteDisplay,
       version: 'Course version assigned at release',
     },
   };
@@ -136,25 +141,37 @@ function presenterIntro(course, standard) {
     presenterTitle: standard.brand.presenterTitle,
     requiredBeforeFirstLesson: true,
     durationSeconds: { ...intro.durationSeconds },
-    script: introScript(course),
+    script: introScript(course, standard),
     spokenPronunciation: {
       cybersecurity: 'cyber security',
     },
+    lowerThird: {
+      line1: standard.brand.presenterName,
+      line2: standard.brand.presenterTitle,
+      line3: standard.brand.legalName,
+      line4: standard.brand.officialWebsiteDisplay,
+    },
     identityControls: {
       approvedSourceRequired: true,
+      ownerPortraitCrossCheckRequired: true,
       facialIdentityLocked: true,
       voiceIdentityLocked: true,
+      nameAndApprovedTitleLocked: true,
+      additionalTitlesAllowed: false,
+      employerReferencesAllowed: false,
       naturalFacialMovementCharacterLocked: true,
       scriptMayChangeByCourse: true,
       wardrobeMayChange: true,
       backgroundMayChange: true,
       lightingMayChange: true,
       framingMayChange: true,
-      graphicsMayChange: true,
+      poseMayChange: true,
+      graphicsMayChangeWithinBrandStandard: true,
       facialReshapingProhibited: true,
       beautificationProhibited: true,
       skinSmoothingProhibited: true,
       exaggeratedFacialAnimationProhibited: true,
+      identityMismatchRequiresRejectionAndDeletion: true,
     },
     voiceSettings: {
       defaultSpeed: intro.defaultSpeechSpeed,
@@ -242,18 +259,26 @@ function validate(openings, standard, allRequested) {
     const [title, disclaimer, intro, transitionItem] = opening.sequence;
     if (title?.id !== 'official-title-page') findings.push(`title-page-missing:${opening.courseId}`);
     if (title?.officialLogoPath !== standard.brand.officialLogoPath) findings.push(`official-logo-mismatch:${opening.courseId}`);
+    if (title?.text?.presenterTitle !== 'Founder and CEO') findings.push(`title-page-owner-title-mismatch:${opening.courseId}`);
+    if (title?.text?.officialWebsite !== 'www.obserrallc.com') findings.push(`title-page-website-mismatch:${opening.courseId}`);
     if (disclaimer?.id !== 'learner-disclosures') findings.push(`disclaimer-missing:${opening.courseId}`);
     if (!Array.isArray(disclaimer?.statements) || disclaimer.statements.length < 5) findings.push(`disclaimer-statements-missing:${opening.courseId}`);
     if (disclaimer?.learnerAcknowledgementRequired !== true) findings.push(`disclaimer-acknowledgement-not-required:${opening.courseId}`);
     if (intro?.id !== 'owner-course-introduction') findings.push(`owner-intro-missing:${opening.courseId}`);
     if (intro?.presenter !== 'Dr. Jody Blanchard') findings.push(`presenter-mismatch:${opening.courseId}`);
+    if (intro?.presenterTitle !== 'Founder and CEO') findings.push(`presenter-title-mismatch:${opening.courseId}`);
     if (intro?.identityControls?.facialIdentityLocked !== true || intro?.identityControls?.voiceIdentityLocked !== true) findings.push(`identity-not-locked:${opening.courseId}`);
+    if (intro?.identityControls?.additionalTitlesAllowed !== false) findings.push(`additional-titles-not-prohibited:${opening.courseId}`);
+    if (intro?.identityControls?.employerReferencesAllowed !== false) findings.push(`employer-references-not-prohibited:${opening.courseId}`);
     if (intro?.identityControls?.scriptMayChangeByCourse !== true) findings.push(`script-not-flexible:${opening.courseId}`);
     if (intro?.voiceSettings?.defaultSpeed !== 0.92) findings.push(`speech-speed-mismatch:${opening.courseId}`);
     if (intro?.speechCleanup?.required !== true) findings.push(`speech-cleanup-not-required:${opening.courseId}`);
     if (intro?.speechCleanup?.mode !== 'precision') findings.push(`speech-cleanup-mode-mismatch:${opening.courseId}`);
     if (intro?.speechCleanup?.cleanupMustNotAlterVoiceIdentity !== true) findings.push(`speech-cleanup-voice-boundary-missing:${opening.courseId}`);
-    if (!String(intro?.script ?? '').includes('Welcome to Obserra EPI Academy.')) findings.push(`intro-script-missing-academy:${opening.courseId}`);
+    if (!String(intro?.script ?? '').includes('Obserra EPI Academy')) findings.push(`intro-script-missing-academy:${opening.courseId}`);
+    if (!String(intro?.script ?? '').includes('Founder and CEO')) findings.push(`intro-script-owner-title-missing:${opening.courseId}`);
+    if (String(intro?.script ?? '').match(/CISO|Chief Information Security Officer|Cybersecurity Executive/i)) findings.push(`unapproved-owner-title-in-intro:${opening.courseId}`);
+    if (intro?.lowerThird?.line4 !== 'www.obserrallc.com') findings.push(`lower-third-website-mismatch:${opening.courseId}`);
     if (intro?.finalMaster?.widthPixels !== 3840 || intro?.finalMaster?.heightPixels !== 2160) findings.push(`intro-not-4k:${opening.courseId}`);
     if (intro?.finalMaster?.upscaleRequiredWhenSourceBelow4K !== true) findings.push(`intro-upscale-not-required:${opening.courseId}`);
     if (intro?.finalMaster?.speechCleanupRequired !== true) findings.push(`intro-master-speech-cleanup-missing:${opening.courseId}`);
@@ -319,6 +344,8 @@ if (!fs.existsSync(standardPath)) fail(`Opening standard not found: ${standardPa
 
 const standard = readJson(standardPath);
 if (standard.standardId !== 'obserra-course-opening-v1') fail('Unexpected course opening standard ID.');
+if (standard.brand.presenterTitle !== 'Founder and CEO') fail('Owner introduction title must be Founder and CEO.');
+if (standard.brand.officialWebsiteDisplay !== 'www.obserrallc.com') fail('Official website must be www.obserrallc.com.');
 const courses = parseCourseSpecs(fs.readFileSync(sourcePath, 'utf8'));
 if (courses.length !== EXPECTED_COURSES) fail(`Parsed ${courses.length} courses; expected ${EXPECTED_COURSES}.`);
 const selected = args.all ? courses : courses.filter((course) => course.id === args.course);
@@ -327,7 +354,7 @@ if (!selected.length) fail(`Course not found: ${args.course}`);
 const openings = selected.map((course) => buildOpening(course, standard));
 const findings = validate(openings, standard, args.all);
 const manifest = {
-  schemaVersion: '1.1.0',
+  schemaVersion: '1.2.0',
   generatedAt: new Date().toISOString(),
   source: path.relative(ROOT, sourcePath).replaceAll('\\', '/'),
   standard: path.relative(ROOT, standardPath).replaceAll('\\', '/'),
@@ -350,14 +377,14 @@ manifest.manifestSha256 = hash({ ...manifest, manifestSha256: undefined });
 
 if (args.mode === 'validate') {
   if (findings.length) fail(`Validation failed: ${findings.join(', ')}`);
-  console.log(`[academy-course-opening-plan] Validation passed for ${openings.length} course opening(s); every intro is governed as a speech-cleaned 4K master before the first lesson.`);
+  console.log(`[academy-course-opening-plan] Validation passed for ${openings.length} course opening(s); every intro uses the exact owner identity, Founder and CEO title, official Obserra EPI branding, and a speech-cleaned 4K master before the first lesson.`);
   process.exit(0);
 }
 
 writeJson(path.join(outputRoot, 'academy-course-opening-manifest.json'), manifest);
 writeCsv(path.join(outputRoot, 'academy-course-opening-register.csv'), openings);
 writeJson(path.join(outputRoot, 'academy-course-opening-validation.json'), {
-  schemaVersion: '1.1.0',
+  schemaVersion: '1.2.0',
   generatedAt: manifest.generatedAt,
   passed: findings.length === 0,
   findings,
