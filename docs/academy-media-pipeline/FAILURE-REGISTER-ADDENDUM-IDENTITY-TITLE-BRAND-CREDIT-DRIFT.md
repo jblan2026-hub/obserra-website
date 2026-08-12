@@ -1,4 +1,4 @@
-# Obserra EPI Academy Failure Register Addendum: Identity, Title, Brand, Provider, Credit, Course-Readiness, and Package-QA Drift
+# Obserra EPI Academy Failure Register Addendum: Identity, Title, Brand, Provider, Credit, Course-Readiness, Package-QA, and Actual-Site Verification Drift
 
 **Originally recorded UTC:** 2026-08-12T04:54:17Z  
 **Updated:** 2026-08-12  
@@ -10,119 +10,147 @@
 
 A generated owner-review output depicted a different person while using Dr. Jody Blanchard's name and business context.
 
-**Impact:** Identity, credibility, reputational, and business risk. Provider credits were consumed for an unusable output.
+**Impact:** Identity, credibility, reputational, business, and provider-credit harm.
 
-**Correction:** The output was rejected. The underlying generated video record was deleted through the connected HeyGen delete-video action and is no longer retrievable. The associated `Owner Review Video` project or session card remains visible in My Projects.
+**Correction:** The output was rejected. The underlying generated video record was deleted. The associated project/session state was separately tracked and no permanent-purge assumption was authorized.
 
-**Prevention:** Any asset using the owner's name or title must bind the exact approved face and exact approved voice before generation. Unconstrained Video Agent substitution is prohibited.
+**Permanent prevention:** Any owner-named media must use the exact approved face and exact approved voice. The owner has since prohibited all additional assistant-generated course video.
 
 ## Failure 2 - Title drift
 
-Prior drafts used titles including `Founder and Cybersecurity Executive`, `Owner, Founder, and Cybersecurity Executive`, `Founder and Owner`, and other unapproved variants.
+Prior drafts used `Founder and Cybersecurity Executive`, `Owner, Founder, and Cybersecurity Executive`, `Founder and Owner`, and related variants.
 
 **Correct title:** `Founder and CEO` only.
 
-**Prevention:** Enforce one literal title across scripts, title cards, lower thirds, captions, transcripts, descriptions, metadata, certificates, assessments, and LearnWorlds fields.
+**Permanent prevention:** Enforce the exact title across scripts, title cards, lower thirds, captions, transcripts, descriptions, metadata, certificates, assessments, and LearnWorlds fields.
 
 ## Failure 3 - Employer and resume drift
 
-The course context risked using current or former employment titles or employers as learner-facing credibility statements.
+Current or former employment titles and employers were treated as possible learner-facing credibility statements.
 
-**Correction:** Current and former employer names, employer logos, outside job titles, and employment history are prohibited in all learner-facing Academy content. The resume is internal grounding only.
+**Correction:** Employer names, employer logos, outside job titles, and employment history are prohibited in learner-facing Academy content. The resume is internal factual grounding only.
 
 ## Failure 4 - Registered brand drift
 
-Prior files used `Obserra Academy`, `OBSERRA ACADEMY`, standalone `Obserra`, and flexible logo or naming language.
+Prior files used `Obserra Academy`, `OBSERRA ACADEMY`, standalone `Obserra`, inconsistent website references, or flexible logo language.
 
-**Correction:** Use only `Obserra EPI Academy`, `Obserra EPI`, `Executive Protection & Intelligence`, `OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC`, the official registered logo, the approved colors, and https://www.obserrallc.com.
-
-**Prevention:** Run a prohibited-term and brand-whitelist scan on every course package and learner-facing implementation.
-
-## Failure 5 - Deletion assumptions and inaccurate state reporting
-
-Provider 404 results, incomplete list endpoints, and deletion of an underlying video record were treated as stronger proof than the authenticated owner interface.
-
-**Correct evidence boundary:**
+**Correction:** Use only:
 
 ```text
-Pre-action screenshot: three visible cards
-Later owner statement: rejected project moved to Trash
-Post-action screenshot: not supplied
-Current active-project count: not independently verified
-Permanent provider purge: not verified
+Obserra EPI Academy
+Obserra EPI
+Executive Protection & Intelligence
+OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
+www.obserrallc.com
 ```
 
-**Prevention:** Distinguish video-record state, project-card visibility, session state, owner-reported action, Trash status, and permanent purge. Record who performed each action and the exact evidence source.
+The official logo and approved colors may not be redrawn, regenerated, recolored, distorted, or replaced.
+
+## Failure 5 - Deletion assumptions and inaccurate provider-state reporting
+
+Provider 404 responses, incomplete list endpoints, underlying-video deletion, project-card visibility, Trash state, and permanent purge were conflated.
+
+**Permanent prevention:** Record each provider object, action, actor, time, and evidence source separately. Never infer hidden state from a partial endpoint or screenshot.
 
 ## Failure 6 - Owner-supplied screenshot was misread
 
-The owner-supplied HeyGen My Projects screenshot was incorrectly summarized as showing only two approved projects and as proving that the rejected project had been moved to Trash.
+A screenshot showing three cards was incorrectly described as showing only two approved projects and proving Trash state.
 
-The screenshot identified by SHA-256:
-
-```text
-68316b82e22f922fe27a2019babb64965d9e0d69a8c908c4e5c898f434291d13
-```
-
-actually shows three visible cards:
-
-1. `Owner Review Video` - rejected wrong-person project or session card.
-2. `Professional man speaking to camera.` - approved owner project.
-3. `Confident_Cybersecurity_Leadership` - approved owner project.
-
-**Correction:** Current records treat the screenshot as pre-action evidence and the later Trash statement as owner-reported post-capture information. No permanent purge is claimed.
-
-**Prevention:** Read screenshots directly. Never infer hidden actions, Trash state, deletion, or a post-action project count beyond the evidence provided.
+**Correction:** The screenshot remains pre-action evidence. Later owner statements remain separately identified as owner-reported post-capture actions. No unsupported project-count or purge claim is authorized.
 
 ## Failure 7 - Unverified LearnWorlds readiness implications
 
-Prior package and status language could imply that the course had been loaded into LearnWorlds or was presentable for owner review while the authenticated platform still showed empty placeholder activities.
+Package language implied that the course was loaded, presentable, or upload-ready while the authenticated LearnWorlds school still lacked direct runtime evidence.
 
-**Correction:** Cybersecurity Foundations remains Draft. Complete LearnWorlds loading, assessment, completion, certificate, resource, accessibility, desktop, and mobile acceptance are not verified.
-
-**Prevention:** Claim platform completion only from direct authenticated evidence showing exact sections, activities, durations, resources, assessment behavior, completion rules, and course state.
+**Correction:** LearnWorlds loading, import success, assessment behavior, completion, certificate issuance, accessibility, desktop/mobile operation, and publication may be claimed only from direct authenticated evidence.
 
 ## Failure 8 - Insufficient course robustness
 
-The first course did not initially maximize pedagogically appropriate LearnWorlds activity types and authoritative learner resources.
+Early course work did not sufficiently use appropriate LearnWorlds activities, authoritative sources, applied exercises, assessments, learner tools, and completion controls.
 
-**Correction:** The validated v4.1.0 package includes branded opening activities, owner-welcome controls, orientation, diagnostic, interactive lessons, accessible written alternatives, scenarios, guided practice, assignments, knowledge checks, official NIST and CISA resources, self-assessments, final exam, survey, completion, certificate, and accessibility controls.
+**Correction:** Subsequent packages added substantive modules, SCORM/HTML5, scenarios, guided practice, workbooks, job aids, knowledge checks, final assessments, resources, completion controls, certificate controls, accessibility requirements, and QA evidence.
+
+**Current evidence boundary:** Package contents do not prove platform compatibility or runtime acceptance.
 
 ## Failure 9 - Provider credit waste
 
-Credits were consumed for a wrong-person output that could not be used.
+Credits were consumed for unusable or unapproved video output.
 
-**Correction:** No additional owner-video generation is authorized until the deterministic exact face and exact voice path is proven, the script and official graphics are frozen, and Dr. Jody Blanchard explicitly authorizes one controlled render.
+**Permanent correction:** The owner will create all final course videos. Assistant-generated video and additional provider-credit expenditure are prohibited.
 
 ## Failure 10 - Repeated instruction drift
 
 The owner had to repeat identity, title, employer, brand, website, video, course-quality, handoff, and verification rules.
 
-**Correction:** These rules are now present in current handoff, restart, machine-readable policies, protected records, activity and failure addenda, certificate implementation, and the authoritative audit package.
+**Permanent prevention:** Every new session must read the current handoff, restart notice, machine-readable policies, actual-site verification gate, and protected records before acting.
 
-**Prevention:** Every restarted session must read the current records first and continue from the first incomplete controlled action without requiring the owner to repeat these rules.
+## Failure 11 - Pre-release package failed enhanced QA
 
-## Failure 11 - Generative AI pre-release package failed the enhanced QA gate
+An early Generative AI package had insufficient SCORM interaction validation, non-deterministic file mapping, incorrect activity-count metadata, and package/hash inconsistency.
 
-The first generated `Generative AI Fundamentals for Business Leaders` review package reached static quality assurance but did not pass the enhanced release gate.
+**Correction:** The defective candidate was quarantined. Later package versions were rebuilt with stronger navigation, keyboard support, exact paths, truthful activity counts, immutable ZIP/hash handling, and clean extraction.
 
-The enhanced audit identified:
+**Permanent prevention:** Any post-build change requires a new version, new hash, and complete rerun of all quality gates.
 
-1. The SCORM packages used a valid basic package structure but did not satisfy the stronger screen-navigation, keyboard-support, responsive-layout, and interaction validation standard adopted for the next course set.
-2. Several LearnWorlds digital-download cells used human-readable labels rather than exact package-relative file paths, which prevented deterministic file-mapping validation.
-3. The package contained 66 mapped activities because the resource library included one navigator plus thirteen official resource activities. Earlier builder metadata incorrectly reported 65.
-4. A post-build finalization step changed the package contents and hash after the initial build result was recorded, creating a hash and file-count inconsistency.
+## Failure 12 - Content and assessment artifacts were generated without checking the actual current target site and exact live template
 
-**Impact:** The package could have been represented as complete despite inconsistent integrity evidence and insufficient SCORM interaction validation.
+The Cybersecurity Foundations final-assessment workbook was generated from a reconstructed or assumed LearnWorlds structure instead of using the untouched exact current XLS/XLSX template downloaded from the actual target assessment activity in the owner's live school.
 
-**Correction:** The package is quarantined and is not an authorized delivery. The builder is being corrected to produce stronger navigable SCORM, exact activity-map paths, truthful dynamic activity counts, one final package hash, and clean extraction evidence from the same immutable ZIP. The corrected package will receive a new version and will not be released until all validation gates pass.
+The owner correctly reported that the workbook was not in the required LearnWorlds upload template.
 
-**Prevention:** A course package is complete only when its final immutable ZIP, SHA-256 file, validation report, manifest, internal file hashes, clean-extraction result, activity map, and SCORM checks all agree. Any post-build modification requires a new version, a new hash, and a full rerun of every quality gate.
+**Impact:**
+
+- the assessment could fail import;
+- required workbook structure, formatting, hidden metadata, tab configuration, filename convention, or platform-specific constraints could be wrong;
+- package-level spreadsheet validation could falsely imply platform compatibility;
+- time was spent on an artifact that was not proven usable in the actual system;
+- the owner had to identify another preventable mismatch.
+
+**Correct current state:**
+
+```text
+Cybersecurity Foundations assessment import: REJECTED FOR UPLOAD / BLOCKED
+Other generated assessment imports: NOT LIVE-TEMPLATE VERIFIED / BLOCKED
+Existing questions: retained as draft content only
+Exact current target-school template preserved: NO
+Authenticated test import: NOT PERFORMED
+Upload-ready status: WITHDRAWN
+```
+
+**Permanent prevention:**
+
+1. Check the actual current applicable site before generating any content.
+2. Use the authenticated target object when account-specific configuration controls the output.
+3. Download the exact current template/export/schema from the actual target object.
+4. Preserve the untouched original and calculate its SHA-256.
+5. Populate only a copy.
+6. Do not rename, reorder, add, delete, merge, or restyle required tabs, fields, columns, or headings.
+7. Check current official vendor documentation.
+8. Test-import the completed artifact into the actual Draft object.
+9. Record direct evidence before any upload-ready or complete claim.
+10. If the site or template cannot be checked, stop and record `BLOCKED`.
+
+**No exceptions.**
+
+Governing records:
+
+```text
+docs/academy-media-pipeline/ACTUAL-SITE-VERIFICATION-GATE.md
+config/academy-actual-site-verification-policy.json
+```
+
+## Actual-site discrepancy recorded
+
+The current public site at https://www.obserrallc.com was checked and currently contains at least one `Obserra Academy` label. The owner-approved registered naming remains `Obserra EPI Academy` and `Obserra EPI`.
+
+**Control:** Treat this as a website discrepancy requiring correction or explicit owner disposition. Do not use the conflicting public-site shorthand as authority to alter learner-facing registered naming.
 
 ## Current unresolved blockers
 
-1. Cybersecurity Foundations authenticated LearnWorlds loading and runtime acceptance remain pending.
-2. Exact-owner course media remains blocked pending separate explicit authorization and owner approval.
-3. The Generative AI package is under corrective rebuild and is not yet released.
-4. The LLM and high-risk-employee courses remain queued behind the corrected Generative AI package.
-5. Publication, live checkout, production merge, production cutover, and courses beyond the owner-authorized three-course set remain blocked.
+1. The exact current LearnWorlds assessment template has not been downloaded from the actual Cybersecurity Foundations Draft assessment and preserved with a hash.
+2. The 25-question final assessment has not been test-imported successfully into the actual Draft course.
+3. Other generated LearnWorlds assessment files are not live-template verified.
+4. The current authenticated LearnWorlds activity options, completion controls, certificate behavior, and learner runtime have not been directly validated.
+5. Every new content-generation batch must pass the actual-site verification gate.
+6. Assistant-generated course video remains prohibited; owner-produced videos remain pending by course.
+7. Publication, live checkout, production merge/cutover, and certificate acceptance remain blocked.
