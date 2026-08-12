@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.4.0",
+  "schemaVersion": "1.5.0",
   "standardId": "obserra-course-opening-v1",
   "standardName": "Obserra EPI Academy Governed Course Opening Standard",
   "appliesTo": {
@@ -15,6 +15,8 @@
     "epiMeaning": "Executive Protection & Intelligence",
     "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
     "spokenLegalName": "Obserra Executive Protection and Intelligence, L.L.C.",
+    "officialWebsite": "https://www.obserrallc.com",
+    "officialWebsiteDisplay": "www.obserrallc.com",
     "officialLogoPath": "/brand/obserra-logo.png",
     "presenterName": "Dr. Jody Blanchard",
     "presenterTitle": "Founder and CEO",
@@ -23,8 +25,9 @@
       "academyReference": "Obserra EPI Academy",
       "shortBusinessReference": "Obserra EPI",
       "fullLegalReference": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "officialWebsiteReference": "www.obserrallc.com",
       "standaloneObserraAsOrganizationNameAllowed": false,
-      "registeredNameLogoAndColorsMayChange": false
+      "registeredNameLogoColorsAndWebsiteMayChange": false
     },
     "logoModificationAllowed": false,
     "generatedReplacementLogoAllowed": false,
@@ -35,6 +38,14 @@
   "ownerIdentity": {
     "presenter": "Dr. Jody Blanchard",
     "approvedProfessionalTitle": "Founder and CEO",
+    "soleAcademyOwnerTitle": true,
+    "additionalOwnerTitlesAllowed": false,
+    "resumeTitlesMayOverrideApprovedTitle": false,
+    "currentOrFormerEmployerNamesAllowed": false,
+    "currentOrFormerEmployerLogosAllowed": false,
+    "currentOrFormerEmployerReferencesAllowed": false,
+    "resumeBackgroundIsInternalGroundingOnly": true,
+    "biographicalExpansionRequiresExplicitSeparateOwnerApproval": true,
     "ownerApprovedExactReferenceRequired": true,
     "faceIdentityImmutable": true,
     "voiceIdentityImmutable": true,
@@ -78,7 +89,9 @@
       "voice substitution",
       "displaying Dr. Jody Blanchard's name over a different person",
       "displaying Founder and CEO over a different person represented as Dr. Jody Blanchard",
-      "adding any unapproved title to the owner introduction"
+      "adding any unapproved title to the owner introduction",
+      "adding any current or former employer name or logo",
+      "using resume content to expand the learner-facing owner identity without explicit approval"
     ],
     "ownerVisualAndAuditoryApprovalIsAuthoritative": true
   },
@@ -97,6 +110,7 @@
         "Presented by Dr. Jody Blanchard",
         "Founder and CEO",
         "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+        "www.obserrallc.com",
         "course version"
       ]
     },
@@ -135,6 +149,8 @@
       "facialIdentityMayChange": false,
       "nameMayChange": false,
       "professionalIdentityMayChange": false,
+      "additionalTitlesMayBeAdded": false,
+      "employerReferencesMayBeAdded": false,
       "ownerNameAndApprovedTitleMayAppearOnlyWithExactOwnerIdentity": true,
       "naturalFacialMovementCharacterMayChange": false,
       "wardrobeMayChange": true,
@@ -164,7 +180,9 @@
         "line1": "Dr. Jody Blanchard",
         "line2": "Founder and CEO",
         "line3": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+        "line4": "www.obserrallc.com",
         "fullLegalNameRequired": true,
+        "officialWebsiteRequired": true,
         "exactOwnerIdentityRequiredBeforeDisplay": true,
         "readableOnDesktopAndMobile": true
       }
@@ -246,13 +264,15 @@
     "placeholderContentProhibited": true
   },
   "releaseGates": [
-    "registered-brand-name-logo-and-colors-approved",
+    "registered-brand-name-logo-colors-and-website-approved",
     "official-title-page-approved",
     "required-disclaimers-present-and-readable",
     "learner-acknowledgement-configured",
     "owner-welcome-script-approved",
     "owner-intro-present-before-first-lesson",
     "owner-name-and-approved-title-bound-to-exact-owner-face-and-voice-approved",
+    "sole-founder-and-ceo-title-verified",
+    "employer-name-and-logo-absence-verified",
     "exact-owner-face-approved",
     "exact-owner-voice-approved",
     "presenter-likeness-approved",
@@ -270,12 +290,15 @@
     "missing official branded title page",
     "missing learner disclaimers or acknowledgement",
     "standalone Obserra used as the organization or Academy name",
-    "registered name, logo, or colors changed",
+    "registered name, logo, colors, or website changed",
     "different person or regenerated owner face",
     "similar but non-owner voice",
     "Dr. Jody Blanchard name displayed on any presenter who is not the exact owner-approved person",
     "Founder and CEO displayed on any presenter who is not the exact owner-approved person",
     "any unapproved additional owner title displayed or spoken in the owner introduction",
+    "any current or former employer name, logo, or identifiable employer reference",
+    "resume titles or employment history used to expand learner-facing identity without explicit owner approval",
+    "incorrect website displayed",
     "1080p-only final intro when 4K mastering is technically supported",
     "substitute or default voice not approved by the owner",
     "excessive or synthetic facial motion",
