@@ -1,10 +1,18 @@
 # LearnWorlds Continuous Handoff Addendum: Owner Identity and Registered Brand Lock
 
-Owner: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
+Owner and presenter: Dr. Jody Blanchard
+
+Approved title: Founder and CEO
+
+Legal company: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 
 Academy short name: Obserra EPI Academy
 
+Short business name: Obserra EPI
+
 EPI meaning: Executive Protection & Intelligence
+
+Official website: https://www.obserrallc.com
 
 Status: Mandatory production control. No exception or substitution is authorized.
 
@@ -16,9 +24,11 @@ Any course introduction that presents Dr. Jody Blanchard must preserve:
 
 1. The owner's exact recognizable facial identity.
 2. The owner's exact voice identity and vocal character.
-3. The owner's name and approved professional title.
+3. The owner's name and the sole approved Academy owner title, Founder and CEO.
 4. The owner's age, skin tone, facial proportions, and defining appearance.
 5. Natural, restrained executive delivery that remains recognizably the owner.
+
+No other owner, presenter identity, business title, company name, Academy name, short business name, or website domain is authorized.
 
 ## Immutable identity versus permitted production variables
 
@@ -28,6 +38,7 @@ The following are immutable and may never be changed, substituted, inferred, reg
 Face and recognizable facial identity
 Voice and recognizable vocal identity
 Name and personal identity
+Approved title: Founder and CEO
 Age and skin tone
 Core physical identity and defining appearance
 ```
@@ -47,7 +58,15 @@ Speech cleanup that does not change voice identity
 
 Every permitted production change remains subordinate to the immutable identity lock. A change to wardrobe, background, pose, framing, script, or graphics may not cause the presenter to become a different or merely similar-looking person.
 
-A generated owner-welcome draft that depicted a different person was rejected. It is prohibited from LearnWorlds, publication, marketing, reuse, or use as a template. The approved transcript may be retained, but the rejected visual and vocal output may not be used.
+## Rejected video deletion verification
+
+A generated owner-welcome draft that depicted a different person was rejected and deleted. The active HeyGen video inventory was subsequently checked and returned no active video items.
+
+The failed Video Agent record can remain visible as historical session metadata even though its underlying video asset has been deleted. The deleted asset now returns not found when queried directly. Two older pending test references also return not found and have no retrievable video assets.
+
+Historical session cards or stale test references must not be mistaken for active, approved, or usable media. None may be loaded into LearnWorlds, published, marketed, reused, or used as a template.
+
+The owner's approved source video and approved identity assets were not deleted or modified.
 
 ## Approved owner source boundary
 
@@ -62,15 +81,18 @@ The official registered business identity may not be improvised or modified.
 Required naming rules:
 
 ```text
+Owner and presenter: Dr. Jody Blanchard
+Approved title: Founder and CEO
 Academy short name: Obserra EPI Academy
 Short business reference: Obserra EPI
 EPI: Executive Protection & Intelligence
 Legal company name: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
+Official website: https://www.obserrallc.com
 ```
 
 Do not use `Obserra` alone as a substitute for the Academy or business short name. Use `Obserra EPI Academy` in Academy-facing titles, course content, media, learner communications, and LearnWorlds presentation. Use `Obserra EPI` when a shorter business reference is needed. Use the full legal company name where the legal entity name is required.
 
-The official logo, legal name, Academy name, and approved navy, black, gold, white, and approved blue palette may not be redrawn, regenerated, renamed, recolored, distorted, cropped, or replaced.
+The official logo, legal name, Academy name, approved title, official website, and approved navy, black, gold, white, and approved blue palette may not be redrawn, regenerated, renamed, recolored, distorted, cropped, replaced, or supplemented with an unapproved owner or company identity.
 
 ## Owner introduction production rule
 
@@ -80,7 +102,14 @@ The corrected Cybersecurity Foundations owner introduction must:
 2. Use the exact approved owner voice.
 3. Replace only the course script and permitted production variables.
 4. Include the unmodified official logo and Obserra EPI Academy branding.
-5. Display the owner's approved name, title, and full legal company name in the lower third.
+5. Display exactly the following lower third:
+
+```text
+Dr. Jody Blanchard
+Founder and CEO
+OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
+```
+
 6. Apply professional precision speech cleanup without altering voice identity.
 7. Produce a 3840 x 2160 highest-quality master with identity-preserving processing.
 8. Include selectable captions, a verified transcript, and a music-free master.
@@ -88,7 +117,7 @@ The corrected Cybersecurity Foundations owner introduction must:
 
 ## Fail-closed rule
 
-Owner-introduction production must stop when the exact owner identity or voice cannot be proven. A generic presenter, inferred professional avatar, similar-looking person, substitute voice, or unconstrained generated identity is prohibited.
+Owner-introduction production must stop when the exact owner identity or voice cannot be proven. A generic presenter, inferred professional avatar, similar-looking person, substitute voice, wrong owner, wrong company, wrong title, or unconstrained generated identity is prohibited.
 
 ## Current course priority
 
