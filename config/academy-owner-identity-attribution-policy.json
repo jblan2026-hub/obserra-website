@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.0.0",
+  "policyId": "obserra-epi-academy-owner-identity-attribution-v1",
+  "policyName": "Obserra EPI Academy Owner Identity and Attribution Policy",
+  "appliesTo": [
+    "all course title pages",
+    "all owner introductions",
+    "all video scripts and transcripts",
+    "all lower thirds and captions",
+    "all course descriptions and landing pages",
+    "all learner resources and downloadable materials",
+    "all assessments and completion materials",
+    "all certificates",
+    "all marketing and promotional materials",
+    "all LearnWorlds content",
+    "all future course templates"
+  ],
+  "owner": {
+    "name": "Dr. Jody Blanchard",
+    "soleApprovedPublicTitle": "Founder and CEO",
+    "alternateTitlesAllowed": false,
+    "additionalTitlesAllowed": false,
+    "currentEmployerNamesAllowed": false,
+    "formerEmployerNamesAllowed": false,
+    "employmentHistoryAllowed": false,
+    "resumeTitlesAllowedInAcademyContent": false,
+    "resumeEmployerHistoryAllowedInAcademyContent": false,
+    "canonicalPortraitPath": "/leadership/dr-jody-blanchard-executive.webp",
+    "exactApprovedFaceRequired": true,
+    "exactApprovedVoiceRequired": true,
+    "substitutePersonAllowed": false,
+    "substituteAvatarAllowed": false,
+    "substituteVoiceAllowed": false,
+    "nameMayAppearOnlyWithExactApprovedIdentity": true,
+    "titleMayAppearOnlyWithExactApprovedIdentity": true
+  },
+  "organization": {
+    "academyName": "Obserra EPI Academy",
+    "shortBusinessName": "Obserra EPI",
+    "epiMeaning": "Executive Protection & Intelligence",
+    "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "standaloneObserraAllowedAsOrganizationName": false,
+    "otherCompanyNamesAllowed": false,
+    "wrongOwnerAttributionAllowed": false
+  },
+  "brand": {
+    "officialLogoPath": "/brand/obserra-logo.png",
+    "officialPalette": [
+      "#050B18",
+      "#0B1730",
+      "#C9A227",
+      "#FFFFFF",
+      "#53B7FF"
+    ],
+    "logoRedrawingAllowed": false,
+    "logoRegenerationAllowed": false,
+    "logoRecoloringAllowed": false,
+    "logoDistortionAllowed": false,
+    "nameVariationAllowed": false,
+    "paletteDeviationAllowed": false
+  },
+  "approvedOwnerLowerThird": [
+    "Dr. Jody Blanchard",
+    "Founder and CEO",
+    "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC"
+  ],
+  "approvedSpokenIdentification": "I am Dr. Jody Blanchard, Founder and CEO of Obserra Executive Protection and Intelligence, L.L.C.",
+  "permittedProductionChanges": [
+    "course-specific script",
+    "professional wardrobe",
+    "background and set",
+    "lighting and framing",
+    "pose and restrained natural movement",
+    "official title cards and lower thirds",
+    "official logo placement",
+    "captions and transcript timing",
+    "identity-preserving speech cleanup",
+    "identity-preserving 4K upscaling"
+  ],
+  "prohibitedProductionChanges": [
+    "different person",
+    "similar-looking person",
+    "regenerated face",
+    "modified facial identity",
+    "different voice",
+    "similar but unapproved voice",
+    "alternate title",
+    "additional title",
+    "current employer name",
+    "former employer name",
+    "employment history",
+    "wrong company name",
+    "wrong owner attribution",
+    "unapproved logo",
+    "unapproved colors"
+  ],
+  "enforcement": {
+    "failClosed": true,
+    "identityMismatchRequiresImmediateRejection": true,
+    "attributionMismatchRequiresImmediateRejection": true,
+    "brandMismatchRequiresImmediateRejection": true,
+    "incorrectMediaMustBeDeleted": true,
+    "learnWorldsUploadBlockedUntilOwnerApproval": true,
+    "publicationBlockedUntilOwnerApproval": true
+  }
+}
