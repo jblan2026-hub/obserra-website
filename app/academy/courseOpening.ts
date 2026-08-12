@@ -15,7 +15,7 @@ export type CourseOpening = {
   officialLogoPath: "/brand/obserra-logo.png";
   presenter: {
     name: "Dr. Jody Blanchard";
-    title: "Owner, Founder, and Cybersecurity Executive";
+    title: "Founder and CEO";
     exactOwnerIdentityRequired: true;
     substituteFaceAllowed: false;
     substituteVoiceAllowed: false;
@@ -35,7 +35,7 @@ export type CourseOpening = {
     };
     ownerSignature: {
       name: "Dr. Jody Blanchard";
-      title: "Owner, Founder, and Cybersecurity Executive";
+      title: "Founder and CEO";
       company: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
       placement: "bottom-safe-area-lower-third";
       spoken: true;
@@ -90,7 +90,7 @@ const legalName = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" as const;
 const spokenLegalName = "Obserra Executive Protection and Intelligence, L.L.C.";
 const officialLogoPath = "/brand/obserra-logo.png" as const;
 const presenterName = "Dr. Jody Blanchard" as const;
-const presenterTitle = "Owner, Founder, and Cybersecurity Executive" as const;
+const presenterTitle = "Founder and CEO" as const;
 
 function cybersecurityFoundationsWelcomeScript() {
   return [
