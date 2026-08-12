@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.3.0",
+  "schemaVersion": "1.4.0",
   "standardId": "obserra-course-opening-v1",
   "standardName": "Obserra EPI Academy Governed Course Opening Standard",
   "appliesTo": {
@@ -17,8 +17,7 @@
     "spokenLegalName": "Obserra Executive Protection and Intelligence, L.L.C.",
     "officialLogoPath": "/brand/obserra-logo.png",
     "presenterName": "Dr. Jody Blanchard",
-    "presenterBusinessTitle": "Founder and Owner",
-    "presenterExecutiveCredential": "Two-Time Fortune 500 Chief Information Security Officer",
+    "presenterTitle": "Founder and CEO",
     "palette": ["#050B18", "#0B1730", "#C9A227", "#FFFFFF", "#53B7FF"],
     "namingRules": {
       "academyReference": "Obserra EPI Academy",
@@ -35,6 +34,7 @@
   },
   "ownerIdentity": {
     "presenter": "Dr. Jody Blanchard",
+    "approvedProfessionalTitle": "Founder and CEO",
     "ownerApprovedExactReferenceRequired": true,
     "faceIdentityImmutable": true,
     "voiceIdentityImmutable": true,
@@ -44,8 +44,7 @@
     "skinToneImmutable": true,
     "facialStructureImmutable": true,
     "accentAndVocalCharacterImmutable": true,
-    "ownerNameMayAppearOnlyWithExactOwnerFaceAndVoice": true,
-    "ownerCredentialsMayAppearOnlyWithExactOwnerFaceAndVoice": true,
+    "ownerNameAndApprovedTitleMayAppearOnlyWithExactOwnerFaceAndVoice": true,
     "nonOwnerPresenterMayNotBeRepresentedAsDrJodyBlanchard": true,
     "identityMismatchRequiresImmediateRejection": true,
     "allowedControlledChanges": [
@@ -78,7 +77,8 @@
       "voice redesign",
       "voice substitution",
       "displaying Dr. Jody Blanchard's name over a different person",
-      "displaying Dr. Jody Blanchard's credentials over a different person"
+      "displaying Founder and CEO over a different person represented as Dr. Jody Blanchard",
+      "adding any unapproved title to the owner introduction"
     ],
     "ownerVisualAndAuditoryApprovalIsAuthoritative": true
   },
@@ -95,8 +95,7 @@
         "course title",
         "course track and level",
         "Presented by Dr. Jody Blanchard",
-        "Founder and Owner, Obserra EPI",
-        "Two-Time Fortune 500 Chief Information Security Officer",
+        "Founder and CEO",
         "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
         "course version"
       ]
@@ -129,15 +128,14 @@
         "maximum": 90
       },
       "presenter": "Dr. Jody Blanchard",
-      "presenterBusinessTitle": "Founder and Owner",
-      "presenterExecutiveCredential": "Two-Time Fortune 500 Chief Information Security Officer",
+      "presenterTitle": "Founder and CEO",
       "scriptMayChangeByCourse": true,
       "identityMayChange": false,
       "voiceIdentityMayChange": false,
       "facialIdentityMayChange": false,
       "nameMayChange": false,
       "professionalIdentityMayChange": false,
-      "ownerNameMayAppearOnlyWithExactOwnerIdentity": true,
+      "ownerNameAndApprovedTitleMayAppearOnlyWithExactOwnerIdentity": true,
       "naturalFacialMovementCharacterMayChange": false,
       "wardrobeMayChange": true,
       "backgroundMayChange": true,
@@ -164,9 +162,8 @@
         "required": true,
         "placement": "bottom-safe-area",
         "line1": "Dr. Jody Blanchard",
-        "line2": "Founder and Owner, Obserra EPI",
-        "line3": "Two-Time Fortune 500 Chief Information Security Officer",
-        "line4": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+        "line2": "Founder and CEO",
+        "line3": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
         "fullLegalNameRequired": true,
         "exactOwnerIdentityRequiredBeforeDisplay": true,
         "readableOnDesktopAndMobile": true
@@ -221,7 +218,7 @@
     "exactOwnerFaceRequired": true,
     "exactOwnerVoiceRequired": true,
     "voiceSimilarityAloneInsufficient": true,
-    "nameAndCredentialsRequireExactIdentity": true,
+    "nameAndApprovedTitleRequireExactIdentity": true,
     "pronunciationApprovalRequired": true,
     "facialReshapingProhibited": true,
     "beautificationProhibited": true,
@@ -255,7 +252,7 @@
     "learner-acknowledgement-configured",
     "owner-welcome-script-approved",
     "owner-intro-present-before-first-lesson",
-    "owner-name-bound-to-exact-owner-face-and-voice-approved",
+    "owner-name-and-approved-title-bound-to-exact-owner-face-and-voice-approved",
     "exact-owner-face-approved",
     "exact-owner-voice-approved",
     "presenter-likeness-approved",
@@ -277,7 +274,8 @@
     "different person or regenerated owner face",
     "similar but non-owner voice",
     "Dr. Jody Blanchard name displayed on any presenter who is not the exact owner-approved person",
-    "Dr. Jody Blanchard credentials displayed on any presenter who is not the exact owner-approved person",
+    "Founder and CEO displayed on any presenter who is not the exact owner-approved person",
+    "any unapproved additional owner title displayed or spoken in the owner introduction",
     "1080p-only final intro when 4K mastering is technically supported",
     "substitute or default voice not approved by the owner",
     "excessive or synthetic facial motion",
