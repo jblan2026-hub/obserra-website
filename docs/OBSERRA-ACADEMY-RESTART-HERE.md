@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Restart Notice v13.4.0
+# Obserra EPI Academy Public Restart Notice v13.5.0
 
 Owner and presenter: Dr. Jody Blanchard
 
@@ -14,52 +14,52 @@ EPI meaning: Executive Protection & Intelligence
 
 Official website: https://www.obserrallc.com
 
-Status: The no-exceptions actual-site verification gate is mandatory before any content is generated. The owner has supplied the actual native LearnWorlds question-import template from the target school. The prior generated assessment workbook is rejected. A corrected 25-question workbook has been populated inside a copy of the native template and structurally validated. Authenticated import remains pending. Assistant-generated course video is prohibited.
+Status: The no-exceptions actual-site verification gate remains mandatory. Every learner-facing section of every current and future course must now contain its own LearnWorlds native-template assessment activity. Cybersecurity Foundations has an eight-file section-assessment package covering all eight learner-facing sections. Authenticated import and runtime acceptance remain pending. Assistant-generated course video is prohibited.
 
 ## Mandatory restart sequence
 
 1. Read `docs/academy-media-pipeline/LATEST-HANDOFF.md`.
 2. Read `docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md`.
 3. Read `docs/academy-media-pipeline/ACTUAL-SITE-VERIFICATION-GATE.md`.
-4. Read `docs/academy-media-pipeline/LEARNWORLDS-ASSESSMENT-NATIVE-TEMPLATE-CORRECTION-2026-08-12.md`.
-5. Read `config/academy-actual-site-verification-policy.json`.
-6. Retrieve the protected private handoff and current verification evidence.
-7. Identify the exact actual sites, platform objects, native templates, and official sources controlling the requested work.
-8. Open and inspect those actual current sites before generating anything.
-9. Preserve and hash every untouched native template or export.
-10. Record the verification result as `PASSED`, `BLOCKED`, or `FAILED`.
-11. Generate only after the verification result is `PASSED`.
+4. Read `docs/academy-media-pipeline/COURSE-SECTION-ASSESSMENT-STANDARD.md`.
+5. Read `docs/academy-media-pipeline/LEARNWORLDS-ASSESSMENT-NATIVE-TEMPLATE-CORRECTION-2026-08-12.md`.
+6. Read `config/academy-actual-site-verification-policy.json`.
+7. Read `config/academy-course-section-assessment-policy.json`.
+8. Retrieve the protected private handoff and current verification evidence.
+9. Identify and inspect the actual current target sites, authenticated objects, native templates, and official sources before generating anything.
+10. Preserve and hash every untouched native template or export.
+11. Generate only after verification is `PASSED`.
 12. Recheck the actual site before import, upload, publication, or release.
-13. Update protected and sanitized handoffs after every verification, discrepancy, failure, corrected template, package version, import result, or owner decision.
+13. Update protected and sanitized handoffs after every assessment build, import result, discrepancy, failure, package version, or owner decision.
 
-## No-exceptions actual-site rule
+## Every-section assessment rule
 
 ```text
-Actual current site checked before generation: REQUIRED
-Authenticated target object checked when account-specific: REQUIRED
-Exact current native template/export obtained when applicable: REQUIRED
-Untouched original preserved and hashed: REQUIRED
-Current official documentation checked: REQUIRED
-Current official Obserra site/brand checked: REQUIRED
-Current official primary sources checked: REQUIRED
-Generation without passed verification: PROHIBITED
-Use of memory, assumptions, generic templates, or old files as substitute evidence: PROHIBITED
+Every learner-facing section of every course has an assessment: REQUIRED
 No exceptions: ENFORCED
 ```
 
-If the actual site, exact target object, native template, or current official source cannot be checked, stop and record:
+For a standard five-module course:
 
 ```text
-BLOCKED - DO NOT GENERATE OR REPRESENT AS UPLOAD-READY
+Welcome and orientation: 5-question baseline self-assessment
+Module 1: 5-question graded knowledge check
+Module 2: 5-question graded knowledge check
+Module 3: 5-question graded knowledge check
+Module 4: 5-question graded knowledge check
+Module 5: 5-question graded knowledge check
+Final assessment and completion: 25-question cumulative exam
+Authoritative resource library: 5-question source-literacy self-assessment
 ```
 
-## Native LearnWorlds assessment template
+Graded section checks and final assessments use an 80 percent pass mark unless Dr. Jody Blanchard explicitly approves another standard.
 
-The owner supplied two byte-identical copies of the actual target-school template.
+Administrative-only package folders are not learner-facing sections and are excluded.
+
+## Native LearnWorlds template
 
 ```text
 Template: Question Bank Template.xlsx
-Preserved copy: Question Bank Template(1).xlsx
 SHA-256: 23e591abe440b3c05139a44543d9626ef17c251d42f30881e6e49f51e027ad7e
 Worksheets: Instructions, Examples, Questions
 ```
@@ -85,57 +85,42 @@ CorrectExplanation
 IncorrectExplanation
 ```
 
-## Assessment correction and hard stop
+Graded files use `exam_`. Non-graded self-assessments use `selfassessment_`. Do not rename, reorder, restyle, or approximate the native template structure.
 
-The owner correctly reported that the prior assessment file was not in the native LearnWorlds template. The generated workbook used `Answer 1` through `Answer 10`, with spaces, and replaced the native Instructions and Examples worksheets. It is rejected.
-
-Corrected workbook:
+## Cybersecurity Foundations section-assessment package
 
 ```text
-File: exam_Cybersecurity_Foundations_Final_Assessment-v2.1.0.xlsx
-SHA-256: d3cff502e819cc3e5c4c0fd99fc7a9f0700fb0c179f791e5bee7dc17ffd0aada
-Questions: 25
-Groups: 5
-Types: 25 TMC
-Native Instructions and Examples preserved: yes
-Exact Questions tab and headings preserved: yes
-Local structural validation: passed
-Authenticated LearnWorlds import: pending
-```
-
-```text
-Prior generated workbook: REJECTED
-Corrected native-template workbook: STRUCTURALLY PASSED
+Package: Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Section-Assessments-v2.2.0.zip
+SHA-256: f80171e10b612d85d3d48d8ba467e529fb1b0677bafc994eccf84021083002c5
+Learner-facing sections: 8
+Assessment workbooks: 8
+Total questions: 60
+Native-template structural validation: PASSED
+Clean extraction: PASSED
 Authenticated import: NOT PERFORMED
-Imported question count: NOT PROVEN
-80 percent pass rule: NOT PROVEN
-Save/reopen persistence: NOT PROVEN
-Upload-ready claim: PENDING TEST IMPORT
+Runtime acceptance: NOT PROVEN
 ```
 
-All earlier packages containing `02_Final_Assessment_25_Questions_Import.xlsx` are superseded for assessment-import purposes and must not be used for the LearnWorlds upload.
+The package includes:
 
-## Official LearnWorlds guidance checked
+1. Welcome baseline diagnostic.
+2. Module 1 knowledge check.
+3. Module 2 knowledge check.
+4. Module 3 knowledge check.
+5. Module 4 knowledge check.
+6. Module 5 knowledge check.
+7. Final cumulative assessment.
+8. Authoritative resource-library check.
 
-- https://support.learnworlds.com/support/solutions/articles/12000087253-how-to-import-questions-to-an-assessment-from-an-xls-file
-- https://support.learnworlds.com/support/solutions/articles/12000101758-how-to-bulk-upload-course-content
+## Coursewide retrofit requirement
 
-The owner-supplied actual-school template controls over generic examples or generated approximations.
+Every existing and future course must be audited section by section. Generative AI, LLMs, High-Risk Employees, Executive Travel Risk Management, and all later courses must receive the same native-template assessment pattern.
 
-## Nonnegotiable owner attribution and brand
+A course is incomplete when any learner-facing section lacks its required assessment import, learning-objective mapping, feedback, and runtime evidence.
 
-```text
-Dr. Jody Blanchard
-Founder and CEO
-OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-www.obserrallc.com
+## Actual-site verification rule
 
-Academy: Obserra EPI Academy
-Short business name: Obserra EPI
-EPI: Executive Protection & Intelligence
-```
-
-No alternate title, employer name, employer logo, outside title, employment history, substitute person, or unapproved voice may appear in learner-facing content. The owner resume is internal factual grounding only. The registered logo and approved colors may not be altered.
+Before generating any assessment or course artifact, check the actual current target site, authenticated object, native template, official LearnWorlds documentation, official Obserra site/brand, and current official primary sources. If verification cannot be completed, stop and record `BLOCKED`.
 
 ## Permanent video-production directive
 
@@ -143,7 +128,6 @@ No alternate title, employer name, employer logo, outside title, employment hist
 ChatGPT-generated course video: PROHIBITED
 Connected-provider course video generation: PROHIBITED
 Additional provider-credit expenditure: PROHIBITED
-Avatar, clone, lip-sync, substitute presenter, or synthetic owner media: PROHIBITED
 Final video production and approval: Dr. Jody Blanchard
 ```
 
@@ -151,26 +135,23 @@ Every video activity remains `OWNER PRODUCTION REQUIRED` until the owner supplie
 
 ## Current controlled action
 
-1. Import `exam_Cybersecurity_Foundations_Final_Assessment-v2.1.0.xlsx` into the actual Cybersecurity Foundations Draft assessment.
-2. Record success or every warning/failure; verify 25 questions, five groups, and question types.
-3. Configure the 80 percent pass mark, save, reopen, and verify persistence.
-4. If import passes, reissue the Cybersecurity Foundations non-video package, materials-and-scripts package, and master set with corrected paths, manifests, validations, versions, and hashes.
-5. Audit every other LearnWorlds-specific artifact against the actual current school interface and exact native templates.
-6. Before generating the next course, check the actual current Obserra site/catalog, actual LearnWorlds options and templates, and current official primary sources.
-7. Continue `Executive Travel Risk Management` only after its verification record is `PASSED`.
-8. Do not generate video.
-9. Preserve every discrepancy and failure.
+1. Import the eight Cybersecurity Foundations assessment workbooks into the matching Draft sections.
+2. Verify question counts, groups, correct-answer mapping, feedback, pass marks, attempts, remediation, save/reopen persistence, and desktop/mobile learner behavior.
+3. Reissue the Cybersecurity Foundations course package after authenticated acceptance.
+4. Retrofit every learner-facing section of Generative AI, LLMs, and High-Risk Employees with native-template assessments.
+5. Apply the standard to Executive Travel Risk Management and all future courses after verification passes.
+6. Do not generate video.
+7. Preserve every discrepancy and failure.
 
 ## Release boundary
 
 ```text
-Actual-site verification: MANDATORY / NO EXCEPTIONS
-Corrected assessment: NATIVE-TEMPLATE STRUCTURE PASSED / IMPORT PENDING
-Prior assessment workbooks: REJECTED
-Continuous non-video production: CONDITIONAL ON PASSED VERIFICATION
+Every-section assessment standard: MANDATORY / NO EXCEPTIONS
+Cybersecurity section-assessment package: STRUCTURALLY PASSED / IMPORT PENDING
+Other courses: RETROFIT REQUIRED
+Actual-site verification: MANDATORY
 Assistant-generated video: PROHIBITED
 LearnWorlds runtime acceptance: NOT PROVEN
-Certificate issuance acceptance: NOT PROVEN
 Publication: BLOCKED
 Live checkout: BLOCKED
 Production merge/cutover: BLOCKED
@@ -179,9 +160,9 @@ Production merge/cutover: BLOCKED
 ## Continuation command
 
 ```text
-Read the v13.4.0 Obserra EPI Academy handoff, the Actual-Site Verification Gate, and the LearnWorlds native-template correction before acting. Check the actual current applicable sites, authenticated target objects, native templates, current official vendor documentation, official Obserra website/brand, and current official primary-source pages before generating content. No exceptions. Use the owner-supplied native LearnWorlds template with SHA-256 23e591abe440b3c05139a44543d9626ef17c251d42f30881e6e49f51e027ad7e. The prior generated assessment is rejected. The corrected file exam_Cybersecurity_Foundations_Final_Assessment-v2.1.0.xlsx has SHA-256 d3cff502e819cc3e5c4c0fd99fc7a9f0700fb0c179f791e5bee7dc17ffd0aada and awaits authenticated import testing. Do not claim upload-ready until the actual Draft assessment imports 25 questions, the 80 percent pass mark is configured, and save/reopen persistence is verified. Use only Dr. Jody Blanchard, Founder and CEO; Obserra EPI Academy; Obserra EPI; Executive Protection & Intelligence; OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC; and www.obserrallc.com. Do not generate course video. Update protected and sanitized handoffs after every verification, discrepancy, result, failure, package change, or owner decision.
+Read the v13.5.0 handoff, Actual-Site Verification Gate, and Course Section Assessment Standard before acting. Every learner-facing section of every course must have its own native LearnWorlds assessment. Use the exact owner-supplied template with SHA-256 23e591abe440b3c05139a44543d9626ef17c251d42f30881e6e49f51e027ad7e. For the standard five-module architecture, build eight assessment activities: Welcome baseline, five module checks, final exam, and resource-library check. Use exam_ for graded files and selfassessment_ for non-graded files. Do not claim readiness until authenticated import, pass marks, persistence, and learner behavior are verified. Use only Dr. Jody Blanchard, Founder and CEO; Obserra EPI Academy; Obserra EPI; Executive Protection & Intelligence; OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC; and www.obserrallc.com. Do not generate course video. Update protected and sanitized records after every build, import, discrepancy, failure, package change, or owner decision.
 ```
 
 ## Public repository warning
 
-This repository is public. Complete manuscripts, assessment answers, authenticated screenshots, downloaded school-specific templates, owner media, provider identifiers, learner data, and security evidence must remain in protected storage. Public records contain sanitized governance and status evidence only.
+This repository is public. Complete manuscripts, assessment answers, authenticated screenshots, downloaded school-specific templates, owner media, provider identifiers, learner data, and security evidence remain in protected storage. Public records contain sanitized governance and status evidence only.
