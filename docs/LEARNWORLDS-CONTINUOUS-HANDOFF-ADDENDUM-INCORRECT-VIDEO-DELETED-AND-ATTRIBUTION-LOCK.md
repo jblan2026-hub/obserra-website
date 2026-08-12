@@ -1,4 +1,4 @@
-# LearnWorlds Continuous Handoff Addendum: Incorrect Video Deleted and Attribution Locked
+# LearnWorlds Continuous Handoff Addendum: Incorrect Underlying Video Deleted and Attribution Locked
 
 **Date:** 2026-08-12  
 **Branch:** `feature/learnworlds-commercial-pipeline`  
@@ -6,11 +6,17 @@
 **Course:** Cybersecurity Foundations for New Professionals  
 **Publication:** Not authorized
 
-## Completed action
+## Verified deletion scope
 
-The rejected owner-introduction video that did not depict the exact approved owner was permanently deleted through the connected HeyGen deletion action. The provider returned a positive deletion confirmation. The approved owner source was not deleted or modified.
+The rejected owner-introduction video did not depict the exact approved owner.
 
-The rejected video may not be restored, uploaded into LearnWorlds, published, marketed, reused, or used as a course template.
+The connected HeyGen deletion action returned a positive deletion confirmation for the underlying generated video record. A subsequent direct lookup returned `video_not_found`, confirming that the underlying video record is no longer retrievable.
+
+The owner reports that the associated Video Agent project or session card remains visible in the HeyGen web interface. The connected tools do not expose a delete-project or delete-session action. Therefore, deletion of the remaining project or session card is not claimed.
+
+The approved owner source was not deleted or modified.
+
+The remaining incorrect project or session card may not be reused, exported, uploaded into LearnWorlds, published, marketed, or used as a course template.
 
 ## Sole approved attribution
 
@@ -41,4 +47,4 @@ The official logo, registered names, and approved colors may not be changed.
 
 The machine-readable enforcement source is `config/academy-owner-identity-attribution-policy.json`.
 
-The course remains Draft. Complete LearnWorlds loading, corrected owner-introduction production, owner review, assessment, resources, completion, certificate, accessibility, desktop, and mobile acceptance remain pending.
+The course remains Draft. Removal of the remaining incorrect HeyGen project or session card, corrected owner-introduction production, complete LearnWorlds loading, owner review, assessment, resources, completion, certificate, accessibility, desktop, and mobile acceptance remain pending.
