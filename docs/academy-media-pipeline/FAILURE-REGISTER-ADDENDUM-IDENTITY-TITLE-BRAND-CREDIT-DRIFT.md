@@ -1,7 +1,7 @@
-# Obserra EPI Academy Failure Register Addendum: Identity, Title, Brand, Provider, Credit, and Course-Readiness Drift
+# Obserra EPI Academy Failure Register Addendum: Identity, Title, Brand, Provider, Credit, Course-Readiness, and Package-QA Drift
 
 **Originally recorded UTC:** 2026-08-12T04:54:17Z  
-**Corrected:** 2026-08-12  
+**Updated:** 2026-08-12  
 **Owner:** Dr. Jody Blanchard  
 **Sole approved title:** Founder and CEO  
 **Status:** CURRENT CORRECTIVE AUDIT RECORD
@@ -42,18 +42,17 @@ Prior files used `Obserra Academy`, `OBSERRA ACADEMY`, standalone `Obserra`, and
 
 Provider 404 results, incomplete list endpoints, and deletion of an underlying video record were treated as stronger proof than the authenticated owner interface.
 
-**Correct current state:**
+**Correct evidence boundary:**
 
 ```text
-Incorrect underlying generated video record: deleted
-Incorrect video retrievable: no
-Owner Review Video project or session card visible in My Projects: yes
-Owner Review Video moved to Trash: no evidence
-Only two approved projects visible: no
-Project or session deletion through connected tools: unavailable
+Pre-action screenshot: three visible cards
+Later owner statement: rejected project moved to Trash
+Post-action screenshot: not supplied
+Current active-project count: not independently verified
+Permanent provider purge: not verified
 ```
 
-**Prevention:** Distinguish video-record state, project-card visibility, session state, Trash status, and permanent purge. Record who performed each action and the exact evidence source.
+**Prevention:** Distinguish video-record state, project-card visibility, session state, owner-reported action, Trash status, and permanent purge. Record who performed each action and the exact evidence source.
 
 ## Failure 6 - Owner-supplied screenshot was misread
 
@@ -71,23 +70,23 @@ actually shows three visible cards:
 2. `Professional man speaking to camera.` - approved owner project.
 3. `Confident_Cybersecurity_Leadership` - approved owner project.
 
-**Correction:** All current records now state that the rejected project card remains visible and is not removed.
+**Correction:** Current records treat the screenshot as pre-action evidence and the later Trash statement as owner-reported post-capture information. No permanent purge is claimed.
 
-**Prevention:** Read screenshots directly. Never infer Trash state, hidden actions, deletion, or an exact project count beyond what is visibly shown.
+**Prevention:** Read screenshots directly. Never infer hidden actions, Trash state, deletion, or a post-action project count beyond the evidence provided.
 
 ## Failure 7 - Unverified LearnWorlds readiness implications
 
 Prior package and status language could imply that the course had been loaded into LearnWorlds or was presentable for owner review while the authenticated platform still showed empty placeholder activities.
 
-**Correction:** The course remains Draft. Complete LearnWorlds loading, assessment, completion, certificate, resource, accessibility, desktop, and mobile acceptance are not verified.
+**Correction:** Cybersecurity Foundations remains Draft. Complete LearnWorlds loading, assessment, completion, certificate, resource, accessibility, desktop, and mobile acceptance are not verified.
 
 **Prevention:** Claim platform completion only from direct authenticated evidence showing exact sections, activities, durations, resources, assessment behavior, completion rules, and course state.
 
 ## Failure 8 - Insufficient course robustness
 
-The first course did not yet maximize pedagogically appropriate LearnWorlds activity types and authoritative learner resources.
+The first course did not initially maximize pedagogically appropriate LearnWorlds activity types and authoritative learner resources.
 
-**Correction:** Rebuild with branded opening activities, exact owner welcome, orientation, diagnostic, interactive lessons, accessible written alternatives, scenarios, guided practice, assignments, knowledge checks, official NIST and other primary resources, self-assessments, final exam, survey, completion, certificate, and accessibility controls.
+**Correction:** The validated v4.1.0 package includes branded opening activities, owner-welcome controls, orientation, diagnostic, interactive lessons, accessible written alternatives, scenarios, guided practice, assignments, knowledge checks, official NIST and CISA resources, self-assessments, final exam, survey, completion, certificate, and accessibility controls.
 
 ## Failure 9 - Provider credit waste
 
@@ -103,10 +102,27 @@ The owner had to repeat identity, title, employer, brand, website, video, course
 
 **Prevention:** Every restarted session must read the current records first and continue from the first incomplete controlled action without requiring the owner to repeat these rules.
 
+## Failure 11 - Generative AI pre-release package failed the enhanced QA gate
+
+The first generated `Generative AI Fundamentals for Business Leaders` review package reached static quality assurance but did not pass the enhanced release gate.
+
+The enhanced audit identified:
+
+1. The SCORM packages used a valid basic package structure but did not satisfy the stronger screen-navigation, keyboard-support, responsive-layout, and interaction validation standard adopted for the next course set.
+2. Several LearnWorlds digital-download cells used human-readable labels rather than exact package-relative file paths, which prevented deterministic file-mapping validation.
+3. The package contained 66 mapped activities because the resource library included one navigator plus thirteen official resource activities. Earlier builder metadata incorrectly reported 65.
+4. A post-build finalization step changed the package contents and hash after the initial build result was recorded, creating a hash and file-count inconsistency.
+
+**Impact:** The package could have been represented as complete despite inconsistent integrity evidence and insufficient SCORM interaction validation.
+
+**Correction:** The package is quarantined and is not an authorized delivery. The builder is being corrected to produce stronger navigable SCORM, exact activity-map paths, truthful dynamic activity counts, one final package hash, and clean extraction evidence from the same immutable ZIP. The corrected package will receive a new version and will not be released until all validation gates pass.
+
+**Prevention:** A course package is complete only when its final immutable ZIP, SHA-256 file, validation report, manifest, internal file hashes, clean-extraction result, activity map, and SCORM checks all agree. Any post-build modification requires a new version, a new hash, and a full rerun of every quality gate.
+
 ## Current unresolved blockers
 
-1. The visible `Owner Review Video` project or session card has not been removed from My Projects.
-2. The correct exact-owner 4K course introduction is not rendered and approved.
-3. The complete Cybersecurity Foundations course is not loaded into LearnWorlds Draft.
-4. Assessment, completion, certificate, resources, accessibility, desktop, and mobile acceptance remain pending.
-5. Additional course production remains blocked pending first-course approval.
+1. Cybersecurity Foundations authenticated LearnWorlds loading and runtime acceptance remain pending.
+2. Exact-owner course media remains blocked pending separate explicit authorization and owner approval.
+3. The Generative AI package is under corrective rebuild and is not yet released.
+4. The LLM and high-risk-employee courses remain queued behind the corrected Generative AI package.
+5. Publication, live checkout, production merge, production cutover, and courses beyond the owner-authorized three-course set remain blocked.
