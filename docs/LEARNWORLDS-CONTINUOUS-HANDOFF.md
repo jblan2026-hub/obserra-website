@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Continuous Handoff v13.5.0
+# Obserra EPI Academy Public Continuous Handoff v13.6.0
 
 The authoritative sanitized operational record is `docs/academy-media-pipeline/LATEST-HANDOFF.md`.
 
@@ -15,65 +15,104 @@ Short business: Obserra EPI
 EPI: Executive Protection & Intelligence
 ```
 
-No alternate title, employer reference, employment history, substitute identity, unapproved voice, altered logo, or unapproved brand form is authorized in learner-facing content.
+No alternate title, employer reference, employment history, substitute identity, unapproved voice, altered logo, or unapproved brand form is authorized in learner-facing content. The owner resume is internal factual grounding only.
 
-## Permanent course-section assessment requirement
+## Permanent no-exceptions controls
 
-Dr. Jody Blanchard has directed that every learner-facing section of every current and future course must contain its own LearnWorlds native-template assessment activity.
+Before generating any Academy content or platform-specific artifact:
 
 ```text
-Every learner-facing section has an assessment: REQUIRED
-Welcome section baseline diagnostic: REQUIRED
-Every instructional module knowledge check: REQUIRED
-Final cumulative assessment: REQUIRED
-Authoritative resource-library check: REQUIRED
-Administrative-only package folders: EXCLUDED
+Actual current target site checked: REQUIRED
+Authenticated target object checked when account-specific: REQUIRED
+Exact current native template/export obtained when applicable: REQUIRED
+Untouched original preserved and hashed: REQUIRED
+Current official vendor documentation checked: REQUIRED
+Current official Obserra site and registered brand checked: REQUIRED
+Current official primary-source pages checked: REQUIRED
+Generation before verification passes: PROHIBITED
+Fallback to memory, old files, generic templates, or assumptions: PROHIBITED
 No exceptions: ENFORCED
 ```
 
-For a standard five-module course, the required pattern is eight assessment activities:
-
-1. Welcome baseline self-assessment.
-2. Module 1 knowledge check.
-3. Module 2 knowledge check.
-4. Module 3 knowledge check.
-5. Module 4 knowledge check.
-6. Module 5 knowledge check.
-7. Final cumulative exam.
-8. Authoritative resource-library self-assessment.
-
-Minimum standards:
-
-```text
-Welcome baseline: 5 questions
-Each instructional section/module: 5 questions
-Final assessment: 25 questions
-Resource-library check: 5 questions
-Graded checks and final: 80 percent pass mark
-```
-
-Governing records:
-
-```text
-docs/academy-media-pipeline/COURSE-SECTION-ASSESSMENT-STANDARD.md
-config/academy-course-section-assessment-policy.json
-```
-
-A course is incomplete when any learner-facing section lacks a native-template assessment activity, direct learning-objective mapping, useful feedback, and import evidence.
-
-## Actual-site verification remains mandatory
-
-Before any platform-specific artifact is generated, the actual current target site, authenticated object, native template, official vendor documentation, official Obserra site/brand, and current official primary sources must be checked.
-
-If direct verification cannot be completed, status is `BLOCKED`. Model memory, prior generated files, old screenshots, generic templates, and assumptions are prohibited substitutes.
+If verification cannot be completed, status is `BLOCKED`.
 
 Governing records:
 
 ```text
 docs/academy-media-pipeline/ACTUAL-SITE-VERIFICATION-GATE.md
 config/academy-actual-site-verification-policy.json
-docs/academy-media-pipeline/LEARNWORLDS-ASSESSMENT-NATIVE-TEMPLATE-CORRECTION-2026-08-12.md
 ```
+
+## Permanent per-section LearnWorlds architecture
+
+Every learner-facing substantive section of every current and future course must contain the full verified LearnWorlds activity-category stack and its own native-template assessment.
+
+Governing records:
+
+```text
+docs/academy-media-pipeline/PER-SECTION-LEARNWORLDS-ACTIVITY-ARCHITECTURE.md
+config/academy-per-section-learnworlds-activity-standard.json
+docs/academy-media-pipeline/COURSE-SECTION-ASSESSMENT-STANDARD.md
+config/academy-course-section-assessment-policy.json
+```
+
+Verified activity categories:
+
+```text
+Multimedia
+Ebook
+Exams
+Self-Assessment
+Forms
+Certificates
+Social
+Embed
+```
+
+Each substantive section must contain:
+
+1. Ebook overview/objectives.
+2. Substantive Ebook main content.
+3. Ebook FAQ/key terms.
+4. Ebook summary/takeaways.
+5. Interactive SCORM/HTML5 instruction.
+6. PDF learner handout, worked example, resource, or job aid.
+7. PPTX presentation and PDF export.
+8. Audio-ready narration script and accessible transcript.
+9. Owner-video insertion point labeled `OWNER PRODUCTION REQUIRED`.
+10. Approved thumbnail, poster, or section background image.
+11. Five-question native-template knowledge check or validated Graded SCORM.
+12. Applied Text assignment or File assignment with rubric.
+13. Self-assessment with immediate feedback.
+14. Reflection/goals activity.
+15. Upload-your-work activity when an artifact is produced.
+16. Section check-in or application form.
+17. Think and Share prompt.
+18. Ask questions and discuss prompt.
+19. Self-Reflection prompt.
+20. Assessment discussion when graded assessment is used.
+21. Verified official external resource or embed.
+22. Meaningful completion gate; visit-only completion is prohibited for substantive learning.
+23. Accessibility alternatives and QA evidence.
+
+Course opening and closing contain the lifecycle activities defined in the governing architecture. Certificates and Course completion remain course-level unless the owner later approves a verified module-credential design.
+
+## Every-section assessment requirement
+
+For a standard five-module course:
+
+```text
+Welcome and orientation: 5-question baseline self-assessment
+Module 1: 5-question graded knowledge check
+Module 2: 5-question graded knowledge check
+Module 3: 5-question graded knowledge check
+Module 4: 5-question graded knowledge check
+Module 5: 5-question graded knowledge check
+Final assessment and completion: 25-question cumulative exam
+Authoritative resource library: 5-question source-literacy self-assessment
+```
+
+Graded checks and final assessments use an 80 percent pass mark unless the owner explicitly changes it. Administrative-only package folders are not learner-facing sections and are excluded.
 
 ## Native LearnWorlds template
 
@@ -104,9 +143,31 @@ CorrectExplanation
 IncorrectExplanation
 ```
 
-Graded files use the `exam_` prefix. Non-graded self-assessments use the `selfassessment_` prefix. The native tabs, headings, order, and plain-text rules must be preserved.
+Graded files use `exam_`. Non-graded self-assessments use `selfassessment_`. Native tabs, headings, order, formatting, and plain-text requirements must remain exact.
 
-## Current Cybersecurity Foundations implementation
+## Mandatory category-first folder architecture
+
+Every course package must use:
+
+```text
+00_COURSE_ADMINISTRATION
+01_EBOOK
+02_MULTIMEDIA
+03_EXAMS_AND_ASSIGNMENTS
+04_SELF_ASSESSMENT
+05_FORMS
+06_SOCIAL
+07_EMBED_AND_EXTERNAL_LINKS
+08_CERTIFICATES_AND_COMPLETION
+09_OWNER_VIDEO_PRODUCTION_REQUIRED
+10_AUTHORITATIVE_RESOURCES
+11_ACCESSIBILITY_TRANSCRIPTS_AND_CAPTIONS
+12_QA_EVIDENCE_AND_RELEASE
+```
+
+Each category contains course-opening, each substantive section/module, and course-closing subfolders where applicable. Every mapped activity must have a real artifact, exact title, native activity type, completion rule, accessibility alternative, package-relative path, and verification status.
+
+## Current Cybersecurity Foundations section-assessment evidence
 
 ```text
 Package: Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Section-Assessments-v2.2.0.zip
@@ -114,29 +175,13 @@ SHA-256: f80171e10b612d85d3d48d8ba467e529fb1b0677bafc994eccf84021083002c5
 Learner-facing sections: 8
 Assessment files: 8
 Total questions: 60
-Welcome baseline: 5
-Five module checks: 25 total
-Final exam: 25
-Resource-library check: 5
 Native-template structural validation: PASSED
 Clean extraction: PASSED
 Authenticated LearnWorlds import: NOT PERFORMED
 Runtime acceptance: NOT PROVEN
 ```
 
-The package adds the two previously missing section assessments: Welcome baseline diagnostic and Authoritative Resource Library check.
-
-## Coursewide retrofit requirement
-
-The same every-section assessment pattern must be applied to:
-
-- Generative AI Fundamentals for Business Leaders;
-- Large Language Models, LLMs, Explained for Leaders;
-- Security Awareness for High Risk Employees;
-- Executive Travel Risk Management;
-- every remaining governed Academy course.
-
-Every activity map, authoring guide, manifest, validation report, completion matrix, and handoff must show assessment coverage by section.
+The complete Cybersecurity course still requires section-by-section retrofit against the full category-level activity architecture.
 
 ## Permanent owner-video directive
 
@@ -147,27 +192,30 @@ Additional provider-credit expenditure: PROHIBITED
 Final course videos: produced and approved by Dr. Jody Blanchard
 ```
 
-Every video activity remains `OWNER PRODUCTION REQUIRED` until the owner supplies the final file.
+Every video activity remains `OWNER PRODUCTION REQUIRED` until the owner supplies the final file. The assistant may create scripts, teleprompter copy, storyboards, shot lists, on-screen text, caption/transcript specifications, technical standards, and integration instructions.
 
 ## Current controlled work order
 
-1. Import all eight Cybersecurity Foundations section-assessment workbooks into the matching Draft course sections.
+1. Import the eight Cybersecurity Foundations section-assessment workbooks into the matching actual Draft sections.
 2. Verify question counts, groups, answer mapping, feedback, pass marks, attempts, remediation, save/reopen persistence, and desktop/mobile behavior.
-3. Reissue the Cybersecurity Foundations course package after authenticated acceptance.
-4. Build one native-template assessment for every learner-facing section of the three already-developed next courses.
-5. Apply the standard to Executive Travel Risk Management and all subsequent courses only after actual-site and source verification passes.
-6. Do not generate course video.
-7. Update protected and sanitized handoffs after every build, import, discrepancy, failure, package version, and owner decision.
+3. Audit and rebuild every Cybersecurity section against the complete category-level activity stack.
+4. Reissue the full course package using the mandatory category-first folder architecture.
+5. Retrofit Generative AI, LLMs, and High-Risk Employees with the same activity and assessment standard.
+6. Apply the standard to Executive Travel Risk Management and every later course only after actual-site and source verification passes.
+7. Do not generate course video.
+8. Update protected and sanitized handoffs after every site check, build, import, discrepancy, failure, package version, and owner decision.
 
 ## Release boundary
 
 ```text
-Every-section assessment standard: MANDATORY / NO EXCEPTIONS
-Cybersecurity section-assessment package: STRUCTURALLY PASSED / IMPORT PENDING
-Other current courses: RETROFIT REQUIRED
-Actual-site verification: MANDATORY
+Actual-site verification: MANDATORY / NO EXCEPTIONS
+Complete activity stack in every learner-facing section: MANDATORY
+Assessment in every learner-facing section: MANDATORY / NO EXCEPTIONS
+Cybersecurity section-assessment pack: STRUCTURALLY PASSED / IMPORT PENDING
+All courses: FULL SECTION RETROFIT REQUIRED
 Assistant-generated video: PROHIBITED
 LearnWorlds runtime acceptance: NOT PROVEN
+Certificate issuance acceptance: NOT PROVEN
 Publication: BLOCKED
 Live checkout: BLOCKED
 Production merge/cutover: BLOCKED
@@ -175,4 +223,4 @@ Production merge/cutover: BLOCKED
 
 ## Handoff rule
 
-Every new work session must read the Actual-Site Verification Gate and Course Section Assessment Standard before generating content. Update protected and sanitized records immediately after every site check, assessment build, import result, failure, package change, integrity check, or owner decision.
+Every new work session must read the Actual-Site Verification Gate, Per-Section LearnWorlds Activity Architecture, and Course Section Assessment Standard before generating content. Update protected and sanitized records immediately after every site check, build, import result, failure, package change, integrity check, or owner decision.
