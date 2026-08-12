@@ -28,7 +28,11 @@ test("opening gate presents official title page, owner introduction, and require
   assert.match(opening, /cyber security/);
   assert.match(gate, /course-opening-title-card/);
   assert.match(gate, /Required learner disclosures/);
-  assert.match(gate, /learnerAcknowledgementRequired/);
+  assert.match(gate, /const \[acknowledged, setAcknowledged\] = useState\(false\)/);
+  assert.match(gate, /type="checkbox"/);
+  assert.match(gate, /checked=\{acknowledged\}/);
+  assert.match(gate, /setAcknowledged\(event\.target\.checked\)/);
+  assert.match(gate, /disabled=\{!canContinue\}/);
   assert.match(gate, /Acknowledge the disclosures to continue/);
   assert.match(gate, /introCompleted/);
 });
