@@ -1,4 +1,4 @@
-# Obserra EPI Academy Public Continuous Handoff v13.1.0
+# Obserra EPI Academy Public Continuous Handoff v13.2.0
 
 The authoritative sanitized operational record is `docs/academy-media-pipeline/LATEST-HANDOFF.md`.
 
@@ -15,103 +15,141 @@ Short business: Obserra EPI
 EPI: Executive Protection & Intelligence
 ```
 
-No alternate title, employer reference, employment history, substitute identity, unapproved voice, altered logo, or unapproved brand form is authorized in learner-facing content.
+No alternate title, employer reference, employment history, substitute identity, unapproved voice, altered logo, or unapproved brand form is authorized in learner-facing content. The owner resume is internal factual grounding only.
 
-## Permanent evidence-based acceptance rule
+## Permanent owner-video directive
 
-Every claimed result must be provable by direct evidence. Plans, outlines, manuscripts, manifests, checklists, activity maps, scripts, placeholders, mockups, file names, package labels, expected runtimes, intended configurations, and ZIP creation are not proof of completion. If direct evidence does not exist, status must be `NOT PROVEN`, `PENDING`, `BLOCKED`, or `FAILED`.
-
-## Owner directive: no further AI video generation
-
-On 2026-08-12, Dr. Jody Blanchard directed that ChatGPT must not build or generate additional course videos. The owner will produce and supply the instructional videos. This instruction is immediate and permanent until the owner explicitly changes it.
+On 2026-08-12, Dr. Jody Blanchard directed that ChatGPT and connected providers must not create any additional course video. The owner will record and approve all course video media.
 
 ```text
+Assistant-generated course video: PROHIBITED
 New HeyGen or other paid video generation: PROHIBITED
-Additional video-credit spend: PROHIBITED
-Automated avatar/module video production: PROHIBITED
-Owner introduction already produced: preserved
-Owner-supplied future course videos: permitted after owner delivery and validation
-Non-video course production and validation: authorized
+Additional provider-credit expenditure: PROHIBITED
+Avatar, clone, lip-sync, substitute presenter, or synthetic owner media: PROHIBITED
+Owner-produced final videos: AUTHORIZED after owner delivery
+Document, script, SCORM, assessment, and production-support work: AUTHORIZED
 ```
 
-A cinematic Module 1 Video Agent generation had already completed before this directive was received. It is retained only as an unapproved provider artifact and must not be represented as accepted course media. No additional module-video generation is authorized.
+Authorized work includes course manuscripts, teleprompter scripts, shot lists, storyboards, on-screen text, lower-third specifications, caption and transcript standards, SCORM/HTML5 activities, workbooks, job aids, assessments, authoritative resources, implementation maps, certificate controls, accessibility evidence, technical delivery specifications, QA records, manifests, hashes, and packaging.
 
-The earlier short/robotic module videos and the v0.2.0 media assembly package are rejected as learner-facing production media. They may remain only as failure/evidence records. Do not reuse them as the production visual standard.
+All video activities must remain labeled `OWNER PRODUCTION REQUIRED` until Dr. Jody Blanchard provides the final media. No plan, script, placeholder, or provider record may be treated as completed video.
 
-## No-drift/no-mockup rule
-
-Academy production must not drift from the governed standard, misrepresent status, or substitute mockups/placeholders for real deliverables. Deficiencies must be preserved and corrected rather than relabeled.
-
-## Website duration and instructional alignment
-
-The website catalog is authoritative for course level and nominal instructional duration. Foundation courses are 2.5 hours and use the governed module timing pattern in `app/academy/courseData.ts`: 24, 26, 28, 30, and 42 minutes. Duration must be supported by measured learner activities, not labels. Owner-supplied videos will be incorporated into the duration matrix when delivered.
-
-## Required complete-course production standard
-
-Before any course can be classified COMPLETE, its protected package must include and prove at minimum: official branded opening; disclaimers/acknowledgement; approved exact-owner introduction; full duration-sized manuscript; instructional narration/video integration specifications; real branded slide materials; real SCORM with valid manifests/launch content; LearnWorlds activity/runtime evidence; scenarios/exercises; workbook; multiple job aids; module checks; 25-question final at 80 percent; authoritative references/resource handout; final captions/transcripts for owner-supplied media; accessibility evidence; thumbnail/visual assets; completion runtime evidence; certificate configuration and issuance evidence; instructor guide where appropriate; LearnWorlds implementation instructions; desktop/mobile QA; owner evidence checklist; manifest/extraction/hash evidence; and a requirement-by-requirement evidence matrix.
-
-## Cybersecurity Foundations package evidence
-
-A structurally validated LearnWorlds upload package exists:
+## Current validated materials and scripts release
 
 ```text
-Package: Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Final-Upload-v5.3.0.zip
-SHA-256: 0a9a6d1275676efcc0789a7f1b021c74b3777d20111c0765843f83c288dbe987
-Size: 63,654,568 bytes
-Members: 97
-Clean extraction: PASS
-Activities: 65 total / 65 marked ready in package metadata
-SCORM packages: 6
-DOCX: 3 documents / 46 rendered pages
-PDF: 39 documents / 119 rendered pages
-Workbooks: 9 / 120 rendered spreadsheet pages
-Approved owner-introduction binary: embedded and byte-identical to standalone copy
-LearnWorlds upload performed: NO
-Publication performed: NO
+Master package:
+Obserra-EPI-Academy-Materials-and-Scripts-Master-Set-v1.0.0.zip
+SHA-256: 708f05b4f55ac6e509f23802b47d069c1af3f8a038c5bb3366ebd2fae118fc98
+Clean extraction: PASS, 92 of 92 files
+
+Scripts-only package:
+Obserra-EPI-Academy-Video-Scripts-Only-v1.0.0.zip
+SHA-256: 8e39843035b3d6ecf9274a55f3fbfb409d97e5f126140bd16c37f39b845bc598
+Clean extraction: PASS, 68 of 68 files
+
+Courses covered: 4
+Complete owner-production scripts: 28
+Video files included: 0
+Recursive video scan findings: 0
+DOCX accessibility: 0 high / 0 medium / 0 low
+DOCX visual QA: PASS, 117 rendered pages reviewed
+Spreadsheet QA: PASS
+LearnWorlds upload: NOT PERFORMED
+Publication: NOT PERFORMED
 ```
 
-These are package/build results only. They do not prove LearnWorlds runtime, learner completion, assessment behavior, certificate issuance, accessibility in the LMS, desktop/mobile operation, or owner acceptance.
+## Per-course packages
 
-## Current truthful Cybersecurity Foundations classification
+### Cybersecurity Foundations for New Professionals
 
 ```text
-Non-video production package: UNDER ACTIVE FILE-BY-FILE AUDIT
-Owner introduction: provider and package evidence exists; final owner acceptance remains governed
-Instructional videos: OWNER-SUPPLIED / PENDING
-Prior robotic module videos: REJECTED
-Cinematic Module 1 generated before freeze: UNAPPROVED / NOT ACCEPTED
-PowerPoint slide decks: audit/rebuild required until actual PPTX render evidence passes
-SCORM structure: package evidence exists; independent manifest/launch audit required
-Handouts/workbooks/references/assessment: package evidence exists; independent content/format audit required
-Website 150-minute alignment: PENDING owner video durations plus measured activity matrix
-LearnWorlds runtime acceptance: NOT PROVEN
-Assessment/completion/certificate runtime: NOT PROVEN
-Desktop/mobile learner journey: NOT PROVEN
-Final complete course: NOT PROVEN
+Materials and scripts package:
+Obserra-EPI-Academy-Cybersecurity-Foundations-Materials-and-Scripts-v1.0.0.zip
+SHA-256: 89c53e51d677a170b33e88e27272ce696e885fe6270ef1fff981fdeef9bc8718
+
+Non-video source package:
+Obserra-EPI-Academy-Cybersecurity-Foundations-Non-Video-Review-v4.1.1.zip
+SHA-256: be6b4f089b24acf306a1919aa4741d8f80eb8c410005931b719a411f963d4f4c
 ```
+
+Five previously embedded MP4 files were removed from nested SCORM packages. The SCORM content was corrected to provide owner-video insertion points and complete transcript-based learning rather than silently retaining rejected or obsolete video media.
+
+### Generative AI Fundamentals for Business Leaders
+
+```text
+Package:
+Obserra-EPI-Academy-Generative-AI-Fundamentals-Business-Leaders-Materials-and-Scripts-v1.0.0.zip
+SHA-256: e208f0b937f7ddd9785e77e4e5a71dff51499b4f72006d8f1c3069d2e5d5fc99
+```
+
+### Large Language Models, LLMs, Explained for Leaders
+
+```text
+Package:
+Obserra-EPI-Academy-LLMs-Explained-for-Leaders-Materials-and-Scripts-v1.0.0.zip
+SHA-256: 84346f9d936065afa1faf80c4788eef2a390f4444970fd06820489c1e2b192b5
+```
+
+### Security Awareness for High Risk Employees
+
+```text
+Package:
+Obserra-EPI-Academy-Security-Awareness-High-Risk-Employees-Materials-and-Scripts-v1.0.0.zip
+SHA-256: d3ecaa1d50636988dd7939aa08a23e3fecb7688f1534d35f72b4b10ed1492cef
+```
+
+## Package contents and production standard
+
+Each course materials package contains:
+
+1. Validated non-video course source package.
+2. Professional Video Production Bible in Word and PDF.
+3. Seven complete teleprompter scripts: owner welcome, five module scripts, and course close.
+4. Course-specific shot, on-screen text, lower-third, and visual-support direction.
+5. Owner video delivery and file-naming requirements.
+6. Caption and transcript production standard.
+7. Production and source-traceability workbook.
+8. SCORM/HTML5 learning activities designed to remain instructional without embedded video.
+9. Learner disclosures, acknowledgement, orientation, workbook, job aids, module checks, final assessment, resources, completion rules, and certificate controls.
+10. Accessibility, rendering, integrity, manifest, hash, and clean-extraction evidence.
+
+The master package also contains the Academy non-video course production standard and the master video-and-materials tracker.
+
+## Evidence-based acceptance rule
+
+Every claimed result must be supported by direct evidence. Scripts, storyboards, plans, manifests, package names, placeholders, expected runtimes, and intended configurations are not proof of video production, LearnWorlds runtime acceptance, learner completion, assessment behavior, certificate issuance, or publication.
+
+Use `NOT PROVEN`, `PENDING`, `BLOCKED`, or `OWNER PRODUCTION REQUIRED` whenever direct evidence is absent.
 
 ## Current controlled work order
 
-1. Audit Cybersecurity Foundations v5.3.0 file-by-file against the complete-course and LearnWorlds submission standard.
-2. Rebuild or correct every failed non-video asset: SCORM, slide decks, handouts, workbook, references, assessments, accessibility artifacts, metadata, implementation instructions, evidence matrix, and duration model.
-3. Produce a clean validated non-video submission package with explicit owner-video insertion points and technical media requirements.
-4. Accept owner-supplied video files only after direct technical and quality validation; then integrate captions/transcripts and update duration evidence.
-5. Load the final package into the existing LearnWorlds Draft course through an authenticated authoring path and run runtime acceptance.
-6. Do not move to the next course until Cybersecurity Foundations meets the evidenced standard or the owner explicitly reprioritizes.
+1. Preserve the four delivered materials-and-scripts packages and their hashes.
+2. Continue the governed catalog in non-video mode.
+3. Build `Executive Travel Risk Management` next with complete documents, scripts, SCORM, exercises, workbook, assessments, authoritative resources, video-production specifications, and QA evidence.
+4. Do not generate any course video.
+5. Integrate future owner-supplied videos only after direct technical and quality validation and explicit owner direction.
+6. Load final packages into LearnWorlds only through an authenticated supported authoring path and validate the complete learner journey before publication.
 
-## Preserved failures and corrections
+## Security and cleanup boundary
 
-- Prior module media was short, robotic, and rejected by the owner.
-- Course/package status was repeatedly overstated before runtime evidence existed.
-- Additional video generation was initiated before a sufficiently controlled acceptance sample was approved, causing time and potential credit waste. Paid video generation is now frozen.
-- A cinematic Module 1 generation completed before the freeze; it remains unapproved and is not accepted course media.
-- Earlier Executive Travel and Digital Exposure packages were incorrectly described as complete; both remain content skeletons.
-- All prior download, stale-SHA, timeout, and provider-state failures remain preserved in earlier records.
+A temporary private GitHub video-transfer workflow was deleted after the owner changed the production directive. The temporary Supabase transfer function was disabled and now returns HTTP 410. A short-lived artifact created before the directive is not part of the delivered package and expires automatically.
 
-## Security boundary
+The public repository must contain sanitized governance and status evidence only. Complete manuscripts, assessment answers, owner media, provider identifiers, learner data, and protected Academy intellectual property remain outside the public repository.
 
-The repository is public. Complete manuscripts, assessment answer material, protected media, provider identifiers, learner data, and other Academy IP remain in protected storage. GitHub receives sanitized governance/status evidence only.
+## Release boundary
+
+```text
+Continuous non-video package production: AUTHORIZED
+Assistant-generated video: PROHIBITED
+Owner-produced video delivery: PENDING BY COURSE
+LearnWorlds runtime acceptance: NOT PROVEN
+Certificate issuance acceptance: NOT PROVEN
+Desktop/mobile learner journey: NOT PROVEN
+Publication: BLOCKED
+Live checkout: BLOCKED
+Production merge/cutover: BLOCKED
+```
 
 ## Handoff rule
 
-Update protected and sanitized handoffs immediately after every substantive action, result, failure, package change, integrity check, provider-state change, LearnWorlds change, evidence finding, or owner decision. Preserve failures permanently. Never infer success from intention, package naming, or prior claims.
+Update protected and sanitized handoffs immediately after every substantive action, package version, script set, validation result, integrity result, failure, LearnWorlds change, provider-state change, or owner decision. Preserve failures permanently and never infer success from intention or package naming.
