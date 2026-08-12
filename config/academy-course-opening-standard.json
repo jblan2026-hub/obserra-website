@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0.0",
+  "standardId": "obserra-course-opening-v1",
+  "standardName": "Obserra EPI Academy Governed Course Opening Standard",
+  "appliesTo": {
+    "allAcademyCourses": true,
+    "allDepartments": true,
+    "allCourseLevels": true,
+    "requiredBeforeFirstLesson": true,
+    "qualityTierDowngradeAllowed": false
+  },
+  "brand": {
+    "academyName": "Obserra EPI Academy",
+    "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "officialLogoPath": "/brand/obserra-logo.png",
+    "presenterName": "Dr. Jody Blanchard",
+    "presenterTitle": "Founder and Cybersecurity Executive",
+    "palette": ["#050B18", "#0B1730", "#C9A227", "#FFFFFF", "#53B7FF"],
+    "logoModificationAllowed": false,
+    "generatedReplacementLogoAllowed": false
+  },
+  "sequence": [
+    {
+      "order": 1,
+      "id": "official-title-page",
+      "type": "title-card",
+      "required": true,
+      "durationSeconds": 5,
+      "requiredElements": [
+        "official Obserra logo",
+        "Obserra EPI Academy",
+        "course title",
+        "course track and level",
+        "Presented by Dr. Jody Blanchard",
+        "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+        "course version"
+      ]
+    },
+    {
+      "order": 2,
+      "id": "learner-disclosures",
+      "type": "disclaimer-card",
+      "required": true,
+      "durationSeconds": 12,
+      "learnerAcknowledgementRequired": true,
+      "requiredStatements": [
+        "This course provides general professional education and does not constitute legal, regulatory, medical, financial, investigative, or other professional advice.",
+        "Completion is a course completion record and does not confer professional certification, licensure, accreditation, regulatory approval, or authorization to act outside an assigned role.",
+        "Examples and scenarios may be fictional or composite and are provided for instruction.",
+        "Follow applicable law, organizational policy, decision authority, privacy requirements, and escalation procedures. Do not conduct unauthorized access, investigation, containment, surveillance, or response.",
+        "This course may use the authorized digital likeness and voice of Dr. Jody Blanchard."
+      ]
+    },
+    {
+      "order": 3,
+      "id": "owner-course-introduction",
+      "type": "presenter-video",
+      "required": true,
+      "requiredBeforeFirstLesson": true,
+      "durationSeconds": {
+        "minimum": 60,
+        "target": 75,
+        "maximum": 90
+      },
+      "presenter": "Dr. Jody Blanchard",
+      "scriptMayChangeByCourse": true,
+      "identityMayChange": false,
+      "voiceIdentityMayChange": false,
+      "facialIdentityMayChange": false,
+      "naturalFacialMovementCharacterMayChange": false,
+      "wardrobeMayChange": true,
+      "backgroundMayChange": true,
+      "lightingMayChange": true,
+      "framingMayChange": true,
+      "graphicsMayChange": true,
+      "defaultSpeechSpeed": 0.92,
+      "speechSpeedRequiresOwnerApproval": true,
+      "pronunciationRule": "Use pronunciation-safe spoken wording when needed while preserving correct written terminology. Speak 'cyber security' as two words when the selected voice mispronounces 'cybersecurity'."
+    },
+    {
+      "order": 4,
+      "id": "lesson-transition",
+      "type": "transition",
+      "required": true,
+      "durationSeconds": 3,
+      "destination": "course orientation or Module 1"
+    }
+  ],
+  "technicalMaster": {
+    "container": "MP4",
+    "videoCodec": "H.264 or approved higher-quality compatible codec",
+    "widthPixels": 3840,
+    "heightPixels": 2160,
+    "aspectRatio": "16:9",
+    "quality": "highest supported production quality",
+    "upscaleRequiredWhenSourceBelow4K": true,
+    "upscaleMustNotAlterIdentity": true,
+    "upscaleMustNotInventFacialDetail": true,
+    "acceptedFrameRates": [23.976, 24, 25, 29.97, 30],
+    "colorSpace": "Rec.709",
+    "scanType": "progressive",
+    "audioSampleRateHz": 48000,
+    "audioChannels": 2,
+    "targetIntegratedLufs": -16,
+    "maximumTruePeakDbtp": -1,
+    "musicFreeMasterRequired": true,
+    "captionFileRequired": true,
+    "transcriptRequired": true,
+    "thumbnailRequired": true
+  },
+  "presenterRealism": {
+    "nearIndistinguishableExecutivePresentationTarget": true,
+    "undetectabilityGuaranteed": false,
+    "naturalBlinkingRequired": true,
+    "stableEyeFocusRequired": true,
+    "subtleBreathingRequired": true,
+    "restrainedHeadMovementRequired": true,
+    "restrainedGesturesRequired": true,
+    "accurateLipSynchronizationRequired": true,
+    "voiceSimilarityRequired": true,
+    "pronunciationApprovalRequired": true,
+    "facialReshapingProhibited": true,
+    "beautificationProhibited": true,
+    "skinSmoothingProhibited": true,
+    "ageModificationProhibited": true,
+    "voiceSubstitutionProhibited": true,
+    "exaggeratedFacialAnimationProhibited": true,
+    "ownerVisualAndAuditoryReviewIsAuthoritative": true
+  },
+  "learnWorldsDelivery": {
+    "requiredActivityOrder": [
+      "official title page",
+      "learner disclosures and acknowledgement",
+      "Dr. Jody Blanchard course introduction",
+      "course orientation",
+      "Module 1"
+    ],
+    "titlePageMayNotBeSkipped": true,
+    "disclaimerAcknowledgementMayNotBeSkipped": true,
+    "introCompletionRequiredBeforeLessons": true,
+    "desktopPlaybackRequired": true,
+    "mobilePlaybackRequired": true,
+    "captionsSelectable": true,
+    "transcriptDownloadable": true,
+    "placeholderContentProhibited": true
+  },
+  "releaseGates": [
+    "official-title-page-approved",
+    "required-disclaimers-present-and-readable",
+    "learner-acknowledgement-configured",
+    "owner-intro-present-before-first-lesson",
+    "presenter-likeness-approved",
+    "presenter-voice-approved",
+    "facial-motion-realism-approved",
+    "pronunciation-approved",
+    "4k-intro-master-verified",
+    "clean-48khz-audio-verified",
+    "captions-and-transcript-verified",
+    "learnworlds-desktop-and-mobile-playback-passed",
+    "owner-release-approval-recorded"
+  ],
+  "releaseProhibitions": [
+    "course begins directly with a lesson and no owner introduction",
+    "missing official branded title page",
+    "missing learner disclaimers or acknowledgement",
+    "1080p-only final intro when 4K mastering is technically supported",
+    "substitute or default voice not approved by the owner",
+    "excessive or synthetic facial motion",
+    "identity modification during generation or upscaling",
+    "publication without captions, transcript, and owner approval"
+  ]
+}
