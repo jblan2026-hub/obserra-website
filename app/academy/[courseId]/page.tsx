@@ -8,6 +8,7 @@ import { courseOfferForCourse } from "../courseOffers";
 import "./course-page.css";
 
 const LEGAL_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
+const ACADEMY_NAME = "Obserra EPI Academy";
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -27,17 +28,17 @@ export async function generateMetadata({
   const runtime = await publicAcademyCourse(baseCourse);
   if (!runtime.course) {
     return {
-      title: "Course Unavailable | Obserra Academy",
+      title: `Course Unavailable | ${ACADEMY_NAME}`,
       robots: { index: false, follow: false, noarchive: true, nosnippet: true },
     };
   }
   const course = runtime.course;
   return {
-    title: `${course.title} | Obserra Academy`,
+    title: `${course.title} | ${ACADEMY_NAME}`,
     description: course.description,
     alternates: { canonical: `/academy/${course.id}` },
     openGraph: {
-      title: `${course.title} | Obserra Academy`,
+      title: `${course.title} | ${ACADEMY_NAME}`,
       description: course.description,
       url: `https://www.obserrallc.com/academy/${course.id}`,
       type: "article",
@@ -45,7 +46,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${course.title} | Obserra Academy`,
+      title: `${course.title} | ${ACADEMY_NAME}`,
       description: course.description,
       images: [OFFICIAL_LOGO],
     },
@@ -89,7 +90,8 @@ export default async function AcademyCoursePage({
     description: course.description,
     provider: {
       "@type": "Organization",
-      name: LEGAL_NAME,
+      name: ACADEMY_NAME,
+      legalName: LEGAL_NAME,
       url: "https://www.obserrallc.com/academy",
       logo: `https://www.obserrallc.com${OFFICIAL_LOGO}`,
     },
@@ -109,9 +111,9 @@ export default async function AcademyCoursePage({
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
 
       <header className="academy-course-nav">
-        <a href="/academy" className="academy-course-brand">
+        <a href="/academy" className="academy-course-brand" aria-label={`${ACADEMY_NAME} course roadmap`}>
           <Image src={OFFICIAL_LOGO} alt={LEGAL_NAME} width={220} height={42} priority />
-          <b>ACADEMY</b>
+          <b>EPI ACADEMY</b>
         </a>
         <nav aria-label="Course navigation">
           <a href="/academy#courses">Course roadmap</a>
