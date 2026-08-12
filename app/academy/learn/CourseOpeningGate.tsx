@@ -49,9 +49,9 @@ export default function CourseOpeningGate({
       <div className="course-opening-watermark" aria-hidden="true">{watermark}</div>
 
       <header className="course-opening-header">
-        <a href="/academy" className="course-opening-brand">
+        <a href="/academy" className="course-opening-brand" aria-label={`${opening.academyName} home`}>
           <Image src={opening.officialLogoPath} alt={opening.legalName} width={220} height={42} priority />
-          <b>ACADEMY</b>
+          <b>EPI ACADEMY</b>
         </a>
         <a href="/academy" className="course-opening-exit">Exit course</a>
       </header>
