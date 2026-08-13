@@ -11,7 +11,8 @@
   gap: 18px;
 }
 
-.fdacs-makeup__head {
+.fdacs-makeup__head,
+.fdacs-makeup__recorded-heading {
   display: flex;
   justify-content: space-between;
   gap: 18px;
@@ -38,8 +39,14 @@
 .fdacs-makeup__metrics strong { color: #fff; font-size: 18px; }
 .fdacs-makeup__notice { color: #bfd0e2; line-height: 1.55; }
 .fdacs-makeup__thread { margin-top: 10px; }
+.fdacs-makeup__recorded { margin: 18px 0; border-color: rgba(199,164,85,.35); }
+.fdacs-makeup__recorded video { width: 100%; max-height: 620px; margin: 14px 0; border-radius: 14px; background: #02070d; border: 1px solid rgba(255,255,255,.1); }
+.fdacs-makeup__recorded button { margin-top: 10px; }
+.fdacs-makeup__presence-code { font-size: 30px; letter-spacing: .25em; font-weight: 800; color: #f0d38d; }
+.fdacs-live__success { border: 1px solid rgba(70,200,130,.35); background: rgba(70,200,130,.08); border-radius: 12px; padding: 12px; }
 
 @media (max-width: 700px) {
-  .fdacs-makeup__head { flex-direction: column; }
+  .fdacs-makeup__head,
+  .fdacs-makeup__recorded-heading { flex-direction: column; }
   .fdacs-makeup__metrics { grid-template-columns: 1fr; }
 }
