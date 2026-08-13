@@ -1,0 +1,63 @@
+name: Florida Class D LMS Gates
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app/florida-security-training/**"
+      - "app/api/florida-class-d/**"
+      - "lib/florida-class-d*.ts"
+      - "scripts/florida-class-d-*.mjs"
+      - "supabase/migrations/*fdacs_class_d*.sql"
+      - "docs/florida-class-d-lms/**"
+      - "package.json"
+      - ".github/workflows/florida-class-d-lms-gates.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: florida-class-d-lms-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ""
+  CLERK_SECRET_KEY: ""
+  STRIPE_SECRET_KEY: ""
+  STRIPE_WEBHOOK_SECRET: ""
+
+jobs:
+  regulated-source-gates:
+    name: Gates 1-3 and website compatibility
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout website
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify dependency lock remains immutable
+        run: git diff --exit-code -- package-lock.json
+
+      - name: Run Florida Class D gated source verification
+        run: npm run verify:florida-class-d
+
+      - name: Run repository contract tests
+        run: npm test
+
+      - name: Run static quality validation
+        run: npm run lint
+
+      - name: Build production application
+        run: npm run build
