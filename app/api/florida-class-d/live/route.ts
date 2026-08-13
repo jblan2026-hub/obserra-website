@@ -13,6 +13,7 @@ import {
   respondFloridaClassDPresenceChallenge,
 } from "../../../../lib/florida-class-d-live-persistence";
 import { floridaClassDLiveInstructionEnabled } from "../../../../lib/florida-class-d-live-policy";
+import { floridaClassDLiveMediaEnabled } from "../../../../lib/florida-class-d-media";
 import { getFloridaClassDStudentTimeLedger } from "../../../../lib/florida-class-d-live-reporting";
 
 const headers = {
@@ -87,6 +88,12 @@ export async function POST(request: Request) {
     const correlationId = typeof body.correlationId === "string" ? body.correlationId : crypto.randomUUID();
 
     if (body.action === "join") {
+      if (!floridaClassDLiveMediaEnabled()) {
+        return NextResponse.json(
+          { error: "Secure live video is not yet enabled.", code: "FDACS_MEDIA_NOT_ENABLED" },
+          { status: 503, headers: { ...headers, "retry-after": "86400" } },
+        );
+      }
       if (!sessionId || typeof body.liveSessionId !== "string" || typeof body.browserInstanceId !== "string") {
         return NextResponse.json({ error: "Authenticated session and device identity are required.", code: "FDACS_LIVE_JOIN_INVALID" }, { status: 400, headers });
       }
@@ -96,7 +103,7 @@ export async function POST(request: Request) {
         browserInstanceId: body.browserInstanceId,
         correlationId,
       });
-      return NextResponse.json({ deviceLeaseId, correlationId, singleDeviceLease: true }, { status: 201, headers });
+      return NextResponse.json({ deviceLeaseId, correlationId, singleDeviceLease: true, secureMediaRequired: true }, { status: 201, headers });
     }
 
     if (body.action === "heartbeat") {
