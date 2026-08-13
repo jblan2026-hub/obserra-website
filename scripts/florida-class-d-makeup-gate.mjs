@@ -35,14 +35,13 @@ requireText(service, "MAX_COURSE_INSTRUCTIONAL_MINUTES = 2400", "Course reconcil
 requireText(service, "OBSERRA_FDACS_CLASS_D_MAKEUP_ENABLED", "Make-up workflow requires an independent production feature gate.");
 requireText(service, 'OBSERRA_FDACS_DS_LICENSE_STATUS?.trim().toLowerCase() === "active"', "Make-up workflow must remain disabled until Class DS status is active.");
 requireText(service, "originalLiveAttendanceRemainsImmutable: true", "Make-up workflow must preserve the original live-attendance evidence.");
-requireText(service, "certificationMutationEnabledInThisGate: false", "Instructional-credit mutation must fail closed until the transactional certification subgate.");
 requireText(service, "recordedPlaybackEnabledInThisGate: false", "Recorded playback must remain disabled until its protected delivery subgate.");
 requireText(service, "activeRecordedAssignedMinutes", "Recorded assignment totals must be checked before creation.");
 requireText(service, "makeup_auto_cancelled_recorded_limit", "Concurrent recorded assignment overflow must auto-cancel rather than remain active.");
 requireText(service, "submitFloridaClassDMakeupQuestion", "Students must be able to submit make-up questions.");
 requireText(service, "answerFloridaClassDMakeupQuestion", "Authorized staff must be able to answer make-up questions.");
 requireText(service, "previewFloridaClassDMakeupReconciliation", "Gate 10 must calculate an auditable time-reconciliation ceiling.");
-requireText(service, "maximumCertifiableMinutes", "Reconciliation must calculate the maximum permissible credit without mutating it.");
+requireText(service, "maximumCertifiableMinutes", "Reconciliation must calculate the maximum permissible credit before certification.");
 
 requireText(studentApi, "requireFloridaClassDSignedInUser", "Student make-up API must require authentication.");
 requireText(studentApi, 'body.action !== "question"', "Student API must restrict its write path to the controlled question action.");
@@ -50,12 +49,15 @@ requireText(adminApi, "requireFloridaClassDStaff", "Make-up administration API m
 requireText(adminApi, 'body.action === "assign"', "Admin API must support controlled make-up assignment.");
 requireText(adminApi, 'body.action === "answer"', "Admin API must support instructor responses.");
 requireText(adminApi, 'body.action === "preview_reconciliation"', "Admin API must expose reconciliation preview.");
-requireText(adminApi, "FDACS_MAKEUP_CERTIFICATION_TRANSACTION_PENDING", "Instructional-credit certification must remain explicitly fail closed in this subgate.");
+requireText(adminApi, 'body.action === "certify"', "Admin API must expose the separately validated atomic certification subgate.");
+requireText(adminApi, "certifyFloridaClassDMakeupAtomic", "Make-up certification must use the atomic certification service.");
 
 requireText(studentPage, "MakeupPortal", "Student make-up route must render the dedicated portal.");
 requireText(studentPortal, "Regulated time reconciliation", "Student portal must explain its controlled time-reconciliation purpose.");
 requireText(adminPage, "requireFloridaClassDStaff", "Admin make-up route must enforce staff authorization server-side.");
+requireText(adminPage, "MakeupManager", "Admin make-up route must render the protected administration console.");
 requireText(handoff, "# Florida Class D Gate 10 Handoff", "Gate 10 requires its own controlled handoff record.");
 requireText(handoff, "600 minutes", "Gate 10 handoff must preserve the recorded make-up ceiling.");
+requireText(handoff, "ATOMIC CERTIFICATION IMPLEMENTED IN SOURCE", "Gate 10 handoff must record the atomic certification boundary.");
 
-console.log("Florida Class D Gate 10 foundation passed: make-up assignments, student/instructor questions, reconciliation ceilings, protected records, and fail-closed credit mutation are validated in source.");
+console.log("Florida Class D Gate 10 foundation passed: make-up assignments, student/instructor questions, reconciliation ceilings, protected records, admin console, and the separately validated atomic certification boundary are present in source.");
