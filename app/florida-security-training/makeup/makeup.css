@@ -1,0 +1,45 @@
+.fdacs-makeup__summary,
+.fdacs-makeup__assignment {
+  max-width: 1500px;
+  margin: 0 auto 18px;
+}
+
+.fdacs-makeup__assignments {
+  max-width: 1500px;
+  margin: 18px auto 0;
+  display: grid;
+  gap: 18px;
+}
+
+.fdacs-makeup__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.fdacs-makeup__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.fdacs-makeup__metrics span,
+.fdacs-makeup__notice,
+.fdacs-makeup__thread {
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(255,255,255,.035);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.fdacs-makeup__metrics span { display: grid; gap: 5px; color: #9fb2c8; }
+.fdacs-makeup__metrics strong { color: #fff; font-size: 18px; }
+.fdacs-makeup__notice { color: #bfd0e2; line-height: 1.55; }
+.fdacs-makeup__thread { margin-top: 10px; }
+
+@media (max-width: 700px) {
+  .fdacs-makeup__head { flex-direction: column; }
+  .fdacs-makeup__metrics { grid-template-columns: 1fr; }
+}
