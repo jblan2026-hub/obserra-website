@@ -48,7 +48,7 @@ Gate 21 is database-promotion readiness only and does not apply production migra
 
 ## Gate 23 - Non-Production Acceptance Evidence
 
-**FULL GREEN BASELINE ESTABLISHED / INTERACTIVE AND APPEND-ONLY HARDENING IMPLEMENTED IN SOURCE / CURRENT-HEAD CI VALIDATION IN PROGRESS / PRODUCTION ACTIVATION DISABLED**
+**INTERACTIVE AND EVENT-LEDGER HARDENING IMPLEMENTED / GREEN SOURCE-BUILD EVIDENCE ESTABLISHED / PRODUCTION ACTIVATION DISABLED**
 
 Gate 23 adds real non-production acceptance evidence records. Acceptance runs are limited to development, sandbox, staging, or UAT; bind to a 40-character release commit SHA; require a synthetic test-identity reference and explicit synthetic-identity confirmation; and track 18 required domains.
 
@@ -69,11 +69,13 @@ Primary Gate 23 artifacts now include:
 - `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`
 - `docs/florida-class-d-lms/LATEST-HANDOFF.md`
 
-The protected acceptance API supports creating runs, recording domain evidence, listing run/check evidence, and finalizing an acceptance run through the fail-closed database function. The server-side acceptance service requires explicit protected Supabase runtime configuration and no longer uses a hardcoded fallback project URL.
+The protected acceptance API supports creating runs, recording domain evidence, listing run/check evidence, and finalizing an acceptance run through the fail-closed database function. The server-side acceptance service requires explicit protected Supabase runtime configuration and does not use a hardcoded fallback project URL.
 
 The staff acceptance page now includes a real interactive console. Authorized staff can create a non-production acceptance run, select a run, record evidence and status for all 18 required domains, review current domain progress, and request finalization. The client prevents finalization until all 18 displayed domains are passed, and the database independently enforces the all-pass rule.
 
-A follow-on database migration now restricts the acceptance event ledger runtime role to read and append operations. Update, delete, and truncate privileges are revoked for the runtime service role while select and insert remain available. No production migration has been applied.
+A follow-on database migration restricts the acceptance event ledger runtime role to read and append operations. Update, delete, and truncate privileges are revoked for the runtime service role while select and insert remain available. No production migration has been applied.
+
+The complete interactive and event-ledger hardening source passed the dedicated Gates 1-23 workflow on commit `a7786ce426879260f3d758d40ee5c898de2f1523`, including source verification, Gate 22, Gate 23, repository tests, lint, and the production Next.js build. Later commits synchronize audit documentation and do not activate production behavior.
 
 ## Mandatory completion and certificate standard
 
@@ -89,24 +91,24 @@ No mockup, placeholder, fabricated screenshot, simulated certificate, simulated 
 
 The DS LMS submission guide must remain synchronized with implemented behavior and include accurately labeled screenshots of the completion review, no-certificate-before-pass boundary, LIAS workflow, student completion documents, supplemental certificate, completion/inspection packet, quality/CAPA/retention, database readiness, runtime readiness, and Gate 23 acceptance evidence. Real learner PII, protected exam content, credentials, license numbers, private provider values, and infrastructure secrets must not appear in public-source evidence.
 
+The DS submission guide control now requires a Gate 23 screenshot from the implemented interactive acceptance console, tied to a real non-production release commit and synthetic test identity, with the 18 required domains and controlled finalization boundary visible. This evidence remains non-production by design.
+
 ## Current CI note
 
-A full dedicated Florida Class D cycle completed successfully on commit `35a7f6ca704a44bc885d1534aa570eb541bc49d3`, including Gates 1-23 source verification, Gate 22 runtime-readiness verification, Gate 23 acceptance verification, repository contract tests, lint, and the production Next.js build. The synchronized documentation head also completed successfully on `a2ee8477cd8caf2739fff9ca647ad79648008db9`.
+A full dedicated Florida Class D cycle completed successfully on commit `a7786ce426879260f3d758d40ee5c898de2f1523` with the interactive console and event-ledger permission hardening included. Source verification, Gate 22 runtime-readiness verification, Gate 23 acceptance verification, repository contract tests, lint, and the production Next.js build all passed.
 
-The current hardened source includes the interactive acceptance console and runtime-role acceptance-event mutation restrictions. A fresh current-head Gates 1-23 cycle is required before those new controls are marked accepted.
+Later handoff and submission-guide synchronization commits continue to trigger CI. These documentation-only updates do not authorize runtime activation.
 
 CI success is source/build evidence only. It is not regulatory approval, database promotion, runtime activation, or launch authorization.
 
 ## Next controlled sequence
 
-1. Complete the current-head Gates 1-23 source, repository-test, lint, and production-build cycle for the interactive console and event-ledger permission changes.
-2. Strengthen the Gate 23 source verifier to explicitly require the protected API, explicit runtime configuration, interactive staff evidence workflow, and event-ledger mutation restrictions.
-3. Synchronize all Gate 23 and DS submission/audit documentation to the final green current head.
-4. Execute real non-production acceptance using synthetic identities only after the applicable non-production database/runtime environment is configured.
-5. Implement and validate remaining online text-screen timing enforcement before launch.
-6. Finalize the Division-approved examination-bank boundary before production examination activation.
-7. Revise the Class DS LMS submission-guide DOCX/PDF with screenshots from implemented screens.
-8. Keep payment/enrollment and all regulated production functions disabled until applicable authorization and production gates pass.
+1. Strengthen the Gate 23 source verifier to explicitly require the protected API, explicit runtime configuration, interactive staff evidence workflow, and event-ledger permission hardening when connector safety permits the verifier update.
+2. Execute real non-production acceptance using synthetic identities only after the applicable non-production database/runtime environment is configured.
+3. Implement and validate remaining online text-screen timing enforcement before launch.
+4. Finalize the Division-approved examination-bank boundary before production examination activation.
+5. Revise the Class DS LMS submission-guide DOCX/PDF with screenshots from implemented screens.
+6. Keep payment/enrollment and all regulated production functions disabled until applicable authorization and production gates pass.
 
 ## Public repository security boundary
 
@@ -114,4 +116,4 @@ Never commit real learner PII, identity documents, protected examination questio
 
 ## Restart instruction
 
-Read `docs/florida-class-d-lms/LATEST-HANDOFF.md`, `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`, and this handoff before continuing. Gate 23 has a full green baseline, and the interactive console plus runtime-role append-only hardening are now implemented in source and under current-head CI validation. Resume from that CI result, strengthen the Gate 23 verifier, synchronize the final green audit record, then execute only controlled non-production acceptance with synthetic identities. Do not treat 40 hours alone as successful completion, do not generate a completion certificate before a passing exam and authorized completion review, do not synthesize FDACS-16103, and do not activate regulated production functions until the applicable authorization and production gates pass.
+Read `docs/florida-class-d-lms/LATEST-HANDOFF.md`, `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`, `docs/florida-class-d-lms/DS-SUBMISSION-LMS-GUIDE-CONTROL.md`, and this handoff before continuing. Gate 23 interactive acceptance and event-ledger runtime hardening are implemented and have green source/build evidence on commit `a7786ce426879260f3d758d40ee5c898de2f1523`. Resume by strengthening verifier coverage when possible, then move into controlled non-production acceptance preparation and the remaining online text-screen timing enforcement. Do not treat 40 hours alone as successful completion, do not generate a completion certificate before a passing exam and authorized completion review, do not synthesize FDACS-16103, and do not activate regulated production functions until the applicable authorization and production gates pass.
