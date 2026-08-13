@@ -14,6 +14,10 @@ function requireText(source, value, message) {
   if (!source.includes(value)) throw new Error(message);
 }
 
+function requireAnyText(source, values, message) {
+  if (!values.some((value) => source.includes(value))) throw new Error(message);
+}
+
 requireText(records, 'courseId: "florida-class-d-40-hour"', "Enrollment must bind to the controlled Florida Class D course id.");
 requireText(records, "minimumInstructionalMinutes: 2400", "Instructional time must require 2,400 minutes / 40 hours.");
 requireText(records, "requiredInstructionalDays: 5", "The record model must preserve five instructional days.");
@@ -53,7 +57,7 @@ requireText(records, "input.openRemediationModuleIds.length === 0", "Exam eligib
 
 requireText(course, 'status: "coming-soon"', "Public course must remain Coming Soon during Gate 2.");
 requireText(handoff, "# Obserra Florida Class D LMS Handoff", "Florida LMS work must be recorded in its own authoritative handoff area.");
-requireText(handoff, "### Gates 1-4", "Consolidated handoff must preserve the Gate 1-4 implementation state.");
+requireAnyText(handoff, ["### Gates 1-4", "### Gates 1 through 4"], "Consolidated handoff must preserve the Gate 1-4 implementation state.");
 requireText(handoff, "regulated student records", "Consolidated handoff must preserve the Gate 2 regulated student-record scope.");
 requireText(handoff, "It is separate from the commercial Obserra Academy", "Handoff must explicitly remain separate from Academy course-content production.");
 
