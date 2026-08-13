@@ -8,11 +8,11 @@ Gate 25 strengthens the regulated Florida Class D runtime boundary by removing h
 
 ## Current state
 
-**IN PROGRESS / ENFORCEMENT ACTIVE / REMEDIATION UNDERWAY / NOT YET ACCEPTED / PRODUCTION ACTIVATION DISABLED**
+**ACCEPTED SOURCE/BUILD BASELINE / ENFORCEMENT ACTIVE / ZERO FINDINGS / PRODUCTION ACTIVATION DISABLED**
 
-Gates 1 through 24 remain the accepted source/build baseline. Gate 25 is enforced in the dedicated Florida Class D CI workflow as `Gates 1-25 and website compatibility`.
+Gate 25 is accepted at source/build commit `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d` based on Florida Class D LMS Gates run #367. The dedicated workflow `Gates 1-25 and website compatibility` completed successfully on that head.
 
-Gate 25 uses `scripts/florida-class-d-runtime-isolation-audit.mjs --enforce`. The audit scans regulated `lib/florida-class-d*.ts` server modules for embedded Supabase project URLs and environment names that would improperly expose secret-class configuration through `NEXT_PUBLIC_*` variables. The enforcing step fails the Class D workflow whenever findings remain.
+Gate 25 uses `scripts/florida-class-d-runtime-isolation-audit.mjs --enforce`. The audit scans regulated `lib/florida-class-d*.ts` server modules for embedded Supabase project URLs and environment names that would improperly expose secret-class configuration through `NEXT_PUBLIC_*` variables. The enforcing step remains mandatory and fails the Class D workflow whenever findings are present.
 
 ## Security objective
 
@@ -22,69 +22,48 @@ The approved configuration boundary is server-only explicit environment configur
 
 ## Remediation completed
 
-The following regulated services have had the hardcoded Supabase fallback removed and now require explicit `OBSERRA_SUPABASE_URL` HTTPS configuration:
+The runtime-isolation remediation removed the embedded Supabase project URL fallback from every regulated module identified by the Gate 25 enforcing inventory, including acceptance, completion, completion documents, completion packet, exam, exam administration, exam monitoring, exam retest, LIAS, live feed, live persistence, live reporting, secure media, base persistence, polls, quality/CAPA, scheduling, student certificate, make-up certification, make-up administration, recorded make-up, and regulatory observer access.
 
-- `lib/florida-class-d-acceptance.ts`
-- `lib/florida-class-d-completion.ts`
-- `lib/florida-class-d-completion-documents.ts`
-- `lib/florida-class-d-completion-packet.ts`
-- `lib/florida-class-d-exam.ts`
-- `lib/florida-class-d-exam-admin.ts`
-- `lib/florida-class-d-exam-monitoring.ts`
-- `lib/florida-class-d-exam-retest.ts`
-- `lib/florida-class-d-lias.ts`
-- `lib/florida-class-d-live-feed.ts`
-- `lib/florida-class-d-live-persistence.ts`
-- `lib/florida-class-d-live-reporting.ts`
-- `lib/florida-class-d-media.ts`
-- `lib/florida-class-d-persistence.ts`
-- `lib/florida-class-d-polls.ts`
-- `lib/florida-class-d-quality.ts`
-- `lib/florida-class-d-scheduling.ts`
-- `lib/florida-class-d-student-certificate.ts`
-- `lib/florida-class-d-makeup-certification.ts`
+These services now require explicit protected `OBSERRA_SUPABASE_URL` HTTPS configuration and preserve the protected service-role credential boundary. When required runtime configuration is absent or invalid, the regulated service fails closed with its service-specific configuration error.
 
-These changes preserve the protected service-role credential boundary and fail closed with service-specific configuration errors when explicit valid runtime configuration is absent.
+## Acceptance evidence
 
-This remains remediation progress only. Gate 25 is not accepted.
+Florida Class D LMS Gates run #367 on source head `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d` completed successfully.
 
-## Current enforced inventory
+The successful regulated cycle includes:
 
-Florida Class D LMS Gates run #362 at source head `f7bcd95158e9077aed89ab000862e70b1cbb7d9d` completed Gates 1 through 24 successfully and then failed at the mandatory Gate 25 runtime-isolation step as designed.
+1. Gates 1 through 21 source verification.
+2. Gate 22 protected runtime-readiness verification.
+3. Gate 23 non-production acceptance artifact verification.
+4. Gate 24 instructional text-screen source verification.
+5. Gate 25 regulated runtime-isolation enforcement with zero findings.
+6. Repository contract tests.
+7. Static quality validation/lint.
+8. Production Next.js application build.
 
-The enforcing audit inspected 29 regulated modules and reported exactly three remaining embedded Supabase URL findings, with no public secret-class `NEXT_PUBLIC_*` findings:
+Website CI, Application Release Validation, and Application Production Pipeline also completed successfully on the same source head. The separate Academy 70x workflow failure is unrelated to the Florida Class D regulated LMS gate and does not supersede the dedicated Class D evidence.
 
-- `lib/florida-class-d-makeup.ts`
-- `lib/florida-class-d-observer.ts`
-- `lib/florida-class-d-recorded-makeup.ts`
+## Acceptance criteria status
 
-Run #362 therefore confirms the completion-packet remediation is now effective in the enforced inventory. Attempts to remove the three remaining legacy fallbacks through the GitHub connector have been blocked by the connector safety layer, so none of those three may be represented as completed until a source commit actually lands and the enforcing inventory proves the reduction.
-
-## Acceptance criteria
-
-Gate 25 is not accepted until all of the following are true:
+Gate 25 acceptance criteria are satisfied at the accepted source/build head:
 
 1. The runtime-isolation audit reports zero embedded Supabase project URLs in regulated `lib/florida-class-d*.ts` modules.
 2. No regulated server module uses a `NEXT_PUBLIC_*` variable for a secret, service-role key, API key, token, or password.
-3. Regulated Supabase persistence fails closed when an explicit HTTPS runtime URL or protected service-role credential is absent.
-4. Existing regulated tests, Gates 1 through 24, lint, and the production Next.js build remain green.
-5. The mandatory Gate 25 CI enforcement step passes with zero findings.
-6. `HANDOFF.md`, `LATEST-HANDOFF.md`, this handoff, the DS submission/audit control, and PR #56 are synchronized to the accepted Gate 25 head.
-
-## Current CI evidence
-
-Run #362 confirms that Gates 1 through 24 all pass on `f7bcd95158e9077aed89ab000862e70b1cbb7d9d`. The Gate 25 enforcement step then stopped the workflow because three regulated files still contained legacy embedded Supabase URLs. Repository contract tests, lint, and the production build were intentionally skipped after the enforcing failure, so Gate 25 cannot yet be called accepted.
-
-The dedicated regulated workflow is the authoritative Gate 25 acceptance signal. Other website or application workflows do not supersede this fail-closed Class D gate.
+3. Regulated persistence requires explicit protected HTTPS runtime configuration and protected server-side credentials.
+4. Existing regulated tests, Gates 1 through 24, lint, and the production Next.js build are green.
+5. The mandatory Gate 25 CI enforcement step is green.
+6. The Gate 25 handoff and restart/audit records are being synchronized to the accepted Gate 25 baseline.
 
 ## Production boundary
 
-No production environment value is to be committed to the repository during this remediation. No production database migration is required merely to remove source-level URL fallbacks. Regulated feature flags remain fail closed. No production database promotion, production runtime activation, LIAS execution, or regulatory approval is implied by Gate 25 source remediation.
+Gate 25 acceptance establishes source/build runtime-isolation compliance only. It does not authorize public enrollment, production database promotion, production runtime activation, real-learner acceptance execution, LIAS production execution, certificate release, regulated launch, or any representation of FDACS approval.
 
-## Audit evidence
+No production database migration or production configuration activation was performed as part of Gate 25 source hardening. Regulated feature flags remain fail closed until the applicable production and regulatory controls are satisfied.
 
-The final Gate 25 evidence must include the enforcing CI step and a green workflow showing zero runtime-isolation findings, followed by passing repository tests, lint, and the production Next.js build. Evidence must not print secret values, service-role keys, license numbers, or private configuration content.
+## Audit evidence rule
+
+The accepted Gate 25 evidence is the mandatory enforcing CI result at run #367 and the source state at `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d`. Audit evidence must not expose the configured Supabase URL, project identifier, service-role value, credentials, provider secrets, license numbers, learner PII, protected examination content, or other protected runtime data.
 
 ## Restart instruction
 
-Continue eliminating the remaining hardcoded fallback in `lib/florida-class-d-makeup.ts`, `lib/florida-class-d-observer.ts`, and `lib/florida-class-d-recorded-makeup.ts`. Do not weaken or bypass the enforcement rule. Do not call Gate 25 accepted until the complete Gates 1 through 25 cycle passes source verification, repository tests, lint, and production build, and the authoritative audit handoffs are synchronized to that green head.
+Treat `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d` as the accepted Gate 25 source/build baseline. Continue with controlled non-production runtime acceptance, production-readiness evidence, the Division-approved examination-bank boundary, submission-guide evidence updates, and owner/admin LMS access preparation. Keep public enrollment, production database promotion, production runtime activation, LIAS production execution, and regulated launch disabled until their separate authorization and acceptance gates are satisfied. Do not treat CI as FDACS approval, do not generate FDACS-16103 locally, and do not issue a course-completion certificate for hours alone.
