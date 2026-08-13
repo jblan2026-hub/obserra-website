@@ -6,7 +6,6 @@ import {
   validateFloridaClassDAcknowledgments,
 } from "./florida-class-d-enrollment-policy";
 
-const DEFAULT_SUPABASE_URL = "https://nwxnyqlyzyufgoadtqxs.supabase.co";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const IDEMPOTENCY_PATTERN = /^[A-Za-z0-9._:-]{12,180}$/;
@@ -86,7 +85,7 @@ function configuredServiceRoleKey() {
 }
 
 function getConfig(): SupabaseConfig {
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || DEFAULT_SUPABASE_URL).replace(/\/$/, "");
+  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   const serviceRoleKey = configuredServiceRoleKey();
   if (!serviceRoleKey) {
     throw new FloridaClassDPersistenceError(
