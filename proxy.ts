@@ -1,5 +1,5 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
-import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 const CANONICAL_HOST = "www.obserrallc.com";
 const DEFAULT_OWNER_ORIGIN = "https://owner.obserrallc.com";
@@ -17,6 +17,8 @@ const PROTECTED_PATH_PREFIXES = [
   "/academy/learn",
   "/academy/certificate",
   "/command-center",
+  "/florida-security-training/admin",
+  "/api/florida-class-d/admin",
 ] as const;
 
 type ClerkEnvironment = "test" | "live";
@@ -217,7 +219,7 @@ function identityConfigurationResponse(request: NextRequest) {
   return response;
 }
 
-export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+export default clerkMiddleware(async (auth, request) => {
   const ownerRoute = redirectToOwnerSite(request);
   if (ownerRoute) return ownerRoute;
 
@@ -231,24 +233,22 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
     return identityConfigurationResponse(request);
   }
 
-  const handler = clerkMiddleware(async (auth, clerkRequest) => {
-    if (requiresAuthentication(clerkRequest)) {
-      const { userId } = await auth();
-      if (!userId) {
-        return pathMatchesPrefix(new URL(clerkRequest.url).pathname, "/command-center")
-          ? redirectToIdentityGateway(clerkRequest)
-          : redirectToSignIn(clerkRequest);
-      }
+  if (requiresAuthentication(request)) {
+    const { userId } = await auth();
+    if (!userId) {
+      return pathMatchesPrefix(new URL(request.url).pathname, "/command-center")
+        ? redirectToIdentityGateway(request)
+        : redirectToSignIn(request);
     }
-    return applyRouteSecurityHeaders(NextResponse.next(), clerkRequest);
-  });
+  }
 
-  return handler(request, event);
-}
+  return applyRouteSecurityHeaders(NextResponse.next(), request);
+});
 
 export const config = {
   matcher: [
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     "/(api|trpc)(.*)",
+    "/__clerk/(.*)",
   ],
 };
