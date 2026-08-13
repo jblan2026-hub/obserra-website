@@ -13,6 +13,7 @@ export const FLORIDA_CLASS_D_EXAM_POLICY = {
   divisionApprovedBankRequired: true,
   trueFalseMaximumPerSubjectFraction: 0.5,
   answerKeyBrowserExposureAllowed: false,
+  monitoringRequired: true,
   publicLaunchEnabledInThisGate: false,
 } as const;
 
@@ -23,6 +24,7 @@ type AttemptRow = {
   bank_id: string;
   clerk_user_id: string;
   status: string;
+  monitoring_status: string;
   started_at: string;
   earliest_submit_at: string;
   submitted_at?: string | null;
@@ -30,6 +32,9 @@ type AttemptRow = {
   passed?: boolean | null;
   randomized_question_ids: string[];
   current_question_index: number;
+  last_heartbeat_at?: string | null;
+  interrupted_at?: string | null;
+  interruption_reason?: string | null;
 };
 type QuestionRow = {
   id: string;
@@ -109,12 +114,23 @@ function studentSafeQuestion(question: QuestionRow, number: number, selectedChoi
   };
 }
 
+function monitoringSummary(attempt: AttemptRow) {
+  return {
+    status: attempt.monitoring_status,
+    lastHeartbeatAt: attempt.last_heartbeat_at ?? null,
+    interruptedAt: attempt.interrupted_at ?? null,
+    interruptionReason: attempt.interruption_reason ?? null,
+    actionBlocked: attempt.monitoring_status !== "active",
+  };
+}
+
 export async function getFloridaClassDExamState(userId: string) {
   const enrollment = await enrollmentForUser(userId);
-  const attempts = await request<AttemptRow[]>(`fdacs_class_d_exam_attempts?${new URLSearchParams({ select: "id,enrollment_id,bank_id,clerk_user_id,status,started_at,earliest_submit_at,submitted_at,score,passed,randomized_question_ids,current_question_index", enrollment_id: `eq.${enrollment.id}`, order: "started_at.desc", limit: "5" })}`);
+  const select = "id,enrollment_id,bank_id,clerk_user_id,status,monitoring_status,started_at,earliest_submit_at,submitted_at,score,passed,randomized_question_ids,current_question_index,last_heartbeat_at,interrupted_at,interruption_reason";
+  const attempts = await request<AttemptRow[]>(`fdacs_class_d_exam_attempts?${new URLSearchParams({ select, enrollment_id: `eq.${enrollment.id}`, order: "started_at.desc", limit: "5" })}`);
   const attempt = attempts[0] ?? null;
   if (!attempt) return { enrollment: { id: enrollment.id, status: enrollment.status }, attempt: null, question: null, policy: FLORIDA_CLASS_D_EXAM_POLICY };
-  if (attempt.status !== "in_progress") return { enrollment: { id: enrollment.id, status: enrollment.status }, attempt: { id: attempt.id, status: attempt.status, startedAt: attempt.started_at, earliestSubmitAt: attempt.earliest_submit_at, submittedAt: attempt.submitted_at ?? null, score: attempt.score ?? null, passed: attempt.passed ?? null }, question: null, policy: FLORIDA_CLASS_D_EXAM_POLICY };
+  if (attempt.status !== "in_progress") return { enrollment: { id: enrollment.id, status: enrollment.status }, attempt: { id: attempt.id, status: attempt.status, monitoring: monitoringSummary(attempt), startedAt: attempt.started_at, earliestSubmitAt: attempt.earliest_submit_at, submittedAt: attempt.submitted_at ?? null, score: attempt.score ?? null, passed: attempt.passed ?? null }, question: null, policy: FLORIDA_CLASS_D_EXAM_POLICY };
 
   const index = Math.min(Math.max(0, attempt.current_question_index), attempt.randomized_question_ids.length - 1);
   const questionId = attempt.randomized_question_ids[index];
@@ -126,7 +142,7 @@ export async function getFloridaClassDExamState(userId: string) {
   if (!questions[0]) throw new FloridaClassDExamError("Examination question is unavailable.", 502, "FDACS_EXAM_QUESTION_UNAVAILABLE");
   return {
     enrollment: { id: enrollment.id, status: enrollment.status },
-    attempt: { id: attempt.id, status: attempt.status, startedAt: attempt.started_at, earliestSubmitAt: attempt.earliest_submit_at, questionNumber: index + 1, totalQuestions: 170 },
+    attempt: { id: attempt.id, status: attempt.status, monitoring: monitoringSummary(attempt), startedAt: attempt.started_at, earliestSubmitAt: attempt.earliest_submit_at, questionNumber: index + 1, totalQuestions: 170 },
     question: studentSafeQuestion(questions[0], index + 1, responses[0]?.selected_choice_key),
     policy: FLORIDA_CLASS_D_EXAM_POLICY,
   };
@@ -156,9 +172,10 @@ export async function startFloridaClassDExam(userId: string, clerkSessionId: str
 export async function answerFloridaClassDExamQuestion(userId: string, input: { attemptId: string; questionId: string; selectedChoiceKey: string; direction: "next" | "previous" | "stay" }) {
   requireUuid(input.attemptId, "attempt id");
   requireUuid(input.questionId, "question id");
-  const attempts = await request<AttemptRow[]>(`fdacs_class_d_exam_attempts?${new URLSearchParams({ select: "id,enrollment_id,bank_id,clerk_user_id,status,started_at,earliest_submit_at,randomized_question_ids,current_question_index", id: `eq.${input.attemptId}`, clerk_user_id: `eq.${userId}`, status: "eq.in_progress", limit: "1" })}`);
+  const attempts = await request<AttemptRow[]>(`fdacs_class_d_exam_attempts?${new URLSearchParams({ select: "id,enrollment_id,bank_id,clerk_user_id,status,monitoring_status,started_at,earliest_submit_at,randomized_question_ids,current_question_index", id: `eq.${input.attemptId}`, clerk_user_id: `eq.${userId}`, status: "eq.in_progress", limit: "1" })}`);
   const attempt = attempts[0];
   if (!attempt) throw new FloridaClassDExamError("Active examination attempt was not found.", 404, "FDACS_EXAM_ATTEMPT_NOT_FOUND");
+  if (attempt.monitoring_status !== "active") throw new FloridaClassDExamError("Examination interaction is paused pending monitoring review.", 409, "FDACS_EXAM_MONITORING_PAUSED");
   const expectedQuestionId = attempt.randomized_question_ids[attempt.current_question_index];
   if (expectedQuestionId !== input.questionId) throw new FloridaClassDExamError("Question sequence mismatch.", 409, "FDACS_EXAM_SEQUENCE_MISMATCH");
   const questions = await request<QuestionRow[]>(`fdacs_class_d_exam_questions?${new URLSearchParams({ select: "id,subject_code,question_type,prompt,choices", id: `eq.${input.questionId}`, bank_id: `eq.${attempt.bank_id}`, limit: "1" })}`);
@@ -173,7 +190,7 @@ export async function answerFloridaClassDExamQuestion(userId: string, input: { a
   const delta = input.direction === "next" ? 1 : input.direction === "previous" ? -1 : 0;
   const nextIndex = Math.max(0, Math.min(169, attempt.current_question_index + delta));
   if (nextIndex !== attempt.current_question_index) {
-    await request(`fdacs_class_d_exam_attempts?${new URLSearchParams({ id: `eq.${attempt.id}`, clerk_user_id: `eq.${userId}`, status: "eq.in_progress" })}`, {
+    await request(`fdacs_class_d_exam_attempts?${new URLSearchParams({ id: `eq.${attempt.id}`, clerk_user_id: `eq.${userId}`, status: "eq.in_progress", monitoring_status: "eq.active" })}`, {
       method: "PATCH",
       headers: { prefer: "return=minimal" },
       body: JSON.stringify({ current_question_index: nextIndex, updated_at: new Date().toISOString() }),
@@ -185,6 +202,9 @@ export async function answerFloridaClassDExamQuestion(userId: string, input: { a
 export async function submitFloridaClassDExam(userId: string, input: { attemptId: string; correlationId: string }) {
   requireUuid(input.attemptId, "attempt id");
   requireUuid(input.correlationId, "correlation id");
+  const attempts = await request<Array<{ monitoring_status: string }>>(`fdacs_class_d_exam_attempts?${new URLSearchParams({ select: "monitoring_status", id: `eq.${input.attemptId}`, clerk_user_id: `eq.${userId}`, status: "eq.in_progress", limit: "1" })}`);
+  if (!attempts[0]) throw new FloridaClassDExamError("Active examination attempt was not found.", 404, "FDACS_EXAM_ATTEMPT_NOT_FOUND");
+  if (attempts[0].monitoring_status !== "active") throw new FloridaClassDExamError("Examination submission is paused pending monitoring review.", 409, "FDACS_EXAM_MONITORING_PAUSED");
   const result = await request<Array<{ score: number; passed: boolean }>>("rpc/fdacs_class_d_submit_exam_attempt", {
     method: "POST",
     body: JSON.stringify({ p_attempt_id: input.attemptId, p_clerk_user_id: userId, p_correlation_id: input.correlationId }),
