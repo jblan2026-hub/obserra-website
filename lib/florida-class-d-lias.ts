@@ -3,7 +3,6 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { FloridaClassDExamError } from "./florida-class-d-exam";
 
-const DEFAULT_SUPABASE_URL = "https://nwxnyqlyzyufgoadtqxs.supabase.co";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export const FLORIDA_CLASS_D_LIAS_POLICY = {
@@ -42,7 +41,7 @@ export function floridaClassDLiasWorkflowEnabled() {
 
 function config() {
   const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || DEFAULT_SUPABASE_URL).replace(/\/$/, "");
+  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   if (!key || !url.startsWith("https://")) {
     throw new FloridaClassDExamError("LIAS workflow service is not configured.", 503, "FDACS_LIAS_NOT_CONFIGURED");
   }
@@ -99,7 +98,7 @@ export async function listFloridaClassDLiasWorkflowQueue() {
 
 export async function listFloridaClassDLiasWorkflowEvents(queueId: string) {
   requireUuid(queueId, "queue id");
-  return request<Array<Record<string, unknown>>>(
+  return request<Array<Record<string, unknown>>(
     "fdacs_class_d_lias_workflow_events?" + new URLSearchParams({
       select: "id,queue_id,completion_record_id,enrollment_id,event_type,actor_clerk_user_id,event_note,submission_reference,certificate_reference,correlation_id,occurred_at,metadata",
       queue_id: `eq.${queueId}`,
