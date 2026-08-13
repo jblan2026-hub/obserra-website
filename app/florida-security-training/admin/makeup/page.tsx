@@ -4,6 +4,7 @@ import {
   FloridaClassDAuthorizationError,
   requireFloridaClassDStaff,
 } from "../../../../lib/florida-class-d-auth";
+import MakeupManager from "./MakeupManager";
 import "../../live-classroom.css";
 import "../../makeup/makeup.css";
 
@@ -16,5 +17,5 @@ export default async function FloridaClassDMakeupAdminPage() {
     if (error instanceof FloridaClassDAuthorizationError) notFound();
     throw error;
   }
-  return <main className="fdacs-live"><section className="fdacs-live__panel"><h1>Class D Make-Up Administration</h1><p>Controlled assignment, instructor communication, and instructional-time reconciliation workspace.</p></section></main>;
+  return <MakeupManager />;
 }
