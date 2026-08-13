@@ -90,6 +90,7 @@ function requireEnabled() {
 
 async function storageUpload(objectKey: string, bytes: Uint8Array, contentType: string) {
   const { key, url, bucket } = config();
+  const uploadBody = new Blob([Uint8Array.from(bytes)], { type: contentType });
   const response = await fetch(`${url}/storage/v1/object/${encodeURIComponent(bucket)}/${objectKey.split("/").map(encodeURIComponent).join("/")}`, {
     method: "POST",
     cache: "no-store",
@@ -101,7 +102,7 @@ async function storageUpload(objectKey: string, bytes: Uint8Array, contentType: 
       "x-upsert": "false",
       "cache-control": "no-store",
     },
-    body: bytes,
+    body: uploadBody,
     signal: AbortSignal.timeout(30_000),
   });
   if (!response.ok) {
