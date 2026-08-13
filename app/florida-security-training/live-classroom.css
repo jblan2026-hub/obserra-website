@@ -183,7 +183,9 @@
 .fdacs-live__panel-head button,
 .fdacs-live__form button,
 .fdacs-live__instructor-controls button,
-.fdacs-live__roster button {
+.fdacs-live__roster button,
+.fdacs-live__poll-form button,
+.fdacs-live__active-poll button {
   border: 1px solid rgba(255,255,255,.14);
   background: #e8eef6;
   color: #07111f;
@@ -192,7 +194,10 @@
   padding: 10px 13px;
   cursor: pointer;
 }
-.fdacs-live__instructor-controls button:disabled {
+.fdacs-live__instructor-controls button:disabled,
+.fdacs-live__form button:disabled,
+.fdacs-live__poll-form button:disabled,
+.fdacs-live__active-poll button:disabled {
   opacity: .46;
   cursor: not-allowed;
 }
@@ -207,7 +212,8 @@
 
 .fdacs-live__form { display: grid; gap: 10px; margin-top: 14px; }
 .fdacs-live__form input,
-.fdacs-live__form textarea {
+.fdacs-live__form textarea,
+.fdacs-live__form select {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid rgba(255,255,255,.14);
@@ -217,8 +223,10 @@
   padding: 12px;
   font: inherit;
 }
+.fdacs-live__form select { background: #0d1d30; }
 .fdacs-live__form textarea { min-height: 92px; resize: vertical; }
 .fdacs-live__form small, .fdacs-live__muted { color: #91a5bd; line-height: 1.5; }
+.fdacs-live__form label { display: grid; gap: 7px; color: #aebed1; font-size: 13px; font-weight: 700; }
 
 .fdacs-live__feed {
   margin-top: 14px;
@@ -242,12 +250,106 @@
 .fdacs-live__feed b { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #9eb3ca; }
 .fdacs-live__feed span { line-height: 1.45; }
 
+.fdacs-live__poll.is-open,
+.fdacs-live__poll-admin.is-open {
+  border-color: rgba(125, 224, 177, .3);
+  box-shadow: 0 18px 50px rgba(0,0,0,.22), inset 0 0 0 1px rgba(125, 224, 177, .06);
+}
+
+.fdacs-live__poll-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.fdacs-live__poll-question {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.fdacs-live__poll-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.fdacs-live__poll-form label {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 12px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 10px;
+  background: rgba(255,255,255,.025);
+  cursor: pointer;
+}
+
+.fdacs-live__poll-form label.is-selected {
+  border-color: rgba(125, 224, 177, .4);
+  background: rgba(24, 89, 64, .2);
+}
+
+.fdacs-live__poll-form input[type="radio"] {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+}
+
+.fdacs-live__poll-form small {
+  color: #91a5bd;
+  line-height: 1.5;
+}
+
+.fdacs-live__poll-recorded {
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: rgba(24, 89, 64, .24);
+  border: 1px solid rgba(125, 224, 177, .26);
+  color: #d9f5e7;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.fdacs-live__poll-builder {
+  margin-top: 14px;
+}
+
+.fdacs-live__active-poll {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.fdacs-live__active-poll > strong {
+  line-height: 1.45;
+  font-size: 16px;
+}
+
+.fdacs-live__active-poll > div {
+  display: grid;
+  gap: 7px;
+}
+
+.fdacs-live__active-poll > div span {
+  padding: 9px 10px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 9px;
+  background: rgba(255,255,255,.025);
+  color: #cdd9e6;
+  line-height: 1.4;
+}
+
 .fdacs-live__roster-panel { margin-top: 16px; }
 .fdacs-live__roster { display: grid; gap: 8px; margin-top: 14px; overflow-x: auto; }
 .fdacs-live__roster > div {
   min-width: 1420px;
   display: grid;
-  grid-template-columns: minmax(190px, 1.35fr) repeat(7, minmax(115px, .72fr)) minmax(150px, .85fr);
+  grid-template-columns: minmax(210px, 1.45fr) repeat(7, minmax(115px, .72fr)) minmax(150px, .85fr);
   align-items: center;
   gap: 10px;
   padding: 11px 12px;
