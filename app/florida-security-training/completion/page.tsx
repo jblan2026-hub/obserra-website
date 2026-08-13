@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FileCheck2, FileDown, ShieldCheck } from "lucide-react";
+import { ExternalLink, FileCheck2, FileDown, ShieldCheck } from "lucide-react";
 import { requireFloridaClassDSignedInUser } from "../../../lib/florida-class-d-auth";
 import { listCompletionDocumentsForStudent } from "../../../lib/florida-class-d-completion-documents";
 import "../florida-security-training.css";
@@ -50,6 +50,18 @@ export default async function FloridaClassDCompletionDocumentsPage() {
             </Link>
           ))}
           {official.length === 0 ? <div><b>Pending</b><span>Your official FDACS-16103 has not yet been released to this portal.</span></div> : null}
+        </div>
+      </section>
+
+      <section className="fl-classd__section">
+        <div className="fl-classd__section-heading">
+          <span>FLORIDA CLASS D APPLICATION</span>
+          <h2>Use the official FDACS application process</h2>
+          <p>The FDACS-16103 is the course-completion evidence students retain for the Class D application. The application itself is submitted to FDACS, not to Obserra.</p>
+        </div>
+        <div className="fl-classd__actions">
+          <a href="https://laso.fdacs.gov/apply/DApplicationForm.aspx" target="_blank" rel="noreferrer">Open official Class D application <ExternalLink size={16} /></a>
+          <a className="secondary" href="https://www.fdacs.gov/Business-Services/Private-Security-Licenses/Class-D-Security-Officer-License-Requirements" target="_blank" rel="noreferrer">Review FDACS Class D requirements <ExternalLink size={16} /></a>
         </div>
       </section>
 
