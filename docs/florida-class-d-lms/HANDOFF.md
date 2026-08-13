@@ -24,6 +24,22 @@ The implemented source architecture contains the five-day / 40-hour regulated co
 
 Forty instructional hours alone do not complete the course and do not earn a completion certificate.
 
+### Gates 1-4
+
+Foundation, regulated student records, durable Supabase persistence/admin APIs, identity verification, acknowledgments, cohort assignment, and regulated enrollment are implemented in source. Production activation and database promotion remain disabled.
+
+### Gates 5-8
+
+Live instructor classroom, one-device presence, server-authoritative time evidence, security challenges, daily attendance certification, secure Daily media, temporary view-only observer access, and exact five-day/20-session scheduling are implemented in source.
+
+### Gates 9-11
+
+Structured live polls/participation analytics, controlled make-up assignment and atomic credit reconciliation, and protected recorded make-up delivery/evidence are implemented in source.
+
+### Gates 12-15
+
+Protected final examination, exam-bank administration, active monitoring, interruption/resume/invalidation, failed-attempt preservation, remediation, and controlled retest authorization are implemented in source.
+
 ## Gates 1-22
 
 Gates 1 through 22 are implemented in source. The dedicated Florida Class D workflow has previously completed source verification, repository tests, lint, and the production Next.js build successfully through Gate 22. Production activation remains disabled.
@@ -67,13 +83,13 @@ The DS LMS submission guide must remain synchronized with implemented behavior a
 
 ## Current CI note
 
-The dedicated workflow now targets **Gates 1-23 and website compatibility**. Gate 23 source verification and repository contract tests have passed on the current head; lint and the production Next.js build must also pass before Gate 23 is accepted.
+The dedicated workflow now targets **Gates 1-23 and website compatibility**. A Gate 23 CI cycle exposed a brittle Gate 2 handoff-heading assertion after documentation consolidation. The authoritative handoff now restores the required detailed gate headings without changing regulated behavior. Gate 23 remains unaccepted until a fresh cycle passes source verification, Gate 22 and Gate 23 verification, repository tests, lint, and the production Next.js build.
 
 CI success is source/build evidence only. It is not regulatory approval, database promotion, runtime activation, or launch authorization.
 
 ## Next controlled sequence
 
-1. Complete the current Gates 1-23 CI cycle.
+1. Complete the fresh Gates 1-23 CI cycle after the handoff compatibility correction.
 2. Harden the acceptance event ledger as append-only at the database layer.
 3. Complete the controlled interactive acceptance write workflow for all 18 domains.
 4. Synchronize the Gate 23-specific handoff and DS submission/audit guide controls.
