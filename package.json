@@ -13,7 +13,8 @@
     "test:academy-1000x-remediation": "node scripts/academy-1000x-remediation-gate.mjs",
     "test:academy-2000x-resilience": "node scripts/academy-2000x-resilience-gate.mjs",
     "test:florida-class-d-foundation": "node scripts/florida-class-d-foundation-gate.mjs",
-    "verify:academy-release": "npm run lint && npm test && npm run test:academy-alignment && npm run test:academy-70x && npm run test:academy-500x && npm run test:academy-1000x-remediation && npm run test:academy-2000x-resilience && npm run test:florida-class-d-foundation && npm run build",
+    "test:florida-class-d-records": "node scripts/florida-class-d-records-gate.mjs",
+    "verify:academy-release": "npm run lint && npm test && npm run test:academy-alignment && npm run test:academy-70x && npm run test:academy-500x && npm run test:academy-1000x-remediation && npm run test:academy-2000x-resilience && npm run test:florida-class-d-foundation && npm run test:florida-class-d-records && npm run build",
     "test:production": "node --test scripts/production-smoke.mjs",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
     "sync:apps": "node scripts/sync-final-apps.mjs --dry-run",
@@ -36,7 +37,7 @@
   "devDependencies": {
     "@types/node": "^22.10.1",
     "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
+    "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.34.0",
     "eslint-config-next": "16.2.11",
