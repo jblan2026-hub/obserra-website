@@ -45,7 +45,8 @@ returns table (
   grant_id uuid,
   live_session_id uuid,
   observer_label text,
-  purpose text
+  purpose text,
+  expires_at timestamptz
 )
 language plpgsql
 security definer
@@ -69,8 +70,8 @@ begin
   if v_grant.expires_at <= now() then raise exception 'observer access grant has expired'; end if;
   if not exists (
     select 1 from public.fdacs_class_d_live_sessions s
-    where s.id = v_grant.live_session_id and s.status in ('scheduled','live','break')
-  ) then raise exception 'live session is not eligible for observer access'; end if;
+    where s.id = v_grant.live_session_id and s.status in ('live','break')
+  ) then raise exception 'live session is not currently available for observer access'; end if;
 
   update public.fdacs_class_d_observer_grants
     set last_accessed_at = now(), access_count = access_count + 1
@@ -84,11 +85,12 @@ begin
     jsonb_build_object(
       'liveSessionId', v_grant.live_session_id,
       'observerLabel', left(v_grant.observer_label, 160),
-      'purpose', left(v_grant.purpose, 500)
+      'purpose', left(v_grant.purpose, 500),
+      'grantExpiresAt', v_grant.expires_at
     )
   );
 
-  return query select v_grant.id, v_grant.live_session_id, v_grant.observer_label, v_grant.purpose;
+  return query select v_grant.id, v_grant.live_session_id, v_grant.observer_label, v_grant.purpose, v_grant.expires_at;
 end;
 $$;
 
