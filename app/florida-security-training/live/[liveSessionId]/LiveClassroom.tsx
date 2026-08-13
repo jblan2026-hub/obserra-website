@@ -26,6 +26,20 @@ type MediaAccess = {
   recordingEnabled?: boolean;
 };
 
+type ActivePoll = {
+  id?: string;
+  question?: string;
+  options?: string[];
+  status?: "open" | "closed";
+  opened_at?: string;
+};
+
+type ActivePollResponse = {
+  pollId?: string;
+  selectedOptionIndex?: number;
+  submittedAt?: string | null;
+};
+
 type LiveState = {
   session?: {
     id?: string;
@@ -51,6 +65,8 @@ type LiveState = {
     retry_expires_at?: string | null;
   } | null;
   interactions?: Interaction[];
+  activePoll?: ActivePoll | null;
+  activePollResponse?: ActivePollResponse | null;
 };
 
 function seconds(value: unknown) {
@@ -82,6 +98,8 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   const [media, setMedia] = useState<MediaAccess | null>(null);
   const [question, setQuestion] = useState("");
   const [challengeAnswer, setChallengeAnswer] = useState("");
+  const [selectedPollOption, setSelectedPollOption] = useState<number | null>(null);
+  const [pollSubmitting, setPollSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [statusText, setStatusText] = useState("Connecting to regulated live classroom…");
   const joining = useRef(false);
@@ -166,6 +184,20 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   }, [deviceLeaseId, refresh]);
 
   useEffect(() => {
+    const activePollId = state?.activePoll?.id;
+    const response = state?.activePollResponse;
+    if (!activePollId) {
+      setSelectedPollOption(null);
+      return;
+    }
+    if (response?.pollId === activePollId && typeof response.selectedOptionIndex === "number") {
+      setSelectedPollOption(response.selectedOptionIndex);
+    } else {
+      setSelectedPollOption(null);
+    }
+  }, [state?.activePoll?.id, state?.activePollResponse]);
+
+  useEffect(() => {
     if (!deviceLeaseId) return;
     const leave = () => {
       navigator.sendBeacon?.(
@@ -211,10 +243,37 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
     }
   }
 
+  async function submitPoll(event: FormEvent) {
+    event.preventDefault();
+    const poll = state?.activePoll;
+    if (!poll?.id || selectedPollOption === null || state?.activePollResponse?.pollId === poll.id) return;
+    const openedAt = poll.opened_at ? Date.parse(poll.opened_at) : Number.NaN;
+    const responseMilliseconds = Number.isFinite(openedAt)
+      ? Math.max(0, Math.min(7_200_000, Date.now() - openedAt))
+      : null;
+    setPollSubmitting(true);
+    setError(null);
+    try {
+      await api({
+        action: "poll_response",
+        pollId: poll.id,
+        selectedOptionIndex: selectedPollOption,
+        responseMilliseconds,
+      });
+      await refresh();
+    } catch (pollError) {
+      setError(pollError instanceof Error ? pollError.message : "Live poll response could not be recorded.");
+    } finally {
+      setPollSubmitting(false);
+    }
+  }
+
   const time = state?.time;
   const dayTime = state?.dayTime;
   const courseTime = state?.courseTime;
   const session = state?.session;
+  const activePoll = state?.activePoll;
+  const activePollAnswered = Boolean(activePoll?.id && state?.activePollResponse?.pollId === activePoll.id);
   const isBreak = session?.current_segment_type === "break";
 
   return (
@@ -289,6 +348,34 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
                 <small>A failed challenge receives one retry opportunity within five minutes before the LMS marks the student absent for review.</small>
               </form>
             ) : <p className="fdacs-live__muted">No check-in is pending. Stay connected and follow the live instructor.</p>}
+          </section>
+
+          <section className={`fdacs-live__panel fdacs-live__poll ${activePoll ? "is-open" : ""}`}>
+            <div className="fdacs-live__panel-head"><h2>Live knowledge poll</h2><span>{activePoll ? (activePollAnswered ? "recorded" : "respond now") : "waiting"}</span></div>
+            {activePoll ? (
+              <form className="fdacs-live__poll-form" onSubmit={submitPoll}>
+                <p className="fdacs-live__poll-question">{activePoll.question}</p>
+                <fieldset disabled={activePollAnswered || pollSubmitting}>
+                  {(activePoll.options ?? []).map((option, index) => (
+                    <label key={`${activePoll.id}-${index}`} className={selectedPollOption === index ? "is-selected" : ""}>
+                      <input
+                        type="radio"
+                        name={`poll-${activePoll.id}`}
+                        checked={selectedPollOption === index}
+                        onChange={() => setSelectedPollOption(index)}
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </fieldset>
+                {activePollAnswered ? (
+                  <div className="fdacs-live__poll-recorded">Response recorded in your regulated participation record.</div>
+                ) : (
+                  <button type="submit" disabled={selectedPollOption === null || pollSubmitting}>{pollSubmitting ? "Recording…" : "Submit response"}</button>
+                )}
+                <small>Your selection and response time are retained as participation evidence. Correct-answer data is not exposed through the student live-class API.</small>
+              </form>
+            ) : <p className="fdacs-live__muted">No structured poll is open. Your instructor may launch questions during live instruction.</p>}
           </section>
 
           <section className="fdacs-live__panel">
