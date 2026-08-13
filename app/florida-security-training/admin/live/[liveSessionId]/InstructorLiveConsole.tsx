@@ -63,6 +63,7 @@ type LivePoll = {
   opened_at?: string;
   closed_at?: string | null;
   correct_option_index?: number | null;
+  response_count?: number;
 };
 
 type ConsoleState = {
@@ -464,7 +465,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
               <div className="fdacs-live__active-poll">
                 <strong>{activePoll.question}</strong>
                 <div>{(activePoll.options ?? []).map((option, index) => <span key={`${activePoll.id}-${index}`}>{index + 1}. {option}{activePoll.correct_option_index === index ? " · key" : ""}</span>)}</div>
-                <p className="fdacs-live__muted">Responses recorded: {students.reduce((sum, student) => sum + ((student.participation?.pollResponseCount ?? 0) > 0 ? 1 : 0), 0)} of {students.length} students have at least one poll response in this lesson. Per-student participation totals are shown in the roster.</p>
+                <p className="fdacs-live__muted">Current poll responses: {activePoll.response_count ?? 0} of {students.length}. Per-student cumulative participation totals for this lesson are shown in the roster.</p>
                 <button type="button" disabled={pollBusy} onClick={() => void closePoll()}>{pollBusy ? "Closing…" : "Close current poll"}</button>
               </div>
             ) : (
