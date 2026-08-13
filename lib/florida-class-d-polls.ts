@@ -15,6 +15,15 @@ export type FloridaClassDLivePoll = {
   correct_option_index?: number | null;
 };
 
+export type FloridaClassDStudentPollState = {
+  activePoll: FloridaClassDLivePoll | null;
+  response: {
+    pollId: string;
+    selectedOptionIndex: number;
+    submittedAt: string | null;
+  } | null;
+};
+
 export type FloridaClassDParticipationAnalytics = {
   enrollmentId: string;
   questionCount: number;
@@ -118,6 +127,54 @@ export async function getFloridaClassDActivePoll(liveSessionId: string) {
   });
   const rows = await request<FloridaClassDLivePoll[]>(`fdacs_class_d_live_polls?${query}`);
   return rows[0] ?? null;
+}
+
+export async function getFloridaClassDStudentPollState(userId: string, liveSessionId: string): Promise<FloridaClassDStudentPollState> {
+  requireUuid(liveSessionId, "live session id");
+  const activePoll = await getFloridaClassDActivePoll(liveSessionId);
+  if (!activePoll?.id) return { activePoll: null, response: null };
+
+  const sessionQuery = new URLSearchParams({ select: "cohort_id", id: `eq.${liveSessionId}`, limit: "1" });
+  const sessions = await request<Array<{ cohort_id?: string }>>(`fdacs_class_d_live_sessions?${sessionQuery}`);
+  const cohortId = sessions[0]?.cohort_id;
+  if (!cohortId || !UUID_PATTERN.test(cohortId)) {
+    throw new FloridaClassDPollError("Live session was not found.", 404, "FDACS_POLL_SESSION_NOT_FOUND");
+  }
+
+  const enrollmentQuery = new URLSearchParams({
+    select: "id",
+    cohort_id: `eq.${cohortId}`,
+    clerk_user_id: `eq.${userId}`,
+    limit: "1",
+  });
+  const enrollments = await request<Array<{ id?: string }>>(`fdacs_class_d_enrollments?${enrollmentQuery}`);
+  const enrollmentId = enrollments[0]?.id;
+  if (!enrollmentId || !UUID_PATTERN.test(enrollmentId)) {
+    throw new FloridaClassDPollError("Student is not enrolled in this live cohort.", 403, "FDACS_POLL_NOT_ENROLLED");
+  }
+
+  const responseQuery = new URLSearchParams({
+    select: "poll_id,selected_option_index,submitted_at",
+    poll_id: `eq.${activePoll.id}`,
+    enrollment_id: `eq.${enrollmentId}`,
+    limit: "1",
+  });
+  const responses = await request<Array<{
+    poll_id?: string;
+    selected_option_index?: number;
+    submitted_at?: string | null;
+  }>>(`fdacs_class_d_live_poll_responses?${responseQuery}`);
+  const response = responses[0];
+  return {
+    activePoll,
+    response: response?.poll_id && typeof response.selected_option_index === "number"
+      ? {
+          pollId: response.poll_id,
+          selectedOptionIndex: response.selected_option_index,
+          submittedAt: response.submitted_at ?? null,
+        }
+      : null,
+  };
 }
 
 export async function getFloridaClassDInstructorPolls(liveSessionId: string) {
