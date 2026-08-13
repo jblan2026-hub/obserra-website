@@ -13,19 +13,33 @@ type GeneratedStoreRecord = {
 };
 
 const storeCatalog = rawStoreCatalog as { applications: GeneratedStoreRecord[] };
-const generatedApps: MarketplaceApp[] = storeCatalog.applications.map((entry) => ({
-  slug: entry.slug,
-  name: entry.name,
-  status: entry.status === "Pilot" || entry.status === "Coming Soon" ? entry.status : "Available",
-  category: entry.category as MarketplaceApp["category"],
-  value: entry.description,
-  features: ["Subscription-controlled access", "Secure customer delivery", `Published release ${entry.version}`],
-  integrations: [],
-  deployment: entry.deployment as MarketplaceApp["deployment"],
-  pricing: entry.pricing,
-  documentation: ["Release notes", "Deployment guide", "Customer support"],
-  faq: [{ q: "How is access provided?", a: "Purchase through the Obserra store. Active subscriptions receive portal access, a subscription-bound application key, and authorized downloads where applicable." }],
-}));
+const generatedApps: MarketplaceApp[] = storeCatalog.applications.map((entry) => {
+  const status = entry.status === "Pilot" || entry.status === "Coming Soon" ? entry.status : "Available";
+  const releaseFeature = status === "Coming Soon"
+    ? "Governed pre-release enrollment"
+    : `Published release ${entry.version}`;
+
+  return {
+    slug: entry.slug,
+    name: entry.name,
+    status,
+    category: entry.category as MarketplaceApp["category"],
+    value: entry.description,
+    features: ["Subscription-controlled access", "Secure customer delivery", releaseFeature],
+    integrations: [],
+    deployment: entry.deployment as MarketplaceApp["deployment"],
+    pricing: entry.pricing,
+    documentation: status === "Coming Soon"
+      ? ["Product preview", "Deployment architecture", "Customer support"]
+      : ["Release notes", "Deployment guide", "Customer support"],
+    faq: [{
+      q: "How is access provided?",
+      a: status === "Coming Soon"
+        ? "This application is in governed pre-release status. Purchase activation will be exposed through the Obserra store only after commercial release approval and pricing configuration."
+        : "Purchase through the Obserra store. Active subscriptions receive portal access, a subscription-bound application key, and authorized downloads where applicable.",
+    }],
+  };
+});
 
 const bySlug = new Map<string, MarketplaceApp>();
 for (const entry of marketplaceApps) bySlug.set(entry.slug, entry);
