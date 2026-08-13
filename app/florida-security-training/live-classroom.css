@@ -1,0 +1,180 @@
+.fdacs-live {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, rgba(44, 83, 130, .25), transparent 32%),
+    linear-gradient(180deg, #07111f 0%, #0b1728 55%, #0a1320 100%);
+  color: #f7f9fc;
+  padding: 24px;
+}
+
+.fdacs-live__topbar {
+  max-width: 1500px;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid rgba(255,255,255,.11);
+  background: rgba(7, 17, 31, .86);
+  border-radius: 20px;
+  padding: 22px 26px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.28);
+}
+
+.fdacs-live__topbar span,
+.fdacs-live__stage-frame > span {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  color: #9fb6d4;
+}
+
+.fdacs-live__topbar h1,
+.fdacs-live__stage-frame h2,
+.fdacs-live__panel h2 {
+  margin: 5px 0 0;
+}
+
+.fdacs-live__status {
+  min-width: 250px;
+  border-radius: 14px;
+  background: rgba(24, 89, 64, .28);
+  border: 1px solid rgba(125, 224, 177, .28);
+  padding: 12px 16px;
+  display: grid;
+  gap: 3px;
+}
+
+.fdacs-live__status.is-break {
+  background: rgba(130, 95, 24, .28);
+  border-color: rgba(245, 202, 95, .32);
+}
+
+.fdacs-live__status small { color: #c6d0df; }
+
+.fdacs-live__alert {
+  max-width: 1500px;
+  margin: 0 auto 18px;
+  border: 1px solid rgba(255, 126, 126, .38);
+  background: rgba(100, 25, 25, .28);
+  color: #ffd7d7;
+  padding: 13px 16px;
+  border-radius: 12px;
+}
+
+.fdacs-live__grid {
+  max-width: 1500px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(330px, .8fr);
+  gap: 22px;
+}
+
+.fdacs-live__stage,
+.fdacs-live__panel {
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(8, 20, 36, .82);
+  border-radius: 20px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.22);
+}
+
+.fdacs-live__stage { padding: 20px; }
+
+.fdacs-live__stage-frame {
+  min-height: 520px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  background:
+    linear-gradient(145deg, rgba(16, 34, 57, .97), rgba(6, 15, 27, .98)),
+    #0b1829;
+  border: 1px solid rgba(142, 170, 204, .18);
+}
+
+.fdacs-live__stage-frame h2 { font-size: clamp(28px, 4vw, 52px); }
+.fdacs-live__stage-frame p { max-width: 720px; color: #aebed1; line-height: 1.65; }
+
+.fdacs-live__timecards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.fdacs-live__timecards article {
+  padding: 15px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 13px;
+  display: grid;
+  gap: 6px;
+}
+
+.fdacs-live__timecards span { color: #91a5bd; font-size: 12px; }
+.fdacs-live__timecards strong { font-size: 20px; font-variant-numeric: tabular-nums; }
+.fdacs-live__fineprint { color: #91a5bd; font-size: 12px; line-height: 1.5; }
+
+.fdacs-live__side { display: grid; gap: 18px; align-content: start; }
+.fdacs-live__panel { padding: 18px; }
+.fdacs-live__panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.fdacs-live__panel-head span { color: #96a9bf; font-size: 12px; text-transform: uppercase; }
+.fdacs-live__panel-head button,
+.fdacs-live__form button {
+  border: 1px solid rgba(255,255,255,.14);
+  background: #e8eef6;
+  color: #07111f;
+  font-weight: 800;
+  border-radius: 10px;
+  padding: 10px 13px;
+  cursor: pointer;
+}
+
+.fdacs-live__form { display: grid; gap: 10px; margin-top: 14px; }
+.fdacs-live__form input,
+.fdacs-live__form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.045);
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  font: inherit;
+}
+.fdacs-live__form textarea { min-height: 92px; resize: vertical; }
+.fdacs-live__form small, .fdacs-live__muted { color: #91a5bd; line-height: 1.5; }
+
+.fdacs-live__feed {
+  margin-top: 14px;
+  max-height: 340px;
+  overflow-y: auto;
+  display: grid;
+  gap: 8px;
+}
+.fdacs-live__feed > div {
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+  padding: 10px 12px;
+  border-radius: 10px;
+  display: grid;
+  gap: 4px;
+}
+.fdacs-live__feed b { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #9eb3ca; }
+.fdacs-live__feed span { line-height: 1.45; }
+
+@media (max-width: 1000px) {
+  .fdacs-live__grid { grid-template-columns: 1fr; }
+  .fdacs-live__timecards { grid-template-columns: repeat(2, 1fr); }
+  .fdacs-live__topbar { align-items: stretch; flex-direction: column; }
+  .fdacs-live__status { min-width: 0; }
+}
+
+@media (max-width: 620px) {
+  .fdacs-live { padding: 12px; }
+  .fdacs-live__stage-frame { min-height: 360px; padding: 24px; }
+  .fdacs-live__timecards { grid-template-columns: 1fr; }
+}
