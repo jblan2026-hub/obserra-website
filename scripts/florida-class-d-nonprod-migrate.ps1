@@ -99,9 +99,44 @@ if (!$cli) {
     if (!$npx) {
         Stop-FailClosed 'Neither Supabase CLI nor npx is available.'
     }
-    $supabaseCommand = @('npx','--yes','supabase')
+    $useNpx = $true
 } else {
-    $supabaseCommand = @('supabase')
+    $useNpx = $false
+}
+
+function Invoke-Supabase([string[]]$Arguments) {
+    if ($useNpx) {
+        & npx --yes supabase @Arguments
+    } else {
+        & supabase @Arguments
+    }
+    return $LASTEXITCODE
+}
+
+function Ensure-SupabaseAuthentication {
+    Write-Host 'Checking Supabase CLI authentication...'
+    $authExit = Invoke-Supabase @('projects','list')
+    if ($authExit -eq 0) {
+        Write-Host 'Supabase CLI authentication is ready.'
+        return
+    }
+
+    Write-Host ''
+    Write-Host 'Supabase CLI is not authenticated. Starting the official interactive login flow now.'
+    Write-Host 'Complete the Supabase browser/device authorization locally. Do not paste any token into source files or chat.'
+    Write-Host ''
+
+    $loginExit = Invoke-Supabase @('login')
+    if ($loginExit -ne 0) {
+        Stop-FailClosed 'Supabase CLI login did not complete successfully.'
+    }
+
+    $verifyExit = Invoke-Supabase @('projects','list')
+    if ($verifyExit -ne 0) {
+        Stop-FailClosed 'Supabase CLI authentication could not be verified after login.'
+    }
+
+    Write-Host 'Supabase CLI authentication verified.'
 }
 
 New-Item -ItemType Directory -Path $evidenceDir -Force | Out-Null
@@ -138,21 +173,20 @@ Write-Host 'The Supabase CLI may securely prompt for authentication/database cre
 
 Push-Location $repoRoot
 try {
-    if ($supabaseCommand[0] -eq 'supabase') {
-        & supabase link --project-ref $ProjectRef
-        if ($LASTEXITCODE -ne 0) { Stop-FailClosed 'Supabase link failed.' }
-        & supabase db push --linked --include-all
-        if ($LASTEXITCODE -ne 0) { Stop-FailClosed 'Supabase migration push failed.' }
-        & supabase migration list --linked | Tee-Object -FilePath $evidencePath -Append
-        if ($LASTEXITCODE -ne 0) { Stop-FailClosed 'Unable to capture linked migration inventory after push.' }
-    } else {
-        & npx --yes supabase link --project-ref $ProjectRef
-        if ($LASTEXITCODE -ne 0) { Stop-FailClosed 'Supabase link failed.' }
-        & npx --yes supabase db push --linked --include-all
-        if ($LASTEXITCODE -ne 0) { Stop-FailClosed 'Supabase migration push failed.' }
+    Ensure-SupabaseAuthentication
+
+    $linkExit = Invoke-Supabase @('link','--project-ref',$ProjectRef)
+    if ($linkExit -ne 0) { Stop-FailClosed 'Supabase link failed after verified CLI authentication.' }
+
+    $pushExit = Invoke-Supabase @('db','push','--linked','--include-all')
+    if ($pushExit -ne 0) { Stop-FailClosed 'Supabase migration push failed.' }
+
+    if ($useNpx) {
         & npx --yes supabase migration list --linked | Tee-Object -FilePath $evidencePath -Append
-        if ($LASTEXITCODE -ne 0) { Stop-FailClosed 'Unable to capture linked migration inventory after push.' }
+    } else {
+        & supabase migration list --linked | Tee-Object -FilePath $evidencePath -Append
     }
+    if ($LASTEXITCODE -ne 0) { Stop-FailClosed 'Unable to capture linked migration inventory after push.' }
 
     Add-Content -Path $evidencePath -Value "Result=SUCCESS"
     Write-Host ''
