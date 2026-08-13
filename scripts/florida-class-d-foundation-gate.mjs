@@ -39,14 +39,11 @@ const expectedModules = [
   [18, "Introduction to Weapons", 1],
 ];
 
-const moduleRows = [...courseSource.matchAll(/\{ id: (\d+), title: "([^"]+)", hours: ([\d.]+), day: (\d), assessment: "([^"]+)" \}/g)]
-  .map((match) => ({
-    id: Number(match[1]),
-    title: match[2],
-    hours: Number(match[3]),
-    day: Number(match[4]),
-    assessment: match[5],
-  }));
+const moduleRows = [...courseSource.matchAll(/\{ id: (\d+), title: "([^"]+)", hours: ([\d.]+), assessment: "([^"]+)" \}/g)]
+  .map((match) => ({ id: Number(match[1]), title: match[2], hours: Number(match[3]), assessment: match[4] }));
+
+const lessonRows = [...courseSource.matchAll(/\{ id: "D([1-5])-L([1-4])", day: ([1-5]), lesson: ([1-4]), title: "([^"]+)", instructionalMinutes: 120, moduleSegments: \[([^\]]+)\], breakAfterMinutes: (0|15) \}/g)]
+  .map((match) => ({ day: Number(match[1]), lesson: Number(match[2]), declaredDay: Number(match[3]), declaredLesson: Number(match[4]), segmentSource: match[6], breakMinutes: Number(match[7]) }));
 
 gate("provider identity is canonical", () => {
   assert.match(courseSource, /provider: "Obserra Executive Protection & Intelligence LLC"/);
@@ -71,10 +68,7 @@ gate("course metadata fixes five days and forty instructional hours", () => {
 
 gate("all eighteen controlled curriculum modules are present in order", () => {
   assert.equal(moduleRows.length, 18);
-  assert.deepEqual(
-    moduleRows.map(({ id, title, hours }) => [id, title, hours]),
-    expectedModules,
-  );
+  assert.deepEqual(moduleRows.map(({ id, title, hours }) => [id, title, hours]), expectedModules);
 });
 
 gate("module hours total exactly forty", () => {
@@ -83,6 +77,25 @@ gate("module hours total exactly forty", () => {
 
 gate("every module has a learning check or applied assessment", () => {
   assert.equal(moduleRows.filter((module) => module.assessment.trim().length > 0).length, 18);
+});
+
+gate("live schedule contains four two-hour lessons per day", () => {
+  assert.equal(lessonRows.length, 20);
+  for (let day = 1; day <= 5; day += 1) {
+    const daily = lessonRows.filter((lesson) => lesson.day === day);
+    assert.equal(daily.length, 4);
+    assert.deepEqual(daily.map((lesson) => lesson.lesson), [1, 2, 3, 4]);
+    assert.ok(daily.every((lesson) => lesson.day === lesson.declaredDay && lesson.lesson === lesson.declaredLesson));
+  }
+});
+
+gate("daily breaks are fifteen minutes after lessons one through three", () => {
+  for (let day = 1; day <= 5; day += 1) {
+    const daily = lessonRows.filter((lesson) => lesson.day === day).sort((a, b) => a.lesson - b.lesson);
+    assert.deepEqual(daily.map((lesson) => lesson.breakMinutes), [15, 15, 15, 0]);
+  }
+  assert.match(courseSource, /trackedBreakMinutesPerDay: 45/);
+  assert.match(publicPage, /Break time is recorded but is never credited toward the required 40 instructional hours/);
 });
 
 gate("certification exam is separately controlled", () => {
@@ -96,11 +109,14 @@ gate("licensure and approval are not misrepresented", () => {
   assert.match(publicPage, /will not represent this course as state-approved until the applicable approval process is complete/);
 });
 
-gate("regulated LMS lifecycle declares required administrative controls", () => {
+gate("regulated LMS lifecycle declares live and administrative controls", () => {
   const requiredPhrases = [
     "identity-verification",
     "automatic course entitlement",
-    "Instructional-time and attendance evidence",
+    "Single-device live-session control",
+    "Instructional-time, break-time, and daily attendance evidence",
+    "Security-question presence challenges",
+    "student Q&A",
     "automatic remediation routing",
     "Controlled 170-question certification examination",
     "Pass/fail, retest, and instructor-review workflow",
