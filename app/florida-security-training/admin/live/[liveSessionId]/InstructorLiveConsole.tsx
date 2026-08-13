@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import InstructionalTextScreenControl from "./InstructionalTextScreenControl";
 
 type TimeSummary = {
   connectedSeconds?: number;
@@ -66,6 +67,22 @@ type LivePoll = {
   response_count?: number;
 };
 
+type ActiveTextScreen = {
+  id?: string;
+  title?: string;
+  body?: string;
+  word_count?: number;
+  minimum_seconds?: number;
+  status?: "open" | "closed";
+};
+
+type TextScreenView = {
+  enrollment_id?: string;
+  observed_seconds?: number;
+  requirement_met_at?: string | null;
+  acknowledged_at?: string | null;
+};
+
 type ConsoleState = {
   session?: {
     id?: string;
@@ -79,6 +96,8 @@ type ConsoleState = {
   students?: StudentRow[];
   interactions?: Interaction[];
   polls?: LivePoll[];
+  activeTextScreen?: ActiveTextScreen | null;
+  textScreenViews?: TextScreenView[];
 };
 
 function asSeconds(value: unknown) {
@@ -419,6 +438,16 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
             <button type="button" onClick={openObserverAdministration}>Regulatory observer access</button>
             <button type="button" className="danger" onClick={() => void sessionAction("end")}>End lesson</button>
           </div>
+
+          <InstructionalTextScreenControl
+            liveSessionId={liveSessionId}
+            status={status}
+            isBreak={isBreak}
+            activeTextScreen={state?.activeTextScreen ?? null}
+            textScreenViews={state?.textScreenViews ?? []}
+            students={students}
+            onChanged={refresh}
+          />
 
           <section className="fdacs-live__panel fdacs-live__roster-panel">
             <div className="fdacs-live__panel-head"><h2>Live attendance and full-course time roster</h2><span>{students.length} students</span></div>
