@@ -3,7 +3,6 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { FloridaClassDExamError } from "./florida-class-d-exam";
 
-const DEFAULT_SUPABASE_URL = "https://nwxnyqlyzyufgoadtqxs.supabase.co";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export const FLORIDA_CLASS_D_RETEST_POLICY = {
@@ -27,7 +26,7 @@ export function floridaClassDExamRetestAdminEnabled() {
 
 function config() {
   const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || DEFAULT_SUPABASE_URL).replace(/\/$/, "");
+  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   if (!key || !url.startsWith("https://")) throw new FloridaClassDExamError("Exam retest administration is not configured.", 503, "FDACS_EXAM_RETEST_NOT_CONFIGURED");
   return { key, url };
 }
