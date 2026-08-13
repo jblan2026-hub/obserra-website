@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { findAppBySlug } from "../../../apps/appsData";
+import { findStorefrontAppBySlug } from "../../../apps/storefront";
 import { resolveAppEntitlement } from "../../../../lib/app-entitlements";
 import { issueApplicationKey } from "../../../../lib/app-license";
 
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const slug = requestUrl.searchParams.get("app") ?? "";
-  const app = findAppBySlug(slug);
+  const app = findStorefrontAppBySlug(slug);
   if (!app) return NextResponse.json({ error: "Unknown application" }, { status: 404 });
 
   const { userId } = await auth();
