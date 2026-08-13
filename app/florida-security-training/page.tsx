@@ -35,7 +35,7 @@ export default function FloridaSecurityTrainingPage() {
       </section>
 
       <section className="fl-classd__section">
-        <div className="fl-classd__section-heading"><span>LIVE CURRICULUM ARCHITECTURE</span><h2>Four live lessons every day</h2><p>Each day contains four 120-minute live instructional lessons. A 15-minute break follows Lessons 1, 2, and 3. The LMS tracks instructional time, break time, connection time, security-question responses, attendance, and participation separately. Break time is recorded but is never credited toward the required 40 instructional hours.</p></div>
+        <div className="fl-classd__section-heading"><span>LIVE CURRICULUM ARCHITECTURE</span><h2>Four live lessons every day</h2><p>Each day contains four 120-minute live instructional lessons. A 15-minute break follows Lessons 1, 2, and 3. The LMS tracks instructional time, break time, connection time, security-question responses, attendance, and participation separately. Break time is recorded but is never credited toward the required 40 instructional hours. The certification examination is controlled separately from the 40 instructional hours.</p></div>
         <div className="fl-classd__days">{floridaClassDDays.map(({ day, lessons }) => <article key={day}><header><span>DAY {day}</span><strong>8 instruction hours + 45 tracked break minutes</strong></header>{lessons.map((lesson) => <div className="fl-classd__module" key={lesson.id}><div><b>{lesson.id}</b><span><strong>{lesson.title}</strong><small>{lesson.moduleSegments.map((segment) => `${moduleTitle(segment.moduleId)} · ${segment.hours} hr`).join(" | ")}</small></span></div><em>2 hr{lesson.breakAfterMinutes ? " + 15 min break" : ""}</em></div>)}</article>)}</div>
       </section>
 
