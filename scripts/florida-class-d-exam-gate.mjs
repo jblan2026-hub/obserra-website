@@ -21,13 +21,14 @@ requireText(migration, "having count(*) filter (where question_type = 'true_fals
 requireText(migration, "array_agg(id order by random())", "Gate 12 must randomize test questions.");
 requireText(migration, "revoke all on table public.fdacs_class_d_exam_questions from public, anon, authenticated", "Exam questions and answer keys must not be directly browser accessible.");
 requireText(migration, "minimum two-hour examination duration has not elapsed", "Submission must fail closed before two hours elapse.");
+requireText(migration, "r.selected_choice_key = q.correct_choice_key", "Scoring must compare answers to the protected database answer key.");
 requireText(migration, "v_score >= 128", "Database scoring must apply the 128-question passing threshold.");
 
 requireText(service, "answerKeyBrowserExposureAllowed: false", "Answer keys must remain server-only.");
 requireText(service, "OBSERRA_FDACS_CLASS_D_EXAM_ENABLED", "The exam requires an independent fail-closed feature gate.");
 requireText(service, "divisionApprovedBankRequired: true", "The service must declare the Division-approved bank requirement.");
 requireText(service, "studentSafeQuestion", "The service must emit a student-safe question payload.");
-requireText(service, "correct_choice_key", "Scoring may use the answer key only on the protected service/database boundary.");
+if (service.includes("correct_choice_key")) throw new Error("The student-facing exam service must not select or expose the answer-key column.");
 
 requireText(api, "requireFloridaClassDSignedInUser", "The examination API must require authenticated learner identity.");
 requireText(api, 'body.action === "start"', "The examination API must support controlled attempt start.");
