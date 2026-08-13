@@ -13,6 +13,7 @@ export default function LiasWorkflowConsole({ initialQueue }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [renderedAt] = useState(() => Date.now());
 
   async function refresh() {
     const response = await fetch("/api/florida-class-d/admin/lias", { cache: "no-store" });
@@ -86,7 +87,7 @@ export default function LiasWorkflowConsole({ initialQueue }: Props) {
           {queue.map((item) => {
             const current = fields[item.id] || {};
             const due = new Date(`${item.reporting_due_on}T23:59:59`);
-            const overdue = item.status === "prepared" && Number.isFinite(due.getTime()) && due.getTime() < Date.now();
+            const overdue = item.status === "prepared" && Number.isFinite(due.getTime()) && due.getTime() < renderedAt;
             return (
               <article key={item.id} className="fdacs-completion-admin__card">
                 <div className="fdacs-completion-admin__card-head">
