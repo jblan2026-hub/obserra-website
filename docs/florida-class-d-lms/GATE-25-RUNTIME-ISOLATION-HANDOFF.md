@@ -8,13 +8,13 @@ Gate 25 strengthens the regulated Florida Class D runtime boundary by removing h
 
 ## Current state
 
-**IN PROGRESS / INVENTORY CONTROL ADDED / NOT YET ACCEPTED / PRODUCTION ACTIVATION DISABLED**
+**IN PROGRESS / INVENTORY CONTROL ACTIVE / REMEDIATION UNDERWAY / NOT YET ACCEPTED / PRODUCTION ACTIVATION DISABLED**
 
 Gate 24 remains the current accepted source/build baseline at `cc6470b2466f68578d63884f646462a2ad65ac0c`.
 
-Gate 25 began with `scripts/florida-class-d-runtime-isolation-audit.mjs`. The audit scans regulated `lib/florida-class-d*.ts` server modules for embedded Supabase project URLs and environment names that would improperly expose secret-class configuration through `NEXT_PUBLIC_*` variables.
+Gate 25 uses `scripts/florida-class-d-runtime-isolation-audit.mjs`. The audit scans regulated `lib/florida-class-d*.ts` server modules for embedded Supabase project URLs and environment names that would improperly expose secret-class configuration through `NEXT_PUBLIC_*` variables.
 
-The audit supports an enforcement mode. Enforcement must not be added to the required CI path until the identified legacy fallbacks are removed, because doing so would intentionally break the regulated workflow before remediation is complete.
+The audit supports an enforcement mode. Enforcement must not be added to the required CI path until all identified legacy fallbacks are removed, because the final enforcing step is intended to prove a zero-finding state rather than create a knowingly failing release gate during remediation.
 
 ## Security objective
 
@@ -22,11 +22,23 @@ Regulated server modules must fail closed when `OBSERRA_SUPABASE_URL` or the req
 
 The approved configuration boundary is server-only explicit environment configuration using HTTPS and protected credentials. No regulated browser component may receive service-role credentials.
 
-## Known remediation scope
+## Remediation completed in this increment
 
-Prior source review identified hardcoded Supabase project URL fallbacks in multiple regulated server modules, including live persistence, live media authorization persistence, quality/CAPA, and completion-document handling. The Gate 23 acceptance service and Gate 24 text-screen service already use explicit protected Supabase configuration without a hardcoded project fallback.
+The following regulated services have now had the hardcoded Supabase fallback removed and require explicit `OBSERRA_SUPABASE_URL` HTTPS configuration:
 
-The runtime-isolation audit is the source-of-truth inventory mechanism for completing this remediation. Each flagged regulated file must be corrected and then rechecked in enforcement mode.
+- `lib/florida-class-d-quality.ts`
+- `lib/florida-class-d-completion.ts`
+- `lib/florida-class-d-lias.ts`
+
+These changes preserve the existing protected service-role credential boundary and fail closed with their existing service-specific configuration errors when an explicit valid runtime URL is absent.
+
+This is remediation progress only. Gate 25 is not accepted because additional regulated modules still require review and any remaining embedded Supabase project URL must be removed before enforcement is enabled.
+
+## Remaining known remediation scope
+
+Prior source review identified hardcoded Supabase project URL fallbacks in additional regulated server modules, including live persistence, live media authorization persistence, completion-document handling, and potentially other legacy regulated services. The Gate 23 acceptance service and Gate 24 text-screen service already use explicit protected Supabase configuration without a hardcoded project fallback.
+
+The runtime-isolation audit remains the source-of-truth inventory mechanism for completing this remediation. Each flagged regulated file must be corrected and then rechecked in enforcement mode.
 
 ## Acceptance criteria
 
@@ -49,4 +61,4 @@ The final Gate 25 evidence must include the enforcing CI step and a green workfl
 
 ## Restart instruction
 
-Continue by running the runtime-isolation inventory, remediating every regulated server module that embeds a Supabase project URL fallback, then enable `--enforce` in the dedicated Florida Class D workflow. Do not call Gate 25 accepted until the complete Gates 1 through 25 cycle passes source verification, repository tests, lint, and production build.
+Continue the runtime-isolation inventory and remediate every remaining regulated server module that embeds a Supabase project URL fallback. Then enable `--enforce` in the dedicated Florida Class D workflow and rerun the complete regulated validation. Do not call Gate 25 accepted until the complete Gates 1 through 25 cycle passes source verification, repository tests, lint, and production build.
