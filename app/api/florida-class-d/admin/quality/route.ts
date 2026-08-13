@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireFloridaClassDStaff } from "../../../../../../lib/florida-class-d-auth";
-import { FloridaClassDExamError } from "../../../../../../lib/florida-class-d-exam";
+import { requireFloridaClassDStaff } from "../../../../../lib/florida-class-d-auth";
+import { FloridaClassDExamError } from "../../../../../lib/florida-class-d-exam";
 import {
   listFloridaClassDQualityCases,
   listFloridaClassDRetentionReviews,
   openFloridaClassDQualityCase,
   progressFloridaClassDQualityCase,
   recordFloridaClassDRetentionReview,
-} from "../../../../../../lib/florida-class-d-quality";
+} from "../../../../../lib/florida-class-d-quality";
 
 export const dynamic = "force-dynamic";
 
