@@ -205,6 +205,11 @@ function shortInstructorId(userId: string) {
   return `inst_${createHash("sha256").update(userId).digest("hex").slice(0, 24)}`;
 }
 
+function shortObserverId(grantId: string) {
+  requireUuid(grantId, "observer grant id");
+  return `obs_${createHash("sha256").update(grantId).digest("hex").slice(0, 24)}`;
+}
+
 function joinUrl(roomUrl: string, token: string) {
   return `${roomUrl}?t=${encodeURIComponent(token)}`;
 }
@@ -293,5 +298,53 @@ export async function getFloridaClassDInstructorMediaAccess(userId: string, live
     joinUrl: joinUrl(room.url, token),
     tokenExpiresAt: new Date((now + 4 * 60 * 60) * 1000).toISOString(),
     recordingEnabled: false,
+  };
+}
+
+export async function getFloridaClassDObserverMediaAccess(input: {
+  liveSessionId: string;
+  grantId: string;
+  observerLabel: string;
+}) {
+  if (!floridaClassDLiveMediaEnabled()) throw new FloridaClassDMediaError("Class D live video is not yet enabled.", 503, "FDACS_MEDIA_NOT_ENABLED");
+  requireUuid(input.liveSessionId, "live session id");
+  requireUuid(input.grantId, "observer grant id");
+  const session = await loadSession(input.liveSessionId);
+  if (!["live", "break"].includes(String(session.status))) {
+    throw new FloridaClassDMediaError("The live lesson is not currently available for observation.", 409, "FDACS_MEDIA_OBSERVER_SESSION_NOT_LIVE");
+  }
+  const room = await ensureRoom(input.liveSessionId);
+  if (!room.name || !room.url) throw new FloridaClassDMediaError("Live media room is incomplete.", 502, "FDACS_MEDIA_ROOM_INVALID");
+  const now = Math.floor(Date.now() / 1000);
+  const displayName = input.observerLabel.trim().slice(0, 80) || "Authorized Regulatory Observer";
+  const token = await createToken({
+    room_name: room.name,
+    user_id: shortObserverId(input.grantId),
+    user_name: displayName,
+    nbf: now - 30,
+    exp: now + 90 * 60,
+    eject_at_token_exp: true,
+    is_owner: false,
+    enable_screenshare: false,
+    start_video_off: true,
+    start_audio_off: true,
+    enable_prejoin_ui: false,
+    enable_live_captions_ui: true,
+    enable_recording_ui: false,
+    permissions: {
+      hasPresence: true,
+      canSend: false,
+      canAdmin: false,
+    },
+  });
+  return {
+    provider: "daily" as const,
+    roomName: room.name,
+    joinUrl: joinUrl(room.url, token),
+    tokenExpiresAt: new Date((now + 90 * 60) * 1000).toISOString(),
+    recordingEnabled: false,
+    observerMode: "view-only" as const,
+    lessonId: typeof session.lesson_id === "string" ? session.lesson_id : null,
+    day: typeof session.day === "number" ? session.day : null,
   };
 }
