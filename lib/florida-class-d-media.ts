@@ -4,7 +4,6 @@ import { createHash } from "node:crypto";
 import { floridaClassDLiveInstructionEnabled } from "./florida-class-d-live-policy";
 
 const DAILY_API_BASE = "https://api.daily.co/v1";
-const DEFAULT_SUPABASE_URL = "https://nwxnyqlyzyufgoadtqxs.supabase.co";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export class FloridaClassDMediaError extends Error {
@@ -39,7 +38,7 @@ function dailyConfig() {
 
 function supabaseConfig() {
   const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || DEFAULT_SUPABASE_URL).replace(/\/$/, "");
+  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   if (!key || !url.startsWith("https://")) {
     throw new FloridaClassDMediaError("Class D media authorization persistence is not configured.", 503, "FDACS_MEDIA_PERSISTENCE_NOT_CONFIGURED");
   }
