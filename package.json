@@ -23,7 +23,8 @@
     "test:florida-class-d-makeup": "node scripts/florida-class-d-makeup-gate.mjs",
     "test:florida-class-d-makeup-certification": "node scripts/florida-class-d-makeup-certification-gate.mjs",
     "test:florida-class-d-recorded-makeup": "node scripts/florida-class-d-recorded-makeup-gate.mjs",
-    "verify:florida-class-d": "npm run test:florida-class-d-foundation && npm run test:florida-class-d-records && npm run test:florida-class-d-persistence && npm run test:florida-class-d-live && npm run test:florida-class-d-media && npm run test:florida-class-d-observer && npm run test:florida-class-d-scheduling && npm run test:florida-class-d-polls && npm run test:florida-class-d-makeup && npm run test:florida-class-d-makeup-certification && npm run test:florida-class-d-recorded-makeup",
+    "test:florida-class-d-exam": "node scripts/florida-class-d-exam-gate.mjs",
+    "verify:florida-class-d": "npm run test:florida-class-d-foundation && npm run test:florida-class-d-records && npm run test:florida-class-d-persistence && npm run test:florida-class-d-live && npm run test:florida-class-d-media && npm run test:florida-class-d-observer && npm run test:florida-class-d-scheduling && npm run test:florida-class-d-polls && npm run test:florida-class-d-makeup && npm run test:florida-class-d-makeup-certification && npm run test:florida-class-d-recorded-makeup && npm run test:florida-class-d-exam",
     "verify:academy-release": "npm run lint && npm test && npm run test:academy-alignment && npm run test:academy-70x && npm run test:academy-500x && npm run test:academy-1000x-remediation && npm run test:academy-2000x-resilience && npm run verify:florida-class-d && npm run build",
     "test:production": "node --test scripts/production-smoke.mjs",
     "release:apps": "node scripts/generate-app-release-bundle.mjs",
@@ -41,7 +42,7 @@
     "lucide-react": "^0.543.0",
     "next": "16.2.11",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react-dom": "^19.2.3",
     "stripe": "^22.4.0"
   },
   "devDependencies": {
