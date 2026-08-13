@@ -42,17 +42,17 @@ function staffRolesFromPrivateMetadata(privateMetadata: Record<string, unknown>)
 }
 
 export async function requireFloridaClassDSignedInUser() {
-  const { userId } = await auth();
+  const { userId, sessionId } = await auth();
   if (!userId) {
     throw new FloridaClassDAuthorizationError("Sign in is required.", 401);
   }
-  return { userId };
+  return { userId, sessionId: sessionId ?? null };
 }
 
 export async function requireFloridaClassDStaff(
   allowedRoles: readonly FloridaClassDStaffRole[],
 ) {
-  const { userId } = await requireFloridaClassDSignedInUser();
+  const { userId, sessionId } = await requireFloridaClassDSignedInUser();
   const client = await clerkClient();
   const user = await client.users.getUser(userId);
   const emails = user.emailAddresses.map((item) => item.emailAddress);
@@ -73,6 +73,7 @@ export async function requireFloridaClassDStaff(
 
   return {
     userId,
+    sessionId,
     role: authorizedRole,
     roles: [...roles],
     primaryEmail: emails[0] ?? null,
