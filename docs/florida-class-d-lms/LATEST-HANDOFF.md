@@ -8,11 +8,13 @@ This is the current restart pointer for the regulated Florida Class D LMS workst
 
 Gates 1 through 22 are implemented in source and remain green through source verification, repository tests, lint, and the production Next.js build.
 
-Gate 23, Non-Production Acceptance Evidence, has now completed a full green dedicated Florida Class D workflow on commit `35a7f6ca704a44bc885d1534aa570eb541bc49d3`. That cycle passed the Gates 1-23 source verification, Gate 22 runtime-readiness verification, Gate 23 acceptance verification, repository contract tests, static quality validation, and the production Next.js build.
+Gate 23, Non-Production Acceptance Evidence, has a full green dedicated Florida Class D workflow baseline and has now advanced beyond that baseline with additional hardening. The current source includes protected acceptance runs, all 18 required acceptance domains, synthetic test-identity confirmation, release-commit binding, service-controlled persistence, an all-pass finalization rule, a protected school/compliance API, and a real interactive staff console for creating acceptance runs, recording domain evidence, reviewing progress, and requesting finalization through the database-controlled all-pass rule.
 
-Gate 23 source now includes protected acceptance runs, all 18 required acceptance domains, synthetic test-identity confirmation, release-commit binding, service-controlled persistence, an all-pass finalization rule, a protected school/compliance API for creating runs, recording domain evidence, listing evidence, and finalizing an acceptance run, plus the staff-protected acceptance evidence page. The acceptance service no longer uses a hardcoded fallback Supabase project URL and requires explicit protected runtime configuration.
+The acceptance service requires explicit protected Supabase runtime configuration and contains no hardcoded fallback project URL. A follow-on database migration now restricts the acceptance event ledger runtime role to read and append operations by revoking update, delete, and truncate privileges and granting only select and insert for that ledger.
 
-Gate 23 is not yet operationally complete. The remaining controlled items are database-level append-only hardening for the acceptance event ledger and the full interactive staff console for recording and finalizing acceptance evidence. No production database migration or production acceptance execution has occurred.
+The current hardened source head is `a7786ce426879260f3d758d40ee5c898de2f1523`. A fresh Gates 1-23 workflow is validating the interactive console and append-only runtime-permission changes. Do not call those new hardening changes accepted until that complete cycle passes source verification, Gate 22, Gate 23, repository tests, lint, and the production Next.js build.
+
+No production database migration or production acceptance execution has occurred.
 
 ## Non-negotiable completion and certificate rule
 
@@ -26,28 +28,9 @@ No mockup, placeholder, fabricated screenshot, simulated certificate, simulated 
 
 ## Gate 23 acceptance domains
 
-Gate 23 requires evidence across all 18 domains before an acceptance run can pass:
+Gate 23 requires evidence across all 18 domains before an acceptance run can pass: identity and enrollment; live media; attendance and instructional time; presence challenges; regulatory observer access; make-up training; recorded make-up; final examination; remediation and retest; successful completion; completion documents; LIAS workflow; completion / inspection packet; quality and CAPA; retention; security headers; mobile and desktop behavior; and accessibility.
 
-- identity and enrollment;
-- live media;
-- attendance and instructional time;
-- presence challenges;
-- regulatory observer access;
-- make-up training;
-- recorded make-up;
-- final examination;
-- remediation and retest;
-- successful completion;
-- completion documents;
-- LIAS workflow;
-- completion / inspection packet;
-- quality and CAPA;
-- retention;
-- security headers;
-- mobile and desktop behavior;
-- accessibility.
-
-A run is not accepted when any required domain is missing, failed, blocked, or not run.
+A run is not accepted when any required domain is missing, failed, blocked, or not run. Passed domain checks require a real evidence reference.
 
 ## Current documentation and screenshot requirement
 
@@ -55,13 +38,12 @@ The Class DS LMS submission guide must be revised before filing/final operationa
 
 ## Next controlled sequence
 
-1. Implement database-level append-only hardening for the Gate 23 acceptance event ledger.
-2. Complete the real interactive staff acceptance console against the existing protected API.
-3. Strengthen the Gate 23 verifier to require the protected API, explicit runtime Supabase configuration, append-only event enforcement, and the interactive staff evidence workflow.
-4. Add or update the Gate 23-specific handoff and synchronize `HANDOFF.md` plus the DS submission/audit controls in the same increment.
-5. Run a fresh full Gates 1-23 source, repository-test, lint, and production-build cycle after those changes.
-6. Execute real non-production acceptance using synthetic identities only after the applicable non-production database and runtime environment is configured.
-7. Keep paid enrollment and all regulated production functions disabled until regulatory authorization, production acceptance, and owner approval are complete.
+1. Complete the fresh Gates 1-23 CI cycle for the interactive console and append-only runtime-permission changes.
+2. Strengthen the Gate 23 verifier so it explicitly requires the protected API, explicit runtime Supabase configuration, interactive evidence workflow, and acceptance-event mutation restrictions.
+3. Synchronize `HANDOFF.md`, this file, the Gate 23 handoff, and DS submission/audit controls with the final green current head.
+4. Execute real non-production acceptance using synthetic identities only after the applicable non-production database and runtime environment is configured.
+5. Complete remaining online text-screen timing enforcement and other launch-specific regulatory acceptance items before representing the LMS as production-ready.
+6. Keep paid enrollment and all regulated production functions disabled until regulatory authorization, production acceptance, and owner approval are complete.
 
 ## Public repository security boundary
 
