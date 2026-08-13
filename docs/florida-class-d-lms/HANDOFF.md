@@ -35,111 +35,39 @@ No source, CI, preview deployment, screenshot, or submission draft may be repres
 - Passing threshold is at least 128 correct answers.
 - Course completion is not issuance of a Florida Class D license.
 
-## Current implementation state through Gate 17
+## Current implementation state through Gate 18
 
-### Gate 1 - Foundation Controls
-
-Status: **IMPLEMENTED IN SOURCE**
-
-Controls: dedicated Florida Training route; Coming Soon public state; payment/enrollment disabled; five-day/40-hour/18-area architecture; exact live-lesson structure; separate exam boundary; no premature approval/licensure claims.
-
-Primary gate: `scripts/florida-class-d-foundation-gate.mjs`
-
-### Gate 2 - Regulated Student Record Model
-
-Status: **IMPLEMENTED IN SOURCE**
-
-Primary model: `lib/florida-class-d-records.ts`
-
-Controls: learner identity, regulated enrollment, cohort assignment, attendance, instructional time, module progress, learning checks, remediation, live-session/device state, audit events, regulated roles, and fail-closed exam eligibility.
-
-### Gate 3 - Durable Regulated Records and Administrative APIs
-
-Status: **IMPLEMENTED IN SOURCE / DATABASE PROMOTION PENDING**
-
-Persistence uses the authorized Obserra Supabase architecture. Protected schemas, server-only service-role persistence, forced RLS, revoked direct browser access, staff authorization, correlation/idempotency controls, append-only audit evidence, and inspection APIs are present in source.
-
-Production database promotion remains a separate controlled change and rollback activity.
-
-### Gate 4 - Identity Verification and Regulated Enrollment
+### Gates 1-4
 
 Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
 
-Controls include legal-name/date-of-birth intake, identity-verification status, controlled acknowledgments, cohort assignment, administrative review, and audit transitions. Identity-document binaries are not committed to the public repository.
+Foundation, public fail-closed controls, regulated student records, durable Supabase persistence/admin APIs, identity verification, and regulated enrollment are implemented. Production database promotion remains a separate controlled change and rollback activity.
 
-### Gate 5 - Live Instructor Classroom, Presence, Time, Interaction and Daily Certification
+### Gates 5-8
 
 Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
 
-Controls include single-device presence, authenticated session binding, server-authoritative connected/instructional/break/uncredited time, cumulative day/course totals, presence challenges, retry/absence review, Q&A, hand raise, instructor prompts, participation evidence, and daily instructor attendance certification.
+Live instructor classroom, single-device presence, server-authoritative connected/instructional/break/uncredited time, cumulative time, presence challenges, Q&A, participation, daily attendance certification, secure Daily media, temporary view-only observer access, and exact five-day/20-session scheduling are implemented.
 
 Break time remains distinct from credited instructional time.
 
-### Gate 6 - Secure Embedded Live Media
+### Gates 9-11
 
 Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
 
-Provider design: Daily private rooms with server-brokered short-lived tokens. Role-specific permissions, no learner screen share, no provider chat/hand raise, recording disabled by default, private scoped rooms, and independent Obserra attendance evidence are enforced in source.
+Structured polls/participation evidence, make-up assignment and atomic make-up credit reconciliation, and protected recorded make-up with time/presence/anti-seek/instructor-review controls are implemented.
 
-### Gate 7 - Temporary Regulatory Observer Access
-
-Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
-
-Controls include bounded, auditable, revocable, view-only temporary observer grants tied to one live session. Observer access cannot expose student records, exam content, administrative privileges, or credentials.
-
-### Gate 8 - Five-Day Cohort Scheduling
+### Gates 12-15
 
 Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
 
-Scheduling creates exactly five ordered training days and 20 timezone-aware two-hour live lessons while preserving the required 15-minute non-instructional intervals after Lessons 1 through 3.
-
-### Gate 9 - Structured Polls and Participation
-
-Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
-
-Controls include instructor polls, one-response learner handling, student-safe payloads, instructor analytics, and participation evidence.
-
-### Gate 10 - Make-Up Training and Atomic Credit Reconciliation
-
-Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
-
-Controls include make-up assignments, learner/instructor questions, reconciliation ceilings, protected records, administrative workflow, and service-role-only atomic make-up credit certification.
-
-### Gate 11 - Protected Recorded Make-Up
-
-Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
-
-Controls include authenticated protected playback, one-device control, server-authoritative time, presence challenges, anti-seek controls, instructional-credit ceilings, and instructor review.
-
-### Gate 12 - Controlled 170-Question Final Examination
-
-Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
-
-Controls include a protected 170-question architecture, two-hour minimum duration, randomized order, 128/170 passing threshold, server-only scoring, and a fail-closed boundary requiring a Division-approved bank before production examination use.
-
-### Gate 13 - Protected Examination Bank Administration
-
-Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
-
-Controls include protected exam-bank import, source hashing, 170-question validation, 18-subject coverage validation, true/false limits, controlled approval-status promotion, and no answer-key exposure in the public repository.
-
-### Gate 14 - Active Examination Monitoring
-
-Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
-
-Controls include one exam session/device, active monitoring, visibility/interruption state, staff-authorized resume, examiner monitoring, and auditable invalidation.
-
-### Gate 15 - Remediation and Retest Governance
-
-Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
-
-Controls preserve failed attempts, require documented remediation before a staff-authorized retest, support one-time authorization consumption/revocation, and retain inspection-ready audit history without inventing a wait-period or retest-count rule.
+The protected 170-question final examination, two-hour minimum duration, randomized delivery, 128/170 passing threshold, protected exam-bank administration, Division-approval status boundary, active exam monitoring, one-session/one-device enforcement, interruption/resume controls, auditable invalidation, failed-attempt preservation, remediation, and controlled retest authorization are implemented.
 
 ### Gate 16 - Successful Completion Review and LIAS Preparation
 
 Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
 
-Completion is never automatic. Successful-completion approval requires:
+Successful-completion approval requires:
 
 - verified learner identity;
 - all five qualifying 480-minute instructional days;
@@ -150,11 +78,11 @@ Completion is never automatic. Successful-completion approval requires:
 - no unresolved live-presence, exam-security, attendance, or completion-blocking state;
 - authorized compliance-administrator approval.
 
-Approval snapshots the controlled evidence, marks the enrollment completed, creates the completion record, and prepares the manual LIAS workflow queue.
+Approval snapshots the evidence, marks the enrollment completed, creates the completion record, and prepares the manual LIAS workflow queue.
 
-### Gate 17 - LIAS Reporting, Completion Documents and Student Application Handoff
+### Gate 17 - LIAS Reporting, Official Completion Documents and Student Application Handoff
 
-Status: **IMPLEMENTED IN SOURCE / CURRENT CI VALIDATION REQUIRED / PRODUCTION ACTIVATION DISABLED**
+Status: **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
 
 Controls include:
 
@@ -169,14 +97,43 @@ Controls include:
 - SHA-256 integrity validation;
 - authenticated enrollment-bound student download;
 - protected student Completion Documents portal;
-- application links to the official FDACS Class D process;
+- official Florida Class D application handoff;
 - inspection-ready post-course packet.
 
 The official **FDACS-16103 Certificate of Security Officer Training** is a LIAS-generated state document. Obserra must not synthesize or self-generate it.
 
-## Mandatory student completion and certification standard
+### Gate 18 - Protected Supplemental Certificate Presentation
 
-The following rule is now authoritative across student materials and LMS documentation:
+Status: **IMPLEMENTED IN SOURCE / CURRENT CI VALIDATION REQUIRED / PRODUCTION ACTIVATION DISABLED**
+
+Gate 18 makes the supplemental records created after successful completion usable as protected learner documents while preserving the examination-first certificate boundary.
+
+Implemented controls include:
+
+- automatic supplemental Obserra certificate/application-handoff records created only from an authorized completion record;
+- database-level independent verification that the preserved final exam attempt is passed and scored at least 128 before document creation;
+- no certificate creation for a learner who has merely reached 40 instructional hours;
+- learner-specific protected render payload using verified legal name and controlled completion facts;
+- server-side rendering for the supplemental Obserra Course Completion Certificate and application-handoff document;
+- HTML escaping of dynamic learner values;
+- independent render-time validation of the 40-hour and passing-exam facts;
+- supplemental certificate presentation of learner legal name, course title, 40 instructional hours, exam score, completion date, and unique Obserra certificate ID;
+- clear supplemental-record disclaimer that the document does not replace FDACS-16103 and does not issue a Class D license;
+- authenticated completed-enrollment-bound document access;
+- restrictive no-store, noindex, nosniff, frame-denial, referrer, and content-security-policy response headers;
+- standards-compatible `Blob` response bodies for generated and stored document delivery;
+- official FDACS-16103 remaining a separately stored LIAS-generated PDF with integrity validation.
+
+Primary Gate 18 artifacts:
+
+- `supabase/migrations/20260813080000_fdacs_class_d_auto_completion_certificate.sql`
+- `lib/florida-class-d-completion-documents.ts`
+- `app/api/florida-class-d/completion-documents/route.ts`
+- `app/florida-security-training/completion/page.tsx`
+- `scripts/florida-class-d-certificate-presentation-gate.mjs`
+- `docs/florida-class-d-lms/GATE-18-STUDENT-CERTIFICATE-PRESENTATION-HANDOFF.md`
+
+## Mandatory student completion and certification standard
 
 **Completing 40 instructional hours does not, by itself, constitute successful course completion and does not cause any completion certificate to be issued.**
 
@@ -184,10 +141,11 @@ A learner who reaches 40 hours but has not passed the separate 170-question fina
 
 After a passing examination and successful-completion approval:
 
-1. The system may create the learner-specific supplemental Obserra Course Completion Certificate/application-handoff record from the controlled completion record.
-2. Authorized school staff perform the official LIAS reporting step.
-3. LIAS generates the official FDACS-16103.
-4. After confirmation and protected ingestion, the student may download FDACS-16103 from the authenticated Completion Documents portal.
+1. The system automatically creates the learner-specific supplemental Obserra Course Completion Certificate/application-handoff record.
+2. The learner can open the protected supplemental Obserra certificate and application handoff from the authenticated Completion Documents portal.
+3. Authorized school staff perform the official LIAS reporting step.
+4. LIAS generates the official FDACS-16103.
+5. After LIAS confirmation and protected ingestion, the learner may download FDACS-16103 from the authenticated portal.
 
 The supplemental Obserra certificate does not replace FDACS-16103 and successful training completion does not itself issue a Florida Class D license.
 
@@ -197,7 +155,7 @@ Authoritative standard:
 
 ## Student-facing information and privacy
 
-The supplemental Obserra completion record may use protected data already present in the regulated system to accurately identify the learner. At minimum, the public-facing certificate design should use the learner's verified legal name, course title, 40 instructional hours, completion date, and unique certificate/reference identifier.
+The supplemental certificate uses protected data already present in the regulated system. The intended learner-facing fields are verified legal name, course title, 40 instructional hours, final examination score, completion date, and a unique certificate/reference identifier.
 
 Do not place raw identity evidence, internal Clerk IDs, internal enrollment UUIDs, examination answers, identity-document details, or unnecessary sensitive identifiers on public-facing certificates or in public source code.
 
@@ -207,20 +165,23 @@ Control record:
 
 `docs/florida-class-d-lms/DS-SUBMISSION-LMS-GUIDE-CONTROL.md`
 
-The current binary submission guide remains a controlled draft outside the public repository. The next controlled DOCX/PDF revision must incorporate the current completion/certification standard and add screenshots of:
+The controlled submission-guide DOCX/PDF must be revised to incorporate the current completion/certification standard and add screenshots of:
 
 1. Completion Review Console showing five qualifying days, 2,400 minutes, 18-area completion, exam pass, issue clearance, and approval.
 2. The no-certificate-before-pass boundary for a learner who has completed instruction but has not passed the final exam.
-3. FDACS/LIAS workflow states including prepared, submitted, confirmed, exceptions, and reporting due date.
-4. Student Completion Documents portal distinguishing official FDACS-16103, supplemental Obserra record, and application instructions.
+3. The generated supplemental Obserra Course Completion Certificate using demonstration learner data.
+4. FDACS/LIAS workflow states including prepared, submitted, confirmed, exceptions, and reporting due date.
+5. Student Completion Documents portal distinguishing official FDACS-16103, supplemental Obserra certificate, and Class D application instructions.
 
 Development screenshots must be labeled as submission/development previews. Production screenshots must replace previews before the guide is used as final operational evidence after applicable authorization and production validation.
 
 ## Current CI note
 
-The prior Gate 17 head passed all Florida Class D source gates, repository tests, and lint, but the production Next.js build failed on a TypeScript `BodyInit` mismatch for a protected completion-document upload using `Uint8Array`.
+The earlier Gate 17 head passed Florida Class D source gates, repository tests, and lint but failed the production Next.js build on a TypeScript `BodyInit` mismatch in the protected completion-document upload path. That source issue was corrected by converting the upload payload to a standards-compatible `Blob`.
 
-That source issue was corrected by converting the protected upload body to a standards-compatible `Blob`. Current CI on the refreshed head must complete before Gate 17 can be called fully green. Do not infer regulatory acceptance from CI success.
+Gate 18 also uses standards-compatible `Blob` response bodies. Current CI on the Gate 18 head must complete source verification, repository tests, lint, and the production build before Gate 18 is called fully green.
+
+CI success is source/build evidence only. It is not FDACS approval, production database promotion, runtime validation, or launch authorization.
 
 ## Key current artifacts
 
@@ -228,6 +189,7 @@ That source issue was corrected by converting the protected upload body to a sta
 - `docs/florida-class-d-lms/STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md`
 - `docs/florida-class-d-lms/GATE-16-COMPLETION-REVIEW-HANDOFF.md`
 - `docs/florida-class-d-lms/GATE-17-LIAS-COMPLETION-DOCUMENTS-HANDOFF.md`
+- `docs/florida-class-d-lms/GATE-18-STUDENT-CERTIFICATE-PRESENTATION-HANDOFF.md`
 - `docs/florida-class-d-lms/DS-SUBMISSION-LMS-GUIDE-CONTROL.md`
 - `app/florida-security-training/completion/page.tsx`
 - `app/florida-security-training/admin/lias/LiasWorkflowConsole.tsx`
@@ -235,19 +197,21 @@ That source issue was corrected by converting the protected upload body to a sta
 - `lib/florida-class-d-lias.ts`
 - `supabase/migrations/20260813080000_fdacs_class_d_auto_completion_certificate.sql`
 - `scripts/florida-class-d-lias-gate.mjs`
+- `scripts/florida-class-d-certificate-presentation-gate.mjs`
 - `.github/workflows/florida-class-d-lms-gates.yml`
 
-## Remaining production work
+## Remaining production and build work
 
-1. Obtain/confirm applicable Class DS authorization and final regulatory acceptance boundaries.
-2. Promote regulated Supabase migrations through controlled production change, rollback, and verification procedures.
-3. Configure protected production runtime variables and private document storage.
-4. Validate Daily media, regulated identity/enrollment, attendance/time, presence, examination, completion, document, inspection, and LIAS workflows end to end with controlled test identities.
-5. Finalize the Division-approved exam bank before production examination activation.
-6. Produce the revised Class DS submission-guide DOCX/PDF with current completion/certification language and the new screenshot evidence.
-7. Replace development screenshot previews with controlled production evidence when appropriate.
-8. Complete security, accessibility, desktop/mobile, operational, inspection, disaster-recovery, and owner acceptance testing.
-9. Activate payment/enrollment only after all applicable launch gates are accepted.
+1. Complete current Gates 1-18 CI validation and correct any remaining source/type/lint/build defect.
+2. Build the next controlled quality/inspection/export layer for complete learner completion packets and school operational review.
+3. Promote regulated Supabase migrations through controlled production change, rollback, and verification procedures.
+4. Configure protected production runtime variables and private document storage.
+5. Validate Daily media, identity/enrollment, attendance/time, presence, examination, completion, document, inspection, and LIAS workflows end to end with controlled test identities.
+6. Finalize the Division-approved exam bank before production examination activation.
+7. Produce the revised Class DS submission-guide DOCX/PDF with current completion/certification language and required screenshot evidence.
+8. Replace development screenshot previews with controlled production evidence where appropriate.
+9. Complete security, accessibility, desktop/mobile, operational, inspection, disaster-recovery, and owner acceptance testing.
+10. Activate payment/enrollment only after all applicable launch gates are accepted.
 
 ## Public repository security boundary
 
@@ -256,5 +220,5 @@ Never commit real learner PII, identity documents, protected exam questions/answ
 ## Restart instruction
 
 ```text
-Read docs/florida-class-d-lms/HANDOFF.md before continuing Florida Class D LMS work. Resume from the current Gate 17 state. Gates 1-17 are implemented in source; production activation remains fail closed and database/runtime promotion is pending. Forty instructional hours alone do not complete the course and do not earn a certificate. Successful completion requires the full 40-hour/five-day record, all 18 required areas/checks, a passing 170-question exam at 128/170 or better, cleared remediation/security issues, and authorized completion approval. After approval, the LMS may create a supplemental Obserra completion record, staff complete manual LIAS reporting, and the official FDACS-16103 is accepted only after LIAS confirmation. Keep all public payment, enrollment, regulated instruction, exam, completion, certificate, LIAS, observer, and production scheduling functions disabled until applicable regulatory and production gates pass. The next controlled work is current CI validation, controlled production/database preparation, and revision of the Class DS submission guide with the completion/certification screenshots.
+Read docs/florida-class-d-lms/HANDOFF.md before continuing Florida Class D LMS work. Resume from the current Gate 18 state. Gates 1-18 are implemented in source; production activation remains fail closed and database/runtime promotion is pending. Forty instructional hours alone do not complete the course and do not earn a certificate. Successful completion requires the full five-day/2,400-minute record, all 18 required areas/checks, a passing 170-question exam at 128/170 or better, cleared remediation/security issues, and authorized completion approval. After approval, the LMS automatically creates the protected supplemental Obserra completion certificate/application-handoff record. Staff complete manual LIAS reporting, and the official FDACS-16103 is accepted only after LIAS confirmation. Keep all public payment, enrollment, regulated instruction, exam, completion, certificate, LIAS, observer, and production scheduling functions disabled until applicable regulatory and production gates pass. The next controlled work is Gates 1-18 CI validation, quality/inspection/export build-out, controlled production/database preparation, and revision of the Class DS submission guide with completion/certificate screenshots.
 ```
