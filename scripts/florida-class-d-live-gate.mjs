@@ -88,7 +88,7 @@ required(adminApi, 'body.action === "certify_day"', "Instructor live API must su
 required(adminApi, "getFloridaClassDRosterTimeLedgers", "Instructor live API must return cumulative per-student time.");
 required(adminApi, '"answer", "prompt", "poll"', "Instructor live API must support interactive teaching events.");
 
-required(studentUi, "Attendance and time tracking are active", "Student classroom must disclose active attendance/time tracking.");
+required(studentUi, "Attendance, instructional time, and secure live media are active", "Student classroom must disclose active attendance/time tracking and secure media state.");
 required(studentUi, "Breaks are tracked in the LMS but are not credited", "Student classroom must clearly distinguish break time from instruction.");
 required(studentUi, "Entire 40-hour course ledger", "Student classroom must display cumulative course time.");
 required(studentUi, "Course breaks", "Student classroom must display cumulative break time.");
