@@ -34,6 +34,24 @@ No source, CI result, preview deployment, screenshot, submission draft, or test 
 - Course completion is not issuance of a Florida Class D license.
 - Forty instructional hours alone do not earn a completion certificate.
 
+## Consolidated implementation index
+
+### Gates 1-4
+
+Foundation, regulated student records, durable Supabase persistence/admin APIs, identity verification, acknowledgments, cohort assignment, and regulated enrollment are implemented in source. Production activation and database promotion remain disabled.
+
+### Gates 5-8
+
+Live instructor classroom, one-device presence, server-authoritative time evidence, security challenges, daily attendance certification, secure Daily media, temporary view-only observer access, and exact five-day/20-session scheduling are implemented in source.
+
+### Gates 9-11
+
+Structured live polls/participation analytics, controlled make-up assignment and atomic credit reconciliation, and protected recorded make-up delivery/evidence are implemented in source.
+
+### Gates 12-15
+
+Protected final examination, exam-bank administration, active monitoring, interruption/resume/invalidation, failed-attempt preservation, remediation, and controlled retest authorization are implemented in source.
+
 ## Gate 1 — Foundation Controls
 
 **IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED**
@@ -208,7 +226,7 @@ Development screenshots must be clearly labeled as previews. Controlled producti
 
 ## Current CI note
 
-The current dedicated workflow targets **Gates 1-20 and website compatibility**. During handoff consolidation, several old source-gate tests exposed brittle exact-heading assertions. Gate 2 and Gate 3 were corrected to validate substantive consolidated-handoff controls. This handoff now preserves explicit gate headings through Gate 20 so legacy gate checks and current restart documentation remain aligned.
+The current dedicated workflow targets **Gates 1-20 and website compatibility**. During handoff consolidation, several old source-gate tests exposed brittle exact-heading assertions. This handoff intentionally retains both grouped gate aliases and detailed gate headings so legacy validation and current restart documentation stay aligned.
 
 Gate 20 is not accepted until regulated source verification, repository tests, lint, and the production Next.js build all pass on the current head.
 
