@@ -305,10 +305,15 @@ export async function getFloridaClassDObserverMediaAccess(input: {
   liveSessionId: string;
   grantId: string;
   observerLabel: string;
+  expiresAt: string;
 }) {
   if (!floridaClassDLiveMediaEnabled()) throw new FloridaClassDMediaError("Class D live video is not yet enabled.", 503, "FDACS_MEDIA_NOT_ENABLED");
   requireUuid(input.liveSessionId, "live session id");
   requireUuid(input.grantId, "observer grant id");
+  const grantExpiresAtMs = Date.parse(input.expiresAt);
+  if (!Number.isFinite(grantExpiresAtMs) || grantExpiresAtMs <= Date.now()) {
+    throw new FloridaClassDMediaError("Observer access grant has expired.", 401, "FDACS_MEDIA_OBSERVER_GRANT_EXPIRED");
+  }
   const session = await loadSession(input.liveSessionId);
   if (!["live", "break"].includes(String(session.status))) {
     throw new FloridaClassDMediaError("The live lesson is not currently available for observation.", 409, "FDACS_MEDIA_OBSERVER_SESSION_NOT_LIVE");
@@ -316,13 +321,18 @@ export async function getFloridaClassDObserverMediaAccess(input: {
   const room = await ensureRoom(input.liveSessionId);
   if (!room.name || !room.url) throw new FloridaClassDMediaError("Live media room is incomplete.", 502, "FDACS_MEDIA_ROOM_INVALID");
   const now = Math.floor(Date.now() / 1000);
+  const grantExp = Math.floor(grantExpiresAtMs / 1000);
+  const tokenExp = Math.min(grantExp, now + 90 * 60);
+  if (tokenExp <= now + 15) {
+    throw new FloridaClassDMediaError("Observer access grant is too close to expiration.", 401, "FDACS_MEDIA_OBSERVER_GRANT_EXPIRING");
+  }
   const displayName = input.observerLabel.trim().slice(0, 80) || "Authorized Regulatory Observer";
   const token = await createToken({
     room_name: room.name,
     user_id: shortObserverId(input.grantId),
     user_name: displayName,
     nbf: now - 30,
-    exp: now + 90 * 60,
+    exp: tokenExp,
     eject_at_token_exp: true,
     is_owner: false,
     enable_screenshare: false,
@@ -341,7 +351,7 @@ export async function getFloridaClassDObserverMediaAccess(input: {
     provider: "daily" as const,
     roomName: room.name,
     joinUrl: joinUrl(room.url, token),
-    tokenExpiresAt: new Date((now + 90 * 60) * 1000).toISOString(),
+    tokenExpiresAt: new Date(tokenExp * 1000).toISOString(),
     recordingEnabled: false,
     observerMode: "view-only" as const,
     lessonId: typeof session.lesson_id === "string" ? session.lesson_id : null,
