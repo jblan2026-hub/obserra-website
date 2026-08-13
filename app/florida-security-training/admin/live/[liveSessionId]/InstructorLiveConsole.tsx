@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type TimeSummary = {
   connectedSeconds?: number;
@@ -108,6 +108,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   const [classPrompt, setClassPrompt] = useState("");
   const [answerText, setAnswerText] = useState("");
   const [answerTarget, setAnswerTarget] = useState<Interaction | null>(null);
+  const [clockMs, setClockMs] = useState(0);
   const autoCheckIssued = useRef(false);
 
   const refresh = useCallback(async () => {
@@ -119,17 +120,31 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   }, [liveSessionId]);
 
   useEffect(() => {
-    void refresh().catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Unable to load live class."));
+    const initialLoad = window.setTimeout(() => {
+      void refresh().catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Unable to load live class."));
+    }, 0);
     const timer = window.setInterval(() => void refresh().catch(() => undefined), 5_000);
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearTimeout(initialLoad);
+      window.clearInterval(timer);
+    };
   }, [refresh]);
 
+  useEffect(() => {
+    const initialTick = window.setTimeout(() => setClockMs(Date.now()), 0);
+    const timer = window.setInterval(() => setClockMs(Date.now()), 5_000);
+    return () => {
+      window.clearTimeout(initialTick);
+      window.clearInterval(timer);
+    };
+  }, []);
+
   const startedAt = state?.session?.started_at;
-  const elapsedInstructionMinutes = startedAt && state?.session?.status === "live"
-    ? Math.max(0, Math.floor((Date.now() - Date.parse(startedAt)) / 60_000))
+  const elapsedInstructionMinutes = startedAt && state?.session?.status === "live" && clockMs > 0
+    ? Math.max(0, Math.floor((clockMs - Date.parse(startedAt)) / 60_000))
     : 0;
 
-  const students = state?.students ?? [];
+  const students = useMemo(() => state?.students ?? [], [state?.students]);
   const interactions = state?.interactions ?? [];
   const questions = interactions.filter((item) => item.interaction_type === "student_question");
 
