@@ -16,6 +16,8 @@ export const FLORIDA_CLASS_D_COMPLETION_DOCUMENT_POLICY = {
   officialCertificateRequiredForClassDApplication: true,
   officialCertificateMayBeGeneratedByObserra: false,
   brandedCertificateIsSupplementalOnly: true,
+  supplementalCertificateRequiresPassingExam: true,
+  supplementalCertificateMinimumScore: 128,
   maximumPdfBytes: MAX_PDF_BYTES,
 } as const;
 
@@ -30,6 +32,12 @@ export type CompletionDocument = {
   source_system: "lias" | "obserra" | "fdacs_public";
   sha256?: string | null;
   content_type?: string | null;
+};
+
+type CompletionDocumentRecord = CompletionDocument & {
+  storage_bucket?: string | null;
+  storage_object_key?: string | null;
+  render_payload?: Record<string, unknown> | null;
 };
 
 function enabled(value: string | undefined) {
@@ -124,6 +132,110 @@ async function storageDownload(bucket: string, objectKey: string) {
   return response;
 }
 
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function requirePayloadString(payload: Record<string, unknown>, key: string) {
+  const value = payload[key];
+  if (typeof value !== "string" || value.trim().length === 0) {
+    throw new FloridaClassDExamError("Generated completion document data is incomplete.", 502, "FDACS_COMPLETION_DOCUMENT_RENDER_DATA_INVALID");
+  }
+  return value.trim();
+}
+
+function requirePayloadNumber(payload: Record<string, unknown>, key: string) {
+  const value = payload[key];
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    throw new FloridaClassDExamError("Generated completion document data is incomplete.", 502, "FDACS_COMPLETION_DOCUMENT_RENDER_DATA_INVALID");
+  }
+  return value;
+}
+
+function renderCertificateHtml(payload: Record<string, unknown>) {
+  const studentLegalName = requirePayloadString(payload, "studentLegalName");
+  const courseTitle = requirePayloadString(payload, "courseTitle");
+  const completionDate = requirePayloadString(payload, "completionDate");
+  const certificateId = requirePayloadString(payload, "certificateId");
+  const instructionalHours = requirePayloadNumber(payload, "instructionalHours");
+  const examScore = requirePayloadNumber(payload, "examScore");
+  const passingScore = requirePayloadNumber(payload, "passingScore");
+  if (instructionalHours < 40 || examScore < passingScore || passingScore < 128) {
+    throw new FloridaClassDExamError("Generated certificate failed completion validation.", 409, "FDACS_COMPLETION_CERTIFICATE_NOT_ELIGIBLE");
+  }
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Obserra Florida Class D Course Completion Certificate</title>
+<style>
+@page{size:landscape;margin:0.45in}*{box-sizing:border-box}body{margin:0;background:#07111f;color:#f5f1e8;font-family:Georgia,"Times New Roman",serif}.sheet{min-height:7.3in;border:2px solid #c9a54d;padding:34px 44px;background:linear-gradient(145deg,#07111f,#0d1e34);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.brand{font-family:Arial,sans-serif;letter-spacing:.18em;color:#d5b45c;font-size:13px}.rule{width:120px;border-top:1px solid #c9a54d;margin:20px auto}.title{font-size:34px;letter-spacing:.03em;margin:8px 0 12px}.subtitle{font-family:Arial,sans-serif;font-size:14px;letter-spacing:.12em;color:#c9a54d;text-transform:uppercase}.name{font-size:38px;margin:24px 0 8px;border-bottom:1px solid #c9a54d;padding:0 28px 10px}.course{font-size:23px;margin:12px 0}.facts{font-family:Arial,sans-serif;display:flex;gap:34px;justify-content:center;flex-wrap:wrap;margin:24px 0;font-size:13px}.facts b{display:block;color:#d5b45c;font-size:15px;margin-bottom:4px}.notice{max-width:800px;font-family:Arial,sans-serif;font-size:11px;line-height:1.5;color:#d5dce6;margin-top:18px}.id{font-family:monospace;font-size:11px;color:#aeb8c5;margin-top:20px}@media print{body{background:#fff}.sheet{break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<main class="sheet">
+<div class="brand">OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</div>
+<div class="rule"></div>
+<div class="subtitle">Supplemental School Record</div>
+<h1 class="title">Course Completion Certificate</h1>
+<p>This certifies that</p>
+<div class="name">${escapeHtml(studentLegalName)}</div>
+<p>successfully completed the school requirements for</p>
+<div class="course">${escapeHtml(courseTitle)}</div>
+<div class="facts">
+<div><b>${escapeHtml(instructionalHours)}</b>Instructional Hours</div>
+<div><b>${escapeHtml(examScore)} / 170</b>Final Examination Score</div>
+<div><b>${escapeHtml(completionDate)}</b>Completion Date</div>
+</div>
+<p class="notice"><strong>Important:</strong> This is a supplemental Obserra school record. It does not replace the official FDACS-16103 Certificate of Security Officer Training generated through LIAS, and course completion does not itself issue a Florida Class D Security Officer license.</p>
+<div class="id">Certificate ID: ${escapeHtml(certificateId)}</div>
+</main>
+</body>
+</html>`;
+}
+
+function renderApplicationHandoffHtml(payload: Record<string, unknown>) {
+  const studentLegalName = requirePayloadString(payload, "studentLegalName");
+  const completionDate = requirePayloadString(payload, "completionDate");
+  const certificateId = requirePayloadString(payload, "certificateId");
+  return `<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>Florida Class D Application Handoff</title>
+<style>body{font-family:Arial,sans-serif;max-width:850px;margin:40px auto;padding:0 24px;color:#132034;line-height:1.55}h1{color:#0b1d33}section{border:1px solid #d5b45c;padding:20px;margin:20px 0}.ref{font-family:monospace;background:#f4f6f8;padding:8px}.notice{font-weight:700}</style></head>
+<body>
+<h1>Florida Class D Application Handoff</h1>
+<p>Student: <strong>${escapeHtml(studentLegalName)}</strong></p>
+<p>Successful course completion date: <strong>${escapeHtml(completionDate)}</strong></p>
+<p class="ref">Obserra completion reference: ${escapeHtml(certificateId)}</p>
+<section><h2>Official training certificate</h2><p>The official Florida training-completion record is the <strong>FDACS-16103 Certificate of Security Officer Training</strong>, generated through the school's LIAS reporting workflow after successful completion is reported. Retain that official document with your Class D application records.</p></section>
+<section><h2>License application</h2><p>Submit the required Class D license application and supporting documents through the official Florida Department of Agriculture and Consumer Services process. This handoff document and any supplemental Obserra certificate do not replace FDACS-16103.</p></section>
+<p class="notice">Successful course completion does not itself issue a Florida Class D Security Officer license.</p>
+</body></html>`;
+}
+
+function renderGeneratedDocument(document: CompletionDocumentRecord) {
+  if (!document.render_payload || typeof document.render_payload !== "object" || Array.isArray(document.render_payload)) {
+    throw new FloridaClassDExamError("Generated completion document data is unavailable.", 404, "FDACS_COMPLETION_DOCUMENT_RENDER_DATA_NOT_FOUND");
+  }
+  if (document.source_system !== "obserra") {
+    throw new FloridaClassDExamError("Generated completion document source is invalid.", 409, "FDACS_COMPLETION_DOCUMENT_RENDER_SOURCE_INVALID");
+  }
+  const html = document.document_type === "obserra_course_completion"
+    ? renderCertificateHtml(document.render_payload)
+    : document.document_type === "class_d_application_instructions"
+      ? renderApplicationHandoffHtml(document.render_payload)
+      : null;
+  if (!html) throw new FloridaClassDExamError("Generated completion document type is not supported.", 400, "FDACS_COMPLETION_DOCUMENT_RENDER_TYPE_INVALID");
+  return new TextEncoder().encode(html);
+}
+
 export async function listCompletionDocumentsForStudent(clerkUserId: string) {
   const enrollments = await restRequest<Array<{ id: string }>>(
     `fdacs_class_d_enrollments?${new URLSearchParams({ select: "id", clerk_user_id: `eq.${clerkUserId}`, status: "eq.completed", order: "updated_at.desc", limit: "10" })}`,
@@ -198,22 +310,33 @@ export async function uploadOfficialFdacs16103(
 
 export async function downloadStudentCompletionDocument(clerkUserId: string, documentId: string) {
   requireUuid(documentId, "document id");
-  const documents = await restRequest<Array<CompletionDocument & { storage_bucket?: string | null; storage_object_key?: string | null }>>(
-    `fdacs_class_d_completion_documents?${new URLSearchParams({ select: "id,enrollment_id,completion_record_id,document_type,status,storage_bucket,storage_object_key,external_reference,issued_at,source_system,sha256,content_type", id: `eq.${documentId}`, status: "eq.available", limit: "1" })}`,
+  const documents = await restRequest<CompletionDocumentRecord[]>(
+    `fdacs_class_d_completion_documents?${new URLSearchParams({ select: "id,enrollment_id,completion_record_id,document_type,status,storage_bucket,storage_object_key,external_reference,issued_at,source_system,sha256,content_type,render_payload", id: `eq.${documentId}`, status: "eq.available", limit: "1" })}`,
   );
   const document = documents[0];
-  if (!document?.storage_bucket || !document.storage_object_key) {
+  if (!document) {
     throw new FloridaClassDExamError("Completion document is not available for download.", 404, "FDACS_COMPLETION_DOCUMENT_NOT_FOUND");
   }
+
   const enrollment = await restRequest<Array<{ id: string }>>(
     `fdacs_class_d_enrollments?${new URLSearchParams({ select: "id", id: `eq.${document.enrollment_id}`, clerk_user_id: `eq.${clerkUserId}`, status: "eq.completed", limit: "1" })}`,
   );
   if (!enrollment[0]) throw new FloridaClassDExamError("Completion document access is not authorized.", 403, "FDACS_COMPLETION_DOCUMENT_FORBIDDEN");
-  const response = await storageDownload(document.storage_bucket, document.storage_object_key);
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  const digest = createHash("sha256").update(bytes).digest("hex");
-  if (document.sha256 && digest !== document.sha256) {
-    throw new FloridaClassDExamError("Completion document integrity validation failed.", 502, "FDACS_COMPLETION_DOCUMENT_INTEGRITY_FAILED");
+
+  if (document.storage_bucket && document.storage_object_key) {
+    const response = await storageDownload(document.storage_bucket, document.storage_object_key);
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    const digest = createHash("sha256").update(bytes).digest("hex");
+    if (document.sha256 && digest !== document.sha256) {
+      throw new FloridaClassDExamError("Completion document integrity validation failed.", 502, "FDACS_COMPLETION_DOCUMENT_INTEGRITY_FAILED");
+    }
+    return { document, bytes, contentType: document.content_type || "application/pdf", generated: false };
   }
-  return { document, bytes, contentType: document.content_type || "application/pdf" };
+
+  if (document.content_type === "text/html" && document.render_payload) {
+    const bytes = renderGeneratedDocument(document);
+    return { document, bytes, contentType: "text/html; charset=utf-8", generated: true };
+  }
+
+  throw new FloridaClassDExamError("Completion document is not available for download.", 404, "FDACS_COMPLETION_DOCUMENT_NOT_FOUND");
 }
