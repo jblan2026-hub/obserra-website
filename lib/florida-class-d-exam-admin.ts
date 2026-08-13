@@ -5,7 +5,7 @@ import { FloridaClassDExamError } from "./florida-class-d-exam";
 
 const DEFAULT_SUPABASE_URL = "https://nwxnyqlyzyufgoadtqxs.supabase.co";
 const COURSE_ID = "florida-class-d-40-hour";
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const SUBJECT_CODES = new Set([
   "legal","role","conduct","communications","observation_reporting","access_control","patrols","safeguarding_information","physical_security","interviewing","emergency_preparedness","safety_awareness","medical_emergencies","terrorism","event_security","communications_systems","special_issues","introduction_weapons",
 ]);
@@ -84,7 +84,7 @@ function normalize(payload: ImportPayload) {
   const questions = payload.questions.map((question, index) => {
     const subjectCode = question.subjectCode?.trim();
     if (!SUBJECT_CODES.has(subjectCode)) throw new FloridaClassDExamError(`Question ${index + 1} has an invalid subject code.`, 400, "FDACS_EXAM_BANK_SUBJECT_INVALID");
-    if (!['multiple_choice','true_false'].includes(question.questionType)) throw new FloridaClassDExamError(`Question ${index + 1} has an invalid type.`, 400, "FDACS_EXAM_BANK_TYPE_INVALID");
+    if (!["multiple_choice","true_false"].includes(question.questionType)) throw new FloridaClassDExamError(`Question ${index + 1} has an invalid type.`, 400, "FDACS_EXAM_BANK_TYPE_INVALID");
     const prompt = question.prompt?.trim();
     if (!prompt || prompt.length > 8000) throw new FloridaClassDExamError(`Question ${index + 1} has an invalid prompt.`, 400, "FDACS_EXAM_BANK_PROMPT_INVALID");
     if (!question.choices || typeof question.choices !== "object" || Array.isArray(question.choices)) throw new FloridaClassDExamError(`Question ${index + 1} choices are invalid.`, 400, "FDACS_EXAM_BANK_CHOICES_INVALID");
@@ -123,7 +123,7 @@ function stableDigest(value: unknown) {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
-export async function importFloridaClassDExamBank(actorUserId: string, payload: ImportPayload, correlationId = randomUUID()) {
+export async function importFloridaClassDExamBank(actorUserId: string, payload: ImportPayload, correlationId: string = randomUUID()) {
   if (!floridaClassDExamAdminEnabled()) throw new FloridaClassDExamError("Exam bank administration is disabled.", 503, "FDACS_EXAM_ADMIN_DISABLED");
   if (!UUID_PATTERN.test(correlationId)) throw new FloridaClassDExamError("Correlation identifier is invalid.", 400, "FDACS_EXAM_ADMIN_CORRELATION_INVALID");
   const normalized = normalize(payload);
@@ -173,7 +173,7 @@ export async function listFloridaClassDExamBanks() {
   return request<Array<Record<string, unknown>>>(`fdacs_class_d_exam_banks?${new URLSearchParams({ select: "id,version,status,division_approval_reference,question_count,required_question_count,passing_score,minimum_exam_seconds,created_at,approved_at", course_id: `eq.${COURSE_ID}`, order: "created_at.desc", limit: "50" })}`);
 }
 
-export async function markFloridaClassDExamBankSubmitted(actorUserId: string, bankId: string, submissionReference: string, correlationId = randomUUID()) {
+export async function markFloridaClassDExamBankSubmitted(actorUserId: string, bankId: string, submissionReference: string, correlationId: string = randomUUID()) {
   if (!floridaClassDExamAdminEnabled()) throw new FloridaClassDExamError("Exam bank administration is disabled.", 503, "FDACS_EXAM_ADMIN_DISABLED");
   if (!UUID_PATTERN.test(bankId) || !UUID_PATTERN.test(correlationId)) throw new FloridaClassDExamError("Identifier is invalid.", 400, "FDACS_EXAM_ADMIN_IDENTIFIER_INVALID");
   if (!submissionReference.trim()) throw new FloridaClassDExamError("Submission reference is required.", 400, "FDACS_EXAM_SUBMISSION_REFERENCE_REQUIRED");
@@ -181,7 +181,7 @@ export async function markFloridaClassDExamBankSubmitted(actorUserId: string, ba
   return { bankId, status: "division_submitted" };
 }
 
-export async function markFloridaClassDExamBankApproved(actorUserId: string, bankId: string, approvalReference: string, correlationId = randomUUID()) {
+export async function markFloridaClassDExamBankApproved(actorUserId: string, bankId: string, approvalReference: string, correlationId: string = randomUUID()) {
   if (!floridaClassDExamAdminEnabled()) throw new FloridaClassDExamError("Exam bank administration is disabled.", 503, "FDACS_EXAM_ADMIN_DISABLED");
   if (!UUID_PATTERN.test(bankId) || !UUID_PATTERN.test(correlationId)) throw new FloridaClassDExamError("Identifier is invalid.", 400, "FDACS_EXAM_ADMIN_IDENTIFIER_INVALID");
   if (approvalReference.trim().length < 3) throw new FloridaClassDExamError("Division approval reference is required.", 400, "FDACS_EXAM_APPROVAL_REFERENCE_REQUIRED");
