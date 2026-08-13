@@ -11,6 +11,7 @@ const navigation = [
   { label: "Applications", href: "/apps" },
   { label: "Industries", href: "/industries" },
   { label: "Academy", href: "/academy" },
+  { label: "Florida Training", href: "/florida-security-training" },
   { label: "Resources", href: "/resources" },
   { label: "Trust", href: "/trust" },
   { label: "About", href: "/about" },
