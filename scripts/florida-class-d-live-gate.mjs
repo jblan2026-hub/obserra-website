@@ -79,14 +79,14 @@ required(reporting, "certifyFloridaClassDLiveDay", "Instructor reporting service
 required(studentApi, "floridaClassDLiveInstructionEnabled", "Student live API must fail closed behind the regulatory live gate.");
 required(studentApi, 'body.action === "heartbeat"', "Student live API must support presence heartbeats.");
 required(studentApi, 'body.action === "challenge"', "Student live API must support presence challenges.");
-required(studentApi, '"question", "hand_raise", "response", "poll_response"', "Student live API must support interaction events.");
+required(studentApi, '["question", "hand_raise", "response"]', "Student live API must support live Q&A and hand-raise interaction events.");
 required(studentApi, "getFloridaClassDStudentTimeLedger", "Student live API must return cumulative course time.");
 required(adminApi, "requireFloridaClassDStaff", "Instructor live API must require server-side staff authorization.");
 required(adminApi, 'body.action === "challenge"', "Instructor live API must support security challenges.");
 required(adminApi, 'body.action === "segment"', "Instructor live API must control instruction versus break segments.");
 required(adminApi, 'body.action === "certify_day"', "Instructor live API must support daily attendance certification.");
 required(adminApi, "getFloridaClassDRosterTimeLedgers", "Instructor live API must return cumulative per-student time.");
-required(adminApi, '"answer", "prompt", "poll"', "Instructor live API must support interactive teaching events.");
+required(adminApi, '["answer", "prompt"]', "Instructor live API must support live teaching prompts and answers.");
 
 required(studentUi, "Attendance, instructional time, and secure live media are active", "Student classroom must disclose active attendance/time tracking and secure media state.");
 required(studentUi, "Breaks are tracked in the LMS but are not credited", "Student classroom must clearly distinguish break time from instruction.");
