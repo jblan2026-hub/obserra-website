@@ -1,5 +1,5 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 
 const CANONICAL_HOST = "www.obserrallc.com";
 const DEFAULT_OWNER_ORIGIN = "https://owner.obserrallc.com";
@@ -219,19 +219,19 @@ function identityConfigurationResponse(request: NextRequest) {
   return response;
 }
 
-export default clerkMiddleware(async (auth, request) => {
+function applyPreAuthRouting(request: NextRequest) {
   const ownerRoute = redirectToOwnerSite(request);
   if (ownerRoute) return ownerRoute;
 
   const ownerHostRoute = redirectOwnerHostToCorrectSurface(request);
   if (ownerHostRoute) return ownerHostRoute;
 
-  const canonical = canonicalRedirect(request);
-  if (canonical) return canonical;
+  return canonicalRedirect(request);
+}
 
-  if (!authenticationReady()) {
-    return identityConfigurationResponse(request);
-  }
+const authenticatedProxy = clerkMiddleware(async (auth, request) => {
+  const preAuthRoute = applyPreAuthRouting(request);
+  if (preAuthRoute) return preAuthRoute;
 
   if (requiresAuthentication(request)) {
     const { userId } = await auth();
@@ -244,6 +244,17 @@ export default clerkMiddleware(async (auth, request) => {
 
   return applyRouteSecurityHeaders(NextResponse.next(), request);
 });
+
+export default function proxy(request: NextRequest, event: NextFetchEvent) {
+  const preAuthRoute = applyPreAuthRouting(request);
+  if (preAuthRoute) return preAuthRoute;
+
+  if (!authenticationReady()) {
+    return identityConfigurationResponse(request);
+  }
+
+  return authenticatedProxy(request, event);
+}
 
 export const config = {
   matcher: [
