@@ -2,9 +2,15 @@
 
 - **Document ID:** WEBSITE-OWNER-PROD-TRUTH-001
 - **Status:** Controlled current-state record
-- **Owner:** Obserra LLC Owner, Web Platform, Commerce, Academy, Security, and Operations
-- **Last updated:** 2026-08-07
-- **Applies to:** `www.obserrallc.com`, public website, Store, Academy, customer and owner entry points, identity, commerce, Studio ingestion, Trust Center, and production observability
+- **Owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC, Web Platform, Commerce, Academy, Security, and Operations
+- **Last updated:** 2026-08-13
+- **Applies to:** `www.obserrallc.com`, `obserrallc.com`, public website, Store, Academy, customer and owner entry points, identity, commerce, Studio ingestion, Trust Center, and production observability
+
+## Canonical identity and domain authority
+
+The legal company and merchant identity is **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**. The canonical company domain is `obserrallc.com`, and the canonical public production origin is `https://www.obserrallc.com`. Product names such as Obserra EIOS, Obserra EPI Academy, and other Obserra applications are products or brands under the legal entity and must not replace the company identity in legal, merchant, billing, deployment, installer, certificate, policy, or handoff records.
+
+`obserra.com` is not the canonical company domain. Any current source, deployment configuration, merchant metadata, generated artifact, installer, email, report, certificate, legal notice, or handoff that substitutes another company identity or domain is configuration drift and a release blocker. Historical evidence may retain historical values only when clearly identified as historical evidence rather than current authority.
 
 ## Purpose
 
@@ -26,17 +32,20 @@ A Vercel `Ready` preview is not production verification. A deployment associated
 
 | Capability | Current state | Evidence boundary | Blocker or next gate |
 |---|---|---|---|
-| Complete Academy learner experience website feature | CI and prior preview verified, not production verified | PR 44, branch `feature/academy-complete-learning-experience`, head `96f5a5a66a28c20ddbdc13b0f89c401089b876c6`; Website CI succeeded and historical branch previews reported Ready | Merge/reconciliation, exact production deployment, identity, entitlement, course, assessment, certificate, and runtime verification remain. |
-| Sitewide control alignment and Studio ingestion | CI verified, latest production deployment blocked | PR 46, branch `agent/sitewide-governance-auto-academy`, head `899c074d4064f3d92969f06bde6acda54d6ed6ba`; Website CI run 8 succeeded | The latest `obserra-website-live` PR deployment was reported canceled and the secondary project deployments were ignored. Direct production verification is absent. |
-| Branch relationship | Blocked for production promotion | PR 46 is based on the PR 44 feature branch rather than `main` | Complete review and reconciliation, then promote one exact release commit through production gates. |
-| Public website availability | Must be measured directly | Historical production and preview evidence exists | Run current production route, header, content, error, and availability tests on the exact active deployment. |
-| Production identity | Blocked until directly proven | The production identity readiness record identifies development Clerk indicators as unapproved | Configure and verify the approved production Clerk instance, domains, live key pairing, MFA/security policy, redirects, webhooks, private caching, and owner allowlist. |
+| Canonical company and domain identity | Controlled in source and handoff | `docs/PRODUCTION-IDENTITY-READINESS.md` and this register identify **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**, `obserrallc.com`, and `https://www.obserrallc.com` as current authority | Continue automated and release-time drift checks across source, deployment, commerce, generated artifacts, policies, certificates, and application integrations. |
+| Current website source | Implemented in source | `main` commit `dca2a5d481549b5c80c034a50a7e24c3ea7f698d`, `security: fail closed on Clerk test keys in production` | Exact production identity, deployment lineage, protected-route behavior, and post-deployment verification remain required. |
+| Public website availability | Directly verified for current public routes | On 2026-08-13 direct checks of `https://www.obserrallc.com`, `/apps`, `/trust`, and `/about` returned the current Obserra executive-intelligence experience | Complete direct checks for the remaining production route inventory, apex-to-`www` convergence, headers, accessibility, protected routes, transactions, and error state. |
+| Applications marketplace | Directly verified current public route | `/apps` presents the Obserra enterprise application marketplace, identifies available, pilot, and coming-soon products, and states secure-by-design deployment expectations | Verify each commercial product brief, live commerce path, entitlement path, and deployment claim against authoritative backend and merchant evidence before production sign-off. |
+| Trust Center | Directly verified current public route | `/trust` reports the Obserra Enterprise Trust Center as published and operational and distinguishes framework alignment from certification or approval | Continue evidence-date, policy, accessibility, legal-claim, procurement, and security-control verification. |
+| Production identity source guard | Implemented in source, not yet production verified | At `dca2a5d481549b5c80c034a50a7e24c3ea7f698d`, `app/layout.tsx` accepts only `pk_live_` and `sk_live_` Clerk keys when `VERCEL_ENV=production`; invalid or test credentials do not initialize `ClerkProvider` | Configure and directly verify the approved production Clerk instance, live key pairing, production domains, redirects, webhooks, MFA/security policy, private caching, and owner allowlist. Confirm no `pk_test_` or `*.clerk.accounts.dev` resource is exposed by the active production deployment. |
+| Vercel deployment lineage | Reconciliation required | For exact source commit `dca2a5d481549b5c80c034a50a7e24c3ea7f698d`, `Vercel - obserra-website-lcn2` reported deployment success. A separate `obserra-website-live` status under the `obserra-59e6b33d` scope reported `Canceled from the Vercel Dashboard`. `Vercel - obserra-integrated-services` was still pending at the latest recorded check. | Reconcile the parallel Vercel scopes and Git integrations so one governed production project owns the canonical domains and produces an unambiguous exact-commit production status. Do not treat the canceled parallel status as a successful release. |
+| Connected Vercel control plane | Blocked for complete administrative verification | The connected Vercel account exposes team `Obserra` / slug `obserra` / ID `team_xpUE1GefY2JHuFFCqbAdnZAj`, but project enumeration returned zero projects during the 2026-08-13 check | Repair or reauthorize the Vercel project connection through approved account controls. Do not bypass the authorization boundary. |
+| Complete Academy learner experience website feature | Not production verified | Historical feature and preview evidence exists, but current production learner identity, entitlement, course, assessment, certificate, and runtime behavior have not all been reverified against one exact release | Reconcile current Academy source with `main`, then verify production identity, entitlement, course, assessment, certificate, checkout, and runtime behavior against the exact production deployment. |
 | Academy public catalog | Operational baseline may exist | Public catalog is descriptive and may preserve a reviewed fallback | Do not infer protected learner readiness, LCMS content, entitlement, assessment, media, or certificate readiness from catalog presence. |
-| Academy Studio ingestion | Implemented in source | PR 46 validates supported approved Studio catalog schemas and fails closed to the reviewed baseline | Connect only an approved publication artifact, verify provenance and schema, then test exact production course detail and checkout behavior. |
-| Store and Stripe commerce | Existing production-oriented contracts, not current full verification | Checkout, signed webhook, deferred claim, orders, billing, and health work exists in merged history | Verify live Stripe mode, product and price mappings, checkout, webhook signatures, idempotency, purchaser claim, entitlements, refunds, billing, failure containment, and no card-data storage. |
-| Trust Center alignment | Implemented in source | PR 46 adds public alignment page and machine-readable API | Deploy and verify wording, evidence dates, accessibility, caching, and restricted claim boundary. |
-| Owner-private Command Center entry point | Blocked | No current owner-only production route and backend path have been directly verified | Implement the approved production identity and BFF architecture, deny non-owner access, and verify end to end against the EIOS production tier. |
-| Production observability | Blocked until measured | Vercel and application logging capabilities exist | Establish direct deployment lineage, runtime error review, route health, alerting, owner notification, and evidence retention for the production project. |
+| Academy Studio ingestion | Implemented in source history, current production state not fully verified | Prior governed Studio ingestion work validates supported approved catalog schemas and fails closed to a reviewed baseline | Connect only an approved publication artifact, verify provenance and schema, then test exact production course detail and checkout behavior. |
+| Store and Stripe commerce | Existing production-oriented contracts, not current full verification | Checkout, signed webhook, deferred claim, orders, billing, and health work exists in merged history | Verify live Stripe mode, legal merchant identity, product and price mappings, checkout, webhook signatures, idempotency, purchaser claim, entitlements, refunds, billing, failure containment, and no card-data storage. |
+| Owner-private Command Center entry point | Blocked | No current owner-only production route and backend path have been directly verified end to end | Implement or verify the approved production identity and BFF architecture, deny non-owner access, and verify end to end against the EIOS production tier. |
+| Production observability | Blocked until measured against the governed production project | Vercel and application logging capabilities exist, but project lineage remains ambiguous | Establish direct deployment lineage, runtime error review, route health, alerting, owner notification, and evidence retention for the authoritative production project. |
 
 ## Production identity gate
 
@@ -55,7 +64,7 @@ Production identity verification requires:
 
 ## Website and Store production gate
 
-The exact production release is verified only when all applicable checks pass against `www.obserrallc.com` and the active Vercel production deployment:
+The exact production release is verified only when all applicable checks pass against `www.obserrallc.com` and the active authoritative Vercel production deployment:
 
 1. Domain and TLS validation for apex and `www`, with the approved canonical redirect.
 2. Successful current route checks for home, services, industries, EIOS, applications, Academy, Store, Trust Center, contact, legal, accessibility, sign-in, customer portal, and owner entry point.
@@ -63,12 +72,13 @@ The exact production release is verified only when all applicable checks pass ag
 4. No unresolved production HTTP 5xx cluster, deployment error, middleware failure, or secret exposure.
 5. Responsive and accessibility checks for public, learner, customer, and owner routes.
 6. Real production data or an explicit empty state. No synthetic orders, learners, licenses, incidents, controls, revenue, inventory, compliance, or deployment status may be presented as real.
-7. Live Stripe checkout and signed webhook verification for each approved product class.
+7. Live Stripe checkout and signed webhook verification for each approved product class under the legal merchant identity **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**.
 8. Idempotent fulfillment, entitlement, purchaser-email claim, refund, cancellation, billing, receipt, and portal behavior.
 9. Academy catalog provenance and approved Studio ingestion, with protected content absent from public artifacts.
 10. Owner-private Command Center route denied to every identity except the approved owner and connected only through the protected EIOS BFF and API.
 11. Production logs, metrics, alerts, deployment lineage, and rollback evidence retained with the release.
-12. Post-deployment smoke and transaction tests tied to the exact Git commit and Vercel deployment ID.
+12. Post-deployment smoke and transaction tests tied to the exact Git commit and authoritative Vercel deployment ID.
+13. Exact identity and domain drift checks proving no active production configuration substitutes `obserra.com` or another legal entity for current Obserra authority.
 
 ## Academy publication boundary
 
