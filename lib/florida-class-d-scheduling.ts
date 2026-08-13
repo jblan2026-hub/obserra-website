@@ -97,6 +97,17 @@ function requireUuid(value: string, field: string) {
   if (!UUID_PATTERN.test(value)) throw new FloridaClassDSchedulingError(`Invalid ${field}.`, 400, "FDACS_SCHEDULE_INVALID_IDENTIFIER");
 }
 
+function isCalendarDate(value: string) {
+  if (!DATE_PATTERN.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
 function normalizedDates(trainingDates: string[]) {
   if (trainingDates.length !== 5) {
     throw new FloridaClassDSchedulingError("Exactly five training dates are required.", 400, "FDACS_SCHEDULE_FIVE_DATES_REQUIRED");
@@ -104,8 +115,8 @@ function normalizedDates(trainingDates: string[]) {
   const dates = trainingDates.map((value) => value.trim());
   for (let index = 0; index < dates.length; index += 1) {
     const date = dates[index];
-    if (!DATE_PATTERN.test(date) || Number.isNaN(Date.parse(`${date}T12:00:00Z`))) {
-      throw new FloridaClassDSchedulingError("Training dates must use YYYY-MM-DD format.", 400, "FDACS_SCHEDULE_INVALID_DATE");
+    if (!isCalendarDate(date)) {
+      throw new FloridaClassDSchedulingError("Training dates must be valid calendar dates in YYYY-MM-DD format.", 400, "FDACS_SCHEDULE_INVALID_DATE");
     }
     if (index > 0 && date <= dates[index - 1]) {
       throw new FloridaClassDSchedulingError("Training dates must be strictly increasing.", 400, "FDACS_SCHEDULE_DATES_NOT_INCREASING");
