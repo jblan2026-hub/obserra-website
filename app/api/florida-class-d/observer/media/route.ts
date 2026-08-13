@@ -54,6 +54,7 @@ export async function POST(request: Request) {
       liveSessionId: grant.liveSessionId,
       grantId: grant.grantId,
       observerLabel: grant.observerLabel,
+      expiresAt: grant.expiresAt,
     });
     return NextResponse.json({
       ...media,
