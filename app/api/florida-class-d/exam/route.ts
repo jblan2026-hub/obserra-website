@@ -8,6 +8,7 @@ import {
   startFloridaClassDExam,
   submitFloridaClassDExam,
 } from "../../../../lib/florida-class-d-exam";
+import { heartbeatFloridaClassDExam } from "../../../../lib/florida-class-d-exam-monitoring";
 
 const headers = {
   "cache-control": "private, no-store, max-age=0, must-revalidate",
@@ -25,6 +26,7 @@ type Body = {
   selectedChoiceKey?: unknown;
   direction?: unknown;
   correlationId?: unknown;
+  pageVisible?: unknown;
 };
 
 function disabled() {
@@ -66,6 +68,18 @@ export async function POST(request: Request) {
     if (body.action === "start") {
       if (typeof body.browserInstanceId !== "string") return NextResponse.json({ error: "Browser instance identifier is required.", code: "FDACS_EXAM_DEVICE_REQUIRED" }, { status: 400, headers });
       return NextResponse.json(await startFloridaClassDExam(userId, sessionId, { browserInstanceId: body.browserInstanceId, correlationId }), { status: 201, headers });
+    }
+
+    if (body.action === "heartbeat") {
+      if (typeof body.attemptId !== "string" || typeof body.browserInstanceId !== "string" || typeof body.pageVisible !== "boolean") {
+        return NextResponse.json({ error: "Exam monitoring fields are incomplete.", code: "FDACS_EXAM_MONITORING_INVALID" }, { status: 400, headers });
+      }
+      return NextResponse.json(await heartbeatFloridaClassDExam(userId, sessionId, {
+        attemptId: body.attemptId,
+        browserInstanceId: body.browserInstanceId,
+        pageVisible: body.pageVisible,
+        correlationId,
+      }), { headers });
     }
 
     if (body.action === "answer") {
