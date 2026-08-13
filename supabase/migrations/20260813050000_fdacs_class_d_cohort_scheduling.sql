@@ -12,8 +12,7 @@ create table if not exists public.fdacs_class_d_cohort_training_days (
   correlation_id uuid not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (cohort_id, day),
-  unique (cohort_id, training_date)
+  unique (cohort_id, day)
 );
 
 alter table public.fdacs_class_d_live_sessions
