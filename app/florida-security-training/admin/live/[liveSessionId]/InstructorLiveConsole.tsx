@@ -18,6 +18,16 @@ type MediaAccess = {
   recordingEnabled?: boolean;
 };
 
+type Participation = {
+  questionCount?: number;
+  handRaiseCount?: number;
+  pollResponseCount?: number;
+  pollCorrectCount?: number;
+  scoredPollResponseCount?: number;
+  pollsPresented?: number;
+  pollResponseRate?: number;
+};
+
 type StudentRow = {
   id?: string;
   status?: string;
@@ -32,6 +42,7 @@ type StudentRow = {
   } | null;
   dayTime?: TimeSummary | null;
   courseTime?: TimeSummary | null;
+  participation?: Participation | null;
 };
 
 type Interaction = {
@@ -42,6 +53,16 @@ type Interaction = {
   content?: string | null;
   parent_interaction_id?: string | null;
   created_at?: string;
+};
+
+type LivePoll = {
+  id?: string;
+  question?: string;
+  options?: string[];
+  status?: "open" | "closed";
+  opened_at?: string;
+  closed_at?: string | null;
+  correct_option_index?: number | null;
 };
 
 type ConsoleState = {
@@ -56,6 +77,7 @@ type ConsoleState = {
   };
   students?: StudentRow[];
   interactions?: Interaction[];
+  polls?: LivePoll[];
 };
 
 function asSeconds(value: unknown) {
@@ -81,6 +103,13 @@ function studentName(row: StudentRow) {
     if (typeof value === "string" && value.trim()) return value;
   }
   return "Enrolled student";
+}
+
+function participationLabel(participation?: Participation | null) {
+  if (!participation) return "No participation evidence yet";
+  const polls = participation.pollsPresented ?? 0;
+  const responses = participation.pollResponseCount ?? 0;
+  return `Q ${participation.questionCount ?? 0} · Hands ${participation.handRaiseCount ?? 0} · Polls ${responses}/${polls}`;
 }
 
 async function adminApi(body: Record<string, unknown>) {
@@ -117,6 +146,10 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   const [classPrompt, setClassPrompt] = useState("");
   const [answerText, setAnswerText] = useState("");
   const [answerTarget, setAnswerTarget] = useState<Interaction | null>(null);
+  const [pollQuestion, setPollQuestion] = useState("");
+  const [pollOptions, setPollOptions] = useState(["", "", "", ""]);
+  const [correctOptionIndex, setCorrectOptionIndex] = useState<number | null>(null);
+  const [pollBusy, setPollBusy] = useState(false);
   const [clockMs, setClockMs] = useState(0);
   const autoCheckIssued = useRef(false);
 
@@ -165,6 +198,8 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   const students = useMemo(() => state?.students ?? [], [state?.students]);
   const interactions = state?.interactions ?? [];
   const questions = interactions.filter((item) => item.interaction_type === "student_question");
+  const polls = state?.polls ?? [];
+  const activePoll = polls.find((poll) => poll.status === "open") ?? null;
 
   const issuePresenceCheck = useCallback(async () => {
     if (!students.length) return;
@@ -279,6 +314,57 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     }
   }
 
+  function updatePollOption(index: number, value: string) {
+    setPollOptions((current) => current.map((option, optionIndex) => optionIndex === index ? value : option));
+  }
+
+  async function createPoll(event: FormEvent) {
+    event.preventDefault();
+    if (activePoll) {
+      setError("Close the current live poll before opening another.");
+      return;
+    }
+    const normalizedOptions = pollOptions.map((option) => option.trim()).filter(Boolean);
+    if (!pollQuestion.trim() || normalizedOptions.length < 2) {
+      setError("A live poll requires a question and at least two answer options.");
+      return;
+    }
+    const normalizedCorrect = correctOptionIndex !== null && correctOptionIndex < normalizedOptions.length ? correctOptionIndex : null;
+    setPollBusy(true);
+    setError(null);
+    try {
+      await adminApi({
+        action: "poll_create",
+        liveSessionId,
+        question: pollQuestion.trim(),
+        options: normalizedOptions,
+        correctOptionIndex: normalizedCorrect,
+      });
+      setPollQuestion("");
+      setPollOptions(["", "", "", ""]);
+      setCorrectOptionIndex(null);
+      await refresh();
+    } catch (pollError) {
+      setError(pollError instanceof Error ? pollError.message : "Live poll could not be opened.");
+    } finally {
+      setPollBusy(false);
+    }
+  }
+
+  async function closePoll() {
+    if (!activePoll?.id) return;
+    setPollBusy(true);
+    setError(null);
+    try {
+      await adminApi({ action: "poll_close", pollId: activePoll.id });
+      await refresh();
+    } catch (pollError) {
+      setError(pollError instanceof Error ? pollError.message : "Live poll could not be closed.");
+    } finally {
+      setPollBusy(false);
+    }
+  }
+
   function openObserverAdministration() {
     window.open(`/florida-security-training/admin/observer/${encodeURIComponent(liveSessionId)}`, "_blank", "noopener,noreferrer");
   }
@@ -335,7 +421,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
 
           <section className="fdacs-live__panel fdacs-live__roster-panel">
             <div className="fdacs-live__panel-head"><h2>Live attendance and full-course time roster</h2><span>{students.length} students</span></div>
-            <p className="fdacs-live__muted">The roster separates live connection, credited instructional presence, tracked breaks, and uncredited time for each student. After Lesson 4 ends, the instructor must certify the day. Break time remains visible but cannot become instructional credit.</p>
+            <p className="fdacs-live__muted">The roster separates live connection, credited instructional presence, tracked breaks, uncredited time, and participation evidence for each student. After Lesson 4 ends, the instructor must certify the day. Break time remains visible but cannot become instructional credit.</p>
             <div className="fdacs-live__roster">
               {students.map((student) => {
                 const live = student.liveTime;
@@ -343,7 +429,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
                 const suggested = suggestedAttendanceStatus(student);
                 return (
                   <div key={student.id ?? studentName(student)} className={absent ? "is-absent" : ""}>
-                    <span><strong>{studentName(student)}</strong><small>{live?.presence_state ?? "not connected"}</small></span>
+                    <span><strong>{studentName(student)}</strong><small>{live?.presence_state ?? "not connected"}</small><small>{participationLabel(student.participation)}</small></span>
                     <span><small>Live connected</small><b>{formatDuration(live?.connected_seconds)}</b></span>
                     <span><small>Day instruction</small><b>{formatDuration(student.dayTime?.instructionalPresenceSeconds)}</b></span>
                     <span><small>Day breaks</small><b>{formatDuration(student.dayTime?.breakPresenceSeconds)}</b></span>
@@ -370,6 +456,33 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
               <textarea value={classPrompt} onChange={(event) => setClassPrompt(event.target.value)} placeholder="Ask the class a question, launch a discussion prompt, or give an instruction" maxLength={4000} />
               <button type="submit">Send to class</button>
             </form>
+          </section>
+
+          <section className={`fdacs-live__panel fdacs-live__poll-admin ${activePoll ? "is-open" : ""}`}>
+            <div className="fdacs-live__panel-head"><h2>Structured live poll</h2><span>{activePoll ? "open" : "ready"}</span></div>
+            {activePoll ? (
+              <div className="fdacs-live__active-poll">
+                <strong>{activePoll.question}</strong>
+                <div>{(activePoll.options ?? []).map((option, index) => <span key={`${activePoll.id}-${index}`}>{index + 1}. {option}{activePoll.correct_option_index === index ? " · key" : ""}</span>)}</div>
+                <p className="fdacs-live__muted">Responses recorded: {students.reduce((sum, student) => sum + ((student.participation?.pollResponseCount ?? 0) > 0 ? 1 : 0), 0)} of {students.length} students have at least one poll response in this lesson. Per-student participation totals are shown in the roster.</p>
+                <button type="button" disabled={pollBusy} onClick={() => void closePoll()}>{pollBusy ? "Closing…" : "Close current poll"}</button>
+              </div>
+            ) : (
+              <form className="fdacs-live__form fdacs-live__poll-builder" onSubmit={createPoll}>
+                <textarea value={pollQuestion} onChange={(event) => setPollQuestion(event.target.value)} placeholder="Ask a live knowledge or participation question" maxLength={1000} />
+                {pollOptions.map((option, index) => (
+                  <input key={index} value={option} onChange={(event) => updatePollOption(index, event.target.value)} placeholder={`Option ${index + 1}${index > 1 ? " (optional)" : ""}`} maxLength={500} />
+                ))}
+                <label>Optional correct answer
+                  <select value={correctOptionIndex === null ? "" : String(correctOptionIndex)} onChange={(event) => setCorrectOptionIndex(event.target.value === "" ? null : Number(event.target.value))}>
+                    <option value="">Participation only</option>
+                    {pollOptions.map((option, index) => <option key={index} value={index} disabled={!option.trim()}>Option {index + 1}</option>)}
+                  </select>
+                </label>
+                <button type="submit" disabled={pollBusy || status !== "live"}>{pollBusy ? "Opening…" : "Open live poll"}</button>
+                <small>Only one structured poll can be open at a time. Polls open only during live instruction and are retained as participation evidence.</small>
+              </form>
+            )}
           </section>
 
           <section className="fdacs-live__panel">
