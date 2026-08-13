@@ -1,9 +1,14 @@
 import "server-only";
 
 import type { FloridaClassDStaffRole } from "./florida-class-d-auth";
+import {
+  FLORIDA_CLASS_D_ENROLLMENT_POLICY_VERSION,
+  validateFloridaClassDAcknowledgments,
+} from "./florida-class-d-enrollment-policy";
 
 const DEFAULT_SUPABASE_URL = "https://nwxnyqlyzyufgoadtqxs.supabase.co";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const IDEMPOTENCY_PATTERN = /^[A-Za-z0-9._:-]{12,180}$/;
 
 export class FloridaClassDPersistenceError extends Error {
@@ -41,6 +46,34 @@ type InstructionTimeRpcInput = {
   creditedMinutes: number;
   source: "lms_session" | "instructor_attested_makeup";
   idempotencyKey: string;
+  correlationId: string;
+};
+
+type PreEnrollmentInput = {
+  legalName: string;
+  dateOfBirth: string;
+  cohortId: string;
+  acceptedAcknowledgmentCodes: readonly string[];
+  correlationId: string;
+};
+
+type IdentityVerificationInput = {
+  studentIdentityId: string;
+  status: "pending" | "verified" | "rejected";
+  verificationReference?: string | null;
+  correlationId: string;
+};
+
+type CohortAssignmentInput = {
+  enrollmentId: string;
+  cohortId: string;
+  correlationId: string;
+};
+
+type EnrollmentReviewInput = {
+  enrollmentId: string;
+  outcome: "approved_pending_entitlement" | "needs_information" | "rejected";
+  reviewNote?: string | null;
   correlationId: string;
 };
 
@@ -99,6 +132,24 @@ function requireIsoTimestamp(value: string, field: string) {
   }
 }
 
+function requireBirthDate(value: string) {
+  if (!DATE_PATTERN.test(value)) {
+    throw new FloridaClassDPersistenceError("Invalid date of birth.", 400, "FDACS_INVALID_DATE_OF_BIRTH");
+  }
+  const parsed = new Date(`${value}T00:00:00Z`);
+  if (!Number.isFinite(parsed.getTime()) || parsed >= new Date()) {
+    throw new FloridaClassDPersistenceError("Invalid date of birth.", 400, "FDACS_INVALID_DATE_OF_BIRTH");
+  }
+}
+
+function requireLegalName(value: string) {
+  const normalized = value.trim();
+  if (!normalized || normalized.length > 200 || /[\u0000-\u001F\u007F]/.test(normalized)) {
+    throw new FloridaClassDPersistenceError("Invalid legal name.", 400, "FDACS_INVALID_LEGAL_NAME");
+  }
+  return normalized;
+}
+
 async function supabaseRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   const config = getConfig();
   const response = await fetch(`${config.url}/rest/v1/${path}`, {
@@ -116,7 +167,18 @@ async function supabaseRequest<T>(path: string, init: RequestInit = {}): Promise
   });
 
   const raw = await response.text();
-  const payload = raw ? JSON.parse(raw) as unknown : null;
+  let payload: unknown = null;
+  if (raw) {
+    try {
+      payload = JSON.parse(raw) as unknown;
+    } catch {
+      throw new FloridaClassDPersistenceError(
+        "Regulated persistence returned an invalid response.",
+        502,
+        "FDACS_PERSISTENCE_INVALID_RESPONSE",
+      );
+    }
+  }
   if (!response.ok) {
     const error = payload && typeof payload === "object" && !Array.isArray(payload)
       ? payload as Record<string, unknown>
@@ -215,9 +277,136 @@ export async function recordFloridaClassDInstructionTime(
   });
 }
 
+export async function createFloridaClassDPreEnrollment(
+  userId: string,
+  input: PreEnrollmentInput,
+) {
+  const legalName = requireLegalName(input.legalName);
+  requireBirthDate(input.dateOfBirth);
+  requireUuid(input.cohortId, "cohort id");
+  requireUuid(input.correlationId, "correlation id");
+  if (!validateFloridaClassDAcknowledgments(input.acceptedAcknowledgmentCodes)) {
+    throw new FloridaClassDPersistenceError(
+      "All required enrollment acknowledgments must be accepted.",
+      400,
+      "FDACS_ACKNOWLEDGMENTS_INCOMPLETE",
+    );
+  }
+
+  return supabaseRequest<string>("rpc/fdacs_class_d_create_pre_enrollment", {
+    method: "POST",
+    body: JSON.stringify({
+      p_clerk_user_id: userId,
+      p_legal_name: legalName,
+      p_date_of_birth: input.dateOfBirth,
+      p_cohort_id: input.cohortId,
+      p_policy_version: FLORIDA_CLASS_D_ENROLLMENT_POLICY_VERSION,
+      p_acknowledgments: input.acceptedAcknowledgmentCodes,
+      p_correlation_id: input.correlationId,
+    }),
+  });
+}
+
+export async function setFloridaClassDIdentityVerification(
+  actor: { userId: string; role: FloridaClassDStaffRole },
+  input: IdentityVerificationInput,
+) {
+  requireUuid(input.studentIdentityId, "student identity id");
+  requireUuid(input.correlationId, "correlation id");
+  if (input.verificationReference && input.verificationReference.length > 500) {
+    throw new FloridaClassDPersistenceError(
+      "Verification reference is too long.",
+      400,
+      "FDACS_VERIFICATION_REFERENCE_TOO_LONG",
+    );
+  }
+  return supabaseRequest<null>("rpc/fdacs_class_d_set_identity_verification", {
+    method: "POST",
+    body: JSON.stringify({
+      p_student_identity_id: input.studentIdentityId,
+      p_status: input.status,
+      p_verification_reference: input.verificationReference ?? null,
+      p_actor_role: actor.role,
+      p_actor_clerk_user_id: actor.userId,
+      p_correlation_id: input.correlationId,
+    }),
+  });
+}
+
+export async function assignFloridaClassDCohort(
+  actor: { userId: string; role: FloridaClassDStaffRole },
+  input: CohortAssignmentInput,
+) {
+  requireUuid(input.enrollmentId, "enrollment id");
+  requireUuid(input.cohortId, "cohort id");
+  requireUuid(input.correlationId, "correlation id");
+  return supabaseRequest<null>("rpc/fdacs_class_d_assign_cohort", {
+    method: "POST",
+    body: JSON.stringify({
+      p_enrollment_id: input.enrollmentId,
+      p_cohort_id: input.cohortId,
+      p_actor_role: actor.role,
+      p_actor_clerk_user_id: actor.userId,
+      p_correlation_id: input.correlationId,
+    }),
+  });
+}
+
+export async function reviewFloridaClassDEnrollment(
+  actor: { userId: string; role: FloridaClassDStaffRole },
+  input: EnrollmentReviewInput,
+) {
+  requireUuid(input.enrollmentId, "enrollment id");
+  requireUuid(input.correlationId, "correlation id");
+  if (input.reviewNote && input.reviewNote.length > 4000) {
+    throw new FloridaClassDPersistenceError(
+      "Enrollment review note is too long.",
+      400,
+      "FDACS_REVIEW_NOTE_TOO_LONG",
+    );
+  }
+  return supabaseRequest<string>("rpc/fdacs_class_d_review_enrollment", {
+    method: "POST",
+    body: JSON.stringify({
+      p_enrollment_id: input.enrollmentId,
+      p_outcome: input.outcome,
+      p_review_note: input.reviewNote ?? null,
+      p_policy_version: FLORIDA_CLASS_D_ENROLLMENT_POLICY_VERSION,
+      p_actor_role: actor.role,
+      p_actor_clerk_user_id: actor.userId,
+      p_correlation_id: input.correlationId,
+    }),
+  });
+}
+
 function tableQuery(table: string, filters: Record<string, string>) {
   const query = new URLSearchParams({ select: "*", ...filters });
   return `${table}?${query.toString()}`;
+}
+
+export async function getFloridaClassDEnrollmentStatusForUser(userId: string) {
+  const query = new URLSearchParams({
+    select: "id,status,cohort_id,student_identity_id,enrolled_at,created_at,updated_at",
+    clerk_user_id: `eq.${userId}`,
+    order: "created_at.desc",
+    limit: "1",
+  });
+  const rows = await supabaseRequest<Record<string, unknown>[]>(
+    `fdacs_class_d_enrollments?${query.toString()}`,
+  );
+  return rows[0] ?? null;
+}
+
+export async function listFloridaClassDPendingEnrollments() {
+  const query = new URLSearchParams({
+    select: "id,status,cohort_id,student_identity_id,created_at,fdacs_class_d_student_identities(id,legal_name,date_of_birth,identity_status)",
+    or: "(status.eq.pending_identity,status.eq.pending_entitlement)",
+    order: "created_at.asc",
+    limit: "250",
+  });
+  return supabaseRequest<Record<string, unknown>[]>(
+    `fdacs_class_d_enrollments?${query.toString()}`,
+  );
 }
 
 export async function getFloridaClassDInspectionRecord(enrollmentId: string) {
@@ -232,10 +421,12 @@ export async function getFloridaClassDInspectionRecord(enrollmentId: string) {
 
   const identityId = typeof enrollment.student_identity_id === "string" ? enrollment.student_identity_id : null;
   const enrollmentFilter = { enrollment_id: `eq.${enrollmentId}`, order: "created_at.asc" };
-  const [identity, attendance, instructionTime, moduleProgress, learningChecks, remediation, holds, audit] = await Promise.all([
+  const [identity, acknowledgments, reviews, attendance, instructionTime, moduleProgress, learningChecks, remediation, holds, audit] = await Promise.all([
     identityId && UUID_PATTERN.test(identityId)
       ? supabaseRequest<Record<string, unknown>[]>(tableQuery("fdacs_class_d_student_identities", { id: `eq.${identityId}`, limit: "1" }))
       : Promise.resolve([]),
+    supabaseRequest<Record<string, unknown>[]>(tableQuery("fdacs_class_d_student_acknowledgments", { enrollment_id: `eq.${enrollmentId}`, order: "accepted_at.asc" })),
+    supabaseRequest<Record<string, unknown>[]>(tableQuery("fdacs_class_d_enrollment_reviews", { enrollment_id: `eq.${enrollmentId}`, order: "reviewed_at.asc" })),
     supabaseRequest<Record<string, unknown>[]>(tableQuery("fdacs_class_d_attendance_entries", enrollmentFilter)),
     supabaseRequest<Record<string, unknown>[]>(tableQuery("fdacs_class_d_instruction_time_entries", enrollmentFilter)),
     supabaseRequest<Record<string, unknown>[]>(tableQuery("fdacs_class_d_module_progress", { enrollment_id: `eq.${enrollmentId}`, order: "module_id.asc" })),
@@ -246,10 +437,12 @@ export async function getFloridaClassDInspectionRecord(enrollmentId: string) {
   ]);
 
   return {
-    schemaVersion: "1.0",
+    schemaVersion: "1.1",
     generatedAt: new Date().toISOString(),
     enrollment,
     identity: identity[0] ?? null,
+    acknowledgments,
+    reviews,
     attendance,
     instructionTime,
     moduleProgress,
