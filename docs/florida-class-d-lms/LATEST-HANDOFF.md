@@ -6,9 +6,13 @@ This is the current restart pointer for the regulated Florida Class D LMS workst
 
 ## Current source state
 
-Gates 1 through 22 are implemented in source and the dedicated Florida Class D workflow completed successfully through source verification, repository tests, lint, and the production Next.js build on the accepted Gate 22 head.
+Gates 1 through 22 are implemented in source and remain green through source verification, repository tests, lint, and the production Next.js build.
 
-Gate 23, Non-Production Acceptance Evidence, has started in source. The current migration creates protected acceptance runs, 18 required acceptance domains, synthetic test-identity confirmation, release-commit binding, service-controlled records, and an all-pass finalization rule. Gate 23 is not yet accepted because its service/API/admin evidence workflow, append-only event hardening, verifier, CI wiring, and synchronized gate documentation are not complete.
+Gate 23, Non-Production Acceptance Evidence, has now completed a full green dedicated Florida Class D workflow on commit `35a7f6ca704a44bc885d1534aa570eb541bc49d3`. That cycle passed the Gates 1-23 source verification, Gate 22 runtime-readiness verification, Gate 23 acceptance verification, repository contract tests, static quality validation, and the production Next.js build.
+
+Gate 23 source now includes protected acceptance runs, all 18 required acceptance domains, synthetic test-identity confirmation, release-commit binding, service-controlled persistence, an all-pass finalization rule, a protected school/compliance API for creating runs, recording domain evidence, listing evidence, and finalizing an acceptance run, plus the staff-protected acceptance evidence page. The acceptance service no longer uses a hardcoded fallback Supabase project URL and requires explicit protected runtime configuration.
+
+Gate 23 is not yet operationally complete. The remaining controlled items are database-level append-only hardening for the acceptance event ledger and the full interactive staff console for recording and finalizing acceptance evidence. No production database migration or production acceptance execution has occurred.
 
 ## Non-negotiable completion and certificate rule
 
@@ -43,7 +47,7 @@ Gate 23 requires evidence across all 18 domains before an acceptance run can pas
 - mobile and desktop behavior;
 - accessibility.
 
-A run is not accepted when any required domain is missing, failed, or blocked.
+A run is not accepted when any required domain is missing, failed, blocked, or not run.
 
 ## Current documentation and screenshot requirement
 
@@ -51,12 +55,12 @@ The Class DS LMS submission guide must be revised before filing/final operationa
 
 ## Next controlled sequence
 
-1. Complete Gate 23 append-only event hardening.
-2. Build the Gate 23 server-side acceptance service and protected admin API.
-3. Build the actual staff acceptance console for recording evidence against all 18 domains.
-4. Add Gate 23 source verification and CI wiring.
-5. Update `HANDOFF.md`, the Gate 23 handoff, and DS submission/audit controls in the same increment.
-6. Run the full Gates 1-23 source, repository-test, lint, and production-build cycle.
+1. Implement database-level append-only hardening for the Gate 23 acceptance event ledger.
+2. Complete the real interactive staff acceptance console against the existing protected API.
+3. Strengthen the Gate 23 verifier to require the protected API, explicit runtime Supabase configuration, append-only event enforcement, and the interactive staff evidence workflow.
+4. Add or update the Gate 23-specific handoff and synchronize `HANDOFF.md` plus the DS submission/audit controls in the same increment.
+5. Run a fresh full Gates 1-23 source, repository-test, lint, and production-build cycle after those changes.
+6. Execute real non-production acceptance using synthetic identities only after the applicable non-production database and runtime environment is configured.
 7. Keep paid enrollment and all regulated production functions disabled until regulatory authorization, production acceptance, and owner approval are complete.
 
 ## Public repository security boundary
