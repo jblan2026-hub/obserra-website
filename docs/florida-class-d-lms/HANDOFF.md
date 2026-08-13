@@ -240,6 +240,7 @@ Gate 7 controls include:
 - observer links carry the secret in a URL fragment so it is not sent as part of the initial HTTP request path;
 - the observer browser removes the fragment after reading it;
 - grant exchange is server-side and returns a separate short-lived media token;
+- provider media-token expiration is capped by the underlying observer-grant expiration and therefore cannot outlive the grant;
 - observer media is view-only: no camera transmission, microphone transmission, screen sharing, room administration, provider chat, hand raise, or recording UI;
 - the observer surface does not expose student identity records, attendance ledgers, exam content, answer keys, instructor credentials, school secrets, or administrative controls;
 - the observer path remains dependent on the same fail-closed Class D live-media gate and therefore cannot activate while the regulated training environment remains disabled.
@@ -247,6 +248,52 @@ Gate 7 controls include:
 This mechanism is an inspection-readiness control. It does not itself assert that FDACS requires a particular proprietary observer technology or that source implementation equals agency acceptance.
 
 Primary gate: `scripts/florida-class-d-observer-gate.mjs`
+
+## Gate 8 — Five-Day Cohort Scheduling and 20 Live Sessions
+
+Status: **IMPLEMENTED IN SOURCE / DEDICATED CI WIRED / PRODUCTION PROMOTION PENDING**
+
+Purpose: convert an approved Class D cohort into an exact five-day instructional calendar and automatically generate all 20 regulated live lesson sessions without manual per-lesson setup.
+
+Primary artifacts:
+
+- `supabase/migrations/20260813050000_fdacs_class_d_cohort_scheduling.sql`
+- `lib/florida-class-d-scheduling.ts`
+- `app/api/florida-class-d/admin/schedule/route.ts`
+- `app/florida-security-training/admin/schedule/ScheduleManager.tsx`
+- `app/florida-security-training/admin/schedule/page.tsx`
+- `scripts/florida-class-d-scheduling-gate.mjs`.
+
+Gate 8 controls include:
+
+- schedule publication is restricted to school-admin and compliance-admin roles;
+- an independent `OBSERRA_FDACS_CLASS_D_SCHEDULING_ENABLED` feature gate is required;
+- production scheduling remains blocked unless the protected Class DS status is active and both Class DI and Class DS license numbers are available in server configuration;
+- exactly five training dates are required and must be strictly increasing;
+- each cohort stores one controlled training-day row for Days 1 through 5;
+- the facility time zone is explicit and validated server-side/database-side;
+- Florida Eastern and Florida Central time zones are supported in the administrative interface;
+- each day automatically generates four 120-minute live sessions;
+- Lessons 2, 3, and 4 begin 135 minutes after the prior lesson start, preserving a 15-minute non-instructional interval after Lessons 1, 2, and 3;
+- the resulting schedule is exactly 20 live sessions and the server fails if the database does not return 20;
+- live sessions store timezone-aware scheduled start and end timestamps;
+- schedule revisions are recorded;
+- rescheduling is allowed only before regulated live activity begins;
+- a schedule cannot be modified after any cohort live session moves beyond `scheduled` state;
+- schedule publication writes an audit event containing the five dates, local start time, time zone, revision, 20-lesson count, two-hour lesson duration, and 15-minute break structure;
+- direct browser database access to cohort training-day schedule records is revoked and server-side service-role access remains the persistence boundary.
+
+### Runtime configuration required later
+
+Do not place these values in Git:
+
+- `OBSERRA_FDACS_CLASS_D_SCHEDULING_ENABLED=enabled`
+- actual DI or DS license numbers;
+- production Supabase secrets.
+
+The scheduling gate must remain disabled in production while the Class DS application is pending.
+
+Primary gate: `scripts/florida-class-d-scheduling-gate.mjs`
 
 ## Class DS LMS submission guide control
 
@@ -260,30 +307,29 @@ That record governs the current submission-draft LMS guide and portal-screenshot
 
 Workflow: `.github/workflows/florida-class-d-lms-gates.yml`
 
-The workflow now targets Gates 1 through 7 and runs:
+The workflow now targets Gates 1 through 8 and runs:
 
 - Florida regulated source verification;
 - repository contract tests;
 - lint;
 - production Next.js build.
 
-`npm run verify:florida-class-d` includes foundation, records, persistence, live-classroom, secure-media, and observer-access source gates.
+`npm run verify:florida-class-d` includes foundation, records, persistence, live-classroom, secure-media, observer-access, and cohort-scheduling source gates.
 
 CI success establishes source/build quality only. It does not establish regulatory approval, production database promotion, live-provider acceptance, or public launch authorization.
 
 ## Next controlled sequence
 
-1. Validate Gate 7 dedicated CI and correct any source, type, lint, or build failure before advancing.
-2. Add cohort scheduling and automatic creation of all 20 live lesson sessions.
-3. Add structured instructor polls, learner responses, and participation analytics.
-4. Add make-up-session workflow and time reconciliation.
-5. Add lesson-screen timing enforcement for any text-based instructional screens where applicable.
-6. Add formal end-of-session evidence reconciliation between Obserra presence records and media-provider session evidence as secondary corroboration only.
-7. Complete examination-engine gate and protected exam-content boundary.
-8. Complete completion, retest, LIAS queue, inspection center, certificate/document, and quality-management gates.
-9. Promote regulated migrations through a controlled database-change gate with rollback and verification evidence.
-10. Replace submission-draft portal screenshots with final controlled production captures before final filing or agency demonstration where appropriate.
-11. Keep public payment, enrollment, regulated access, examination access, completion issuance, and LIAS execution disabled until every applicable regulatory and production gate is satisfied.
+1. Validate Gate 8 dedicated CI and correct any source, type, lint, or build failure before advancing.
+2. Add structured instructor polls, learner responses, and participation analytics.
+3. Add make-up-session workflow and time reconciliation.
+4. Add lesson-screen timing enforcement for any text-based instructional screens where applicable.
+5. Add formal end-of-session evidence reconciliation between Obserra presence records and media-provider session evidence as secondary corroboration only.
+6. Complete examination-engine gate and protected exam-content boundary.
+7. Complete completion, retest, LIAS queue, inspection center, certificate/document, and quality-management gates.
+8. Promote regulated migrations through a controlled database-change gate with rollback and verification evidence.
+9. Replace submission-draft portal screenshots with final controlled production captures before final filing or agency demonstration where appropriate.
+10. Keep public payment, enrollment, regulated access, examination access, completion issuance, LIAS execution, observer access, and production scheduling disabled until every applicable regulatory and production gate is satisfied.
 
 ## Future Florida investigative-training workstream
 
@@ -311,6 +357,6 @@ Never commit:
 
 ## Release discipline
 
-Do not enable public checkout, enrollment, live regulated instruction, examination access, completion issuance, LIAS execution, or external observer access merely because source or CI passes.
+Do not enable public checkout, enrollment, live regulated instruction, examination access, completion issuance, LIAS execution, external observer access, or production cohort scheduling merely because source or CI passes.
 
 Each capability requires its own validated production gate and applicable regulatory authorization.
