@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireFloridaClassDStaff } from "../../../../lib/florida-class-d-auth";
 import { listFloridaClassDAcceptanceRuns } from "../../../../lib/florida-class-d-acceptance";
+import AcceptanceConsole from "./AcceptanceConsole";
 import "../../live-classroom.css";
 
 export const metadata: Metadata = {
@@ -30,10 +31,15 @@ export default async function FloridaClassDAcceptancePage() {
       <section className="fdacs-live__panel">
         <h2>Acceptance standard</h2>
         <p>
-          Every acceptance run must be tied to a real non-production release commit and a synthetic test identity.
-          All 18 required domains must pass before the run can be finalized. A missing, failed, or blocked domain prevents acceptance.
+          Every acceptance run is tied to a real non-production release commit and a synthetic test identity.
+          All 18 required domains must pass before the run can be finalized. A missing, failed, blocked, or not-run domain prevents acceptance.
+        </p>
+        <p>
+          This console records actual protected acceptance evidence. It does not represent production activation, FDACS approval, or LIAS submission.
         </p>
       </section>
+
+      <AcceptanceConsole initialRuns={runs} />
 
       <section className="fdacs-live__panel">
         <h2>Recorded acceptance runs</h2>
