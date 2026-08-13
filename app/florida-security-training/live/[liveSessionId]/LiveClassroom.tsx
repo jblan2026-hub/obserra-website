@@ -10,6 +10,14 @@ type Interaction = {
   created_at?: string;
 };
 
+type TimeSummary = {
+  connectedSeconds?: number;
+  instructionalPresenceSeconds?: number;
+  breakPresenceSeconds?: number;
+  uncreditedConnectedSeconds?: number;
+  unresolvedChallengeAbsences?: number;
+};
+
 type LiveState = {
   session?: {
     id?: string;
@@ -25,6 +33,8 @@ type LiveState = {
     uncredited_connected_seconds?: number;
     presence_state?: string;
   } | null;
+  dayTime?: TimeSummary | null;
+  courseTime?: TimeSummary | null;
   pendingChallenge?: {
     id?: string;
     prompt?: string;
@@ -176,6 +186,8 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   }
 
   const time = state?.time;
+  const dayTime = state?.dayTime;
+  const courseTime = state?.courseTime;
   const session = state?.session;
   const isBreak = session?.current_segment_type === "break";
 
@@ -201,13 +213,31 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
             <h2>{session?.lesson_id ?? "Scheduled lesson"}</h2>
             <p>The embedded secure video provider will occupy this surface. Attendance, interaction, and regulated time controls operate independently from the media provider.</p>
           </div>
+
+          <h3 className="fdacs-live__time-title">Current live lesson</h3>
           <div className="fdacs-live__timecards">
             <article><span>Total connected</span><strong>{formatDuration(seconds(time?.connected_seconds))}</strong></article>
             <article><span>Instruction present</span><strong>{formatDuration(seconds(time?.instructional_presence_seconds))}</strong></article>
             <article><span>Break time</span><strong>{formatDuration(seconds(time?.break_presence_seconds))}</strong></article>
             <article><span>Uncredited connected</span><strong>{formatDuration(seconds(time?.uncredited_connected_seconds))}</strong></article>
           </div>
-          <p className="fdacs-live__fineprint">Breaks are tracked in the LMS but are not credited toward the required 40 instructional hours. Final attendance credit remains subject to instructor verification.</p>
+
+          <h3 className="fdacs-live__time-title">Day {session?.day ?? "–"} cumulative time</h3>
+          <div className="fdacs-live__timecards">
+            <article><span>Day connected</span><strong>{formatDuration(seconds(dayTime?.connectedSeconds))}</strong></article>
+            <article><span>Day instruction</span><strong>{formatDuration(seconds(dayTime?.instructionalPresenceSeconds))}</strong></article>
+            <article><span>Day breaks</span><strong>{formatDuration(seconds(dayTime?.breakPresenceSeconds))}</strong></article>
+            <article><span>Day uncredited</span><strong>{formatDuration(seconds(dayTime?.uncreditedConnectedSeconds))}</strong></article>
+          </div>
+
+          <h3 className="fdacs-live__time-title">Entire 40-hour course ledger</h3>
+          <div className="fdacs-live__timecards">
+            <article><span>Course connected</span><strong>{formatDuration(seconds(courseTime?.connectedSeconds))}</strong></article>
+            <article><span>Course instruction</span><strong>{formatDuration(seconds(courseTime?.instructionalPresenceSeconds))}</strong></article>
+            <article><span>Course breaks</span><strong>{formatDuration(seconds(courseTime?.breakPresenceSeconds))}</strong></article>
+            <article><span>Course uncredited</span><strong>{formatDuration(seconds(courseTime?.uncreditedConnectedSeconds))}</strong></article>
+          </div>
+          <p className="fdacs-live__fineprint">Every tracked second remains associated with the authenticated student enrollment. Breaks are tracked in the LMS but are not credited toward the required 40 instructional hours. Final daily attendance credit remains subject to instructor verification.</p>
         </div>
 
         <aside className="fdacs-live__side">
