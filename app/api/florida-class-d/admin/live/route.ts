@@ -3,6 +3,7 @@ import {
   FloridaClassDAuthorizationError,
   requireFloridaClassDStaff,
 } from "../../../../../lib/florida-class-d-auth";
+import { listFloridaClassDLiveInteractions } from "../../../../../lib/florida-class-d-live-feed";
 import {
   endFloridaClassDLiveSession,
   FloridaClassDLivePersistenceError,
@@ -74,8 +75,11 @@ export async function GET(request: Request) {
     if (!liveSessionId) {
       return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
     }
-    const roster = await getFloridaClassDLiveRoster(liveSessionId);
-    return NextResponse.json(roster, { headers });
+    const [roster, interactions] = await Promise.all([
+      getFloridaClassDLiveRoster(liveSessionId),
+      listFloridaClassDLiveInteractions(liveSessionId),
+    ]);
+    return NextResponse.json({ ...roster, interactions }, { headers });
   } catch (error) {
     return errorResponse(error);
   }
