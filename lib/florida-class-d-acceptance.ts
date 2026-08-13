@@ -3,8 +3,6 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { FloridaClassDExamError } from "./florida-class-d-exam";
 
-const DEFAULT_SUPABASE_URL = "https://nwxnyqlyzyufgoadtqxs.supabase.co";
-
 export const FLORIDA_CLASS_D_ACCEPTANCE_DOMAINS = [
   "identity_enrollment",
   "live_media",
@@ -55,7 +53,7 @@ export type FloridaClassDAcceptanceCheck = {
 
 function config() {
   const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || DEFAULT_SUPABASE_URL).replace(/\/$/, "");
+  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   if (!key || !url.startsWith("https://")) {
     throw new FloridaClassDExamError("Acceptance evidence service is not configured.", 503, "FDACS_ACCEPTANCE_NOT_CONFIGURED");
   }
