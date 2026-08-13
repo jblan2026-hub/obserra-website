@@ -8,16 +8,19 @@ Public state remains `COMING SOON · LMS IN PROGRESS`. The owner reports an acti
 
 ## Current Gate 10 status
 
-Status: **FOUNDATION IMPLEMENTED IN SOURCE / CONTRACT TEST GREEN / INSTRUCTIONAL-CREDIT MUTATION INTENTIONALLY LOCKED**
+Status: **ATOMIC CERTIFICATION IMPLEMENTED IN SOURCE / DEDICATED SOURCE GATES WIRED / PRODUCTION PROMOTION PENDING**
 
-The current implementation establishes assignment, student/instructor communication, protected record storage, and reconciliation-preview controls for instructional time missed during the live Class D course. It does not yet mutate credited instructional time and it does not yet deliver recorded instruction.
+The implementation now establishes assignment, student/instructor communication, protected record storage, reconciliation preview, and an atomic database certification transaction for evidence-reviewed make-up instructional credit. Protected recorded playback remains intentionally locked for the next controlled increment.
 
 Primary artifacts:
 
 - `supabase/migrations/20260813052000_fdacs_class_d_makeup_records.sql`
 - `supabase/migrations/20260813052100_fdacs_class_d_makeup_access.sql`
 - `supabase/migrations/20260813052200_fdacs_class_d_makeup_constraints.sql`
+- `supabase/migrations/20260813052400_fdacs_class_d_makeup_certification.sql`
+- `supabase/migrations/20260813052500_fdacs_class_d_makeup_certification_security.sql`
 - `lib/florida-class-d-makeup.ts`
+- `lib/florida-class-d-makeup-certification.ts`
 - `app/api/florida-class-d/makeup/route.ts`
 - `app/api/florida-class-d/admin/makeup/route.ts`
 - `app/florida-security-training/makeup/page.tsx`
@@ -25,6 +28,7 @@ Primary artifacts:
 - `app/florida-security-training/admin/makeup/page.tsx`
 - `app/florida-security-training/admin/makeup/MakeupManager.tsx`
 - `scripts/florida-class-d-makeup-gate.mjs`
+- `scripts/florida-class-d-makeup-certification-gate.mjs`
 - `test/florida-class-d-makeup-gate.test.mjs`
 
 ## Implemented controls
@@ -41,32 +45,40 @@ Primary artifacts:
 - independent `OBSERRA_FDACS_CLASS_D_MAKEUP_ENABLED` feature gate;
 - Class DS status and protected Class DI/Class DS configuration required before the workflow can activate;
 - reconciliation preview calculates live-day minutes, prior certified make-up, remaining daily deficit, course deficit, recorded make-up balance, and maximum currently certifiable minutes;
-- original live-attendance evidence is not rewritten by the make-up service;
-- authenticated student portal for assigned make-up records and instructor Q&A;
-- server-protected administrative route and separate administration console source for assignment, question response, and reconciliation preview;
-- recorded playback remains explicitly locked;
-- instructional-credit certification remains explicitly locked with `FDACS_MAKEUP_CERTIFICATION_TRANSACTION_PENDING`.
+- atomic certification locks the assignment row before calculating and writing make-up credit;
+- evidence reference plus ordered evidence start/end timestamps are required before certification;
+- evidence duration must be at least as long as the requested certified instructional minutes;
+- daily credit cannot exceed 480 instructional minutes;
+- total course credit cannot exceed 2,400 instructional minutes;
+- recorded make-up credit cannot exceed 600 minutes;
+- certification creates a separate `instructor_attested_makeup` instruction-time entry and separate `made_up` attendance evidence;
+- original live-attendance evidence is not rewritten;
+- certification writes an append-only audit event with assignment, attendance, and instruction-time references;
+- certification RPC execution is security-definer, direct public/browser execution is revoked, and execute permission is limited to the Supabase service role;
+- administrative certification requires staff authorization, idempotency, correlation ID, and controlled evidence fields;
+- authenticated student portal remains available for assigned make-up records and instructor Q&A;
+- administrative console now exposes assignment, question response, reconciliation preview, and controlled certification inputs;
+- recorded playback remains explicitly locked pending its protected delivery subgate.
 
 ## Regulatory design boundary
 
-Recorded make-up delivery remains capped at **600 minutes** in the LMS design. The protected recorded-playback experience will not activate until a later gate provides its timing, participation, evidence, and instructor-question controls. The system preserves the original live attendance record and treats make-up as a separate auditable recovery record.
+Recorded make-up delivery remains capped at **600 minutes** in the LMS design. The protected recorded-playback experience will not activate until the next gate provides its timing, participation, evidence, and instructor-question controls. The system preserves the original live attendance record and treats make-up as a separate auditable recovery record.
 
-The current reconciliation service will calculate the permissible ceiling but will not write instructional credit until an atomic database certification transaction is available. This prevents a non-transactional application-layer race from creating excess daily, course, or recorded make-up credit.
+The atomic certification transaction is intentionally database-enforced rather than application-only. This prevents concurrent application requests from creating excess daily, course, or recorded make-up credit and ensures the assignment update, instruction-time record, attendance evidence, and audit event are committed as one controlled transaction.
 
-## Verification evidence
+## Verification boundary
 
-The latest dedicated Florida Class D workflow completed source verification, repository contract tests, lint, and the production Next.js build successfully after the Gate 10 foundation was added. Gate 10 is executed through `test/florida-class-d-makeup-gate.test.mjs` as part of the repository contract-test step while the older aggregate npm script still enumerates Gates 1 through 9.
+`npm run verify:florida-class-d` now includes both the Gate 10 make-up foundation gate and the Gate 10 certification-security gate. The dedicated workflow is labeled **Gates 1-10 and website compatibility** and runs regulated source verification, repository contract tests, lint, and the production Next.js build.
 
 CI success establishes source/build quality only. It does not establish FDACS approval, production database promotion, secure recorded-playback acceptance, or public launch authorization.
 
 ## Next controlled sequence
 
-1. Add the atomic make-up certification transaction so evidence-reviewed minutes can be credited without race conditions.
-2. Wire the administrative console directly into the protected make-up administration page after the certification boundary is complete.
-3. Build protected recorded make-up playback with screen-time, participation, question, and completion evidence controls.
-4. Add end-of-session evidence reconciliation between Obserra presence records and media-provider evidence as secondary corroboration only.
-5. Continue to the protected 170-question final-examination engine and examination-content boundary.
-6. Keep public payment, regulated training access, final examination, completion issuance, and LIAS execution disabled until every applicable regulatory and production gate is satisfied.
+1. Validate the complete Gate 10 source/test/lint/build cycle after the atomic certification changes.
+2. Build protected recorded make-up playback with timing, participation, question, completion, and evidence controls.
+3. Add end-of-session evidence reconciliation between Obserra presence records and media-provider evidence as secondary corroboration only.
+4. Continue to the protected 170-question final-examination engine and examination-content boundary.
+5. Keep public payment, regulated training access, final examination, completion issuance, and LIAS execution disabled until every applicable regulatory and production gate is satisfied.
 
 ## Production boundary
 
