@@ -10,6 +10,14 @@ type TimeSummary = {
   unresolvedChallengeAbsences?: number;
 };
 
+type MediaAccess = {
+  provider?: "daily";
+  roomName?: string;
+  joinUrl?: string;
+  tokenExpiresAt?: string;
+  recordingEnabled?: boolean;
+};
+
 type StudentRow = {
   id?: string;
   status?: string;
@@ -103,6 +111,7 @@ function suggestedAttendanceStatus(student: StudentRow) {
 
 export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId: string }) {
   const [state, setState] = useState<ConsoleState | null>(null);
+  const [media, setMedia] = useState<MediaAccess | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [presenceCode, setPresenceCode] = useState<string | null>(null);
   const [classPrompt, setClassPrompt] = useState("");
@@ -119,16 +128,25 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     setError(null);
   }, [liveSessionId]);
 
+  const loadMedia = useCallback(async () => {
+    const response = await fetch(`/api/florida-class-d/admin/media?liveSessionId=${encodeURIComponent(liveSessionId)}`, { cache: "no-store" });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Unable to provision instructor video.");
+    const access = payload as MediaAccess;
+    if (!access.joinUrl) throw new Error("Secure live video did not return a join URL.");
+    setMedia(access);
+  }, [liveSessionId]);
+
   useEffect(() => {
     const initialLoad = window.setTimeout(() => {
-      void refresh().catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Unable to load live class."));
+      void Promise.all([refresh(), loadMedia()]).catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Unable to load live class."));
     }, 0);
     const timer = window.setInterval(() => void refresh().catch(() => undefined), 5_000);
     return () => {
       window.clearTimeout(initialLoad);
       window.clearInterval(timer);
     };
-  }, [refresh]);
+  }, [loadMedia, refresh]);
 
   useEffect(() => {
     const initialTick = window.setTimeout(() => setClockMs(Date.now()), 0);
@@ -172,6 +190,10 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   }, [elapsedInstructionMinutes, issuePresenceCheck, state?.session?.status, students.length]);
 
   async function sessionAction(action: "start" | "end") {
+    if (action === "start" && !media?.joinUrl) {
+      setError("Secure live video must be provisioned before regulated instruction can start.");
+      return;
+    }
     try {
       await adminApi({ action, liveSessionId });
       if (action === "start") {
@@ -279,15 +301,27 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
 
       <section className="fdacs-live__grid">
         <div className="fdacs-live__stage">
-          <div className="fdacs-live__stage-frame">
-            <span>LIVE INSTRUCTOR MEDIA AND TEACHING SURFACE</span>
-            <h2>{state?.session?.lesson_id ?? "Florida Class D Live Lesson"}</h2>
-            <p>This is the instructor control surface for the embedded live media provider, lesson presentation, security checks, questions, polls, attendance verification, and inspection access. Media transport remains fail-closed until the approved provider is configured.</p>
-            {presenceCode ? <div className="fdacs-live__presence-code"><small>CURRENT PRESENCE CODE</small><strong>{presenceCode}</strong><span>Read or display this code to the live class. Do not post it in the student Q&amp;A feed.</span></div> : null}
+          <div className="fdacs-live__stage-frame fdacs-live__media-frame">
+            {media?.joinUrl ? (
+              <iframe
+                title="Obserra Florida Class D instructor secure live video classroom"
+                src={media.joinUrl}
+                allow="camera; microphone; fullscreen; display-capture; autoplay"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="fdacs-live__media-waiting">
+                <span>SECURE INSTRUCTOR MEDIA</span>
+                <h2>{state?.session?.lesson_id ?? "Florida Class D Live Lesson"}</h2>
+                <p>The regulated lesson cannot start until the secure room and short-lived instructor token are provisioned.</p>
+              </div>
+            )}
           </div>
+          <p className="fdacs-live__fineprint">Instructor video, audio, screen sharing, and prejoin device checks are delivered through the secure media room. Recording is disabled by default. Obserra remains the system of record for attendance and instructional time.</p>
+          {presenceCode ? <div className="fdacs-live__presence-code"><small>CURRENT PRESENCE CODE</small><strong>{presenceCode}</strong><span>Read or display this code to the live class. Do not post it in the student Q&amp;A feed.</span></div> : null}
 
           <div className="fdacs-live__instructor-controls">
-            <button type="button" onClick={() => void sessionAction("start")}>Start live lesson</button>
+            <button type="button" onClick={() => void sessionAction("start")} disabled={!media?.joinUrl}>Start live lesson</button>
             <button type="button" onClick={() => void issuePresenceCheck()}>Issue presence check</button>
             <button type="button" onClick={() => void segment("break")}>Start 15-minute break</button>
             <button type="button" onClick={() => void segment("instruction")}>Resume instruction</button>
