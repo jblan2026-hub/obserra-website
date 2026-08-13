@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
-import { requireFloridaClassDStaff } from "@/lib/florida-class-d-auth";
-import { FloridaClassDExamError } from "@/lib/florida-class-d-exam";
+import { requireFloridaClassDStaff } from "../../../../../lib/florida-class-d-auth";
+import { FloridaClassDExamError } from "../../../../../lib/florida-class-d-exam";
 import {
   importFloridaClassDExamBank,
   listFloridaClassDExamBanks,
   markFloridaClassDExamBankApproved,
   markFloridaClassDExamBankSubmitted,
-} from "@/lib/florida-class-d-exam-admin";
+} from "../../../../../lib/florida-class-d-exam-admin";
 
 export const dynamic = "force-dynamic";
 
