@@ -2,6 +2,14 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+type TimeSummary = {
+  connectedSeconds?: number;
+  instructionalPresenceSeconds?: number;
+  breakPresenceSeconds?: number;
+  uncreditedConnectedSeconds?: number;
+  unresolvedChallengeAbsences?: number;
+};
+
 type StudentRow = {
   id?: string;
   status?: string;
@@ -14,6 +22,8 @@ type StudentRow = {
     presence_state?: string;
     last_heartbeat_at?: string | null;
   } | null;
+  dayTime?: TimeSummary | null;
+  courseTime?: TimeSummary | null;
 };
 
 type Interaction = {
@@ -40,8 +50,12 @@ type ConsoleState = {
   interactions?: Interaction[];
 };
 
+function asSeconds(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? Math.max(0, value) : 0;
+}
+
 function formatDuration(value: unknown) {
-  const totalSeconds = typeof value === "number" && Number.isFinite(value) ? Math.max(0, value) : 0;
+  const totalSeconds = asSeconds(value);
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = Math.floor(totalSeconds % 60);
@@ -77,6 +91,14 @@ function generatePresenceCode() {
   const bytes = new Uint32Array(1);
   crypto.getRandomValues(bytes);
   return String(100000 + (bytes[0] % 900000));
+}
+
+function suggestedAttendanceStatus(student: StudentRow) {
+  const instruction = asSeconds(student.dayTime?.instructionalPresenceSeconds);
+  const unresolved = typeof student.dayTime?.unresolvedChallengeAbsences === "number" ? student.dayTime.unresolvedChallengeAbsences : 0;
+  if (instruction >= 28_800 && unresolved === 0) return "present" as const;
+  if (instruction === 0) return "absent" as const;
+  return "makeup_required" as const;
 }
 
 export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId: string }) {
@@ -169,6 +191,27 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     }
   }
 
+  async function certifyDay(student: StudentRow) {
+    const day = state?.session?.day;
+    if (!student.id || !day || day < 1 || day > 5) return;
+    const attendanceStatus = suggestedAttendanceStatus(student);
+    const label = attendanceStatus === "present" ? "PRESENT" : attendanceStatus === "absent" ? "ABSENT" : "MAKEUP REQUIRED";
+    const approved = window.confirm(`Certify Day ${day} attendance for ${studentName(student)} as ${label}? The LMS-derived instructional and break time will be retained with the instructor attestation.`);
+    if (!approved) return;
+    try {
+      await adminApi({
+        action: "certify_day",
+        enrollmentId: student.id,
+        day,
+        attendanceStatus,
+        idempotencyKey: `fdacs-live-day-${day}-${student.id}`,
+      });
+      await refresh();
+    } catch (certificationError) {
+      setError(certificationError instanceof Error ? certificationError.message : "Daily attendance certification failed.");
+    }
+  }
+
   async function submitPrompt(event: FormEvent) {
     event.preventDefault();
     if (!classPrompt.trim()) return;
@@ -202,6 +245,8 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
 
   const status = state?.session?.status ?? "locked";
   const isBreak = state?.session?.current_segment_type === "break";
+  const day = state?.session?.day;
+  const canCertifyDay = Boolean(day && state?.session?.lesson_id === `D${day}-L4` && status === "ended");
 
   return (
     <main className="fdacs-live">
@@ -212,7 +257,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
         </div>
         <div className={`fdacs-live__status ${isBreak ? "is-break" : ""}`}>
           <strong>{status.toUpperCase()} · {state?.session?.lesson_id ?? "SESSION"}</strong>
-          <small>Day {state?.session?.day ?? "–"} · all attendance and time evidence is server recorded</small>
+          <small>Day {day ?? "–"} · all attendance and time evidence is server recorded</small>
         </div>
       </header>
 
@@ -236,19 +281,27 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
           </div>
 
           <section className="fdacs-live__panel fdacs-live__roster-panel">
-            <div className="fdacs-live__panel-head"><h2>Live attendance and time roster</h2><span>{students.length} students</span></div>
+            <div className="fdacs-live__panel-head"><h2>Live attendance and full-course time roster</h2><span>{students.length} students</span></div>
+            <p className="fdacs-live__muted">The roster separates live connection, credited instructional presence, tracked breaks, and uncredited time for each student. After Lesson 4 ends, the instructor must certify the day. Break time remains visible but cannot become instructional credit.</p>
             <div className="fdacs-live__roster">
               {students.map((student) => {
                 const live = student.liveTime;
                 const absent = live?.presence_state === "absent_challenge";
+                const suggested = suggestedAttendanceStatus(student);
                 return (
                   <div key={student.id ?? studentName(student)} className={absent ? "is-absent" : ""}>
                     <span><strong>{studentName(student)}</strong><small>{live?.presence_state ?? "not connected"}</small></span>
-                    <span><small>Connected</small><b>{formatDuration(live?.connected_seconds)}</b></span>
-                    <span><small>Instruction</small><b>{formatDuration(live?.instructional_presence_seconds)}</b></span>
-                    <span><small>Break</small><b>{formatDuration(live?.break_presence_seconds)}</b></span>
-                    <span><small>Uncredited</small><b>{formatDuration(live?.uncredited_connected_seconds)}</b></span>
-                    {absent ? <button type="button" onClick={() => void restorePresence(student)}>Review absence</button> : <em>Active record</em>}
+                    <span><small>Live connected</small><b>{formatDuration(live?.connected_seconds)}</b></span>
+                    <span><small>Day instruction</small><b>{formatDuration(student.dayTime?.instructionalPresenceSeconds)}</b></span>
+                    <span><small>Day breaks</small><b>{formatDuration(student.dayTime?.breakPresenceSeconds)}</b></span>
+                    <span><small>Course connected</small><b>{formatDuration(student.courseTime?.connectedSeconds)}</b></span>
+                    <span><small>Course instruction</small><b>{formatDuration(student.courseTime?.instructionalPresenceSeconds)}</b></span>
+                    <span><small>Course breaks</small><b>{formatDuration(student.courseTime?.breakPresenceSeconds)}</b></span>
+                    <span><small>Course uncredited</small><b>{formatDuration(student.courseTime?.uncreditedConnectedSeconds)}</b></span>
+                    <span className="fdacs-live__roster-actions">
+                      {absent ? <button type="button" onClick={() => void restorePresence(student)}>Review absence</button> : null}
+                      {canCertifyDay ? <button type="button" onClick={() => void certifyDay(student)}>Certify {suggested.replace("_", " ")}</button> : <em>{canCertifyDay ? "Ready" : "Awaiting day end"}</em>}
+                    </span>
                   </div>
                 );
               })}
