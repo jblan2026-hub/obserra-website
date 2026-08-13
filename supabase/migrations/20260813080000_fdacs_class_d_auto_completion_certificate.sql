@@ -15,6 +15,10 @@ declare
   v_certificate_reference text;
   v_completion_date date;
 begin
+  if new.verified_instructional_minutes < 2400 then
+    raise exception '40 verified instructional hours are required before completion documents can be created';
+  end if;
+
   select i.legal_name
     into v_legal_name
   from public.fdacs_class_d_enrollments e
@@ -33,7 +37,7 @@ begin
     and passed = true;
 
   if v_exam_score is null or v_exam_score < 128 then
-    raise exception 'preserved passing examination evidence is required before completion documents can be created';
+    raise exception 'passing examination evidence is required before any completion certificate or application handoff document can be created';
   end if;
 
   v_completion_date := coalesce(new.approved_at::date, current_date);
@@ -130,13 +134,15 @@ begin
     new.enrollment_id,
     'completion_document',
     new.id,
-    'supplemental_completion_documents_auto_generated',
+    'supplemental_completion_documents_auto_generated_after_exam_pass',
     new.correlation_id,
     jsonb_build_object(
       'certificateReference', v_certificate_reference,
       'studentLegalNameSnapshot', v_legal_name,
+      'verifiedInstructionalMinutes', new.verified_instructional_minutes,
       'instructionalHours', 40,
       'examScore', v_exam_score,
+      'passingScore', 128,
       'officialFdacs16103Generated', false
     )
   );
