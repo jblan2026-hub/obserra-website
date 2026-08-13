@@ -64,6 +64,7 @@ export default function InstructionalTextScreen({
       screenIdRef.current = null;
       return;
     }
+    const activeTextScreenId: string = textScreenId;
 
     let cancelled = false;
 
@@ -71,11 +72,11 @@ export default function InstructionalTextScreen({
       try {
         const result = await liveApi({
           action: "text_screen_begin",
-          textScreenId,
+          textScreenId: activeTextScreenId,
           deviceLeaseId,
         });
         if (!cancelled) {
-          screenIdRef.current = textScreenId;
+          screenIdRef.current = activeTextScreenId;
           setProgress(result.progress ?? null);
           setError(null);
         }
@@ -87,10 +88,10 @@ export default function InstructionalTextScreen({
     void begin();
 
     const heartbeat = window.setInterval(() => {
-      if (cancelled || document.visibilityState !== "visible" || screenIdRef.current !== textScreenId) return;
+      if (cancelled || document.visibilityState !== "visible" || screenIdRef.current !== activeTextScreenId) return;
       void liveApi({
         action: "text_screen_heartbeat",
-        textScreenId,
+        textScreenId: activeTextScreenId,
         deviceLeaseId,
       }).then((result) => {
         if (!cancelled) {
