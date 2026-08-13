@@ -24,13 +24,16 @@ create table if not exists public.fdacs_class_d_live_poll_responses (
   selected_option_index smallint not null check (selected_option_index >= 0),
   is_correct boolean,
   submitted_at timestamptz not null default now(),
-  response_milliseconds integer check (response_milliseconds is null or response_milliseconds >= 0),
+  response_milliseconds integer check (response_milliseconds is null or response_milliseconds between 0 and 7200000),
   correlation_id uuid not null,
   unique (poll_id, enrollment_id)
 );
 
 create index if not exists fdacs_class_d_live_polls_session_idx
   on public.fdacs_class_d_live_polls(live_session_id, status, opened_at desc);
+create unique index if not exists fdacs_class_d_one_open_live_poll_idx
+  on public.fdacs_class_d_live_polls(live_session_id)
+  where status = 'open';
 create index if not exists fdacs_class_d_live_poll_responses_session_idx
   on public.fdacs_class_d_live_poll_responses(live_session_id, enrollment_id, submitted_at);
 
@@ -135,7 +138,7 @@ begin
   if p_selected_option_index < 0 or p_selected_option_index >= jsonb_array_length(v_poll.options) then
     raise exception 'poll response option is out of range';
   end if;
-  if p_response_milliseconds is not null and p_response_milliseconds < 0 then
+  if p_response_milliseconds is not null and p_response_milliseconds not between 0 and 7200000 then
     raise exception 'poll response timing is invalid';
   end if;
 
