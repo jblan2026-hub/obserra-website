@@ -65,7 +65,7 @@ function emptySummary(): FloridaClassDTimeSummary {
 }
 
 function summarize(rows: Record<string, unknown>[]): FloridaClassDTimeSummary {
-  return rows.reduce((summary, row) => ({
+  return rows.reduce<FloridaClassDTimeSummary>((summary, row) => ({
     connectedSeconds: summary.connectedSeconds + asCount(row.connected_seconds),
     instructionalPresenceSeconds: summary.instructionalPresenceSeconds + asCount(row.instructional_presence_seconds),
     breakPresenceSeconds: summary.breakPresenceSeconds + asCount(row.break_presence_seconds),
