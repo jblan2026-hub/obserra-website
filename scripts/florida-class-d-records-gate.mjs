@@ -52,8 +52,8 @@ requireText(records, "uniqueCompleted.size ===", "Exam eligibility must enforce 
 requireText(records, "input.openRemediationModuleIds.length === 0", "Exam eligibility must fail while remediation remains open.");
 
 requireText(course, 'status: "coming-soon"', "Public course must remain Coming Soon during Gate 2.");
-requireText(handoff, "## LMS / Regulated School System Handoff", "Florida LMS work must be recorded in its own handoff area.");
+requireText(handoff, "# Obserra Florida Class D LMS Handoff", "Florida LMS work must be recorded in its own authoritative handoff area.");
 requireText(handoff, "Gate 2 — Regulated Student Record Model", "Handoff must record Gate 2 status.");
-requireText(handoff, "Separate from Academy course-content build", "Handoff must explicitly remain separate from course-content production.");
+requireText(handoff, "It is separate from the commercial Obserra Academy", "Handoff must explicitly remain separate from Academy course-content production.");
 
 console.log("Florida Class D Gate 2 passed: regulated student record model and handoff boundaries validated.");
