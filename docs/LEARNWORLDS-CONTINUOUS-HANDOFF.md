@@ -2,6 +2,8 @@
 
 The authoritative sanitized operational record is `docs/academy-media-pipeline/LATEST-HANDOFF.md`. The consolidated restart snapshot is `docs/academy-media-pipeline/MASTER-HANDOFF-2026-08-12.md`.
 
+The separate authoritative sanitized record for the Florida FDACS Class D Security Officer School / regulated LMS build is `docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md`. That workstream must remain distinct from the commercial Academy course-production sequence.
+
 ## Canonical identity
 
 ```text
@@ -27,6 +29,21 @@ No alternate title, employer reference, employment history, substitute identity,
 6. Final owner video is produced and approved only by Dr. Jody Blanchard.
 7. Use Windows-safe delivery names and short extraction roots.
 8. Keep every course in Draft until authenticated save/reopen, SCORM, assessment, completion, certificate, accessibility, desktop/mobile, and owner acceptance gates pass.
+9. For Florida Class D school/LMS work, preserve the separate FDACS gated sequence and do not activate payment, enrollment, examination, completion issuance, or LIAS execution before its applicable gate and regulatory authorization.
+
+## Separate Florida Class D regulated-school workstream
+
+```text
+Handoff: docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md
+Implementation branch: feature/florida-class-d-lms-foundation
+PR: #56
+Public state: COMING SOON · LMS IN PROGRESS
+Gate 1: IMPLEMENTED IN SOURCE / CI EVIDENCE PENDING
+Gate 2: IMPLEMENTED IN SOURCE / DURABLE PERSISTENCE AND CI EVIDENCE PENDING
+Next: Gate 3 — Durable Regulated Records & Administrative API
+```
+
+The Class D build is not a normal LearnWorlds catalog course. It has independent regulated controls for identity, enrollment, cohorts, attendance, instructional-time evidence, learning checks, remediation, certification-exam eligibility, school administration, FDACS/LIAS workflow, retained records, inspection readiness, and regulatory launch.
 
 ## Permanent course architecture
 
@@ -67,6 +84,8 @@ Resource-library check: 5
 Total: 60
 Final pass mark: 80 percent unless owner changes it
 ```
+
+This generic Academy assessment standard does not supersede the separately controlled Florida Class D certification-examination requirements recorded in the FDACS Class D School Build Handoff.
 
 ## Proven SCORM packaging pattern
 
@@ -157,11 +176,19 @@ Scripts, teleprompter copy, storyboards, shot lists, on-screen text, caption/tra
 
 ## Current controlled work order
 
+### Commercial Academy course build
+
 1. Remediate Course 2 SCORM and Windows-safe packaging before its LearnWorlds upload.
 2. Continue to `Executive Travel Risk Management`.
 3. Then continue to `Digital Exposure and Executive Privacy`, `AI Ready Workforce`, `Coding for Cyber Leaders`, and the remaining governed catalog.
 4. Integrate owner-produced videos only after technical, identity, caption, transcript, brand, accessibility, and owner-approval validation.
 5. Never claim LearnWorlds completion or publication readiness without authenticated end-to-end runtime evidence.
+
+### Florida Class D school / regulated LMS build
+
+1. Read `docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md`.
+2. Resume from Gate 3 — Durable Regulated Records & Administrative API.
+3. Preserve the Coming Soon state and all later regulatory launch gates.
 
 ## Release boundary
 
@@ -171,6 +198,7 @@ Course 1 corrected S00 SCORM packaging: LEARNWORLDS ACCEPTED, OWNER REPORTED
 Course 2 content package: COMPLETE NONVIDEO / SCORM REMEDIATION REQUIRED BEFORE UPLOAD
 Course 3 content package: COMPLETE NONVIDEO / HARDENED SCORM / RUNTIME PENDING
 Course 4 content package: COMPLETE NONVIDEO / HARDENED SCORM / RUNTIME PENDING
+Florida Class D School/LMS: SEPARATE WORKSTREAM / GATE 1 + GATE 2 SOURCE IMPLEMENTED / GATE 3 NEXT
 Authenticated full-course runtime: NOT PROVEN
 Certificate issuance acceptance: NOT PROVEN
 Desktop/mobile learner journey: NOT PROVEN
@@ -181,4 +209,4 @@ Production merge/cutover: BLOCKED
 
 ## Handoff rule
 
-Every new work session must read the Master Handoff, Latest Handoff, Restart Here, Actual-Site Verification Gate, Per-Section LearnWorlds Activity Architecture, and Course Section Assessment Standard before generating or changing course assets. Preserve every discrepancy and failure.
+Every new work session must read the Master Handoff, Latest Handoff, Restart Here, Actual-Site Verification Gate, Per-Section LearnWorlds Activity Architecture, and Course Section Assessment Standard before generating or changing commercial course assets. Any Florida Class D school/FDACS/LMS work must additionally read and follow the separate FDACS Class D School Build Handoff before changing regulated-school source or operations.
