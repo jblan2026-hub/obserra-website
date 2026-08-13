@@ -7,6 +7,7 @@ import {
 import ObserverGrantManager from "./ObserverGrantManager";
 import "../../../live-classroom.css";
 import "../../../observer/observer.css";
+import "./observer-admin.css";
 
 export default async function FloridaClassDObserverAdminPage({ params }: { params: Promise<{ liveSessionId: string }> }) {
   const { liveSessionId } = await params;
