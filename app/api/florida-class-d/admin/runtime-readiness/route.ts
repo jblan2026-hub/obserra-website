@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireFloridaClassDStaff } from "../../../../../lib/florida-class-d-auth";
-import { getFloridaClassDRuntimeReadiness } from "../../../../../lib/florida-class-d-runtime-readiness";
+import {
+  getFloridaClassDNonProductionAcceptanceReadiness,
+  getFloridaClassDProductionRuntimeReadiness,
+} from "../../../../../lib/florida-class-d-runtime-readiness";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +18,14 @@ const headers = {
 export async function GET() {
   try {
     await requireFloridaClassDStaff(["school_admin", "compliance_admin"]);
-    return NextResponse.json({ readiness: getFloridaClassDRuntimeReadiness() }, { status: 200, headers });
+    return NextResponse.json(
+      {
+        readiness: getFloridaClassDProductionRuntimeReadiness(),
+        production: getFloridaClassDProductionRuntimeReadiness(),
+        nonProductionAcceptance: getFloridaClassDNonProductionAcceptanceReadiness(),
+      },
+      { status: 200, headers },
+    );
   } catch (error) {
     const status = error instanceof Error && "status" in error && typeof (error as { status?: unknown }).status === "number"
       ? (error as { status: number }).status
