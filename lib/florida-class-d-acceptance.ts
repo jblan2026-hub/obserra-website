@@ -55,12 +55,12 @@ function config() {
   const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
   const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   if (!key || !url.startsWith("https://")) {
-    throw new FloridaClassDExamError("Acceptance evidence service is not configured.", 503, "FDACS_ACCEPTANCE_NOT_CONFIGURED");
+    throw new FloridaClassDExamError("Regulated Class D data service is not configured.", 503, "FDACS_REGULATED_DATA_NOT_CONFIGURED");
   }
   return { key, url };
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+export async function floridaClassDRegulatedRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   const { key, url } = config();
   const response = await fetch(`${url}/rest/v1/${path}`, {
     ...init,
@@ -80,16 +80,16 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!response.ok) {
     const record = payload && typeof payload === "object" && !Array.isArray(payload) ? payload as Record<string, unknown> : null;
     throw new FloridaClassDExamError(
-      typeof record?.message === "string" ? record.message : "Acceptance evidence request failed.",
+      typeof record?.message === "string" ? record.message : "Regulated Class D data request failed.",
       response.status >= 500 ? 502 : response.status,
-      typeof record?.code === "string" ? record.code : "FDACS_ACCEPTANCE_REQUEST_FAILED",
+      typeof record?.code === "string" ? record.code : "FDACS_REGULATED_DATA_REQUEST_FAILED",
     );
   }
   return payload as T;
 }
 
 export async function listFloridaClassDAcceptanceRuns() {
-  return request<FloridaClassDAcceptanceRun[]>(
+  return floridaClassDRegulatedRequest<FloridaClassDAcceptanceRun[]>(
     "fdacs_class_d_acceptance_runs?select=id,environment_type,release_commit_sha,test_identity_reference,synthetic_identity_confirmed,status,started_by_clerk_user_id,started_at,completed_at,summary&order=started_at.desc&limit=50",
   );
 }
@@ -100,7 +100,7 @@ export async function listFloridaClassDAcceptanceChecks(runId: string) {
     run_id: `eq.${runId}`,
     order: "domain.asc",
   });
-  return request<FloridaClassDAcceptanceCheck[]>(`fdacs_class_d_acceptance_checks?${params.toString()}`);
+  return floridaClassDRegulatedRequest<FloridaClassDAcceptanceCheck[]>(`fdacs_class_d_acceptance_checks?${params.toString()}`);
 }
 
 export async function createFloridaClassDAcceptanceRun(input: {
@@ -115,7 +115,7 @@ export async function createFloridaClassDAcceptanceRun(input: {
   if (input.testIdentityReference.trim().length < 3) {
     throw new FloridaClassDExamError("A synthetic test identity reference is required.", 400, "FDACS_ACCEPTANCE_IDENTITY_REQUIRED");
   }
-  const [run] = await request<FloridaClassDAcceptanceRun[]>("fdacs_class_d_acceptance_runs", {
+  const [run] = await floridaClassDRegulatedRequest<FloridaClassDAcceptanceRun[]>("fdacs_class_d_acceptance_runs", {
     method: "POST",
     headers: { prefer: "return=representation" },
     body: JSON.stringify({
@@ -146,7 +146,7 @@ export async function recordFloridaClassDAcceptanceCheck(input: {
     throw new FloridaClassDExamError("Passed acceptance checks require an evidence reference.", 400, "FDACS_ACCEPTANCE_EVIDENCE_REQUIRED");
   }
   const query = new URLSearchParams({ on_conflict: "run_id,domain" });
-  await request(`fdacs_class_d_acceptance_checks?${query.toString()}`, {
+  await floridaClassDRegulatedRequest(`fdacs_class_d_acceptance_checks?${query.toString()}`, {
     method: "POST",
     headers: { prefer: "resolution=merge-duplicates,return=minimal" },
     body: JSON.stringify({
@@ -167,7 +167,7 @@ export async function finalizeFloridaClassDAcceptanceRun(input: {
   summary?: string;
   actorUserId: string;
 }) {
-  return request<{ run_id: string; status: "passed"; passed_domains: number }>("rpc/fdacs_class_d_finalize_acceptance_run", {
+  return floridaClassDRegulatedRequest<{ run_id: string; status: "passed"; passed_domains: number }>("rpc/fdacs_class_d_finalize_acceptance_run", {
     method: "POST",
     body: JSON.stringify({
       p_run_id: input.runId,
