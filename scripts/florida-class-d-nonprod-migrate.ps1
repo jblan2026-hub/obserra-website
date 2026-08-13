@@ -115,23 +115,23 @@ function Invoke-Supabase([string[]]$Arguments) {
 
 function Ensure-SupabaseAuthentication {
     Write-Host 'Checking Supabase CLI authentication...'
-    $authExit = Invoke-Supabase @('projects','list')
+    $authExit = Invoke-Supabase -Arguments @('projects','list')
     if ($authExit -eq 0) {
         Write-Host 'Supabase CLI authentication is ready.'
         return
     }
 
     Write-Host ''
-    Write-Host 'Supabase CLI is not authenticated. Starting the official interactive login flow now.'
+    Write-Host 'Supabase CLI authentication check failed. Starting the official interactive login flow now.'
     Write-Host 'Complete the Supabase browser/device authorization locally. Do not paste any token into source files or chat.'
     Write-Host ''
 
-    $loginExit = Invoke-Supabase @('login')
+    $loginExit = Invoke-Supabase -Arguments @('login')
     if ($loginExit -ne 0) {
         Stop-FailClosed 'Supabase CLI login did not complete successfully.'
     }
 
-    $verifyExit = Invoke-Supabase @('projects','list')
+    $verifyExit = Invoke-Supabase -Arguments @('projects','list')
     if ($verifyExit -ne 0) {
         Stop-FailClosed 'Supabase CLI authentication could not be verified after login.'
     }
@@ -175,10 +175,10 @@ Push-Location $repoRoot
 try {
     Ensure-SupabaseAuthentication
 
-    $linkExit = Invoke-Supabase @('link','--project-ref',$ProjectRef)
+    $linkExit = Invoke-Supabase -Arguments @('link','--project-ref',$ProjectRef)
     if ($linkExit -ne 0) { Stop-FailClosed 'Supabase link failed after verified CLI authentication.' }
 
-    $pushExit = Invoke-Supabase @('db','push','--linked','--include-all')
+    $pushExit = Invoke-Supabase -Arguments @('db','push','--linked','--include-all')
     if ($pushExit -ne 0) { Stop-FailClosed 'Supabase migration push failed.' }
 
     if ($useNpx) {
