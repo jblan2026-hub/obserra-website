@@ -18,6 +18,14 @@ type TimeSummary = {
   unresolvedChallengeAbsences?: number;
 };
 
+type MediaAccess = {
+  provider?: "daily";
+  roomName?: string;
+  joinUrl?: string;
+  tokenExpiresAt?: string;
+  recordingEnabled?: boolean;
+};
+
 type LiveState = {
   session?: {
     id?: string;
@@ -71,6 +79,7 @@ async function api(body: Record<string, unknown>) {
 export default function LiveClassroom({ liveSessionId }: { liveSessionId: string }) {
   const [deviceLeaseId, setDeviceLeaseId] = useState<string | null>(null);
   const [state, setState] = useState<LiveState | null>(null);
+  const [media, setMedia] = useState<MediaAccess | null>(null);
   const [question, setQuestion] = useState("");
   const [challengeAnswer, setChallengeAnswer] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -94,6 +103,15 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
     setState(payload as LiveState);
   }, [liveSessionId]);
 
+  const loadMedia = useCallback(async () => {
+    const response = await fetch(`/api/florida-class-d/media?liveSessionId=${encodeURIComponent(liveSessionId)}`, { cache: "no-store" });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Secure live video is unavailable.");
+    const access = payload as MediaAccess;
+    if (!access.joinUrl) throw new Error("Secure live video did not return a join URL.");
+    setMedia(access);
+  }, [liveSessionId]);
+
   useEffect(() => {
     let cancelled = false;
     async function join() {
@@ -103,7 +121,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
         const result = await api({ action: "join", liveSessionId, browserInstanceId });
         if (cancelled) return;
         setDeviceLeaseId(typeof result.deviceLeaseId === "string" ? result.deviceLeaseId : null);
-        setStatusText("Connected. Attendance and time tracking are active.");
+        setStatusText("Connected. Attendance, instructional time, and secure live media are active.");
         await refresh();
       } catch (joinError) {
         if (!cancelled) {
@@ -117,6 +135,14 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
       cancelled = true;
     };
   }, [browserInstanceId, liveSessionId, refresh]);
+
+  useEffect(() => {
+    if (!deviceLeaseId) return;
+    const timer = window.setTimeout(() => {
+      void loadMedia().catch((mediaError) => setError(mediaError instanceof Error ? mediaError.message : "Secure live video failed to load."));
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [deviceLeaseId, loadMedia]);
 
   useEffect(() => {
     if (!deviceLeaseId) return;
@@ -208,11 +234,23 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
 
       <section className="fdacs-live__grid">
         <div className="fdacs-live__stage">
-          <div className="fdacs-live__stage-frame">
-            <span>LIVE INSTRUCTOR MEDIA</span>
-            <h2>{session?.lesson_id ?? "Scheduled lesson"}</h2>
-            <p>The embedded secure video provider will occupy this surface. Attendance, interaction, and regulated time controls operate independently from the media provider.</p>
+          <div className="fdacs-live__stage-frame fdacs-live__media-frame">
+            {media?.joinUrl ? (
+              <iframe
+                title="Obserra Florida Class D secure live video classroom"
+                src={media.joinUrl}
+                allow="camera; microphone; fullscreen; display-capture; autoplay"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="fdacs-live__media-waiting">
+                <span>SECURE LIVE INSTRUCTOR MEDIA</span>
+                <h2>{session?.lesson_id ?? "Scheduled lesson"}</h2>
+                <p>The encrypted classroom video surface opens only after authenticated enrollment, single-device attendance control, and the live-media gate succeed.</p>
+              </div>
+            )}
           </div>
+          <p className="fdacs-live__fineprint">Video and audio are delivered through a short-lived, room-bound secure media token. Obserra attendance and instructional-time evidence remain independent from the media provider. Recording is disabled by default.</p>
 
           <h3 className="fdacs-live__time-title">Current live lesson</h3>
           <div className="fdacs-live__timecards">
