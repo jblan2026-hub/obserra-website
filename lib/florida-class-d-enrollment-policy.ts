@@ -1,4 +1,4 @@
-export const FLORIDA_CLASS_D_ENROLLMENT_POLICY_VERSION = "2026-08-13-v1";
+export const FLORIDA_CLASS_D_ENROLLMENT_POLICY_VERSION = "2026-08-13-v2";
 
 export type FloridaClassDAcknowledgmentCode =
   | "training-not-license"
@@ -29,15 +29,15 @@ export const floridaClassDRequiredAcknowledgments: readonly FloridaClassDAcknowl
   },
   {
     code: "attendance-40-hours",
-    label: "Instructional attendance is controlled",
+    label: "Instructional attendance, missed time, and retake obligations",
     statement:
-      "I understand that the regulated training record must document the required instructional time and that I may not receive instructional credit for time I did not complete.",
+      "I understand that I must complete and receive credit for all required instructional time. If I miss more instructional time than can be lawfully and operationally made up within the current course, I will not complete that cohort and must re-enroll in the course and pay the applicable published retake tuition or fee before restarting training. Break time, disconnected time, unresolved absence time, and other uncredited time do not count toward the required 40 instructional hours.",
   },
   {
     code: "exam-separate-controlled",
     label: "Certification examination is separately controlled",
     statement:
-      "I understand that examination eligibility and examination records are controlled separately from instructional progress and are not unlocked merely by purchase or account creation.",
+      "I understand that completing 40 instructional hours does not earn a completion certificate. I must also satisfy examination eligibility requirements and pass the controlled final examination before any Obserra completion certificate, application-handoff document, or official FDACS-16103 certificate can be released.",
   },
   {
     code: "records-privacy",
