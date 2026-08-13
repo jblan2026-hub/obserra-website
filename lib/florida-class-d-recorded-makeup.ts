@@ -3,7 +3,6 @@ import "server-only";
 import { createHash, randomInt } from "node:crypto";
 import { floridaClassDMakeupEnabled, FloridaClassDMakeupError } from "./florida-class-d-makeup";
 
-const DEFAULT_SUPABASE_URL = "https://nwxnyqlyzyufgoadtqxs.supabase.co";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HEARTBEAT_SECONDS = 30;
 const CHALLENGE_INTERVAL_MINUTES = 110;
@@ -60,7 +59,7 @@ export function floridaClassDRecordedMakeupEnabled() {
 
 function config() {
   const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || DEFAULT_SUPABASE_URL).replace(/\/$/, "");
+  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   const mediaOrigin = process.env.OBSERRA_FDACS_RECORDED_MEDIA_ORIGIN?.trim().replace(/\/$/, "") || "";
   if (!key || !url.startsWith("https://") || !mediaOrigin.startsWith("https://")) {
     throw new FloridaClassDMakeupError("Recorded make-up delivery is not configured.", 503, "FDACS_RECORDED_MAKEUP_NOT_CONFIGURED");
