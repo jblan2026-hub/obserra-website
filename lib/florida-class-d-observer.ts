@@ -102,6 +102,15 @@ function normalizeText(value: string, field: string, maxLength: number) {
   return normalized;
 }
 
+async function requireObserverEligibleSession(liveSessionId: string) {
+  const query = new URLSearchParams({ select: "id,status", id: `eq.${liveSessionId}`, limit: "1" });
+  const rows = await request<Array<{ id?: string; status?: string }>>(`fdacs_class_d_live_sessions?${query}`);
+  const session = rows[0];
+  if (!session?.id || !["scheduled", "live", "break"].includes(String(session.status))) {
+    throw new FloridaClassDObserverAccessError("Live session is not eligible for observer access.", 409, "FDACS_OBSERVER_SESSION_NOT_ELIGIBLE");
+  }
+}
+
 export async function createFloridaClassDObserverGrant(actor: StaffActor, input: {
   liveSessionId: string;
   observerLabel: string;
@@ -117,6 +126,7 @@ export async function createFloridaClassDObserverGrant(actor: StaffActor, input:
   if (!Number.isInteger(input.durationMinutes) || input.durationMinutes < 15 || input.durationMinutes > 240) {
     throw new FloridaClassDObserverAccessError("Observer access duration must be between 15 and 240 minutes.", 400, "FDACS_OBSERVER_INVALID_DURATION");
   }
+  await requireObserverEligibleSession(input.liveSessionId);
 
   const secret = randomBytes(32).toString("base64url");
   const tokenDigest = digest(secret);
@@ -176,15 +186,18 @@ export async function revokeFloridaClassDObserverGrant(actor: StaffActor, input:
   requireUuid(input.grantId, "observer grant id");
   requireUuid(input.correlationId, "correlation id");
   const revokedAt = new Date().toISOString();
-  const query = new URLSearchParams({ id: `eq.${input.grantId}`, revoked_at: "is.null" });
-  await request(`fdacs_class_d_observer_grants?${query}`, {
+  const query = new URLSearchParams({ id: `eq.${input.grantId}`, revoked_at: "is.null", select: "id" });
+  const rows = await request<Array<{ id?: string }>>(`fdacs_class_d_observer_grants?${query}`, {
     method: "PATCH",
-    headers: { prefer: "return=minimal" },
+    headers: { prefer: "return=representation" },
     body: JSON.stringify({
       revoked_at: revokedAt,
       revoked_by_clerk_user_id: actor.userId,
     }),
   });
+  if (!rows[0]?.id) {
+    throw new FloridaClassDObserverAccessError("Observer grant was not active or could not be revoked.", 409, "FDACS_OBSERVER_REVOKE_NOT_APPLIED");
+  }
   await request("fdacs_class_d_audit_events", {
     method: "POST",
     headers: { prefer: "return=minimal" },
@@ -211,19 +224,25 @@ export async function exchangeFloridaClassDObserverToken(accessToken: string, co
     live_session_id?: string;
     observer_label?: string;
     purpose?: string;
+    expires_at?: string;
   }>>("fdacs_class_d_record_observer_access", {
     p_grant_id: grantId,
     p_token_digest: digest(secret),
     p_correlation_id: correlationId,
   });
   const row = rows[0];
-  if (!row?.grant_id || !row.live_session_id || !row.observer_label) {
+  if (!row?.grant_id || !row.live_session_id || !row.observer_label || !row.expires_at) {
     throw new FloridaClassDObserverAccessError("Observer access could not be validated.", 401, "FDACS_OBSERVER_ACCESS_DENIED");
+  }
+  const expiresAtMs = Date.parse(row.expires_at);
+  if (!Number.isFinite(expiresAtMs) || expiresAtMs <= Date.now()) {
+    throw new FloridaClassDObserverAccessError("Observer access has expired.", 401, "FDACS_OBSERVER_ACCESS_EXPIRED");
   }
   return {
     grantId: row.grant_id,
     liveSessionId: row.live_session_id,
     observerLabel: row.observer_label,
     purpose: row.purpose ?? "Regulatory observation",
+    expiresAt: row.expires_at,
   };
 }
