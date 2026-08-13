@@ -16,6 +16,10 @@ import {
   startFloridaClassDLiveSession,
 } from "../../../../../lib/florida-class-d-live-persistence";
 import {
+  certifyFloridaClassDLiveDay,
+  getFloridaClassDRosterTimeLedgers,
+} from "../../../../../lib/florida-class-d-live-reporting";
+import {
   floridaClassDLiveInstructionEnabled,
   getFloridaClassDInstructorLicenseNumber,
   getFloridaClassDSchoolLicenseNumber,
@@ -43,6 +47,8 @@ type Body = {
   parentInteractionId?: unknown;
   inspectionAccessReference?: unknown;
   reviewNote?: unknown;
+  attendanceStatus?: unknown;
+  idempotencyKey?: unknown;
   correlationId?: unknown;
 };
 
@@ -62,7 +68,7 @@ function errorResponse(error: unknown) {
   }
   console.error("Florida Class D live instructor API failed", error instanceof Error ? error.name : "unknown_error");
   return NextResponse.json(
-    { error: "Unable to process the regulated instructor request.", code: "FDACS_LIVE_ADMIN_REQUEST_FAILED" },
+    { error: error instanceof Error ? error.message : "Unable to process the regulated instructor request.", code: "FDACS_LIVE_ADMIN_REQUEST_FAILED" },
     { status: 500, headers },
   );
 }
@@ -79,7 +85,21 @@ export async function GET(request: Request) {
       getFloridaClassDLiveRoster(liveSessionId),
       listFloridaClassDLiveInteractions(liveSessionId),
     ]);
-    return NextResponse.json({ ...roster, interactions }, { headers });
+    const day = typeof roster.session.day === "number" ? roster.session.day : 1;
+    const enrollmentIds = roster.students
+      .map((student) => typeof student.id === "string" ? student.id : null)
+      .filter((id): id is string => Boolean(id));
+    const ledgers = await getFloridaClassDRosterTimeLedgers(enrollmentIds, day);
+    const students = roster.students.map((student) => {
+      const enrollmentId = typeof student.id === "string" ? student.id : "";
+      const ledger = ledgers.get(enrollmentId);
+      return {
+        ...student,
+        dayTime: ledger?.dayTime ?? null,
+        courseTime: ledger?.courseTime ?? null,
+      };
+    });
+    return NextResponse.json({ ...roster, students, interactions }, { headers });
   } catch (error) {
     return errorResponse(error);
   }
@@ -171,6 +191,27 @@ export async function POST(request: Request) {
         correlationId,
       });
       return NextResponse.json({ restored: true, correlationId }, { headers });
+    }
+
+    if (body.action === "certify_day") {
+      const allowedStatuses = ["present", "partial", "absent", "makeup_required"];
+      if (
+        typeof body.enrollmentId !== "string" ||
+        !Number.isInteger(body.day) ||
+        typeof body.attendanceStatus !== "string" ||
+        !allowedStatuses.includes(body.attendanceStatus) ||
+        typeof body.idempotencyKey !== "string"
+      ) {
+        return NextResponse.json({ error: "Daily attendance certification fields are incomplete.", code: "FDACS_LIVE_ATTENDANCE_CERTIFICATION_INVALID" }, { status: 400, headers });
+      }
+      const result = await certifyFloridaClassDLiveDay(actor, {
+        enrollmentId: body.enrollmentId,
+        day: body.day as 1 | 2 | 3 | 4 | 5,
+        status: body.attendanceStatus as "present" | "partial" | "absent" | "makeup_required",
+        idempotencyKey: body.idempotencyKey,
+        correlationId,
+      });
+      return NextResponse.json({ result, correlationId }, { status: 201, headers });
     }
 
     if (["answer", "prompt", "poll"].includes(body.action)) {
