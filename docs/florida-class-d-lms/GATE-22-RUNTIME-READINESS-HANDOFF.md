@@ -4,50 +4,73 @@ Snapshot: 2026-08-13
 
 ## Scope
 
-Gate 22 currently implements protected **production-runtime configuration readiness** checks for the regulated Florida Class D LMS. It does not activate regulated functions and does not expose secret values.
+Gate 22 implements separate protected runtime-readiness profiles for the regulated Florida Class D LMS:
+
+- **Production activation readiness**
+- **Non-production acceptance readiness**
+
+Neither profile activates regulated functions, exposes secret values, authorizes launch, or represents FDACS approval.
 
 ## Implemented controls
 
 - Server-only runtime readiness service.
 - Protected school-admin/compliance-admin readiness API.
 - Protected administrative readiness page.
+- Backward-compatible default readiness response remains production-oriented.
+- Explicit production and non-production readiness evaluators.
 - Explicit checks for Clerk server/client configuration presence.
 - Explicit protected Supabase HTTPS URL requirement.
 - Supabase service-role credential presence check without returning the credential.
 - Daily live-media provider and API credential presence checks.
-- Private Class DS and Class DI configuration checks without displaying license numbers.
+- Private Class DI instructor license configuration check without displaying the license number.
 - Private completion-document bucket configuration check.
 - Regulated feature-flag inspection with the readiness expectation that those flags remain disabled until controlled activation.
-- Readiness results return only booleans, labels, safe status text, blocker identifiers, and the names of enabled feature flags. Secret values, tokens, license numbers, bucket names, and infrastructure hostnames are suppressed.
+- Readiness results return only booleans, labels, safe status text, blocker identifiers, and enabled feature-flag names. Secret values, tokens, license numbers, bucket names, and infrastructure hostnames are suppressed.
 
-## Current sequencing finding
+## Production activation readiness
 
-A repository alignment review performed after Florida Class D LMS Gates run #375 identified an important distinction between **production activation readiness** and the **non-production readiness required before Gate 23 acceptance execution**.
+The production profile requires the protected technical runtime controls and retains Class DS licensing as a distinct production-only boundary.
 
-The current `lib/florida-class-d-runtime-readiness.ts` report is production-oriented. Its production readiness result requires the Class DS school license status to be active and requires a private Class DS license number. Those are valid production-activation controls and must remain fail closed while the Class DS school application is pending.
+Production readiness requires:
 
-However, the next controlled milestone is an actual Gate 23 acceptance execution in development, sandbox, staging, or UAT using synthetic identities only. That non-production acceptance must not require the Class DS license to be marked active and must not require a Class DS license number to be populated before one is actually issued.
+1. Clerk publishable and server credentials are configured.
+2. `OBSERRA_SUPABASE_URL` is explicitly configured as HTTPS.
+3. A protected Supabase service-role credential is configured server-side.
+4. Daily is configured as the live-media provider and the protected Daily API credential is present.
+5. The private Class DI instructor license value is configured.
+6. The private completion-document bucket is configured.
+7. Regulated production feature flags remain disabled during readiness review.
+8. The Class DS school license status is active only after actual issuance and controlled authorization.
+9. The Class DS license number is present only after actual issuance and remains private.
 
-Therefore, the current production readiness result must **not** be used as the sole authorization predicate for Gate 23 non-production acceptance. Until the runtime-readiness implementation exposes a separately controlled non-production acceptance-readiness profile, operators must treat Gate 22 production readiness and Gate 23 non-production execution readiness as distinct controls.
+The production report distinguishes three states:
 
-## Required non-production readiness remediation
+- `READY FOR CONTROLLED ACTIVATION REVIEW` only when there are zero blockers.
+- `READY EXCEPT CLASS DS LICENSE` only when every non-license technical blocker is clear and the remaining blockers are limited to the Class DS license status and/or Class DS license number.
+- `FAIL CLOSED` for any other blocked state.
 
-Before the actual Gate 23 non-production acceptance run is executed, the runtime-readiness implementation should provide a separate fail-closed non-production acceptance profile that verifies, without exposing secret values:
+`READY EXCEPT CLASS DS LICENSE` is a staged technical-readiness state. It is not permission to activate production.
 
-1. The runtime is explicitly identified as `development`, `sandbox`, `staging`, or `uat` and not production.
-2. Non-production acceptance has been explicitly authorized for that runtime.
-3. Synthetic-identity-only mode is explicitly enabled.
+## Non-production acceptance readiness
+
+The separate non-production profile is now implemented for development, sandbox, staging, or UAT acceptance using synthetic identities only.
+
+It verifies, without exposing protected values:
+
+1. `OBSERRA_FDACS_RUNTIME_ENVIRONMENT` is explicitly one of `development`, `sandbox`, `staging`, or `uat`.
+2. `OBSERRA_FDACS_NONPROD_ACCEPTANCE_AUTHORIZED` is explicitly enabled.
+3. `OBSERRA_FDACS_SYNTHETIC_IDENTITY_ONLY` is explicitly enabled.
 4. Protected Clerk identity configuration is present.
-5. An explicit protected HTTPS Supabase runtime URL and protected server-side service credential are present for the authorized non-production database.
+5. An explicit protected HTTPS Supabase runtime URL and protected server-side service credential are present.
 6. Daily live-media configuration required for acceptance testing is present.
 7. Private completion-document storage required for acceptance testing is configured.
-8. Regulated production feature flags remain disabled unless a narrowly scoped non-production test procedure explicitly requires an approved test-only behavior.
-9. The non-production readiness result does not require an active Class DS school license or a Class DS license number.
-10. Production activation readiness continues to require the applicable license status, private license number, production configuration, regulatory authorization, and owner approval.
+8. The private Class DI instructor license value is configured.
+9. Regulated production feature flags remain disabled during readiness review.
+10. The profile does not inspect or require Class DS license status or a Class DS license number.
 
-The non-production acceptance profile must not infer that a protected database is non-production from a hostname alone. It should require an explicit controlled environment designation and authorization marker in addition to protected configuration presence.
+The non-production profile does not infer environment classification from a hostname. The explicit environment designation and authorization markers are required and fail closed.
 
-## Feature flags covered by the current production readiness report
+## Feature flags covered by Gate 22
 
 - `OBSERRA_FDACS_CLASS_D_LIVE_ENABLED`
 - `OBSERRA_FDACS_CLASS_D_MEDIA_ENABLED`
@@ -63,6 +86,8 @@ Additional regulated feature flags must be added to this inventory as new runtim
 
 The absence of an issued Class DS license is a production activation blocker. It is not, by itself, a blocker to a properly isolated, explicitly authorized, synthetic-only non-production acceptance execution.
 
+Class DS license issuance does not automatically activate the regulated LMS. Production activation remains a controlled decision after applicable regulatory authorization, production verification, end-to-end testing, security and operational acceptance, and owner approval.
+
 ## Completion and certificate boundary
 
 Runtime readiness does not change the completion standard. Forty instructional hours alone do not earn a completion certificate. The learner must satisfy the controlled successful-completion requirements, including the passing 170-question final examination at 128/170 or better and authorized completion approval, before supplemental Obserra completion documents may be generated. The official FDACS-16103 remains a LIAS-generated state document.
@@ -73,10 +98,13 @@ Runtime readiness does not change the completion standard. Forty instructional h
 - `app/api/florida-class-d/admin/runtime-readiness/route.ts`
 - `app/florida-security-training/admin/runtime-readiness/page.tsx`
 - `scripts/florida-class-d-runtime-readiness-gate.mjs`
+- `proxy.ts`
 - `docs/florida-class-d-lms/GATE-22-RUNTIME-READINESS-HANDOFF.md`
 
 ## Release boundary
 
-Gate 22 production configuration-readiness evidence is not FDACS approval, database-promotion approval, launch authorization, or permission to turn on regulated production feature flags. Production activation remains a later controlled decision after regulatory authorization, database verification, end-to-end testing, security/operational acceptance, and owner approval.
+Gate 22 runtime-readiness evidence is not FDACS approval, database-promotion approval, launch authorization, or permission to turn on regulated production feature flags.
 
-The next operational milestone remains controlled Gate 23 non-production acceptance using synthetic identities only after an authorized non-production runtime has been configured and separately verified as non-production-ready. No production database migration, real learner acceptance, production activation, LIAS production execution, certificate release, or FDACS approval claim is authorized by this handoff.
+The next operational milestone is controlled Gate 23 non-production acceptance using synthetic identities only after an authorized non-production runtime is configured and the non-production readiness profile reports ready. Production remains fail closed until the actual Class DS license is issued and privately configured, applicable regulatory and production acceptance gates are satisfied, and owner approval is recorded.
+
+No real learner acceptance, LIAS production execution, certificate release, or FDACS approval claim is authorized by this handoff.
