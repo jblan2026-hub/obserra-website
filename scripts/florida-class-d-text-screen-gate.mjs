@@ -73,6 +73,8 @@ requireText(instructorConsole, "<InstructionalTextScreenControl", "The real inst
 requireText(instructorConsole, "textScreenViews", "Instructor console must expose learner text-screen evidence.");
 
 requireText(handoff, "No mockup, placeholder, client-only timer", "Gate 24 audit handoff must reject mockups and client-only compliance timing.");
-requireText(handoff, "No production migration has been applied", "Gate 24 handoff must preserve the production fail-closed boundary.");
+if (!/No production database migration has been applied(?:\s+by Gate 24 work)?\./.test(handoff)) {
+  throw new Error("Gate 24 handoff must preserve the production fail-closed boundary.");
+}
 
 console.log("Florida Class D Gate 24 passed: server-calculated text-screen timing, authenticated visible-tab evidence, learner acknowledgment, instructor discussion confirmation, and protected audit boundaries are enforced in source.");
