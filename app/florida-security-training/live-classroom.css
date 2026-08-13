@@ -112,11 +112,19 @@
 .fdacs-live__presence-code small,
 .fdacs-live__presence-code span { color: #9fb2c8; }
 
+.fdacs-live__time-title {
+  margin: 20px 2px 0;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #a9bdd4;
+}
+
 .fdacs-live__timecards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .fdacs-live__timecards article {
@@ -197,9 +205,9 @@
 .fdacs-live__roster-panel { margin-top: 16px; }
 .fdacs-live__roster { display: grid; gap: 8px; margin-top: 14px; overflow-x: auto; }
 .fdacs-live__roster > div {
-  min-width: 860px;
+  min-width: 1420px;
   display: grid;
-  grid-template-columns: minmax(190px, 1.4fr) repeat(4, minmax(110px, .7fr)) minmax(105px, .7fr);
+  grid-template-columns: minmax(190px, 1.35fr) repeat(7, minmax(115px, .72fr)) minmax(150px, .85fr);
   align-items: center;
   gap: 10px;
   padding: 11px 12px;
@@ -212,6 +220,8 @@
 .fdacs-live__roster small { color: #8fa4bd; }
 .fdacs-live__roster b { font-variant-numeric: tabular-nums; }
 .fdacs-live__roster em { color: #87c7a8; font-style: normal; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+.fdacs-live__roster-actions { display: flex !important; flex-wrap: wrap; gap: 6px !important; }
+.fdacs-live__roster-actions button { padding: 7px 9px; font-size: 11px; }
 
 @media (max-width: 1000px) {
   .fdacs-live__grid { grid-template-columns: 1fr; }
