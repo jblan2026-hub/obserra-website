@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { findAppBySlug } from "../../../apps/appsData";
+import { findStorefrontAppBySlug } from "../../../apps/storefront";
 import { availablePlansFor, stripePriceEnvironmentKey, type BillingInterval } from "../../../apps/commerce";
 import { getStripe } from "../../../../lib/stripe";
 import { primaryAccountEmail } from "../../../../lib/app-entitlements";
@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   const planId = requestUrl.searchParams.get("plan") ?? "professional";
   const interval = (requestUrl.searchParams.get("interval") ?? "monthly") as BillingInterval;
   const deployment = requestUrl.searchParams.get("deployment") ?? "SaaS";
-  const app = findAppBySlug(slug);
+  const app = findStorefrontAppBySlug(slug);
 
   if (!app) return NextResponse.redirect(new URL("/apps?checkout=invalid-app", requestUrl));
   const plan = availablePlansFor(app).find((entry) => entry.id === planId);
