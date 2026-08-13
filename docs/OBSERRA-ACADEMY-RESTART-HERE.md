@@ -20,8 +20,13 @@ Snapshot: 2026-08-12 19:39 ET
 4. Read `docs/academy-media-pipeline/ACTUAL-SITE-VERIFICATION-GATE.md`.
 5. Read `docs/academy-media-pipeline/PER-SECTION-LEARNWORLDS-ACTIVITY-ARCHITECTURE.md`.
 6. Read `docs/academy-media-pipeline/COURSE-SECTION-ASSESSMENT-STANDARD.md`.
-7. Preserve all completed course assets, failures, corrections, hashes, and runtime evidence before changing anything.
-8. Recheck current platform objects and official sources immediately before authenticated import or publication.
+7. For any Florida Class D school, FDACS, regulated LMS, attendance, examination-control, LIAS, or school-operations work, also read `docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md` and treat it as a separate regulated workstream from the commercial course build.
+8. Preserve all completed course assets, failures, corrections, hashes, and runtime evidence before changing anything.
+9. Recheck current platform objects and official sources immediately before authenticated import or publication.
+
+## Separate regulated-school workstream
+
+The Florida FDACS Class D Security Officer School / regulated LMS build is tracked separately in `docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md`. Do not merge its regulatory gates, student-record controls, attendance/time evidence, certification-examination controls, LIAS workflow, or inspection-readiness state into the normal Academy Course 1–N production sequence.
 
 ## Permanent controls
 
@@ -112,11 +117,12 @@ Preserved Course 4 defect: all eight inherited presentation PDFs were byte-ident
 3. Then continue to `Digital Exposure and Executive Privacy`, `AI Ready Workforce`, `Coding for Cyber Leaders`, and the remaining catalog in governed order.
 4. Integrate owner-produced videos only after identity, title, branding, transcript, caption, audio, technical, and owner-approval validation.
 5. Never claim publication readiness without authenticated end-to-end LearnWorlds runtime evidence.
+6. Track Florida Class D school/LMS development only in the separate FDACS Class D handoff and its own gated sequence.
 
 ## Continuation command
 
 ```text
-Read the v14.0.0 Restart Notice, Master Handoff, Latest Handoff, and Continuous Handoff before acting. Preserve all completed work and failures. Treat the corrected Course 1 S00 LearnWorlds upload as the proven SCORM 1.2 packaging pattern. Before Course 2 LearnWorlds upload, replace its eight SCORM packages with the proven structure and issue a Windows-safe delivery. Courses 3 and 4 already use the hardened pattern. Then continue to Executive Travel Risk Management using the same eight-section architecture, native assessment standard, owner-video boundary, Windows-safe packaging, evidence discipline, and Draft runtime acceptance gates.
+Read the v14.0.0 Restart Notice, Master Handoff, Latest Handoff, and Continuous Handoff before acting. Preserve all completed work and failures. Treat the corrected Course 1 S00 LearnWorlds upload as the proven SCORM 1.2 packaging pattern. Before Course 2 LearnWorlds upload, replace its eight SCORM packages with the proven structure and issue a Windows-safe delivery. Courses 3 and 4 already use the hardened pattern. Then continue to Executive Travel Risk Management using the same eight-section architecture, native assessment standard, owner-video boundary, Windows-safe packaging, evidence discipline, and Draft runtime acceptance gates. For Florida Class D school/FDACS/LMS work, switch to the separate FDACS Class D School Build Handoff and resume from its latest regulated gate instead of the commercial-course sequence.
 ```
 
 ## Public repository warning
