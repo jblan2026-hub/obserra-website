@@ -84,7 +84,7 @@ requireText(instruction, "correlationId", "Instruction-time API must carry a cor
 requireText(inspection, '["school_admin", "compliance_admin"]', "Inspection export must be restricted to school/compliance administration.");
 
 requireText(course, 'status: "coming-soon"', "Gate 3 must not open the public regulated course.");
-requireText(handoff, "Gate 3", "Separate Florida LMS handoff must record Gate 3.");
-requireText(handoff, "Separate from Academy course-content build", "FDACS LMS handoff must remain separate from commercial course production.");
+requireText(handoff, "## Gate 3 — Durable Regulated Records and Administrative APIs", "Separate Florida LMS handoff must record Gate 3.");
+requireText(handoff, "It is separate from the commercial Obserra Academy", "FDACS LMS handoff must remain separate from commercial course production.");
 
 console.log("Florida Class D Gate 3 passed: durable-record schema, staff authorization, atomic write contracts, and inspection API boundaries validated in source.");
