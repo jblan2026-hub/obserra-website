@@ -10,11 +10,15 @@ Gates 1 through 24 are implemented in source. The accepted Gate 24 source/build 
 
 The dedicated Florida Class D LMS workflow completed successfully on that commit. The green cycle includes the existing regulated source gates, Gate 22 runtime-readiness verification, Gate 23 non-production acceptance verification, Gate 24 instructional text-screen verification, repository contract tests, lint, and the production Next.js build.
 
-Gate 23, Non-Production Acceptance Evidence, includes protected acceptance records, all 18 required acceptance domains, synthetic test-identity confirmation, release-commit binding, service-controlled persistence, an all-pass finalization rule, a protected school/compliance API, a real interactive staff console, and restricted acceptance-event runtime permissions.
+Gate 23 includes protected non-production acceptance records, all 18 required acceptance domains, synthetic test-identity confirmation, release-commit binding, service-controlled persistence, an all-pass finalization rule, a protected school/compliance API, a real interactive staff console, and restricted acceptance-event runtime permissions.
 
-Gate 24, Instructional Text-Screen Timing, is now implemented end to end in source. The regulated database calculates the minimum instructional text display duration using the 60-seconds-per-50-words rule, prorated by actual word count. Learner timing is tied to the authenticated learner and active device lease, visible-tab heartbeats feed server-observed timing evidence, acknowledgment is unavailable until the server-observed minimum is met, and the instructor must persist a live-discussion confirmation before closing the text screen.
+Gate 24 is implemented end to end in source. The regulated database calculates the minimum instructional text display duration using the 60-seconds-per-50-words rule, prorated by actual word count. Learner timing is tied to the authenticated learner and active device lease, visible-tab heartbeats feed server-observed timing evidence, acknowledgment is unavailable until the server-observed minimum is met, and the instructor must persist a live-discussion confirmation before closing the text screen.
 
-No production database migration, production non-production-acceptance execution against real learner data, production learner text-screen evidence, or regulated launch activation has occurred.
+Gate 25, Regulated Runtime Isolation, is now **in progress**. `scripts/florida-class-d-runtime-isolation-audit.mjs` has been added to inventory regulated server modules for embedded Supabase project URLs and improper `NEXT_PUBLIC_*` secret-class environment names. `docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md` defines the acceptance criteria and production boundary.
+
+Gate 25 is not accepted. The audit is not yet an enforcing CI gate because legacy hardcoded Supabase project URL fallbacks remain to be remediated. Enabling enforcement before remediation would intentionally break the regulated workflow.
+
+No production database migration, production acceptance execution against real learner data, production learner text-screen evidence, or regulated launch activation has occurred.
 
 ## Non-negotiable completion and certificate rule
 
@@ -36,26 +40,25 @@ A run is not accepted when any required domain is missing, failed, blocked, or n
 
 The controlled DS LMS submission guide must include a screenshot of the implemented Gate 24 workflow. The evidence should show the instructional text, word count, server-calculated minimum duration, server-observed learner time, remaining or requirement-met state, learner acknowledgment boundary, and instructor discussion/closure control. Use demonstration or synthetic data unless an authorized production evidence procedure permits otherwise.
 
+## Gate 25 security objective
+
+Regulated `lib/florida-class-d*.ts` server modules must not embed Supabase project URLs and must not use public environment variables for secret-class configuration. Regulated persistence must fail closed when the explicit protected HTTPS Supabase URL or required service-role credential is absent. The Gate 23 acceptance service and Gate 24 text-screen service already follow this explicit-runtime pattern; remaining legacy regulated modules are being brought to the same boundary.
+
 ## Current documentation and screenshot requirement
 
 The Class DS LMS submission guide must be revised before filing/final operational use to show implemented, accurately labeled evidence for Completion Review, the 40-hours-but-no-certificate-before-exam-pass boundary, LIAS workflow, Student Completion Documents, the supplemental Obserra Course Completion Certificate, Completion & Inspection Packets, Quality/CAPA/Retention, database-promotion readiness, runtime-readiness evidence, Gate 23 acceptance evidence, and Gate 24 instructional text-screen timing. No credential, license number, learner PII, protected exam content, provider secret, or infrastructure secret may appear in public-source screenshots or evidence.
 
-## Current unresolved production controls
-
-Source/build validation is not production acceptance. Before regulated launch, remaining controlled work includes real non-production acceptance in an appropriately configured environment, production database-promotion evidence, protected runtime configuration, final examination-bank approval boundary, final DS submission-guide screenshots, production security review, and controlled owner/admin access readiness.
-
-Several regulated server modules outside the Gate 23/24 services still contain hardcoded Supabase project URL fallbacks. These must be removed so production regulated modules require explicit protected HTTPS runtime configuration and do not publish unnecessary project identifiers.
-
 ## Next controlled sequence
 
-1. Synchronize the master handoff, Gate 24 handoff, DS submission/audit control, and PR #56 with the green Gate 24 baseline.
-2. Harden regulated runtime configuration by removing remaining hardcoded Supabase project URL fallbacks and requiring explicit protected environment configuration.
-3. Add source verification for that runtime-isolation boundary and rerun the complete regulated workflow.
-4. Execute real non-production acceptance using synthetic identities only after the applicable non-production database and runtime environment is configured.
-5. Finalize the Division-approved examination-bank boundary before production examination activation.
-6. Revise the Class DS LMS submission-guide DOCX/PDF with screenshots from implemented screens.
-7. Prepare owner/admin LMS access using the authenticated Clerk role path without placing credentials or license numbers in source or chat.
-8. Keep paid enrollment and all regulated production functions disabled until regulatory authorization, production acceptance, and owner approval are complete.
+1. Run the Gate 25 runtime-isolation inventory and identify every regulated module with an embedded Supabase project URL fallback.
+2. Remove those fallbacks so regulated services require explicit `OBSERRA_SUPABASE_URL` HTTPS configuration and protected server-side credentials.
+3. Add Gate 25 enforcement to the dedicated Florida Class D CI workflow only after the inventory is clean.
+4. Rerun Gates 1 through 25, repository tests, lint, and the production Next.js build and synchronize all audit handoffs to the actual green head.
+5. Execute real non-production acceptance using synthetic identities only after the applicable non-production database and runtime environment is configured.
+6. Finalize the Division-approved examination-bank boundary before production examination activation.
+7. Revise the Class DS LMS submission-guide DOCX/PDF with screenshots from implemented screens.
+8. Prepare owner/admin LMS access using the authenticated Clerk role path without placing credentials or license numbers in source or chat.
+9. Keep paid enrollment and all regulated production functions disabled until regulatory authorization, production acceptance, and owner approval are complete.
 
 ## Public repository security boundary
 
@@ -63,4 +66,4 @@ Never commit real learner PII, identity documents, protected exam questions or a
 
 ## Restart instruction
 
-Resume from the green Gate 24 baseline `cc6470b2466f68578d63884f646462a2ad65ac0c`. Gate 24 is accepted as source/build evidence only. Continue with regulated runtime-isolation hardening and controlled non-production acceptance preparation. Do not treat CI as FDACS approval, do not apply production migrations from source-gate work, do not generate FDACS-16103 locally, and do not issue a course-completion certificate for hours alone.
+Resume from `docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md`. Gate 24 remains the accepted source/build baseline at `cc6470b2466f68578d63884f646462a2ad65ac0c`; Gate 25 is in progress and must not be called accepted until the inventory is clean and the enforcing CI cycle is green. Do not treat CI as FDACS approval, do not apply production migrations from source-gate work, do not generate FDACS-16103 locally, and do not issue a course-completion certificate for hours alone.
