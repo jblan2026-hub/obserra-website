@@ -3,7 +3,7 @@ import "server-only";
 import { createHash, randomUUID } from "node:crypto";
 import { FloridaClassDExamError } from "./florida-class-d-exam";
 
-const DEFAULT_BUCKET = "fdacs-class-d-private";
+const REQUIRED_BUCKET = "fdacs-class-d-completion-documents";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MAX_PDF_BYTES = 10 * 1024 * 1024;
 
@@ -50,8 +50,8 @@ export function floridaClassDCompletionDocumentsEnabled() {
 function config() {
   const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
   const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
-  const bucket = process.env.OBSERRA_FDACS_DOCUMENTS_BUCKET?.trim() || DEFAULT_BUCKET;
-  if (!key || !url.startsWith("https://") || !bucket) {
+  const bucket = process.env.OBSERRA_FDACS_DOCUMENTS_BUCKET?.trim() || "";
+  if (!key || !url.startsWith("https://") || bucket !== REQUIRED_BUCKET) {
     throw new FloridaClassDExamError("Completion document service is not configured.", 503, "FDACS_COMPLETION_DOCUMENTS_NOT_CONFIGURED");
   }
   return { key, url, bucket };
@@ -120,6 +120,9 @@ async function storageUpload(objectKey: string, bytes: Uint8Array, contentType: 
 
 async function storageDownload(bucket: string, objectKey: string) {
   const { key, url } = config();
+  if (bucket !== REQUIRED_BUCKET) {
+    throw new FloridaClassDExamError("Protected completion document storage boundary is invalid.", 409, "FDACS_COMPLETION_DOCUMENT_BUCKET_INVALID");
+  }
   const response = await fetch(`${url}/storage/v1/object/authenticated/${encodeURIComponent(bucket)}/${objectKey.split("/").map(encodeURIComponent).join("/")}`, {
     method: "GET",
     cache: "no-store",
