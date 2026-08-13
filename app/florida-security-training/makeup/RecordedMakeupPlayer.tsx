@@ -50,17 +50,13 @@ export default function RecordedMakeupPlayer({ assignmentId, assignedMinutes }: 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [playbackSessionId, setPlaybackSessionId] = useState<string | null>(null);
   const [mediaUrl, setMediaUrl] = useState<string | null>(null);
-  const [browserId, setBrowserId] = useState<string | null>(null);
+  const [browserId] = useState<string | null>(() => typeof window === "undefined" ? null : browserInstanceId());
   const [verifiedSeconds, setVerifiedSeconds] = useState(0);
   const [requiredSeconds, setRequiredSeconds] = useState(assignedMinutes * 60);
   const [status, setStatus] = useState("Not started");
   const [error, setError] = useState<string | null>(null);
   const [challenge, setChallenge] = useState<{ id: string; code?: string; expiresAt?: string } | null>(null);
   const [challengeAnswer, setChallengeAnswer] = useState("");
-
-  useEffect(() => {
-    setBrowserId(browserInstanceId());
-  }, []);
 
   useEffect(() => {
     if (!playbackSessionId || !browserId) return;
@@ -76,8 +72,8 @@ export default function RecordedMakeupPlayer({ assignmentId, assignedMinutes }: 
           pageVisible: document.visibilityState === "visible",
         }) as HeartbeatResponse;
         const result = payload.result ?? {};
-        setVerifiedSeconds(Number(result.verifiedWatchSeconds ?? verifiedSeconds));
-        setRequiredSeconds(Number(result.requiredWatchSeconds ?? requiredSeconds));
+        if (typeof result.verifiedWatchSeconds === "number") setVerifiedSeconds(result.verifiedWatchSeconds);
+        if (typeof result.requiredWatchSeconds === "number") setRequiredSeconds(result.requiredWatchSeconds);
         setStatus(result.status ?? "active");
         if (result.status === "challenge_required") {
           video.pause();
@@ -95,7 +91,7 @@ export default function RecordedMakeupPlayer({ assignmentId, assignedMinutes }: 
       }
     }, 30_000);
     return () => window.clearInterval(timer);
-  }, [browserId, playbackSessionId, requiredSeconds, verifiedSeconds]);
+  }, [browserId, playbackSessionId]);
 
   async function start() {
     if (!browserId) return;
