@@ -279,6 +279,10 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     }
   }
 
+  function openObserverAdministration() {
+    window.open(`/florida-security-training/admin/observer/${encodeURIComponent(liveSessionId)}`, "_blank", "noopener,noreferrer");
+  }
+
   const status = state?.session?.status ?? "locked";
   const isBreak = state?.session?.current_segment_type === "break";
   const day = state?.session?.day;
@@ -325,6 +329,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
             <button type="button" onClick={() => void issuePresenceCheck()}>Issue presence check</button>
             <button type="button" onClick={() => void segment("break")}>Start 15-minute break</button>
             <button type="button" onClick={() => void segment("instruction")}>Resume instruction</button>
+            <button type="button" onClick={openObserverAdministration}>Regulatory observer access</button>
             <button type="button" className="danger" onClick={() => void sessionAction("end")}>End lesson</button>
           </div>
 
