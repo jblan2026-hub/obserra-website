@@ -31,9 +31,24 @@ export default async function FloridaClassDCompletionDocumentsPage() {
         <div className="fl-classd__notice">
           <FileCheck2 size={20} />
           <div>
-            <strong>The official training certificate is FDACS-16103.</strong>
-            <span>It must be generated through the school&apos;s LIAS reporting workflow. An Obserra-branded certificate may also be provided, but it is supplemental and does not replace FDACS-16103.</span>
+            <strong>No completion certificate is issued for hours alone.</strong>
+            <span>Forty verified instructional hours are required, but you must also complete all required learning activities, pass the separate 170-question final examination with at least 128 correct answers, clear any required remediation or attendance issues, and receive school completion approval before any course-completion certificate is released.</span>
           </div>
+        </div>
+        <div className="fl-classd__notice">
+          <FileCheck2 size={20} />
+          <div>
+            <strong>The official training certificate is FDACS-16103.</strong>
+            <span>It is generated through the school&apos;s LIAS reporting workflow only after successful completion. An Obserra-branded certificate may also be provided after the passing examination and completion approval, but it is supplemental and does not replace FDACS-16103.</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="fl-classd__section">
+        <div className="fl-classd__section-heading">
+          <span>SUCCESSFUL COMPLETION STANDARD</span>
+          <h2>40 hours + required coursework + passing examination + school approval</h2>
+          <p>Reaching 2,400 verified instructional minutes makes the instructional-hours requirement complete. It does not, by itself, complete the course. A failed examination keeps the course incomplete and no certificate is issued. If a retest is required, the regulated remediation and retest process must be completed before successful completion can be approved.</p>
         </div>
       </section>
 
@@ -41,7 +56,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
         <div className="fl-classd__section-heading">
           <span>OFFICIAL FLORIDA TRAINING RECORD</span>
           <h2>Certificate to include with the Class D application</h2>
-          <p>Download the LIAS-generated Certificate of Security Officer Training when it appears below and retain a copy with your application records.</p>
+          <p>After you pass the final examination and the school approves successful completion, authorized staff report the completion through LIAS. Download the LIAS-generated Certificate of Security Officer Training when it appears below and retain a copy with your application records.</p>
         </div>
         <div className="fl-classd__automation-grid">
           {official.map((document) => (
@@ -57,7 +72,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
         <div className="fl-classd__section-heading">
           <span>FLORIDA CLASS D APPLICATION</span>
           <h2>Use the official FDACS application process</h2>
-          <p>The FDACS-16103 is the course-completion evidence students retain for the Class D application. The application itself is submitted to FDACS, not to Obserra.</p>
+          <p>The FDACS-16103 is the official course-completion evidence students retain for the Class D application. The application itself is submitted to FDACS, not to Obserra.</p>
         </div>
         <div className="fl-classd__actions">
           <a href="https://laso.fdacs.gov/apply/DApplicationForm.aspx" target="_blank" rel="noreferrer">Open official Class D application <ExternalLink size={16} /></a>
@@ -69,7 +84,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
         <div className="fl-classd__section-heading">
           <span>SUPPLEMENTAL RECORDS</span>
           <h2>School completion and application support</h2>
-          <p>Supplemental Obserra records may be provided for your files. These do not substitute for the official LIAS-generated FDACS-16103.</p>
+          <p>Supplemental Obserra records may be generated only after the passing examination and successful completion approval. They may include your verified legal name, course title, 40 instructional hours, completion date, and a unique certificate identifier. These records do not substitute for the official LIAS-generated FDACS-16103.</p>
         </div>
         <div className="fl-classd__automation-grid">
           {supplemental.map((document) => (
@@ -85,7 +100,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
         <ShieldCheck />
         <div>
           <strong>License application reminder</strong>
-          <p>Course completion does not itself issue a Florida Class D license. Submit the required license application and supporting documentation to the Florida Department of Agriculture and Consumer Services and wait for state licensure before performing duties that require a Class D license.</p>
+          <p>Successful course completion does not itself issue a Florida Class D license. Submit the required license application and supporting documentation to the Florida Department of Agriculture and Consumer Services and wait for state licensure before performing duties that require a Class D license.</p>
         </div>
       </section>
     </main>
