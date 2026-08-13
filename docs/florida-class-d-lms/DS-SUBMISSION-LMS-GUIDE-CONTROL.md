@@ -23,7 +23,7 @@ Working artifact names:
 
 The generated binary artifacts are not committed to this public repository. Final submission copies must be handled as controlled regulatory records.
 
-**Required next controlled revision:** the DOCX/PDF submission package must be revised to incorporate the completion/certification standard and the additional completion, LIAS, and student-document screenshots described below before filing. The repository standard in `STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md` is authoritative for that revision.
+**Required next controlled revision:** the DOCX/PDF submission package must be revised to incorporate the completion/certification standard and the additional completion, LIAS, student-document, certificate, and inspection-packet screenshots described below before filing. The repository standard in `STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md` is authoritative for that revision.
 
 ## Submission status
 
@@ -44,7 +44,7 @@ The submission guide, student materials, LMS notices, instructor materials, hand
 - The official **FDACS-16103 Certificate of Security Officer Training** is generated through LIAS after successful completion is reported. Obserra does not synthesize or self-generate the official state form.
 - Successful course completion and receipt of training documents do not themselves issue a Florida Class D license.
 
-The controlled supplemental certificate may contain the learner's verified legal name, course title, 40 instructional hours, completion date, and unique certificate/reference identifier. Sensitive identity evidence, raw identifiers, examination answers, and internal system identifiers must not be placed on a public-facing certificate unless a later regulatory requirement specifically requires them.
+The controlled supplemental certificate may contain the learner's verified legal name, course title, 40 instructional hours, final-examination score, completion date, and unique certificate/reference identifier. Sensitive identity evidence, raw identifiers, examination answers, and internal system identifiers must not be placed on a public-facing certificate unless a later regulatory requirement specifically requires them.
 
 ## Guide contents
 
@@ -65,19 +65,20 @@ The controlled guide must cover:
 13. Separate final certification examination and eligibility gate.
 14. **Successful-completion standard: 40 hours + 18 curriculum areas + passing 128/170 examination + issue clearance + authorized completion approval.**
 15. **Certificate issuance sequence and explicit prohibition on certificate release before a passing examination.**
-16. Records, retention, and inspection readiness.
-17. FDACS/LIAS post-course reporting and FDACS-16103 handling.
-18. Student Class D application-document handoff.
-19. Security and privacy architecture.
-20. Quality management and change control.
-21. Portal evidence gallery.
-22. Online training compliance matrix.
-23. Submission packet checklist.
-24. Pre-submission and pre-launch status matrix.
-25. Reference list.
-26. Instructor operating checklist.
-27. Controlled record inventory.
-28. Final submission update fields.
+16. Supplemental Obserra completion-certificate presentation and official FDACS-16103 separation.
+17. Records, retention, inspection readiness, and completion-packet export.
+18. FDACS/LIAS post-course reporting and FDACS-16103 handling.
+19. Student Class D application-document handoff.
+20. Security and privacy architecture.
+21. Quality management and change control.
+22. Portal evidence gallery.
+23. Online training compliance matrix.
+24. Submission packet checklist.
+25. Pre-submission and pre-launch status matrix.
+26. Reference list.
+27. Instructor operating checklist.
+28. Controlled record inventory.
+29. Final submission update fields.
 
 ## Portal screenshot inventory
 
@@ -101,6 +102,8 @@ The next controlled DOCX/PDF revision must add screenshots that show the complet
 11. **Passing Examination / Completion Boundary:** visual evidence that a learner at 40 instructional hours receives no certificate until the 170-question examination is passed at 128/170 or better.
 12. **FDACS / LIAS Completion Workflow:** prepared, submitted, confirmed, exception handling, reporting due date, and the manual/no-scraping control boundary.
 13. **Student Completion Documents Portal:** official FDACS-16103, supplemental Obserra certificate, application instructions, and the explicit distinction between successful training completion and state licensure.
+14. **Supplemental Obserra Course Completion Certificate:** learner-specific certificate rendered only after successful completion, showing demonstration legal name, course title, 40 instructional hours, exam score, completion date, unique certificate ID, and the supplemental/not-a-license disclaimer.
+15. **Completion & Inspection Packets:** protected staff view showing printable and JSON packet export, with attendance, instructional time, exam result history, completion, LIAS, completion-document metadata, and audit evidence while excluding exam questions/answers and raw identity documents.
 
 These screenshots must use demonstration data only. Final production screenshots must replace development previews before the guide is used as operational evidence after applicable authorization and production validation.
 
@@ -125,8 +128,10 @@ The guide maps the proposed platform to the current online Class D requirements 
 - no certificate issuance based solely on reaching 40 instructional hours;
 - final examination pass at 128/170 before successful completion/certificate release;
 - authorized completion review before post-course documents are released;
+- supplemental Obserra certificate generated only from the controlled successful-completion record;
 - LIAS reporting and FDACS-16103 generation workflow;
 - protected learner-specific completion-document delivery;
+- protected staff-only completion/inspection packet with controlled sensitive-data exclusions;
 - controlled school records and inspection readiness.
 
 ## Student-material publication rule
@@ -160,4 +165,4 @@ Recommended organization for the DS application package:
 
 ## Production evidence rule
 
-Source/build validation and development screenshots do not constitute regulatory approval or production acceptance. Before the guide is converted from submission draft to final operational evidence, the school must capture final production screenshots after the applicable regulatory authorization, database promotion, media-provider configuration, identity/enrollment workflow, attendance/time controls, examination engine, completion review, certificate/document workflow, records/inspection center, and LIAS operating procedures have been validated.
+Source/build validation and development screenshots do not constitute regulatory approval or production acceptance. Before the guide is converted from submission draft to final operational evidence, the school must capture final production screenshots after the applicable regulatory authorization, database promotion, media-provider configuration, identity/enrollment workflow, attendance/time controls, examination engine, completion review, certificate/document workflow, completion-packet/inspection center, and LIAS operating procedures have been validated.
