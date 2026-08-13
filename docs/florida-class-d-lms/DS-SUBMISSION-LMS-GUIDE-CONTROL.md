@@ -23,7 +23,7 @@ Working artifact names:
 
 The generated binary artifacts are not committed to this public repository. Final submission copies must be handled as controlled regulatory records.
 
-**Required next controlled revision:** the DOCX/PDF submission package must be revised before filing to incorporate the current completion/certification standard and the additional completion, LIAS, student-document, certificate, inspection-packet, quality/CAPA, retention, database/runtime readiness, Gate 23 acceptance, Gate 24 instructional text-screen, and final Gate 25 runtime-isolation evidence defined below. The repository standard in `STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md` is authoritative for completion/certification wording.
+**Required next controlled revision:** the DOCX/PDF submission package must be revised before filing to incorporate the current completion/certification standard and the additional completion, LIAS, student-document, certificate, inspection-packet, quality/CAPA, retention, database/runtime readiness, Gate 23 acceptance, Gate 24 instructional text-screen, and accepted Gate 25 runtime-isolation evidence defined below. The repository standard in `STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md` is authoritative for completion/certification wording.
 
 ## Submission status
 
@@ -64,9 +64,9 @@ The current 0.9 guide embeds nine controlled development screenshots using demon
 8. Inspection/audit center for immediate production of regulated training records.
 9. Controlled final-examination eligibility gate.
 
-## Required screenshots for the next submission-guide revision
+## Required screenshots and evidence for the next submission-guide revision
 
-The next controlled DOCX/PDF revision must add screenshots showing the complete post-instruction, school-operations, readiness, acceptance, and text-screen workflow:
+The next controlled DOCX/PDF revision must add implemented evidence showing the complete post-instruction, school-operations, readiness, acceptance, text-screen, and runtime-isolation workflow:
 
 10. **Completion Review Console:** 2,400 verified minutes, five qualifying 480-minute days, all 18 curriculum areas/learning checks, passing examination evidence, unresolved-issue checks, and authorized completion approval.
 11. **Passing Examination / Completion Boundary:** the **no-certificate-before-pass boundary**, visually showing that a learner at 40 instructional hours receives no certificate until the 170-question examination is passed at 128/170 or better.
@@ -79,6 +79,7 @@ The next controlled DOCX/PDF revision must add screenshots showing the complete 
 18. **Protected Runtime Readiness:** staff-only readiness view showing configuration-presence status for identity, database, live media, licensing, document storage, and regulated feature flags without exposing secret values, license numbers, provider credentials, project identifiers, or private bucket names.
 19. **Gate 23 Non-Production Acceptance Evidence:** the implemented staff acceptance console showing a real development, sandbox, staging, or UAT acceptance run tied to a release commit and synthetic test identity; all 18 required acceptance domains; evidence/status recording; aggregate passed-domain progress; and the controlled finalization boundary. The screenshot must identify the actual non-production environment and must not be represented as production acceptance or FDACS approval.
 20. **Gate 24 Instructional Text-Screen Timing:** the implemented learner and instructor workflow showing instructional text content, word count, server-calculated minimum duration using the 60-seconds-per-50-words policy, server-observed learner timing, remaining or requirement-met state, learner acknowledgment only after the minimum is met, instructor review of learner timing/acknowledgment evidence, and documented instructor discussion before controlled closure.
+21. **Gate 25 Regulated Runtime Isolation Evidence:** controlled CI/audit evidence from accepted source/build head `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d` and Florida Class D LMS Gates run #367 showing the mandatory Gate 25 enforcement step passed with zero regulated runtime-isolation findings, followed by passing repository tests, static quality validation/lint, and the production Next.js build. The evidence must not display the configured runtime URL, project identifier, service-role credential, provider secret, license number, learner PII, or other protected runtime information.
 
 All screenshots must use demonstration or synthetic data only unless a separately authorized production evidence procedure applies. Final production screenshots must replace development previews where final operational evidence is required and must never expose learner PII, protected exam content, license numbers, credentials, provider secrets, service-role values, or sensitive infrastructure information.
 
@@ -92,23 +93,23 @@ No production acceptance execution or production database migration has occurred
 
 ## Gate 24 instructional text-screen control documented
 
-Gate 24 is implemented end to end in source and has a green source/build baseline at commit `cc6470b2466f68578d63884f646462a2ad65ac0c`.
+Gate 24 is implemented end to end in source and remains part of the accepted Gate 25 source/build baseline.
 
 The regulated text-screen control calculates the minimum duration using controlled server/database logic from actual word count at 60 seconds per 50 words, prorated by word count. The learner cannot supply the authoritative duration. Learner timing is tied to the authenticated learner and active regulated device lease. The learner interface sends timing heartbeats only while the browser tab is visible and shows server-observed progress. The acknowledgment control remains unavailable until the server-observed minimum is satisfied.
 
 Only one instructional text screen may be open for a live session. Opening is restricted to active instruction rather than break state. The instructor console can create the screen, review aggregate learner progress, document the live discussion, and request closure. The database requires the discussion confirmation before closure and does not fabricate missing learner acknowledgments.
 
-The Gate 24 verifier, repository tests, lint, and production Next.js build all passed in the dedicated Florida Class D workflow on the accepted baseline commit. This is source/build evidence only and is not FDACS approval or production acceptance.
+The Gate 24 verifier, repository tests, lint, and production Next.js build are green in the accepted Gate 25 regulated cycle. This is source/build evidence only and is not FDACS approval or production acceptance.
 
-## Gate 25 regulated runtime-isolation control
+## Gate 25 regulated runtime-isolation control documented
 
-Gate 25 is in progress and must remain identified as an engineering/security hardening control until the enforcing CI cycle is green.
+Gate 25 is **accepted as a source/build security control** at commit `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d` based on Florida Class D LMS Gates run #367.
 
-The runtime-isolation audit scans regulated `lib/florida-class-d*.ts` server modules for embedded Supabase project URLs and secret-class configuration exposed through `NEXT_PUBLIC_*` names. Regulated services are required to use explicit protected HTTPS runtime configuration and protected server-side service-role credentials rather than repository-embedded project fallbacks.
+The runtime-isolation audit is a mandatory enforcing step in the dedicated regulated workflow. It scans regulated `lib/florida-class-d*.ts` server modules for embedded Supabase project URLs and secret-class configuration exposed through `NEXT_PUBLIC_*` names. Regulated services are required to use explicit protected HTTPS runtime configuration and protected server-side service-role credentials rather than repository-embedded project fallbacks.
 
-This increment removed hardcoded Supabase project fallbacks from the quality/CAPA service, successful-completion review service, and LIAS workflow service. Those services now fail closed when the explicit `OBSERRA_SUPABASE_URL` or required protected credential is absent.
+The final remediation removed every embedded project URL fallback identified by the enforcing inventory, including the remaining make-up administration, regulatory observer-access, and recorded make-up modules. Run #367 passed the Gate 25 enforcement with zero findings and then passed repository contract tests, static quality validation/lint, and the production Next.js build.
 
-Additional legacy regulated modules still require remediation before Gate 25 can be accepted. The final Gate 25 audit evidence must include a zero-finding enforcing runtime-isolation scan and a green complete Florida Class D workflow. The evidence must not expose the configured URL, project identifier, service-role value, credentials, provider secrets, license numbers, or other protected runtime data.
+Gate 25 acceptance does **not** constitute production database promotion, production runtime activation, production acceptance, LIAS production execution, regulated launch approval, or FDACS approval. Regulated feature flags remain fail closed until their separate production and regulatory gates are satisfied.
 
 ## Quality, CAPA, and retention controls documented
 
@@ -144,4 +145,4 @@ The Gate 23 non-production acceptance screenshot remains non-production evidence
 
 ## Current audit baseline
 
-For repository audit traceability, the accepted Gate 24 source/build baseline is `cc6470b2466f68578d63884f646462a2ad65ac0c`. Gate 25 is in progress with partial source remediation completed and is not yet an accepted gate. Handoff synchronization commits after the Gate 24 baseline do not authorize production activation.
+For repository audit traceability, the accepted Gate 25 source/build baseline is `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d`, validated by Florida Class D LMS Gates run #367. The dedicated regulated cycle passed Gates 1 through 25, repository contract tests, static quality validation/lint, and the production Next.js build. This baseline does not authorize production activation or represent FDACS approval.
