@@ -1,6 +1,6 @@
 # Obserra FDACS Class D School Build Handoff
 
-Snapshot: 2026-08-12
+Snapshot: 2026-08-13
 
 Owner: Dr. Jody Blanchard
 
@@ -12,9 +12,13 @@ Website: https://www.obserrallc.com
 
 ## Purpose
 
-This is the authoritative sanitized handoff for the **Florida FDACS Class D Security Officer School / regulated LMS build**.
+This is the authoritative sanitized restart record for the **Florida FDACS Class D Security Officer School and regulated LMS build**.
 
-This workstream is **separate from the Obserra EPI Academy commercial course-production build**. Do not mix this handoff with the Course 1, Course 2, Course 3, Course 4, Course 5, LearnWorlds SCORM, owner-video, or general Academy catalog production state except where shared website infrastructure is intentionally reused.
+This workstream is **separate from the Obserra EPI Academy commercial course-production build**. Do not mix this handoff with the Course 1 through Course N, LearnWorlds SCORM, owner-video, or general Academy catalog production state except where shared website infrastructure is intentionally reused.
+
+Implementation detail is also maintained on the Florida branch at:
+
+`docs/florida-class-d-lms/HANDOFF.md`
 
 ## Current repository implementation
 
@@ -30,39 +34,62 @@ Current public state:
 
 `COMING SOON · LMS IN PROGRESS`
 
-Paid enrollment, student course access, regulatory completion issuance, live examination access, and LIAS execution remain disabled.
+Paid enrollment, regulated student access, live instruction activation, regulatory completion issuance, live examination access, and LIAS execution remain disabled.
 
-## Regulatory-course architecture currently modeled
+## Current licensing state and activation boundary
+
+Owner reports an active Florida Class DI instructor license and a pending Class DS school application.
+
+No private license documentation or license number is committed to this public repository. The production live-instruction gate is designed to require protected server configuration for both the DI and DS license numbers and refuses to enable live regulated instruction unless the DS status is explicitly configured as active.
+
+Therefore:
+
+- continue building and testing source now;
+- keep the Florida public page Coming Soon;
+- do not activate paid enrollment or regulated live student access while the DS remains pending;
+- do not claim FDACS approval merely because the platform source or CI passes.
+
+## Controlled course architecture
 
 ```text
 Provider: Obserra Executive Protection & Intelligence LLC
 Course: Florida Class D Security Officer Training
 Instructional days: 5
-Instructional hours: 40
-Hours per day: 8
-Required curriculum modules: 18
+Credited instructional hours: 40
+Credited instructional minutes: 2,400
+Credited instructional minutes per day: 480
+Live instructional lessons per day: 4
+Instruction per live lesson: 120 minutes
+Scheduled breaks: 15 minutes after Lessons 1, 2, and 3 each day
+Tracked break time: 45 minutes per day
+Break credit toward instruction: zero
+Required curriculum areas: 18
 Certification examination: separately controlled from instructional hours
 Exam questions: 170
 Passing threshold metadata: 128 correct
 Public approval claim: prohibited until applicable approval is established
 ```
 
-## Gate 1 — Foundation controls
+The fourth live lesson concludes the instructional day; no post-day break is scheduled after Lesson 4.
 
-Status: `IMPLEMENTED IN SOURCE / CI EVIDENCE PENDING`
+## Gate 1 — Foundation Controls
+
+Status: `IMPLEMENTED IN SOURCE / DEDICATED CI WIRED`
 
 Implemented controls include:
 
 - dedicated Florida Training website navigation;
 - premium Florida Class D Coming Soon / LMS In Progress page;
 - payment and enrollment disabled;
-- exact five-day / 40-hour / 18-module course structure modeled;
-- learning check or applied assessment defined for every module;
+- five-day / 40-hour / 18-area course architecture;
+- four two-hour live lesson blocks each day;
+- fifteen-minute breaks after the first three lesson blocks each day;
+- break time explicitly tracked but never credited as instruction;
+- learning check or applied assessment defined for every curriculum area;
 - separate controlled examination metadata;
 - licensure distinction language;
 - no state-approval representation before applicable approval;
-- planned identity, entitlement, attendance, instructional-time, remediation, examination, FDACS/LIAS, inspection, and quality-management lifecycle;
-- fail-closed source gate wired into the Academy release-verification path.
+- fail-closed Florida-specific source gates.
 
 Gate script:
 
@@ -70,7 +97,7 @@ Gate script:
 
 ## Gate 2 — Regulated Student Record Model
 
-Status: `IMPLEMENTED IN SOURCE / CI EVIDENCE PENDING`
+Status: `IMPLEMENTED IN SOURCE / DEDICATED CI WIRED`
 
 Source domain model:
 
@@ -80,23 +107,36 @@ Gate script:
 
 `scripts/florida-class-d-records-gate.mjs`
 
-The model defines sanitized production contracts for student identity, identity verification, enrollment, cohort assignment, five-day attendance, instructional-time credit, 18-module progress, learning checks, remediation, append-only audit events, regulated role boundaries, and deterministic examination eligibility.
+The model defines sanitized production contracts for:
 
-Exam eligibility remains blocked unless identity is verified, at least 2,400 instructional minutes are credited, all 18 modules are complete, and no remediation remains open.
+- student identity and verification;
+- regulated enrollment and cohort assignment;
+- five-day attendance;
+- instructional-time credit;
+- 18-area progress;
+- learning checks and remediation;
+- live sessions;
+- single-device leases;
+- presence challenges;
+- separate instructional, break, connected, and uncredited time;
+- student/instructor live interactions;
+- append-only audit events;
+- regulated role boundaries;
+- deterministic examination eligibility.
+
+Exam eligibility remains blocked unless identity is verified, at least 2,400 instructional minutes are credited, all 18 curriculum areas are complete, and no remediation remains open.
 
 Students may not alter credited attendance, instructional time, or their own exam eligibility.
 
 ## Gate 3 — Durable Regulated Records & Administrative API
 
-Status: `IMPLEMENTED IN SOURCE / DATABASE PROMOTION AND CI EVIDENCE PENDING`
+Status: `IMPLEMENTED IN SOURCE / DATABASE PROMOTION PENDING`
 
-### Production persistence architecture verified
+### Production persistence architecture
 
-Before building Gate 3, the current authorized Obserra backend was inspected directly. The active **Obserra Academy Supabase** production project already contains durable Academy enrollment, lesson-progress, assessment, certificate, owner-control, and production-event tables. Existing protected Academy tables have forced row-level security and are limited to service-role access after the database-lockdown migrations.
+The existing authorized Obserra Supabase backend is the selected persistence platform. Do not introduce a second database platform for the regulated school build without an explicit architecture change.
 
-Decision: **reuse the existing authorized Supabase backend**. Do not introduce a separate database or duplicate persistence platform for the FDACS school build.
-
-### Gate 3 implementation on the Florida LMS branch
+### Gate 3 implementation
 
 ```text
 supabase/migrations/20260813033000_fdacs_class_d_regulated_records.sql
@@ -108,69 +148,159 @@ app/api/florida-class-d/admin/inspection/route.ts
 scripts/florida-class-d-persistence-gate.mjs
 ```
 
-`package.json` now runs Gate 3 after Gates 1 and 2 inside `verify:academy-release`.
+The durable schema defines protected cohorts, identity state, regulated enrollments, attendance, instructional-time evidence, progress, learning checks, remediation, record holds, and append-only audit events.
 
-### Durable schema defined
+Security controls include forced RLS, revoked browser-role table access, server-only service-role access, Clerk staff authorization, no-store APIs, restricted inspection export, idempotency keys, correlation IDs, and transactional evidence/audit writes.
 
-The migration defines restricted tables for:
+Production database promotion remains a separate approval and validation step. No real learner data is created by source implementation.
 
-- cohorts;
-- student identity state;
-- regulated enrollments;
-- attendance evidence;
-- instructional-time evidence;
-- module progress;
-- learning-check results;
-- remediation;
-- inspection/legal/regulatory/administrative record holds;
-- append-only audit events.
+## Gate 4 — Identity Verification & Regulated Enrollment Workflow
 
-The schema intentionally excludes identity-document binaries, payment-card data, final examination answer keys, and FDACS/LIAS credentials.
+Status: `IMPLEMENTED IN SOURCE / PRODUCTION ACTIVATION DISABLED`
 
-### Gate 3 security architecture
+### Gate 4 implementation
 
-- RLS enabled and forced on every FDACS regulated table.
-- Direct table access revoked from `public`, `anon`, and `authenticated` roles.
-- Service-role access is server-only.
-- The service-role secret is never exposed through a `NEXT_PUBLIC` variable.
-- Audit events reject update/delete operations.
-- Clerk private metadata defines instructor, school-admin, and compliance-admin roles.
-- Existing protected owner-email allowlist remains bootstrap school/compliance administration authority.
-- Regulated APIs use private/no-store responses.
-- Inspection export is limited to school-admin and compliance-admin roles.
+```text
+supabase/migrations/20260813040000_fdacs_class_d_enrollment_workflow.sql
+lib/florida-class-d-enrollment-policy.ts
+app/api/florida-class-d/enrollment/route.ts
+app/api/florida-class-d/admin/enrollments/route.ts
+app/api/florida-class-d/admin/identity/route.ts
+```
 
-### Atomic evidence and audit writes
+Implemented controls include:
 
-Attendance and instructional-time writes use controlled database RPC contracts. Each regulated write carries an authenticated actor, actor role, enrollment ID, idempotency key, and correlation ID. The database function is designed to create the evidence record and its audit event in one transaction. Duplicate idempotency keys return the prior evidence record rather than creating a second one.
+- controlled pre-enrollment;
+- legal-name and date-of-birth data capture;
+- identity-verification workflow;
+- versioned learner acknowledgments;
+- cohort assignment controls;
+- school/compliance administrator review;
+- verified identity required before approval;
+- all required acknowledgments required before approval;
+- auditable status transitions;
+- payment, instructional access, examination access, completion issuance, and LIAS still disabled.
 
-### Production promotion status
+No identity-document binaries are committed or stored by this source workflow.
 
-The Gate 3 migration is committed as controlled source but is **not represented as applied to production**. The current operations policy requires owner approval, rollback readiness, audit evidence, and direct runtime verification before production promotion.
+## Gate 5 — Live Instructor Classroom, Presence & Interaction
 
-The server-side persistence adapter also fails closed until a private `OBSERRA_SUPABASE_SERVICE_ROLE_KEY` or controlled equivalent is configured in the deployment environment.
+Status: `IMPLEMENTED IN SOURCE / CI AND PRODUCTION PROMOTION PENDING`
 
-No real learner data was created during Gate 3 source implementation.
+### Gate 5 implementation
 
-## Separate FDACS school operations package already produced outside the public repository
+```text
+lib/florida-class-d-live-policy.ts
+lib/florida-class-d-live-persistence.ts
+lib/florida-class-d-live-feed.ts
+supabase/migrations/20260813043000_fdacs_class_d_live_classroom.sql
+app/api/florida-class-d/live/route.ts
+app/api/florida-class-d/admin/live/route.ts
+app/florida-security-training/live/[liveSessionId]/page.tsx
+app/florida-security-training/live/[liveSessionId]/LiveClassroom.tsx
+app/florida-security-training/admin/live/[liveSessionId]/page.tsx
+app/florida-security-training/admin/live/[liveSessionId]/InstructorLiveConsole.tsx
+app/florida-security-training/live-classroom.css
+scripts/florida-class-d-live-gate.mjs
+```
+
+### Live classroom controls implemented in source
+
+- real-time instructor-operated classroom control plane;
+- Florida physical-location policy metadata;
+- DI and DS license data bound to live sessions through protected runtime configuration;
+- fail-closed live activation while DS status is not active;
+- one active learner device lease at a time;
+- authenticated Clerk session plus browser-instance binding;
+- 60-second presence heartbeat;
+- controlled stale-device recovery;
+- separate connected, instructional-presence, break-presence, and uncredited-connected time;
+- instructor-controlled instruction/break segments;
+- fifteen-minute breaks after each of the first three live lessons every day;
+- security presence challenges before the two-hour maximum interval;
+- five-minute retry opportunity after a failed challenge;
+- failed retry marks the learner absent for review and stops continued instructional credit;
+- documented instructor presence-restoration review;
+- daily attendance still requires instructor verification;
+- student questions;
+- instructor answers;
+- hand raise;
+- instructor prompts;
+- participation records and poll-response contract;
+- minimum text-screen timing policy helper of one minute per 50 words with proration;
+- live-session inspection-access reference field;
+- append-only live interaction history.
+
+### Instructor console
+
+The instructor console can:
+
+- start and end the live lesson;
+- start the fifteen-minute break and resume instruction;
+- issue classwide presence checks;
+- automatically issue an opening check and another at approximately 105 instructional minutes, before two hours elapse;
+- display the current security code without publishing it in the Q&A feed;
+- view each learner's connected time, instructional time, break time, uncredited time, and presence state;
+- document review of an absence state;
+- send class prompts;
+- receive student questions;
+- send instructor answers.
+
+### Student classroom
+
+The student classroom can:
+
+- enter with an authenticated account;
+- acquire the single-device lease;
+- send recurring server-side presence heartbeats;
+- see live instruction versus break state;
+- see connected, instructional, break, and uncredited time counters;
+- answer security challenges;
+- ask questions;
+- raise a hand;
+- view live Q&A and instructor responses.
+
+### Live media transport boundary
+
+**The regulated control plane is implemented, but the actual embedded video/audio transport is not yet selected or configured.**
+
+The student and instructor pages deliberately contain media placeholders. The next live subgate must integrate a secure real-time provider without replacing Obserra's independent attendance/time evidence controls.
+
+The media integration must preserve authenticated real-time interaction, investigator live-access capability, accessibility, desktop/mobile operation, and the one-device policy. A third-party meeting attendance report must never become the sole regulated attendance record.
+
+## Dedicated Florida CI
+
+Workflow:
+
+`.github/workflows/florida-class-d-lms-gates.yml`
+
+`npm run verify:florida-class-d` now executes the foundation, record-model, persistence, and live-instruction source gates. The workflow also runs repository tests, lint, and production build.
+
+Do not treat unrelated commercial Academy gate failures as Florida regulated-LMS acceptance or rejection. The dedicated Florida workflow is the authoritative automated source/build signal for this workstream, followed by runtime and regulatory validation.
+
+## Separate FDACS school operations package outside the public repository
 
 The school-administration workstream includes controlled materials for student enrollment, identity verification, daily attendance/time sheets, instructor certification, make-up training, module learning checks, remediation, final-exam records, exam chain of custody, acknowledgments, evaluations, incidents, retention logs, instructor rosters, curriculum revision control, FDACS inspection binder, LIAS workflow, graduate licensing instructions, and quality/CAPA controls.
 
 Protected operational documents, examination answers, learner records, private credentials, and regulated PII must not be committed to this public repository.
 
-## Website / LMS target lifecycle
+## Target lifecycle
 
 ```text
 Public Florida Training page
 → authenticated account
-→ identity verification
-→ enrollment acknowledgments
-→ payment entitlement after launch authorization
+→ identity verification and acknowledgments
+→ payment entitlement only after launch authorization
 → cohort assignment
-→ Day 1–5 sequential regulated instruction
+→ Day 1–5 live regulated instruction
+→ single-device session control
 → attendance and instructional-time evidence
+→ tracked breaks separated from instructional credit
+→ security presence challenges
+→ live Q&A and participation
 → module learning checks
-→ remediation where required
-→ 40 instructional hours complete
+→ remediation and permitted make-up where required
+→ 40 credited instructional hours complete
 → controlled certification examination eligibility
 → pass/fail and retest workflow
 → instructor / school administrator review
@@ -180,55 +310,44 @@ Public Florida Training page
 → inspection-ready retained record
 ```
 
-## Next gate — Gate 4: Identity Verification & Regulated Enrollment Workflow
+## Next controlled sequence
 
-Planned next scope:
-
-1. Controlled student pre-enrollment creation.
-2. Legal-name and date-of-birth capture with data minimization.
-3. Identity-verification status workflow without committing identity documents to the public repository.
-4. Required student acknowledgments and policy acceptance.
-5. Cohort assignment controls.
-6. School-admin review and approval.
-7. Enrollment state-transition rules.
-8. Audit events for every identity/enrollment transition.
-9. Synthetic test fixtures only.
-10. Keep payment activation, instructional access, final exam, completion issuance, and LIAS execution disabled.
-
-## Future gated sequence
-
-```text
-Gate 4 — Identity verification and regulated enrollment workflow
-Gate 5 — Cohort scheduling, attendance, and instructional-time controls
-Gate 6 — Module player, learning checks, and remediation engine
-Gate 7 — Controlled 170-question certification examination engine
-Gate 8 — Pass/fail, retest, instructor review, and completion workflow
-Gate 9 — FDACS/LIAS administrative queue and inspection center
-Gate 10 — Stripe purchase entitlement and launch activation controls
-Gate 11 — End-to-end regulatory, security, accessibility, and owner acceptance
-```
+1. Validate Gate 5 through the dedicated Florida CI workflow and fix any failures.
+2. Select and integrate the secure live video/audio provider.
+3. Implement the FDACS investigator live-access technical and operating procedure.
+4. Complete structured live polls and participation analytics.
+5. Automate cohort schedules and creation of all 20 live lesson sessions.
+6. Reconcile live presence/time evidence into daily instructor attendance certification.
+7. Build the permitted online make-up workflow.
+8. Enforce timing for text-based screens in the live lesson player.
+9. Promote regulated database migrations only through approved production database-change gates with rollback evidence.
+10. Build module learning-check/remediation automation.
+11. Build the controlled 170-question examination engine with protected/randomized question delivery.
+12. Build completion/retest/instructor-review and FDACS/LIAS queue workflows.
+13. Activate Stripe entitlement only after the regulatory and operational launch gates are satisfied.
+14. Complete end-to-end regulatory, security, accessibility, mobile/desktop, inspection, and owner acceptance.
 
 ## Security and public-repository boundary
 
 Never commit:
 
 - real learner names, dates of birth, addresses, identity documents, or contact details;
-- payment card data;
+- payment-card data;
 - FDACS/LIAS credentials, tokens, private screenshots, or session information;
 - protected final examination questions or answer keys;
-- private instructor credential documents;
+- private instructor credential documents or license-number evidence;
 - production secrets or private API credentials.
 
 Public repository content is limited to sanitized source code, schemas, tests, policy gates, release evidence, and non-sensitive handoff documentation.
 
 ## Truth and release boundary
 
-Do not claim that the Florida Class D LMS is FDACS approved, deployed, purchasable, open for student enrollment, capable of issuing regulatory completion, or accepted by FDACS merely because source code exists or a local/static gate passes.
+Do not claim that the Florida Class D LMS is FDACS approved, deployed for regulated use, purchasable, open for student enrollment, capable of issuing regulatory completion, or accepted by FDACS merely because source code or CI exists.
 
-Each capability requires its own implementation evidence, CI evidence, deployment evidence, and applicable regulatory authorization before activation or representation.
+Each capability requires implementation evidence, source/build CI evidence, runtime evidence, deployment evidence, and applicable regulatory authorization before activation or public representation.
 
 ## Restart instruction for this workstream
 
 ```text
-Read docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md before continuing any Florida Class D school/LMS work. Treat it as a separate regulated workstream from the Obserra EPI Academy commercial course build. Resume from the latest passed or implemented gate. Gate 3 durable-record and admin-API source exists but production database promotion remains pending. Continue with Gate 4 identity verification and regulated enrollment while keeping the public page Coming Soon and payment, learner access, examination, completion issuance, and LIAS execution disabled until their later validated gates.
+Read docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md before continuing any Florida Class D school/LMS work. Treat it as a separate regulated workstream from the Obserra EPI Academy commercial course build. Resume from the latest implemented gate. Gates 1 through 5 now have source implementation, but the regulated migrations have not been promoted to production and live media transport is not yet configured. Owner reports DI active and DS pending. Keep the public page Coming Soon and keep paid enrollment, regulated student access, live activation, examination, completion issuance, and LIAS execution disabled until their later validated gates and regulatory conditions are satisfied. Next priority is Gate 5 CI validation followed by secure live video/audio and investigator-access integration.
 ```
