@@ -3,6 +3,7 @@ import {
   FloridaClassDAuthorizationError,
   requireFloridaClassDSignedInUser,
 } from "../../../../lib/florida-class-d-auth";
+import { FloridaClassDExamError } from "../../../../lib/florida-class-d-exam";
 import {
   acquireFloridaClassDDeviceLease,
   FloridaClassDLivePersistenceError,
@@ -20,6 +21,12 @@ import {
   getFloridaClassDStudentPollState,
   submitFloridaClassDLivePollResponse,
 } from "../../../../lib/florida-class-d-polls";
+import {
+  acknowledgeFloridaClassDLiveTextScreen,
+  beginFloridaClassDLiveTextScreenView,
+  getFloridaClassDActiveTextScreen,
+  heartbeatFloridaClassDLiveTextScreenView,
+} from "../../../../lib/florida-class-d-text-screen";
 
 const headers = {
   "cache-control": "private, no-store, max-age=0, must-revalidate",
@@ -40,6 +47,7 @@ type RequestBody = {
   pollId?: unknown;
   selectedOptionIndex?: unknown;
   responseMilliseconds?: unknown;
+  textScreenId?: unknown;
   correlationId?: unknown;
 };
 
@@ -57,7 +65,8 @@ function errorResponse(error: unknown) {
   if (
     error instanceof FloridaClassDAuthorizationError ||
     error instanceof FloridaClassDLivePersistenceError ||
-    error instanceof FloridaClassDPollError
+    error instanceof FloridaClassDPollError ||
+    error instanceof FloridaClassDExamError
   ) {
     return NextResponse.json(
       { error: error.message, code: "code" in error ? error.code : "FDACS_LIVE_AUTHORIZATION_FAILED" },
@@ -79,10 +88,11 @@ export async function GET(request: Request) {
     if (!liveSessionId) {
       return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
     }
-    const [state, ledger, pollState] = await Promise.all([
+    const [state, ledger, pollState, activeTextScreen] = await Promise.all([
       getFloridaClassDLiveStudentState(userId, liveSessionId),
       getFloridaClassDStudentTimeLedger(userId, liveSessionId),
       getFloridaClassDStudentPollState(userId, liveSessionId),
+      getFloridaClassDActiveTextScreen(liveSessionId),
     ]);
     return NextResponse.json({
       ...state,
@@ -90,6 +100,7 @@ export async function GET(request: Request) {
       courseTime: ledger.courseTime,
       activePoll: pollState.activePoll,
       activePollResponse: pollState.response,
+      activeTextScreen,
     }, { headers });
   } catch (error) {
     return errorResponse(error);
@@ -151,6 +162,25 @@ export async function POST(request: Request) {
         correlationId,
       });
       return NextResponse.json({ result, correlationId }, { headers });
+    }
+
+    if (body.action === "text_screen_begin" || body.action === "text_screen_heartbeat") {
+      if (typeof body.textScreenId !== "string" || typeof body.deviceLeaseId !== "string") {
+        return NextResponse.json({ error: "Text-screen id and active device lease are required.", code: "FDACS_TEXT_SCREEN_VIEW_INVALID" }, { status: 400, headers });
+      }
+      const input = { textScreenId: body.textScreenId, deviceLeaseId: body.deviceLeaseId, correlationId };
+      const progress = body.action === "text_screen_begin"
+        ? await beginFloridaClassDLiveTextScreenView(userId, input)
+        : await heartbeatFloridaClassDLiveTextScreenView(userId, input);
+      return NextResponse.json({ progress, correlationId }, { headers });
+    }
+
+    if (body.action === "text_screen_acknowledge") {
+      if (typeof body.textScreenId !== "string") {
+        return NextResponse.json({ error: "Text-screen id is required.", code: "FDACS_TEXT_SCREEN_ACK_INVALID" }, { status: 400, headers });
+      }
+      await acknowledgeFloridaClassDLiveTextScreen(userId, { textScreenId: body.textScreenId, correlationId });
+      return NextResponse.json({ acknowledged: true, correlationId }, { headers });
     }
 
     if (body.action === "poll_response") {
