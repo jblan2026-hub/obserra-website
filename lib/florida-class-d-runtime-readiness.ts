@@ -3,18 +3,25 @@ import "server-only";
 export type FloridaClassDRuntimeReadinessItem = {
   key: string;
   label: string;
-  category: "identity" | "database" | "media" | "licensing" | "documents" | "feature_flag";
+  category: "environment" | "identity" | "database" | "media" | "licensing" | "documents" | "feature_flag";
   ready: boolean;
   detail: string;
   sensitive: boolean;
 };
 
+export type FloridaClassDRuntimeProfile = "production" | "nonproduction_acceptance";
+
 export type FloridaClassDRuntimeReadinessReport = {
+  profile: FloridaClassDRuntimeProfile;
   generatedAt: string;
   readyForControlledActivationReview: boolean;
+  readyExceptForClassDSLicense: boolean;
+  technicalReadinessComplete: boolean;
   secretsExposed: false;
   items: FloridaClassDRuntimeReadinessItem[];
   blockingKeys: string[];
+  nonLicenseBlockingKeys: string[];
+  classDSLicenseBlockingKeys: string[];
   enabledRegulatedFeatureFlags: string[];
 };
 
@@ -25,6 +32,9 @@ const REGULATED_FEATURE_FLAGS = [
   "OBSERRA_FDACS_CLASS_D_COMPLETION_DOCUMENTS_ENABLED",
   "OBSERRA_FDACS_CLASS_D_QUALITY_ENABLED",
 ] as const;
+
+const NONPRODUCTION_ENVIRONMENTS = new Set(["development", "sandbox", "staging", "uat"]);
+const CLASS_DS_LICENSE_KEYS = new Set(["ds_status", "ds_license_number"]);
 
 function value(name: string) {
   return process.env[name]?.trim() || "";
@@ -49,28 +59,13 @@ function item(
   return { key, label, category, ready, detail, sensitive };
 }
 
-export const FLORIDA_CLASS_D_RUNTIME_READINESS_POLICY = {
-  reportExposesSecretValues: false,
-  explicitProductionSupabaseUrlRequired: true,
-  serviceRoleRequired: true,
-  clerkServerCredentialRequired: true,
-  dailyProviderRequiredForLiveMedia: true,
-  dsStatusMustBeActiveBeforeActivation: true,
-  dsLicenseNumberMustRemainPrivate: true,
-  diLicenseNumberMustRemainPrivate: true,
-  privateDocumentBucketRequired: true,
-  regulatedFeatureFlagsMustRemainDisabledDuringReadinessReview: true,
-} as const;
-
-export function getFloridaClassDRuntimeReadiness(): FloridaClassDRuntimeReadinessReport {
+function commonProtectedRuntimeItems(): FloridaClassDRuntimeReadinessItem[] {
   const explicitSupabaseUrl = value("OBSERRA_SUPABASE_URL");
   const serviceRolePresent = present("OBSERRA_SUPABASE_SERVICE_ROLE_KEY") || present("SUPABASE_SERVICE_ROLE_KEY");
   const mediaProvider = value("OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER").toLowerCase();
-  const dsStatus = value("OBSERRA_FDACS_DS_LICENSE_STATUS").toLowerCase();
   const documentBucket = value("OBSERRA_FDACS_DOCUMENTS_BUCKET");
-  const enabledFlags = REGULATED_FEATURE_FLAGS.filter((name) => enabled(name));
 
-  const items: FloridaClassDRuntimeReadinessItem[] = [
+  return [
     item(
       "clerk_publishable",
       "Clerk publishable key configured",
@@ -92,7 +87,7 @@ export function getFloridaClassDRuntimeReadiness(): FloridaClassDRuntimeReadines
       "Explicit Supabase HTTPS URL configured",
       "database",
       explicitSupabaseUrl.startsWith("https://"),
-      explicitSupabaseUrl.startsWith("https://") ? "Configured; hostname suppressed." : "Explicit production URL is missing or not HTTPS.",
+      explicitSupabaseUrl.startsWith("https://") ? "Configured; hostname suppressed." : "Explicit protected runtime URL is missing or not HTTPS.",
       true,
     ),
     item(
@@ -108,7 +103,7 @@ export function getFloridaClassDRuntimeReadiness(): FloridaClassDRuntimeReadines
       "Daily selected as live-media provider",
       "media",
       mediaProvider === "daily",
-      mediaProvider === "daily" ? "Provider configured as Daily." : "OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER must be daily before live-media activation.",
+      mediaProvider === "daily" ? "Provider configured as Daily." : "OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER must be daily before controlled live-media use.",
     ),
     item(
       "daily_api_key",
@@ -116,21 +111,6 @@ export function getFloridaClassDRuntimeReadiness(): FloridaClassDRuntimeReadines
       "media",
       present("OBSERRA_FDACS_DAILY_API_KEY"),
       present("OBSERRA_FDACS_DAILY_API_KEY") ? "Configured; value suppressed." : "Missing.",
-      true,
-    ),
-    item(
-      "ds_status",
-      "Class DS school license status active",
-      "licensing",
-      dsStatus === "active",
-      dsStatus === "active" ? "Configured as active." : "Must remain non-active until the Class DS school license is actually issued and authorized for production use.",
-    ),
-    item(
-      "ds_license_number",
-      "Class DS school license number configured privately",
-      "licensing",
-      present("OBSERRA_FDACS_DS_LICENSE_NUMBER"),
-      present("OBSERRA_FDACS_DS_LICENSE_NUMBER") ? "Configured; value suppressed." : "Missing. Do not populate until an actual Class DS license number exists.",
       true,
     ),
     item(
@@ -149,23 +129,124 @@ export function getFloridaClassDRuntimeReadiness(): FloridaClassDRuntimeReadines
       documentBucket.length >= 3 ? "Configured; bucket name suppressed." : "OBSERRA_FDACS_DOCUMENTS_BUCKET is missing.",
       true,
     ),
-    ...REGULATED_FEATURE_FLAGS.map((name) => item(
-      `flag:${name}`,
-      `${name} remains disabled during readiness review`,
-      "feature_flag",
-      !enabled(name),
-      enabled(name) ? "ENABLED. This is a readiness blocker until controlled activation is authorized." : "Disabled/fail closed.",
-    )),
   ];
+}
 
+function featureFlagItems(): FloridaClassDRuntimeReadinessItem[] {
+  return REGULATED_FEATURE_FLAGS.map((name) => item(
+    `flag:${name}`,
+    `${name} remains disabled during readiness review`,
+    "feature_flag",
+    !enabled(name),
+    enabled(name) ? "ENABLED. This is a readiness blocker until controlled activation is authorized." : "Disabled/fail closed.",
+  ));
+}
+
+function buildReport(
+  profile: FloridaClassDRuntimeProfile,
+  items: FloridaClassDRuntimeReadinessItem[],
+): FloridaClassDRuntimeReadinessReport {
   const blockingKeys = items.filter((entry) => !entry.ready).map((entry) => entry.key);
+  const classDSLicenseBlockingKeys = profile === "production"
+    ? blockingKeys.filter((key) => CLASS_DS_LICENSE_KEYS.has(key))
+    : [];
+  const nonLicenseBlockingKeys = blockingKeys.filter((key) => !CLASS_DS_LICENSE_KEYS.has(key));
+  const enabledFlags = REGULATED_FEATURE_FLAGS.filter((name) => enabled(name));
+  const technicalReadinessComplete = nonLicenseBlockingKeys.length === 0;
+  const readyExceptForClassDSLicense = profile === "production"
+    && technicalReadinessComplete
+    && classDSLicenseBlockingKeys.length > 0
+    && classDSLicenseBlockingKeys.every((key) => CLASS_DS_LICENSE_KEYS.has(key));
 
   return {
+    profile,
     generatedAt: new Date().toISOString(),
     readyForControlledActivationReview: blockingKeys.length === 0,
+    readyExceptForClassDSLicense,
+    technicalReadinessComplete,
     secretsExposed: false,
     items,
     blockingKeys,
+    nonLicenseBlockingKeys,
+    classDSLicenseBlockingKeys,
     enabledRegulatedFeatureFlags: [...enabledFlags],
   };
+}
+
+export const FLORIDA_CLASS_D_RUNTIME_READINESS_POLICY = {
+  reportExposesSecretValues: false,
+  explicitProductionSupabaseUrlRequired: true,
+  serviceRoleRequired: true,
+  clerkServerCredentialRequired: true,
+  dailyProviderRequiredForLiveMedia: true,
+  dsStatusMustBeActiveBeforeActivation: true,
+  dsLicenseNumberMustRemainPrivate: true,
+  diLicenseNumberMustRemainPrivate: true,
+  privateDocumentBucketRequired: true,
+  regulatedFeatureFlagsMustRemainDisabledDuringReadinessReview: true,
+  nonProductionEnvironmentMustBeExplicit: true,
+  nonProductionAcceptanceAuthorizationMustBeExplicit: true,
+  nonProductionSyntheticIdentityOnlyMustBeExplicit: true,
+  nonProductionReadinessMustNotRequireClassDSLicense: true,
+} as const;
+
+export function getFloridaClassDProductionRuntimeReadiness(): FloridaClassDRuntimeReadinessReport {
+  const dsStatus = value("OBSERRA_FDACS_DS_LICENSE_STATUS").toLowerCase();
+
+  return buildReport("production", [
+    ...commonProtectedRuntimeItems(),
+    item(
+      "ds_status",
+      "Class DS school license status active",
+      "licensing",
+      dsStatus === "active",
+      dsStatus === "active" ? "Configured as active." : "Must remain non-active until the Class DS school license is actually issued and authorized for production use.",
+    ),
+    item(
+      "ds_license_number",
+      "Class DS school license number configured privately",
+      "licensing",
+      present("OBSERRA_FDACS_DS_LICENSE_NUMBER"),
+      present("OBSERRA_FDACS_DS_LICENSE_NUMBER") ? "Configured; value suppressed." : "Missing. Do not populate until an actual Class DS license number exists.",
+      true,
+    ),
+    ...featureFlagItems(),
+  ]);
+}
+
+export function getFloridaClassDNonProductionAcceptanceReadiness(): FloridaClassDRuntimeReadinessReport {
+  const runtimeEnvironment = value("OBSERRA_FDACS_RUNTIME_ENVIRONMENT").toLowerCase();
+  const environmentAllowed = NONPRODUCTION_ENVIRONMENTS.has(runtimeEnvironment);
+  const acceptanceAuthorized = enabled("OBSERRA_FDACS_NONPROD_ACCEPTANCE_AUTHORIZED");
+  const syntheticIdentityOnly = enabled("OBSERRA_FDACS_SYNTHETIC_IDENTITY_ONLY");
+
+  return buildReport("nonproduction_acceptance", [
+    item(
+      "nonprod_environment",
+      "Explicit non-production runtime designation",
+      "environment",
+      environmentAllowed,
+      environmentAllowed ? "Explicitly designated as an approved non-production runtime." : "Set OBSERRA_FDACS_RUNTIME_ENVIRONMENT to development, sandbox, staging, or uat. Production is never accepted here.",
+    ),
+    item(
+      "nonprod_acceptance_authorized",
+      "Non-production acceptance explicitly authorized",
+      "environment",
+      acceptanceAuthorized,
+      acceptanceAuthorized ? "Explicit authorization marker is enabled." : "OBSERRA_FDACS_NONPROD_ACCEPTANCE_AUTHORIZED must be explicitly enabled for controlled acceptance.",
+    ),
+    item(
+      "synthetic_identity_only",
+      "Synthetic-identity-only mode explicitly enabled",
+      "identity",
+      syntheticIdentityOnly,
+      syntheticIdentityOnly ? "Synthetic-identity-only mode is enabled." : "OBSERRA_FDACS_SYNTHETIC_IDENTITY_ONLY must be explicitly enabled. Real learner acceptance is prohibited.",
+    ),
+    ...commonProtectedRuntimeItems(),
+    ...featureFlagItems(),
+  ]);
+}
+
+export function getFloridaClassDRuntimeReadiness(): FloridaClassDRuntimeReadinessReport {
+  return getFloridaClassDProductionRuntimeReadiness();
 }
