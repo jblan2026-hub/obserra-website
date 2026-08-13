@@ -71,13 +71,13 @@ export default function QualityConsole({ initialCases, initialRetentionReviews }
   }
 
   async function progressCase(caseId: string, status: QualityStatus) {
-    const correctiveAction = status === "closed" ? window.prompt("Corrective action verified before closure:") || "" : null;
+    const correctiveAction = status === "closed" ? window.prompt("Corrective action verified before closure:") || "" : "";
     if (status === "closed" && correctiveAction.trim().length < 3) {
       setError("A documented corrective action is required before closure.");
       return;
     }
     const eventNote = window.prompt("Case note (optional):") || "";
-    await post({ action: "progress_case", caseId, status, correctiveAction, eventNote }, `Quality case moved to ${status}.`);
+    await post({ action: "progress_case", caseId, status, correctiveAction: correctiveAction || null, eventNote }, `Quality case moved to ${status}.`);
   }
 
   async function recordRetentionReview() {
