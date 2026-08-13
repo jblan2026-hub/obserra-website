@@ -98,7 +98,7 @@ export async function listFloridaClassDLiasWorkflowQueue() {
 
 export async function listFloridaClassDLiasWorkflowEvents(queueId: string) {
   requireUuid(queueId, "queue id");
-  return request<Array<Record<string, unknown>>(
+  return request<Array<Record<string, unknown>>>(
     "fdacs_class_d_lias_workflow_events?" + new URLSearchParams({
       select: "id,queue_id,completion_record_id,enrollment_id,event_type,actor_clerk_user_id,event_note,submission_reference,certificate_reference,correlation_id,occurred_at,metadata",
       queue_id: `eq.${queueId}`,
