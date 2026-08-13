@@ -9,7 +9,7 @@ Gate 22 implements separate protected runtime-readiness profiles for the regulat
 - **Production activation readiness**
 - **Non-production acceptance readiness**
 
-Neither profile activates regulated functions, exposes secret values, authorizes launch, or represents FDACS approval.
+This readiness evidence does not activate regulated functions. Neither profile exposes secret values, authorizes launch, or represents FDACS approval. Protected credentials, license values, tokens, and other sensitive configuration are never written into the public repository.
 
 ## Implemented controls
 
