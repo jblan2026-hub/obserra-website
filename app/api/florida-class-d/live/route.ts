@@ -15,6 +15,11 @@ import {
 import { floridaClassDLiveInstructionEnabled } from "../../../../lib/florida-class-d-live-policy";
 import { floridaClassDLiveMediaEnabled } from "../../../../lib/florida-class-d-media";
 import { getFloridaClassDStudentTimeLedger } from "../../../../lib/florida-class-d-live-reporting";
+import {
+  FloridaClassDPollError,
+  getFloridaClassDActivePoll,
+  submitFloridaClassDLivePollResponse,
+} from "../../../../lib/florida-class-d-polls";
 
 const headers = {
   "cache-control": "private, no-store, max-age=0, must-revalidate",
@@ -32,6 +37,9 @@ type RequestBody = {
   answer?: unknown;
   content?: unknown;
   parentInteractionId?: unknown;
+  pollId?: unknown;
+  selectedOptionIndex?: unknown;
+  responseMilliseconds?: unknown;
   correlationId?: unknown;
 };
 
@@ -46,7 +54,11 @@ function disabled() {
 }
 
 function errorResponse(error: unknown) {
-  if (error instanceof FloridaClassDAuthorizationError || error instanceof FloridaClassDLivePersistenceError) {
+  if (
+    error instanceof FloridaClassDAuthorizationError ||
+    error instanceof FloridaClassDLivePersistenceError ||
+    error instanceof FloridaClassDPollError
+  ) {
     return NextResponse.json(
       { error: error.message, code: "code" in error ? error.code : "FDACS_LIVE_AUTHORIZATION_FAILED" },
       { status: error.status, headers },
@@ -67,11 +79,12 @@ export async function GET(request: Request) {
     if (!liveSessionId) {
       return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
     }
-    const [state, ledger] = await Promise.all([
+    const [state, ledger, activePoll] = await Promise.all([
       getFloridaClassDLiveStudentState(userId, liveSessionId),
       getFloridaClassDStudentTimeLedger(userId, liveSessionId),
+      getFloridaClassDActivePoll(liveSessionId),
     ]);
-    return NextResponse.json({ ...state, dayTime: ledger.dayTime, courseTime: ledger.courseTime }, { headers });
+    return NextResponse.json({ ...state, dayTime: ledger.dayTime, courseTime: ledger.courseTime, activePoll }, { headers });
   } catch (error) {
     return errorResponse(error);
   }
@@ -134,7 +147,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ result, correlationId }, { headers });
     }
 
-    if (["question", "hand_raise", "response", "poll_response"].includes(body.action)) {
+    if (body.action === "poll_response") {
+      if (
+        typeof body.pollId !== "string" ||
+        !Number.isInteger(body.selectedOptionIndex) ||
+        (body.responseMilliseconds !== undefined && body.responseMilliseconds !== null && !Number.isInteger(body.responseMilliseconds))
+      ) {
+        return NextResponse.json({ error: "Poll response fields are incomplete.", code: "FDACS_POLL_RESPONSE_INVALID_REQUEST" }, { status: 400, headers });
+      }
+      const responseId = await submitFloridaClassDLivePollResponse(userId, {
+        pollId: body.pollId,
+        selectedOptionIndex: body.selectedOptionIndex as number,
+        responseMilliseconds: typeof body.responseMilliseconds === "number" ? body.responseMilliseconds : null,
+        correlationId,
+      });
+      return NextResponse.json({ responseId, correlationId, recorded: true }, { status: 201, headers });
+    }
+
+    if (["question", "hand_raise", "response"].includes(body.action)) {
       if (typeof body.liveSessionId !== "string") {
         return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
       }
@@ -142,9 +172,7 @@ export async function POST(request: Request) {
         ? "student_question"
         : body.action === "hand_raise"
           ? "hand_raise"
-          : body.action === "poll_response"
-            ? "poll_response"
-            : "student_response";
+          : "student_response";
       const interaction = await postFloridaClassDLiveInteraction({
         liveSessionId: body.liveSessionId,
         actorRole: "student",
