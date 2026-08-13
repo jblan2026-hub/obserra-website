@@ -74,7 +74,9 @@ required(adminApi, '"answer", "prompt", "poll"', "Instructor live API must suppo
 
 required(studentUi, "Attendance and time tracking are active", "Student classroom must disclose active attendance/time tracking.");
 required(studentUi, "Breaks are tracked in the LMS but are not credited", "Student classroom must clearly distinguish break time from instruction.");
-required(studentUi, "Live Q&A", "Student classroom must expose live Q&A.");
+if (!studentUi.includes("Live Q&A") && !studentUi.includes("Live Q&amp;A")) {
+  throw new Error("Student classroom must expose live Q&A.");
+}
 required(instructorUi, "Live attendance and time roster", "Instructor console must expose live attendance and time evidence.");
 required(instructorUi, "Issue presence check", "Instructor console must expose security challenge control.");
 required(instructorUi, "Start 15-minute break", "Instructor console must expose the required break control.");
