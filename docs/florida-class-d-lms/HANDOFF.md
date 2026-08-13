@@ -166,20 +166,22 @@ The migrations remain source artifacts until a separate production database prom
 
 No identity-document binaries are stored by this source implementation.
 
-## Gate 5 — Live Instructor Classroom, Presence & Interaction
+## Gate 5 — Live Instructor Classroom, Presence, Interaction & Time Evidence
 
 **Status: IMPLEMENTED IN SOURCE / CI AND PRODUCTION PROMOTION PENDING**
 
 ### Purpose
 
-Gate 5 establishes the regulated live-class control plane so the DI instructor can teach in real time while the LMS records attendance, presence evidence, student interaction, instructional time, break time, and exceptions.
+Gate 5 establishes the regulated live-class control plane so the DI instructor can teach in real time while the LMS records attendance, presence evidence, student interaction, instructional time, break time, cumulative course time, and exceptions.
 
 ### Gate 5 artifacts
 
 - `lib/florida-class-d-live-policy.ts`
 - `lib/florida-class-d-live-persistence.ts`
 - `lib/florida-class-d-live-feed.ts`
+- `lib/florida-class-d-live-reporting.ts`
 - `supabase/migrations/20260813043000_fdacs_class_d_live_classroom.sql`
+- `supabase/migrations/20260813044000_fdacs_class_d_daily_attendance_reconciliation.sql`
 - `app/api/florida-class-d/live/route.ts`
 - `app/api/florida-class-d/admin/live/route.ts`
 - `app/florida-security-training/live/[liveSessionId]/page.tsx`
@@ -204,13 +206,17 @@ The source now models and enforces:
 - server-side instructional-time tracking;
 - server-side break-time tracking;
 - total-connected and uncredited-connected time tracking;
+- daily cumulative time by student;
+- full-course cumulative time by student;
 - explicit instruction versus break segments controlled by the instructor;
 - 15-minute breaks after the first three two-hour lessons each day;
 - security challenges issued before the two-hour maximum interval;
 - five-minute retry opportunity after a failed security challenge;
 - second challenge failure marks the learner absent in the live-presence record and stops further instructional credit until review;
 - documented instructor review path for presence restoration;
-- daily attendance still requires instructor verification;
+- instructor-certified daily attendance reconciliation after all four daily lessons end;
+- database prevention of a `present` certification unless 480 verified instructional minutes exist and no security-challenge absence remains unresolved;
+- daily attendance audit evidence that includes connected time, instructional time, break time, uncredited time, and challenge exceptions;
 - student questions to the instructor;
 - instructor answers;
 - hand raise;
@@ -231,8 +237,12 @@ The instructor console currently provides controls to:
 - start the scheduled 15-minute break;
 - resume instruction;
 - end the lesson;
-- view each student’s connected time, instructional-presence time, break time, uncredited time, and presence state;
+- view each student’s live connected time;
+- view each student’s day instructional and break time;
+- view each student’s cumulative course connected, instructional, break, and uncredited time;
 - review a security-challenge absence with a documented note;
+- certify daily attendance after the fourth lesson has ended;
+- prevent a full-present certification when the evidence is incomplete;
 - send class prompts;
 - receive student questions;
 - answer individual student questions.
@@ -245,16 +255,20 @@ The student live classroom currently provides:
 - single-device lease acquisition;
 - continuous server-side heartbeat;
 - visible live instruction/break state;
-- visible connected, instructional, break, and uncredited time counters;
+- current-lesson time counters;
+- cumulative daily connected, instructional, break, and uncredited counters;
+- cumulative full-course connected, instructional, break, and uncredited counters;
 - presence-challenge response form;
 - live Q&A feed;
 - question submission;
 - hand raise;
 - interaction logging.
 
+Every time category is associated to the authenticated enrollment. Breaks are visible and retained for audit/history but are structurally separate from instructional credit.
+
 ### Important live-media boundary
 
-**The regulated attendance, presence, time, Q&A, instructor-control, and audit control plane is implemented in source, but the actual embedded live video/audio transport is not yet selected or configured.**
+**The regulated attendance, presence, cumulative time, Q&A, instructor-control, daily-certification, and audit control plane is implemented in source, but the actual embedded live video/audio transport is not yet selected or configured.**
 
 The student and instructor pages deliberately contain a media surface placeholder. The next live subgate must integrate an approved real-time media provider while preserving:
 
@@ -284,16 +298,15 @@ The dedicated Florida workflow runs:
 
 ## Next controlled sequence
 
-1. Validate the new Gate 5 CI run and fix any source/build failures.
+1. Validate the latest Gate 5 CI run and fix any source/build failures.
 2. Select and integrate the secure live video/audio provider.
 3. Implement FDACS investigator live-access procedure and technical access path.
 4. Complete structured instructor polls and participation analytics.
 5. Add cohort scheduling and automatic creation of the 20 live lesson sessions.
-6. Add daily instructor attendance certification and reconciliation from live evidence into the formal attendance ledger.
-7. Add make-up-session workflow for permitted missed online instruction.
-8. Add lesson-screen timing enforcement for text-based instructional screens.
-9. Promote regulated migrations to production only through an approved database change gate with rollback and verification evidence.
-10. Keep public enrollment, payment, instructional access, exam access, completion issuance, and LIAS execution disabled until their separate launch gates and regulatory conditions are met.
+6. Add make-up-session workflow for permitted missed online instruction and reconcile make-up credit into attendance.
+7. Add lesson-screen timing enforcement for text-based instructional screens.
+8. Promote regulated migrations to production only through an approved database change gate with rollback and verification evidence.
+9. Keep public enrollment, payment, instructional access, exam access, completion issuance, and LIAS execution disabled until their separate launch gates and regulatory conditions are met.
 
 ## Security and repository boundary
 
