@@ -8,6 +8,9 @@ import { primaryAccountEmail } from "../../../../lib/app-entitlements";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+const LEGAL_MERCHANT_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
+const COMMERCE_SOURCE = "obserra-website-application-commerce";
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const slug = requestUrl.searchParams.get("app") ?? "";
@@ -55,6 +58,8 @@ export async function GET(request: Request) {
       billingInterval: interval,
       deploymentModel: deployment,
       clerkUserId: userId,
+      merchantLegalName: LEGAL_MERCHANT_NAME,
+      commerceSource: COMMERCE_SOURCE,
     };
 
     const session = await stripe.checkout.sessions.create({
