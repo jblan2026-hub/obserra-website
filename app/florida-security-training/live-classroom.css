@@ -98,6 +98,42 @@
 .fdacs-live__stage-frame h2 { font-size: clamp(28px, 4vw, 52px); }
 .fdacs-live__stage-frame p { max-width: 720px; color: #aebed1; line-height: 1.65; }
 
+.fdacs-live__media-frame {
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  background: #030812;
+}
+
+.fdacs-live__media-frame iframe {
+  width: 100%;
+  min-height: 620px;
+  border: 0;
+  display: block;
+  background: #030812;
+}
+
+.fdacs-live__media-waiting {
+  min-height: 520px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background:
+    radial-gradient(circle at 50% 25%, rgba(71, 112, 164, .22), transparent 32%),
+    linear-gradient(145deg, rgba(16, 34, 57, .97), rgba(6, 15, 27, .98));
+}
+
+.fdacs-live__media-waiting > span {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  color: #9fb6d4;
+}
+
 .fdacs-live__presence-code {
   margin-top: 22px;
   min-width: min(460px, 90%);
@@ -155,6 +191,10 @@
   border-radius: 10px;
   padding: 10px 13px;
   cursor: pointer;
+}
+.fdacs-live__instructor-controls button:disabled {
+  opacity: .46;
+  cursor: not-allowed;
 }
 .fdacs-live__instructor-controls button.danger { background: #f4d9d9; color: #4b1111; }
 
@@ -228,10 +268,14 @@
   .fdacs-live__timecards { grid-template-columns: repeat(2, 1fr); }
   .fdacs-live__topbar { align-items: stretch; flex-direction: column; }
   .fdacs-live__status { min-width: 0; }
+  .fdacs-live__media-frame iframe { min-height: 540px; }
 }
 
 @media (max-width: 620px) {
   .fdacs-live { padding: 12px; }
   .fdacs-live__stage-frame { min-height: 360px; padding: 24px; }
+  .fdacs-live__media-frame { padding: 0; }
+  .fdacs-live__media-frame iframe { min-height: 460px; }
+  .fdacs-live__media-waiting { min-height: 360px; padding: 24px; }
   .fdacs-live__timecards { grid-template-columns: 1fr; }
 }
