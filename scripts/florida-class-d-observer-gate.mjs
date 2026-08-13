@@ -21,6 +21,7 @@ for (const [value, message] of [
   ["access_scope = 'live_observer'", "Observer grants must be restricted to live-observer scope."],
   ["expires_at", "Observer grants must expire."],
   ["revoked_at", "Observer grants must support revocation."],
+  ["s.status in ('live','break')", "Observer access exchange must require an active live or break session."],
   ["force row level security", "Observer grants must force row-level security."],
   ["revoke all on table public.fdacs_class_d_observer_grants from public, anon, authenticated", "Direct browser access to observer grants must be revoked."],
   ["grant execute on function public.fdacs_class_d_record_observer_access", "Observer token exchange must be service-role controlled."],
@@ -34,10 +35,12 @@ for (const [value, message] of [
   ["school_admin", "Observer grant creation must require school administration."],
   ["compliance_admin", "Observer grant creation must permit compliance administration."],
   ["fdacs_class_d_record_observer_access", "Observer access exchange must use the audited database function."],
+  ["expiresAt: row.expires_at", "Validated observer grants must propagate their expiration to the media broker."],
 ]) requireText(observer, value, message);
 
 for (const [value, message] of [
   ["getFloridaClassDObserverMediaAccess", "The media broker must expose a dedicated observer access path."],
+  ["const tokenExp = Math.min(grantExp, now + 90 * 60)", "Observer media tokens must never outlive the underlying observer grant."],
   ["canSend: false", "Observer media must not transmit camera or microphone media."],
   ["canAdmin: false", "Observer media must not receive room administration rights."],
   ["enable_screenshare: false", "Observer media must not screen share."],
@@ -52,10 +55,11 @@ requireText(adminRoute, "oneTimeDisplay: true", "Observer plaintext token must b
 requireText(adminRoute, "#access=", "Observer links must place the secret in the browser fragment rather than the server request path.");
 requireText(observerRoute, "exchangeFloridaClassDObserverToken", "Observer media API must validate the temporary grant before media issuance.");
 requireText(observerRoute, "getFloridaClassDObserverMediaAccess", "Observer media API must issue view-only media after grant validation.");
+requireText(observerRoute, "expiresAt: grant.expiresAt", "Observer media API must bind the provider token to the validated grant expiration.");
 requireText(observerUi, "window.location.hash", "Observer UI must read the temporary token from the URL fragment.");
 requireText(observerUi, "window.history.replaceState", "Observer UI must remove the access fragment after reading it.");
 requireText(observerUi, 'allow="fullscreen; autoplay"', "Observer iframe must not request camera, microphone, or display-capture browser permissions.");
 requireText(adminUi, "The plaintext access token is not stored by Obserra", "Admin UI must explain observer token handling.");
 requireText(handoff, "## Gate 7 — Temporary Regulatory Observer Access", "The Class D handoff must record Gate 7 observer controls.");
 
-console.log("Florida Class D Gate 7 passed: temporary regulatory observer access is bounded, auditable, revocable, and view-only.");
+console.log("Florida Class D Gate 7 passed: temporary regulatory observer access is bounded, auditable, revocable, grant-expiry-bound, and view-only.");
