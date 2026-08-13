@@ -13,6 +13,7 @@ import {
   respondFloridaClassDPresenceChallenge,
 } from "../../../../lib/florida-class-d-live-persistence";
 import { floridaClassDLiveInstructionEnabled } from "../../../../lib/florida-class-d-live-policy";
+import { getFloridaClassDStudentTimeLedger } from "../../../../lib/florida-class-d-live-reporting";
 
 const headers = {
   "cache-control": "private, no-store, max-age=0, must-revalidate",
@@ -65,8 +66,11 @@ export async function GET(request: Request) {
     if (!liveSessionId) {
       return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
     }
-    const state = await getFloridaClassDLiveStudentState(userId, liveSessionId);
-    return NextResponse.json(state, { headers });
+    const [state, ledger] = await Promise.all([
+      getFloridaClassDLiveStudentState(userId, liveSessionId),
+      getFloridaClassDStudentTimeLedger(userId, liveSessionId),
+    ]);
+    return NextResponse.json({ ...state, dayTime: ledger.dayTime, courseTime: ledger.courseTime }, { headers });
   } catch (error) {
     return errorResponse(error);
   }
