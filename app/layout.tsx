@@ -35,6 +35,12 @@ function isValidClerkConfiguration() {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim();
   const secretKey = process.env.CLERK_SECRET_KEY?.trim();
   if (!publishableKey || !secretKey) return false;
+
+  const isVercelProduction = process.env.VERCEL_ENV === "production";
+  if (isVercelProduction) {
+    return /^pk_live_[A-Za-z0-9_-]+$/.test(publishableKey) && /^sk_live_[A-Za-z0-9_-]+$/.test(secretKey);
+  }
+
   const publishableValid = /^(pk_test_|pk_live_)[A-Za-z0-9_-]+$/.test(publishableKey);
   const secretValid = /^(sk_test_|sk_live_)[A-Za-z0-9_-]+$/.test(secretKey);
   const environmentsMatch =
