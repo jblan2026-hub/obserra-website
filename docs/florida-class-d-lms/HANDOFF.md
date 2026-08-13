@@ -34,23 +34,23 @@ The implemented source architecture includes the five-day / 40-hour regulated co
 
 Forty instructional hours alone do not complete the course and do not earn a completion certificate.
 
-### Gates 1 through 4
+### Gates 1-4
 
 Foundation, regulated student records, durable Supabase persistence/admin APIs, identity verification, acknowledgments, cohort assignment, and regulated enrollment are implemented in source. Production activation and database promotion remain disabled.
 
-### Gates 5 through 8
+### Gates 5-8
 
 Live instructor classroom, one-device presence, server-authoritative time evidence, security challenges, daily attendance certification, secure Daily media, temporary view-only observer access, and exact five-day/20-session scheduling are implemented in source.
 
-### Gates 9 through 11
+### Gates 9-11
 
 Structured live polls/participation analytics, controlled make-up assignment and atomic credit reconciliation, and protected recorded make-up delivery/evidence are implemented in source.
 
-### Gates 12 through 15
+### Gates 12-15
 
 Protected final examination, exam-bank administration, active monitoring, interruption/resume/invalidation, failed-attempt preservation, remediation, and controlled retest authorization are implemented in source.
 
-### Gates 16 through 20
+### Gates 16-20
 
 Successful-completion review, LIAS workflow, supplemental completion-document handling, student completion-document presentation, completion/inspection packets, school quality/CAPA, retention, and legal-hold controls are implemented in source.
 
@@ -82,9 +82,9 @@ Primary Gate 24 artifacts include `supabase/migrations/20260813110000_fdacs_clas
 
 Gate 25 strengthens the regulated runtime isolation boundary. `scripts/florida-class-d-runtime-isolation-audit.mjs` inventories regulated `lib/florida-class-d*.ts` server modules for embedded Supabase project URLs and improper `NEXT_PUBLIC_*` secret-class environment names. `docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md` defines the acceptance criteria.
 
-The Gate 23 acceptance service and Gate 24 text-screen service already require explicit protected Supabase runtime configuration without hardcoded project fallback URLs. This increment removed the hardcoded Supabase fallback from `lib/florida-class-d-quality.ts`, `lib/florida-class-d-completion.ts`, and `lib/florida-class-d-lias.ts`. Those services now require an explicit protected `OBSERRA_SUPABASE_URL` HTTPS value and fail closed when required runtime configuration is absent.
+The Gate 23 acceptance service and Gate 24 text-screen service already require explicit protected Supabase runtime configuration without hardcoded project fallback URLs. Runtime-isolation remediation has now removed hardcoded Supabase fallbacks from `lib/florida-class-d-quality.ts`, `lib/florida-class-d-completion.ts`, `lib/florida-class-d-lias.ts`, `lib/florida-class-d-media.ts`, and `lib/florida-class-d-completion-documents.ts`. Those services now require an explicit protected `OBSERRA_SUPABASE_URL` HTTPS value and fail closed when required runtime configuration is absent.
 
-Additional legacy regulated modules still require inventory/remediation, including known live-media/live-persistence and completion-document paths. Gate 25 will not be accepted until the runtime-isolation inventory is clean, enforcement is added to the required CI path, and the full regulated workflow remains green.
+`lib/florida-class-d-live-persistence.ts` remains a known open remediation target because its source still contains a hardcoded Supabase project fallback. Gate 25 will not be accepted until the runtime-isolation inventory is clean, enforcement is added to the required CI path, and the full regulated workflow remains green.
 
 ## Mandatory completion and certificate standard
 
@@ -110,7 +110,7 @@ Real learner PII, protected exam content, credentials, license numbers, private 
 
 The dedicated Florida Class D LMS workflow is green on `cc6470b2466f68578d63884f646462a2ad65ac0c`. Website CI, Application Release Validation, and the Application Production Pipeline also completed successfully on that commit. The Academy 70x Production Gate failure is unrelated to this regulated Class D workstream.
 
-Gate 25 commits after the accepted baseline are audit/hardening work in progress and must not be described as an accepted gate until their own full green cycle is established.
+Gate 25 commits after the accepted baseline are audit/hardening work in progress and must not be described as an accepted gate until their own full green cycle is established. The Gate 2 historical-heading compatibility assertion was corrected at `e25230665f6e264f21bbd9cdd264e411eceb3b83`; the current handoff also restores the exact historical gate heading forms expected by earlier verifiers.
 
 ## Current unresolved production controls
 
@@ -123,7 +123,7 @@ The Division-approved examination-bank boundary also remains a production activa
 ## Next controlled sequence
 
 1. Continue the Gate 25 runtime-isolation inventory and identify every remaining regulated module with an embedded Supabase project URL fallback.
-2. Remove the remaining fallbacks and require explicit `OBSERRA_SUPABASE_URL` HTTPS configuration plus protected server-side credentials.
+2. Remove the remaining fallbacks, including live persistence, and require explicit `OBSERRA_SUPABASE_URL` HTTPS configuration plus protected server-side credentials.
 3. Add Gate 25 enforcement to the dedicated Florida Class D CI workflow after remediation.
 4. Rerun Gates 1 through 25, repository tests, lint, and the production Next.js build and synchronize audit evidence to the actual green head.
 5. Execute controlled non-production acceptance with synthetic identities only after the applicable non-production database/runtime environment is configured.
@@ -138,4 +138,4 @@ Never commit real learner PII, identity documents, protected examination questio
 
 ## Restart instruction
 
-Read `docs/florida-class-d-lms/LATEST-HANDOFF.md`, `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`, `docs/florida-class-d-lms/GATE-24-TEXT-SCREEN-TIMING-HANDOFF.md`, `docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md`, `docs/florida-class-d-lms/DS-SUBMISSION-LMS-GUIDE-CONTROL.md`, and this handoff before continuing. Gate 24 remains the accepted source/build baseline at `cc6470b2466f68578d63884f646462a2ad65ac0c`. Gate 25 is in progress with quality, completion-review, and LIAS runtime fallbacks remediated. Resume with the remaining runtime-isolation inventory and do not call Gate 25 accepted until the enforcing CI cycle is green. Do not treat CI as FDACS approval, do not apply production migrations from source-gate work, do not generate FDACS-16103 locally, and do not issue a completion certificate for hours alone.
+Read `docs/florida-class-d-lms/LATEST-HANDOFF.md`, `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`, `docs/florida-class-d-lms/GATE-24-TEXT-SCREEN-TIMING-HANDOFF.md`, `docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md`, `docs/florida-class-d-lms/DS-SUBMISSION-LMS-GUIDE-CONTROL.md`, and this handoff before continuing. Gate 24 remains the accepted source/build baseline at `cc6470b2466f68578d63884f646462a2ad65ac0c`. Gate 25 is in progress. Resume with the remaining runtime-isolation inventory and do not call Gate 25 accepted until the enforcing CI cycle is green. Do not treat CI as FDACS approval, do not apply production migrations from source-gate work, do not generate FDACS-16103 locally, and do not issue a completion certificate for hours alone.
