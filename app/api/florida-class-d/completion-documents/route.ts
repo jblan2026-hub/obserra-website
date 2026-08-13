@@ -14,6 +14,7 @@ const secureHeaders = {
   "x-frame-options": "DENY",
   "referrer-policy": "no-referrer",
   "x-robots-tag": "noindex, nofollow, noarchive",
+  "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
 };
 
 function json(body: unknown, status = 200) {
@@ -28,6 +29,16 @@ function errorResponse(error: unknown) {
   return json({ error: "Completion documents request failed." }, 500);
 }
 
+function presentation(documentType: string) {
+  if (documentType === "fdacs_16103") {
+    return { filename: "FDACS-16103-Certificate-of-Security-Officer-Training.pdf", disposition: "attachment" as const };
+  }
+  if (documentType === "obserra_course_completion") {
+    return { filename: "Obserra-Florida-Class-D-Course-Completion-Certificate.html", disposition: "inline" as const };
+  }
+  return { filename: "Obserra-Florida-Class-D-Application-Instructions.html", disposition: "inline" as const };
+}
+
 export async function GET(request: NextRequest) {
   try {
     const user = await requireFloridaClassDSignedInUser();
@@ -35,15 +46,14 @@ export async function GET(request: NextRequest) {
     if (!documentId) return json({ documents: await listCompletionDocumentsForStudent(user.userId) });
 
     const result = await downloadStudentCompletionDocument(user.userId, documentId);
-    const filename = result.document.document_type === "fdacs_16103"
-      ? "FDACS-16103-Certificate-of-Security-Officer-Training.pdf"
-      : "Obserra-Class-D-Completion-Document.pdf";
-    return new NextResponse(result.bytes, {
+    const output = presentation(result.document.document_type);
+    const body = new Blob([Uint8Array.from(result.bytes)], { type: result.contentType });
+    return new NextResponse(body, {
       status: 200,
       headers: {
         ...secureHeaders,
         "content-type": result.contentType,
-        "content-disposition": `attachment; filename="${filename}"`,
+        "content-disposition": `${output.disposition}; filename="${output.filename}"`,
         "content-length": String(result.bytes.byteLength),
       },
     });
