@@ -3,6 +3,7 @@ import {
   FloridaClassDAuthorizationError,
   requireFloridaClassDStaff,
 } from "../../../../../lib/florida-class-d-auth";
+import { certifyFloridaClassDMakeupAtomic } from "../../../../../lib/florida-class-d-makeup-certification";
 import {
   answerFloridaClassDMakeupQuestion,
   assignFloridaClassDMakeup,
@@ -33,6 +34,11 @@ type Body = {
   questionId?: unknown;
   answer?: unknown;
   assignmentId?: unknown;
+  certifiedMinutes?: unknown;
+  evidenceReference?: unknown;
+  evidenceStartedAt?: unknown;
+  evidenceEndedAt?: unknown;
+  idempotencyKey?: unknown;
   correlationId?: unknown;
 };
 
@@ -123,14 +129,26 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "certify") {
-      return NextResponse.json(
-        {
-          error: "Make-up instructional credit remains fail closed until the transactional certification subgate is promoted.",
-          code: "FDACS_MAKEUP_CERTIFICATION_TRANSACTION_PENDING",
-          correlationId,
-        },
-        { status: 503, headers: { ...headers, "retry-after": "86400" } },
-      );
+      if (
+        typeof body.assignmentId !== "string" ||
+        !Number.isInteger(body.certifiedMinutes) ||
+        typeof body.evidenceReference !== "string" ||
+        typeof body.evidenceStartedAt !== "string" ||
+        typeof body.evidenceEndedAt !== "string" ||
+        typeof body.idempotencyKey !== "string"
+      ) {
+        return NextResponse.json({ error: "Certification evidence fields are incomplete.", code: "FDACS_MAKEUP_CERTIFICATION_INVALID" }, { status: 400, headers });
+      }
+      const certification = await certifyFloridaClassDMakeupAtomic(actor, {
+        assignmentId: body.assignmentId,
+        certifiedMinutes: body.certifiedMinutes as number,
+        evidenceReference: body.evidenceReference,
+        evidenceStartedAt: body.evidenceStartedAt,
+        evidenceEndedAt: body.evidenceEndedAt,
+        idempotencyKey: body.idempotencyKey,
+        correlationId,
+      });
+      return NextResponse.json({ certification, correlationId }, { headers });
     }
 
     return NextResponse.json({ error: "Unsupported make-up administration action.", code: "FDACS_MAKEUP_ADMIN_ACTION_UNSUPPORTED" }, { status: 400, headers });
