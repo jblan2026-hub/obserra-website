@@ -3,6 +3,7 @@ import {
   FloridaClassDAuthorizationError,
   requireFloridaClassDStaff,
 } from "../../../../../lib/florida-class-d-auth";
+import { FloridaClassDExamError } from "../../../../../lib/florida-class-d-exam";
 import { listFloridaClassDLiveInteractions } from "../../../../../lib/florida-class-d-live-feed";
 import {
   endFloridaClassDLiveSession,
@@ -31,6 +32,12 @@ import {
   getFloridaClassDParticipationAnalytics,
   openFloridaClassDLivePoll,
 } from "../../../../../lib/florida-class-d-polls";
+import {
+  closeFloridaClassDLiveTextScreen,
+  getFloridaClassDActiveTextScreen,
+  getFloridaClassDTextScreenViews,
+  openFloridaClassDLiveTextScreen,
+} from "../../../../../lib/florida-class-d-text-screen";
 
 const headers = {
   "cache-control": "private, no-store, max-age=0, must-revalidate",
@@ -60,6 +67,10 @@ type Body = {
   question?: unknown;
   options?: unknown;
   correctOptionIndex?: unknown;
+  textScreenId?: unknown;
+  textScreenTitle?: unknown;
+  textScreenBody?: unknown;
+  discussionNote?: unknown;
   correlationId?: unknown;
 };
 
@@ -74,7 +85,8 @@ function errorResponse(error: unknown) {
   if (
     error instanceof FloridaClassDAuthorizationError ||
     error instanceof FloridaClassDLivePersistenceError ||
-    error instanceof FloridaClassDPollError
+    error instanceof FloridaClassDPollError ||
+    error instanceof FloridaClassDExamError
   ) {
     return NextResponse.json(
       { error: error.message, code: "code" in error ? error.code : "FDACS_LIVE_AUTHORIZATION_FAILED" },
@@ -96,11 +108,12 @@ export async function GET(request: Request) {
     if (!liveSessionId) {
       return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
     }
-    const [roster, interactions, polls, participationMap] = await Promise.all([
+    const [roster, interactions, polls, participationMap, activeTextScreen] = await Promise.all([
       getFloridaClassDLiveRoster(liveSessionId),
       listFloridaClassDLiveInteractions(liveSessionId),
       getFloridaClassDInstructorPolls(liveSessionId),
       getFloridaClassDParticipationAnalytics(liveSessionId),
+      getFloridaClassDActiveTextScreen(liveSessionId),
     ]);
     const day = typeof roster.session.day === "number" ? roster.session.day : 1;
     const enrollmentIds = roster.students
@@ -109,7 +122,10 @@ export async function GET(request: Request) {
         return typeof record.id === "string" ? record.id : null;
       })
       .filter((id): id is string => Boolean(id));
-    const ledgers = await getFloridaClassDRosterTimeLedgers(enrollmentIds, day);
+    const [ledgers, textScreenViews] = await Promise.all([
+      getFloridaClassDRosterTimeLedgers(enrollmentIds, day),
+      activeTextScreen ? getFloridaClassDTextScreenViews(activeTextScreen.id) : Promise.resolve([]),
+    ]);
     const students = roster.students.map((student) => {
       const record = student as Record<string, unknown>;
       const enrollmentId = typeof record.id === "string" ? record.id : "";
@@ -122,7 +138,7 @@ export async function GET(request: Request) {
         participation: participationMap.get(enrollmentId) ?? null,
       };
     });
-    return NextResponse.json({ ...roster, students, interactions, polls }, { headers });
+    return NextResponse.json({ ...roster, students, interactions, polls, activeTextScreen, textScreenViews }, { headers });
   } catch (error) {
     return errorResponse(error);
   }
@@ -180,6 +196,31 @@ export async function POST(request: Request) {
       if (typeof body.liveSessionId !== "string") return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
       await endFloridaClassDLiveSession(actor, { liveSessionId: body.liveSessionId, correlationId });
       return NextResponse.json({ ended: true, correlationId }, { headers });
+    }
+
+    if (body.action === "text_screen_open") {
+      if (typeof body.liveSessionId !== "string" || typeof body.textScreenTitle !== "string" || typeof body.textScreenBody !== "string") {
+        return NextResponse.json({ error: "Text-screen title and instructional text are required.", code: "FDACS_TEXT_SCREEN_OPEN_INVALID" }, { status: 400, headers });
+      }
+      const textScreenId = await openFloridaClassDLiveTextScreen(actor, {
+        liveSessionId: body.liveSessionId,
+        title: body.textScreenTitle,
+        body: body.textScreenBody,
+        correlationId,
+      });
+      return NextResponse.json({ textScreenId, correlationId, opened: true }, { status: 201, headers });
+    }
+
+    if (body.action === "text_screen_close") {
+      if (typeof body.textScreenId !== "string" || typeof body.discussionNote !== "string") {
+        return NextResponse.json({ error: "Text-screen id and instructor discussion confirmation are required.", code: "FDACS_TEXT_SCREEN_CLOSE_INVALID" }, { status: 400, headers });
+      }
+      await closeFloridaClassDLiveTextScreen(actor, {
+        textScreenId: body.textScreenId,
+        discussionNote: body.discussionNote,
+        correlationId,
+      });
+      return NextResponse.json({ textScreenId: body.textScreenId, correlationId, closed: true }, { headers });
     }
 
     if (body.action === "challenge") {
