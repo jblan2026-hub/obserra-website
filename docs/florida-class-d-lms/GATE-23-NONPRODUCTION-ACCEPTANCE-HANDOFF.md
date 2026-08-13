@@ -11,9 +11,11 @@ Gate 23 provides controlled, auditable acceptance evidence for the Florida Class
 The current source includes:
 
 - `supabase/migrations/20260813090000_fdacs_class_d_nonproduction_acceptance.sql`
+- `supabase/migrations/20260813105000_fdacs_class_d_acceptance_event_permissions.sql`
 - `lib/florida-class-d-acceptance.ts`
 - `app/api/florida-class-d/admin/acceptance/route.ts`
 - `app/florida-security-training/admin/acceptance/page.tsx`
+- `app/florida-security-training/admin/acceptance/AcceptanceConsole.tsx`
 - `scripts/florida-class-d-acceptance-gate.mjs`
 - `.github/workflows/florida-class-d-lms-gates.yml`
 
@@ -27,20 +29,23 @@ The required domains are identity/enrollment, live media, attendance/time, prese
 
 The acceptance API requires school-admin or compliance-admin authorization. Passed checks require an evidence reference. The acceptance service requires explicit protected Supabase runtime configuration and does not use a hardcoded fallback project URL. Real learner PII, production credentials, protected exam content, license numbers, provider secrets, and infrastructure secrets must not be placed in acceptance evidence stored in public source.
 
+The interactive acceptance console now provides a real staff workflow to create a controlled non-production run, select the run, record evidence against each required domain, see the current 18-domain status, and request finalization. The client disables finalization until all 18 displayed domains are passed, while the database function independently enforces the same all-pass requirement server-side.
+
+The follow-on acceptance-event permission migration restricts the runtime service role to select and insert on the acceptance event ledger. Update, delete, and truncate privileges are revoked for that runtime role so regulated service activity can append and read events but cannot modify or remove existing event rows.
+
 ## Validation evidence
 
 A full dedicated Florida Class D workflow passed on commit `35a7f6ca704a44bc885d1534aa570eb541bc49d3`, including Gates 1-23 source verification, Gate 22 runtime-readiness verification, Gate 23 acceptance verification, repository tests, lint, and the production Next.js build.
 
-That CI result is source/build evidence only. It does not mean the Class DS license is issued, production migrations are applied, production runtime is activated, or the LMS is approved by FDACS.
+The current hardened source head is `a7786ce426879260f3d758d40ee5c898de2f1523`. A fresh Gates 1-23 workflow is validating the interactive console and append-only runtime-permission changes. Those new hardening changes are not accepted until the complete current-head workflow is green.
+
+CI results are source/build evidence only. They do not mean the Class DS license is issued, production migrations are applied, production runtime is activated, or the LMS is approved by FDACS.
 
 ## Remaining Gate 23 controls
 
-Gate 23 is not operationally complete until both of these controls are implemented and revalidated:
+The major operational hardening items previously open are now implemented in source: the real interactive acceptance console and runtime-role mutation restrictions on the acceptance event ledger. The remaining Gate 23 work is to complete current-head CI, strengthen the Gate 23 verifier to explicitly assert the new API/console/permission controls, synchronize the audit handoffs to the final green commit, and then execute real non-production acceptance only in an appropriately configured non-production environment with synthetic identities.
 
-1. Database-level append-only enforcement for acceptance audit events so existing acceptance events cannot be updated or deleted through the regulated service path.
-2. A complete interactive staff acceptance console that records and finalizes real acceptance evidence through the protected API rather than presenting a read-only list.
-
-After those controls land, strengthen the Gate 23 verifier so it explicitly validates the protected API, explicit runtime configuration, append-only event enforcement, and the interactive evidence workflow.
+No production acceptance execution or production database migration has occurred.
 
 ## No mockups or placeholders
 
@@ -52,4 +57,4 @@ Gate 23 does not change the completion standard. Forty instructional hours alone
 
 ## Restart instruction
 
-Read this file together with `HANDOFF.md` and `LATEST-HANDOFF.md`. Resume by implementing append-only acceptance audit enforcement and the real interactive acceptance console. Then update the Gate 23 verifier and audit handoffs and run the complete Gates 1-23 CI cycle. Keep production activation fail closed.
+Read this file together with `HANDOFF.md` and `LATEST-HANDOFF.md`. Resume from the current-head Gates 1-23 CI result, strengthen the Gate 23 verifier, synchronize all audit handoffs, and only then execute real non-production acceptance with synthetic identities in the configured non-production environment. Keep production activation fail closed.
