@@ -7,7 +7,9 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), "u
 const policy = read("lib/florida-class-d-live-policy.ts");
 const records = read("lib/florida-class-d-records.ts");
 const persistence = read("lib/florida-class-d-live-persistence.ts");
+const reporting = read("lib/florida-class-d-live-reporting.ts");
 const migration = read("supabase/migrations/20260813043000_fdacs_class_d_live_classroom.sql");
+const attendanceMigration = read("supabase/migrations/20260813044000_fdacs_class_d_daily_attendance_reconciliation.sql");
 const studentApi = read("app/api/florida-class-d/live/route.ts");
 const adminApi = read("app/api/florida-class-d/admin/live/route.ts");
 const studentUi = read("app/florida-security-training/live/[liveSessionId]/LiveClassroom.tsx");
@@ -58,34 +60,52 @@ required(migration, "break_presence_seconds", "Break presence must be stored sep
 required(migration, "instructional_presence_seconds", "Instructional presence must be stored separately.");
 required(migration, "fdacs_class_d_restore_presence_after_review", "Instructor review path is required after a failed presence challenge.");
 
+required(attendanceMigration, "fdacs_class_d_certify_live_day", "Daily live attendance must have an instructor certification transaction.");
+required(attendanceMigration, "all four live lessons must be completed before daily attendance certification", "Daily attendance certification must wait until all four lessons end.");
+required(attendanceMigration, "v_instructional_minutes := least(480", "Daily instructional credit must cap at 480 minutes.");
+required(attendanceMigration, "present status requires 480 verified instructional minutes", "Present status must require all eight instructional hours.");
+required(attendanceMigration, "breakPresenceSeconds", "Attendance certification audit evidence must preserve tracked break time.");
+required(attendanceMigration, "uncreditedConnectedSeconds", "Attendance certification audit evidence must preserve uncredited time.");
+required(attendanceMigration, "grant execute on function public.fdacs_class_d_certify_live_day", "Daily attendance certification RPC must be service-role only.");
+
 required(persistence, "fdacs_class_d_acquire_device_lease", "Server persistence must acquire the single-device lease through the controlled RPC.");
 required(persistence, "fdacs_class_d_record_live_heartbeat", "Server persistence must record presence heartbeats.");
 required(persistence, "fdacs_class_d_respond_presence_challenge", "Server persistence must record challenge responses.");
 required(persistence, "fdacs_class_d_live_interactions", "Server persistence must retain live Q&A and participation records.");
+required(reporting, "getFloridaClassDStudentTimeLedger", "Student reporting must aggregate daily and full-course time.");
+required(reporting, "getFloridaClassDRosterTimeLedgers", "Instructor reporting must aggregate time by student.");
+required(reporting, "certifyFloridaClassDLiveDay", "Instructor reporting service must expose controlled daily attendance certification.");
 
 required(studentApi, "floridaClassDLiveInstructionEnabled", "Student live API must fail closed behind the regulatory live gate.");
 required(studentApi, 'body.action === "heartbeat"', "Student live API must support presence heartbeats.");
 required(studentApi, 'body.action === "challenge"', "Student live API must support presence challenges.");
 required(studentApi, '"question", "hand_raise", "response", "poll_response"', "Student live API must support interaction events.");
+required(studentApi, "getFloridaClassDStudentTimeLedger", "Student live API must return cumulative course time.");
 required(adminApi, "requireFloridaClassDStaff", "Instructor live API must require server-side staff authorization.");
 required(adminApi, 'body.action === "challenge"', "Instructor live API must support security challenges.");
 required(adminApi, 'body.action === "segment"', "Instructor live API must control instruction versus break segments.");
+required(adminApi, 'body.action === "certify_day"', "Instructor live API must support daily attendance certification.");
+required(adminApi, "getFloridaClassDRosterTimeLedgers", "Instructor live API must return cumulative per-student time.");
 required(adminApi, '"answer", "prompt", "poll"', "Instructor live API must support interactive teaching events.");
 
 required(studentUi, "Attendance and time tracking are active", "Student classroom must disclose active attendance/time tracking.");
 required(studentUi, "Breaks are tracked in the LMS but are not credited", "Student classroom must clearly distinguish break time from instruction.");
+required(studentUi, "Entire 40-hour course ledger", "Student classroom must display cumulative course time.");
+required(studentUi, "Course breaks", "Student classroom must display cumulative break time.");
 if (!studentUi.includes("Live Q&A") && !studentUi.includes("Live Q&amp;A")) {
   throw new Error("Student classroom must expose live Q&A.");
 }
-required(instructorUi, "Live attendance and time roster", "Instructor console must expose live attendance and time evidence.");
+required(instructorUi, "Live attendance and full-course time roster", "Instructor console must expose live and cumulative attendance evidence.");
 required(instructorUi, "Issue presence check", "Instructor console must expose security challenge control.");
 required(instructorUi, "Start 15-minute break", "Instructor console must expose the required break control.");
 required(instructorUi, "Student questions", "Instructor console must expose student questions.");
 required(instructorUi, "elapsedInstructionMinutes >= 105", "Instructor console must automatically trigger a presence check before two instructional hours elapse.");
+required(instructorUi, "certifyDay", "Instructor console must support instructor-certified daily attendance.");
+required(instructorUi, "Course breaks", "Instructor console must display each student's cumulative break time.");
 
 required(course, "liveLessonsPerDay: 4", "Course model must define four live lessons per day.");
 required(course, "trackedBreakMinutesPerDay: 45", "Course model must define 45 tracked break minutes per day.");
 required(publicPage, "Break time is recorded but is never credited", "Public preview must accurately disclose tracked break treatment.");
 required(course, 'status: "coming-soon"', "Live source implementation must not open the course publicly.");
 
-console.log("Florida Class D live instruction gate passed: source supports live teaching, single-device presence, time separation, challenges, Q&A, breaks, and fail-closed DS activation.");
+console.log("Florida Class D live instruction gate passed: source supports live teaching, single-device presence, cumulative student time, daily attendance certification, challenges, Q&A, tracked breaks, and fail-closed DS activation.");
