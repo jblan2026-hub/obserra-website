@@ -87,14 +87,19 @@ export async function GET(request: Request) {
     ]);
     const day = typeof roster.session.day === "number" ? roster.session.day : 1;
     const enrollmentIds = roster.students
-      .map((student) => typeof student.id === "string" ? student.id : null)
+      .map((student) => {
+        const record = student as Record<string, unknown>;
+        return typeof record.id === "string" ? record.id : null;
+      })
       .filter((id): id is string => Boolean(id));
     const ledgers = await getFloridaClassDRosterTimeLedgers(enrollmentIds, day);
     const students = roster.students.map((student) => {
-      const enrollmentId = typeof student.id === "string" ? student.id : "";
+      const record = student as Record<string, unknown>;
+      const enrollmentId = typeof record.id === "string" ? record.id : "";
       const ledger = ledgers.get(enrollmentId);
       return {
-        ...student,
+        ...record,
+        liveTime: student.liveTime,
         dayTime: ledger?.dayTime ?? null,
         courseTime: ledger?.courseTime ?? null,
       };
