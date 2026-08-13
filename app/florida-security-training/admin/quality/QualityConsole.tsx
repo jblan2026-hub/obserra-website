@@ -23,6 +23,13 @@ export default function QualityConsole({ initialCases, initialRetentionReviews }
     title: "",
     description: "",
   });
+  const [retentionForm, setRetentionForm] = useState({
+    enrollmentId: "",
+    completionRecordId: "",
+    completionDate: "",
+    legalHoldActive: false,
+    reviewNote: "",
+  });
 
   const openCount = useMemo(() => cases.filter((item) => item.status !== "closed" && item.status !== "voided").length, [cases]);
   const criticalCount = useMemo(() => cases.filter((item) => item.severity === "critical" && item.status !== "closed" && item.status !== "voided").length, [cases]);
@@ -71,6 +78,22 @@ export default function QualityConsole({ initialCases, initialRetentionReviews }
     }
     const eventNote = window.prompt("Case note (optional):") || "";
     await post({ action: "progress_case", caseId, status, correctiveAction, eventNote }, `Quality case moved to ${status}.`);
+  }
+
+  async function recordRetentionReview() {
+    await post({ action: "retention_review", ...retentionForm }, "Retention review recorded with the regulatory minimum, operational retention date, and legal-hold state.");
+    setRetentionForm((current) => ({ ...current, reviewNote: "" }));
+  }
+
+  function loadRetentionReview(item: FloridaClassDRetentionReview) {
+    setRetentionForm({
+      enrollmentId: item.enrollment_id,
+      completionRecordId: item.completion_record_id || "",
+      completionDate: item.reviewed_at ? item.reviewed_at.slice(0, 10) : "",
+      legalHoldActive: item.legal_hold_active,
+      reviewNote: item.review_note || "",
+    });
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   }
 
   return (
@@ -147,7 +170,7 @@ export default function QualityConsole({ initialCases, initialRetentionReviews }
 
       <section className="fdacs-live__panel">
         <h2>Retention reviews</h2>
-        <p>Regulatory minimum and the school's longer operational retention policy remain separate. Legal holds block disposition.</p>
+        <p>Regulatory minimum and the school&apos;s longer operational retention policy remain separate. Legal holds block disposition. Actual destruction is not automated by this console.</p>
         <div className="fdacs-completion-admin__grid">
           {retentionReviews.map((item) => (
             <article key={item.id} className="fdacs-completion-admin__card">
@@ -158,9 +181,23 @@ export default function QualityConsole({ initialCases, initialRetentionReviews }
                 <div><dt>Next review</dt><dd>{item.next_review_on}</dd></div>
                 <div><dt>Legal hold</dt><dd>{item.legal_hold_active ? "ACTIVE" : "No"}</dd></div>
               </dl>
+              <button type="button" disabled={busy || !item.completion_record_id} onClick={() => loadRetentionReview(item)}>Review / update hold</button>
             </article>
           ))}
           {retentionReviews.length === 0 ? <p>No retention-review records are currently available.</p> : null}
+        </div>
+      </section>
+
+      <section className="fdacs-live__panel">
+        <h2>Record or update a retention review</h2>
+        <p>The completion date anchors both the two-year regulatory minimum and the three-year operational retention target. Use legal hold whenever litigation, investigation, complaint, audit, or another preservation obligation blocks disposition.</p>
+        <div className="fdacs-completion-admin__grid">
+          <label>Enrollment ID<input value={retentionForm.enrollmentId} onChange={(event) => setRetentionForm((current) => ({ ...current, enrollmentId: event.target.value }))} /></label>
+          <label>Completion record ID<input value={retentionForm.completionRecordId} onChange={(event) => setRetentionForm((current) => ({ ...current, completionRecordId: event.target.value }))} /></label>
+          <label>Successful completion date<input type="date" value={retentionForm.completionDate} onChange={(event) => setRetentionForm((current) => ({ ...current, completionDate: event.target.value }))} /></label>
+          <label><input type="checkbox" checked={retentionForm.legalHoldActive} onChange={(event) => setRetentionForm((current) => ({ ...current, legalHoldActive: event.target.checked }))} /> Legal hold active</label>
+          <label>Review note<textarea value={retentionForm.reviewNote} maxLength={8000} onChange={(event) => setRetentionForm((current) => ({ ...current, reviewNote: event.target.value }))} /></label>
+          <button type="button" disabled={busy || !retentionForm.enrollmentId || !retentionForm.completionRecordId || !retentionForm.completionDate} onClick={() => void recordRetentionReview()}>Record retention review</button>
         </div>
       </section>
     </main>
