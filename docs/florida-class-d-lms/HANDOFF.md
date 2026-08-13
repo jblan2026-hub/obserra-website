@@ -48,7 +48,7 @@ Gate 21 is database-promotion readiness only and does not apply production migra
 
 ## Gate 23 - Non-Production Acceptance Evidence
 
-**FULL GREEN SOURCE/BUILD BASELINE ESTABLISHED / OPERATIONAL HARDENING STILL OPEN / PRODUCTION ACTIVATION DISABLED**
+**FULL GREEN BASELINE ESTABLISHED / INTERACTIVE AND APPEND-ONLY HARDENING IMPLEMENTED IN SOURCE / CURRENT-HEAD CI VALIDATION IN PROGRESS / PRODUCTION ACTIVATION DISABLED**
 
 Gate 23 adds real non-production acceptance evidence records. Acceptance runs are limited to development, sandbox, staging, or UAT; bind to a 40-character release commit SHA; require a synthetic test-identity reference and explicit synthetic-identity confirmation; and track 18 required domains.
 
@@ -59,17 +59,21 @@ The database finalization function refuses to pass an acceptance run unless all 
 Primary Gate 23 artifacts now include:
 
 - `supabase/migrations/20260813090000_fdacs_class_d_nonproduction_acceptance.sql`
+- `supabase/migrations/20260813105000_fdacs_class_d_acceptance_event_permissions.sql`
 - `lib/florida-class-d-acceptance.ts`
 - `app/api/florida-class-d/admin/acceptance/route.ts`
 - `app/florida-security-training/admin/acceptance/page.tsx`
+- `app/florida-security-training/admin/acceptance/AcceptanceConsole.tsx`
 - `scripts/florida-class-d-acceptance-gate.mjs`
 - `.github/workflows/florida-class-d-lms-gates.yml`
 - `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`
 - `docs/florida-class-d-lms/LATEST-HANDOFF.md`
 
-The protected acceptance API supports creating runs, recording domain evidence, listing run/check evidence, and finalizing an acceptance run through the fail-closed database function. The server-side acceptance service now requires explicit protected Supabase runtime configuration and no longer uses a hardcoded fallback project URL.
+The protected acceptance API supports creating runs, recording domain evidence, listing run/check evidence, and finalizing an acceptance run through the fail-closed database function. The server-side acceptance service requires explicit protected Supabase runtime configuration and no longer uses a hardcoded fallback project URL.
 
-The current acceptance page is a real staff-protected view over persisted acceptance records. It is not a mockup. The full interactive staff acceptance console remains incomplete. Database-level append-only enforcement for the Gate 23 acceptance event ledger also remains open. No production acceptance execution has occurred.
+The staff acceptance page now includes a real interactive console. Authorized staff can create a non-production acceptance run, select a run, record evidence and status for all 18 required domains, review current domain progress, and request finalization. The client prevents finalization until all 18 displayed domains are passed, and the database independently enforces the all-pass rule.
+
+A follow-on database migration now restricts the acceptance event ledger runtime role to read and append operations. Update, delete, and truncate privileges are revoked for the runtime service role while select and insert remain available. No production migration has been applied.
 
 ## Mandatory completion and certificate standard
 
@@ -87,23 +91,22 @@ The DS LMS submission guide must remain synchronized with implemented behavior a
 
 ## Current CI note
 
-The dedicated workflow targets **Gates 1-23 and website compatibility**. A full dedicated Florida Class D cycle completed successfully on commit `35a7f6ca704a44bc885d1534aa570eb541bc49d3`, including Gates 1-23 source verification, Gate 22 runtime-readiness verification, Gate 23 acceptance verification, repository contract tests, lint, and the production Next.js build.
+A full dedicated Florida Class D cycle completed successfully on commit `35a7f6ca704a44bc885d1534aa570eb541bc49d3`, including Gates 1-23 source verification, Gate 22 runtime-readiness verification, Gate 23 acceptance verification, repository contract tests, lint, and the production Next.js build. The synchronized documentation head also completed successfully on `a2ee8477cd8caf2739fff9ca647ad79648008db9`.
 
-Later audit-documentation commits do not change the regulated runtime behavior. A fresh CI cycle is still required after the remaining append-only audit enforcement and interactive acceptance console are implemented.
+The current hardened source includes the interactive acceptance console and runtime-role acceptance-event mutation restrictions. A fresh current-head Gates 1-23 cycle is required before those new controls are marked accepted.
 
 CI success is source/build evidence only. It is not regulatory approval, database promotion, runtime activation, or launch authorization.
 
 ## Next controlled sequence
 
-1. Implement database-level append-only enforcement for the Gate 23 acceptance event ledger.
-2. Complete the controlled interactive staff acceptance workflow for all 18 domains against the existing protected API.
-3. Strengthen Gate 23 source verification to require the protected API, explicit runtime Supabase configuration, append-only event enforcement, and the interactive staff workflow.
-4. Synchronize `HANDOFF.md`, `LATEST-HANDOFF.md`, the Gate 23 handoff, and DS submission/audit guide controls in the same increment.
-5. Run the full Gates 1-23 source, repository-test, lint, and production-build cycle after those changes.
-6. Execute real non-production acceptance using synthetic identities only after the applicable non-production database/runtime environment is configured.
-7. Finalize the Division-approved examination-bank boundary before production examination activation.
-8. Revise the Class DS LMS submission-guide DOCX/PDF with screenshots from implemented screens.
-9. Keep payment/enrollment and all regulated production functions disabled until applicable authorization and production gates pass.
+1. Complete the current-head Gates 1-23 source, repository-test, lint, and production-build cycle for the interactive console and event-ledger permission changes.
+2. Strengthen the Gate 23 source verifier to explicitly require the protected API, explicit runtime configuration, interactive staff evidence workflow, and event-ledger mutation restrictions.
+3. Synchronize all Gate 23 and DS submission/audit documentation to the final green current head.
+4. Execute real non-production acceptance using synthetic identities only after the applicable non-production database/runtime environment is configured.
+5. Implement and validate remaining online text-screen timing enforcement before launch.
+6. Finalize the Division-approved examination-bank boundary before production examination activation.
+7. Revise the Class DS LMS submission-guide DOCX/PDF with screenshots from implemented screens.
+8. Keep payment/enrollment and all regulated production functions disabled until applicable authorization and production gates pass.
 
 ## Public repository security boundary
 
@@ -111,4 +114,4 @@ Never commit real learner PII, identity documents, protected examination questio
 
 ## Restart instruction
 
-Read `docs/florida-class-d-lms/LATEST-HANDOFF.md`, `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`, and this handoff before continuing. Gates 1-22 are green in source/build validation, and Gate 23 has a full green source/build baseline on commit `35a7f6ca704a44bc885d1534aa570eb541bc49d3`. Resume by implementing append-only acceptance audit hardening and the real interactive acceptance console, then re-run full CI. Do not treat 40 hours alone as successful completion, do not generate a completion certificate before a passing exam and authorized completion review, do not synthesize FDACS-16103, and do not activate regulated production functions until the applicable authorization and production gates pass.
+Read `docs/florida-class-d-lms/LATEST-HANDOFF.md`, `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`, and this handoff before continuing. Gate 23 has a full green baseline, and the interactive console plus runtime-role append-only hardening are now implemented in source and under current-head CI validation. Resume from that CI result, strengthen the Gate 23 verifier, synchronize the final green audit record, then execute only controlled non-production acceptance with synthetic identities. Do not treat 40 hours alone as successful completion, do not generate a completion certificate before a passing exam and authorized completion review, do not synthesize FDACS-16103, and do not activate regulated production functions until the applicable authorization and production gates pass.
