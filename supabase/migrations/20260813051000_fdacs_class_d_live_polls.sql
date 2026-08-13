@@ -70,7 +70,12 @@ begin
   if p_options is null or jsonb_typeof(p_options) <> 'array' or jsonb_array_length(p_options) not between 2 and 6 then
     raise exception 'poll must contain between two and six options';
   end if;
-  if exists (select 1 from jsonb_array_elements(p_options) value where jsonb_typeof(value) <> 'string' or char_length(trim(value #>> '{}')) not between 1 and 500) then
+  if exists (
+    select 1
+    from jsonb_array_elements(p_options) as opt(value)
+    where jsonb_typeof(opt.value) <> 'string'
+       or char_length(trim(opt.value #>> '{}')) not between 1 and 500
+  ) then
     raise exception 'poll options must be non-empty strings of no more than 500 characters';
   end if;
   if p_correct_option_index is not null and (p_correct_option_index < 0 or p_correct_option_index >= jsonb_array_length(p_options)) then
