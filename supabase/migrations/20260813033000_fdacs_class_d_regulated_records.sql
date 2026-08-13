@@ -326,7 +326,7 @@ revoke all on table public.fdacs_class_d_audit_events from public, anon, authent
 revoke all on function public.fdacs_class_d_touch_updated_at() from public, anon, authenticated;
 revoke all on function public.fdacs_class_d_reject_audit_mutation() from public, anon, authenticated;
 revoke all on function public.fdacs_class_d_record_attendance(uuid,smallint,text,timestamptz,timestamptz,integer,text,text,text,uuid) from public, anon, authenticated;
-revoke all on function public.fdacs_class_d_record_instruction_time(uuid,smallint,timestamptz,timestamptz,integer,text,text,text,uuid) from public, anon, authenticated;
+revoke all on function public.fdacs_class_d_record_instruction_time(uuid,smallint,timestamptz,timestamptz,integer,text,text,text,text,uuid) from public, anon, authenticated;
 
 grant select, insert, update on table public.fdacs_class_d_cohorts to service_role;
 grant select, insert, update on table public.fdacs_class_d_student_identities to service_role;
@@ -339,7 +339,7 @@ grant select, insert, update on table public.fdacs_class_d_remediation_records t
 grant select, insert, update on table public.fdacs_class_d_record_holds to service_role;
 grant select, insert on table public.fdacs_class_d_audit_events to service_role;
 grant execute on function public.fdacs_class_d_record_attendance(uuid,smallint,text,timestamptz,timestamptz,integer,text,text,text,uuid) to service_role;
-grant execute on function public.fdacs_class_d_record_instruction_time(uuid,smallint,timestamptz,timestamptz,integer,text,text,text,uuid) to service_role;
+grant execute on function public.fdacs_class_d_record_instruction_time(uuid,smallint,timestamptz,timestamptz,integer,text,text,text,text,uuid) to service_role;
 
 comment on table public.fdacs_class_d_student_identities is 'Restricted Florida Class D regulated identity record. No identity-document binaries are stored here.';
 comment on table public.fdacs_class_d_audit_events is 'Append-only audit ledger for Florida Class D regulated training operations.';
