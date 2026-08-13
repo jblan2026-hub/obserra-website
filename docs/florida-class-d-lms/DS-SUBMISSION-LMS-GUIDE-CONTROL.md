@@ -23,7 +23,7 @@ Working artifact names:
 
 The generated binary artifacts are not committed to this public repository. Final submission copies must be handled as controlled regulatory records.
 
-**Required next controlled revision:** the DOCX/PDF submission package must be revised to incorporate the completion/certification standard and the additional completion, LIAS, student-document, certificate, inspection-packet, quality/CAPA, and retention screenshots described below before filing. The repository standard in `STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md` is authoritative for completion/certification wording.
+**Required next controlled revision:** the DOCX/PDF submission package must be revised before filing to incorporate the current completion/certification standard and the additional completion, LIAS, student-document, certificate, inspection-packet, quality/CAPA, and retention screenshots defined below. The repository standard in `STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md` is authoritative for completion/certification wording.
 
 ## Submission status
 
@@ -44,47 +44,15 @@ The submission guide, student materials, LMS notices, instructor materials, hand
 - The official **FDACS-16103 Certificate of Security Officer Training** is generated through LIAS after successful completion is reported. Obserra does not synthesize or self-generate the official state form.
 - Successful course completion and receipt of training documents do not themselves issue a Florida Class D license.
 
-The controlled supplemental certificate may contain the learner's verified legal name, course title, 40 instructional hours, final-examination score, completion date, and unique certificate/reference identifier. Sensitive identity evidence, raw identifiers, examination answers, and internal system identifiers must not be placed on a public-facing certificate unless a later regulatory requirement specifically requires them.
+The controlled supplemental certificate may contain the learner's verified legal name, course title, 40 instructional hours, final-examination score, completion date, and unique certificate/reference identifier. Sensitive identity evidence, raw identity-document data, examination answers, and secrets must not be placed on the student-facing certificate.
 
 ## Guide contents
 
-The controlled guide must cover:
+The controlled guide must cover the five-day/40-hour schedule, all 18 curriculum areas, live instructional methods, secure enrollment and identity verification, attendance/timekeeping, breaks, security challenges, text-screen timing, Q&A, learning checks, remediation, permitted make-up training, the separate final examination, successful-completion review, certificate issuance sequence, records/inspection readiness, FDACS/LIAS workflow, student application handoff, security/privacy, quality/CAPA, retention/legal-hold governance, change control, evidence screenshots, the online compliance matrix, submission checklist, pre-launch status, operating checklists, controlled records, and final submission update fields.
 
-1. Executive summary and regulated LMS architecture.
-2. Regulatory basis and DS submission scope.
-3. Five-day, 40-hour training schedule and 20 live-lesson structure.
-4. All 18 FDACS curriculum topic hours and embedded learning checks.
-5. Training methods and a representative 120-minute live-lesson method.
-6. Secure enrollment and identity verification.
-7. Live classroom, secure media, student interaction, and instructor controls.
-8. Attendance, timekeeping, and 15-minute break controls.
-9. Security challenges and active-participation controls.
-10. Text-screen timing, questions, and student/instructor interaction.
-11. Learning checks and remediation.
-12. Missed online instruction and controlled make-up training.
-13. Separate final certification examination and eligibility gate.
-14. **Successful-completion standard: 40 hours + 18 curriculum areas + passing 128/170 examination + issue clearance + authorized completion approval.**
-15. **Certificate issuance sequence and explicit prohibition on certificate release before a passing examination.**
-16. Supplemental Obserra completion-certificate presentation and official FDACS-16103 separation.
-17. Records, retention, inspection readiness, and completion-packet export.
-18. FDACS/LIAS post-course reporting and FDACS-16103 handling.
-19. Student Class D application-document handoff.
-20. Security and privacy architecture.
-21. Quality management, complaints/exceptions, CAPA, and verified closure.
-22. Regulatory-minimum versus operational retention periods, legal holds, and disposition governance.
-23. Change control.
-24. Portal evidence gallery.
-25. Online training compliance matrix.
-26. Submission packet checklist.
-27. Pre-submission and pre-launch status matrix.
-28. Reference list.
-29. Instructor operating checklist.
-30. Controlled record inventory.
-31. Final submission update fields.
+## Current portal screenshot inventory
 
-## Portal screenshot inventory
-
-The current 0.9 guide embeds nine controlled development screenshots. All screenshots use demonstration data and are labeled as submission/development previews rather than production evidence:
+The current 0.9 guide embeds nine controlled development screenshots using demonstration data:
 
 1. Public Florida Security Training portal showing Coming Soon state and locked enrollment.
 2. Student live classroom showing instructor media, independent time ledger, presence status, and Q&A.
@@ -96,78 +64,39 @@ The current 0.9 guide embeds nine controlled development screenshots. All screen
 8. Inspection/audit center for immediate production of regulated training records.
 9. Controlled final-examination eligibility gate.
 
-### Required screenshots for the next submission-guide revision
+## Required screenshots for the next submission-guide revision
 
-The next controlled DOCX/PDF revision must add screenshots that show the complete post-instruction and school-operations workflow:
+The next controlled DOCX/PDF revision must add screenshots showing the complete post-instruction and school-operations workflow:
 
-10. **Completion Review Console:** 2,400 verified minutes, five qualifying 480-minute days, 18 curriculum areas/learning checks, passing examination evidence, unresolved-issue checks, and authorized completion approval.
-11. **Passing Examination / Completion Boundary:** visual evidence that a learner at 40 instructional hours receives no certificate until the 170-question examination is passed at 128/170 or better.
+10. **Completion Review Console:** 2,400 verified minutes, five qualifying 480-minute days, all 18 curriculum areas/learning checks, passing examination evidence, unresolved-issue checks, and authorized completion approval.
+11. **Passing Examination / Completion Boundary:** the **no-certificate-before-pass boundary**, visually showing that a learner at 40 instructional hours receives no certificate until the 170-question examination is passed at 128/170 or better.
 12. **FDACS / LIAS Completion Workflow:** prepared, submitted, confirmed, exception handling, reporting due date, and the manual/no-scraping control boundary.
-13. **Student Completion Documents Portal:** official FDACS-16103, supplemental Obserra certificate, application instructions, and the explicit distinction between successful training completion and state licensure.
+13. **Student Completion Documents Portal:** official FDACS-16103, supplemental Obserra certificate, application instructions, and the distinction between successful training completion and state licensure.
 14. **Supplemental Obserra Course Completion Certificate:** learner-specific certificate rendered only after successful completion, showing demonstration legal name, course title, 40 instructional hours, exam score, completion date, unique certificate ID, and the supplemental/not-a-license disclaimer.
-15. **Completion & Inspection Packets:** protected staff view showing printable and JSON packet export, with attendance, instructional time, exam result history, completion, LIAS, completion-document metadata, and audit evidence while excluding exam questions/answers and raw identity documents.
-16. **Quality, CAPA & Record Retention:** protected staff view showing a demonstration quality/exception case, severity and workflow state, corrective-action/verification controls, the separate two-year regulatory minimum and three-year operational retention dates, next-review date, and legal-hold status. The screenshot must make clear that actual record destruction is not automated.
+15. **Completion & Inspection Packets:** protected staff view showing printable and JSON packet export, with attendance, instructional time, exam-result history, completion, LIAS, completion-document metadata, and audit evidence while excluding exam questions/answers and raw identity documents.
+16. **Quality, CAPA & Record Retention:** protected staff view showing a demonstration quality/exception case, severity/workflow state, corrective-action and verification controls, the separate two-year regulatory minimum and three-year operational retention dates, next-review date, and legal-hold status. The screenshot must make clear that actual record destruction is not automated.
 
-These screenshots must use demonstration data only. Final production screenshots must replace development previews before the guide is used as operational evidence after applicable authorization and production validation.
+All screenshots must use demonstration data only. Final production screenshots must replace development previews before the guide is represented as final operational evidence.
 
 ## Quality, CAPA, and retention controls documented
 
-The controlled guide must explain that school quality and records operations are not treated as informal notes. The LMS architecture supports controlled incident/complaint/exception/quality cases; severity; investigation; root cause; corrective and preventive action; verification; closure; append-only case-event history; audit evidence; and protected school/compliance administration.
+The controlled guide must explain that school quality and records operations are controlled records rather than informal notes. The LMS architecture supports incident, complaint, exception, security-event, and quality cases; severity; investigation; root cause; corrective and preventive action; verification; closure; append-only case-event history; audit evidence; and protected school/compliance administration.
 
 Retention documentation must keep the applicable regulatory minimum distinct from the school's longer operational retention policy. The current design records a two-year regulatory minimum and a separate three-year operational target. Legal holds prevent disposition eligibility. Actual disposition/destruction is not automated by the LMS and remains a separately authorized human action after applicable requirements and preservation obligations are satisfied.
 
-## Regulatory control points documented
+## Regulatory and workflow control points documented
 
-The guide maps the proposed platform to the current online Class D requirements and school controls, including:
-
-- live simultaneous instruction by a licensed Class DI instructor;
-- Florida physical training location;
-- investigator access to live courses when required;
-- secure website transport;
-- identity verification using state or federal photo identification;
-- daily digital attendance evidence;
-- single-device student login control;
-- security challenges at least every two hours with five-minute retry handling;
-- required timing for text instructional screens and instructor discussion;
-- student ability to submit questions to a Class DI instructor;
-- controlled recorded make-up instruction within the applicable limit;
-- randomized online examination questions;
-- completion verification before reporting;
-- separate 40 instructional hours and final examination time;
-- no certificate issuance based solely on reaching 40 instructional hours;
-- final examination pass at 128/170 before successful completion/certificate release;
-- authorized completion review before post-course documents are released;
-- supplemental Obserra certificate generated only from the controlled successful-completion record;
-- LIAS reporting and FDACS-16103 generation workflow;
-- protected learner-specific completion-document delivery;
-- protected staff-only completion/inspection packet with controlled sensitive-data exclusions;
-- quality/exception/CAPA case management with auditable verification and closure;
-- separate regulatory-minimum and operational-retention dates;
-- legal-hold preservation and human-controlled disposition;
-- controlled school records and inspection readiness.
+The guide must document live simultaneous DI instruction, Florida physical training location, investigator live access when required, secure website transport, photo-ID identity verification, daily digital attendance, single-device control, recurring security challenges with retry handling, text-screen timing and instructor discussion, learner-to-DI questions, controlled recorded make-up instruction, randomized online examination questions, completion verification before reporting, separate 40 instructional hours and examination time, the no-certificate-before-pass rule, authorized completion review, supplemental-certificate controls, manual LIAS reporting, official FDACS-16103 handling, protected learner document delivery, completion/inspection packets, quality/CAPA, retention/legal holds, and inspection readiness.
 
 ## Student-material publication rule
 
-The completion/certification standard must be carried into every student-facing artifact. At minimum it must appear in:
+The completion/certification standard must appear in enrollment acknowledgments, the student handbook and syllabus, LMS orientation, Day 1 introduction, attendance/timekeeping explanation, final-examination instructions, remediation/retest instructions, course-status/completion screen, completion-document portal, Class D application instructions, FAQs/support scripts, and the instructor completion checklist.
 
-- enrollment acknowledgments;
-- student handbook and syllabus;
-- LMS orientation/onboarding;
-- Day 1 course introduction;
-- attendance/timekeeping explanation;
-- final-examination instructions;
-- remediation/retest instructions;
-- course status/completion screen;
-- completion-document portal;
-- Class D application instructions;
-- FAQs and support scripts;
-- instructor guide and completion checklist.
-
-No student material may state or imply that the certificate is automatically earned at the moment the 40th instructional hour is recorded.
+No student material may state or imply that a certificate is automatically earned when the 40th instructional hour is recorded.
 
 ## Suggested packet position
 
-Recommended organization for the DS application package:
+Recommended DS application package organization:
 
 1. FDACS-16003 application and required fees.
 2. Required Class D training curriculum.
@@ -177,4 +106,4 @@ Recommended organization for the DS application package:
 
 ## Production evidence rule
 
-Source/build validation and development screenshots do not constitute regulatory approval or production acceptance. Before the guide is converted from submission draft to final operational evidence, the school must capture final production screenshots after the applicable regulatory authorization, database promotion, media-provider configuration, identity/enrollment workflow, attendance/time controls, examination engine, completion review, certificate/document workflow, completion-packet/inspection center, quality/CAPA and retention operations, and LIAS operating procedures have been validated.
+Source/build validation and development screenshots do not constitute regulatory approval or production acceptance. Before the guide is converted from submission draft to final operational evidence, the school must capture final production screenshots after applicable regulatory authorization, database promotion, media-provider configuration, identity/enrollment workflow, attendance/time controls, examination engine, completion review, certificate/document workflow, completion-packet/inspection center, quality/CAPA and retention operations, and LIAS procedures have been validated.
