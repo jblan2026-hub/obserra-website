@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import InstructionalTextScreen from "./InstructionalTextScreen";
 
 type Interaction = {
   id?: string;
@@ -40,6 +41,15 @@ type ActivePollResponse = {
   submittedAt?: string | null;
 };
 
+type ActiveTextScreen = {
+  id?: string;
+  title?: string;
+  body?: string;
+  word_count?: number;
+  minimum_seconds?: number;
+  opened_at?: string;
+};
+
 type LiveState = {
   session?: {
     id?: string;
@@ -67,6 +77,7 @@ type LiveState = {
   interactions?: Interaction[];
   activePoll?: ActivePoll | null;
   activePollResponse?: ActivePollResponse | null;
+  activeTextScreen?: ActiveTextScreen | null;
 };
 
 function seconds(value: unknown) {
@@ -310,6 +321,8 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
             )}
           </div>
           <p className="fdacs-live__fineprint">Video and audio are delivered through a short-lived, room-bound secure media token. Obserra attendance and instructional-time evidence remain independent from the media provider. Recording is disabled by default.</p>
+
+          <InstructionalTextScreen screen={state?.activeTextScreen} deviceLeaseId={deviceLeaseId} />
 
           <h3 className="fdacs-live__time-title">Current live lesson</h3>
           <div className="fdacs-live__timecards">
