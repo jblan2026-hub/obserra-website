@@ -45,6 +45,7 @@ requireText(route, "lessonCount: lessons.length", "The scheduling API must retur
 requireText(ui, "Publish 5-day / 20-lesson schedule", "The admin UI must clearly identify the complete schedule publishing action.");
 requireText(ui, "(lesson - 1) * 135", "The admin preview must mirror the 15-minute between-lesson schedule." );
 requireText(ui, "8h instruction + 45m breaks", "The admin preview must distinguish instruction from tracked breaks." );
-requireText(handoff, "## Gate 8 — Five-Day Cohort Scheduling and 20 Live Sessions", "The handoff must record Gate 8 scheduling controls.");
+requireText(handoff, "exact five-day/20-session scheduling", "The handoff must preserve the Gate 8 five-day/20-session scheduling scope.");
+requireText(handoff, "### Gates 5-8", "The consolidated handoff must retain the historical Gate 5-8 implementation section.");
 
 console.log("Florida Class D Gate 8 passed: cohort scheduling requires five ordered dates and generates exactly 20 timezone-aware two-hour live lessons with controlled breaks.");
