@@ -6,7 +6,7 @@ This handoff governs the regulated Florida Class D school and LMS workstream for
 
 It is separate from the commercial Obserra Academy Course 1 through Course N / LearnWorlds course-production handoffs.
 
-This revision supersedes the earlier Gate 5 statement that live video/audio was only a placeholder. Detailed prior state remains preserved in Git history.
+This revision supersedes earlier Gate 5/6 statements where applicable. Detailed prior state remains preserved in Git history.
 
 ## Current branch and pull request
 
@@ -80,6 +80,8 @@ Controls include:
 - fail-closed examination eligibility.
 
 Examination eligibility remains blocked unless identity is verified, at least 2,400 instructional minutes are credited, all 18 areas are complete, and required remediation is closed.
+
+The Gate 2 source check was updated after a CI false-negative caused by stale handoff heading text. The handoff itself remained separate throughout; the automated check now validates this authoritative handoff title and its explicit separation from the commercial Academy workstream.
 
 Primary gate: `scripts/florida-class-d-records-gate.mjs`
 
@@ -162,7 +164,7 @@ Primary gate: `scripts/florida-class-d-live-gate.mjs`
 
 ## Gate 6 — Secure Embedded Live Video and Audio
 
-Status: **IMPLEMENTED IN SOURCE / CURRENT CI VALIDATION PENDING**
+Status: **IMPLEMENTED IN SOURCE / SOURCE VALIDATION WIRED / PRODUCTION ACCEPTANCE PENDING**
 
 Provider architecture: Daily Prebuilt embedded through server-brokered private-room access.
 
@@ -183,26 +185,18 @@ Gate 6 controls include:
 - provider selection locked to `daily` for this implementation;
 - media cannot activate unless the underlying regulated Class D live-instruction gate is active;
 - private Daily room per regulated live-session ID;
-- Daily room names derived from UUID-based live-session identity;
 - expiring rooms;
-- unique Daily participant user IDs enforced;
-- provider-native chat disabled so the Obserra Q&A record remains authoritative;
-- provider-native hand raise disabled so the Obserra participation record remains authoritative;
-- Daily prejoin camera/microphone/browser check enabled;
-- short-lived room-scoped meeting tokens;
-- ejection at token expiration;
-- learner Daily user ID bound to the regulated enrollment UUID;
-- learner is non-owner and cannot screen share;
-- learner can send camera and microphone media;
-- instructor receives separate owner privileges and screen-share capability;
-- recording UI disabled by default;
-- no automatic recording;
-- student and instructor video embedded directly inside the Obserra live classroom and instructor console;
-- regulated live student join now fails closed unless secure media is enabled;
-- instructor Start Live Lesson remains disabled until secure media is successfully provisioned;
-- Obserra remains the system of record for attendance and instructional-time evidence rather than relying on the video provider's attendance report.
-
-Gate 6 uses Daily only as the encrypted real-time transport layer. Student identity, attendance, time credit, security challenges, breaks, Q&A, remediation, and daily certification remain controlled by the Obserra LMS.
+- unique participant user IDs;
+- provider-native chat and hand raise disabled so Obserra remains the authoritative interaction record;
+- prejoin camera/microphone/browser check for instructors and students;
+- short-lived room-scoped meeting tokens with ejection at expiration;
+- learner media identity bound to regulated enrollment UUID;
+- learner cannot screen share or administer the room;
+- instructor receives owner privileges and screen-share capability;
+- recording disabled by default;
+- student and instructor video embedded directly inside Obserra;
+- regulated student join and instructor start controls fail closed unless media is provisioned;
+- Obserra remains the system of record for attendance and instructional-time evidence.
 
 ### Runtime configuration required later
 
@@ -212,42 +206,88 @@ Do not place these values in Git:
 - `OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER=daily`
 - `OBSERRA_FDACS_DAILY_API_KEY=<secret>`
 
-The media gate must remain disabled in production while the DS license is pending and until the production acceptance gate is completed.
+The media gate must remain disabled in production while the DS license is pending and until production acceptance is completed.
 
 Primary gate: `scripts/florida-class-d-media-gate.mjs`
+
+## Gate 7 — Temporary Regulatory Observer Access
+
+Status: **IMPLEMENTED IN SOURCE / DEDICATED CI WIRED / PRODUCTION PROMOTION PENDING**
+
+Purpose: provide a controlled way for an authorized regulator or other specifically approved observer to view a live Class D instructional session without receiving student-record, examination, credential, or administrative privileges.
+
+Primary artifacts:
+
+- `supabase/migrations/20260813045000_fdacs_class_d_observer_access.sql`
+- `lib/florida-class-d-observer.ts`
+- observer support in `lib/florida-class-d-media.ts`
+- `app/api/florida-class-d/admin/observer/route.ts`
+- `app/api/florida-class-d/observer/media/route.ts`
+- `app/florida-security-training/admin/observer/[liveSessionId]/ObserverGrantManager.tsx`
+- `app/florida-security-training/observer/ObserverClassroom.tsx`
+- `scripts/florida-class-d-observer-gate.mjs`.
+
+Gate 7 controls include:
+
+- only school-admin or compliance-admin roles may create or revoke observer grants;
+- each grant is bound to one regulated live-session UUID;
+- grant duration is bounded to 15 through 240 minutes;
+- grant secrets use cryptographically secure random material;
+- plaintext grant secrets are not stored in the regulated database;
+- only a SHA-256 token digest is persisted;
+- access can be revoked before expiration;
+- observer access and revocation are audited;
+- observer links carry the secret in a URL fragment so it is not sent as part of the initial HTTP request path;
+- the observer browser removes the fragment after reading it;
+- grant exchange is server-side and returns a separate short-lived media token;
+- observer media is view-only: no camera transmission, microphone transmission, screen sharing, room administration, provider chat, hand raise, or recording UI;
+- the observer surface does not expose student identity records, attendance ledgers, exam content, answer keys, instructor credentials, school secrets, or administrative controls;
+- the observer path remains dependent on the same fail-closed Class D live-media gate and therefore cannot activate while the regulated training environment remains disabled.
+
+This mechanism is an inspection-readiness control. It does not itself assert that FDACS requires a particular proprietary observer technology or that source implementation equals agency acceptance.
+
+Primary gate: `scripts/florida-class-d-observer-gate.mjs`
+
+## Class DS LMS submission guide control
+
+A separate controlled submission-guide record is maintained at:
+
+`docs/florida-class-d-lms/DS-SUBMISSION-LMS-GUIDE-CONTROL.md`
+
+That record governs the current submission-draft LMS guide and portal-screenshot exhibit package. Final filing must use the actual filed school information and controlled production screenshots where appropriate.
 
 ## Dedicated CI
 
 Workflow: `.github/workflows/florida-class-d-lms-gates.yml`
 
-The workflow now targets Gates 1 through 6 and runs:
+The workflow now targets Gates 1 through 7 and runs:
 
 - Florida regulated source verification;
 - repository contract tests;
 - lint;
 - production Next.js build.
 
-`npm run verify:florida-class-d` includes foundation, records, persistence, live-classroom, and secure-media source gates.
+`npm run verify:florida-class-d` includes foundation, records, persistence, live-classroom, secure-media, and observer-access source gates.
 
 CI success establishes source/build quality only. It does not establish regulatory approval, production database promotion, live-provider acceptance, or public launch authorization.
 
 ## Next controlled sequence
 
-1. Validate Gate 6 dedicated CI and fix any build or type failures.
-2. Add a controlled FDACS investigator live-access role and temporary access workflow without exposing student or school secrets.
-3. Add cohort scheduling and automatic creation of all 20 live lesson sessions.
-4. Add structured instructor polls, learner responses, and participation analytics.
-5. Add make-up-session workflow and time reconciliation.
-6. Add lesson-screen timing enforcement for text-based instructional screens where applicable.
-7. Add formal live-class end-of-session evidence reconciliation between Obserra presence records and media-provider session evidence as secondary corroboration only.
-8. Complete examination-engine gate and protected exam-content boundary.
-9. Complete completion, retest, LIAS queue, inspection center, certificate/document, and quality-management gates.
-10. Promote regulated migrations through a controlled database-change gate with rollback and verification evidence.
+1. Validate Gate 7 dedicated CI and correct any source, type, lint, or build failure before advancing.
+2. Add cohort scheduling and automatic creation of all 20 live lesson sessions.
+3. Add structured instructor polls, learner responses, and participation analytics.
+4. Add make-up-session workflow and time reconciliation.
+5. Add lesson-screen timing enforcement for any text-based instructional screens where applicable.
+6. Add formal end-of-session evidence reconciliation between Obserra presence records and media-provider session evidence as secondary corroboration only.
+7. Complete examination-engine gate and protected exam-content boundary.
+8. Complete completion, retest, LIAS queue, inspection center, certificate/document, and quality-management gates.
+9. Promote regulated migrations through a controlled database-change gate with rollback and verification evidence.
+10. Replace submission-draft portal screenshots with final controlled production captures before final filing or agency demonstration where appropriate.
 11. Keep public payment, enrollment, regulated access, examination access, completion issuance, and LIAS execution disabled until every applicable regulatory and production gate is satisfied.
 
 ## Future Florida investigative-training workstream
 
-A separate future workstream has been recorded at:
+A separate future workstream is recorded at:
 
 `docs/florida-investigative-training/FUTURE-SITE-LMS-HANDOFF.md`
 
@@ -262,6 +302,7 @@ Never commit:
 - real student names, dates of birth, IDs, addresses, phone numbers, payment information, or identity documents;
 - protected examination questions, answer keys, or exam pools;
 - FDACS/LIAS credentials, screenshots containing authenticated data, tokens, or session information;
+- observer access tokens or observer links generated for real inspections;
 - Daily API keys or meeting tokens;
 - Supabase service-role keys;
 - private instructor credential evidence;
@@ -270,6 +311,6 @@ Never commit:
 
 ## Release discipline
 
-Do not enable public checkout, enrollment, live regulated instruction, examination access, completion issuance, or LIAS execution merely because source or CI passes.
+Do not enable public checkout, enrollment, live regulated instruction, examination access, completion issuance, LIAS execution, or external observer access merely because source or CI passes.
 
 Each capability requires its own validated production gate and applicable regulatory authorization.
