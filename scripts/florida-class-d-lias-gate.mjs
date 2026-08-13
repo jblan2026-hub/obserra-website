@@ -24,8 +24,8 @@ assert(migration.includes("fdacs_class_d_mark_lias_submitted") && migration.incl
 assert(migration.includes("fdacs_class_d_lias_workflow_events") && migration.includes("append-only"), "LIAS workflow history must be durable and append-only");
 assert(hardening.includes("alter column reporting_due_on set default") && hardening.includes("prepared_event"), "future completion queue rows must receive a due date and prepared event automatically");
 assert(documentMigration.includes("fdacs_16103") && documentMigration.includes("source_system"), "completion documents must distinguish the official LIAS-generated FDACS-16103");
-assert(hardening.includes("FDACS-16103 must originate from LIAS") && hardening.includes("status <> 'confirmed'") === false, "official certificate registration must be restricted to confirmed LIAS output");
-assert(hardening.includes("v_queue.status <> 'confirmed'"), "FDACS-16103 delivery must fail closed until LIAS confirmation exists");
+assert(hardening.includes("FDACS-16103 must originate from LIAS") && hardening.includes("v_queue.status <> 'confirmed'"), "official certificate registration must be restricted to confirmed LIAS output");
+assert(hardening.includes("certificate_reference is distinct from trim(p_external_reference)"), "FDACS-16103 reference must match the confirmed LIAS certificate reference");
 assert(documentService.includes('officialCertificateMayBeGeneratedByObserra: false'), "Obserra must never synthesize the official FDACS-16103");
 assert(documentService.includes("createHash(\"sha256\")") && documentService.includes("integrity validation failed"), "stored official certificate downloads must be integrity checked");
 assert(documentService.includes("MAX_PDF_BYTES") && documentService.includes('"%PDF-"'), "official certificate uploads must be bounded PDF files");
