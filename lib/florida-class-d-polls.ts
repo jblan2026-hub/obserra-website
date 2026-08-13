@@ -13,6 +13,7 @@ export type FloridaClassDLivePoll = {
   opened_at?: string;
   closed_at?: string | null;
   correct_option_index?: number | null;
+  response_count?: number;
 };
 
 export type FloridaClassDStudentPollState = {
@@ -179,13 +180,27 @@ export async function getFloridaClassDStudentPollState(userId: string, liveSessi
 
 export async function getFloridaClassDInstructorPolls(liveSessionId: string) {
   requireUuid(liveSessionId, "live session id");
-  const query = new URLSearchParams({
+  const pollQuery = new URLSearchParams({
     select: "id,question,options,status,opened_at,closed_at,correct_option_index",
     live_session_id: `eq.${liveSessionId}`,
     order: "opened_at.desc",
     limit: "100",
   });
-  return request<FloridaClassDLivePoll[]>(`fdacs_class_d_live_polls?${query}`);
+  const responseQuery = new URLSearchParams({
+    select: "poll_id",
+    live_session_id: `eq.${liveSessionId}`,
+    limit: "5000",
+  });
+  const [polls, responses] = await Promise.all([
+    request<FloridaClassDLivePoll[]>(`fdacs_class_d_live_polls?${pollQuery}`),
+    request<Array<{ poll_id?: string }>>(`fdacs_class_d_live_poll_responses?${responseQuery}`),
+  ]);
+  const responseCounts = new Map<string, number>();
+  for (const response of responses) {
+    if (!response.poll_id) continue;
+    responseCounts.set(response.poll_id, (responseCounts.get(response.poll_id) ?? 0) + 1);
+  }
+  return polls.map((poll) => ({ ...poll, response_count: poll.id ? responseCounts.get(poll.id) ?? 0 : 0 }));
 }
 
 export async function openFloridaClassDLivePoll(actor: StaffActor, input: {
