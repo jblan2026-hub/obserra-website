@@ -64,7 +64,7 @@ The current 0.9 guide embeds nine controlled development screenshots using demon
 8. Inspection/audit center for immediate production of regulated training records.
 9. Controlled final-examination eligibility gate.
 
-## Required screenshots and evidence for the next submission-guide revision
+## Required screenshots for the next submission-guide revision
 
 The next controlled DOCX/PDF revision must add implemented evidence showing the complete post-instruction, school-operations, readiness, acceptance, text-screen, and runtime-isolation workflow:
 
