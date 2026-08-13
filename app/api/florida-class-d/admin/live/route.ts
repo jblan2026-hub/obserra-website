@@ -24,6 +24,13 @@ import {
   getFloridaClassDInstructorLicenseNumber,
   getFloridaClassDSchoolLicenseNumber,
 } from "../../../../../lib/florida-class-d-live-policy";
+import {
+  closeFloridaClassDLivePoll,
+  FloridaClassDPollError,
+  getFloridaClassDInstructorPolls,
+  getFloridaClassDParticipationAnalytics,
+  openFloridaClassDLivePoll,
+} from "../../../../../lib/florida-class-d-polls";
 
 const headers = {
   "cache-control": "private, no-store, max-age=0, must-revalidate",
@@ -49,6 +56,10 @@ type Body = {
   reviewNote?: unknown;
   attendanceStatus?: unknown;
   idempotencyKey?: unknown;
+  pollId?: unknown;
+  question?: unknown;
+  options?: unknown;
+  correctOptionIndex?: unknown;
   correlationId?: unknown;
 };
 
@@ -60,7 +71,11 @@ function disabled() {
 }
 
 function errorResponse(error: unknown) {
-  if (error instanceof FloridaClassDAuthorizationError || error instanceof FloridaClassDLivePersistenceError) {
+  if (
+    error instanceof FloridaClassDAuthorizationError ||
+    error instanceof FloridaClassDLivePersistenceError ||
+    error instanceof FloridaClassDPollError
+  ) {
     return NextResponse.json(
       { error: error.message, code: "code" in error ? error.code : "FDACS_LIVE_AUTHORIZATION_FAILED" },
       { status: error.status, headers },
@@ -81,9 +96,11 @@ export async function GET(request: Request) {
     if (!liveSessionId) {
       return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
     }
-    const [roster, interactions] = await Promise.all([
+    const [roster, interactions, polls, participationMap] = await Promise.all([
       getFloridaClassDLiveRoster(liveSessionId),
       listFloridaClassDLiveInteractions(liveSessionId),
+      getFloridaClassDInstructorPolls(liveSessionId),
+      getFloridaClassDParticipationAnalytics(liveSessionId),
     ]);
     const day = typeof roster.session.day === "number" ? roster.session.day : 1;
     const enrollmentIds = roster.students
@@ -102,9 +119,10 @@ export async function GET(request: Request) {
         liveTime: student.liveTime,
         dayTime: ledger?.dayTime ?? null,
         courseTime: ledger?.courseTime ?? null,
+        participation: participationMap.get(enrollmentId) ?? null,
       };
     });
-    return NextResponse.json({ ...roster, students, interactions }, { headers });
+    return NextResponse.json({ ...roster, students, interactions, polls }, { headers });
   } catch (error) {
     return errorResponse(error);
   }
@@ -219,7 +237,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ result, correlationId }, { status: 201, headers });
     }
 
-    if (["answer", "prompt", "poll"].includes(body.action)) {
+    if (body.action === "poll_create") {
+      if (
+        typeof body.liveSessionId !== "string" ||
+        typeof body.question !== "string" ||
+        !Array.isArray(body.options) ||
+        !body.options.every((option) => typeof option === "string") ||
+        (body.correctOptionIndex !== undefined && body.correctOptionIndex !== null && !Number.isInteger(body.correctOptionIndex))
+      ) {
+        return NextResponse.json({ error: "Structured poll fields are incomplete.", code: "FDACS_POLL_CREATE_INVALID_REQUEST" }, { status: 400, headers });
+      }
+      const pollId = await openFloridaClassDLivePoll(actor, {
+        liveSessionId: body.liveSessionId,
+        question: body.question,
+        options: body.options as string[],
+        correctOptionIndex: typeof body.correctOptionIndex === "number" ? body.correctOptionIndex : null,
+        correlationId,
+      });
+      return NextResponse.json({ pollId, correlationId, opened: true }, { status: 201, headers });
+    }
+
+    if (body.action === "poll_close") {
+      if (typeof body.pollId !== "string") {
+        return NextResponse.json({ error: "Poll id is required.", code: "FDACS_POLL_CLOSE_INVALID_REQUEST" }, { status: 400, headers });
+      }
+      await closeFloridaClassDLivePoll(actor, { pollId: body.pollId, correlationId });
+      return NextResponse.json({ pollId: body.pollId, correlationId, closed: true }, { headers });
+    }
+
+    if (["answer", "prompt"].includes(body.action)) {
       if (typeof body.liveSessionId !== "string") return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
       const interactionType = body.action === "answer" ? "instructor_answer" : "instructor_prompt";
       const interaction = await postFloridaClassDLiveInteraction({
