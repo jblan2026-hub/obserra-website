@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireFloridaClassDStaff } from "../../../../../../lib/florida-class-d-auth";
+import { requireFloridaClassDStaff } from "../../../../../lib/florida-class-d-auth";
 import {
   getFloridaClassDCompletionPacket,
   renderFloridaClassDCompletionPacketHtml,
-} from "../../../../../../lib/florida-class-d-completion-packet";
-import { FloridaClassDExamError } from "../../../../../../lib/florida-class-d-exam";
+} from "../../../../../lib/florida-class-d-completion-packet";
+import { FloridaClassDExamError } from "../../../../../lib/florida-class-d-exam";
 
 export const dynamic = "force-dynamic";
 
