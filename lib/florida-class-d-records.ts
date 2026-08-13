@@ -19,6 +19,15 @@ export type FloridaClassDEnrollmentStatus =
 export type FloridaClassDAttendanceStatus = "present" | "partial" | "absent" | "makeup_required" | "made_up";
 export type FloridaClassDModuleStatus = "locked" | "available" | "in_progress" | "remediation_required" | "complete";
 export type FloridaClassDIdentityStatus = "unverified" | "pending" | "verified" | "rejected";
+export type FloridaClassDLiveSessionStatus = "scheduled" | "live" | "break" | "ended" | "cancelled";
+export type FloridaClassDLiveSegmentType = "instruction" | "break";
+export type FloridaClassDInteractionType =
+  | "student_question"
+  | "instructor_answer"
+  | "instructor_prompt"
+  | "student_response"
+  | "hand_raise"
+  | "poll_response";
 
 export type FloridaClassDStudentIdentity = {
   studentId: string;
@@ -70,6 +79,64 @@ export type FloridaClassDInstructionTimeEntry = {
   source: "lms_session" | "instructor_attested_makeup";
 };
 
+export type FloridaClassDLiveSession = {
+  liveSessionId: string;
+  cohortId: string;
+  day: 1 | 2 | 3 | 4 | 5;
+  lessonId: string;
+  instructorClerkUserId: string;
+  instructorLicenseNumber: string;
+  status: FloridaClassDLiveSessionStatus;
+  segmentType: FloridaClassDLiveSegmentType;
+  startedAt?: string;
+  endedAt?: string;
+};
+
+export type FloridaClassDDeviceLease = {
+  leaseId: string;
+  enrollmentId: string;
+  liveSessionId: string;
+  clerkSessionId: string;
+  browserInstanceId: string;
+  acquiredAt: string;
+  lastHeartbeatAt: string;
+  releasedAt?: string;
+};
+
+export type FloridaClassDPresenceChallenge = {
+  challengeId: string;
+  liveSessionId: string;
+  enrollmentId: string;
+  challengeType: "presence_code" | "lesson_check" | "instructor_prompt";
+  issuedAt: string;
+  expiresAt: string;
+  retryExpiresAt?: string;
+  status: "pending" | "passed" | "retry_required" | "failed";
+  attemptCount: number;
+};
+
+export type FloridaClassDLiveTimeTotal = {
+  enrollmentId: string;
+  day: 1 | 2 | 3 | 4 | 5;
+  connectedSeconds: number;
+  instructionalPresenceSeconds: number;
+  breakPresenceSeconds: number;
+  absentSeconds: number;
+  lastHeartbeatAt?: string;
+};
+
+export type FloridaClassDLiveInteraction = {
+  interactionId: string;
+  liveSessionId: string;
+  enrollmentId?: string;
+  actorRole: "student" | "instructor";
+  actorClerkUserId: string;
+  interactionType: FloridaClassDInteractionType;
+  content?: string;
+  parentInteractionId?: string;
+  createdAt: string;
+};
+
 export type FloridaClassDModuleProgress = {
   progressId: string;
   enrollmentId: string;
@@ -106,7 +173,23 @@ export type FloridaClassDAuditEvent = {
   actorRole: FloridaClassDRecordRole;
   actorId: string;
   enrollmentId?: string;
-  entityType: "identity" | "enrollment" | "cohort" | "attendance" | "instruction_time" | "module_progress" | "learning_check" | "remediation" | "exam" | "completion" | "lias";
+  entityType:
+    | "identity"
+    | "enrollment"
+    | "cohort"
+    | "attendance"
+    | "instruction_time"
+    | "live_session"
+    | "device_lease"
+    | "presence"
+    | "presence_challenge"
+    | "live_interaction"
+    | "module_progress"
+    | "learning_check"
+    | "remediation"
+    | "exam"
+    | "completion"
+    | "lias";
   entityId: string;
   action: string;
   correlationId: string;
@@ -118,6 +201,15 @@ export const FLORIDA_CLASS_D_RECORD_CONTROLS = {
   minimumInstructionalMinutes: 2400,
   requiredInstructionalDays: 5,
   requiredModules: 18,
+  liveLessonsPerDay: 4,
+  instructionalMinutesPerLiveLesson: 120,
+  scheduledBreakMinutes: 15,
+  breakMinutesAreTrackedButNotCredited: true,
+  presenceHeartbeatSeconds: 60,
+  presenceChallengeIntervalMinutes: 110,
+  presenceChallengeRetryMinutes: 5,
+  singleActiveDevicePerEnrollment: true,
+  dailyAttendanceRequiresInstructorVerification: true,
   examRequiresInstructionComplete: true,
   paymentRequiresRegulatoryLaunchGate: true,
   completionRequiresInstructorReview: true,
@@ -128,11 +220,28 @@ export const FLORIDA_CLASS_D_RECORD_CONTROLS = {
 } as const;
 
 export const FLORIDA_CLASS_D_ADMIN_PERMISSIONS = {
-  student: ["read_own_progress", "submit_learning_check"],
-  instructor: ["read_assigned_cohort", "attest_attendance", "approve_makeup", "approve_remediation"],
+  student: [
+    "read_own_progress",
+    "join_live_class",
+    "respond_presence_challenge",
+    "ask_live_question",
+    "submit_live_response",
+    "submit_learning_check",
+  ],
+  instructor: [
+    "read_assigned_cohort",
+    "operate_live_class",
+    "view_live_presence",
+    "issue_presence_challenge",
+    "answer_student_questions",
+    "launch_live_poll",
+    "attest_attendance",
+    "approve_makeup",
+    "approve_remediation",
+  ],
   school_admin: ["manage_cohorts", "manage_enrollments", "review_completion", "prepare_lias_queue"],
   compliance_admin: ["read_all_records", "export_inspection_record", "review_audit_history", "manage_record_holds"],
-  system: ["append_audit_event", "calculate_progress", "enforce_sequential_access"],
+  system: ["append_audit_event", "calculate_progress", "enforce_sequential_access", "track_live_presence", "enforce_single_device"],
 } as const;
 
 export function isExamEligible(input: {
