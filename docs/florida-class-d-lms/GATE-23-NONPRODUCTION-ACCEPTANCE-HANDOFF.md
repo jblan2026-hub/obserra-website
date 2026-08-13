@@ -19,7 +19,7 @@ The current source includes:
 - `scripts/florida-class-d-acceptance-gate.mjs`
 - `.github/workflows/florida-class-d-lms-gates.yml`
 
-Acceptance records bind to a real 40-character release commit SHA and a synthetic test identity reference. All 18 required domains must be recorded as passed before the database finalization function can pass an acceptance run.
+Acceptance records bind to an exact 40-character release commit SHA and a synthetic test identity reference. All 18 required domains must be recorded as passed before the database finalization function can pass an acceptance run.
 
 ## Required acceptance domains
 
@@ -29,27 +29,33 @@ The required domains are identity/enrollment, live media, attendance/time, prese
 
 The acceptance API requires school-admin or compliance-admin authorization. Passed checks require an evidence reference. The acceptance service requires explicit protected Supabase runtime configuration and does not use a hardcoded fallback project URL. Real learner PII, production credentials, protected exam content, license numbers, provider secrets, and infrastructure secrets must not be placed in acceptance evidence stored in public source.
 
-The interactive acceptance console now provides a real staff workflow to create a controlled non-production run, select the run, record evidence against each required domain, see the current 18-domain status, and request finalization. The client disables finalization until all 18 displayed domains are passed, while the database function independently enforces the same all-pass requirement server-side.
+The interactive acceptance console provides the implemented staff workflow to create a controlled non-production run, select the run, record evidence against each required domain, review the current 18-domain status, and request finalization. The client disables finalization until all 18 displayed domains are passed, while the database function independently enforces the same all-pass requirement server-side.
 
-The follow-on acceptance-event permission migration restricts the runtime service role to select and insert on the acceptance event ledger. Update, delete, and truncate privileges are revoked for that runtime role so regulated service activity can append and read events but cannot modify or remove existing event rows.
+The acceptance-event permission migration restricts the runtime service role to select and insert on the acceptance event ledger. Update, delete, and truncate privileges are revoked for that runtime role so regulated service activity can append and read events but cannot modify or remove existing event rows.
+
+## Source-verifier hardening
+
+The Gate 23 source verifier was strengthened at commit `7e2195d675cf060eac76c9460c8e841590e45f97` so the dedicated regulated workflow explicitly checks more than the original artifact-presence assertions. The verifier now checks the 18-domain database finalization boundary, controlled non-production environment vocabulary, explicit protected database runtime configuration, 40-character release binding, synthetic-identity confirmation, evidence-required passing checks, database-controlled finalization, the implemented staff page, and school/compliance authorization on the protected acceptance API.
+
+This strengthens regression detection for the implemented acceptance controls. It does not replace a real non-production acceptance execution.
 
 ## Validation evidence
 
-A full dedicated Florida Class D workflow passed on commit `35a7f6ca704a44bc885d1534aa570eb541bc49d3`, including Gates 1-23 source verification, Gate 22 runtime-readiness verification, Gate 23 acceptance verification, repository tests, lint, and the production Next.js build.
+Gate 23 is included in the accepted Gates 1-25 source/build baseline. Florida Class D LMS Gates run #367 passed on source commit `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d`, and the synchronized documentation head `03c35fd4dff84d3f9ae168d13eae0c7b7fc93c5f` passed the full regulated cycle again in run #372.
 
-The current hardened source head is `a7786ce426879260f3d758d40ee5c898de2f1523`. A fresh Gates 1-23 workflow is validating the interactive console and append-only runtime-permission changes. Those new hardening changes are not accepted until the complete current-head workflow is green.
+The stronger Gate 23 verifier at `7e2195d675cf060eac76c9460c8e841590e45f97` has already passed its Gate 23 verification step in Florida Class D LMS Gates run #373. At this snapshot, the same run has also passed Gates 1-25, repository contract tests, and static quality validation; the production Next.js build is still in progress. The strengthened verifier commit is therefore not yet promoted as a new accepted current-head baseline until the complete run finishes green.
 
-CI results are source/build evidence only. They do not mean the Class DS license is issued, production migrations are applied, production runtime is activated, or the LMS is approved by FDACS.
+CI results are source/build evidence only. They do not mean the Class DS license is issued, production migrations are applied, production runtime is activated, a real non-production acceptance run has occurred, or the LMS is approved by FDACS.
 
-## Remaining Gate 23 controls
+## Remaining Gate 23 operational work
 
-The major operational hardening items previously open are now implemented in source: the real interactive acceptance console and runtime-role mutation restrictions on the acceptance event ledger. The remaining Gate 23 work is to complete current-head CI, strengthen the Gate 23 verifier to explicitly assert the new API/console/permission controls, synchronize the audit handoffs to the final green commit, and then execute real non-production acceptance only in an appropriately configured non-production environment with synthetic identities.
+The source architecture, interactive console, protected API, event-ledger permission hardening, and strengthened verifier are implemented. The remaining Gate 23 work is operational rather than a fabricated source success state: configure an appropriate non-production database/runtime environment, use synthetic identities only, execute the implemented acceptance workflow against the intended release commit, collect evidence for all 18 domains, and allow the database finalization rule to determine whether the run passes.
 
-No production acceptance execution or production database migration has occurred.
+A production environment must not be used for this Gate 23 acceptance execution. No production acceptance execution or production database migration has occurred.
 
 ## No mockups or placeholders
 
-No mockup, placeholder, fabricated screenshot, simulated certificate, simulated LIAS output, or fake success state may be counted as Gate 23 evidence. Screenshots must come from implemented screens and be labeled with the actual environment.
+No mockup, placeholder, fabricated screenshot, simulated certificate, simulated LIAS output, or fake success state may be counted as Gate 23 evidence. Screenshots must come from implemented screens and be labeled with the actual environment. Development, sandbox, staging, or UAT evidence must not be relabeled as production evidence.
 
 ## Completion and certificate boundary
 
@@ -57,4 +63,4 @@ Gate 23 does not change the completion standard. Forty instructional hours alone
 
 ## Restart instruction
 
-Read this file together with `HANDOFF.md` and `LATEST-HANDOFF.md`. Resume from the current-head Gates 1-23 CI result, strengthen the Gate 23 verifier, synchronize all audit handoffs, and only then execute real non-production acceptance with synthetic identities in the configured non-production environment. Keep production activation fail closed.
+Treat Gate 23 as implemented source architecture with operational non-production execution still outstanding. First confirm the complete current-head CI result for `7e2195d675cf060eac76c9460c8e841590e45f97`. Then configure an authorized non-production runtime, execute the implemented 18-domain acceptance process with synthetic identities and a real release commit, preserve evidence without secrets or learner PII, and synchronize the resulting acceptance record into the audit package. Keep production activation fail closed.
