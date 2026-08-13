@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 
 type TimeSummary = {
   connectedSeconds?: number;
@@ -124,11 +124,10 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     return () => window.clearInterval(timer);
   }, [refresh]);
 
-  const elapsedInstructionMinutes = useMemo(() => {
-    const startedAt = state?.session?.started_at;
-    if (!startedAt || state?.session?.status !== "live") return 0;
-    return Math.max(0, Math.floor((Date.now() - Date.parse(startedAt)) / 60_000));
-  }, [state?.session?.started_at, state?.session?.status]);
+  const startedAt = state?.session?.started_at;
+  const elapsedInstructionMinutes = startedAt && state?.session?.status === "live"
+    ? Math.max(0, Math.floor((Date.now() - Date.parse(startedAt)) / 60_000))
+    : 0;
 
   const students = state?.students ?? [];
   const interactions = state?.interactions ?? [];
@@ -300,7 +299,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
                     <span><small>Course uncredited</small><b>{formatDuration(student.courseTime?.uncreditedConnectedSeconds)}</b></span>
                     <span className="fdacs-live__roster-actions">
                       {absent ? <button type="button" onClick={() => void restorePresence(student)}>Review absence</button> : null}
-                      {canCertifyDay ? <button type="button" onClick={() => void certifyDay(student)}>Certify {suggested.replace("_", " ")}</button> : <em>{canCertifyDay ? "Ready" : "Awaiting day end"}</em>}
+                      {canCertifyDay ? <button type="button" onClick={() => void certifyDay(student)}>Certify {suggested.replace("_", " ")}</button> : <em>Awaiting day end</em>}
                     </span>
                   </div>
                 );
