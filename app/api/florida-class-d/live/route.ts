@@ -17,7 +17,7 @@ import { floridaClassDLiveMediaEnabled } from "../../../../lib/florida-class-d-m
 import { getFloridaClassDStudentTimeLedger } from "../../../../lib/florida-class-d-live-reporting";
 import {
   FloridaClassDPollError,
-  getFloridaClassDActivePoll,
+  getFloridaClassDStudentPollState,
   submitFloridaClassDLivePollResponse,
 } from "../../../../lib/florida-class-d-polls";
 
@@ -79,12 +79,18 @@ export async function GET(request: Request) {
     if (!liveSessionId) {
       return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
     }
-    const [state, ledger, activePoll] = await Promise.all([
+    const [state, ledger, pollState] = await Promise.all([
       getFloridaClassDLiveStudentState(userId, liveSessionId),
       getFloridaClassDStudentTimeLedger(userId, liveSessionId),
-      getFloridaClassDActivePoll(liveSessionId),
+      getFloridaClassDStudentPollState(userId, liveSessionId),
     ]);
-    return NextResponse.json({ ...state, dayTime: ledger.dayTime, courseTime: ledger.courseTime, activePoll }, { headers });
+    return NextResponse.json({
+      ...state,
+      dayTime: ledger.dayTime,
+      courseTime: ledger.courseTime,
+      activePoll: pollState.activePoll,
+      activePollResponse: pollState.response,
+    }, { headers });
   } catch (error) {
     return errorResponse(error);
   }
