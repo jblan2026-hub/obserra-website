@@ -21,10 +21,13 @@ docs/LEARNWORLDS-CONTINUOUS-HANDOFF.md
 docs/academy-media-pipeline/ACTUAL-SITE-VERIFICATION-GATE.md
 docs/academy-media-pipeline/PER-SECTION-LEARNWORLDS-ACTIVITY-ARCHITECTURE.md
 docs/academy-media-pipeline/COURSE-SECTION-ASSESSMENT-STANDARD.md
+docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md
 config/academy-actual-site-verification-policy.json
 config/academy-per-section-learnworlds-activity-standard.json
 config/academy-course-section-assessment-policy.json
 ```
+
+The FDACS Class D School Build Handoff is a **separate regulated-school workstream**. It is not part of the normal Course 1–N production sequence and must be used whenever work involves Florida Class D school licensing operations, regulated LMS records, attendance/time evidence, certification-examination controls, FDACS/LIAS workflow, or inspection readiness.
 
 ## Canonical identity
 
@@ -43,6 +46,23 @@ No alternate owner title, employer attribution, substitute identity, altered log
 Every learner-facing substantive section uses the governed 13-category LearnWorlds architecture and its own native-template assessment. Standard five-module courses contain 60 assessment questions and use an 80 percent final pass mark unless the owner changes it.
 
 Final videos remain owner-produced. Course packages include scripts, teleprompter copy, storyboards, on-screen text, caption/transcript controls, technical specifications, and exact insertion filenames, but no final owner video binaries.
+
+## Separate Florida Class D school/LMS state
+
+```text
+Authoritative handoff: docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md
+Implementation branch: feature/florida-class-d-lms-foundation
+PR: #56
+Public state: COMING SOON · LMS IN PROGRESS
+Gate 1 — Foundation controls: IMPLEMENTED IN SOURCE / CI EVIDENCE PENDING
+Gate 2 — Regulated Student Record Model: IMPLEMENTED IN SOURCE / DURABLE PERSISTENCE AND CI EVIDENCE PENDING
+Next: Gate 3 — Durable Regulated Records & Administrative API
+Payment/enrollment: BLOCKED
+Student access: BLOCKED
+Certification examination runtime: BLOCKED
+Completion issuance: BLOCKED
+LIAS execution: BLOCKED
+```
 
 ## LearnWorlds SCORM runtime discovery and permanent correction
 
@@ -138,7 +158,8 @@ Proven:
 - static package integrity for the delivered course packages;
 - corrected Course 1 S00 SCORM packaging accepted by LearnWorlds;
 - Windows-safe delivery process for Courses 1, 3, and 4;
-- owner-video scripts and production controls exist for Courses 1 through 4.
+- owner-video scripts and production controls exist for Courses 1 through 4;
+- Florida Class D Gate 1 and Gate 2 source contracts exist on the dedicated Class D implementation branch.
 
 Not proven:
 
@@ -151,16 +172,26 @@ Not proven:
 - desktop/mobile learner journey;
 - LMS accessibility acceptance;
 - owner end-to-end acceptance;
-- publication or live checkout readiness.
+- publication or live checkout readiness;
+- durable Class D record persistence, Class D CI acceptance, production deployment, FDACS approval, live Class D enrollment, controlled exam runtime, regulatory completion issuance, or LIAS execution.
 
 ## Current controlled work order
+
+### Commercial Academy
 
 1. Remediate Course 2 SCORM using the Course 1 proven structure and issue a Windows-safe Course 2 package before any LearnWorlds SCORM upload.
 2. Continue to Course 5: `Executive Travel Risk Management`.
 3. Continue afterward to `Digital Exposure and Executive Privacy`, `AI Ready Workforce`, `Coding for Cyber Leaders`, and the remaining governed catalog.
 4. Integrate owner-produced videos only after direct technical, identity, transcript, caption, branding, accessibility, and owner-approval validation.
 5. Claim LearnWorlds readiness or completion only after authenticated import, save/reopen, SCORM, assessment, certificate, desktop/mobile, accessibility, and full learner-journey evidence exists.
-6. Update protected and sanitized handoffs after every substantive build, failure, correction, runtime result, or owner decision.
+
+### Florida Class D School / Regulated LMS
+
+1. Read `docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md`.
+2. Resume from Gate 3 — Durable Regulated Records & Administrative API.
+3. Keep Coming Soon, payment, enrollment, student access, exam runtime, completion issuance, and LIAS execution blocked until each later gate and applicable regulatory authorization is proven.
+
+Update protected and sanitized handoffs after every substantive build, failure, correction, runtime result, or owner decision.
 
 ## Release boundary
 
@@ -169,7 +200,8 @@ Course 1: COMPLETE NONVIDEO OWNER-VIDEO-READY; S00 SCORM PACKAGING ACCEPTED; FUL
 Course 2: COMPLETE NONVIDEO OWNER-VIDEO-READY; SCORM REMEDIATION REQUIRED BEFORE UPLOAD
 Course 3: COMPLETE NONVIDEO OWNER-VIDEO-READY; HARDENED SCORM; RUNTIME PENDING
 Course 4: COMPLETE NONVIDEO OWNER-VIDEO-READY; HARDENED SCORM; RUNTIME PENDING
-Next course: Executive Travel Risk Management after Course 2 SCORM remediation
+Next commercial course: Executive Travel Risk Management after Course 2 SCORM remediation
+Florida Class D School/LMS: SEPARATE WORKSTREAM; GATE 1 + GATE 2 SOURCE IMPLEMENTED; GATE 3 NEXT
 Authenticated full-course LearnWorlds acceptance: NOT PROVEN
 Certificate issuance acceptance: NOT PROVEN
 Desktop/mobile learner journey: NOT PROVEN
@@ -180,4 +212,4 @@ Production merge/cutover: BLOCKED
 
 ## Public repository warning
 
-This repository is public. Complete manuscripts, answer keys, authenticated private screenshots, owner media, provider identifiers, credentials, learner data, and protected Academy intellectual property remain outside the public repository. Public records contain sanitized governance, status, hashes, failures, and release boundaries only.
+This repository is public. Complete manuscripts, answer keys, authenticated private screenshots, owner media, provider identifiers, credentials, learner data, regulated learner PII, protected Class D examination material, FDACS/LIAS credentials, and protected Academy intellectual property remain outside the public repository. Public records contain sanitized governance, status, hashes, failures, and release boundaries only.
