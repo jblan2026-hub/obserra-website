@@ -10,7 +10,7 @@ Gate 25 strengthens the regulated Florida Class D runtime boundary by removing h
 
 **IN PROGRESS / ENFORCEMENT ACTIVE / REMEDIATION UNDERWAY / NOT YET ACCEPTED / PRODUCTION ACTIVATION DISABLED**
 
-Gates 1 through 24 remain the accepted source/build baseline. Gate 25 is now enforced in the dedicated Florida Class D CI workflow as `Gates 1-25 and website compatibility`.
+Gates 1 through 24 remain the accepted source/build baseline. Gate 25 is enforced in the dedicated Florida Class D CI workflow as `Gates 1-25 and website compatibility`.
 
 Gate 25 uses `scripts/florida-class-d-runtime-isolation-audit.mjs --enforce`. The audit scans regulated `lib/florida-class-d*.ts` server modules for embedded Supabase project URLs and environment names that would improperly expose secret-class configuration through `NEXT_PUBLIC_*` variables. The enforcing step fails the Class D workflow whenever findings remain.
 
@@ -50,16 +50,15 @@ This remains remediation progress only. Gate 25 is not accepted.
 
 ## Current enforced inventory
 
-Florida Class D LMS Gates run #359 at branch head `ac1f17d63b57d98354550cd212fa9db404a40676` completed Gates 1 through 24 successfully and then failed at the mandatory Gate 25 runtime-isolation step as designed.
+Florida Class D LMS Gates run #362 at source head `f7bcd95158e9077aed89ab000862e70b1cbb7d9d` completed Gates 1 through 24 successfully and then failed at the mandatory Gate 25 runtime-isolation step as designed.
 
-The enforcing audit inspected 29 regulated modules and reported four remaining embedded Supabase URL findings with no public secret-class `NEXT_PUBLIC_*` findings:
+The enforcing audit inspected 29 regulated modules and reported exactly three remaining embedded Supabase URL findings, with no public secret-class `NEXT_PUBLIC_*` findings:
 
-- `lib/florida-class-d-completion-packet.ts`
 - `lib/florida-class-d-makeup.ts`
 - `lib/florida-class-d-observer.ts`
 - `lib/florida-class-d-recorded-makeup.ts`
 
-`lib/florida-class-d-completion-packet.ts` was remediated after run #359, so the next enforcing inventory is expected to reduce the open set further. `makeup`, `observer`, and `recorded-makeup` remain open at this snapshot. Attempts to remove their legacy fallback through the GitHub connector were blocked by the connector safety layer, so they must not be represented as completed.
+Run #362 therefore confirms the completion-packet remediation is now effective in the enforced inventory. Attempts to remove the three remaining legacy fallbacks through the GitHub connector have been blocked by the connector safety layer, so none of those three may be represented as completed until a source commit actually lands and the enforcing inventory proves the reduction.
 
 ## Acceptance criteria
 
@@ -74,9 +73,9 @@ Gate 25 is not accepted until all of the following are true:
 
 ## Current CI evidence
 
-Run #359 confirms that Gates 1 through 24 all pass on `ac1f17d63b57d98354550cd212fa9db404a40676`. The Gate 25 enforcement step then stopped the workflow because four regulated files still contained legacy embedded Supabase URLs. Repository contract tests, lint, and the production build were intentionally skipped after the enforcing failure, so Gate 25 cannot yet be called accepted.
+Run #362 confirms that Gates 1 through 24 all pass on `f7bcd95158e9077aed89ab000862e70b1cbb7d9d`. The Gate 25 enforcement step then stopped the workflow because three regulated files still contained legacy embedded Supabase URLs. Repository contract tests, lint, and the production build were intentionally skipped after the enforcing failure, so Gate 25 cannot yet be called accepted.
 
-Website CI, Application Release Validation, and Application Production Pipeline completed successfully for that same source head. Those workflows do not supersede the dedicated Florida Class D regulated gate.
+The dedicated regulated workflow is the authoritative Gate 25 acceptance signal. Other website or application workflows do not supersede this fail-closed Class D gate.
 
 ## Production boundary
 
@@ -88,4 +87,4 @@ The final Gate 25 evidence must include the enforcing CI step and a green workfl
 
 ## Restart instruction
 
-Re-run the mandatory Gate 25 inventory after the completion-packet remediation, then continue eliminating the remaining hardcoded fallback in `lib/florida-class-d-makeup.ts`, `lib/florida-class-d-observer.ts`, and `lib/florida-class-d-recorded-makeup.ts`. Do not weaken or bypass the enforcement rule. Do not call Gate 25 accepted until the complete Gates 1 through 25 cycle passes source verification, repository tests, lint, and production build, and the authoritative audit handoffs are synchronized to that green head.
+Continue eliminating the remaining hardcoded fallback in `lib/florida-class-d-makeup.ts`, `lib/florida-class-d-observer.ts`, and `lib/florida-class-d-recorded-makeup.ts`. Do not weaken or bypass the enforcement rule. Do not call Gate 25 accepted until the complete Gates 1 through 25 cycle passes source verification, repository tests, lint, and production build, and the authoritative audit handoffs are synchronized to that green head.
