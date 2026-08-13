@@ -30,7 +30,7 @@ Current public state:
 
 `COMING SOON · LMS IN PROGRESS`
 
-Paid enrollment, student course access, regulatory completion issuance, and live examination access remain disabled.
+Paid enrollment, student course access, regulatory completion issuance, live examination access, and LIAS execution remain disabled.
 
 ## Regulatory-course architecture currently modeled
 
@@ -70,7 +70,7 @@ Gate script:
 
 ## Gate 2 — Regulated Student Record Model
 
-Status: `IMPLEMENTED IN SOURCE / DURABLE PERSISTENCE AND CI EVIDENCE PENDING`
+Status: `IMPLEMENTED IN SOURCE / CI EVIDENCE PENDING`
 
 Source domain model:
 
@@ -80,48 +80,80 @@ Gate script:
 
 `scripts/florida-class-d-records-gate.mjs`
 
-The model now defines sanitized production contracts for:
+The model defines sanitized production contracts for student identity, identity verification, enrollment, cohort assignment, five-day attendance, instructional-time credit, 18-module progress, learning checks, remediation, append-only audit events, regulated role boundaries, and deterministic examination eligibility.
 
-- student identity tied to authenticated user identity;
-- identity-verification state;
-- controlled Class D enrollment;
-- cohort / class-session assignment;
-- five-day attendance records;
-- credited instructional-time ledger;
-- 18-module progress ledger;
-- learning-check attempts and results;
-- remediation records;
-- append-only audit-event history;
-- student, instructor, school-admin, compliance-admin, and system role boundaries;
-- deterministic exam-eligibility policy.
-
-Exam eligibility is designed to remain blocked unless identity is verified, at least 2,400 instructional minutes are credited, all 18 modules are complete, and no remediation remains open.
+Exam eligibility remains blocked unless identity is verified, at least 2,400 instructional minutes are credited, all 18 modules are complete, and no remediation remains open.
 
 Students may not alter credited attendance, instructional time, or their own exam eligibility.
 
+## Gate 3 — Durable Regulated Records & Administrative API
+
+Status: `IMPLEMENTED IN SOURCE / DATABASE PROMOTION AND CI EVIDENCE PENDING`
+
+### Production persistence architecture verified
+
+Before building Gate 3, the current authorized Obserra backend was inspected directly. The active **Obserra Academy Supabase** production project already contains durable Academy enrollment, lesson-progress, assessment, certificate, owner-control, and production-event tables. Existing protected Academy tables have forced row-level security and are limited to service-role access after the database-lockdown migrations.
+
+Decision: **reuse the existing authorized Supabase backend**. Do not introduce a separate database or duplicate persistence platform for the FDACS school build.
+
+### Gate 3 implementation on the Florida LMS branch
+
+```text
+supabase/migrations/20260813033000_fdacs_class_d_regulated_records.sql
+lib/florida-class-d-auth.ts
+lib/florida-class-d-persistence.ts
+app/api/florida-class-d/admin/attendance/route.ts
+app/api/florida-class-d/admin/instruction-time/route.ts
+app/api/florida-class-d/admin/inspection/route.ts
+scripts/florida-class-d-persistence-gate.mjs
+```
+
+`package.json` now runs Gate 3 after Gates 1 and 2 inside `verify:academy-release`.
+
+### Durable schema defined
+
+The migration defines restricted tables for:
+
+- cohorts;
+- student identity state;
+- regulated enrollments;
+- attendance evidence;
+- instructional-time evidence;
+- module progress;
+- learning-check results;
+- remediation;
+- inspection/legal/regulatory/administrative record holds;
+- append-only audit events.
+
+The schema intentionally excludes identity-document binaries, payment-card data, final examination answer keys, and FDACS/LIAS credentials.
+
+### Gate 3 security architecture
+
+- RLS enabled and forced on every FDACS regulated table.
+- Direct table access revoked from `public`, `anon`, and `authenticated` roles.
+- Service-role access is server-only.
+- The service-role secret is never exposed through a `NEXT_PUBLIC` variable.
+- Audit events reject update/delete operations.
+- Clerk private metadata defines instructor, school-admin, and compliance-admin roles.
+- Existing protected owner-email allowlist remains bootstrap school/compliance administration authority.
+- Regulated APIs use private/no-store responses.
+- Inspection export is limited to school-admin and compliance-admin roles.
+
+### Atomic evidence and audit writes
+
+Attendance and instructional-time writes use controlled database RPC contracts. Each regulated write carries an authenticated actor, actor role, enrollment ID, idempotency key, and correlation ID. The database function is designed to create the evidence record and its audit event in one transaction. Duplicate idempotency keys return the prior evidence record rather than creating a second one.
+
+### Production promotion status
+
+The Gate 3 migration is committed as controlled source but is **not represented as applied to production**. The current operations policy requires owner approval, rollback readiness, audit evidence, and direct runtime verification before production promotion.
+
+The server-side persistence adapter also fails closed until a private `OBSERRA_SUPABASE_SERVICE_ROLE_KEY` or controlled equivalent is configured in the deployment environment.
+
+No real learner data was created during Gate 3 source implementation.
+
 ## Separate FDACS school operations package already produced outside the public repository
 
-The school-administration workstream includes controlled materials for:
-
-- student enrollment;
-- identity verification;
-- daily attendance and time sheets;
-- instructor attendance certification;
-- make-up training;
-- module learning checks;
-- remediation;
-- final examination score records;
-- examination security and chain of custody;
-- student acknowledgments;
-- course evaluations;
-- incident records;
-- records-retention logs;
-- instructor rosters;
-- curriculum revision control;
-- FDACS inspection binder;
-- LIAS operational workflow;
-- post-course Class D licensing instructions;
-- quality-management and corrective-action controls.
+The school-administration workstream includes controlled materials for student enrollment, identity verification, daily attendance/time sheets, instructor certification, make-up training, module learning checks, remediation, final-exam records, exam chain of custody, acknowledgments, evaluations, incidents, retention logs, instructor rosters, curriculum revision control, FDACS inspection binder, LIAS workflow, graduate licensing instructions, and quality/CAPA controls.
 
 Protected operational documents, examination answers, learner records, private credentials, and regulated PII must not be committed to this public repository.
 
@@ -148,24 +180,24 @@ Public Florida Training page
 → inspection-ready retained record
 ```
 
-## Next gate — Gate 3: Durable Regulated Records & Administrative API
+## Next gate — Gate 4: Identity Verification & Regulated Enrollment Workflow
 
 Planned next scope:
 
-1. Verify the current authorized production persistence architecture before implementation.
-2. Add durable records for student identity state, enrollment, cohort, attendance, instructional time, module progress, learning checks, remediation, and audit history.
-3. Add authenticated server-side administrative APIs.
-4. Enforce instructor, school-admin, and compliance-admin authorization server-side.
-5. Make attendance and instructional-time writes idempotent and auditable.
-6. Add immutable correlation IDs and append-only event history.
-7. Define record-retention, legal-hold, and inspection-export boundaries.
-8. Use synthetic test data only in the public repository.
-9. Keep payment, enrollment activation, final exam, completion issuance, and LIAS execution behind later explicit gates.
+1. Controlled student pre-enrollment creation.
+2. Legal-name and date-of-birth capture with data minimization.
+3. Identity-verification status workflow without committing identity documents to the public repository.
+4. Required student acknowledgments and policy acceptance.
+5. Cohort assignment controls.
+6. School-admin review and approval.
+7. Enrollment state-transition rules.
+8. Audit events for every identity/enrollment transition.
+9. Synthetic test fixtures only.
+10. Keep payment activation, instructional access, final exam, completion issuance, and LIAS execution disabled.
 
 ## Future gated sequence
 
 ```text
-Gate 3 — Durable regulated records and administrative API
 Gate 4 — Identity verification and regulated enrollment workflow
 Gate 5 — Cohort scheduling, attendance, and instructional-time controls
 Gate 6 — Module player, learning checks, and remediation engine
@@ -198,5 +230,5 @@ Each capability requires its own implementation evidence, CI evidence, deploymen
 ## Restart instruction for this workstream
 
 ```text
-Read docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md before continuing any Florida Class D school/LMS work. Treat it as a separate regulated workstream from the Obserra EPI Academy commercial course build. Resume from the latest passed or implemented gate, preserve every regulatory boundary and failure, keep the public page Coming Soon until launch authorization, and never enable payment, student access, examination, completion issuance, or LIAS execution ahead of its validated gate.
+Read docs/academy-media-pipeline/FDACS-CLASS-D-SCHOOL-BUILD-HANDOFF.md before continuing any Florida Class D school/LMS work. Treat it as a separate regulated workstream from the Obserra EPI Academy commercial course build. Resume from the latest passed or implemented gate. Gate 3 durable-record and admin-API source exists but production database promotion remains pending. Continue with Gate 4 identity verification and regulated enrollment while keeping the public page Coming Soon and payment, learner access, examination, completion issuance, and LIAS execution disabled until their later validated gates.
 ```
