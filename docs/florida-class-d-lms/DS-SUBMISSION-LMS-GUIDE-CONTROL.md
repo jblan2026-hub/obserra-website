@@ -4,7 +4,7 @@
 
 This record preserves the controlled scope of the supplemental LMS evidence package prepared for the Florida Class DS Security Officer School or Training Facility application for **Obserra Executive Protection & Intelligence LLC**.
 
-The supplemental guide does not replace the training curriculum, final examination, or other supporting documents required by FDACS-16003. It explains the proposed online LMS delivery method, attendance controls, security controls, training methods, examination gating, completion standards, certificate controls, records, inspection readiness, quality/CAPA controls, retention governance, and FDACS/LIAS operating workflow.
+The supplemental guide does not replace the training curriculum, final examination, or other supporting documents required by FDACS-16003. It explains the proposed online LMS delivery method, attendance controls, security controls, training methods, examination gating, completion standards, certificate controls, records, inspection readiness, quality/CAPA controls, retention governance, non-production acceptance, and FDACS/LIAS operating workflow.
 
 ## Controlled artifact
 
@@ -23,7 +23,7 @@ Working artifact names:
 
 The generated binary artifacts are not committed to this public repository. Final submission copies must be handled as controlled regulatory records.
 
-**Required next controlled revision:** the DOCX/PDF submission package must be revised before filing to incorporate the current completion/certification standard and the additional completion, LIAS, student-document, certificate, inspection-packet, quality/CAPA, and retention screenshots defined below. The repository standard in `STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md` is authoritative for completion/certification wording.
+**Required next controlled revision:** the DOCX/PDF submission package must be revised before filing to incorporate the current completion/certification standard and the additional completion, LIAS, student-document, certificate, inspection-packet, quality/CAPA, retention, database/runtime readiness, and Gate 23 acceptance screenshots defined below. The repository standard in `STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md` is authoritative for completion/certification wording.
 
 ## Submission status
 
@@ -48,7 +48,7 @@ The controlled supplemental certificate may contain the learner's verified legal
 
 ## Guide contents
 
-The controlled guide must cover the five-day/40-hour schedule, all 18 curriculum areas, live instructional methods, secure enrollment and identity verification, attendance/timekeeping, breaks, security challenges, text-screen timing, Q&A, learning checks, remediation, permitted make-up training, the separate final examination, successful-completion review, certificate issuance sequence, records/inspection readiness, FDACS/LIAS workflow, student application handoff, security/privacy, quality/CAPA, retention/legal-hold governance, change control, evidence screenshots, the online compliance matrix, submission checklist, pre-launch status, operating checklists, controlled records, and final submission update fields.
+The controlled guide must cover the five-day/40-hour schedule, all 18 curriculum areas, live instructional methods, secure enrollment and identity verification, attendance/timekeeping, breaks, security challenges, text-screen timing, Q&A, learning checks, remediation, permitted make-up training, the separate final examination, successful-completion review, certificate issuance sequence, records/inspection readiness, FDACS/LIAS workflow, student application handoff, security/privacy, quality/CAPA, retention/legal-hold governance, database/runtime readiness, non-production acceptance evidence, change control, evidence screenshots, the online compliance matrix, submission checklist, pre-launch status, operating checklists, controlled records, and final submission update fields.
 
 ## Current portal screenshot inventory
 
@@ -66,7 +66,7 @@ The current 0.9 guide embeds nine controlled development screenshots using demon
 
 ## Required screenshots for the next submission-guide revision
 
-The next controlled DOCX/PDF revision must add screenshots showing the complete post-instruction and school-operations workflow:
+The next controlled DOCX/PDF revision must add screenshots showing the complete post-instruction, school-operations, readiness, and acceptance workflow:
 
 10. **Completion Review Console:** 2,400 verified minutes, five qualifying 480-minute days, all 18 curriculum areas/learning checks, passing examination evidence, unresolved-issue checks, and authorized completion approval.
 11. **Passing Examination / Completion Boundary:** the **no-certificate-before-pass boundary**, visually showing that a learner at 40 instructional hours receives no certificate until the 170-question examination is passed at 128/170 or better.
@@ -75,8 +75,19 @@ The next controlled DOCX/PDF revision must add screenshots showing the complete 
 14. **Supplemental Obserra Course Completion Certificate:** learner-specific certificate rendered only after successful completion, showing demonstration legal name, course title, 40 instructional hours, exam score, completion date, unique certificate ID, and the supplemental/not-a-license disclaimer.
 15. **Completion & Inspection Packets:** protected staff view showing printable and JSON packet export, with attendance, instructional time, exam-result history, completion, LIAS, completion-document metadata, and audit evidence while excluding exam questions/answers and raw identity documents.
 16. **Quality, CAPA & Record Retention:** protected staff view showing a demonstration quality/exception case, severity/workflow state, corrective-action and verification controls, the separate two-year regulatory minimum and three-year operational retention dates, next-review date, and legal-hold status. The screenshot must make clear that actual record destruction is not automated.
+17. **Database Promotion Readiness:** controlled migration inventory, backup/recovery requirement, preflight state, RLS/service-role review, rollback or compensating-change plan, post-migration verification plan, and regulated feature flags remaining disabled.
+18. **Protected Runtime Readiness:** staff-only readiness view showing configuration-presence status for identity, database, live media, licensing, document storage, and regulated feature flags without exposing secret values, license numbers, provider credentials, project identifiers, or private bucket names.
+19. **Gate 23 Non-Production Acceptance Evidence:** the implemented staff acceptance console showing a real development, sandbox, staging, or UAT acceptance run tied to a release commit and synthetic test identity; all 18 required acceptance domains; evidence/status recording; aggregate passed-domain progress; and the controlled finalization boundary. The screenshot must identify the actual non-production environment and must not be represented as production acceptance or FDACS approval.
 
-All screenshots must use demonstration data only. Final production screenshots must replace development previews before the guide is represented as final operational evidence.
+All screenshots must use demonstration or synthetic data only. Final production screenshots must replace development previews where final operational evidence is required and must never expose learner PII, protected exam content, license numbers, credentials, provider secrets, or sensitive infrastructure information.
+
+## Gate 23 acceptance control documented
+
+Gate 23 has a full green source/build baseline. The current source additionally includes the real interactive staff acceptance console, the protected school/compliance acceptance API, explicit protected database runtime configuration, and a follow-on acceptance-event permission migration that restricts the regulated runtime role to read and append operations on the acceptance event ledger.
+
+Acceptance is limited to development, sandbox, staging, or UAT and uses synthetic identities. All 18 required domains must pass before database-controlled finalization succeeds. A failed, blocked, missing, or not-run domain prevents acceptance. Passed checks require an evidence reference.
+
+The current interactive and event-ledger hardening changes completed the dedicated Gates 1-23 source/build workflow successfully on commit `a7786ce426879260f3d758d40ee5c898de2f1523`. No production acceptance execution or production database migration has occurred.
 
 ## Quality, CAPA, and retention controls documented
 
@@ -86,7 +97,7 @@ Retention documentation must keep the applicable regulatory minimum distinct fro
 
 ## Regulatory and workflow control points documented
 
-The guide must document live simultaneous DI instruction, Florida physical training location, investigator live access when required, secure website transport, photo-ID identity verification, daily digital attendance, single-device control, recurring security challenges with retry handling, text-screen timing and instructor discussion, learner-to-DI questions, controlled recorded make-up instruction, randomized online examination questions, completion verification before reporting, separate 40 instructional hours and examination time, the no-certificate-before-pass rule, authorized completion review, supplemental-certificate controls, manual LIAS reporting, official FDACS-16103 handling, protected learner document delivery, completion/inspection packets, quality/CAPA, retention/legal holds, and inspection readiness.
+The guide must document live simultaneous DI instruction, Florida physical training location, investigator live access when required, secure website transport, photo-ID identity verification, daily digital attendance, single-device control, recurring security challenges with retry handling, text-screen timing and instructor discussion, learner-to-DI questions, controlled recorded make-up instruction, randomized online examination questions, completion verification before reporting, separate 40 instructional hours and examination time, the no-certificate-before-pass rule, authorized completion review, supplemental-certificate controls, manual LIAS reporting, official FDACS-16103 handling, protected learner document delivery, completion/inspection packets, quality/CAPA, retention/legal holds, database/runtime readiness, non-production acceptance, and inspection readiness.
 
 ## Student-material publication rule
 
@@ -102,8 +113,10 @@ Recommended DS application package organization:
 2. Required Class D training curriculum.
 3. Required final examination.
 4. Proof of fictitious name filing, if applicable.
-5. **Exhibit C - Online LMS Training Delivery, Attendance, Security, Completion, Certification, Recordkeeping, Quality, Retention, and Inspection Controls** using this guide.
+5. **Exhibit C - Online LMS Training Delivery, Attendance, Security, Completion, Certification, Recordkeeping, Quality, Retention, Readiness, Acceptance, and Inspection Controls** using this guide.
 
 ## Production evidence rule
 
-Source/build validation and development screenshots do not constitute regulatory approval or production acceptance. Before the guide is converted from submission draft to final operational evidence, the school must capture final production screenshots after applicable regulatory authorization, database promotion, media-provider configuration, identity/enrollment workflow, attendance/time controls, examination engine, completion review, certificate/document workflow, completion-packet/inspection center, quality/CAPA and retention operations, and LIAS procedures have been validated.
+Source/build validation and development screenshots do not constitute regulatory approval or production acceptance. Before the guide is converted from submission draft to final operational evidence, the school must capture final production evidence after applicable regulatory authorization, database promotion, media-provider configuration, identity/enrollment workflow, attendance/time controls, examination engine, completion review, certificate/document workflow, completion-packet/inspection center, quality/CAPA and retention operations, and LIAS procedures have been validated.
+
+The Gate 23 non-production acceptance screenshot remains non-production evidence by design. It may demonstrate the school's controlled acceptance method but must never be relabeled as production acceptance. Any unresolved production dependency must be stated as unresolved rather than inferred or represented as complete.
