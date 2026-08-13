@@ -24,6 +24,8 @@ Gates 1 through 24 are implemented in source. The current accepted Gate 24 sourc
 
 The dedicated Florida Class D LMS workflow completed successfully on that commit, including regulated source verification, Gate 22 runtime-readiness verification, Gate 23 non-production acceptance verification, Gate 24 instructional text-screen verification, repository contract tests, lint, and the production Next.js build.
 
+Gate 25, Regulated Runtime Isolation, is now in progress. It is not yet an accepted gate and does not alter the accepted Gate 24 baseline.
+
 This CI evidence establishes source/build compatibility only. It is not regulatory approval, production database promotion, production runtime activation, production acceptance, or launch authorization.
 
 ## Controlled Class D architecture
@@ -74,6 +76,14 @@ Only one instructional text screen may be open for a live session. Opening is re
 
 Primary Gate 24 artifacts include `supabase/migrations/20260813110000_fdacs_class_d_text_screen_timing.sql`, `lib/florida-class-d-text-screen.ts`, the protected learner and instructor live APIs, the learner `InstructionalTextScreen` component, the instructor `InstructionalTextScreenControl`, `scripts/florida-class-d-text-screen-gate.mjs`, and the dedicated Gates 1-24 workflow step.
 
+### Gate 25
+
+**IN PROGRESS / NOT ACCEPTED / PRODUCTION ACTIVATION DISABLED**
+
+Gate 25 strengthens the regulated runtime isolation boundary. `scripts/florida-class-d-runtime-isolation-audit.mjs` inventories regulated `lib/florida-class-d*.ts` server modules for embedded Supabase project URLs and improper `NEXT_PUBLIC_*` secret-class environment names. `docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md` defines the acceptance criteria.
+
+The Gate 23 acceptance service and Gate 24 text-screen service already require explicit protected Supabase runtime configuration without hardcoded project fallback URLs. Legacy regulated modules identified in prior review still require remediation. Gate 25 will not be accepted until the runtime-isolation inventory is clean, enforcement is added to the required CI path, and the full regulated workflow remains green.
+
 ## Mandatory completion and certificate standard
 
 Successful completion requires the full five-day/2,400-minute record, all 18 required curriculum areas/checks, a passing 170-question exam at 128/170 or better, cleared completion-blocking issues, and authorized school/compliance approval.
@@ -98,26 +108,27 @@ Real learner PII, protected exam content, credentials, license numbers, private 
 
 The dedicated Florida Class D LMS workflow is green on `cc6470b2466f68578d63884f646462a2ad65ac0c`. Website CI, Application Release Validation, and the Application Production Pipeline also completed successfully on that commit. The Academy 70x Production Gate failure is unrelated to this regulated Class D workstream.
 
-CI success is source/build evidence only. It is not regulatory approval, database promotion, runtime activation, or launch authorization.
+Gate 25 commits after the accepted baseline are audit/hardening work in progress and must not be described as an accepted gate until their own full green cycle is established.
 
 ## Current unresolved production controls
 
-No production database migration has been applied by this workstream. No production non-production-acceptance run has been executed against real learner data. No regulated launch function is authorized by these source gates.
+No production database migration has been applied by this workstream. No production acceptance run has been executed against real learner data. No regulated launch function is authorized by these source gates.
 
-The next security hardening priority is to remove hardcoded Supabase project URL fallbacks that still exist in other regulated server modules and require explicit protected HTTPS runtime configuration. This reduces unnecessary exposure of production infrastructure identifiers and strengthens the fail-closed runtime boundary.
+The current security hardening priority is to remove hardcoded Supabase project URL fallbacks that still exist in regulated server modules and require explicit protected HTTPS runtime configuration. This reduces unnecessary exposure of production infrastructure identifiers and strengthens the fail-closed runtime boundary.
 
 The Division-approved examination-bank boundary also remains a production activation prerequisite. The protected production exam question bank and answer key must not be committed to the public repository.
 
 ## Next controlled sequence
 
-1. Keep `HANDOFF.md`, `LATEST-HANDOFF.md`, Gate 24, the DS submission/audit control, and PR #56 synchronized to the green Gate 24 baseline.
-2. Remove remaining hardcoded Supabase project URL fallbacks from regulated server modules and require explicit protected runtime configuration.
-3. Add source verification for regulated runtime isolation and rerun the complete workflow.
-4. Execute controlled non-production acceptance with synthetic identities only after the applicable non-production database/runtime environment is configured.
-5. Finalize the Division-approved examination-bank boundary before production exam activation.
-6. Revise the controlled Class DS LMS submission-guide DOCX/PDF with screenshots from implemented screens.
-7. Prepare owner/admin LMS access through the authenticated Clerk staff-role path without placing credentials, secrets, or license numbers in source or chat.
-8. Keep payment/enrollment and all regulated production functions disabled until applicable authorization, production acceptance, and owner approval are complete.
+1. Run the Gate 25 runtime-isolation inventory and identify every regulated module with an embedded Supabase project URL fallback.
+2. Remove those fallbacks and require explicit `OBSERRA_SUPABASE_URL` HTTPS configuration plus protected server-side credentials.
+3. Add Gate 25 enforcement to the dedicated Florida Class D CI workflow after remediation.
+4. Rerun Gates 1 through 25, repository tests, lint, and the production Next.js build and synchronize audit evidence to the actual green head.
+5. Execute controlled non-production acceptance with synthetic identities only after the applicable non-production database/runtime environment is configured.
+6. Finalize the Division-approved examination-bank boundary before production exam activation.
+7. Revise the controlled Class DS LMS submission-guide DOCX/PDF with screenshots from implemented screens.
+8. Prepare owner/admin LMS access through the authenticated Clerk staff-role path without placing credentials, secrets, or license numbers in source or chat.
+9. Keep payment/enrollment and all regulated production functions disabled until applicable authorization, production acceptance, and owner approval are complete.
 
 ## Public repository security boundary
 
@@ -125,4 +136,4 @@ Never commit real learner PII, identity documents, protected examination questio
 
 ## Restart instruction
 
-Read `docs/florida-class-d-lms/LATEST-HANDOFF.md`, `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`, `docs/florida-class-d-lms/GATE-24-TEXT-SCREEN-TIMING-HANDOFF.md`, `docs/florida-class-d-lms/DS-SUBMISSION-LMS-GUIDE-CONTROL.md`, and this handoff before continuing. Gates 1 through 24 are implemented and the Gate 24 source/build baseline is green at `cc6470b2466f68578d63884f646462a2ad65ac0c`. Resume with regulated runtime-isolation hardening and controlled non-production acceptance preparation. Do not treat CI as FDACS approval, do not apply production migrations from source-gate work, do not generate FDACS-16103 locally, and do not issue a completion certificate for hours alone.
+Read `docs/florida-class-d-lms/LATEST-HANDOFF.md`, `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`, `docs/florida-class-d-lms/GATE-24-TEXT-SCREEN-TIMING-HANDOFF.md`, `docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md`, `docs/florida-class-d-lms/DS-SUBMISSION-LMS-GUIDE-CONTROL.md`, and this handoff before continuing. Gate 24 remains the accepted source/build baseline at `cc6470b2466f68578d63884f646462a2ad65ac0c`. Gate 25 is in progress. Resume with runtime-isolation remediation and do not call Gate 25 accepted until the enforcing CI cycle is green. Do not treat CI as FDACS approval, do not apply production migrations from source-gate work, do not generate FDACS-16103 locally, and do not issue a completion certificate for hours alone.
