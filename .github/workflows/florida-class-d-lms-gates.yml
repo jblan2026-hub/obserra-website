@@ -30,7 +30,7 @@ env:
 
 jobs:
   regulated-source-gates:
-    name: Gates 1-22 and website compatibility
+    name: Gates 1-23 and website compatibility
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -55,6 +55,9 @@ jobs:
 
       - name: Run Gate 22 runtime readiness source verification
         run: node scripts/florida-class-d-runtime-readiness-gate.mjs
+
+      - name: Run Gate 23 acceptance evidence source verification
+        run: node scripts/florida-class-d-acceptance-gate.mjs
 
       - name: Run repository contract tests
         run: npm test
