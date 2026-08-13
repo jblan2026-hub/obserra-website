@@ -62,7 +62,6 @@ export default function InstructionalTextScreen({
     const textScreenId = screen?.id;
     if (!textScreenId || !deviceLeaseId) {
       screenIdRef.current = null;
-      setProgress(null);
       return;
     }
 
