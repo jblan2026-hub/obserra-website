@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { findAppBySlug } from "../../../apps/appsData";
+import { findStorefrontAppBySlug } from "../../../apps/storefront";
 import { resolveUnifiedEntitlement } from "../../../../lib/unified-entitlements";
 
 function launchEnvironmentKey(slug: string) {
@@ -10,7 +10,7 @@ function launchEnvironmentKey(slug: string) {
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const slug = requestUrl.searchParams.get("app") ?? "";
-  const app = findAppBySlug(slug);
+  const app = findStorefrontAppBySlug(slug);
   if (!app) return NextResponse.redirect(new URL("/apps?access=invalid-app", requestUrl));
 
   const { userId, orgId } = await auth();
