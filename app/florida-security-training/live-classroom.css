@@ -98,6 +98,20 @@
 .fdacs-live__stage-frame h2 { font-size: clamp(28px, 4vw, 52px); }
 .fdacs-live__stage-frame p { max-width: 720px; color: #aebed1; line-height: 1.65; }
 
+.fdacs-live__presence-code {
+  margin-top: 22px;
+  min-width: min(460px, 90%);
+  padding: 18px 22px;
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.05);
+  display: grid;
+  gap: 7px;
+}
+.fdacs-live__presence-code strong { font-size: clamp(40px, 7vw, 74px); letter-spacing: .14em; font-variant-numeric: tabular-nums; }
+.fdacs-live__presence-code small,
+.fdacs-live__presence-code span { color: #9fb2c8; }
+
 .fdacs-live__timecards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -123,7 +137,9 @@
 .fdacs-live__panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .fdacs-live__panel-head span { color: #96a9bf; font-size: 12px; text-transform: uppercase; }
 .fdacs-live__panel-head button,
-.fdacs-live__form button {
+.fdacs-live__form button,
+.fdacs-live__instructor-controls button,
+.fdacs-live__roster button {
   border: 1px solid rgba(255,255,255,.14);
   background: #e8eef6;
   color: #07111f;
@@ -131,6 +147,14 @@
   border-radius: 10px;
   padding: 10px 13px;
   cursor: pointer;
+}
+.fdacs-live__instructor-controls button.danger { background: #f4d9d9; color: #4b1111; }
+
+.fdacs-live__instructor-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 0 4px;
 }
 
 .fdacs-live__form { display: grid; gap: 10px; margin-top: 14px; }
@@ -155,16 +179,39 @@
   display: grid;
   gap: 8px;
 }
-.fdacs-live__feed > div {
+.fdacs-live__feed > div,
+.fdacs-live__question-card {
   border: 1px solid rgba(255,255,255,.08);
   background: rgba(255,255,255,.03);
+  color: inherit;
   padding: 10px 12px;
   border-radius: 10px;
   display: grid;
   gap: 4px;
+  text-align: left;
 }
+.fdacs-live__question-card { cursor: pointer; width: 100%; }
 .fdacs-live__feed b { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #9eb3ca; }
 .fdacs-live__feed span { line-height: 1.45; }
+
+.fdacs-live__roster-panel { margin-top: 16px; }
+.fdacs-live__roster { display: grid; gap: 8px; margin-top: 14px; overflow-x: auto; }
+.fdacs-live__roster > div {
+  min-width: 860px;
+  display: grid;
+  grid-template-columns: minmax(190px, 1.4fr) repeat(4, minmax(110px, .7fr)) minmax(105px, .7fr);
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 11px;
+  background: rgba(255,255,255,.028);
+}
+.fdacs-live__roster > div.is-absent { border-color: rgba(255, 129, 129, .38); background: rgba(92, 25, 25, .2); }
+.fdacs-live__roster span { display: grid; gap: 3px; }
+.fdacs-live__roster small { color: #8fa4bd; }
+.fdacs-live__roster b { font-variant-numeric: tabular-nums; }
+.fdacs-live__roster em { color: #87c7a8; font-style: normal; font-size: 12px; font-weight: 800; text-transform: uppercase; }
 
 @media (max-width: 1000px) {
   .fdacs-live__grid { grid-template-columns: 1fr; }
