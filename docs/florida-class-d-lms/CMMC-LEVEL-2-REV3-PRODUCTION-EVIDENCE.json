@@ -1,0 +1,300 @@
+{
+  "schemaVersion": "1.0",
+  "snapshotDate": "2026-08-14",
+  "program": {
+    "name": "Obserra Website and Academy Production Security Evidence",
+    "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "repository": "jblan2026-hub/obserra-website",
+    "branch": "feature/cmmc-level2-rev3-audit-package",
+    "claimBoundary": "Engineering alignment, release evidence, and audit traceability only. This ledger does not claim CMMC certification, CUI authorization, FedRAMP authorization, or FDACS approval."
+  },
+  "framework": {
+    "engineeringBaseline": "NIST SP 800-171 Rev. 3",
+    "assessmentBaseline": "NIST SP 800-171A Rev. 3",
+    "currentCmmcLevel2Crosswalk": "NIST SP 800-171 Rev. 2 practice identifiers retained for the currently enforced DoD CMMC Level 2 assessment baseline.",
+    "nistOscalSource": {
+      "repository": "usnistgov/oscal-content",
+      "path": "nist.gov/SP800-171/rev3/json/NIST_SP800-171_rev3_catalog.json",
+      "blobSha": "1bc9d5ab5f57329c1ab5553b4d2b27ea54d9d13f"
+    }
+  },
+  "release": {
+    "previousValidatedSourceSha": "4891b3b0f1c8a4ad4aa7c9804dd683e22e03b5d2",
+    "mergedProductionSha": "7bb1272847d1f6426ba1cb1b73cf42ea6aee0662",
+    "validatedVercelDeploymentId": "dpl_7e9hNGYHF1M7xxkvYQHqN6kzZxwY",
+    "canonicalDomains": [
+      "www.obserrallc.com",
+      "obserrallc.com"
+    ],
+    "regulatedClassDProductionAuthorized": false,
+    "cuiProcessingAuthorized": false
+  },
+  "records": [
+    {
+      "id": "PRE-001",
+      "title": "Centralized Clerk runtime normalization and fail-closed identity",
+      "status": "implemented_source_pending_postdeploy_validation",
+      "rev3": [
+        "03.01.02",
+        "03.01.05",
+        "03.05.01",
+        "03.05.03",
+        "03.05.04",
+        "03.05.12",
+        "03.13.15",
+        "03.16.03"
+      ],
+      "rev2": [
+        "3.1.1",
+        "3.1.2",
+        "3.1.5",
+        "3.5.1",
+        "3.5.2",
+        "3.5.3",
+        "3.5.10"
+      ],
+      "implementation": "One server-side configuration authority normalizes Clerk's supported publishable-key environment names and surrounding whitespace, enforces matched live keys in Vercel production, initializes middleware before authentication, and emits only nonsecret reason codes when identity is unavailable.",
+      "evidence": [
+        "lib/clerk-runtime-config.ts",
+        "lib/identity-runtime.ts",
+        "app/layout.tsx",
+        "proxy.ts"
+      ],
+      "methods": [
+        "examine",
+        "test"
+      ],
+      "boundary": "Obserra application and Clerk external identity service",
+      "gap": "Post-deployment runtime validation must confirm the production Clerk instance is actually healthy; provider assurance remains external evidence."
+    },
+    {
+      "id": "PRE-002",
+      "title": "Canonical production domain binding",
+      "status": "implemented_source_pending_postdeploy_validation",
+      "rev3": [
+        "03.04.01",
+        "03.04.02",
+        "03.04.03",
+        "03.04.05",
+        "03.13.01",
+        "03.13.06",
+        "03.16.01"
+      ],
+      "rev2": [
+        "3.4.1",
+        "3.4.2",
+        "3.4.3",
+        "3.4.5",
+        "3.13.1"
+      ],
+      "implementation": "Vercel production aliases for both canonical Obserra domains are declared in source. Vercel assigns them only after a deployment is READY and targets production, preventing preview deployments from taking production traffic.",
+      "evidence": [
+        "vercel.json",
+        "proxy.ts"
+      ],
+      "methods": [
+        "examine",
+        "test"
+      ],
+      "boundary": "Obserra application and Vercel edge/runtime",
+      "gap": "Post-deployment evidence must prove both canonical domains resolve to the exact accepted production deployment."
+    },
+    {
+      "id": "PRE-003",
+      "title": "Exact-SHA production release and runtime verification",
+      "status": "partial_external_evidence_required",
+      "rev3": [
+        "03.03.05",
+        "03.04.03",
+        "03.04.04",
+        "03.12.01",
+        "03.12.03",
+        "03.14.06",
+        "03.16.01"
+      ],
+      "rev2": [
+        "3.3.5",
+        "3.4.3",
+        "3.4.4",
+        "3.12.1",
+        "3.12.3",
+        "3.14.6"
+      ],
+      "implementation": "The validated Gate 33 source was merged through PR 56, Vercel created a verified production deployment from the merge commit, and production routing/runtime are independently checked before release acceptance.",
+      "evidence": [
+        "docs/florida-class-d-lms/LATEST-HANDOFF.md",
+        "docs/florida-class-d-lms/GATE-33-CMMC-LEVEL-2-REV3-TRACEABILITY-HANDOFF.md",
+        ".github/workflows/florida-class-d-lms-gates.yml"
+      ],
+      "methods": [
+        "examine",
+        "test"
+      ],
+      "boundary": "GitHub and Vercel",
+      "gap": "Canonical alias promotion and final post-deployment runtime evidence are pending for the Gate 34 release."
+    },
+    {
+      "id": "PRE-004",
+      "title": "Stripe payment authorization and signed fulfillment",
+      "status": "implemented_source_evidence",
+      "rev3": [
+        "03.01.02",
+        "03.01.03",
+        "03.01.05",
+        "03.03.01",
+        "03.03.02",
+        "03.13.15",
+        "03.16.03"
+      ],
+      "rev2": [
+        "3.1.1",
+        "3.1.2",
+        "3.1.5",
+        "3.3.1",
+        "3.3.2"
+      ],
+      "implementation": "Academy Checkout Session creation is POST-only and same-origin, purchase authorization is rechecked against the Academy control plane, fulfillment requires Stripe webhook signature validation and paid status, and deferred redemption revalidates the paid session plus verified Clerk email ownership.",
+      "evidence": [
+        "app/api/academy/checkout/route.ts",
+        "app/api/webhook/stripe/route.ts",
+        "app/api/academy/redeem/route.ts",
+        "scripts/florida-class-d-website-academy-commerce-gate.mjs"
+      ],
+      "methods": [
+        "examine",
+        "test"
+      ],
+      "boundary": "Obserra application and Stripe external commerce service",
+      "gap": "Stripe provider assurance and formal service responsibility evidence remain external."
+    },
+    {
+      "id": "PRE-005",
+      "title": "Academy database least privilege and fail-closed publication",
+      "status": "implemented_source_evidence",
+      "rev3": [
+        "03.01.02",
+        "03.01.03",
+        "03.01.05",
+        "03.04.01",
+        "03.04.02",
+        "03.13.06",
+        "03.16.03"
+      ],
+      "rev2": [
+        "3.1.1",
+        "3.1.2",
+        "3.1.5",
+        "3.4.1",
+        "3.4.2"
+      ],
+      "implementation": "Academy learner/control tables use forced RLS with no anon/authenticated grants for backend-only data paths, public catalog access is GET-only and field-limited, missing control data fails closed, and only the reviewed nonregulated 60-course baseline is seeded as public/purchasable.",
+      "evidence": [
+        "supabase/config.toml",
+        "supabase/functions/academy-public-catalog/index.ts",
+        "supabase/migrations/20260814025522_academy_baseline_publication_controls.sql",
+        "supabase/migrations/20260814025503_academy_worker_fk_performance_indexes.sql",
+        "lib/academy-control-contracts.ts"
+      ],
+      "methods": [
+        "examine",
+        "test"
+      ],
+      "boundary": "Obserra application and Supabase",
+      "gap": "Authoritative backup, restore, retention, RPO, RTO, and provider assurance evidence remain external."
+    },
+    {
+      "id": "PRE-006",
+      "title": "CMMC Level 2 Rev. 3 no-drift traceability",
+      "status": "implemented_source_evidence",
+      "rev3": [
+        "03.03.08",
+        "03.04.01",
+        "03.04.03",
+        "03.12.01",
+        "03.12.03",
+        "03.15.02",
+        "03.16.01"
+      ],
+      "rev2": [
+        "3.3.8",
+        "3.4.1",
+        "3.4.3",
+        "3.12.1",
+        "3.12.3",
+        "3.12.4"
+      ],
+      "implementation": "The authoritative control register is machine-readable JSON, the audit matrix is generated from it, digests are verified in CI, and this release evidence supplement is likewise generated and checked from one machine-readable source.",
+      "evidence": [
+        "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.json",
+        "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-AUDIT-MATRIX.md",
+        "scripts/cmmc-level2-rev3-traceability.mjs",
+        "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.json",
+        "scripts/cmmc-level2-rev3-production-evidence.mjs"
+      ],
+      "methods": [
+        "examine",
+        "test"
+      ],
+      "boundary": "Obserra GitHub CI",
+      "gap": "Formal organization policies, final SSP, CUI scope, and external assessment evidence remain separate requirements."
+    },
+    {
+      "id": "PRE-007",
+      "title": "High availability, backup, restore, and failover evidence",
+      "status": "external_evidence_required",
+      "rev3": [
+        "03.08.09",
+        "03.12.03",
+        "03.14.06",
+        "03.16.03"
+      ],
+      "rev2": [
+        "3.12.3",
+        "3.14.6"
+      ],
+      "implementation": "Gate 31 requires candidate-bound cryptographic HA evidence rather than accepting availability claims without retained artifacts.",
+      "evidence": [
+        "lib/florida-class-d-ha-evidence.ts",
+        "scripts/florida-class-d-ha-evidence-integrity-gate.mjs",
+        "docs/florida-class-d-lms/GATE-31-HA-EVIDENCE-INTEGRITY-HANDOFF.md"
+      ],
+      "methods": [
+        "examine",
+        "interview",
+        "test"
+      ],
+      "boundary": "Shared Obserra and external providers",
+      "gap": "Provider-backed availability, backup/restore, failover, RPO and RTO artifacts are not yet complete; Florida Class D production remains fail closed."
+    },
+    {
+      "id": "PRE-008",
+      "title": "Regulated Class D separation from generic commerce",
+      "status": "implemented_source_evidence",
+      "rev3": [
+        "03.01.02",
+        "03.01.03",
+        "03.04.02",
+        "03.13.06",
+        "03.16.01"
+      ],
+      "rev2": [
+        "3.1.1",
+        "3.1.2",
+        "3.4.2"
+      ],
+      "implementation": "Generic Academy checkout, redemption, and Stripe fulfillment do not activate Florida Class D. Regulated mutations and production activation remain controlled by dedicated fail-closed authorities.",
+      "evidence": [
+        "lib/florida-class-d-production-activation.ts",
+        "lib/florida-class-d-mutation-boundary.ts",
+        "proxy.ts",
+        "scripts/florida-class-d-regulated-mutation-boundary-gate.mjs"
+      ],
+      "methods": [
+        "examine",
+        "test"
+      ],
+      "boundary": "Obserra application and regulated LMS",
+      "gap": "Class D production still requires licensing, candidate-bound UAT, production database promotion, HA evidence, and explicit activation prerequisites."
+    }
+  ]
+}
