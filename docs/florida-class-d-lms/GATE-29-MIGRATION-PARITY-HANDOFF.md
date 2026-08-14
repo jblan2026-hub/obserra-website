@@ -4,9 +4,9 @@ Snapshot: 2026-08-13
 
 ## Status
 
-Gate 29 is being implemented on top of exact Gates 1-28 five-green source checkpoint:
+Gate 29 is implemented and validated at exact five-green source checkpoint:
 
-`595465a76675693fdcc1b5e5d9a14269a7ccbdfd`
+`a84c754db81ae805de634dbd74c8745ee8d29714`
 
 Production remains fail closed. Gate 29 does not apply a production database migration and does not authorize production activation.
 
@@ -34,7 +34,11 @@ Both pin the same three internal functions to `search_path = public`, revoke exe
 
 The unapplied duplicate was removed from source at commit `bd83c77a9a69a6454a0b03c58da0e1a802ef767e` so a fresh production promotion will follow the same 29-version lineage already verified in non-production rather than executing equivalent hardening twice under different versions.
 
-The Gate 29 expected lineage was then reconciled to the exact 29 source filenames that match the regulated non-production migration versions and names.
+A later manifest diagnostic identified one expected-filename defect for the make-up certification security migration. The canonical source and regulated non-production history both use:
+
+`20260813052500_fdacs_class_d_makeup_certification_security.sql`
+
+The manifest lineage was corrected to that exact filename before the promotion digest was accepted.
 
 ## Deterministic manifest
 
@@ -49,16 +53,22 @@ The Gate 29 expected lineage was then reconciled to the exact 29 source filename
 - can write the evidence manifest to a workflow artifact;
 - prints the migration count, latest version, and manifest digest without exposing credentials or runtime secrets.
 
+The validated deterministic manifest values are:
+
+- migration count: `29`;
+- latest migration version: `20260814011203`;
+- migration manifest SHA-256: `a2099d8610f0427fa2f85cb7a47efaa2af4b899be21952b0fcacaadd15e8e453`.
+
 The deterministic manifest does not contain learner PII, credentials, license values, protected exam content, or database connection details.
 
 ## Production activation binding
 
-The completed Gate 29 design requires Gate 26 production activation to verify all of the following:
+Gate 26 production activation now verifies all of the following:
 
-- the database-promotion source SHA exactly matches the frozen production release candidate SHA;
-- the applied regulated migration version is exactly `20260814011203`;
-- the runtime-provided regulated migration-manifest SHA-256 exactly matches the source-controlled expected manifest SHA-256;
-- the existing `OBSERRA_FDACS_DB_PROMOTION_STATUS` remains `verified`;
+- `OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA` is a valid Git SHA and exactly matches the frozen production release candidate SHA;
+- `OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION` exactly equals `20260814011203`;
+- `OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256` exactly equals `a2099d8610f0427fa2f85cb7a47efaa2af4b899be21952b0fcacaadd15e8e453`;
+- `OBSERRA_FDACS_DB_PROMOTION_STATUS` remains `verified`;
 - all other Gate 26 production, licensing, HA, rollback, security, and owner-approval conditions remain satisfied.
 
 This binds production database evidence to the exact validated migration bytes rather than to an operator-entered generic success state.
@@ -67,9 +77,9 @@ This binds production database evidence to the exact validated migration bytes r
 
 The regulated non-production branch is:
 
-- branch: `obserra-fdacs-lms-nonprod`
-- project ref: `jeklrsratrijrsamdauv`
-- parent project: `nwxnyqlyzyufgoadtqxs`
+- branch: `obserra-fdacs-lms-nonprod`;
+- project ref: `jeklrsratrijrsamdauv`;
+- parent project: `nwxnyqlyzyufgoadtqxs`.
 
 Its applied regulated migration history contains exactly 29 Class D versions, including the recovered security migration `20260813204215` and Gate 28 migration `20260814011203`.
 
@@ -79,14 +89,21 @@ The main connected Supabase project remains without any `public.fdacs_class_d_*`
 
 ## CI evidence
 
-The dedicated Florida Class D workflow will:
+Exact validated source checkpoint:
 
-1. generate the deterministic migration manifest from the checked-out source;
-2. retain the manifest as a workflow artifact tied to the exact Git SHA;
-3. run Gate 29 source verification;
-4. continue repository tests, lint, and production build only if the migration lineage and Gate 26 binding are valid.
+`a84c754db81ae805de634dbd74c8745ee8d29714`
 
-The manifest artifact is evidence for a specific Git commit. It is not FDACS approval and is not permission to promote production.
+All five primary workflows are green on that exact SHA:
+
+- Florida Class D LMS Gates #461;
+- Website CI #2067;
+- Academy 70x Production Gate #1179;
+- Application Release Validation #868;
+- Application Production Pipeline #887.
+
+Florida Class D LMS Gates #461 passed Gates 1-29, generated and uploaded the retained migration manifest evidence, passed repository contract tests and static quality validation, and completed the production Next.js build successfully.
+
+The manifest artifact is evidence for a specific Git checkout. It is not FDACS approval and is not permission to promote production.
 
 ## Promotion evidence requirements
 
@@ -118,15 +135,6 @@ No production migration is executed by Gate 29 CI.
 - `lib/florida-class-d-production-activation.ts`
 - `.github/workflows/florida-class-d-lms-gates.yml`
 - `docs/florida-class-d-lms/ACTION-LEDGER.md`
-
-## Validation sequence
-
-1. Generate the manifest in CI and capture the deterministic SHA-256 for the exact 29-version regulated source lineage.
-2. Bind that digest and latest migration version into Gate 26 source controls.
-3. Require deployment/promotion evidence variables to match the source-controlled digest, version, and release candidate SHA.
-4. Run the complete Gates 1-29 workflow, repository tests, lint, and production build.
-5. Establish a new exact five-green source checkpoint only after all five primary workflows pass on the same SHA.
-6. Do not apply any production database migration until the separately governed production-promotion sequence is authorized.
 
 ## Production and regulatory boundary
 
