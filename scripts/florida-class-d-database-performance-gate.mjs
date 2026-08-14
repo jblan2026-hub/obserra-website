@@ -2,12 +2,20 @@ import fs from "node:fs";
 
 const migrationPath = "supabase/migrations/20260813211000_fdacs_class_d_fk_performance_indexes.sql";
 const migration = fs.readFileSync(migrationPath, "utf8");
+const securityMigration = fs.readFileSync("supabase/migrations/20260813204215_fdacs_class_d_security_hardening.sql", "utf8");
 const handoff = fs.readFileSync("docs/florida-class-d-lms/GATE-28-DATABASE-PERFORMANCE-HANDOFF.md", "utf8");
 const workflow = fs.readFileSync(".github/workflows/florida-class-d-lms-gates.yml", "utf8");
 
 function requireText(source, value, message) {
   if (!source.includes(value)) throw new Error(`Gate 28 failed: ${message}`);
 }
+
+requireText(securityMigration, "alter function public.fdacs_class_d_live_append_only()", "source must preserve the verified non-production security-hardening migration");
+requireText(securityMigration, "alter function public.fdacs_class_d_reject_quality_event_mutation()", "source must preserve quality-event trigger hardening");
+requireText(securityMigration, "alter function public.fdacs_class_d_lias_queue_prepared_event()", "source must preserve LIAS prepared-event trigger hardening");
+requireText(securityMigration, "set search_path = public", "security-hardening functions must pin their search_path");
+requireText(securityMigration, "from public, anon, authenticated", "security-hardening migration must revoke browser/public execute privileges");
+requireText(securityMigration, "to service_role", "security-hardening migration must retain service-role execution");
 
 requireText(migration, "begin;", "performance migration must use a controlled transaction");
 requireText(migration, "set local lock_timeout = '5s'", "migration must fail quickly rather than wait indefinitely on a DDL lock");
@@ -70,4 +78,4 @@ requireText(handoff, "No production database promotion", "handoff must preserve 
 requireText(workflow, "Run Gate 28 database performance source verification", "dedicated Class D workflow must make Gate 28 mandatory");
 requireText(workflow, "node scripts/florida-class-d-database-performance-gate.mjs", "Gate 28 verifier must run in CI");
 
-console.log("Florida Class D Gate 28 passed: all 20 verified foreign-key coverage gaps receive idempotent B-tree indexes, DDL lock and statement waits are bounded, destructive/index-removal operations are prohibited, and production database promotion remains fail closed.");
+console.log("Florida Class D Gate 28 passed: verified non-production security migration history is preserved in source, all 20 verified foreign-key coverage gaps receive idempotent B-tree indexes, DDL lock and statement waits are bounded, destructive/index-removal operations are prohibited, and production database promotion remains fail closed.");
