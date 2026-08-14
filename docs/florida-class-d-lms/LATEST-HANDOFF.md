@@ -1,8 +1,8 @@
 # Florida Class D LMS Latest Handoff
 
-Snapshot: 2026-08-13 21:00 ET
+Snapshot: 2026-08-13 23:10 ET
 
-This is the current restart pointer for the regulated Florida Class D LMS and Class DS filing workstream for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**.
+This is the current restart pointer for the regulated Florida Class D LMS, Obserra Academy production dependency work, and Class DS filing workstream for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**.
 
 ## Restart authority
 
@@ -14,94 +14,213 @@ PR state at last direct verification: **open, mergeable, unmerged**.
 Read these controlled records before changing regulated behavior:
 
 1. `HANDOFF.md`
-2. `ACTION-LEDGER.md`
-3. `CURRENT-STATUS-2026-08-13.md`
-4. the applicable gate-specific handoff
-5. `DS-SUBMISSION-LMS-GUIDE-CONTROL.md`
+2. `LATEST-HANDOFF.md`
+3. `ACTION-LEDGER.md`
+4. `CURRENT-STATUS-2026-08-13.md`
+5. `GATE-29-MIGRATION-PARITY-HANDOFF.md`
+6. `GATE-30-MUTATION-BOUNDARY-HANDOFF.md`
+7. `GATE-31-HA-EVIDENCE-INTEGRITY-HANDOFF.md`
+8. `GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md`
+9. `DS-SUBMISSION-LMS-GUIDE-CONTROL.md`
 
-`HANDOFF.md` preserves the exact historical Gates 1-25 verifier-contract language. New actions must not rewrite those historical literals merely to record later state. `ACTION-LEDGER.md` is the append-only action record for exact SHAs, workflow results, failures, blocked writes, production effects, and next actions.
+`HANDOFF.md` preserves historical verifier-contract language. Do not rewrite historical literals merely to record later state.
 
-## Current exact validated five-green checkpoint
+## Exact completed five-green checkpoint
 
-`1b6a35bdb289faaa15e5fdc1eb814cd607e65425`
+The current completed exact five-green regulated checkpoint remains:
+
+`99ef49f4b43ee0cd0da6f147a4566e4d22a47aa8`
 
 All five primary workflows are green on that exact SHA:
 
-- Florida Class D LMS Gates #422.
-- Website CI #1989.
-- Academy 70x Production Gate #1140.
-- Application Release Validation #829.
-- Application Production Pipeline #848.
+- Florida Class D LMS Gates #474.
+- Website CI #2093.
+- Academy 70x Production Gate #1192.
+- Application Release Validation #881.
+- Application Production Pipeline #900.
 
-Florida Class D LMS Gates #422 passed the complete Gates 1-26 source chain, Gate 22 runtime-readiness verification, Gate 23 acceptance-evidence verification, Gate 24 instructional text-screen verification, Gate 25 runtime-isolation enforcement, Gate 26 production-activation verification, repository contract tests, lint/static quality validation, and the production Next.js build.
+This exact SHA is the completed Gates 1-31 authority.
 
-Application Production Pipeline #848 completed successfully, including the final signed-artifact publication contract.
+## Gates 29 through 31
 
-This exact SHA is the current validated source/build checkpoint. Later documentation-only synchronization commits do not supersede it as validated source authority unless a complete validation cycle is recorded for the later head.
+### Gate 29 migration parity and promotion manifest
 
-## Historical Gates 1-25 handoff checkpoint
+The authoritative regulated migration manifest contains 29 Class D migrations.
 
-`af4247978c3b1b3aaac45ce7e15f321512cbf71c`
+Latest Class D migration version:
 
-Historical green workflows on that exact SHA:
+`20260814011203`
 
-- Florida Class D LMS Gates #400.
-- Website CI #1942.
-- Academy 70x Production Gate #1118.
-- Application Release Validation #807.
-- Application Production Pipeline #826.
+Canonical migration-manifest SHA-256:
 
-This SHA remains the preserved historical Gates 1-25 handoff-contract checkpoint and audit evidence. It is not the current Gate 26 source checkpoint.
+`a2099d8610f0427fa2f85cb7a47efaa2af4b899be21952b0fcacaadd15e8e453`
 
-## Gate 26 Production Activation Authorization
+Production activation is cryptographically bound to the exact release candidate, candidate-bound Gate 23 UAT, deployed Vercel SHA, production database promotion source SHA, latest regulated migration version, and migration-manifest digest.
 
-Gate 26 is implemented, mandatory in the dedicated Class D workflow, and CI-accepted on `1b6a35b...`.
+### Gate 30 regulated mutation boundary
 
-Production authorization requires exact candidate/UAT/deployment SHA binding, production identity, protected database and media configuration, actual licensing state, database-promotion verification, examination-bank authorization, LIAS procedure verification, security acceptance, rollback verification, owner release approval, mandatory HA/recovery evidence, and explicit final production activation authorization.
+A secure-by-default global mutation choke point now protects POST, PUT, PATCH, and DELETE operations under `/api/florida-class-d`.
 
-License issuance alone cannot activate the regulated LMS.
+Normal regulated Class D mutations require production regulated-execution authorization. The Gate 23 acceptance endpoint is separately restricted to explicit regulated nonproduction authorization.
 
-Current production-impacting paths explicitly bound to Gate 26 or the shared regulated-execution authorization include:
+This control is default deny and applies to current and future Class D mutation routes covered by the API matcher.
 
-- live instruction;
+### Gate 31 cryptographic HA evidence
+
+HA evidence is now a protected cryptographic release artifact rather than a collection of operator-set status strings.
+
+The HA evidence contract requires exactly ten verified subsystems:
+
+1. edge and DNS;
+2. application runtime;
+3. identity;
+4. database;
+5. media;
+6. document storage;
+7. commerce;
+8. observability;
+9. backup and restore;
+10. failover.
+
+The contract requires exact release-candidate binding, canonical SHA-256, per-evidence digests, recency, RTO at or below 60 minutes, RPO at or below 15 minutes, and failover evidence no older than 90 days.
+
+No external-provider HA evidence has been fabricated or inferred from vendor marketing.
+
+## Gate 32 current workstream
+
+Detailed handoff:
+
+`GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md`
+
+Gate 32 extends the security boundary across the public website, Obserra Academy, Supabase Academy control plane, Clerk identity, Stripe commerce, Vercel runtime behavior, production dependency hygiene, and shared transactional security headers.
+
+Latest source-hardening head before documentation synchronization:
+
+`7da136c63612b83313d6178a94546d40903213ae`
+
+Gate 32 is not yet an exact five-green checkpoint. The final handoff-synchronized SHA must pass all five primary workflows before Gate 32 can be recorded as completed five-green.
+
+### Academy publication state
+
+The live Academy control plane now contains:
+
+- 60 total reviewed course controls;
+- 60 published and purchasable nonregulated Academy courses;
+- zero Class D or security-officer-like controls.
+
+The Class D regulated course remains excluded.
+
+Canonical publication migration:
+
+`supabase/migrations/20260814025522_academy_baseline_publication_controls.sql`
+
+### Academy database performance
+
+Three Academy worker foreign-key support indexes were applied and source-controlled:
+
+- `academy_openai_usage_events_command_idx`;
+- `academy_openai_usage_events_node_idx`;
+- `academy_worker_slot_status_command_idx`.
+
+Canonical migration:
+
+`supabase/migrations/20260814025503_academy_worker_fk_performance_indexes.sql`
+
+### Clerk and paid learner access
+
+The website proxy directly exports `clerkMiddleware()`.
+
+Paid Academy media and the Obserrian Academy Tutor now require authenticated Clerk identity and current course entitlement in preview as well as production. Generic preview authentication bypasses were removed.
+
+### Stripe commerce
+
+Stripe Checkout Session creation is now POST-only, same-origin protected, form-content-type restricted, current course-control authorized, webhook-readiness checked, and no-store.
+
+Deferred paid-course claims require a paid Stripe session and either exact Clerk user binding or a verified Clerk email matching the Stripe purchaser email.
+
+Signed Stripe webhooks remain the entitlement fulfillment authority.
+
+### Public Academy catalog
+
+The Supabase public catalog Edge Function remains intentionally unauthenticated only at the gateway, GET-only, public-field-limited, and public-visible-only.
+
+Hidden or unpublished Academy control records are not returned in the public list response.
+
+### Website security headers
+
+Gate 32 now verifies CSP, clickjacking protection, HSTS, MIME sniffing protection, cross-origin protections, disabled framework disclosure, and no-store handling for Academy APIs, Stripe webhook responses, Class D APIs, Academy payment returns, and identity routes.
+
+### Production dependency remediation
+
+The production dependency audit correctly rejected the previous dependency graph because vulnerable transitive PostCSS and Sharp versions remained in the Next.js chain.
+
+The remediation aligned:
+
+- Next.js `16.3.1`;
+- eslint-config-next `16.3.1`;
+- React `19.2.8`;
+- React DOM `19.2.8`.
+
+A one-time branch workflow regenerated the lockfile and passed clean install, production dependency audit, repository tests, lint, and production build before pushing the patched lock. That temporary write-capable workflow was then removed.
+
+## Supabase environment boundary
+
+Main project:
+
+- name: `Obserra Academy`;
+- project ref: `nwxnyqlyzyufgoadtqxs`;
+- observed state: `ACTIVE_HEALTHY`;
+- Class D schema objects: **zero**.
+
+Regulated nonproduction branch:
+
+- branch: `obserra-fdacs-lms-nonprod`;
+- project ref: `jeklrsratrijrsamdauv`;
+- purpose: synthetic Class D acceptance and regulated nonproduction validation only.
+
+No Class D production database promotion has occurred.
+
+## Vercel and public access
+
+Existing intended Vercel project: `obserra-website-live`.  
+Canonical registered domain: `obserrallc.com`.  
+Public website host: `www.obserrallc.com`.  
+Owner-confirmed intended Vercel team slug: `obserra`.
+
+The currently observed production deployment still reflects the older production SHA until a controlled deployment of a validated candidate occurs. The branch contains the Clerk middleware fix, but production Clerk behavior must be reverified on the actual deployed candidate before production readiness is claimed.
+
+Public Academy access:
+
+`https://www.obserrallc.com/academy`
+
+## Production and regulatory boundary
+
+Florida Class D production remains **fail closed**.
+
+Nothing in Gates 29 through 32 authorizes:
+
+- public regulated enrollment;
+- real regulated learner access;
 - production scheduling;
-- regulated learner enrollment API;
-- student final-examination API;
-- LIAS administration;
-- official completion-document ingestion.
+- live Class D instruction;
+- production examination access;
+- LIAS production execution;
+- official completion release;
+- regulated observer access;
+- Class D database promotion;
+- regulated runtime activation.
 
-The shared non-production execution model remains explicit, environment-limited, and synthetic-identity-only. It does not convert UAT evidence into production evidence.
+No source commit, CI result, UAT result, HA artifact, deployment state, filing package, screenshot, or readiness report is FDACS approval.
 
-## Mandatory high availability
-
-HA is mandatory across the complete regulated production service chain:
-
-- edge routing and DNS;
-- application runtime;
-- identity/authentication;
-- regulated database/persistence;
-- live instructional media;
-- completion-document storage;
-- commerce/payment dependency used for regulated enrollment;
-- observability and alerting;
-- backup and restore;
-- end-to-end failover.
-
-Current controlled engineering ceilings enforced by Gate 26:
-
-- RTO: **60 minutes or less**.
-- RPO: **15 minutes or less**.
-- End-to-end failover exercise: **no older than 90 days** at production activation.
-
-HA status markers may only be recorded as verified when authentic supporting evidence exists. Vendor marketing or generic service claims do not establish Obserra production verification.
+The historical Gate 23 18-of-18 synthetic UAT record is not candidate-bound to the current source and cannot be reused as final acceptance.
 
 ## Controlled filing baseline
 
 Current controlled private artifacts remain:
 
-- LMS Guide DOCX v0.15.
-- LMS Guide PDF v0.15, 43 pages.
-- Submission Readiness Register v1.5, 6 pages.
+- LMS Guide DOCX v0.15;
+- LMS Guide PDF v0.15, 43 pages;
+- Submission Readiness Register v1.5, 6 pages;
 - Controlled Pre-Filing Packet v0.15 Live Evidence Only.
 
 Controlled packet ZIP SHA-256:
@@ -116,39 +235,41 @@ Final examination SHA-256:
 
 `240e297682e157221e33ec830bef026e829116ac5f57c5de5565fa244241467e`
 
-The public-repository `DS-SUBMISSION-LMS-GUIDE-CONTROL.md` still contains older v0.9 metadata because replacement writes were blocked before changing GitHub. Do not treat that stale public metadata as the current private controlled filing-artifact baseline. Preserve its Gate 17-19 verifier literals until a safe synchronized revision is possible.
+`DS-SUBMISSION-LMS-GUIDE-CONTROL.md` still contains older public metadata and must not be represented as synchronized to the current private filing baseline until a controlled revision actually lands.
 
-## Production and regulatory boundary
+## Current blockers before regulated production
 
-Production remains **fail closed**. Public paid enrollment, regulated learner access, production scheduling, live Class D instruction, production exam access, LIAS production execution, completion/certificate release, observer production access, regulated database promotion, and runtime activation remain disabled until actual Class DS authorization and all final production gates pass.
-
-No source commit, CI result, UAT result, HA evidence marker, deployment state, filing package, screenshot, or readiness report is FDACS approval.
-
-Forty instructional hours alone do not complete the course and do not earn a completion certificate. The passing 170-question final examination at 128/170 or better and authorized completion approval remain required. Official FDACS-16103 remains LIAS-generated and must not be synthesized locally.
-
-## Deployment governance
-
-Existing intended Vercel project: `obserra-website-live`.  
-Canonical registered domain: `obserrallc.com`.  
-Public website host: `www.obserrallc.com`.  
-Owner-reported intended Vercel team technical slug: `obserra`.
-
-Direct Vercel control-plane verification remains outstanding in the current connector context. Do not create another project, move the existing project, or change DNS as a workaround.
-
-## Audit continuity
-
-Every material LMS, FDACS, CI, UAT, Vercel, database, identity, media, examination, LIAS, filing, HA/recovery, security, or production-readiness action must be recorded in `ACTION-LEDGER.md` with the exact SHA or external object, result/evidence, workflow identifiers where applicable, production/regulatory effect, rollback state, unresolved blockers, and next governed action.
-
-Failed and blocked actions remain part of the record and must never be rewritten as successful.
+- final exact five-workflow Gate 32 validation on one exact handoff-synchronized SHA;
+- controlled production deployment of the validated candidate;
+- deployed Clerk authentication verification;
+- deployed Academy entitlement and payment verification;
+- authentic Vercel, Clerk, Stripe, media, document-storage, observability, backup/restore, and failover evidence sufficient for the Gate 31 HA manifest;
+- final candidate-bound Gate 23 18-of-18 synthetic UAT on the regulated nonproduction branch;
+- controlled Class D production database promotion evidence;
+- actual Class DS authorization;
+- current DI instructor authorization where required;
+- final security, rollback, and owner-controlled production activation approval.
 
 ## Next governed actions
 
-1. Treat `1b6a35bdb289faaa15e5fdc1eb814cd607e65425` as the exact current validated five-green source checkpoint.
-2. Synchronize current-status and Gate 26 handoff records to that checkpoint without altering historical Gates 1-25 verifier contracts.
-3. Continue production-grade resilience and observability engineering as the next controlled milestone.
-4. Produce authentic HA, failover, backup/restore, and recovery evidence for every production dependency.
-5. Reconcile the authoritative existing Vercel project without project movement or DNS change.
-6. Close remaining Class DS filing controls.
-7. Freeze the final production candidate and execute a new exact-candidate-bound Gate 23 18-of-18 synthetic UAT acceptance.
-8. Complete production database, identity, media, exam-bank, LIAS, commerce, observability, security, rollback, HA, and owner-approval gates.
-9. Do not activate regulated production functions until actual Class DS authorization and every final production condition passes.
+1. Complete the exact five-workflow validation set on the final handoff-synchronized Gate 32 head.
+2. Record that exact SHA and all five workflow run numbers in this handoff and the Gate 32 detailed handoff if green.
+3. Keep PR #56 open and unmerged until the controlled release decision is made.
+4. Do not promote the Class D schema or activate regulated production.
+5. When a validated candidate is intentionally deployed, verify Clerk, Academy entitlement, public catalog, Stripe POST checkout, signed-webhook fulfillment, caching protections, and rollback against the deployed exact SHA.
+6. Obtain authentic provider HA and recovery evidence and construct the Gate 31 manifest for the final candidate.
+7. Execute fresh exact-candidate-bound Gate 23 18-of-18 synthetic UAT before any regulated production activation decision.
+
+## Access pointers
+
+Detailed Gate 32 handoff:
+
+`docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md`
+
+Pull request:
+
+`https://github.com/jblan2026-hub/obserra-website/pull/56`
+
+Live Academy:
+
+`https://www.obserrallc.com/academy`
