@@ -6,6 +6,7 @@ import {
 import {
   floridaClassDPreEnrollmentEnabled,
 } from "../../../../lib/florida-class-d-enrollment-policy";
+import { floridaClassDProductionActivationAuthorized } from "../../../../lib/florida-class-d-production-activation";
 import {
   createFloridaClassDPreEnrollment,
   FloridaClassDPersistenceError,
@@ -27,6 +28,10 @@ type PreEnrollmentRequest = {
   correlationId?: unknown;
 };
 
+function enrollmentEnabled() {
+  return floridaClassDProductionActivationAuthorized() && floridaClassDPreEnrollmentEnabled();
+}
+
 function errorResponse(error: unknown) {
   if (error instanceof FloridaClassDAuthorizationError || error instanceof FloridaClassDPersistenceError) {
     return NextResponse.json(
@@ -46,7 +51,7 @@ export async function GET() {
     const { userId } = await requireFloridaClassDSignedInUser();
     const enrollment = await getFloridaClassDEnrollmentStatusForUser(userId);
     return NextResponse.json(
-      { enrollment, preEnrollmentEnabled: floridaClassDPreEnrollmentEnabled() },
+      { enrollment, preEnrollmentEnabled: enrollmentEnabled() },
       { headers: responseHeaders },
     );
   } catch (error) {
@@ -56,7 +61,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    if (!floridaClassDPreEnrollmentEnabled()) {
+    if (!enrollmentEnabled()) {
       return NextResponse.json(
         {
           error: "Florida Class D pre-enrollment is not yet enabled.",
