@@ -33,9 +33,9 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
       day: monday
-      time: "10:00"
+      time: "09:15"
       timezone: America/New_York
     open-pull-requests-limit: 5
     labels:
