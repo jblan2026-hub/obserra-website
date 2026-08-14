@@ -61,15 +61,9 @@ function groundedPreviewAnswer(question: string, lesson: NonNullable<ReturnType<
 }
 
 export async function POST(request: Request) {
-  const ownerPreview = process.env.VERCEL_ENV === "preview";
-  let userId: string | null = null;
-
-  if (!ownerPreview) {
-    const session = await auth();
-    userId = session.userId;
-    if (!userId) {
-      return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers: responseHeaders });
-    }
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers: responseHeaders });
   }
 
   let body: TutorRequest;
@@ -88,11 +82,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid tutor request" }, { status: 400, headers: responseHeaders });
   }
 
-  if (!ownerPreview && userId) {
-    const state = await academyStateWithOwnerAccess(userId, courseId);
-    if (!state.entitlements[courseId]) {
-      return NextResponse.json({ error: "Paid course access is required" }, { status: 403, headers: responseHeaders });
-    }
+  const state = await academyStateWithOwnerAccess(userId, courseId);
+  if (!state.entitlements[courseId]) {
+    return NextResponse.json({ error: "Paid course access is required" }, { status: 403, headers: responseHeaders });
   }
 
   const lesson = lessonBrief(courseId, lessonIndex);
