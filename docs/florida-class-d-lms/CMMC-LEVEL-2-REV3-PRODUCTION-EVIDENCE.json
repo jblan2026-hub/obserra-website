@@ -19,12 +19,12 @@
     }
   },
   "release": {
-    "previousValidatedSourceSha": "2189c73ff5ba15ea07aa51ab84da23112403a720",
-    "mergedProductionSha": "d35917f417d24489ffd5877b989f36dbb3bbb613",
-    "validatedVercelDeploymentId": "dpl_DxojVNKBd9hJtcjXth3QptKei4Lw",
+    "previousValidatedSourceSha": "688a5845b013a078c9a8c4971af323157800d8bc",
+    "mergedProductionSha": "2dde838ee176e6f450abeca2daad96ab377ed931",
+    "validatedVercelDeploymentId": "dpl_5wuL2pUUGcpgk6z7HgvZyVrQLbpd",
     "intendedVercelProjectId": "prj_lxTKKDa9sbhht7FaigiaF1PONMiC",
-    "observedServingVercelProjectId": "prj_FfAnssVJU8pcJydGNJHmCliP6Yme",
-    "routingOwnershipVerified": false,
+    "observedServingVercelProjectId": "prj_lxTKKDa9sbhht7FaigiaF1PONMiC",
+    "routingOwnershipVerified": true,
     "canonicalDomains": ["www.obserrallc.com", "obserrallc.com"],
     "regulatedClassDProductionAuthorized": false,
     "cuiProcessingAuthorized": false
@@ -36,11 +36,11 @@
       "status": "partial_external_evidence_required",
       "rev3": ["03.01.02", "03.01.05", "03.05.01", "03.05.03", "03.05.04", "03.05.12", "03.13.15", "03.16.03"],
       "rev2": ["3.1.1", "3.1.2", "3.1.5", "3.5.1", "3.5.2", "3.5.3", "3.5.10"],
-      "implementation": "Identity uses one server-side configuration authority, side-effect-free key inspection, conditional Clerk middleware, fail-closed protected routes, and explicit OBSERRA_IDENTITY_RUNTIME_ENABLED activation. Public content remains available when identity is disabled or degraded; identity-protected routes are not authorized without a functioning provider context.",
+      "implementation": "Identity uses one server-side configuration authority, side-effect-free key inspection, conditional Clerk middleware, fail-closed protected routes, and explicit OBSERRA_IDENTITY_RUNTIME_ENABLED activation. Vercel control-plane inspection on 2026-08-14 confirmed the activation flag and both Clerk key variable names are present with Production scope without exposing their values. The linked Clerk product records obserrallc.com as its production domain, while the deployment check reports that Clerk DNS verification is incomplete. Public content remains available when identity is disabled or degraded; identity-protected routes are not authorized without a functioning provider context.",
       "evidence": ["lib/clerk-runtime-config.ts", "lib/identity-runtime.ts", "app/layout.tsx", "proxy.ts", "test/identity-explicit-activation.test.mjs", "docs/florida-class-d-lms/PRODUCTION-RECOVERY-2026-08-14-HANDOFF.md"],
       "methods": ["examine", "test"],
       "boundary": "Obserra application and Clerk external identity service",
-      "gap": "Current production identity remains intentionally disabled/degraded. Verify the production Clerk instance and matching live protected configuration through the provider control plane before enabling identity, then retain post-deployment authentication and authorization evidence."
+      "gap": "The canonical deployment still reports identity configuration required. Complete the production Clerk DNS records through the authoritative third-party DNS provider, obtain a passing Clerk DNS deployment check, promote the exact release, and retain post-deployment authentication and authorization evidence. The remote Clerk dashboard requires local human authentication and was not bypassed."
     },
     {
       "id": "PRE-002",
@@ -48,11 +48,11 @@
       "status": "implemented_source_pending_postdeploy_validation",
       "rev3": ["03.04.01", "03.04.02", "03.04.03", "03.04.05", "03.12.03", "03.13.01", "03.13.06", "03.16.01", "03.16.03"],
       "rev2": ["3.4.1", "3.4.2", "3.4.3", "3.4.5", "3.12.3", "3.13.1"],
-      "implementation": "PR #80 removed repository-propagated aliases and merged as verified SHA d35917f417d24489ffd5877b989f36dbb3bbb613 after Florida Gates #570, Website CI #2344, and CodeQL #42 passed. Direct deployment inspection confirms the current duplicate-project deployments no longer carry the canonicals. Operator control-plane evidence shows both canonicals on intended project obserra-website-live and no production domain on either duplicate, but the old lcn2 deployment dpl_AYZXGVZurpGcKXLSzvKrudM7rt5w still retains both deployment-level aliases and serves canonical traffic. The liveness contract now reports VERCEL_PROJECT_ID, VERCEL_DEPLOYMENT_ID, and VERCEL_GIT_COMMIT_SHA and marks authority verified only for intended project prj_lxTKKDa9sbhht7FaigiaF1PONMiC.",
+      "implementation": "PR #82 merged the Gate 37 release as GitHub-verified SHA 2dde838ee176e6f450abeca2daad96ab377ed931 after all fourteen candidate checks passed. Intended deployment dpl_5wuL2pUUGcpgk6z7HgvZyVrQLbpd built READY from that exact verified SHA, and Vercel project settings show www.obserrallc.com valid on obserra-website-live with the apex configured as a 308 redirect. The canonical health contract now reports the intended project ID, but canonical traffic remains on prior deployment dpl_FdYBScoDxVX3bDFkk2dTwyvxtBPa at commit 0e72459a8940f23976038d85d6394409000f48c5 because failed deployment checks held the new deployment in Staged state.",
       "evidence": ["vercel.json", "app/api/health/route.ts", ".github/workflows/production-e2e-operational-gate.yml", "proxy.ts", "docs/florida-class-d-lms/PRODUCTION-RECOVERY-2026-08-14-HANDOFF.md", "docs/florida-class-d-lms/VERCEL-CANONICAL-DOMAIN-OWNERSHIP-GAP.md"],
       "methods": ["examine", "test"],
       "boundary": "Obserra application and Vercel edge/runtime control plane",
-      "gap": "Deploy the routing-evidence release from the intended project, verify the live health contract reports intended project prj_lxTKKDa9sbhht7FaigiaF1PONMiC and the exact accepted deployment/commit, verify the old lcn2 deployment no longer owns either canonical alias, and retain the result before closing GitHub issue #76."
+      "gap": "Complete the Clerk production DNS check, allow Vercel to assign the custom domains, and verify the live health contract reports exact release 2dde838ee176e6f450abeca2daad96ab377ed931 or its governed successor on the accepted deployment before closing GitHub issue #76."
     },
     {
       "id": "PRE-003",
@@ -60,11 +60,11 @@
       "status": "partial_external_evidence_required",
       "rev3": ["03.03.05", "03.04.03", "03.04.04", "03.12.01", "03.12.03", "03.14.06", "03.16.01", "03.16.03"],
       "rev2": ["3.3.5", "3.4.3", "3.4.4", "3.12.1", "3.12.3", "3.14.6"],
-      "implementation": "PR #80 exact-head validation passed Florida Class D LMS Gates #570, Website CI #2344, and CodeQL Advanced #42 before GitHub merged verified SHA d35917f417d24489ffd5877b989f36dbb3bbb613. Intended deployment dpl_DxojVNKBd9hJtcjXth3QptKei4Lw is READY and production-targeted for that exact SHA; its build compiled, type-checked, generated 159 pages, deployed output, and uploaded cache without a build error. Vercel nevertheless reports its postdeployment checks failed while lcn2 is successful, and the canonical request still reports older lcn2 deployment dpl_AYZXGVZurpGcKXLSzvKrudM7rt5w. The next release adds direct runtime project/deployment/commit evidence and requires the intended project before routing acceptance.",
+      "implementation": "PR #82 exact-head validation passed fourteen candidate checks before GitHub merged verified SHA 2dde838ee176e6f450abeca2daad96ab377ed931. Intended deployment dpl_5wuL2pUUGcpgk6z7HgvZyVrQLbpd is READY but Staged. Vercel Deployment Details identifies the blocking results exactly: the required operational job tested the previously promoted canonical revision and rejected identity status configuration-required; the built-in TypeCheck was skipped because package.json lacked a typecheck script; Clerk DNS is incomplete; and custom-domain assignment is blocked by those failed checks. Gate 38 adds a real tsc --noEmit script, keeps the configured required job as a pre-promotion source/routing gate, and moves exact-SHA identity, commerce, credential, and LMS verification into a separately named post-promotion job that polls for canonical convergence.",
       "evidence": ["app/api/health/route.ts", ".github/workflows/production-e2e-operational-gate.yml", "docs/florida-class-d-lms/PRODUCTION-RECOVERY-2026-08-14-HANDOFF.md", "docs/florida-class-d-lms/ACTION-LEDGER-PRODUCTION-RECOVERY-2026-08-14.md", "docs/florida-class-d-lms/VERCEL-CANONICAL-DOMAIN-OWNERSHIP-GAP.md", ".github/workflows/florida-class-d-lms-gates.yml"],
       "methods": ["examine", "test"],
       "boundary": "GitHub and Vercel",
-      "gap": "Close GitHub issue #76 only after canonical traffic is exclusively bound to an accepted READY deployment in intended project prj_lxTKKDa9sbhht7FaigiaF1PONMiC and the intended Vercel postdeployment check is identified and passes. Provider-wide availability, recovery, and formal continuous-monitoring evidence remain separate requirements."
+      "gap": "Publish and validate the Gate 38 workflow change, then close GitHub issue #76 only after the exact accepted release owns canonical traffic and the post-promotion job passes. Clerk DNS remains an external owner action and provider-wide availability, recovery, and formal continuous-monitoring evidence remain separate requirements."
     },
     {
       "id": "PRE-004",
@@ -96,7 +96,7 @@
       "status": "implemented_source_evidence",
       "rev3": ["03.03.08", "03.04.01", "03.04.03", "03.12.01", "03.12.03", "03.15.02", "03.16.01"],
       "rev2": ["3.3.8", "3.4.1", "3.4.3", "3.12.1", "3.12.3", "3.12.4"],
-      "implementation": "The authoritative control registers and production evidence are machine-readable JSON. Gate 35 separately enumerates all 110 Rev. 2 requirements, 97 active Rev. 3 requirements, and 33 withdrawn Rev. 3 identifiers. Human audit views and SHA-256 digests are generated deterministically, and CI fails on malformed mappings, missing evidence references, generated-document drift, or digest drift.",
+      "implementation": "The authoritative control registers and production evidence are machine-readable JSON. Gate 35 separately enumerates all 110 Rev. 2 requirements, 97 active Rev. 3 requirements, and 33 withdrawn Rev. 3 identifiers. Gate 38 records the exact Vercel deployment-check findings and remediation without converting the unresolved Clerk/DNS dependency or pending human review into a pass. Human audit views and SHA-256 digests are generated deterministically, and CI fails on malformed mappings, missing evidence references, generated-document drift, or digest drift.",
       "evidence": ["docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.json", "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-AUDIT-MATRIX.md", "scripts/cmmc-level2-rev3-traceability.mjs", "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.json", "scripts/cmmc-level2-rev3-production-evidence.mjs", "docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.json", "docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MATRIX.md", "scripts/cmmc-level2-dual-baseline.mjs"],
       "methods": ["examine", "test"],
       "boundary": "Obserra GitHub CI",
@@ -156,11 +156,11 @@
       "status": "implemented_source_evidence",
       "rev3": ["03.04.01", "03.04.03", "03.04.04", "03.04.05", "03.12.01", "03.16.01"],
       "rev2": ["3.4.1", "3.4.3", "3.4.4", "3.4.5", "3.12.1"],
-      "implementation": "A Vercel-recognized lib sentinel binds proxy.ts changes to production deployment relevance, CI verifies the exact Git blob identity, and package-lock.json is retained in the Vercel build context so production dependency resolution matches the audited lockfile.",
-      "evidence": ["lib/proxy-release-fingerprint.ts", "test/vercel-deployment-integrity.test.mjs", ".vercelignore", ".github/workflows/florida-class-d-lms-gates.yml", "docs/florida-class-d-lms/PRODUCTION-RECOVERY-2026-08-14-HANDOFF.md"],
+      "implementation": "A Vercel-recognized lib sentinel binds proxy.ts changes to production deployment relevance, CI verifies the exact Git blob identity, and package-lock.json is retained in the Vercel build context so production dependency resolution matches the audited lockfile. Gate 38 adds the exact typecheck script expected by Vercel and separates pre-promotion eligibility from exact-SHA post-promotion operational verification so a canonical check cannot deadlock the alias promotion it is intended to verify.",
+      "evidence": ["lib/proxy-release-fingerprint.ts", "test/vercel-deployment-integrity.test.mjs", ".vercelignore", "package.json", ".github/workflows/production-e2e-operational-gate.yml", ".github/workflows/florida-class-d-lms-gates.yml", "docs/florida-class-d-lms/PRODUCTION-RECOVERY-2026-08-14-HANDOFF.md"],
       "methods": ["examine", "test"],
       "boundary": "GitHub CI and Vercel production deployment",
-      "gap": "The Vercel project Ignored Build Step remains provider-side configuration; the source sentinel prevents the observed proxy-skip failure under the current rule, but future project-setting changes require revalidation."
+      "gap": "The Vercel project Ignored Build Step, required deployment-check selection, Clerk DNS state, and alias promotion remain provider-side configuration. Revalidate all four on the governed successor deployment before declaring production verified."
     },
     {
       "id": "PRE-012",
@@ -168,11 +168,11 @@
       "status": "implemented_source_evidence",
       "rev3": ["03.03.05", "03.04.03", "03.06.01", "03.06.02", "03.12.03", "03.14.01", "03.14.03", "03.14.06", "03.16.01", "03.16.03"],
       "rev2": ["3.3.5", "3.4.3", "3.6.1", "3.6.2", "3.12.3", "3.14.1", "3.14.3", "3.14.6"],
-      "implementation": "The production HTTP 500 incident was traced across Clerk initialization, Vercel routing/build-skip behavior, and dependency-lock parity. Remediation isolates public availability from identity-provider failure, retains fail-closed protected access, records failed intermediate releases, and binds the recovered runtime to an exact merge SHA and deployment ID.",
+      "implementation": "The production HTTP 500 incident was traced across Clerk initialization, Vercel routing/build-skip behavior, dependency-lock parity, and a deployment-check promotion deadlock. Remediation isolates public availability from identity-provider failure, retains fail-closed protected access, records failed intermediate releases, adds a real TypeScript check, and requires separately recorded pre-promotion and exact-SHA post-promotion results.",
       "evidence": ["proxy.ts", "lib/clerk-runtime-config.ts", "test/identity-explicit-activation.test.mjs", "test/vercel-deployment-integrity.test.mjs", "docs/florida-class-d-lms/PRODUCTION-RECOVERY-2026-08-14-HANDOFF.md", "docs/florida-class-d-lms/ACTION-LEDGER-PRODUCTION-RECOVERY-2026-08-14.md"],
       "methods": ["examine", "test"],
       "boundary": "Obserra application, GitHub CI, Vercel, and Clerk",
-      "gap": "Formal organizational incident-response exercise evidence and provider assurance remain separate assessment evidence."
+      "gap": "Clerk production DNS is unresolved and the exact new deployment is not yet canonical. Formal organizational incident-response exercise evidence and provider assurance remain separate assessment evidence."
     }
   ]
 }

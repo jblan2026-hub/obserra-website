@@ -1,11 +1,11 @@
 {
   "schemaVersion": "obserra.cmmc.continuity-handoff.v1",
-  "updatedAt": "2026-08-14T18:54:54Z",
+  "updatedAt": "2026-08-14T20:30:59Z",
   "legalOwner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   "repository": "jblan2026-hub/obserra-website",
   "workingBranch": "codex/gate37-public-production-hardening",
-  "workingBaseCommitSha": "0e72459a8940f23976038d85d6394409000f48c5",
-  "statusClaim": "implemented_locally_live_activation_pending",
+  "workingBaseCommitSha": "ca3664dd69635cb7f4e454b0ff22f6054d857606",
+  "statusClaim": "published_release_live_activation_pending",
   "statusRule": "Do not describe the continuous audit record as live until the production migrations, protected workflow secrets, approved main-branch workflow, actual archive write, controlled catalog read, artifact-chain check, access-event-chain check, health check, and paired receipt have all been verified.",
   "scope": {
     "included": [
@@ -154,9 +154,13 @@
     },
     "candidateSource": {
       "branch": "codex/gate37-public-production-hardening",
-      "workingBaseCommitSha": "0e72459a8940f23976038d85d6394409000f48c5",
-      "exactReleaseCommitSha": null,
-      "publicationState": "not_published",
+      "workingBaseCommitSha": "ca3664dd69635cb7f4e454b0ff22f6054d857606",
+      "exactReleaseCommitSha": "2dde838ee176e6f450abeca2daad96ab377ed931",
+      "mergedProductionCommitSha": "2dde838ee176e6f450abeca2daad96ab377ed931",
+      "stagedVercelDeploymentId": "dpl_5wuL2pUUGcpgk6z7HgvZyVrQLbpd",
+      "stagedDeploymentState": "READY",
+      "stagedDeploymentPromotionState": "blocked_by_required_checks_and_clerk_dns",
+      "publicationState": "published_ready_staged_not_canonical",
       "authoritativeTechnicalState": "not_tested",
       "eligibleAsFinalEvidence": false,
       "authorizedCredentialCount": 9,
@@ -175,7 +179,7 @@
     "humanReview": "pending",
     "pendingHumanIsTechnicalFailure": false,
     "assessmentFinding": "not_assessed",
-    "claimBoundary": "The current production deployment is verified failed for all nine EC-Council images. The candidate source and local HTTP/build validations are non-authoritative; candidate technical state remains not_tested and no production-fix or final-evidence claim is permitted until an exact commit is approved, deployed READY, reverified on the canonical page, and bound to a hashed final result artifact."
+    "claimBoundary": "The current canonical production deployment is verified failed for all nine EC-Council images. Release 2dde838ee176e6f450abeca2daad96ab377ed931 is merged and its exact Vercel deployment is READY, but it remains staged rather than canonical because required deployment checks blocked custom-domain assignment. Local and staged-candidate validations remain non-authoritative; candidate technical state remains not_tested and no production-fix or final-evidence claim is permitted until the exact release is promoted, reverified on the canonical page, and bound to a hashed final result artifact."
   },
   "fdacsPiiDatabaseAudit": {
     "machineReadablePath": "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json",
@@ -232,13 +236,14 @@
     "Paired machine-readable JSON and human-readable Markdown are generated from the same in-memory bundle and bound by a SHA-256 manifest.",
     "Archive source gate verifies exact revisions, ownership, claim boundaries, assessor-only findings, indefinite retention, immutable evidence, paired views, and both integrity-chain verifiers.",
     "The isolated live FDACS database has six new audit/retention/identity/hardening migrations, 64 explicit browser-deny policies, zero browser execute grants across 102 FDACS routines, zero security-advisor findings, zero unindexed foreign-key findings, five valid integrity chains, and three verified live fail-closed export observations; the unpublished source gate is not_tested and production authorization remains false.",
-    "The website credential candidate has nine authorized local assets, three live Active ADG issuer observations, a six-of-six integrity result, a clean TypeScript result, a complete Next.js production build, and HTTP 200 results for every direct/optimized asset path; current production still fails all nine images and remains a live blocker.",
-    "The fail-closed legal identity audit generated paired machine/human records, requires the exact legal entity and canonical public origin, preserves only enumerated product brands and stable technical identifiers, maps to CMMC configuration/evidence controls, and records the unpublished candidate as not_tested rather than green.",
+    "The website credential release has nine authorized local assets, three live Active ADG issuer observations, a six-of-six integrity result, a clean TypeScript result, a complete Next.js production build, and HTTP 200 results for every direct/optimized asset path; release 2dde838ee176e6f450abeca2daad96ab377ed931 is merged and READY in Vercel but staged, while canonical production still fails all nine images and remains a live blocker.",
+    "Vercel deployment checks identify two independent blockers: the code-controlled required job tested the pre-promotion canonical deployment, creating a circular gate, and Clerk reported incomplete or mismatched production DNS. The code-controlled workflow is remediated to separate pre-promotion source readiness from post-promotion exact-release verification; Clerk/DNS remains an explicit external pending action and is not bypassed or falsely passed.",
+    "The fail-closed legal identity audit generated paired machine/human records, requires the exact legal entity and canonical public origin, preserves only enumerated product brands and stable technical identifiers, maps to CMMC configuration/evidence controls, and records the non-canonical release as not_tested rather than green.",
     "The optimized Next.js 16.3.1 candidate build generated all 163 static pages; TypeScript, quiet ESLint, the 57-test Node source suite, and regulated Florida Class D source gates through Gate 21 were satisfied locally. These are non-authoritative candidate validations and do not create a green technical result.",
     "The stale unsupported CMMC Phase II suspension statement was removed from historical supporting records."
   ],
   "liveActivationBlockers": [
-    {"id": "LIVE-001", "state": "pending", "item": "Publish and approve the workflow through the governed GitHub main-branch process."},
+    {"id": "LIVE-001", "state": "complete", "item": "Gate 37 was approved and merged through the governed GitHub main-branch process as signed commit 2dde838ee176e6f450abeca2daad96ab377ed931."},
     {"id": "LIVE-002", "state": "pending", "item": "Obtain fresh confirmation for the quoted $10/month dedicated CMMC archive project. The Academy project is rejected because its shared service-role boundary includes Applications tables."},
     {"id": "LIVE-003", "state": "pending", "item": "Create the dedicated archive project, apply both archive migrations, and verify functions, grants, RLS, immutability, retention constraints, and integrity checks."},
     {"id": "LIVE-004", "state": "pending", "item": "Confirm any additional Small-compute, read-replica, and PITR costs; configure the approved resilience topology."},
@@ -246,7 +251,8 @@
     {"id": "LIVE-006", "state": "pending", "item": "Configure protected OBSERRA_CMMC_ARCHIVE_URL and OBSERRA_CMMC_ARCHIVE_SERVICE_ROLE_KEY environment secrets for the dedicated boundary."},
     {"id": "LIVE-007", "state": "pending", "item": "Run an actual approved in-scope change, archive the exact-revision pair, read it through the controlled catalog, verify both chains and health, and retain the machine/human receipt."},
     {"id": "LIVE-008", "state": "pending", "item": "Release stable continuous-audit links only after LIVE-001 through LIVE-007 are evidenced as complete."},
-    {"id": "LIVE-009", "state": "pending", "item": "Approve and publish the exact website candidate, deploy it through the intended Vercel project, and verify all nine EC-Council images have nonzero dimensions and every ADG link resolves to its individual active issuer record."}
+    {"id": "LIVE-009", "state": "pending", "item": "Publish the Gate 38 deployment-check remediation, allow the intended Vercel project to promote the exact release, and verify all nine EC-Council images have nonzero dimensions and every ADG link resolves to its individual active issuer record."},
+    {"id": "LIVE-010", "state": "pending", "item": "Complete the external Clerk production-domain/DNS configuration for obserrallc.com. Remote Clerk authentication is unavailable in this environment; this gate is recorded and must not be bypassed or mislabeled as satisfied."}
   ],
   "continuousAuditLinks": {
     "released": false,
@@ -257,7 +263,8 @@
   },
   "resumeOrder": [
     "Regenerate and verify the CMMC evidence pair and website credential manifest after every in-scope source change without modifying Applications paths.",
-    "Obtain publication authorization for the exact final commit, deploy through the intended Vercel project, and reverify the nine website credential images plus three ADG issuer links on the canonical page.",
+    "Publish the approved Gate 38 deployment-check remediation through the governed GitHub path, then observe the exact intended-project Vercel deployment.",
+    "Keep the Clerk production-domain/DNS gate explicitly pending; do not bypass or falsely satisfy it. After its external completion, promote and reverify the nine website credential images plus three ADG issuer links on the canonical page.",
     "Obtain the fresh $10/month dedicated-project confirmation; do not use the Academy or FDACS project as the archive target.",
     "Create the isolated archive project, then apply and verify the archive migrations without modifying Academy or Applications tables.",
     "Confirm and configure the approved HA/backup topology, then run exact-revision recovery tests.",

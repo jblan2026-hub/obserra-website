@@ -16,12 +16,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  production-operational-verification:
+  production-promotion-readiness:
     name: Website, Academy, identity, commerce, and security
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Verify website liveness contract
+      - name: Checkout candidate source
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run candidate type and release-boundary gates
+        run: |
+          npm run typecheck
+          npm run verify:academy-durable-commerce
+          node scripts/florida-class-d-website-academy-commerce-gate.mjs
+
+      - name: Verify existing canonical routing authority before promotion
         shell: bash
         run: |
           set -euo pipefail
@@ -43,6 +62,53 @@ jobs:
           grep -Eqi '^x-obserra-vercel-project-id:[[:space:]]*prj_lxTKKDa9sbhht7FaigiaF1PONMiC' /tmp/website-health-headers.txt
           grep -Eqi '^x-obserra-vercel-deployment-id:[[:space:]]*dpl_[A-Za-z0-9]+' /tmp/website-health-headers.txt
           grep -Eqi '^x-obserra-release-commit:[[:space:]]*[0-9a-f]{40}' /tmp/website-health-headers.txt
+
+  production-operational-verification:
+    name: Post-promotion canonical website, Academy, identity, commerce, and security
+    needs: production-promotion-readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Wait for the exact candidate to own the canonical domain
+        shell: bash
+        env:
+          EXPECTED_RELEASE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          accepted=false
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error --max-time 30 \
+              'https://www.obserrallc.com/api/health' \
+              -D /tmp/website-health-headers.txt -o /tmp/website-health.json; then
+              if jq -e --arg expected_project_id 'prj_lxTKKDa9sbhht7FaigiaF1PONMiC' --arg expected_release_sha "$EXPECTED_RELEASE_SHA" '
+                .service == "obserra-website" and
+                .status == "live" and
+                .contract == "website-liveness-v1" and
+                .routing.expectedProjectId == $expected_project_id and
+                .routing.observedProjectId == $expected_project_id and
+                .routing.authority == "verified" and
+                .routing.verified == true and
+                (.routing.deploymentId | test("^dpl_[A-Za-z0-9]+$")) and
+                .routing.gitCommitSha == $expected_release_sha
+              ' /tmp/website-health.json >/dev/null &&
+                grep -Eqi '^cache-control:[[:space:]]*no-store' /tmp/website-health-headers.txt &&
+                grep -Eqi '^x-obserra-health-contract:[[:space:]]*website-liveness-v1' /tmp/website-health-headers.txt &&
+                grep -Eqi '^x-obserra-routing-authority:[[:space:]]*verified' /tmp/website-health-headers.txt &&
+                grep -Eqi '^x-obserra-vercel-project-id:[[:space:]]*prj_lxTKKDa9sbhht7FaigiaF1PONMiC' /tmp/website-health-headers.txt &&
+                grep -Eqi '^x-obserra-vercel-deployment-id:[[:space:]]*dpl_[A-Za-z0-9]+' /tmp/website-health-headers.txt &&
+                grep -Eqi "^x-obserra-release-commit:[[:space:]]*${EXPECTED_RELEASE_SHA}" /tmp/website-health-headers.txt; then
+                accepted=true
+                break
+              fi
+            fi
+            sleep 10
+          done
+
+          if [ "$accepted" != "true" ]; then
+            echo "Canonical production did not converge to exact release ${EXPECTED_RELEASE_SHA}." >&2
+            cat /tmp/website-health.json >&2 2>/dev/null || true
+            exit 1
+          fi
 
       - name: Verify homepage and security headers
         shell: bash
