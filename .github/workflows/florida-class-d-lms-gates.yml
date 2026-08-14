@@ -30,7 +30,7 @@ env:
 
 jobs:
   regulated-source-gates:
-    name: Gates 1-30 and website compatibility
+    name: Gates 1-31 and website compatibility
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -90,6 +90,9 @@ jobs:
 
       - name: Run Gate 30 regulated mutation-boundary verification
         run: node scripts/florida-class-d-regulated-mutation-boundary-gate.mjs
+
+      - name: Run Gate 31 HA evidence integrity verification
+        run: node scripts/florida-class-d-ha-evidence-integrity-gate.mjs
 
       - name: Run repository contract tests
         run: npm test
