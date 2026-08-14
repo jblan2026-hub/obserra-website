@@ -4,15 +4,21 @@ Snapshot: 2026-08-13
 
 ## Status
 
-Gate 28 is being implemented on top of exact Gates 1-27 five-green source checkpoint:
+Gate 28 was implemented on top of exact Gates 1-27 five-green source checkpoint:
 
 `79502264a7c75c80a2d448316720658cfa56154b`
+
+Florida Class D LMS Gates #444 passed Gates 1-28, repository contract tests, lint/static quality validation, and the production Next.js build on source head `2c47678a741b4b635bc00990fe4a1678642bbf0b` before the migration filename was reconciled to the exact Supabase-recorded version.
+
+The Gate 28 performance migration was then applied successfully to the existing regulated non-production branch only. Post-migration catalog verification reports zero Class D foreign keys without a covering index, and the Supabase performance advisor no longer reports Class D `unindexed_foreign_keys` findings.
+
+Supabase recorded the applied migration as version `20260814011203`, so the Git migration filename was reconciled to that exact version. A complete validation cycle on the final reconciled Git head remains required before establishing the final Gate 28 five-green source checkpoint.
 
 Production remains fail closed. Gate 28 does not apply a production database migration and does not authorize production activation.
 
 ## Evidence source
 
-The connected Supabase control plane was inspected read-only.
+The connected Supabase control plane was inspected read-only before the controlled non-production Gate 28 migration.
 
 Main project:
 
@@ -30,7 +36,7 @@ Existing regulated non-production branch:
 - observed state: `ACTIVE_HEALTHY`
 - regulated Class D schema: present
 
-This confirms the current production boundary: the main connected project has not been promoted to the Class D schema, while the dedicated non-production branch contains the regulated implementation.
+This confirms the production boundary: the main connected project has not been promoted to the Class D schema, while the dedicated non-production branch contains the regulated implementation.
 
 ## Migration-history reconciliation
 
@@ -50,9 +56,9 @@ The recovered migration:
 
 Independent catalog verification confirmed all three functions currently have `search_path=public`, no execute privilege for public/anon/authenticated, and execute privilege for service_role.
 
-Restoring this file to Git source does not reapply the migration to non-production and does not change the database. It reconciles migration history so subsequent controlled migrations can be applied without knowingly carrying source/database drift.
+Restoring this file to Git source did not reapply the migration to non-production and did not change the database. It reconciled migration history so subsequent controlled migrations could be applied without knowingly carrying source/database drift.
 
-Gate 28 CI now requires this security migration to remain present with the verified security controls.
+Gate 28 CI requires this security migration to remain present with the verified security controls.
 
 ## Performance finding
 
@@ -81,6 +87,38 @@ Gate 28 adds one B-tree covering index for each verified missing foreign-key pat
 19. `fdacs_class_d_recorded_playback_challenges(enrollment_id)`
 20. `fdacs_class_d_retention_reviews(completion_record_id)`
 
+## Controlled non-production application result
+
+Validated source before application: `2c47678a741b4b635bc00990fe4a1678642bbf0b`.
+
+Class D workflow on that source: Florida Class D LMS Gates #444, success.
+
+Target: existing regulated non-production Supabase branch `obserra-fdacs-lms-nonprod`, project ref `jeklrsratrijrsamdauv`.
+
+Pre-application operational checks:
+
+- target branch `ACTIVE_HEALTHY`;
+- zero active non-idle database sessions;
+- zero open transactions;
+- target Class D tables essentially empty except retained synthetic acceptance evidence;
+- production/main project untouched.
+
+Applied migration name: `fdacs_class_d_fk_performance_indexes`.
+
+Supabase-recorded migration version: `20260814011203`.
+
+Canonical source file after reconciliation:
+
+`supabase/migrations/20260814011203_fdacs_class_d_fk_performance_indexes.sql`
+
+Application result: **success**.
+
+Post-application direct catalog verification: **zero** Florida Class D foreign-key constraints remain without a covering index.
+
+Post-application Supabase performance advisor: **zero** Florida Class D `unindexed_foreign_keys` findings. Remaining unindexed-FK findings are unrelated Academy/Application/Obserrian objects outside this workstream.
+
+New Gate 28 indexes appear as `unused_index` INFO findings because the regulated non-production branch has negligible workload. These INFO findings are expected and are not a basis for deleting the new FK support indexes before representative workload exists.
+
 ## HA-safe promotion strategy
 
 Supabase documents that ordinary index creation can block writes, while concurrent index creation reduces write blocking. The current Supabase CLI has known pipeline limitations around `CREATE INDEX CONCURRENTLY` replay.
@@ -96,7 +134,7 @@ The migration uses:
 - no table deletion
 - no data mutation
 
-If the deployment cannot obtain the required DDL lock within the controlled timeout, the migration must fail rather than waiting indefinitely. Production activation remains blocked until migration and post-migration verification succeed.
+If a future authorized production promotion cannot obtain the required DDL lock within the controlled timeout, the migration must fail rather than waiting indefinitely. Production activation remains blocked until migration and post-migration verification succeed.
 
 ## Explicit exclusions
 
@@ -113,19 +151,18 @@ The non-production Class D tables currently grant no table privileges to `PUBLIC
 ## Primary artifacts
 
 - `supabase/migrations/20260813204215_fdacs_class_d_security_hardening.sql`
-- `supabase/migrations/20260813211000_fdacs_class_d_fk_performance_indexes.sql`
+- `supabase/migrations/20260814011203_fdacs_class_d_fk_performance_indexes.sql`
 - `scripts/florida-class-d-database-performance-gate.mjs`
 - `.github/workflows/florida-class-d-lms-gates.yml`
 - `docs/florida-class-d-lms/ACTION-LEDGER.md`
 
 ## Validation sequence
 
-1. Validate migration-history parity and the index migration in the repository Gates 1-28 workflow.
-2. Apply the committed performance migration only to the existing regulated non-production branch through the controlled Supabase migration channel.
-3. Verify all 20 covering indexes exist.
-4. Re-run the Supabase performance advisor and direct catalog coverage query.
-5. Record the exact non-production migration/evidence result in `ACTION-LEDGER.md`.
-6. Do not apply the migration to production until the final production candidate/promotion sequence is authorized.
+1. Validate migration-history parity and the reconciled `20260814011203` index migration in the repository Gates 1-28 workflow.
+2. Preserve the successful non-production application evidence and zero-gap catalog result.
+3. Preserve the post-application advisor result showing no Class D `unindexed_foreign_keys` findings.
+4. Record the exact final Git five-green checkpoint and non-production evidence result in `ACTION-LEDGER.md`.
+5. Do not apply the migration to production until the final production candidate/promotion sequence is authorized.
 
 ## Production and regulatory boundary
 
