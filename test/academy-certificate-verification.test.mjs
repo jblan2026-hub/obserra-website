@@ -75,9 +75,11 @@ test("legacy schema 1.0 certificates remain explicitly supported", () => {
   assert.match(academy, /signed\.schemaVersion === "1\.1" \? signed\.courseTitle : course\.title/);
 });
 
-test("certificate presentation renders signed title and version and uses canonical credential name", () => {
+test("certificate presentation renders signed title and governed version and uses canonical credential name", () => {
   assert.match(certificatePage, /signed\.schemaVersion === "1\.1" \? signed\.courseTitle : course\.title/);
-  assert.match(certificatePage, /signed\.schemaVersion === "1\.1" \? signed\.courseVersion/);
+  assert.match(certificatePage, /const courseVersion = signed\.schemaVersion === "1\.1"[\s\S]*\? signed\.courseVersion[\s\S]*: \(publication\.version \|\| BASELINE_COURSE_VERSION\)/);
+  assert.match(certificatePage, /publicationForCourse\(courseId\)/);
+  assert.match(certificatePage, /BASELINE_COURSE_VERSION/);
   assert.match(certificateView, /Certificate of Course Completion/);
   assert.match(certificateView, /Course Version/);
 });
