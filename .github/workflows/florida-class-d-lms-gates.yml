@@ -30,7 +30,7 @@ env:
 
 jobs:
   regulated-source-gates:
-    name: Gates 1-27 and website compatibility
+    name: Gates 1-28 and website compatibility
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -70,6 +70,9 @@ jobs:
 
       - name: Run Gate 27 resilience and observability source verification
         run: node scripts/florida-class-d-resilience-observability-gate.mjs
+
+      - name: Run Gate 28 database performance source verification
+        run: node scripts/florida-class-d-database-performance-gate.mjs
 
       - name: Run repository contract tests
         run: npm test
