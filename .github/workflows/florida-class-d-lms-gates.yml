@@ -30,7 +30,7 @@ env:
 
 jobs:
   regulated-source-gates:
-    name: Gates 1-25 and website compatibility
+    name: Gates 1-26 and website compatibility
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -64,6 +64,9 @@ jobs:
 
       - name: Run Gate 25 regulated runtime-isolation enforcement
         run: node scripts/florida-class-d-runtime-isolation-audit.mjs --enforce
+
+      - name: Run Gate 26 production activation source verification
+        run: node scripts/florida-class-d-production-activation-gate.mjs
 
       - name: Run repository contract tests
         run: npm test
