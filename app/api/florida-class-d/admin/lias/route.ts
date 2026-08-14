@@ -9,6 +9,7 @@ import {
   markFloridaClassDLiasSubmitted,
   openFloridaClassDLiasException,
 } from "../../../../../lib/florida-class-d-lias";
+import { floridaClassDRegulatedExecutionAuthorized } from "../../../../../lib/florida-class-d-production-activation";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,13 @@ function response(body: unknown, status = 200) {
   return NextResponse.json(body, { status, headers });
 }
 
+function executionBlocked() {
+  return response(
+    { error: "Florida Class D regulated LIAS execution is not authorized in this environment.", code: "FDACS_REGULATED_EXECUTION_NOT_AUTHORIZED" },
+    503,
+  );
+}
+
 function errorResponse(error: unknown) {
   if (error instanceof FloridaClassDExamError) return response({ error: error.message, code: error.code }, error.status);
   if (error instanceof Error && "status" in error && typeof (error as { status?: unknown }).status === "number") {
@@ -34,6 +42,7 @@ function errorResponse(error: unknown) {
 
 export async function GET(request: NextRequest) {
   try {
+    if (!floridaClassDRegulatedExecutionAuthorized()) return executionBlocked();
     await requireFloridaClassDStaff(["school_admin", "compliance_admin"]);
     const enrollmentId = request.nextUrl.searchParams.get("enrollmentId");
     const queueId = request.nextUrl.searchParams.get("queueId");
@@ -47,6 +56,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!floridaClassDRegulatedExecutionAuthorized()) return executionBlocked();
     const staff = await requireFloridaClassDStaff(["compliance_admin"]);
     const body = await request.json().catch(() => null) as Record<string, unknown> | null;
     if (!body || typeof body.action !== "string") return response({ error: "Invalid LIAS workflow request." }, 400);
