@@ -1,5 +1,5 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { prepareClerkRuntime } from "./lib/clerk-runtime-config";
 import { evaluateFloridaClassDMutationBoundary } from "./lib/florida-class-d-mutation-boundary";
 
@@ -22,6 +22,9 @@ const PROTECTED_PATH_PREFIXES = [
   "/florida-security-training/admin",
   "/api/florida-class-d/admin",
 ] as const;
+
+type ConfiguredClerkHandler = ReturnType<typeof clerkMiddleware>;
+let configuredClerkHandler: ConfiguredClerkHandler | null = null;
 
 function authenticationReady() {
   return prepareClerkRuntime().ready;
@@ -218,7 +221,7 @@ function identityConfigurationResponse(request: NextRequest) {
   return response;
 }
 
-export default clerkMiddleware(async (auth, request) => {
+function preIdentityBoundary(request: NextRequest) {
   const ownerRoute = redirectToOwnerSite(request);
   if (ownerRoute) return ownerRoute;
 
@@ -228,24 +231,42 @@ export default clerkMiddleware(async (auth, request) => {
   const canonical = canonicalRedirect(request);
   if (canonical) return canonical;
 
-  const regulatedMutation = regulatedMutationBoundary(request);
-  if (regulatedMutation) return regulatedMutation;
+  return regulatedMutationBoundary(request);
+}
+
+function getConfiguredClerkHandler() {
+  if (configuredClerkHandler) return configuredClerkHandler;
+
+  configuredClerkHandler = clerkMiddleware(async (auth, request) => {
+    if (requiresAuthentication(request)) {
+      const { userId } = await auth();
+      if (!userId) {
+        return pathMatchesPrefix(new URL(request.url).pathname, "/command-center")
+          ? redirectToIdentityGateway(request)
+          : redirectToSignIn(request);
+      }
+    }
+
+    return applyRouteSecurityHeaders(NextResponse.next(), request);
+  });
+
+  return configuredClerkHandler;
+}
+
+export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+  const preIdentityResponse = preIdentityBoundary(request);
+  if (preIdentityResponse) return preIdentityResponse;
 
   if (!authenticationReady()) {
     return identityConfigurationResponse(request);
   }
 
-  if (requiresAuthentication(request)) {
-    const { userId } = await auth();
-    if (!userId) {
-      return pathMatchesPrefix(new URL(request.url).pathname, "/command-center")
-        ? redirectToIdentityGateway(request)
-        : redirectToSignIn(request);
-    }
+  try {
+    return await getConfiguredClerkHandler()(request, event);
+  } catch {
+    return identityConfigurationResponse(request);
   }
-
-  return applyRouteSecurityHeaders(NextResponse.next(), request);
-});
+}
 
 export const config = {
   matcher: [
