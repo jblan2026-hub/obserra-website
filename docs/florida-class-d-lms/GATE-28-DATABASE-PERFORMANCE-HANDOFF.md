@@ -32,6 +32,28 @@ Existing regulated non-production branch:
 
 This confirms the current production boundary: the main connected project has not been promoted to the Class D schema, while the dedicated non-production branch contains the regulated implementation.
 
+## Migration-history reconciliation
+
+Read-only migration-history comparison identified non-production migration version `20260813204215`, name `fdacs_class_d_security_hardening`, recorded in Supabase but absent from the Git branch.
+
+The database-retained migration statement was recovered from `supabase_migrations.schema_migrations` and independently verified against the resulting database state before being restored to source as:
+
+`supabase/migrations/20260813204215_fdacs_class_d_security_hardening.sql`
+
+The recovered migration:
+
+- pins `search_path = public` for `fdacs_class_d_live_append_only()`;
+- pins `search_path = public` for `fdacs_class_d_reject_quality_event_mutation()`;
+- pins `search_path = public` for `fdacs_class_d_lias_queue_prepared_event()`;
+- revokes execute from `public`, `anon`, and `authenticated` for those three functions;
+- grants execute to `service_role`.
+
+Independent catalog verification confirmed all three functions currently have `search_path=public`, no execute privilege for public/anon/authenticated, and execute privilege for service_role.
+
+Restoring this file to Git source does not reapply the migration to non-production and does not change the database. It reconciles migration history so subsequent controlled migrations can be applied without knowingly carrying source/database drift.
+
+Gate 28 CI now requires this security migration to remain present with the verified security controls.
+
 ## Performance finding
 
 Supabase performance advisor and direct `pg_catalog` verification identified exactly 20 Florida Class D foreign-key constraints without a covering index.
@@ -90,6 +112,7 @@ The non-production Class D tables currently grant no table privileges to `PUBLIC
 
 ## Primary artifacts
 
+- `supabase/migrations/20260813204215_fdacs_class_d_security_hardening.sql`
 - `supabase/migrations/20260813211000_fdacs_class_d_fk_performance_indexes.sql`
 - `scripts/florida-class-d-database-performance-gate.mjs`
 - `.github/workflows/florida-class-d-lms-gates.yml`
@@ -97,8 +120,8 @@ The non-production Class D tables currently grant no table privileges to `PUBLIC
 
 ## Validation sequence
 
-1. Validate the migration in the repository Gates 1-28 workflow.
-2. Apply the committed migration only to the existing regulated non-production branch through the controlled Supabase migration channel.
+1. Validate migration-history parity and the index migration in the repository Gates 1-28 workflow.
+2. Apply the committed performance migration only to the existing regulated non-production branch through the controlled Supabase migration channel.
 3. Verify all 20 covering indexes exist.
 4. Re-run the Supabase performance advisor and direct catalog coverage query.
 5. Record the exact non-production migration/evidence result in `ACTION-LEDGER.md`.
