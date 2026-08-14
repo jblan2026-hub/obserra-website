@@ -254,7 +254,6 @@ function render(mapping, rev3, validation, digest, rev3Digest) {
     "CI validates the complete 110-item Rev. 2 catalog, the complete 97-active/33-withdrawn Rev. 3 catalog, every identifier disposition, every explicit implementation trace, every local evidence reference, the generated report, and both input digests.",
     "",
     `Verification command: \`${mapping.outputs.ciCommand}\``,
-    "",
   );
   return `${lines.join("\n")}\n`;
 }
