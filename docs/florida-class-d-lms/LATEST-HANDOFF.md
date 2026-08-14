@@ -10,13 +10,15 @@ Gate 35 starting SHA: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
 
 Gate 35 implementation checkpoint: `c39f7ce2617b391a4df631227e4683bb320b81db`
 
+Gate 35 GitHub candidate: PR #78, initial candidate commit `f1ff531a3f015c85d5028be2e7c79aef90cd7f4a`, exact candidate tree `02b81adc614b75caba5b0441a31e6ddf42a2bda8`. Use the current PR head reported by GitHub as the validation and deployment authority after any documentation synchronization commit.
+
 Live Supabase checkpoint: migrations `20260814061110_academy_durable_learner_commerce` and `20260814061912_academy_payment_event_integrity_hardening` are applied to `nwxnyqlyzyufgoadtqxs`. The four new service-only tables are empty, forced-RLS protected, and backed by nine service-only functions plus append-only audit triggers. Stripe replays bind every material event field and claims bind the signed-webhook course version. This is live schema readiness, not a claim that the undeployed branch code or commerce runtime is operational.
 
 Validated source checkpoint: Gate 32, Gate 35 durable commerce, 110/97 dual-baseline validation, Academy alignment, Academy 70x/500x/1000x/2000x, targeted lint, non-incremental TypeScript, and all 51 repository tests pass. A complete local production build was not obtained because sandbox network policy stopped static generation at the external Academy control-plane read. Exact-SHA GitHub/Vercel build evidence is still required.
 
 Current evidence digests: Rev. 3 traceability `ab63297c4b6dcccd8e7a6e1b03ded72d150b163217db77832c90d783432de226`; production evidence `b5ba465f13ac6996ce6ad1a62928007257ea5d34128d06dd798bdd4167819d46`; complete dual baseline `632dc6f7b64ef3a9b798705823b05f85a8abb2de131c3eafb7c972873e0dea38`.
 
-Immediate continuation: push the scoped candidate, open a PR, pass CI and CodeQL, then configure and verify the three dedicated Academy Vercel secrets, live Clerk, and live Stripe/webhook controls; resolve duplicate Vercel domain ownership with action-time confirmation; deploy the exact validated SHA; and run the non-mutating production operational gate.
+Immediate continuation: pass PR #78 CI and CodeQL, then configure and verify the three dedicated Academy Vercel secrets, live Clerk, and live Stripe/webhook controls; resolve duplicate Vercel domain ownership with action-time confirmation; deploy the exact validated SHA; and run the non-mutating production operational gate.
 
 Latest live recheck: canonical traffic remains on undeployed `dpl_FYdopKa9RE5XMGMJecQ11AGMe3vb`; `/api/health` is 404; commerce is HTTP 503 with the old session-ID idempotency marker and identity degraded; Class D is live but not ready. Both canonical domains remain listed on all three Vercel projects, and the latest recorded deployment on each project is canceled.
 

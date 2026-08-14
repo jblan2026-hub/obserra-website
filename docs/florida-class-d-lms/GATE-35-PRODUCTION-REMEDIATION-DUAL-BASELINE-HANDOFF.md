@@ -21,6 +21,7 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 - Verified starting SHA: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
 - Working branch: `codex/production-readiness-cmmc-dual-baseline`
 - Implementation checkpoint: `c39f7ce2617b391a4df631227e4683bb320b81db`
+- GitHub candidate: PR #78; initial candidate commit `f1ff531a3f015c85d5028be2e7c79aef90cd7f4a`; exact candidate tree `02b81adc614b75caba5b0441a31e6ddf42a2bda8`
 - Previously observed live deployment: `dpl_FYdopKa9RE5XMGMJecQ11AGMe3vb`
 - Intended Vercel authority: `obserra-website-live` / `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`
 - Duplicate Vercel claimants: `obserra-website-lcn2` and `obserra-integrated-services`
@@ -119,7 +120,7 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 3. Verify live Stripe key, account charge capability, and signed webhook endpoint secret, then validate webhook delivery without creating a fabricated charge.
 4. Remove canonical-domain attachments from the two duplicate Vercel projects only, after the required action-time confirmation, and verify both domains remain on `obserra-website-live`.
 5. Remove static repository aliases only after exclusive Vercel ownership is directly verified.
-6. Push the scoped branch, open a PR, pass Florida gates, Website CI, CodeQL, and deploy the exact validated SHA.
+6. Pass PR #78 Florida gates, Website CI, and CodeQL, then deploy only the exact accepted PR head SHA.
 7. Re-run the production operational workflow. It must remain red until website liveness, live identity, live Stripe, signed webhook verification, durable storage, and Class D readiness truthfully pass.
 
 ## Latest live runtime and routing recheck
