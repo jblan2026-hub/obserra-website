@@ -182,6 +182,18 @@ Full local regulated validation subsequently retained two blocked runs and their
 
 No Vercel deployment, canonical routing result, FDACS activation, CUI authorization, CMMC assessor finding, or human approval is created by this reconciliation. Those states remain pending and fail closed where required.
 
+## Gate 38 Vercel deployment-check remediation
+
+Gate 37 publication completed through PR #82. All fourteen candidate checks passed on GitHub-verified head `688a5845b013a078c9a8c4971af323157800d8bc`; GitHub merged verified production SHA `2dde838ee176e6f450abeca2daad96ab377ed931`. Vercel deployment `dpl_5wuL2pUUGcpgk6z7HgvZyVrQLbpd` built successfully from that exact SHA and reached READY, but remained Staged because deployment checks blocked custom-domain assignment.
+
+Direct Vercel Deployment Details inspection established the exact failures. The required operational workflow evaluated the already-promoted canonical deployment before Vercel could assign the candidate aliases and rejected the old revision's `configuration-required` identity headers. Vercel also skipped TypeCheck because no `typecheck` package script existed. Clerk reported incomplete DNS for `obserrallc.com` and no matching status for one Vercel alias. Vercel then reported that custom-domain aliasing was blocked by those failed checks.
+
+Gate 38 adds `typecheck: tsc --noEmit` and separates the configured required pre-promotion check from a separately named post-promotion job. The pre-promotion job verifies candidate types, Academy/Florida source boundaries, and the existing canonical routing authority without claiming the candidate is live. The post-promotion job polls until the canonical health contract reports the exact Git SHA and intended Vercel project, then runs the full website, credential, identity, commerce, Academy, Florida Class D liveness/readiness, security-header, and canonical-redirect checks.
+
+Vercel currently shows `www.obserrallc.com` as a valid production domain and the apex as a valid 308 redirect, but the authoritative nameservers are third party. The linked Clerk product already records `obserrallc.com` as its production domain. Clerk dashboard access requires local human verification and cannot be authenticated remotely; that boundary was not bypassed. Production Clerk DNS and the resulting deployment check therefore remain unresolved external owner actions. They are not reclassified, waived, or marked passed.
+
+This remediation does not authorize CUI, Florida Class D production, or a CMMC finding. All organization/assessor human dispositions remain `pending`, and pending human review is not represented as a technical failure or approval.
+
 ## Regulated and CUI boundary
 
 Florida Class D production authorized: **false**.

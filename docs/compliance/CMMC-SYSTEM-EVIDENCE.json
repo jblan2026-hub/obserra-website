@@ -1,12 +1,12 @@
 {
   "schemaVersion": "2.0",
-  "bundleId": "obserra-cmmc-working-6d6e1bac9936c891e31332d6",
+  "bundleId": "obserra-cmmc-working-fcd75b18420e2ca8519af449",
   "bundleState": "working_evidence_inventory",
-  "generatedAt": "2026-08-14T18:49:07Z",
+  "generatedAt": "2026-08-14T20:27:30Z",
   "legalOwner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   "sourceDefinition": {
     "path": "docs/compliance/CMMC-SYSTEM-SCOPE-SOURCE.json",
-    "sha256": "617c3ac5fcda779ec15e15e93515f79d5cbdcb26e95a5c9ec80297a26c3c1b12",
+    "sha256": "7091e9267af6efc111325867c17d9fd36823ac9f4d0a7e7d1b8fab81436c8ab5",
     "state": "final"
   },
   "schemaReference": {
@@ -58,10 +58,10 @@
   "repositoryRevision": {
     "repository": "jblan2026-hub/obserra-website",
     "branch": "codex/gate37-public-production-hardening",
-    "headCommitSha": "0e72459a8940f23976038d85d6394409000f48c5",
+    "headCommitSha": "f7cbb936c79433eadf3977e6c18d9b8c5448fa0e",
     "revisionBinding": "working_tree_digest",
     "workingTreeState": "clean",
-    "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594",
+    "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000",
     "workingTreePathCount": 516,
     "digestPolicy": {
       "algorithm": "sha256",
@@ -236,7 +236,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -271,7 +271,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -306,7 +306,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -341,7 +341,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -376,7 +376,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -411,7 +411,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -428,7 +428,7 @@
           "title": "Machine-readable current workstream and recovery handoff",
           "path": "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json",
           "artifactState": "working",
-          "sha256": "a67a0acc63d29fafa32153c691544bfaf20dd46c441d6de453518bb0a6f0c3c0",
+          "sha256": "9c639b7ed46c1861b7d8a50f54970015c5abf1161079a5ee0077c8a0d3ae3a0d",
           "hashVerified": true,
           "evidenceOrigin": "organization_evidence",
           "owner": {
@@ -446,7 +446,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -481,7 +481,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -22171,7 +22171,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -22206,7 +22206,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -22241,7 +22241,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -22276,7 +22276,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -22311,7 +22311,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -22328,7 +22328,7 @@
           "title": "Machine-readable legal identity source audit",
           "path": "docs/compliance/LEGAL-IDENTITY-AUDIT.json",
           "artifactState": "working",
-          "sha256": "3fcc21b3685a6a546334f603c2718ec4294d97cc46c3b0b422e95b3c013c25ff",
+          "sha256": "cd06d1212493680eed14b1414cc068a144adc83b334c7f31b42e4a43a6985323",
           "hashVerified": true,
           "evidenceOrigin": "organization_evidence",
           "owner": {
@@ -22346,7 +22346,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -22381,7 +22381,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -22416,7 +22416,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -22451,7 +22451,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -22486,7 +22486,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -28898,7 +28898,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -28933,7 +28933,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -28968,7 +28968,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -29003,7 +29003,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -40119,7 +40119,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -40154,7 +40154,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -40189,7 +40189,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -40224,7 +40224,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -44385,7 +44385,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -44420,7 +44420,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -44455,7 +44455,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -44490,7 +44490,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -49313,7 +49313,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -49348,7 +49348,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -49383,7 +49383,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -53666,7 +53666,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -53701,7 +53701,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -53736,7 +53736,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -53771,7 +53771,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -53806,7 +53806,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -53841,7 +53841,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -53876,7 +53876,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -53911,7 +53911,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -53946,7 +53946,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -53981,7 +53981,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -54016,7 +54016,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -54051,7 +54051,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -54086,7 +54086,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -54121,7 +54121,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -54156,7 +54156,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -66322,7 +66322,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -66357,7 +66357,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -66392,7 +66392,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -72595,7 +72595,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -72630,7 +72630,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -72665,7 +72665,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -72700,7 +72700,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -72735,7 +72735,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -72752,7 +72752,7 @@
           "title": "Archive isolation and HA activation decision",
           "path": "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json",
           "artifactState": "working",
-          "sha256": "a67a0acc63d29fafa32153c691544bfaf20dd46c441d6de453518bb0a6f0c3c0",
+          "sha256": "9c639b7ed46c1861b7d8a50f54970015c5abf1161079a5ee0077c8a0d3ae3a0d",
           "hashVerified": true,
           "evidenceOrigin": "organization_evidence",
           "owner": {
@@ -72770,7 +72770,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -76675,7 +76675,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -76710,7 +76710,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -76745,7 +76745,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -76762,7 +76762,7 @@
           "title": "Production E2E operational gate",
           "path": ".github/workflows/production-e2e-operational-gate.yml",
           "artifactState": "working",
-          "sha256": "c20e3948bdb444ff75e228ff850a66a3acb1eb869b952878dd132e7f46c575ad",
+          "sha256": "dfc79cfde0d421f2761b3c0d8ede2dc2cfd538d591b8a4f76dd130fcfb4ad0d5",
           "hashVerified": true,
           "evidenceOrigin": "product_supplied_evidence",
           "owner": {
@@ -76780,7 +76780,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -82222,7 +82222,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -82257,7 +82257,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -82292,7 +82292,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -82327,7 +82327,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -82362,7 +82362,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -88970,7 +88970,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -89005,7 +89005,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -89040,7 +89040,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -94172,7 +94172,7 @@
           "title": "Direct dependency manifest",
           "path": "package.json",
           "artifactState": "working",
-          "sha256": "5e546b3c3635add0ac84e7f2435316aa7171d6db47a8109c43533f05ed031c8c",
+          "sha256": "cf8846f9dc74f9f0c99b2c93e281b81b9bee1489d5f5769cc125ee2295a563da",
           "hashVerified": true,
           "evidenceOrigin": "product_supplied_evidence",
           "owner": {
@@ -94190,7 +94190,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",
@@ -94225,7 +94225,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "test",
@@ -94260,7 +94260,7 @@
               "nist-sp-800-171ar3-2024-05"
             ],
             "targetGitCommitSha": null,
-            "workingTreeSha256": "6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594"
+            "workingTreeSha256": "fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000"
           },
           "testResult": {
             "method": "examine",

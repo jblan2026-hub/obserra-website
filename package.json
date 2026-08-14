@@ -6,6 +6,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "test": "node --test",
     "generate:cmmc-traceability": "node scripts/cmmc-level2-rev3-traceability.mjs --write",
     "verify:cmmc-traceability": "node scripts/cmmc-level2-rev3-traceability.mjs --check",
