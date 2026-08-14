@@ -97,3 +97,6 @@ jobs:
         run: |
           echo "Production runtime smoke requires real Clerk GitHub Actions credentials."
           exit 1
+- name: GitHub Copilot CLI
+
+  uses: austenstone/copilot-cli@v3.2
