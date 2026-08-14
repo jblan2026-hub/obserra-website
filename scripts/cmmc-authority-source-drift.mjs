@@ -105,7 +105,7 @@ const REQUEST_PROFILES = [
 
 function requestHeaders(profile, url) {
   const headers = { ...profile.headers };
-  if (profile.id === "browser_compatible_same_source" && new URL(url).hostname.toLowerCase().endsWith("dodcio.defense.gov")) {
+  if (profile.id === "browser_compatible_same_source" && new URL(url).hostname.toLowerCase() === "dodcio.defense.gov") {
     headers.Referer = "https://dodcio.defense.gov/CMMC/Resources-Documentation/";
   }
   return headers;
