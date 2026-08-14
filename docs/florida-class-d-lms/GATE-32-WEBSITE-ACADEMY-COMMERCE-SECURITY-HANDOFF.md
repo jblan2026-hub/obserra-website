@@ -1,6 +1,6 @@
 # Gate 32 Website, Academy, Commerce, Identity, and Data Security Handoff
 
-Snapshot: 2026-08-13 23:10 ET
+Snapshot: 2026-08-13 23:22 ET
 
 Owner: **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**
 
@@ -12,13 +12,13 @@ Pull request: `PR #56`
 
 ## Purpose
 
-Gate 32 extends the regulated release chain into the production website and Obserra Academy dependency surface without weakening the Florida Class D fail-closed boundary. The work covers the public website, Academy LMS, Supabase-backed Academy control plane, Clerk identity boundary, Stripe checkout and entitlement fulfillment, Vercel runtime behavior, production dependency hygiene, and the shared security headers that protect these routes.
+Gate 32 extends the regulated release chain across the public website and Obserra Academy dependency surface without weakening the Florida Class D fail closed boundary. The work covers the public website, Academy LMS, Supabase Academy control plane, Clerk identity boundary, Stripe checkout and entitlement fulfillment, Vercel runtime behavior, production dependency hygiene, course release identity, database access controls, and shared transactional security headers.
 
-This handoff is an engineering and audit record. It is not FDACS approval, Class DS authorization, production activation approval, or evidence that external high-availability obligations have been independently verified.
+This handoff is an engineering and audit record. It is not FDACS approval, Class DS authorization, production activation approval, CMMC certification, FedRAMP authorization, or independent verification of every external provider high availability obligation.
 
-## Historical regulated authority
+## Historical Gates 1 through 31 authority
 
-The last completed exact five-green Gates 1-31 checkpoint remains:
+The completed Gates 1 through 31 checkpoint remains preserved as historical evidence:
 
 `99ef49f4b43ee0cd0da6f147a4566e4d22a47aa8`
 
@@ -30,97 +30,127 @@ Five green workflows on that SHA:
 - Application Release Validation #881.
 - Application Production Pipeline #900.
 
-Gate 29 cryptographically bound the Class D migration manifest. Gate 30 established the default-deny regulated mutation boundary. Gate 31 established cryptographically bound HA evidence requirements. Those controls remain part of the source baseline and are not replaced by Gate 32.
+Gate 29 cryptographically bound the Class D migration manifest. Gate 30 established the default deny regulated mutation boundary. Gate 31 established cryptographically bound HA evidence requirements. Gate 32 preserves those controls.
 
-## Current Gate 32 source state
+## Exact Gate 32 source checkpoint
 
-Latest source-hardening head before this documentation synchronization:
+The current completed exact Gate 32 source checkpoint is:
 
-`7da136c63612b83313d6178a94546d40903213ae`
+`c53e18e33eb7fb6a3bdfc9569b18381b3eef0a19`
 
-The complete five-workflow validation set for the final documentation head is still required. Do not treat Gate 32 as an exact five-green checkpoint until the same final SHA has passed all five primary workflows.
+All five primary workflows passed on that exact SHA:
+
+- Florida Class D LMS Gates #520.
+- Website CI #2233.
+- Academy 70x Production Gate #1254.
+- Application Release Validation #943.
+- Application Production Pipeline #962.
+
+This checkpoint includes the website, Academy, payment, identity, database, dependency, preview access, course publication identity, and build reproducibility hardening described below.
+
+A later documentation synchronization commit changes the branch SHA. The final documentation head must therefore receive its own five workflow validation before it becomes the final handoff checkpoint.
 
 ## Gate 32 controls implemented
 
 ### Clerk identity and middleware
 
-The website proxy now exports `clerkMiddleware()` directly so server-side `auth()` can detect the Clerk middleware boundary correctly. The matcher includes API routes and Clerk internal paths.
+The website proxy directly exports `clerkMiddleware()` so server side `auth()` executes inside Clerk's supported middleware boundary. The matcher includes API routes and Clerk internal paths.
 
-Paid Academy lesson media and the Obserrian Academy Tutor no longer contain a preview-environment authentication bypass. Preview and production now require:
+Paid Academy lesson media and the Obserrian Academy Tutor no longer contain a preview environment authentication bypass. Preview and production require:
 
 - a valid Clerk session;
-- a signed-in user;
+- a signed in user;
 - current Academy entitlement for the requested course.
 
-Owner access remains available only through the authenticated owner-access path rather than through a generic `VERCEL_ENV=preview` exemption.
+Owner access remains available only through the authenticated owner access path.
+
+The live production deployment still runs the older production SHA and has emitted the known `auth()` cannot detect `clerkMiddleware()` runtime failure. Gate 32 corrects that source defect, but the fix must be verified after an intentionally authorized production deployment.
 
 ### Academy publication control plane
 
-The existing reviewed website catalog was established as the controlled Academy publication baseline.
+The reviewed website catalog is the controlled nonregulated Academy publication baseline.
 
-Live Supabase main-project verification after publication:
+Live Supabase main project verification after publication:
 
 - total Academy course controls: **60**;
 - published and purchasable controls: **60**;
-- Class D or security-officer-like controls: **0**.
+- Class D or security officer like controls: **0**.
 
-The baseline publication migration is idempotent and does not overwrite later operator decisions. Each newly inserted course control is associated with an audit event using the controlled actor identity `system:baseline-reviewed-catalog`.
+The baseline publication migration is idempotent and does not overwrite later operator decisions. Each newly inserted course control is associated with an audit event using actor `system:baseline-reviewed-catalog`.
 
 Canonical source migration:
 
 `supabase/migrations/20260814025522_academy_baseline_publication_controls.sql`
 
-The Class D regulated course is intentionally not part of this 60-course Academy baseline.
+The regulated Class D course is intentionally excluded from this 60 course baseline.
+
+### Course release identity and commercial traceability
+
+The reviewed baseline now has one authoritative semantic release identity:
+
+- version: `1.0.0`;
+- release status: `published`.
+
+`app/academy/coursePublication.ts` is the publication authority for baseline release identity. The public course API, Stripe Checkout metadata, payment intent metadata, dynamic Stripe product metadata, and legacy certificate fallback now derive course release identity from the same publication authority.
+
+Signed certificate schema 1.1 claims remain authoritative for certificates already carrying their own signed course title and semantic version. Legacy certificate rendering uses the governed publication version rather than an unrelated hard coded fallback.
+
+Regression tests enforce version and release status parity across publication, checkout, public course API, and certificate rendering.
 
 ### Public Academy catalog minimization
 
-The `academy-public-catalog` Supabase Edge Function was tightened so it:
+The `academy-public-catalog` Supabase Edge Function is source controlled and deployed as live version 5. It:
 
-- remains GET-only;
-- exposes only public-safe control and override fields;
-- returns only `public_visible=true` course controls;
+- is GET only;
+- is intentionally unauthenticated only at the gateway;
+- exposes only public safe control and override fields;
+- returns only `public_visible=true` controls;
 - retrieves content overrides only for public course IDs;
-- does not expose hidden/unpublished control records as part of the list response;
-- continues to fail closed if the control service is unavailable.
+- does not expose hidden or unpublished control records in the list response;
+- fails closed when the control service is unavailable.
 
-The live Edge Function was deployed as version 5 during this workstream.
+The protected owner function remains separately authenticated and was not weakened.
 
 ### Stripe commerce and purchase boundary
 
-Creating a Stripe Checkout Session is now a state-changing POST operation rather than a GET side effect.
+Creating a Stripe Checkout Session is a state changing POST operation rather than a GET side effect.
 
-The checkout endpoint now requires:
+The checkout endpoint requires:
 
 - POST;
-- same-origin `Origin` validation;
+- same origin `Origin` validation;
 - supported form content type;
-- current operational Academy control-plane state;
-- current course `purchaseEnabled=true` authorization;
+- current operational Academy control plane state;
+- current `purchaseEnabled=true` authorization;
 - Stripe secret configuration;
-- Stripe webhook-secret configuration;
-- no-store response caching.
+- Stripe webhook secret configuration;
+- no store response caching.
 
-GET requests to the checkout endpoint return HTTP 405 with `Allow: POST`.
+GET requests return HTTP 405 with `Allow: POST`.
 
-Academy catalog and course-detail purchase controls now submit POST forms to `/api/academy/checkout`; legacy query-string checkout links are forbidden by Gate 32.
+Academy catalog and course detail purchase controls submit POST forms to `/api/academy/checkout`. Legacy query string checkout mutation links are forbidden by Gate 32.
+
+The currently serving production deployment predates this fix and still renders legacy GET checkout links. No production checkout test should invoke those old GET links because doing so could create a Stripe session. Post deployment verification must confirm GET returns 405 before commerce is accepted as fully remediated.
 
 ### Payment claim and entitlement hardening
 
-Deferred course redemption re-fetches the Stripe Checkout Session and requires:
+Deferred course redemption re fetches the Stripe Checkout Session and requires:
 
-- `mode=payment`;
-- completed session status;
+- payment mode;
+- completed session state;
 - `payment_status=paid`;
 - exact course metadata match;
 - either exact Clerk user binding from checkout or a verified Clerk email matching the Stripe purchaser email.
 
 An unverified Clerk email alias cannot claim a paid course.
 
-Stripe webhook fulfillment remains signature-verified and grants access only after a paid event.
+Stripe webhook fulfillment remains signature verified and grants access only after a paid event. Entitlement creation remains idempotent.
+
+The live commerce health boundary returned operational status during this workstream and confirmed Stripe configuration, signed event verification, and idempotent fulfillment without exposing any secret values.
 
 ### Website and transactional security headers
 
-The website retains and Gate 32 now verifies:
+Gate 32 verifies the website retains:
 
 - Content Security Policy;
 - `object-src 'none'`;
@@ -128,40 +158,35 @@ The website retains and Gate 32 now verifies:
 - HTTPS upgrade policy;
 - HSTS with includeSubDomains and preload;
 - MIME sniffing protection;
-- cross-origin opener/resource protections;
+- cross origin opener and resource protections;
 - framework disclosure disabled.
 
-No-store transactional headers were extended to Academy APIs, the Stripe webhook, Class D APIs, Academy payment return, and identity routes.
+No store transactional headers cover Academy APIs, the Stripe webhook, Class D APIs, the Academy payment return, and identity routes.
+
+The live site was directly observed serving CSP, HSTS, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, cross origin opener protection, and a restrictive permissions policy.
 
 ### Next.js and production dependency remediation
 
-Gate 32 added a production dependency audit:
+Gate 32 added:
 
 `npm audit --omit=dev --audit-level=high`
 
-That audit correctly rejected the prior dependency graph because vulnerable transitive PostCSS and Sharp versions remained in the Next.js chain.
+The audit rejected the prior dependency graph because vulnerable transitive PostCSS and Sharp versions remained in the Next.js dependency chain.
 
-The remediation upgraded and aligned:
+The remediation aligned:
 
 - `next` to `16.3.1`;
 - `eslint-config-next` to `16.3.1`;
 - `react` to `19.2.8`;
 - `react-dom` to `19.2.8`.
 
-A one-time branch workflow regenerated the lockfile and required all of the following before pushing it:
+A one time branch workflow regenerated the lockfile and required clean `npm ci`, the production dependency audit, repository tests, lint, and a production Next.js build before pushing the lockfile. That workflow completed successfully and was removed immediately afterward.
 
-- deterministic lock regeneration;
-- clean `npm ci`;
-- production dependency audit;
-- repository tests;
-- lint;
-- production Next.js build.
-
-That one-time workflow completed successfully and pushed lockfile head `a8800916169d7f439b4827d52371dc1563c379b7`. The temporary write-capable workflow was then removed from the branch.
+Next 16.3.1 generated an additional `next-env.d.ts` root parameter type reference. That generated reference is committed so clean CI builds are reproducible and do not leave uncommitted framework generated drift.
 
 ### Supabase Academy database performance and access control
 
-Supabase performance analysis identified three Academy worker foreign keys without covering indexes. The following indexes were applied and source-controlled:
+Three Academy worker foreign key support indexes were applied and source controlled:
 
 - `academy_openai_usage_events_command_idx`;
 - `academy_openai_usage_events_node_idx`;
@@ -171,7 +196,35 @@ Canonical source migration:
 
 `supabase/migrations/20260814025503_academy_worker_fk_performance_indexes.sql`
 
-Academy learner, assessment, certificate, enrollment, owner, production-evidence, and worker tables reviewed during this workstream use the intended service/backend-only access model with forced RLS and no anon or authenticated grants. The `academy_production_live_handoff` object is a security-invoker view, not a table; the attempted table-RLS migration was rejected atomically and removed from Git without changing the database.
+Academy learner, assessment, certificate, enrollment, owner, production evidence, and worker tables reviewed during this workstream use the intended backend only access model with forced RLS and no anon or authenticated grants.
+
+`academy_production_live_handoff` is a security invoker view, not a table. An attempted table RLS migration was rejected atomically and removed from Git. No database change occurred from that rejected migration.
+
+Academy security definer functions reviewed have controlled search paths, no anon or authenticated execute grants, and service role only execution.
+
+## Validation history retained for audit
+
+Gate 32 did not become green on the first attempt. The following intermediate failures are part of the controlled history and must not be rewritten as successes.
+
+### Gate 32 documentation head `9576ec126ebc2dc82d165220aa1f019e933213c6`
+
+Academy 70x Production Gate #1241 failed because the Academy verifier still pinned Next and `eslint-config-next` at 16.2.11 after the audited dependency remediation intentionally moved both to 16.3.1. The verifier was updated to the patched security baseline rather than rolling dependencies backward.
+
+### Head `92af58ab77a8eea06c22678991f9f145dfa2fb87`
+
+The Academy gate itself passed all 369 assertions, but the clean build generated an additional Next 16.3.1 type reference in `next-env.d.ts`. CI correctly rejected the uncommitted generated drift. The generated reference was committed instead of disabling the reproducibility control.
+
+### Exact five green intermediate checkpoint `42fb836463a50aeeb12ba64e6dc43e594d726c25`
+
+All five primary workflows passed on this SHA after the dependency and reproducibility fixes. It remains valid intermediate evidence but is superseded as Gate 32 source authority by `c53e18e3...` because later course release identity hardening was added.
+
+### Head `9729c3ab09aa280b746d6a1b6ebe3d9c4617723c`
+
+The publication identity change caused test failures because one certificate test asserted old single line source formatting. The certificate behavior itself remained correct. The test was changed to assert the security invariant rather than source formatting.
+
+### Final source checkpoint `c53e18e33eb7fb6a3bdfc9569b18381b3eef0a19`
+
+All five primary workflows passed. This is the current completed Gate 32 source checkpoint before final documentation synchronization.
 
 ## Live environment observations
 
@@ -181,11 +234,11 @@ Main project: `Obserra Academy`
 
 Project ref: `nwxnyqlyzyufgoadtqxs`
 
-Observed state during this workstream: `ACTIVE_HEALTHY`.
+Observed state: `ACTIVE_HEALTHY`.
 
 The main project contains the live nonregulated Academy control plane and still contains **zero `fdacs_class_d_*` objects**. No Class D production schema promotion occurred.
 
-Regulated nonproduction branch remains:
+Regulated nonproduction remains:
 
 - branch: `obserra-fdacs-lms-nonprod`;
 - project ref: `jeklrsratrijrsamdauv`;
@@ -193,35 +246,67 @@ Regulated nonproduction branch remains:
 
 ### Vercel
 
-Intended existing project remains `obserra-website-live` under the intended team slug `obserra`.
+Direct control plane access verified the intended Vercel scope:
+
+- team slug: `obserra`;
+- team id: `team_xpUE1GefY2JHuFFCqbAdnZAj`;
+- project: `obserra-website-live`;
+- project id: `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`.
 
 Canonical public host remains:
 
 `https://www.obserrallc.com`
 
-The currently observed production deployment still reflects the older production SHA until a controlled production deployment of the new release candidate occurs. Production runtime logs previously showed the known Clerk middleware/auth failure on the older deployment. The direct-export Clerk fix exists in the branch but must be verified on the actual deployed candidate before production readiness can be claimed.
+The currently serving production deployment is READY on the older main source SHA:
+
+`80473277620e05acd5359330a706204703c999f0`
+
+Observed deployment id:
+
+`dpl_8VC9x6gKpPjmB2DXyQx1FxDfyEi8`
+
+Direct feature branch deployments are canceled because their GitHub commit verification metadata is `unverified`. Verified GitHub generated merge commits are allowed to build and reach READY. This is a Vercel verified commit policy behavior, not evidence that the Gate 32 application build is failing.
+
+No project move, project creation, or DNS change was performed.
+
+### Live Academy
+
+The live public Academy currently serves all 60 authorized nonregulated courses from the intended production project and reports the Academy control plane as operational.
+
+Because production still serves the older source SHA, it also still reflects pre Gate 32 behaviors, including legacy GET checkout links and the old Clerk middleware path. These are deployment lag observations, not branch regressions.
 
 ### Stripe
 
-The live Academy commerce-health boundary previously returned operational status with Stripe secret configuration present and webhook verification required. No secret values were exposed or requested in this workstream.
+The live Academy commerce health boundary returned HTTP 200 and reported commerce operational with:
 
-### Academy public catalog
+- Stripe secret configuration present;
+- webhook secret configuration present;
+- signed event verification required;
+- idempotent fulfillment enabled.
 
-The live public Academy catalog was restored to the reviewed 60-course nonregulated baseline through the secure control plane. The Class D regulated course remains excluded.
+No Stripe secret value was read, exposed, or requested.
+
+### Clerk
+
+The live site has owner confirmed Clerk integration, but the old production deployment continues to report identity degraded and runtime telemetry contains the known middleware detection error. Current Clerk documentation confirms the branch production key validation pattern is consistent with the supported `pk_live_` and `sk_live_` production key structure. The validator was not weakened.
+
+The identity state must be rechecked after Gate 32 is actually deployed before concluding that production Clerk credentials need owner action.
 
 ## High availability and production activation
 
-Gate 31 remains the authority for cryptographic HA evidence. Gate 32 does not replace that requirement.
+Gate 31 remains the authority for cryptographic HA evidence. Gate 32 does not replace it.
 
-No HA evidence has been fabricated for Vercel, Clerk, Stripe, Daily, observability, backup/restore, or document storage. External-provider evidence and final release binding are still required before regulated production activation.
+No HA evidence has been fabricated for Vercel, Clerk, Stripe, Daily, observability, backup and restore, document storage, or end to end failover.
 
-Current source policy continues to require authentic evidence for the complete service chain and enforces:
+The current Supabase connector does not expose project backup controls. Backup and restore therefore remains unverified external evidence for regulated activation rather than an assumed capability.
+
+Current policy requires authentic evidence for the complete regulated service chain and enforces:
 
 - RTO at or below 60 minutes;
 - RPO at or below 15 minutes;
 - failover exercise evidence no older than 90 days;
-- exact release-candidate binding;
-- protected HA evidence manifest and SHA-256 digest.
+- exact release candidate binding;
+- protected HA evidence manifest and SHA 256 digest.
 
 ## Florida Class D regulatory boundary
 
@@ -240,31 +325,19 @@ Nothing in Gate 32 authorizes:
 - Class D database promotion;
 - production activation.
 
-The main Supabase project remains without Class D schema objects. The historical Gate 23 18-of-18 synthetic UAT record is not candidate-bound to the current source and cannot be reused as final acceptance.
+The main Supabase project remains without Class D schema objects. The historical Gate 23 18 of 18 synthetic UAT record is not candidate bound to the current source and cannot be reused as final acceptance.
 
-Actual Class DS authorization, current DI instructor authorization where required, candidate-bound UAT, provider evidence, production database promotion evidence, rollback/security acceptance, and owner-controlled activation approval remain separate prerequisites.
-
-## Current validation requirement
-
-The branch must not be described as Gate 32 five-green until one exact final SHA passes all five primary workflows:
-
-1. Florida Class D LMS Gates.
-2. Website CI.
-3. Academy 70x Production Gate.
-4. Application Release Validation.
-5. Application Production Pipeline.
-
-Any later source or handoff synchronization commit changes the candidate SHA and therefore requires the final checkpoint to be recorded against the new exact head.
+Actual Class DS authorization, current DI instructor authorization where required, candidate bound UAT, provider evidence, production database promotion evidence, rollback and security acceptance, and owner controlled activation approval remain separate prerequisites.
 
 ## Next governed actions
 
-1. Complete the exact five-workflow validation set on the final handoff-synchronized head.
-2. Record the exact workflow run numbers and exact final SHA in this handoff and `LATEST-HANDOFF.md` once green.
-3. Keep PR #56 open and unmerged until the controlled release decision is made.
-4. Do not activate Class D production or promote the Class D schema to the main Supabase project.
-5. When a production candidate is intentionally deployed, verify Clerk authentication, Academy entitlement enforcement, public catalog state, Stripe POST checkout, signed-webhook fulfillment, no-store transactional responses, and rollback behavior against the deployed exact SHA.
-6. Obtain authentic provider HA/recovery evidence and build the Gate 31 manifest for the final candidate rather than using generic vendor claims.
-7. Run a fresh exact-candidate-bound Gate 23 18-of-18 synthetic UAT on the regulated nonproduction branch before any regulated production activation decision.
+1. Synchronize `LATEST-HANDOFF.md` and the regulated action record to exact source checkpoint `c53e18e3...`.
+2. Revalidate all five workflows on the resulting final documentation SHA.
+3. Keep PR #56 open and unmerged until the owner explicitly authorizes the normal verified GitHub merge and production promotion.
+4. Do not promote the Class D schema or activate regulated production.
+5. After an authorized production deployment, verify the exact deployed SHA, Clerk authentication, Academy entitlement enforcement, the 60 course public catalog, POST only Stripe checkout, GET checkout rejection, signed webhook fulfillment, course version `1.0.0`, release status `published`, transactional caching protections, and fresh runtime errors.
+6. Obtain authentic provider HA and recovery evidence and construct the Gate 31 manifest only from retained evidence.
+7. Execute fresh exact candidate bound Gate 23 18 of 18 synthetic UAT before any regulated production activation decision.
 
 ## Access pointers
 
