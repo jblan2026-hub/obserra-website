@@ -21,7 +21,10 @@ const redeemPath = "app/api/academy/redeem/route.ts";
 const webhookPath = "app/api/webhook/stripe/route.ts";
 const supabaseConfigPath = "supabase/config.toml";
 const publicCatalogPath = "supabase/functions/academy-public-catalog/index.ts";
+const baselinePublicationPath = "supabase/migrations/20260814025522_academy_baseline_publication_controls.sql";
+const workerIndexesPath = "supabase/migrations/20260814025503_academy_worker_fk_performance_indexes.sql";
 const productionActivationPath = "lib/florida-class-d-production-activation.ts";
+const tsconfigPath = "tsconfig.json";
 
 const proxy = read(proxyPath);
 const contracts = read(contractsPath);
@@ -31,7 +34,10 @@ const redeem = read(redeemPath);
 const webhook = read(webhookPath);
 const supabaseConfig = read(supabaseConfigPath);
 const publicCatalog = read(publicCatalogPath);
+const baselinePublication = read(baselinePublicationPath);
+const workerIndexes = read(workerIndexesPath);
 const productionActivation = read(productionActivationPath);
+const tsconfig = read(tsconfigPath);
 
 // Clerk must wrap the exported Next.js proxy directly so auth() can detect middleware execution.
 requireText(proxyPath, proxy, "export default clerkMiddleware(", "direct Clerk middleware export");
@@ -46,13 +52,35 @@ requireText(contractsPath, contracts, "purchaseEnabled: false", "non-purchasable
 requireText(controlPath, control, "courses: []", "empty degraded public catalog");
 requireText(controlPath, control, "course: null", "unavailable degraded public course");
 
-// The public catalog is intentionally unauthenticated at the gateway, GET-only, and limited to public fields.
+// The public catalog is intentionally unauthenticated at the gateway, GET-only, field-limited, and public-visible-only.
 requireText(supabaseConfigPath, supabaseConfig, "[functions.academy-public-catalog]", "public catalog function config");
 requireText(supabaseConfigPath, supabaseConfig, "verify_jwt = false", "public catalog JWT gateway disabled");
 requireText(publicCatalogPath, publicCatalog, 'request.method !== "GET"', "GET-only method guard");
 requireText(publicCatalogPath, publicCatalog, '.select("course_id, lifecycle, public_visible, purchase_enabled, preserve_existing_entitlements, revision, updated_at")', "public control field allowlist");
 requireText(publicCatalogPath, publicCatalog, '.select("course_id, course_summary, content_hash, revision, updated_at")', "public override field allowlist");
+requireText(publicCatalogPath, publicCatalog, '.eq("public_visible", true)', "public-visible-only control filter");
+requireText(publicCatalogPath, publicCatalog, '.in("course_id", publicCourseIds)', "public-only override filter");
 forbidText(publicCatalogPath, publicCatalog, "requireServiceRole(request)", "caller service-role requirement");
+
+// Reviewed website baseline publication must be idempotent, audited, and contain exactly 60 non-regulated courses.
+const baselineIds = [...baselinePublication.matchAll(/\('([a-z0-9]+(?:-[a-z0-9]+)*)'\)/g)].map((match) => match[1]);
+if (baselineIds.length !== 60 || new Set(baselineIds).size !== 60) {
+  throw new Error(`Gate 32 failed: ${baselinePublicationPath} must contain exactly 60 unique baseline course IDs`);
+}
+if (baselineIds.some((courseId) => courseId.includes("class-d") || courseId.includes("security-officer"))) {
+  throw new Error(`Gate 32 failed: ${baselinePublicationPath} must not publish regulated Class D training`);
+}
+requireText(baselinePublicationPath, baselinePublication, "on conflict (course_id) do nothing", "idempotent publication insert");
+requireText(baselinePublicationPath, baselinePublication, "system:baseline-reviewed-catalog", "audited system publication actor");
+requireText(baselinePublicationPath, baselinePublication, "baseline-published", "publication audit event");
+
+// Academy worker foreign keys required by the production control plane must retain covering indexes.
+requireText(workerIndexesPath, workerIndexes, "academy_openai_usage_events_command_idx", "OpenAI usage command FK index");
+requireText(workerIndexesPath, workerIndexes, "academy_openai_usage_events_node_idx", "OpenAI usage node FK index");
+requireText(workerIndexesPath, workerIndexes, "academy_worker_slot_status_command_idx", "worker slot command FK index");
+
+// Deno Edge Function source must remain outside the Next.js application type-check boundary.
+requireText(tsconfigPath, tsconfig, '"supabase/functions/**"', "Supabase Edge Function type-check exclusion");
 
 // Academy checkout must fail closed without current catalog authorization and Stripe webhook verification.
 requireText(checkoutPath, checkout, "STRIPE_SECRET_KEY", "Stripe secret readiness check");
@@ -83,4 +111,4 @@ forbidText(checkoutPath, checkout.toLowerCase(), "florida-class-d", "Florida Cla
 forbidText(redeemPath, redeem.toLowerCase(), "florida-class-d", "Florida Class D generic Academy redemption coupling");
 forbidText(webhookPath, webhook.toLowerCase(), "florida-class-d", "Florida Class D generic Stripe fulfillment coupling");
 
-console.log("Gate 32 passed: website identity, Academy control plane, commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
+console.log("Gate 32 passed: website identity, Academy publication/control plane, database dependencies, commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
