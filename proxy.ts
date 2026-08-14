@@ -1,5 +1,5 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
-import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextMiddleware, type NextRequest } from "next/server";
 import { prepareClerkRuntime } from "./lib/clerk-runtime-config";
 import { evaluateFloridaClassDMutationBoundary } from "./lib/florida-class-d-mutation-boundary";
 
@@ -23,8 +23,7 @@ const PROTECTED_PATH_PREFIXES = [
   "/api/florida-class-d/admin",
 ] as const;
 
-type ConfiguredClerkHandler = ReturnType<typeof clerkMiddleware>;
-let configuredClerkHandler: ConfiguredClerkHandler | null = null;
+let configuredClerkHandler: NextMiddleware | null = null;
 
 function authenticationReady() {
   return prepareClerkRuntime().ready;
@@ -234,7 +233,7 @@ function preIdentityBoundary(request: NextRequest) {
   return regulatedMutationBoundary(request);
 }
 
-function getConfiguredClerkHandler() {
+function getConfiguredClerkHandler(): NextMiddleware {
   if (configuredClerkHandler) return configuredClerkHandler;
 
   configuredClerkHandler = clerkMiddleware(async (auth, request) => {
@@ -262,7 +261,8 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
   }
 
   try {
-    return await getConfiguredClerkHandler()(request, event);
+    const clerkHandler = getConfiguredClerkHandler();
+    return await clerkHandler(request, event);
   } catch {
     return identityConfigurationResponse(request);
   }
