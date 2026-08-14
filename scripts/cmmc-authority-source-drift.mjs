@@ -82,31 +82,101 @@ function validateConfiguration(watch, authority) {
   for (const item of authority.authorities) if (!pinnedIds.has(item.authorityId)) fail(`authority ${item.authorityId} lacks a pinned artifact-integrity check`);
 }
 
-async function fetchOfficial(url) {
-  const response = await fetch(url, {
-    redirect: "follow",
-    signal: AbortSignal.timeout(90_000),
+const REQUEST_PROFILES = [
+  {
+    id: "identified_monitor",
     headers: {
       "User-Agent": "OBSERRA-CMMC-Authority-Monitor/1.0 (+https://obserrallc.com)",
       Accept: "application/pdf, application/xml, application/json, text/html;q=0.9, */*;q=0.8",
     },
-  });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const bytes = Buffer.from(await response.arrayBuffer());
-  if (!bytes.length || bytes.length > 64 * 1024 * 1024) throw new Error(`response size ${bytes.length} is outside the 1-byte to 64-MiB monitor boundary`);
-  return { bytes, finalUrl: response.url, contentType: response.headers.get("content-type") ?? "unknown" };
+  },
+  {
+    id: "browser_compatible_same_source",
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+      Accept: "application/pdf, application/xml, application/json, text/html,application/xhtml+xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+    },
+  },
+];
+
+function requestHeaders(profile, url) {
+  const headers = { ...profile.headers };
+  if (profile.id === "browser_compatible_same_source" && new URL(url).hostname.toLowerCase() === "dodcio.defense.gov") {
+    headers.Referer = "https://dodcio.defense.gov/CMMC/Resources-Documentation/";
+  }
+  return headers;
+}
+
+function fetchFailure(message, attempts) {
+  const error = new Error(message);
+  error.attempts = attempts;
+  return error;
+}
+
+async function fetchOfficial(url) {
+  const attempts = [];
+  for (const [index, profile] of REQUEST_PROFILES.entries()) {
+    let response;
+    try {
+      response = await fetch(url, {
+        redirect: "follow",
+        signal: AbortSignal.timeout(90_000),
+        headers: requestHeaders(profile, url),
+      });
+    } catch (error) {
+      attempts.push({ requestProfile: profile.id, requestedUrl: url, outcome: "network_error" });
+      throw fetchFailure(error instanceof Error ? error.message : String(error), attempts);
+    }
+
+    attempts.push({
+      requestProfile: profile.id,
+      requestedUrl: url,
+      outcome: response.ok ? "response_ok" : "http_error",
+      httpStatus: response.status,
+      finalUrl: response.url,
+    });
+    if (!response.ok) {
+      const retryAllowed = (response.status === 403 || response.status === 429) && index < REQUEST_PROFILES.length - 1;
+      if (retryAllowed) {
+        await response.body?.cancel();
+        continue;
+      }
+      const attemptSummary = attempts.map((attempt) => `${attempt.requestProfile}:${attempt.httpStatus ?? attempt.outcome}`).join(", ");
+      throw fetchFailure(`official source request failed (${attemptSummary})`, attempts);
+    }
+
+    const bytes = Buffer.from(await response.arrayBuffer());
+    if (!bytes.length || bytes.length > 64 * 1024 * 1024) {
+      throw fetchFailure(`response size ${bytes.length} is outside the 1-byte to 64-MiB monitor boundary`, attempts);
+    }
+    return {
+      bytes,
+      finalUrl: response.url,
+      contentType: response.headers.get("content-type") ?? "unknown",
+      requestProfile: profile.id,
+      requestAttempts: attempts,
+    };
+  }
+  throw fetchFailure("official source request exhausted all same-source request profiles", attempts);
 }
 
 async function runCheck(check) {
   const base = { checkId: check.checkId, checkType: check.checkType, authorityId: check.authorityId, requestedUrl: check.url };
+  let requestEvidence = { requestProfile: null, requestAttempts: [] };
   try {
     const fetched = await fetchOfficial(check.url);
     const observedSha256 = sha256(fetched.bytes);
+    requestEvidence = { requestProfile: fetched.requestProfile, requestAttempts: fetched.requestAttempts };
     if (check.checkType === "pinned_sha256") {
       const passed = observedSha256 === check.expectedSha256;
       return {
         ...base,
         status: passed ? "passed" : "drift_detected",
+        ...requestEvidence,
         finalUrl: fetched.finalUrl,
         contentType: fetched.contentType,
         observedBytes: fetched.bytes.length,
@@ -124,6 +194,7 @@ async function runCheck(check) {
       return {
         ...base,
         status: passed ? "passed" : "drift_detected",
+        ...requestEvidence,
         finalUrl: fetched.finalUrl,
         contentType: fetched.contentType,
         observedBytes: fetched.bytes.length,
@@ -145,6 +216,7 @@ async function runCheck(check) {
     return {
       ...base,
       status: passed ? "passed" : "drift_detected",
+      ...requestEvidence,
       finalUrl: fetched.finalUrl,
       contentType: fetched.contentType,
       observedBytes: fetched.bytes.length,
@@ -158,6 +230,8 @@ async function runCheck(check) {
     return {
       ...base,
       status: "error",
+      requestProfile: requestEvidence.requestProfile,
+      requestAttempts: Array.isArray(error?.attempts) ? error.attempts : requestEvidence.requestAttempts,
       detail: `Official source check could not complete: ${error instanceof Error ? error.message : String(error)}`,
     };
   }
