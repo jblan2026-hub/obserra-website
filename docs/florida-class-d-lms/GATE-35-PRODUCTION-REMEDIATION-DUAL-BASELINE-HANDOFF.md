@@ -22,6 +22,8 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 - Working branch: `codex/production-readiness-cmmc-dual-baseline`
 - Implementation checkpoint: `c39f7ce2617b391a4df631227e4683bb320b81db`
 - GitHub candidate: PR #78; initial candidate commit `f1ff531a3f015c85d5028be2e7c79aef90cd7f4a`; exact candidate tree `02b81adc614b75caba5b0441a31e6ddf42a2bda8`
+- Merged release: `2189c73ff5ba15ea07aa51ab84da23112403a720`
+- Intended READY deployment: `dpl_6ERkFxUAKg6yjnrJVQ649dLeM6rz`
 - Previously observed live deployment: `dpl_FYdopKa9RE5XMGMJecQ11AGMe3vb`
 - Intended Vercel authority: `obserra-website-live` / `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`
 - Duplicate Vercel claimants: `obserra-website-lcn2` and `obserra-integrated-services`
@@ -45,16 +47,16 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 | Rev. 3 mapping gate | 97 active requirements and 21 trace records passed; digest `7119dd9f2b00aa6f9b23bca7a4f4677303e80066c1936dee4b5ae136d1b0eab3` | Verified but not the complete CMMC Level 2 assessment baseline |
 | Production evidence gate | Existing production evidence passed; digest `3a4952b12a81dbff2dfbec4f05c3f6933e654a5ef710af9e2fb1f970b1efd1e4` | Verified for recorded state, requires Gate 35 updates |
 
-## Confirmed defects and gaps
+## Current resolved items and remaining gaps
 
-1. The repository does not yet contain a first-class, complete, machine-validated register for all 110 Rev. 2 requirements.
-2. The existing Rev. 3 register identifies Rev. 2 practices only within implementation trace records. This is not complete 110-requirement coverage.
-3. The scheduled production end-to-end workflow expects a retired GET checkout flow and a public live Clerk marker. Its assertions conflict with the hardened runtime contract and can produce false results.
+1. The repository now contains a first-class, complete, machine-validated register for all 110 Rev. 2 requirements plus the 97-active/33-withdrawn Rev. 3 overlay. Every Rev. 2 assessment result remains `not_assessed`.
+2. The dual-baseline generator, human matrix, schema, digests, and CI drift enforcement passed on the exact PR head.
+3. The scheduled production end-to-end workflow now asserts the POST-only checkout, real website liveness, live identity/commerce dependencies, durable fulfillment, and regulated readiness contracts without creating a payment.
 4. Live commerce is fail closed because the Stripe secret and webhook runtime configuration are not available to the serving deployment.
 5. Live identity is intentionally disabled or degraded because a verified live Clerk control-plane configuration has not been activated.
 6. Both canonical domains remain reported against three Git-linked Vercel projects, so exclusive routing ownership is unverified.
-7. Academy learner enrollment, progress, assessment, and certificate state is currently persisted in Clerk private metadata even though service-only Supabase learner tables exist. The design requires reconciliation for durable concurrency, auditability, and provider-size limits before it can be accepted as production-ready.
-8. Stripe webhook processing did not retain a durable provider-event ledger at the starting SHA. Gate 35 now provides a live empty event ledger and transactional event-ID idempotency, but the code is not a production runtime control until its exact validated commit is deployed and the Vercel dependency configuration is verified.
+7. Durable Academy learner, progress, assessment, certificate, payment-event, and audit code is deployed, and the live service-only schema is ready. Runtime storage remains fail closed until its dedicated protected Vercel variables are configured.
+8. Stripe webhook event-ID idempotency and the durable provider-event ledger are deployed, but live Stripe and webhook configuration remains unavailable and commerce health correctly returns HTTP 503.
 9. GitHub `main` branch protection, required status checks, rulesets, Dependabot alerts, and secret-scanning state remain external administrator controls tracked by issue #60.
 10. CUI scope, SSP, asset categorization, provider responsibility matrices, FIPS boundary evidence, organizational policies, incident exercises, backup/restore, RPO/RTO, and failover evidence remain incomplete. CUI processing must remain unauthorized.
 11. Florida Class D production remains blocked by the recorded licensing, candidate-bound acceptance, production database, HA/recovery, rollback, and explicit activation prerequisites.
@@ -78,7 +80,7 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 - Input digest record: `docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.sha256`
 - Dual-baseline SHA-256: `632dc6f7b64ef3a9b798705823b05f85a8abb2de131c3eafb7c972873e0dea38`
 - Current Rev. 3 traceability SHA-256: `ab63297c4b6dcccd8e7a6e1b03ded72d150b163217db77832c90d783432de226`
-- Current production-evidence SHA-256: `b5ba465f13ac6996ce6ad1a62928007257ea5d34128d06dd798bdd4167819d46`
+- Current production-evidence SHA-256: `cc9ca9647d163c27d75d480585a34b4173cb19fb5a5e863f46d6ecbace30178e`
 - CI verification command: `npm run verify:cmmc-dual-baseline`
 - CI workflow now runs Gate 35 and validates exact catalog counts, identifier dispositions, trace references, local evidence existence, generated report drift, and input digests.
 
@@ -109,7 +111,7 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 - Academy 70x passes 369 assertions. The 500, 1000, and 2000 case suites pass as static contract tests only and are not live transaction evidence.
 - Repository tests pass 51 of 51.
 - Targeted ESLint and non-incremental TypeScript compilation pass.
-- A local production build compiled and passed TypeScript, then the restricted sandbox stopped static generation when the Academy control plane attempted its external Supabase read. This is an environment limitation, not a completed build result. GitHub/Vercel build evidence remains required on the exact candidate SHA.
+- Website CI #2340 and the intended Vercel production deployment built the exact validated release successfully.
 - Rev. 3 traceability, production evidence, and the dual-baseline human views and digests were regenerated and all three drift checks pass.
 - The scoped implementation checkpoint is `c39f7ce2617b391a4df631227e4683bb320b81db`; no application-product path is included.
 
@@ -120,17 +122,16 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 3. Verify live Stripe key, account charge capability, and signed webhook endpoint secret, then validate webhook delivery without creating a fabricated charge.
 4. Remove canonical-domain attachments from the two duplicate Vercel projects only, after the required action-time confirmation, and verify both domains remain on `obserra-website-live`.
 5. Remove static repository aliases only after exclusive Vercel ownership is directly verified.
-6. Pass PR #78 Florida gates, Website CI, and CodeQL, then deploy only the exact accepted PR head SHA.
-7. Re-run the production operational workflow. It must remain red until website liveness, live identity, live Stripe, signed webhook verification, durable storage, and Class D readiness truthfully pass.
+6. Re-run the production operational workflow. It must remain red until website liveness, live identity, live Stripe, signed webhook verification, durable storage, and Class D readiness truthfully pass.
 
 ## Latest live runtime and routing recheck
 
-- Canonical traffic still serves deployment `dpl_FYdopKa9RE5XMGMJecQ11AGMe3vb`; the new branch code is not deployed.
-- `GET /api/health` returns HTTP 404, as expected before the new liveness route is deployed.
-- Academy commerce health remains HTTP 503 and reports identity degraded plus Stripe/webhook unavailable. Its old `stripe-checkout-session-id` idempotency marker confirms the durable event-ID release is not yet serving.
+- GitHub merge SHA `2189c73ff5ba15ea07aa51ab84da23112403a720` is deployed to all three Git-linked Vercel projects. Intended deployment `dpl_6ERkFxUAKg6yjnrJVQ649dLeM6rz` is READY and production-targeted.
+- `GET /api/health` returns HTTP 200 with `website-liveness-v1`.
+- Academy commerce health remains HTTP 503 and reports the new Stripe-event-ID/durable-Supabase contract, but identity, Stripe/webhook, durable Academy storage, and purchaser identity hashing are unavailable.
 - Florida Class D liveness returns HTTP 200 and `live`; readiness returns HTTP 503 and `not_ready`.
 - Direct Vercel project reads still list both canonical domains on all three projects: `obserra-website-live`, `obserra-website-lcn2`, and `obserra-integrated-services`.
-- The latest recorded deployment on each of those three projects is canceled. This does not alter the previously observed serving deployment or resolve exclusive domain ownership.
+- The exact-merge deployment on each project is READY. The canonical homepage still returned cached HTML marked with older lcn2 deployment `dpl_FYdopKa9RE5XMGMJecQ11AGMe3vb` while the new API routes were reachable, so this does not resolve exclusive domain ownership.
 
 ## Evidence update rule
 
