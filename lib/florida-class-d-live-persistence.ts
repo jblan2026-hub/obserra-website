@@ -111,6 +111,143 @@ async function resolveStudentEnrollment(userId: string, liveSessionId: string) {
   return { session, enrollmentId: enrollment.id };
 }
 
+export async function listFloridaClassDStudentLiveSessions(userId: string) {
+  if (userId.length < 3 || userId.length > 255) {
+    throw new FloridaClassDLivePersistenceError(
+      "Authenticated student identity is invalid.",
+      400,
+      "FDACS_LIVE_INVALID_STUDENT_IDENTITY",
+    );
+  }
+  const enrollmentQuery = new URLSearchParams({
+    select: "id,status,cohort_id,execution_profile,training_credit_eligible",
+    clerk_user_id: `eq.${userId}`,
+    status: "in.(enrolled,in_progress,instruction_complete,exam_eligible)",
+    order: "created_at.desc",
+    limit: "1",
+  });
+  const enrollments = await request<Array<{
+    id?: string;
+    status?: string;
+    cohort_id?: string;
+    execution_profile?: string;
+    training_credit_eligible?: boolean;
+  }>>(`fdacs_class_d_enrollments?${enrollmentQuery}`);
+  const enrollment = enrollments[0];
+  if (!enrollment?.cohort_id) return [];
+
+  const sessionQuery = new URLSearchParams({
+    select: "id,day,lesson_id,status,scheduled_start_at,scheduled_end_at,execution_profile",
+    cohort_id: `eq.${enrollment.cohort_id}`,
+    order: "day.asc,scheduled_start_at.asc",
+    limit: "20",
+  });
+  const trainingDayQuery = new URLSearchParams({
+    select: "day,time_zone",
+    cohort_id: `eq.${enrollment.cohort_id}`,
+    order: "day.asc",
+    limit: "5",
+  });
+  const [sessions, trainingDays] = await Promise.all([
+    request<Array<{
+    id: string;
+    day: number;
+    lesson_id: string;
+    status: string;
+    scheduled_start_at: string;
+    scheduled_end_at: string;
+    execution_profile: string;
+    }>>(`fdacs_class_d_live_sessions?${sessionQuery}`),
+    request<Array<{ day: number; time_zone: string }>>(
+      `fdacs_class_d_cohort_training_days?${trainingDayQuery}`,
+    ),
+  ]);
+  const timeZoneByDay = new Map(trainingDays.map((entry) => [entry.day, entry.time_zone]));
+  return sessions.map((session) => ({
+    ...session,
+    time_zone: timeZoneByDay.get(session.day) ?? "America/New_York",
+  }));
+}
+
+export async function assertFloridaClassDLiveSessionInstructor(
+  actor: StaffActor,
+  liveSessionId: string,
+) {
+  requireUuid(liveSessionId, "live session id");
+  const query = new URLSearchParams({
+    select: "id,cohort_id,day,lesson_id,status,execution_profile,instructor_clerk_user_id",
+    id: `eq.${liveSessionId}`,
+    limit: "1",
+  });
+  const sessions = await request<Record<string, unknown>[]>(`fdacs_class_d_live_sessions?${query}`);
+  const session = sessions[0];
+  if (!session) {
+    throw new FloridaClassDLivePersistenceError(
+      "Live session not found.",
+      404,
+      "FDACS_LIVE_SESSION_NOT_FOUND",
+    );
+  }
+  if (
+    session.execution_profile === "owner_uat_noncredit"
+    && (actor.role !== "instructor" || session.instructor_clerk_user_id !== actor.userId)
+  ) {
+    throw new FloridaClassDLivePersistenceError(
+      "Only the Class DI instructor assigned to this owner-UAT lesson may use its instructor controls.",
+      403,
+      "FDACS_OWNER_UAT_ASSIGNED_INSTRUCTOR_REQUIRED",
+    );
+  }
+  return session;
+}
+
+export async function assertFloridaClassDLiveActionScope(
+  liveSessionId: string,
+  input: {
+    enrollmentId?: string;
+    pollId?: string;
+    textScreenId?: string;
+    parentInteractionId?: string;
+  },
+) {
+  requireUuid(liveSessionId, "live session id");
+  const sessionQuery = new URLSearchParams({ select: "id,cohort_id", id: `eq.${liveSessionId}`, limit: "1" });
+  const sessions = await request<Array<{ id?: string; cohort_id?: string }>>(`fdacs_class_d_live_sessions?${sessionQuery}`);
+  const cohortId = sessions[0]?.cohort_id;
+  if (!cohortId) {
+    throw new FloridaClassDLivePersistenceError("Live session not found.", 404, "FDACS_LIVE_SESSION_NOT_FOUND");
+  }
+
+  const checks: Promise<boolean>[] = [];
+  if (input.enrollmentId) {
+    requireUuid(input.enrollmentId, "enrollment id");
+    const query = new URLSearchParams({ select: "id", id: `eq.${input.enrollmentId}`, cohort_id: `eq.${cohortId}`, limit: "1" });
+    checks.push(request<Array<{ id?: string }>>(`fdacs_class_d_enrollments?${query}`).then((rows) => rows[0]?.id === input.enrollmentId));
+  }
+  if (input.pollId) {
+    requireUuid(input.pollId, "poll id");
+    const query = new URLSearchParams({ select: "id", id: `eq.${input.pollId}`, live_session_id: `eq.${liveSessionId}`, limit: "1" });
+    checks.push(request<Array<{ id?: string }>>(`fdacs_class_d_live_polls?${query}`).then((rows) => rows[0]?.id === input.pollId));
+  }
+  if (input.textScreenId) {
+    requireUuid(input.textScreenId, "text screen id");
+    const query = new URLSearchParams({ select: "id", id: `eq.${input.textScreenId}`, live_session_id: `eq.${liveSessionId}`, limit: "1" });
+    checks.push(request<Array<{ id?: string }>>(`fdacs_class_d_live_text_screens?${query}`).then((rows) => rows[0]?.id === input.textScreenId));
+  }
+  if (input.parentInteractionId) {
+    requireUuid(input.parentInteractionId, "parent interaction id");
+    const query = new URLSearchParams({ select: "id", id: `eq.${input.parentInteractionId}`, live_session_id: `eq.${liveSessionId}`, limit: "1" });
+    checks.push(request<Array<{ id?: string }>>(`fdacs_class_d_live_interactions?${query}`).then((rows) => rows[0]?.id === input.parentInteractionId));
+  }
+  if ((await Promise.all(checks)).some((inScope) => !inScope)) {
+    throw new FloridaClassDLivePersistenceError(
+      "The requested instructor action is outside this live lesson.",
+      403,
+      "FDACS_LIVE_ACTION_SCOPE_MISMATCH",
+    );
+  }
+}
+
 export async function scheduleFloridaClassDLiveSession(actor: StaffActor, input: {
   cohortId: string;
   day: 1 | 2 | 3 | 4 | 5;
@@ -141,8 +278,8 @@ export async function scheduleFloridaClassDLiveSession(actor: StaffActor, input:
 
 export function startFloridaClassDLiveSession(actor: StaffActor, input: {
   liveSessionId: string;
-  instructorLicenseNumber: string;
-  schoolLicenseNumber: string;
+  instructorLicenseNumber: string | null;
+  schoolLicenseNumber: string | null;
   inspectionAccessReference?: string | null;
   correlationId: string;
 }) {

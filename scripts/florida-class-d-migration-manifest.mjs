@@ -42,6 +42,9 @@ export const EXPECTED_FLORIDA_CLASS_D_MIGRATIONS = [
   "20260814173000_fdacs_class_d_investigator_audit_access.sql",
   "20260814174000_fdacs_class_d_audit_performance_and_explicit_deny.sql",
   "20260814175000_fdacs_class_d_trigger_function_execute_hardening.sql",
+  "20260814210337_fdacs_class_d_owner_real_identity_uat.sql",
+  "20260814213309_fdacs_class_d_owner_uat_instruction_safety.sql",
+  "20260814215217_fdacs_class_d_owner_uat_live_execution_and_instructor_provisioning.sql",
 ];
 
 function sha256(value) {

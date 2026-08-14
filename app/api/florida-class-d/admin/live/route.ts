@@ -6,6 +6,8 @@ import {
 import { FloridaClassDExamError } from "../../../../../lib/florida-class-d-exam";
 import { listFloridaClassDLiveInteractions } from "../../../../../lib/florida-class-d-live-feed";
 import {
+  assertFloridaClassDLiveActionScope,
+  assertFloridaClassDLiveSessionInstructor,
   endFloridaClassDLiveSession,
   FloridaClassDLivePersistenceError,
   getFloridaClassDLiveRoster,
@@ -16,6 +18,7 @@ import {
   setFloridaClassDLiveSegment,
   startFloridaClassDLiveSession,
 } from "../../../../../lib/florida-class-d-live-persistence";
+import { floridaClassDOwnerUatProfileRequested } from "../../../../../lib/florida-class-d-owner-uat";
 import {
   certifyFloridaClassDLiveDay,
   getFloridaClassDRosterTimeLedgers,
@@ -103,11 +106,12 @@ function errorResponse(error: unknown) {
 export async function GET(request: Request) {
   try {
     if (!floridaClassDLiveInstructionEnabled()) return disabled();
-    await requireFloridaClassDStaff(["instructor", "school_admin", "compliance_admin"]);
+    const actor = await requireFloridaClassDStaff(["instructor", "school_admin", "compliance_admin"]);
     const liveSessionId = new URL(request.url).searchParams.get("liveSessionId");
     if (!liveSessionId) {
       return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
     }
+    await assertFloridaClassDLiveSessionInstructor(actor, liveSessionId);
     const [roster, interactions, polls, participationMap, activeTextScreen] = await Promise.all([
       getFloridaClassDLiveRoster(liveSessionId),
       listFloridaClassDLiveInteractions(liveSessionId),
@@ -153,14 +157,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid instructor live-class request.", code: "FDACS_LIVE_ADMIN_INVALID_REQUEST" }, { status: 400, headers });
     }
     const correlationId = typeof body.correlationId === "string" ? body.correlationId : crypto.randomUUID();
-    const instructorLicenseNumber = getFloridaClassDInstructorLicenseNumber();
-    const schoolLicenseNumber = getFloridaClassDSchoolLicenseNumber();
-    if (!instructorLicenseNumber || !schoolLicenseNumber) return disabled();
 
     if (body.action === "schedule") {
+      if (floridaClassDOwnerUatProfileRequested()) {
+        return NextResponse.json(
+          { error: "Owner UAT schedules must use the exact-release controlled cohort scheduler.", code: "FDACS_OWNER_UAT_EXACT_SCHEDULER_REQUIRED" },
+          { status: 409, headers },
+        );
+      }
       if (typeof body.cohortId !== "string" || !Number.isInteger(body.day) || typeof body.lessonId !== "string") {
         return NextResponse.json({ error: "Cohort, day, and lesson are required.", code: "FDACS_LIVE_SCHEDULE_INVALID" }, { status: 400, headers });
       }
+      const instructorLicenseNumber = getFloridaClassDInstructorLicenseNumber();
+      const schoolLicenseNumber = getFloridaClassDSchoolLicenseNumber();
+      if (!instructorLicenseNumber || !schoolLicenseNumber) return disabled();
       const session = await scheduleFloridaClassDLiveSession(actor, {
         cohortId: body.cohortId,
         day: body.day as 1 | 2 | 3 | 4 | 5,
@@ -172,10 +182,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ session, correlationId }, { status: 201, headers });
     }
 
+    if (typeof body.liveSessionId !== "string") {
+      return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
+    }
+    const liveSessionId = body.liveSessionId;
+    const liveSession = await assertFloridaClassDLiveSessionInstructor(actor, liveSessionId);
+    await assertFloridaClassDLiveActionScope(liveSessionId, {
+      enrollmentId: typeof body.enrollmentId === "string" ? body.enrollmentId : undefined,
+      pollId: typeof body.pollId === "string" ? body.pollId : undefined,
+      textScreenId: typeof body.textScreenId === "string" ? body.textScreenId : undefined,
+      parentInteractionId: typeof body.parentInteractionId === "string" ? body.parentInteractionId : undefined,
+    });
+
     if (body.action === "start") {
-      if (typeof body.liveSessionId !== "string") return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
+      const ownerUat = floridaClassDOwnerUatProfileRequested();
+      const instructorLicenseNumber = ownerUat ? null : getFloridaClassDInstructorLicenseNumber();
+      const schoolLicenseNumber = ownerUat ? null : getFloridaClassDSchoolLicenseNumber();
+      if (!ownerUat && (!instructorLicenseNumber || !schoolLicenseNumber)) return disabled();
       await startFloridaClassDLiveSession(actor, {
-        liveSessionId: body.liveSessionId,
+        liveSessionId,
         instructorLicenseNumber,
         schoolLicenseNumber,
         inspectionAccessReference: typeof body.inspectionAccessReference === "string" ? body.inspectionAccessReference : null,
@@ -185,25 +210,24 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "segment") {
-      if (typeof body.liveSessionId !== "string" || (body.segmentType !== "instruction" && body.segmentType !== "break")) {
+      if (body.segmentType !== "instruction" && body.segmentType !== "break") {
         return NextResponse.json({ error: "Live session and segment type are required.", code: "FDACS_LIVE_SEGMENT_INVALID" }, { status: 400, headers });
       }
-      await setFloridaClassDLiveSegment(actor, { liveSessionId: body.liveSessionId, segmentType: body.segmentType, correlationId });
+      await setFloridaClassDLiveSegment(actor, { liveSessionId, segmentType: body.segmentType, correlationId });
       return NextResponse.json({ segmentType: body.segmentType, correlationId }, { headers });
     }
 
     if (body.action === "end") {
-      if (typeof body.liveSessionId !== "string") return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
-      await endFloridaClassDLiveSession(actor, { liveSessionId: body.liveSessionId, correlationId });
+      await endFloridaClassDLiveSession(actor, { liveSessionId, correlationId });
       return NextResponse.json({ ended: true, correlationId }, { headers });
     }
 
     if (body.action === "text_screen_open") {
-      if (typeof body.liveSessionId !== "string" || typeof body.textScreenTitle !== "string" || typeof body.textScreenBody !== "string") {
+      if (typeof body.textScreenTitle !== "string" || typeof body.textScreenBody !== "string") {
         return NextResponse.json({ error: "Text-screen title and instructional text are required.", code: "FDACS_TEXT_SCREEN_OPEN_INVALID" }, { status: 400, headers });
       }
       const textScreenId = await openFloridaClassDLiveTextScreen(actor, {
-        liveSessionId: body.liveSessionId,
+        liveSessionId,
         title: body.textScreenTitle,
         body: body.textScreenBody,
         correlationId,
@@ -234,7 +258,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Challenge fields are incomplete.", code: "FDACS_LIVE_CHALLENGE_INVALID" }, { status: 400, headers });
       }
       const challengeId = await issueFloridaClassDPresenceChallenge(actor, {
-        liveSessionId: body.liveSessionId,
+        liveSessionId,
         enrollmentId: body.enrollmentId,
         challengeType: body.challengeType as "presence_code" | "lesson_check" | "instructor_prompt",
         prompt: body.prompt,
@@ -245,11 +269,11 @@ export async function POST(request: Request) {
     }
 
     if (body.action === "restore_presence") {
-      if (typeof body.liveSessionId !== "string" || typeof body.enrollmentId !== "string" || typeof body.reviewNote !== "string") {
+      if (typeof body.enrollmentId !== "string" || typeof body.reviewNote !== "string") {
         return NextResponse.json({ error: "Presence review fields are incomplete.", code: "FDACS_LIVE_PRESENCE_REVIEW_INVALID" }, { status: 400, headers });
       }
       await restoreFloridaClassDPresence(actor, {
-        liveSessionId: body.liveSessionId,
+        liveSessionId,
         enrollmentId: body.enrollmentId,
         reviewNote: body.reviewNote,
         correlationId,
@@ -268,6 +292,16 @@ export async function POST(request: Request) {
       ) {
         return NextResponse.json({ error: "Daily attendance certification fields are incomplete.", code: "FDACS_LIVE_ATTENDANCE_CERTIFICATION_INVALID" }, { status: 400, headers });
       }
+      if (
+        liveSession.day !== body.day
+        || liveSession.lesson_id !== `D${body.day}-L4`
+        || liveSession.status !== "ended"
+      ) {
+        return NextResponse.json(
+          { error: "Daily attendance may be certified only from the ended fourth lesson for that day.", code: "FDACS_LIVE_ATTENDANCE_SESSION_MISMATCH" },
+          { status: 409, headers },
+        );
+      }
       const result = await certifyFloridaClassDLiveDay(actor, {
         enrollmentId: body.enrollmentId,
         day: body.day as 1 | 2 | 3 | 4 | 5,
@@ -280,7 +314,6 @@ export async function POST(request: Request) {
 
     if (body.action === "poll_create") {
       if (
-        typeof body.liveSessionId !== "string" ||
         typeof body.question !== "string" ||
         !Array.isArray(body.options) ||
         !body.options.every((option) => typeof option === "string") ||
@@ -289,7 +322,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Structured poll fields are incomplete.", code: "FDACS_POLL_CREATE_INVALID_REQUEST" }, { status: 400, headers });
       }
       const pollId = await openFloridaClassDLivePoll(actor, {
-        liveSessionId: body.liveSessionId,
+        liveSessionId,
         question: body.question,
         options: body.options as string[],
         correctOptionIndex: typeof body.correctOptionIndex === "number" ? body.correctOptionIndex : null,
@@ -307,10 +340,9 @@ export async function POST(request: Request) {
     }
 
     if (["answer", "prompt"].includes(body.action)) {
-      if (typeof body.liveSessionId !== "string") return NextResponse.json({ error: "Live session id is required.", code: "FDACS_LIVE_SESSION_REQUIRED" }, { status: 400, headers });
       const interactionType = body.action === "answer" ? "instructor_answer" : "instructor_prompt";
       const interaction = await postFloridaClassDLiveInteraction({
-        liveSessionId: body.liveSessionId,
+        liveSessionId,
         actorRole: "instructor",
         actorUserId: actor.userId,
         interactionType,

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createHash } from "node:crypto";
+import type { FloridaClassDStaffRole } from "./florida-class-d-auth";
 import { floridaClassDLiveInstructionEnabled } from "./florida-class-d-live-policy";
 
 const DAILY_API_BASE = "https://api.daily.co/v1";
@@ -114,7 +115,7 @@ function roomName(liveSessionId: string) {
 async function loadSession(liveSessionId: string) {
   requireUuid(liveSessionId, "live session id");
   const query = new URLSearchParams({
-    select: "id,cohort_id,day,lesson_id,status,instructor_clerk_user_id",
+    select: "id,cohort_id,day,lesson_id,status,execution_profile,instructor_clerk_user_id",
     id: `eq.${liveSessionId}`,
     limit: "1",
   });
@@ -222,6 +223,22 @@ export function floridaClassDLiveMediaEnabled() {
   );
 }
 
+export async function verifyFloridaClassDMediaProviderConnection() {
+  if (!floridaClassDLiveMediaEnabled()) {
+    throw new FloridaClassDMediaError("Class D live video is not enabled for this controlled runtime.", 503, "FDACS_MEDIA_NOT_ENABLED");
+  }
+  const response = await dailyRequest<Record<string, unknown>>("/rooms?limit=1");
+  if (!response || typeof response !== "object") {
+    throw new FloridaClassDMediaError("Live media provider readiness response is invalid.", 502, "FDACS_MEDIA_READINESS_INVALID");
+  }
+  return {
+    provider: "daily" as const,
+    apiAuthenticated: true,
+    roomCreationTested: false,
+    secretValuesExposed: false,
+  };
+}
+
 export async function getFloridaClassDStudentMediaAccess(userId: string, liveSessionId: string) {
   if (!floridaClassDLiveMediaEnabled()) throw new FloridaClassDMediaError("Class D live video is not yet enabled.", 503, "FDACS_MEDIA_NOT_ENABLED");
   const session = await loadSession(liveSessionId);
@@ -262,18 +279,31 @@ export async function getFloridaClassDStudentMediaAccess(userId: string, liveSes
   };
 }
 
-export async function getFloridaClassDInstructorMediaAccess(userId: string, liveSessionId: string) {
+export async function getFloridaClassDInstructorMediaAccess(
+  actor: { userId: string; role: FloridaClassDStaffRole },
+  liveSessionId: string,
+) {
   if (!floridaClassDLiveMediaEnabled()) throw new FloridaClassDMediaError("Class D live video is not yet enabled.", 503, "FDACS_MEDIA_NOT_ENABLED");
   const session = await loadSession(liveSessionId);
   if (!["scheduled", "live", "break"].includes(String(session.status))) {
     throw new FloridaClassDMediaError("This lesson is not eligible for live media access.", 409, "FDACS_MEDIA_LESSON_NOT_ELIGIBLE");
+  }
+  if (
+    session.execution_profile === "owner_uat_noncredit"
+    && (actor.role !== "instructor" || session.instructor_clerk_user_id !== actor.userId)
+  ) {
+    throw new FloridaClassDMediaError(
+      "Only the assigned Class DI instructor may receive the owner token for this owner-UAT room.",
+      403,
+      "FDACS_OWNER_UAT_MEDIA_INSTRUCTOR_REQUIRED",
+    );
   }
   const room = await ensureRoom(liveSessionId);
   if (!room.name || !room.url) throw new FloridaClassDMediaError("Live media room is incomplete.", 502, "FDACS_MEDIA_ROOM_INVALID");
   const now = Math.floor(Date.now() / 1000);
   const token = await createToken({
     room_name: room.name,
-    user_id: shortInstructorId(userId),
+    user_id: shortInstructorId(actor.userId),
     user_name: "Class D Instructor",
     nbf: now - 60,
     exp: now + 4 * 60 * 60,

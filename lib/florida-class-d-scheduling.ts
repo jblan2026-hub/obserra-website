@@ -5,6 +5,12 @@ import {
   getFloridaClassDInstructorLicenseNumber,
   getFloridaClassDSchoolLicenseNumber,
 } from "./florida-class-d-live-policy";
+import {
+  floridaClassDOwnerUatEvidenceSha256,
+  floridaClassDOwnerUatExecutionAuthorized,
+  floridaClassDOwnerUatProfileRequested,
+  getFloridaClassDOwnerUatReport,
+} from "./florida-class-d-owner-uat";
 import { floridaClassDProductionActivationAuthorized } from "./florida-class-d-production-activation";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -41,12 +47,15 @@ function enabled(value: string | undefined) {
 }
 
 export function floridaClassDSchedulingEnabled() {
+  if (!enabled(process.env.OBSERRA_FDACS_CLASS_D_SCHEDULING_ENABLED)) return false;
+  if (floridaClassDOwnerUatProfileRequested()) {
+    return floridaClassDOwnerUatExecutionAuthorized();
+  }
   return (
-    floridaClassDProductionActivationAuthorized() &&
-    enabled(process.env.OBSERRA_FDACS_CLASS_D_SCHEDULING_ENABLED) &&
-    process.env.OBSERRA_FDACS_DS_LICENSE_STATUS?.trim().toLowerCase() === "active" &&
-    Boolean(getFloridaClassDInstructorLicenseNumber()) &&
-    Boolean(getFloridaClassDSchoolLicenseNumber())
+    floridaClassDProductionActivationAuthorized()
+    && process.env.OBSERRA_FDACS_DS_LICENSE_STATUS?.trim().toLowerCase() === "active"
+    && Boolean(getFloridaClassDInstructorLicenseNumber())
+    && Boolean(getFloridaClassDSchoolLicenseNumber())
   );
 }
 
@@ -126,6 +135,38 @@ function normalizedDates(trainingDates: string[]) {
   return dates;
 }
 
+export async function prepareFloridaClassDOwnerUatCohort(
+  actor: StaffActor,
+  correlationId: string,
+) {
+  if (actor.role !== "school_admin" && actor.role !== "compliance_admin") {
+    throw new FloridaClassDSchedulingError(
+      "Owner UAT cohort preparation requires school or compliance administration.",
+      403,
+      "FDACS_OWNER_UAT_COHORT_ADMIN_REQUIRED",
+    );
+  }
+  requireUuid(correlationId, "correlation id");
+  const report = getFloridaClassDOwnerUatReport();
+  const evidenceSha256 = floridaClassDOwnerUatEvidenceSha256();
+  if (!report.authorized || !report.releaseCommitSha || !report.expiresAt || !evidenceSha256) {
+    throw new FloridaClassDSchedulingError(
+      "The exact-release owner UAT authorization is incomplete.",
+      503,
+      "FDACS_OWNER_UAT_COHORT_NOT_AUTHORIZED",
+    );
+  }
+  const cohortId = await rpc<string>("fdacs_class_d_create_owner_uat_cohort", {
+    p_release_commit_sha: report.releaseCommitSha,
+    p_expires_at: report.expiresAt,
+    p_authorization_evidence_sha256: evidenceSha256,
+    p_actor_ref: actor.userId,
+    p_correlation_id: correlationId,
+  });
+  requireUuid(cohortId, "owner UAT cohort id");
+  return cohortId;
+}
+
 export async function publishFloridaClassDCohortSchedule(actor: StaffActor, input: {
   cohortId: string;
   trainingDates: string[];
@@ -138,7 +179,7 @@ export async function publishFloridaClassDCohortSchedule(actor: StaffActor, inpu
     throw new FloridaClassDSchedulingError("Class D scheduling requires school or compliance administration.", 403, "FDACS_SCHEDULE_ADMIN_REQUIRED");
   }
   if (!floridaClassDSchedulingEnabled()) {
-    throw new FloridaClassDSchedulingError("Class D production scheduling is not yet enabled.", 503, "FDACS_SCHEDULE_NOT_ENABLED");
+    throw new FloridaClassDSchedulingError("Class D scheduling is not enabled for this controlled runtime.", 503, "FDACS_SCHEDULE_NOT_ENABLED");
   }
   requireUuid(input.cohortId, "cohort id");
   requireUuid(input.correlationId, "correlation id");
@@ -155,24 +196,34 @@ export async function publishFloridaClassDCohortSchedule(actor: StaffActor, inpu
   if (instructorClerkUserId.length < 3 || instructorClerkUserId.length > 255) {
     throw new FloridaClassDSchedulingError("A valid licensed instructor identity is required.", 400, "FDACS_SCHEDULE_INVALID_INSTRUCTOR");
   }
-  const instructorLicenseNumber = getFloridaClassDInstructorLicenseNumber();
-  const schoolLicenseNumber = getFloridaClassDSchoolLicenseNumber();
-  if (!instructorLicenseNumber || !schoolLicenseNumber) {
-    throw new FloridaClassDSchedulingError("Active Class DI and DS license configuration is required before scheduling.", 503, "FDACS_SCHEDULE_LICENSE_CONFIGURATION_REQUIRED");
-  }
-
-  const rows = await rpc<FloridaClassDScheduledLesson[]>("fdacs_class_d_publish_cohort_schedule", {
+  const ownerUat = floridaClassDOwnerUatExecutionAuthorized();
+  const common = {
     p_cohort_id: input.cohortId,
     p_training_dates: trainingDates,
     p_day_start_local: `${dayStartLocal}:00`,
     p_time_zone: timeZone,
     p_instructor_clerk_user_id: instructorClerkUserId,
-    p_instructor_license_number: instructorLicenseNumber,
-    p_school_license_number: schoolLicenseNumber,
     p_actor_role: actor.role,
     p_actor_clerk_user_id: actor.userId,
     p_correlation_id: input.correlationId,
-  });
+  };
+  const rows = ownerUat
+    ? await rpc<FloridaClassDScheduledLesson[]>("fdacs_class_d_publish_owner_uat_schedule", {
+        ...common,
+        p_release_commit_sha: process.env.VERCEL_GIT_COMMIT_SHA?.trim().toLowerCase() || "",
+      })
+    : await (async () => {
+        const instructorLicenseNumber = getFloridaClassDInstructorLicenseNumber();
+        const schoolLicenseNumber = getFloridaClassDSchoolLicenseNumber();
+        if (!instructorLicenseNumber || !schoolLicenseNumber) {
+          throw new FloridaClassDSchedulingError("Active Class DI and DS license configuration is required before production scheduling.", 503, "FDACS_SCHEDULE_LICENSE_CONFIGURATION_REQUIRED");
+        }
+        return rpc<FloridaClassDScheduledLesson[]>("fdacs_class_d_publish_cohort_schedule", {
+          ...common,
+          p_instructor_license_number: instructorLicenseNumber,
+          p_school_license_number: schoolLicenseNumber,
+        });
+      })();
   if (!Array.isArray(rows) || rows.length !== 20) {
     throw new FloridaClassDSchedulingError("The cohort schedule did not produce exactly 20 regulated live lessons.", 502, "FDACS_SCHEDULE_SESSION_COUNT_INVALID");
   }

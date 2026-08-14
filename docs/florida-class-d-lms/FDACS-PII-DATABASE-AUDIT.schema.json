@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://www.obserrallc.com/schemas/fdacs-pii-database-audit-v1.1.json",
+  "$id": "https://www.obserrallc.com/schemas/fdacs-pii-database-audit-v1.2.json",
   "title": "FDACS isolated student-record PII database audit record",
   "description": "Minimum fail-closed machine contract for the FDACS database's own live audit record and CMMC-mapped proof of security protocols.",
   "type": "object",
@@ -23,6 +23,7 @@
     "governingSources",
     "sourceMigrations",
     "liveVerification",
+    "ownerUatControlVerification",
     "liveAuditPackageTest",
     "cmmcSecurityProtocolProof",
     "technicalChecks",
@@ -34,7 +35,7 @@
     "summary"
   ],
   "properties": {
-    "schemaVersion": {"const": "1.1"},
+    "schemaVersion": {"const": "1.2"},
     "recordId": {"type": "string", "minLength": 20},
     "recordState": {"enum": ["live_hardened_activation_pending", "live_authorized"]},
     "observedAt": {"type": "string", "minLength": 20},
@@ -88,7 +89,7 @@
     },
     "sourceMigrations": {
       "type": "array",
-      "minItems": 6,
+      "minItems": 8,
       "items": {
         "type": "object",
         "required": ["path", "providerMigrationVersion", "providerMigrationName", "liveApplied", "sha256"],
@@ -147,6 +148,91 @@
             }
           }
         }
+      }
+    },
+    "ownerUatControlVerification": {
+      "type": "object",
+      "required": [
+        "migrationApplied",
+        "providerMigrationVersion",
+        "instructionSafetyMigrationApplied",
+        "instructionSafetyProviderMigrationVersion",
+        "liveExecutionMigrationApplied",
+        "liveExecutionProviderMigrationVersion",
+        "executionProfile",
+        "deploymentEnvironment",
+        "trainingCreditEligible",
+        "maximumValidityDays",
+        "capacity",
+        "exactReleaseRequired",
+        "authorizationEvidenceSha256Required",
+        "liveIdentityProviderRequired",
+        "productionActivationMutuallyExclusive",
+        "distinctInstructorAttestationRequired",
+        "verifiedActiveAssignedDiRequired",
+        "liveScheduleFunctionRestrictedToServiceRole",
+        "assignedInstructorStartEnforced",
+        "encryptedInstructorProvisioningRestrictedToServiceRole",
+        "verifiedActiveInstructorExpirationRequired",
+        "instructorReadinessSuppressesLicenseValues",
+        "noSchoolLicenseClaimForOwnerUat",
+        "completionAndLiasWriteGuardsPresent",
+        "studentSelfAttestationGuardsPresent",
+        "transactionalNegativeTests",
+        "liveCohortRowsCreated",
+        "liveEnrollmentRowsCreated",
+        "liveSessionRowsCreated",
+        "liveInstructorFileRowsCreated",
+        "liveProtectedArtifactRowsCreated",
+        "productionRuntimeAuthorized"
+      ],
+      "properties": {
+        "migrationApplied": {"const": true},
+        "providerMigrationVersion": {"type": "string", "pattern": "^[0-9]{14}$"},
+        "instructionSafetyMigrationApplied": {"const": true},
+        "instructionSafetyProviderMigrationVersion": {"type": "string", "pattern": "^[0-9]{14}$"},
+        "liveExecutionMigrationApplied": {"const": true},
+        "liveExecutionProviderMigrationVersion": {"type": "string", "pattern": "^[0-9]{14}$"},
+        "executionProfile": {"const": "owner_uat_noncredit"},
+        "deploymentEnvironment": {"const": "preview"},
+        "trainingCreditEligible": {"const": false},
+        "maximumValidityDays": {"const": 14},
+        "capacity": {"const": 1},
+        "exactReleaseRequired": {"const": true},
+        "authorizationEvidenceSha256Required": {"const": true},
+        "liveIdentityProviderRequired": {"const": true},
+        "productionActivationMutuallyExclusive": {"const": true},
+        "distinctInstructorAttestationRequired": {"const": true},
+        "verifiedActiveAssignedDiRequired": {"const": true},
+        "liveScheduleFunctionRestrictedToServiceRole": {"const": true},
+        "assignedInstructorStartEnforced": {"const": true},
+        "encryptedInstructorProvisioningRestrictedToServiceRole": {"const": true},
+        "verifiedActiveInstructorExpirationRequired": {"const": true},
+        "instructorReadinessSuppressesLicenseValues": {"const": true},
+        "noSchoolLicenseClaimForOwnerUat": {"const": true},
+        "completionAndLiasWriteGuardsPresent": {"const": true},
+        "studentSelfAttestationGuardsPresent": {"const": true},
+        "transactionalNegativeTests": {
+          "type": "object",
+          "required": ["expirationBeyond14DaysRejected", "productionAuthorizationWithUnverifiedGatesRejected", "validCohortCreatedAndRolledBack", "wrongReleaseScheduleRejected", "missingVerifiedDiScheduleRejected", "wrongActorLiveStartRejected", "missingVerifiedDiLiveStartRejected", "missingExpirationProvisioningRejected", "liveExecutionRowsCreatedAndRolledBack"],
+          "properties": {
+            "expirationBeyond14DaysRejected": {"const": true},
+            "productionAuthorizationWithUnverifiedGatesRejected": {"const": true},
+            "validCohortCreatedAndRolledBack": {"const": true},
+            "wrongReleaseScheduleRejected": {"const": true},
+            "missingVerifiedDiScheduleRejected": {"const": true},
+            "wrongActorLiveStartRejected": {"const": true},
+            "missingVerifiedDiLiveStartRejected": {"const": true},
+            "missingExpirationProvisioningRejected": {"const": true},
+            "liveExecutionRowsCreatedAndRolledBack": {"const": true}
+          }
+        },
+        "liveCohortRowsCreated": {"const": 0},
+        "liveEnrollmentRowsCreated": {"const": 0},
+        "liveSessionRowsCreated": {"const": 0},
+        "liveInstructorFileRowsCreated": {"const": 0},
+        "liveProtectedArtifactRowsCreated": {"const": 0},
+        "productionRuntimeAuthorized": {"const": false}
       }
     },
     "liveAuditPackageTest": {

@@ -6,6 +6,8 @@ import { useCallback, useEffect, useState } from "react";
 type VerificationStatus = {
   enrollmentId?: string | null;
   enrollmentStatus?: string | null;
+  executionProfile?: string | null;
+  trainingCreditEligible?: boolean | null;
   identityStatus?: string | null;
   providerStatus?: string | null;
   documentCheckStatus?: string | null;
@@ -21,6 +23,9 @@ type StatusResponse = {
   identityImagesStoredByLms?: boolean;
   biometricTemplatesStoredByLms?: boolean;
   instructorAttestationRequired?: boolean;
+  executionProfile?: string;
+  trainingCreditEligible?: boolean;
+  fdacsApprovalClaimed?: boolean;
   error?: string;
 };
 
@@ -110,6 +115,7 @@ export default function IdentityVerificationClient() {
   const providerVerified = status?.providerStatus === "verified" &&
     status.documentCheckStatus === "verified" && status.selfieCheckStatus === "verified";
   const complete = Boolean(status?.instructorAttestationRecorded && status?.identityStatus === "verified");
+  const ownerUat = payload?.executionProfile === "owner_uat_noncredit";
 
   if (!payload && !error) {
     return <div className="fl-classd__notice"><span>Loading controlled identity status…</span></div>;
@@ -117,6 +123,12 @@ export default function IdentityVerificationClient() {
 
   return (
     <section className="fl-classd__section" aria-live="polite">
+      {ownerUat ? (
+        <div className="fl-classd__notice">
+          <strong>Live provider · non-credit owner UAT.</strong>
+          <span>Your government ID and selfie are processed by Stripe&apos;s hosted live verification service. This acceptance record cannot grant training credit, completion, LIAS reporting, or represent FDACS approval.</span>
+        </div>
+      ) : null}
       {error ? <div className="fl-classd__notice"><strong>Access remains locked.</strong><span>{error}</span></div> : null}
 
       {!status?.enrollmentId ? (
@@ -165,7 +177,7 @@ export default function IdentityVerificationClient() {
           >
             {busy ? "Opening secure verification…" : status?.providerStatus === "requires_input" ? "Resume secure verification" : "Start secure identity verification"}
           </button>
-          {!payload?.verificationEnabled ? <p>Verification remains fail-closed until the controlled production or synthetic-acceptance runtime is authorized.</p> : null}
+          {!payload?.verificationEnabled ? <p>Verification remains fail-closed until controlled production, synthetic acceptance, or the restricted owner UAT runtime is authorized.</p> : null}
         </div>
       )}
     </section>

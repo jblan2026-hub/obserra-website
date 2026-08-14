@@ -60,13 +60,15 @@ export default function InstructionalTextScreenControl({
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const views = textScreenViews ?? [];
-  const counts = useMemo(() => ({
-    roster: (students ?? []).filter((student) => Boolean(student.id)).length,
-    viewed: views.length,
-    timeMet: views.filter((view) => Boolean(view.requirement_met_at)).length,
-    acknowledged: views.filter((view) => Boolean(view.acknowledged_at)).length,
-  }), [students, views]);
+  const counts = useMemo(() => {
+    const views = textScreenViews ?? [];
+    return {
+      roster: (students ?? []).filter((student) => Boolean(student.id)).length,
+      viewed: views.length,
+      timeMet: views.filter((view) => Boolean(view.requirement_met_at)).length,
+      acknowledged: views.filter((view) => Boolean(view.acknowledged_at)).length,
+    };
+  }, [students, textScreenViews]);
 
   async function openScreen(event: FormEvent) {
     event.preventDefault();
@@ -98,6 +100,7 @@ export default function InstructionalTextScreenControl({
     try {
       await adminApi({
         action: "text_screen_close",
+        liveSessionId,
         textScreenId: activeTextScreen.id,
         discussionNote: discussionNote.trim(),
       });

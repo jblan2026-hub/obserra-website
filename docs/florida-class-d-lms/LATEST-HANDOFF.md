@@ -1,5 +1,22 @@
 # Florida Class D LMS Latest Handoff
 
+## Active Gate 38 FDACS-only continuation
+
+Gate 38 is the active continuation. Read `GATE-38-OWNER-REAL-IDENTITY-UAT-HANDOFF.md`, `FDACS-PII-DATABASE-AUDIT.md`, and `ACTION-LEDGER-GATE-35-ADDENDUM.md` before further action.
+
+- branch: `codex/fdacs-baseline-completion`;
+- reconciled base: `2dde838ee176e6f450abeca2daad96ab377ed931`;
+- Applications workstream: excluded and untouched;
+- source lineage: 38 regulated migrations through `20260814215217`;
+- isolated live provider migration: `20260814223854_fdacs_class_d_owner_uat_live_execution_and_instructor_provisioning` (38 total);
+- database result: 64 forced-RLS FDACS tables, zero browser table/function grants across 114 routines, zero security findings, zero student/instructor/artifact UAT rows;
+- FDACS audit source: 11 passed, 0 failed, 4 not tested; paired human/machine reports are regenerated from this controlled source;
+- production runtime authorization: false;
+- human review: `pending`;
+- CMMC assessment finding: `not_assessed`.
+
+The exact-release owner UAT is Preview-only, capacity one, expires within 14 days, and cannot award training credit, create a completion record, or enqueue LIAS. It requires live Stripe-hosted Identity, an authenticated owner, real Daily provider readiness, and a distinct assigned Class DI instructor whose authentic evidence is validated and encrypted through the protected frontend. The protected workflow now includes read-only provider preflight, exact-release cohort preparation, 20-session scheduling, instructor/student session links, live identity/attendance controls, post-attestation non-credit activation, and the learner's assigned-session list. GitHub exact-head checks, the Vercel Preview deployment, external-provider/key authorization, authentic DI provisioning, and the real owner workflow remain pending. Do not enter real PII or secrets in chat.
+
 ## Active Gate 35 continuation
 
 Gate 35 production remediation and CMMC dual-baseline work is active. Continue from `GATE-35-PRODUCTION-REMEDIATION-DUAL-BASELINE-HANDOFF.md` and `ACTION-LEDGER-GATE-35-ADDENDUM.md`. The current assessment mapping must cover all 110 NIST SP 800-171 Rev. 2 requirements and all 97 active NIST SP 800-171 Rev. 3 requirements while preserving the 33 withdrawn Rev. 3 identifiers. Do not treat the Rev. 3 engineering overlay as a substitute for the current CMMC Level 2 assessment baseline.
