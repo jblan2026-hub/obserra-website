@@ -12,6 +12,16 @@ type GeneratedStoreRecord = {
   description: string;
 };
 
+const legacySlugAliases: Readonly<Record<string, string>> = Object.freeze({
+  "obserra-incident-command": "obserra-cyber-crisis-commander",
+  "obserra-incident-command-console": "obserra-cyber-crisis-commander",
+});
+
+export function canonicalStorefrontSlug(slug: string) {
+  const normalized = slug.trim().toLowerCase();
+  return legacySlugAliases[normalized] ?? normalized;
+}
+
 const storeCatalog = rawStoreCatalog as { applications: GeneratedStoreRecord[] };
 const generatedApps: MarketplaceApp[] = storeCatalog.applications.map((entry) => {
   const status = entry.status === "Pilot" || entry.status === "Coming Soon" ? entry.status : "Available";
@@ -20,7 +30,7 @@ const generatedApps: MarketplaceApp[] = storeCatalog.applications.map((entry) =>
     : `Published release ${entry.version}`;
 
   return {
-    slug: entry.slug,
+    slug: canonicalStorefrontSlug(entry.slug),
     name: entry.name,
     status,
     category: entry.category as MarketplaceApp["category"],
@@ -42,10 +52,16 @@ const generatedApps: MarketplaceApp[] = storeCatalog.applications.map((entry) =>
 });
 
 const bySlug = new Map<string, MarketplaceApp>();
-for (const entry of marketplaceApps) bySlug.set(entry.slug, entry);
-for (const entry of generatedApps) bySlug.set(entry.slug, { ...bySlug.get(entry.slug), ...entry });
+for (const entry of marketplaceApps) {
+  const slug = canonicalStorefrontSlug(entry.slug);
+  bySlug.set(slug, { ...entry, slug });
+}
+for (const entry of generatedApps) {
+  const slug = canonicalStorefrontSlug(entry.slug);
+  bySlug.set(slug, { ...bySlug.get(slug), ...entry, slug });
+}
 
 export const storefrontApps = [...bySlug.values()];
 export function findStorefrontAppBySlug(slug: string) {
-  return storefrontApps.find((entry) => entry.slug === slug);
+  return bySlug.get(canonicalStorefrontSlug(slug));
 }

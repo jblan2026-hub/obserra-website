@@ -27,10 +27,10 @@ jobs:
       CI: "true"
     steps:
       - name: Checkout website
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 
       - name: Configure Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: "22"
           cache: npm
@@ -46,6 +46,54 @@ jobs:
 
       - name: Verify lockfile remains immutable
         run: git diff --exit-code -- package-lock.json
+
+      - name: Audit complete and production dependency graphs
+        id: dependency_audit
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p security-evidence
+          set +e
+          npm audit --json > security-evidence/npm-audit-full.json
+          full_status=$?
+          npm audit --omit=dev --json > security-evidence/npm-audit-production.json
+          production_status=$?
+          node scripts/verify-npm-audit.mjs \
+            --full security-evidence/npm-audit-full.json \
+            --production security-evidence/npm-audit-production.json \
+            --output security-evidence/npm-audit-summary.json
+          verifier_status=$?
+          set -e
+          printf 'full_exit_status=%s\nproduction_exit_status=%s\nverifier_exit_status=%s\n' \
+            "$full_status" "$production_status" "$verifier_status" \
+            > security-evidence/npm-audit-command-status.txt
+          {
+            echo "commit=${GITHUB_SHA}"
+            echo "repository=${GITHUB_REPOSITORY}"
+            echo "workflow=${GITHUB_WORKFLOW}"
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "node=$(node --version)"
+            echo "npm=$(npm --version)"
+            echo "package_lock_sha256=$(sha256sum package-lock.json | awk '{print $1}')"
+            echo "audit_verifier_sha256=$(sha256sum scripts/verify-npm-audit.mjs | awk '{print $1}')"
+          } > security-evidence/npm-audit-context.txt
+          exit "$verifier_status"
+
+      - name: Upload dependency audit evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: website-dependency-audit-${{ github.sha }}
+          path: security-evidence/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Enforce dependency vulnerability gate
+        if: steps.dependency_audit.outcome != 'success'
+        run: |
+          echo "The complete or production website dependency graph contains a high or critical vulnerability, or npm audit could not be verified." >&2
+          exit 1
 
       - name: Run unit and catalog contract tests
         run: npm test

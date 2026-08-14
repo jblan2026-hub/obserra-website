@@ -511,7 +511,6 @@ export function finalAssessment(courseId: string): KnowledgeCheck[] {
   return Array.from({ length: 25 }, (_, index) => {
     const moduleIndex = index % course.modules.length;
     const module = course.modules[moduleIndex];
-    const outcome = course.outcomes[index % course.outcomes.length];
     const authority = grounding.authorities[index % grounding.authorities.length];
     const subject = curriculum.lessonSubjects[moduleIndex];
     const workProduct = curriculum.workProducts[moduleIndex];

@@ -35,7 +35,5 @@ export function stripePriceEnvironmentKey(slug: string, plan: string, interval: 
 }
 
 export function availablePlansFor(app: MarketplaceApp) {
-  if (app.status === "Coming Soon") return [];
-  if (app.status === "Pilot") return commercePlans.filter((plan) => plan.id === "enterprise");
-  return commercePlans;
+  return app.status === "Available" ? commercePlans : [];
 }

@@ -48,6 +48,30 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31_536_000,
   },
+  async redirects() {
+    return [
+      {
+        source: "/apps/obserra-incident-command-console",
+        destination: "/apps/obserra-cyber-crisis-commander",
+        permanent: true,
+      },
+      {
+        source: "/apps/obserra-incident-command-console/subscribe",
+        destination: "/apps/obserra-cyber-crisis-commander/subscribe",
+        permanent: true,
+      },
+      {
+        source: "/apps/obserra-incident-command",
+        destination: "/apps/obserra-cyber-crisis-commander",
+        permanent: true,
+      },
+      {
+        source: "/apps/obserra-incident-command/subscribe",
+        destination: "/apps/obserra-cyber-crisis-commander/subscribe",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
@@ -64,6 +88,14 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/api/stripe/:path*",
+        headers: transactionalRouteHeaders,
+      },
+      {
+        source: "/api/apps/:path*",
+        headers: transactionalRouteHeaders,
+      },
+      {
+        source: "/apps/:slug/subscribe",
         headers: transactionalRouteHeaders,
       },
       {

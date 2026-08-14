@@ -173,17 +173,26 @@ export const marketplaceApps: MarketplaceApp[] = [
     faq: [{ q: "Does this replace vulnerability scanners?", a: "No. It consumes scanner data and improves decision prioritization." }]
   },
   {
-    slug: "obserra-incident-command-console",
-    name: "Obserra Incident Command Console",
+    slug: "obserra-cyber-crisis-commander",
+    name: "Obserra Cyber Crisis Commander",
     status: "Coming Soon",
     category: "Cybersecurity",
-    value: "Coordinates incident command workflows with role-based execution and live accountability.",
-    features: ["Command timeline", "Role and task orchestration", "Post-incident evidence pack"],
-    integrations: ["SOAR", "SIEM", "Service desk"],
-    deployment: ["SaaS", "Private Cloud"],
-    pricing: "Pricing to be announced.",
-    documentation: ["Preview feature guide", "Roadmap highlights"],
-    faq: [{ q: "Is this production-ready today?", a: "No. This product is not yet available and is marked Coming Soon." }]
+    value: "Coordinates cyber crisis command, executive decisions, response actions, communications, evidence, and recovery accountability in one secure operational workspace.",
+    features: ["Crisis command timeline", "Role-based action and decision tracking", "Communications and evidence governance"],
+    integrations: ["SIEM", "SOAR", "ServiceNow", "Enterprise identity providers"],
+    deployment: ["SaaS", "Private Cloud", "On-Premises"],
+    pricing: "Commercial enrollment opens only after production security, installer, high-availability, supply-chain, and release approval gates pass.",
+    documentation: ["Product security profile", "Administrator and user guides", "Deployment and recovery guide"],
+    faq: [
+      {
+        q: "Is Cyber Crisis Commander available for purchase today?",
+        a: "No. The application remains in governed pre-production hardening. Sales, SaaS launch, and customer downloads remain disabled until the exact approved release passes every production gate."
+      },
+      {
+        q: "Will SaaS and customer-hosted deployment be supported?",
+        a: "The planned commercial release supports governed SaaS, private-cloud, and customer-hosted deployment pathways, each with separate security and operational approval evidence."
+      }
+    ]
   },
   {
     slug: "obserra-cloud-security-posture-advisor",
