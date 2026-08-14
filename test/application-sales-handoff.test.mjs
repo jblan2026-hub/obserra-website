@@ -18,6 +18,8 @@ const launchPolicy = source("lib/application-launch.ts");
 const nextConfig = source("next.config.ts");
 const environmentExample = source(".env.example");
 const vercelIgnore = source(".vercelignore");
+const vercelConfig = JSON.parse(source("vercel.json"));
+const packageConfig = JSON.parse(source("package.json"));
 
 function crisisCommanderRecord() {
   const match = appsData.match(/\{\s*slug: "obserra-cyber-crisis-commander",[\s\S]*?\n\s*\},\n\s*\{/);
@@ -93,10 +95,15 @@ test("Cyber Crisis Commander production environment settings remain intentionall
   assert.match(environmentExample, /^STRIPE_PRICE_OBSERRA_CYBER_CRISIS_COMMANDER_ENTERPRISE_ANNUAL=$/m);
 });
 
-test("Vercel preserves the npm lockfile for reproducible dependency installation", () => {
+test("Vercel preserves and immutably installs the npm lockfile", () => {
   const ignoredPaths = vercelIgnore
     .split(/\r?\n/)
     .map((entry) => entry.trim())
     .filter((entry) => entry && !entry.startsWith("#"));
   assert.ok(!ignoredPaths.includes("package-lock.json"), "package-lock.json must be present in the Vercel build context");
+  assert.equal(vercelConfig.installCommand, "npm ci", "Vercel must use npm ci for an immutable dependency install");
+});
+
+test("GitHub CI and Vercel use the same supported Node major", () => {
+  assert.equal(packageConfig.engines?.node, "22.x");
 });
