@@ -1,6 +1,6 @@
 # Obserra website
 
-Private Next.js website for **Obserra Executive Protection & Intelligence LLC**. The authoritative production project is Vercel project `obserra-integrated-services`; the public canonical URL is `https://www.obserrallc.com`.
+Private Next.js website for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**. The authoritative production project is Vercel project `obserra-integrated-services`; the public canonical URL is `https://www.obserrallc.com`.
 
 ## Secure runtime configuration
 

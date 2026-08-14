@@ -132,7 +132,7 @@ function phaseInstruction({
     },
     {
       heading: "Authoritative basis",
-      body: `${primary.reference}, published by ${primary.publisher}, is directly relevant to this lesson. ${primary.whyItMatters} ${secondary.reference} provides an additional authoritative lens. The course uses these references to explain why the lesson matters and to separate established requirements or recognized guidance from Obserra teaching examples and organizational choices.`,
+      body: `${primary.reference}, published by ${primary.publisher}, is directly relevant to this lesson. ${primary.whyItMatters} ${secondary.reference} provides an additional authoritative lens. The course uses these references to explain why the lesson matters and to separate established requirements or recognized guidance from Obserra Academy teaching examples and organizational choices.`,
       application: `In the ${workProduct}, identify the specific requirement, control objective, governance principle, professional expectation, or risk management concept from ${primary.reference} that supports the recommendation. If the source is guidance rather than law, label it accurately instead of presenting it as a legal mandate.`,
     },
     {

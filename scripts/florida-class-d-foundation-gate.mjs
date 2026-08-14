@@ -46,7 +46,7 @@ const lessonRows = [...courseSource.matchAll(/\{ id: "D([1-5])-L([1-4])", day: (
   .map((match) => ({ day: Number(match[1]), lesson: Number(match[2]), declaredDay: Number(match[3]), declaredLesson: Number(match[4]), segmentSource: match[6], breakMinutes: Number(match[7]) }));
 
 gate("provider identity is canonical", () => {
-  assert.match(courseSource, /provider: "Obserra Executive Protection & Intelligence LLC"/);
+  assert.match(courseSource, /provider: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC"/);
 });
 
 gate("course remains fail-closed and coming soon", () => {

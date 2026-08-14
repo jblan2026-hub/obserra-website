@@ -307,7 +307,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
           <div className="fdacs-live__stage-frame fdacs-live__media-frame">
             {media?.joinUrl ? (
               <iframe
-                title="Obserra Florida Class D secure live video classroom"
+                title="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Florida Class D secure live video classroom"
                 src={media.joinUrl}
                 allow="camera; microphone; fullscreen; display-capture; autoplay"
                 referrerPolicy="no-referrer"
@@ -320,7 +320,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
               </div>
             )}
           </div>
-          <p className="fdacs-live__fineprint">Video and audio are delivered through a short-lived, room-bound secure media token. Obserra attendance and instructional-time evidence remain independent from the media provider. Recording is disabled by default.</p>
+          <p className="fdacs-live__fineprint">Video and audio are delivered through a short-lived, room-bound secure media token. OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC attendance and instructional-time evidence remain independent from the media provider. Recording is disabled by default.</p>
 
           <InstructionalTextScreen screen={state?.activeTextScreen} deviceLeaseId={deviceLeaseId} />
 

@@ -172,6 +172,16 @@ The production recovery maps principally to:
 
 The current CMMC Level 2 Rev. 2 crosswalk remains preserved separately in the machine-readable production evidence register.
 
+## Gate 37 publication-resume and workflow recovery
+
+The unpublished production-hardening checkpoint is preserved at exact commit `83364708ae618555ec514d27a93079bad22a7c4c` and tree `2d75297998906cb0e84666dc4d5c72e9ecaf682b`. It contains exactly 208 changed paths relative to `0e72459a8940f23976038d85d6394409000f48c5` and no protected Applications path.
+
+Before publication, current GitHub `main` was fetched and found to contain three later workflow-only commits. Each added a mis-nested `austenstone/copilot-cli@v3.2` action block; the insertions made the affected Website CI, Florida Class D LMS Gates, and Academy Studio synchronization YAML operationally invalid and used a mutable tag instead of an immutable commit pin. Merge commit `7f9c8f24a2ee1b73cbd0a748e5768486aaf33dbc` retains both Git histories while removing those blocks. The workflows must still pass exact-head GitHub validation before merge, and this record does not treat local YAML parsing as provider execution evidence.
+
+Full local regulated validation subsequently retained two blocked runs and their fixes. Gate 25 first rejected one embedded FDACS Supabase origin; the exact-binding control now derives that origin from the controlled project reference and the enforcing rerun reports zero findings across 36 regulated modules. Gate 29 then rejected its stale 29-file expectation against the intended 35-file source lineage; the gate, activation constants, and handoff now bind version `20260814175000` and manifest SHA-256 `40eb88f6b8cb6ce2716eb260cde7f29d69d78f0a201e90cd6373ac1ebf2be090`. These source checks do not execute database migrations.
+
+No Vercel deployment, canonical routing result, FDACS activation, CUI authorization, CMMC assessor finding, or human approval is created by this reconciliation. Those states remain pending and fail closed where required.
+
 ## Regulated and CUI boundary
 
 Florida Class D production authorized: **false**.

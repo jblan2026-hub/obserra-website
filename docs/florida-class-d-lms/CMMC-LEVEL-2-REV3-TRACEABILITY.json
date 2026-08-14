@@ -2,12 +2,12 @@
   "schemaVersion": "1.0",
   "snapshotDate": "2026-08-13",
   "program": {
-    "name": "Obserra Website and Academy CMMC Level 2 Traceability",
+    "name": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Website and Academy CMMC Traceability",
     "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
     "repository": "jblan2026-hub/obserra-website",
     "branch": "codex/production-readiness-cmmc-dual-baseline",
     "sourceCheckpoint": "ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88",
-    "claimBoundary": "Engineering alignment, evidence traceability, and audit readiness only. This register does not claim CMMC certification, a CMMC status in SPRS, FedRAMP authorization, FDACS approval, or authorization to process CUI."
+    "claimBoundary": "Historical requirement-level supporting inventory only. The current objective-level authority is docs/compliance/CMMC-SYSTEM-EVIDENCE.json. This register does not claim CMMC certification, a CMMC status in SPRS, FedRAMP authorization, FDACS approval, authorization to process CUI, or an assessor finding."
   },
   "framework": {
     "engineeringBaseline": {
@@ -18,15 +18,16 @@
     "cmmcLevel2CurrentRuleBaseline": {
       "publication": "NIST SP 800-171 Rev. 2",
       "requirementCount": 110,
-      "ruleState": "As of 2026-08-13, CMMC Phase II implementation is suspended while Phase I self assessment requirements remain. Current DoD Level 2 enforcement continues to reference the 110 requirements in NIST SP 800-171 Rev. 2.",
-      "crosswalkPurpose": "NIST SP 800-171 Rev. 3 is the Obserra engineering baseline. Rev. 2 practice mappings are retained so the evidence package remains usable for the currently enforced CMMC Level 2 assessment baseline."
+      "ruleState": "The governing Level 2 record is bound to 32 CFR Part 170, the September 2024 CMMC Level 2 Assessment Guide version 2.13, NIST SP 800-171 Revision 2, and NIST SP 800-171A June 2018 as incorporated by reference. This historical supporting register does not infer or declare a CMMC implementation-phase status.",
+      "crosswalkPurpose": "NIST SP 800-171 Revision 3 and NIST SP 800-171A Revision 3 are supplemental forward-engineering references only. The authoritative objective-level record, exact source hashes, system separation, evidence ownership, technical results, human disposition, and claim boundaries are maintained in docs/compliance/CMMC-SYSTEM-EVIDENCE.json."
     },
     "officialSources": [
+      "https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170",
+      "https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf",
+      "https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final",
+      "https://csrc.nist.gov/pubs/sp/800/171/a/final",
       "https://csrc.nist.gov/pubs/sp/800/171/r3/final",
-      "https://csrc.nist.gov/pubs/sp/800/171/a/r3/final",
-      "https://csrc.nist.gov/projects/cprt/catalog",
-      "https://dowcio.war.gov/CMMC/About/",
-      "https://www.acquisition.gov/dfars/252.204-7021-contractor-compliance-cybersecurity-maturity-model-certification-level-requirements."
+      "https://csrc.nist.gov/pubs/sp/800/171/a/r3/final"
     ]
   },
   "traceability": {
@@ -179,7 +180,7 @@
     {
       "id": "TR-014", "title": "Regulated migration manifest and database promotion binding", "status": "implemented_source_evidence",
       "rev3": ["03.04.01", "03.04.03", "03.04.04", "03.04.11", "03.12.01", "03.16.01"], "rev2": ["3.4.1", "3.4.3", "3.4.4", "3.12.1", "3.12.4"],
-      "implementation": "Gate 29 produces a deterministic regulated migration manifest and binds database promotion to the exact candidate SHA, latest migration version, and manifest digest.",
+      "implementation": "Gate 29 produces a deterministic regulated migration manifest and binds database promotion to the exact candidate SHA, latest migration version, and manifest digest. Gate 37 reconciles the complete 35-file lineage through version 20260814175000 and pins manifest SHA-256 40eb88f6b8cb6ce2716eb260cde7f29d69d78f0a201e90cd6373ac1ebf2be090; no migration is executed by this source gate.",
       "evidence": ["scripts/florida-class-d-migration-manifest.mjs", "scripts/florida-class-d-migration-parity-gate.mjs", "docs/florida-class-d-lms/GATE-29-MIGRATION-PARITY-HANDOFF.md"],
       "methods": ["examine", "test"], "boundary": "Obserra GitHub and Supabase", "gap": "Production Class D database promotion is intentionally not authorized or performed."
     },
@@ -207,8 +208,8 @@
     {
       "id": "TR-018", "title": "GitHub change control and exact SHA validation", "status": "implemented_source_evidence",
       "rev3": ["03.04.03", "03.04.04", "03.04.05", "03.12.01", "03.16.01"], "rev2": ["3.4.3", "3.4.4", "3.4.5", "3.12.1"],
-      "implementation": "Material regulated changes are committed on a controlled branch, associated with PR 56, and accepted only after the exact SHA passes five mandatory workflows.",
-      "evidence": [".github/workflows/florida-class-d-lms-gates.yml", ".github/workflows/website-ci.yml", ".github/workflows/academy-70x-production-gate.yml", ".github/workflows/application-release-validation.yml", ".github/workflows/application-production-pipeline.yml", "docs/florida-class-d-lms/LATEST-HANDOFF.md"],
+      "implementation": "Material website and regulated LMS changes are committed on a controlled branch, preserved at exact Git SHAs, and accepted only after the exact pull-request head passes the applicable Website CI, Florida Class D LMS, CodeQL, and CMMC evidence-governance checks. Gate 37 preserves the original 208-path checkpoint at 83364708ae618555ec514d27a93079bad22a7c4c and reconciles the later main history at merge commit 7f9c8f24a2ee1b73cbd0a748e5768486aaf33dbc without rewriting either parent. Three malformed, mis-nested, tag-pinned Copilot CLI action insertions were removed before publication because they made the workflows invalid and introduced an unreviewed supply-chain dependency.",
+      "evidence": [".github/workflows/florida-class-d-lms-gates.yml", ".github/workflows/website-ci.yml", ".github/workflows/cmmc-evidence-governance.yml", ".github/workflows/codeql.yml", ".github/workflows/academy-70x-production-gate.yml", "docs/florida-class-d-lms/LATEST-HANDOFF.md", "docs/florida-class-d-lms/ACTION-LEDGER-GATE-35-ADDENDUM.md"],
       "methods": ["examine", "test"], "boundary": "Obserra GitHub", "gap": "Branch protection, administrator role review, signing policy, and organizational change approval evidence should be retained for formal assessment."
     },
     {
@@ -231,6 +232,13 @@
       "implementation": "CMMC and NIST traceability is maintained in machine-readable registers. The Gate 35 dual-baseline register explicitly enumerates all 110 Rev. 2 assessment requirements, all 97 active Rev. 3 engineering requirements, and all 33 withdrawn Rev. 3 identifiers. Human-readable output and digests are generated deterministically, and CI fails on schema, catalog, mapping, evidence reference, or generated-document drift.",
       "evidence": ["docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.json", "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.schema.json", "scripts/cmmc-level2-rev3-traceability.mjs", "docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.json", "docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.schema.json", "docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MATRIX.md", "scripts/cmmc-level2-dual-baseline.mjs", ".github/workflows/florida-class-d-lms-gates.yml"],
       "methods": ["examine", "test"], "boundary": "Obserra GitHub CI", "gap": "The SSP and organization wide policies remain separate required assessment evidence and are not auto satisfied by this register."
+    },
+    {
+      "id": "TR-022", "title": "Regulated runtime isolation and explicit FDACS project binding", "status": "implemented_source_evidence",
+      "rev3": ["03.01.02", "03.01.05", "03.04.02", "03.04.03", "03.13.01", "03.13.06", "03.16.01"], "rev2": ["3.1.2", "3.1.5", "3.4.2", "3.4.3", "3.13.1", "3.13.6"],
+      "implementation": "Regulated Florida Class D server modules require explicit protected Supabase URL and service-role configuration. The readiness and activation controls derive the expected HTTPS origin from the controlled FDACS project reference rather than embedding a repository URL or using a fallback. Gate 25 scans all regulated modules and fails on embedded Supabase origins or public secret-class environment names.",
+      "evidence": ["lib/florida-class-d-runtime-readiness.ts", "lib/florida-class-d-production-activation.ts", "scripts/florida-class-d-runtime-isolation-audit.mjs", "docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Obserra regulated LMS and isolated FDACS Supabase runtime", "gap": "Exact-release CI and protected live runtime configuration must still be verified; production activation and CUI processing remain unauthorized."
     }
   ],
   "openAuditGaps": [

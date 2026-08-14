@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { serviceCatalog, serviceMap } from "../serviceCatalog";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "../services.css";
 
 export async function generateStaticParams() {
@@ -14,12 +15,12 @@ export async function generateMetadata({ params }: { params: Promise<{ serviceId
   const service = serviceMap[serviceId];
   if (!service) return {};
   return {
-    title: `${service.title} | Obserra Enterprise Services`,
+    title: `${service.title} | ${LEGAL_ENTITY_NAME} Enterprise Services`,
     description: service.summary,
     alternates: { canonical: `/services/${service.id}` },
-    keywords: [service.title, service.category, "enterprise advisory", "executive risk", "Obserra Services"],
+    keywords: [service.title, service.category, "enterprise advisory", "executive risk", `${LEGAL_ENTITY_NAME} Services`],
     openGraph: {
-      title: `${service.title} | Obserra Enterprise Services`,
+      title: `${service.title} | ${LEGAL_ENTITY_NAME} Enterprise Services`,
       description: service.summary,
       url: `https://www.obserrallc.com/services/${service.id}`,
       type: "website",
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ serviceId
     },
     twitter: {
       card: "summary_large_image",
-      title: `${service.title} | Obserra Enterprise Services`,
+      title: `${service.title} | ${LEGAL_ENTITY_NAME} Enterprise Services`,
       description: service.summary,
       images: ["/brand/visuals/obserra-cybersecurity.png"],
     },
@@ -49,7 +50,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         description: service.detail,
         provider: {
           "@type": "Organization",
-          name: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+          name: LEGAL_ENTITY_NAME,
           url: "https://www.obserrallc.com",
         },
         areaServed: "Global",
@@ -72,8 +73,8 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     <>
       <main className="apps-page services-page service-detail-page">
         <header className="apps-nav">
-          <a href="/" className="apps-brand" aria-label="Obserra home">
-            <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
+          <a href="/" className="apps-brand" aria-label={`${LEGAL_ENTITY_NAME} home`}>
+            <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
             <span>SERVICE DETAIL</span>
           </a>
           <nav aria-label="Service detail navigation">
@@ -161,7 +162,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           <div>
             <p className="apps-eyebrow">READY TO SCOPE THE WORK</p>
             <h2>Begin with the decision, exposure, deadline, and outcome that matter most.</h2>
-            <p>Obserra will determine the appropriate service scope, engagement model, information requirements, and next commercial step. Pricing is provided only after scope is understood.</p>
+            <p>{LEGAL_ENTITY_NAME} will determine the appropriate service scope, engagement model, information requirements, and next commercial step. Pricing is provided only after scope is understood.</p>
           </div>
           <div className="service-detail-cta-actions">
             <a className="apps-button" href={consultationHref}>Request consultation</a>

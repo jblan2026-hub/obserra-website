@@ -27,7 +27,7 @@ export default async function LearnCoursePage({ params }: { params: Promise<{ co
       initialProgress={state.progress[courseId] ?? { completedLessons: [] }}
       lessons={lessons}
       assessment={finalAssessmentQuestions(course.id)}
-      watermark="PAID OBSERRA ACADEMY ACCESS · OBSERRA PROPRIETARY"
+      watermark="PAID OBSERRA ACADEMY ACCESS · OBSERRA ACADEMY PROPRIETARY"
     />
   );
 }

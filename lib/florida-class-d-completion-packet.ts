@@ -14,8 +14,8 @@ export const FLORIDA_CLASS_D_COMPLETION_PACKET_POLICY = {
 } as const;
 
 function config() {
-  const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
+  const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+  const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   if (!key || !url.startsWith("https://")) {
     throw new FloridaClassDExamError("Completion packet service is not configured.", 503, "FDACS_COMPLETION_PACKET_NOT_CONFIGURED");
   }
@@ -177,6 +177,6 @@ export function renderFloridaClassDCompletionPacketHtml(packet: Awaited<ReturnTy
 <h2>FDACS / LIAS</h2><div class="box"><p><b>Status:</b> ${escapeHtml(lias?.status ?? "Not prepared")}</p><p><b>Reporting due:</b> ${escapeHtml(lias?.reporting_due_on ?? "")}</p><p><b>Submitted:</b> ${escapeHtml(lias?.submitted_at ?? "")}</p><p><b>Confirmed:</b> ${escapeHtml(lias?.confirmed_at ?? "")}</p><p><b>FDACS-16103 reference:</b> ${escapeHtml(lias?.certificate_reference ?? "")}</p></div>
 <h2>Completion Documents</h2>${rowsHtml(documentRows,["document_type","status","external_reference","issued_at","source_system"])}
 <h2>Module Progress</h2>${rowsHtml(packet.moduleProgress as Array<Record<string,unknown>>,["module_id","status","instructional_minutes_credited","learning_check_passed","completed_at"])}
-<p class="notice">Successful course completion does not itself issue a Florida Class D Security Officer license. The official FDACS-16103 is generated through LIAS and is distinct from any supplemental Obserra course-completion record.</p>
+<p class="notice">Successful course completion does not itself issue a Florida Class D Security Officer license. The official FDACS-16103 is generated through LIAS and is distinct from any supplemental OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC course-completion record.</p>
 </body></html>`;
 }

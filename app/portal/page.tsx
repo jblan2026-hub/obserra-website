@@ -4,18 +4,19 @@ import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./portal.css";
 
 export const metadata: Metadata = {
-  title: "Customer Dashboard | Obserra",
-  description: "Access your protected Obserra customer workspace for Academy, applications, licenses, reports, billing, certificates, support, and account security.",
+  title: `Customer Dashboard | ${LEGAL_ENTITY_NAME}`,
+  description: `Access your protected ${LEGAL_ENTITY_NAME} customer workspace for Academy, applications, licenses, reports, billing, certificates, support, and account security.`,
   alternates: { canonical: "/portal" },
   robots: { index: false, follow: false },
 };
 
 const dashboardModules = [
   { eyebrow: "ACADEMY", title: "Learning workspace", copy: "Browse available training, resume account-based learning, and review course completion requirements.", href: "/academy", action: "Open Academy", state: "Available" },
-  { eyebrow: "APPLICATIONS", title: "Obserra applications", copy: "Review secure enterprise applications and request deployment, licensing, or technical evaluation support.", href: "/apps", action: "View applications", state: "Available" },
+  { eyebrow: "APPLICATIONS", title: `${LEGAL_ENTITY_NAME} applications`, copy: "Review secure enterprise applications and request deployment, licensing, or technical evaluation support.", href: "/apps", action: "View applications", state: "Available" },
   { eyebrow: "CERTIFICATES", title: "Completion records", copy: "Request certificate assistance, verification support, or corrections to approved completion records.", href: "/contact?interest=certificate-support", action: "Certificate support", state: "Support-enabled" },
   { eyebrow: "LICENSING", title: "Enterprise licensing", copy: "Coordinate renewals, procurement, user allocation, team training, and application deployment planning.", href: "/contact?interest=enterprise-licensing", action: "Contact licensing", state: "Request-based" },
   { eyebrow: "BILLING", title: "Orders and invoicing", copy: "Request receipts, invoice support, payment clarification, enrollment assistance, or procurement documentation.", href: "/contact?interest=billing-support", action: "Billing support", state: "Request-based" },
@@ -39,13 +40,13 @@ export default async function PortalPage() {
 
   const user = await currentUser();
   const displayName = user?.firstName || user?.username || user?.primaryEmailAddress?.emailAddress?.split("@")[0] || "Customer";
-  const primaryEmail = user?.primaryEmailAddress?.emailAddress || "Verified Obserra account";
+  const primaryEmail = user?.primaryEmailAddress?.emailAddress || `Verified ${LEGAL_ENTITY_NAME} account`;
 
   return (
     <main className="portal-page">
       <header className="portal-nav">
-        <Link href="/" className="portal-brand" aria-label="Obserra home">
-          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
+        <Link href="/" className="portal-brand" aria-label={`${LEGAL_ENTITY_NAME} home`}>
+          <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
           <span>CUSTOMER DASHBOARD</span>
         </Link>
         <nav aria-label="Portal navigation">
@@ -59,7 +60,7 @@ export default async function PortalPage() {
         <div className="portal-command-copy">
           <p className="portal-eyebrow">AUTHENTICATED CUSTOMER WORKSPACE</p>
           <h1 id="dashboard-title">Welcome, {displayName}.</h1>
-          <p>Your Obserra identity is verified. This dashboard centralizes active customer pathways and shows which account capabilities are available, request-based, controlled, or still pending production data integration.</p>
+          <p>Your {LEGAL_ENTITY_NAME} identity is verified. This dashboard centralizes active customer pathways and shows which account capabilities are available, request-based, controlled, or still pending production data integration.</p>
           <div className="portal-actions"><Link className="portal-button" href="/academy">Continue to Academy</Link><Link className="portal-outline" href="/contact?interest=customer-support">Open customer support</Link></div>
         </div>
         <aside className="portal-profile" aria-label="Authenticated account summary">
@@ -76,7 +77,7 @@ export default async function PortalPage() {
       </section>
 
       <section className="portal-workspace" aria-labelledby="workspace-title">
-        <div className="portal-section-heading"><div><p className="portal-eyebrow">CUSTOMER WORKSPACE</p><h2 id="workspace-title">Access the services connected to your Obserra relationship.</h2></div><p>Module status reflects current production readiness. Request-based modules connect you to the responsible Obserra team without presenting invented balances, licenses, transactions, cases, or records.</p></div>
+        <div className="portal-section-heading"><div><p className="portal-eyebrow">CUSTOMER WORKSPACE</p><h2 id="workspace-title">Access the services connected to your {LEGAL_ENTITY_NAME} relationship.</h2></div><p>Module status reflects current production readiness. Request-based modules connect you to the responsible {LEGAL_ENTITY_NAME} team without presenting invented balances, licenses, transactions, cases, or records.</p></div>
         <div className="portal-grid">
           {dashboardModules.map((module) => <article className="portal-card" key={module.title}><div className="portal-card-top"><small>{module.eyebrow}</small><span>{module.state}</span></div><h3>{module.title}</h3><p>{module.copy}</p><Link href={module.href}>{module.action} →</Link></article>)}
         </div>
@@ -95,7 +96,7 @@ export default async function PortalPage() {
         <div className="portal-roadmap">{roadmap.map(([title,state,copy]) => <article key={title}><div><span>{state}</span><h3>{title}</h3></div><p>{copy}</p></article>)}</div>
       </section>
 
-      <section className="portal-section"><div className="portal-support"><div><p className="portal-eyebrow">CUSTOMER ASSISTANCE</p><h2>Reach the correct Obserra team through one confidential request.</h2><p>Use customer support for enrollment, certificates, billing, licensing, reports, application access, active engagements, or account assistance.</p></div><div className="portal-actions"><Link className="portal-button" href="/contact?interest=customer-support">Open support request</Link><a className="portal-outline" href="mailto:info@obserrallc.com">Email support</a></div></div></section>
+      <section className="portal-section"><div className="portal-support"><div><p className="portal-eyebrow">CUSTOMER ASSISTANCE</p><h2>Reach the correct {LEGAL_ENTITY_NAME} team through one confidential request.</h2><p>Use customer support for enrollment, certificates, billing, licensing, reports, application access, active engagements, or account assistance.</p></div><div className="portal-actions"><Link className="portal-button" href="/contact?interest=customer-support">Open support request</Link><a className="portal-outline" href="mailto:info@obserrallc.com">Email support</a></div></div></section>
 
       <footer className="portal-footer"><span>OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</span><nav><Link href="/trust">Trust Center</Link><Link href="/privacy">Privacy</Link><Link href="/contact">Contact</Link></nav></footer>
     </main>

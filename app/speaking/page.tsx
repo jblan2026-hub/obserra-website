@@ -26,7 +26,7 @@ const highlights = [
 export default function SpeakingPage() {
   return <main className="speaker-page">
     <header className="speaker-nav">
-      <Link href="/"><Image src="/brand/obserra-logo.png" width={280} height={54} priority alt="Obserra Executive Protection and Intelligence LLC" /></Link>
+      <Link href="/"><Image src="/brand/obserra-logo.png" width={280} height={54} priority alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" /></Link>
       <nav><Link href="/">Home</Link><Link href="/about">About</Link><Link href="/services">Services</Link><Link href="/academy">Academy</Link><Link href="/contact?interest=speaking" className="speaker-nav-cta">Book Dr. Blanchard</Link></nav>
     </header>
 
@@ -59,6 +59,6 @@ export default function SpeakingPage() {
 
     <section className="speaker-booking"><p className="speaker-kicker">BOOKING AND MEDIA REQUESTS</p><h2>Bring an experienced executive voice to your next event.</h2><p>Use one inquiry path for keynotes, board briefings, panels, podcasts, media interviews, workshops, and private leadership sessions.</p><div className="speaker-actions"><Link href="/contact?interest=speaking" className="speaker-button">Start a speaking request</Link><Link href="/about" className="speaker-outline">Review executive credentials</Link></div></section>
 
-    <footer className="speaker-footer"><Image src="/brand/obserra-logo.png" width={190} height={38} alt="Obserra Executive Protection and Intelligence LLC" /><p>Speaking and media engagements are coordinated through Obserra Executive Protection &amp; Intelligence LLC.</p></footer>
+    <footer className="speaker-footer"><Image src="/brand/obserra-logo.png" width={190} height={38} alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" /><p>Speaking and media engagements are coordinated through OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC.</p></footer>
   </main>;
 }

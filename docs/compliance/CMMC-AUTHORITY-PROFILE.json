@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "2.0",
+  "profileId": "obserra-cmmc-l2-authority-profile-2026-08-12",
+  "profileStatus": "final",
+  "legalOwner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "effectiveSnapshotDate": "2026-08-12",
+  "retrievedAt": "2026-08-14T16:42:37Z",
+  "governingAssessmentBaseline": {
+    "regulationAuthorityId": "32-cfr-part-170-2026-08-12",
+    "assessmentGuideAuthorityId": "dod-cmmc-l2-assessment-guide-v2.13-2024-09",
+    "requirementAuthorityId": "nist-sp-800-171r2-upd1",
+    "assessmentProcedureAuthorityId": "nist-sp-800-171a-june-2018",
+    "requirementCount": 110,
+    "objectiveCount": 320,
+    "relationship": "32 CFR Part 170 incorporates NIST SP 800-171 Revision 2 and NIST SP 800-171A June 2018 by reference for the current CMMC Level 2 assessment baseline. The September 2024 CMMC Level 2 Assessment Guide version 2.13 provides DoD guidance and does not itself have the force and effect of law."
+  },
+  "supplementalEngineeringBaseline": {
+    "requirementAuthorityId": "nist-sp-800-171r3-2024-05",
+    "assessmentProcedureAuthorityId": "nist-sp-800-171ar3-2024-05",
+    "relationship": "NIST SP 800-171 Revision 3 and NIST SP 800-171A Revision 3 are retained as the forward engineering and assessment crosswalk. They do not replace the Revision 2 and June 2018 publications incorporated by reference in 32 CFR Part 170 unless the governing rule changes."
+  },
+  "authorities": [
+    {
+      "authorityId": "32-cfr-part-170-2026-08-12",
+      "title": "32 CFR Part 170—Cybersecurity Maturity Model Certification (CMMC) Program",
+      "publisher": "Office of the Federal Register / U.S. Department of Defense",
+      "version": "eCFR point-in-time text current through 2026-08-12; source rule 89 FR 83214, October 15, 2024",
+      "publicationDate": "2024-10-15",
+      "role": "governing_regulation",
+      "incorporatedByReference": false,
+      "officialUrl": "https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170",
+      "pinnedArtifactUrl": "https://www.ecfr.gov/api/versioner/v1/full/2026-08-12/title-32.xml?part=170",
+      "artifactMediaType": "application/xml",
+      "artifactSha256": "3dc8b9bebbe56753206429657cbac24ff32bfd64c75356ba276af38a1032b628"
+    },
+    {
+      "authorityId": "dod-cmmc-l2-assessment-guide-v2.13-2024-09",
+      "title": "CMMC Assessment Guide—Level 2",
+      "publisher": "U.S. Department of Defense Chief Information Officer",
+      "version": "Version 2.13",
+      "publicationDate": "2024-09-01",
+      "role": "governing_assessment_guidance",
+      "incorporatedByReference": false,
+      "forceOfLaw": false,
+      "officialUrl": "https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf",
+      "pinnedArtifactUrl": "https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf",
+      "artifactMediaType": "application/pdf",
+      "artifactSha256": "0dcaba1626a0d23893981d74dd3f0f2338fff54cece67d81bc811ce76392d867"
+    },
+    {
+      "authorityId": "nist-sp-800-171r2-upd1",
+      "title": "NIST SP 800-171 Revision 2—Protecting Controlled Unclassified Information in Nonfederal Systems and Organizations",
+      "publisher": "National Institute of Standards and Technology",
+      "version": "Revision 2, February 2020, including updates through January 28, 2021",
+      "publicationDate": "2021-01-28",
+      "role": "incorporated_governing_requirement_baseline",
+      "incorporatedByReference": true,
+      "incorporationCitation": "32 CFR 170.2(a)(9)",
+      "officialUrl": "https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final",
+      "pinnedArtifactUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171r2.pdf",
+      "artifactMediaType": "application/pdf",
+      "artifactSha256": "298bdbfcf6a4890a564b225c893230a0b32b2e69e3b98dd898aaeb1d544c5e12"
+    },
+    {
+      "authorityId": "nist-sp-800-171a-june-2018",
+      "title": "NIST SP 800-171A—Assessing Security Requirements for Controlled Unclassified Information",
+      "publisher": "National Institute of Standards and Technology",
+      "version": "June 2018",
+      "publicationDate": "2018-06-13",
+      "role": "incorporated_governing_assessment_procedure",
+      "incorporatedByReference": true,
+      "incorporationCitation": "32 CFR 170.2(a)(10)",
+      "officialUrl": "https://csrc.nist.gov/pubs/sp/800/171/a/final",
+      "pinnedArtifactUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171A.pdf",
+      "artifactMediaType": "application/pdf",
+      "artifactSha256": "21bf3acc43f4284f723639b82eb71e3ce597fa3610f7e9dcf5e8484e22bc0f71"
+    },
+    {
+      "authorityId": "nist-sp-800-171r3-2024-05",
+      "title": "NIST SP 800-171 Revision 3—Protecting Controlled Unclassified Information in Nonfederal Systems and Organizations",
+      "publisher": "National Institute of Standards and Technology",
+      "version": "Revision 3, May 2024",
+      "publicationDate": "2024-05-14",
+      "role": "supplemental_forward_engineering_baseline",
+      "incorporatedByReference": false,
+      "officialUrl": "https://csrc.nist.gov/pubs/sp/800/171/r3/final",
+      "pinnedArtifactUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171r3.pdf",
+      "artifactMediaType": "application/pdf",
+      "artifactSha256": "3e4631df8b5d61f40a6e542b52779ef30ddbbfff31e09214fa94ad6e6f5e6d08"
+    },
+    {
+      "authorityId": "nist-sp-800-171ar3-2024-05",
+      "title": "NIST SP 800-171A Revision 3—Assessing Security Requirements for Controlled Unclassified Information",
+      "publisher": "National Institute of Standards and Technology",
+      "version": "Revision 3, May 2024",
+      "publicationDate": "2024-05-14",
+      "role": "supplemental_forward_assessment_baseline",
+      "incorporatedByReference": false,
+      "officialUrl": "https://csrc.nist.gov/pubs/sp/800/171/a/r3/final",
+      "pinnedArtifactUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171Ar3.pdf",
+      "artifactMediaType": "application/pdf",
+      "artifactSha256": "946d963707cdaba19901c49d5c89517adb00844fe5d101e9dac7febc68e34cfa"
+    }
+  ],
+  "evidenceRule": {
+    "permittedOrigins": [
+      "product_supplied_evidence",
+      "organization_evidence",
+      "assessor_determination",
+      "customer_responsibility"
+    ],
+    "findingEligibility": "Only a final artifact whose SHA-256 is verified, whose exact source and release revisions are recorded, and whose objective-level mapping, owner, system scope, test result, and claim boundary are complete may be eligible to support an evidence finding.",
+    "assessorAuthorityBoundary": "Product and organization evidence may support an assessment but cannot create an assessor determination. An assessor determination must be imported as a separately signed, final, hashed assessor artifact owned by the assessor or assessment organization.",
+    "failClosed": true
+  },
+  "driftMonitoring": {
+    "watchDefinition": "docs/compliance/CMMC-AUTHORITY-WATCH.json",
+    "currentResult": "docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json",
+    "cadence": "weekly_and_manual",
+    "silentBaselineUpdatesAllowed": false,
+    "rule": "Official-source drift blocks authority freshness and requires reviewed profile, catalog, mapping, and evidence regeneration. A detected change is never applied silently."
+  }
+}

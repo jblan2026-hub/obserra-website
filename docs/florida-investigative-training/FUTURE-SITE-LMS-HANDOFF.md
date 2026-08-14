@@ -4,7 +4,7 @@
 
 **PLANNED AFTER FLORIDA CLASS D LMS COMPLETION. NOT A CURRENT PUBLIC TRAINING OFFERING.**
 
-This record preserves a separate future workstream for **Obserra Executive Protection & Intelligence LLC** after the Florida Class D regulated-school LMS reaches its controlled completion point.
+This record preserves a separate future workstream for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC** after the Florida Class D regulated-school LMS reaches its controlled completion point.
 
 ## Owner-reported licensing state
 

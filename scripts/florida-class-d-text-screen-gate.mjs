@@ -34,7 +34,7 @@ requireText(completionGuard, "fdacs_class_d_missing_text_screen_acknowledgments"
 requireText(completionGuard, "v.acknowledged_at is null", "Missing acknowledgment evidence must be detectable for completion review.");
 
 requireText(sharedData, "export async function floridaClassDRegulatedRequest", "Gate 24 must use the protected regulated server data helper.");
-requireText(sharedData, 'process.env.OBSERRA_SUPABASE_URL?.trim() || ""', "Protected regulated data access must require explicit Supabase runtime configuration.");
+requireText(sharedData, 'process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || ""', "Protected regulated data access must require explicit Supabase runtime configuration.");
 if (/DEFAULT_SUPABASE_URL/.test(service)) throw new Error("Gate 24 text-screen service may not use a hardcoded Supabase fallback URL.");
 
 for (const value of [

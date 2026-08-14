@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1.1",
+  "recordId": "fdacs-pii-database-audit-2026-08-14T17:57:49Z",
+  "recordState": "live_hardened_activation_pending",
+  "observedAt": "2026-08-14T17:57:49.805602Z",
+  "legalOwner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "systemId": "SYS-FDACS-DATABASE",
+  "systemName": "FDACS isolated student-record PII database",
+  "provider": "Supabase",
+  "providerProjectName": "OBSERRA FDACS Student Records Production",
+  "providerProjectRef": "ggkxgjhsbgbifiqrhavr",
+  "region": "us-east-1",
+  "classification": "regulated_student_pii_non_cui",
+  "liveAuthorityPolicy": "Live provider state is authoritative. Repository source is candidate evidence until the exact migration and live result are verified and hashed.",
+  "scopeBoundary": {
+    "studentPiiAuthorized": true,
+    "cuiAuthorized": false,
+    "paymentDataAuthorized": false,
+    "academyDataAuthorized": false,
+    "applicationsWorkstreamDataAuthorized": false,
+    "identityDocumentImagesAuthorized": false,
+    "nonFdacsTableCount": 0
+  },
+  "retention": {
+    "minimumYears": 2,
+    "operationalYears": 3,
+    "automaticDeletionEnabled": false,
+    "legalHoldSupported": true,
+    "finalExportRequiresProtectedArtifact": true
+  },
+  "governingSources": [
+    {
+      "authorityId": "FAC-5N-1.140-2024-11-28",
+      "title": "Security Officer, Recovery Agent and Private Investigative Intern School Curriculum; Examinations; Retention of Records",
+      "exactVersion": "Final adopted rule effective 2024-11-28",
+      "officialUrl": "https://www.flrules.org/gateway/ruleno.asp?id=5n-1.140",
+      "requirements": [
+        "Instructor verification of the student's U.S. state or federal photo identification",
+        "Instructor verification and digital logging of daily attendance",
+        "Minimum two-year record retention",
+        "Immediate production of student records to an FDACS investigator on request",
+        "Reproducible or transmittable electronic records",
+        "Online training-session, instructor, attendance, and security-protocol evidence"
+      ]
+    },
+    {
+      "authorityId": "FS-493.6132-2025",
+      "title": "Online training courses",
+      "exactVersion": "2025 Florida Statutes",
+      "officialUrl": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0400-0499%2F0493%2FSections%2F0493.6132.html",
+      "requirements": [
+        "Digital attendance log",
+        "Training-session and instructor records",
+        "Proof of compliance with security protocols",
+        "Investigator access on request",
+        "Division live course access for audit, monitoring, or inspection"
+      ]
+    }
+  ],
+  "sourceMigrations": [
+    {
+      "path": "supabase/migrations/20260814170000_fdacs_class_d_pii_boundary_hardening.sql",
+      "providerMigrationVersion": "20260814174420",
+      "providerMigrationName": "fdacs_class_d_pii_boundary_hardening",
+      "liveApplied": true
+    },
+    {
+      "path": "supabase/migrations/20260814171000_fdacs_class_d_automatic_record_archive.sql",
+      "providerMigrationVersion": "20260814174433",
+      "providerMigrationName": "fdacs_class_d_automatic_record_archive",
+      "liveApplied": true
+    },
+    {
+      "path": "supabase/migrations/20260814172000_fdacs_class_d_instructor_identity_attendance.sql",
+      "providerMigrationVersion": "20260814174445",
+      "providerMigrationName": "fdacs_class_d_instructor_identity_attendance",
+      "liveApplied": true
+    },
+    {
+      "path": "supabase/migrations/20260814173000_fdacs_class_d_investigator_audit_access.sql",
+      "providerMigrationVersion": "20260814174534",
+      "providerMigrationName": "fdacs_class_d_investigator_audit_access",
+      "liveApplied": true
+    },
+    {
+      "path": "supabase/migrations/20260814174000_fdacs_class_d_audit_performance_and_explicit_deny.sql",
+      "providerMigrationVersion": "20260814174751",
+      "providerMigrationName": "fdacs_class_d_audit_performance_and_explicit_deny",
+      "liveApplied": true
+    },
+    {
+      "path": "supabase/migrations/20260814175000_fdacs_class_d_trigger_function_execute_hardening.sql",
+      "providerMigrationVersion": "20260814175650",
+      "providerMigrationName": "fdacs_class_d_trigger_function_execute_hardening",
+      "liveApplied": true
+    }
+  ],
+  "liveVerification": {
+    "providerMigrationCount": 35,
+    "fdacsTableCount": 64,
+    "publicTableCount": 64,
+    "nonFdacsTableCount": 0,
+    "fdacsTablesWithoutForcedRls": 0,
+    "explicitBrowserDenyPolicyCount": 64,
+    "anonOrAuthenticatedTablePrivilegeCount": 0,
+    "fdacsFunctionCount": 102,
+    "anonOrAuthenticatedFunctionExecutePrivilegeCount": 0,
+    "securityDefinerEmptySearchPathCount": 45,
+    "securityDefinerFixedProtectedPublicSearchPathCount": 49,
+    "anonCreatePrivilegeOnPublicSchema": false,
+    "authenticatedCreatePrivilegeOnPublicSchema": false,
+    "serviceRoleDirectAuditTablePrivilegeCount": 0,
+    "securityAdvisorFindingCount": 0,
+    "securityAdvisorErrorOrWarningCount": 0,
+    "unindexedForeignKeyFindingCount": 0,
+    "performanceAdvisorInfoCount": 105,
+    "unusedIndexInfoCount": 104,
+    "authConnectionAllocationInfoCount": 1,
+    "archiveQueueHealthy": true,
+    "archiveQueueCounts": {
+      "pending": 0,
+      "processing": 0,
+      "retryWait": 0,
+      "completed": 0,
+      "deadLetter": 0
+    },
+    "studentRecordCounts": {
+      "studentIdentities": 0,
+      "enrollments": 0,
+      "attendanceEntries": 0,
+      "identityVerificationSessions": 0,
+      "dailyIdentityCheckins": 0,
+      "dailyAttendanceAttestations": 0,
+      "examAttempts": 0,
+      "completionRecords": 0,
+      "completionDocuments": 0
+    },
+    "chainVerification": [
+      {
+        "chain": "activation_evidence",
+        "valid": true,
+        "recordCount": 0,
+        "failureCount": 0,
+        "headSha256": null
+      },
+      {
+        "chain": "record_access",
+        "valid": true,
+        "recordCount": 1,
+        "failureCount": 0,
+        "headSha256": "77d978e19ddf905423d89e93383e4e3f462e8b6f66a03f200e31321030f6601d"
+      },
+      {
+        "chain": "identity_provider_events",
+        "valid": true,
+        "recordCount": 0,
+        "failureCount": 0,
+        "headSha256": null
+      },
+      {
+        "chain": "protected_artifacts",
+        "valid": true,
+        "recordCount": 0,
+        "failureCount": 0,
+        "headSha256": null
+      },
+      {
+        "chain": "investigator_exports",
+        "valid": true,
+        "recordCount": 1,
+        "failureCount": 0,
+        "headSha256": "0ba5ccc37e71a709f7841722f010aa863e504e35f02139f6653081b73b149105"
+      }
+    ]
+  },
+  "liveAuditPackageTest": {
+    "requestReference": "FDACS-AUDIT-PREFLIGHT-2026-08-14",
+    "exportId": "27ea0a5a-1c07-4c68-a37f-eb775df343fb",
+    "exportSchema": "obserra.fdacs.class-d.investigator-audit.v2",
+    "classification": "internal_sensitive_non_pii",
+    "payloadSha256": "588eea7731526ff01704ae06b0b07381ec97340f7d162cb0cd3f3db1bd255d1e",
+    "payloadDigestRecomputed": "588eea7731526ff01704ae06b0b07381ec97340f7d162cb0cd3f3db1bd255d1e",
+    "exportEventSha256": "0ba5ccc37e71a709f7841722f010aa863e504e35f02139f6653081b73b149105",
+    "artifactState": "generated_unarchived",
+    "eligibleAsFinalFdacsRecordEvidence": false,
+    "awaitingFinalizationCount": 1,
+    "studentPiiIncluded": false,
+    "result": "passed_generation_and_hash_recording",
+    "negativeTests": {
+      "unauthorizedActorRejected": true,
+      "finalizationWithoutMatchingProtectedArtifactRejected": true,
+      "deliveryBeforeFinalizationRejected": true,
+      "exportEventCountAfterTests": 1,
+      "finalizedEventCountAfterTests": 0,
+      "deliveredEventCountAfterTests": 0
+    }
+  },
+  "cmmcSecurityProtocolProof": {
+    "systemId": "SYS-FDACS-DATABASE",
+    "centralMachineRecord": "docs/compliance/CMMC-SYSTEM-EVIDENCE.json",
+    "centralHumanExtract": "docs/compliance/CMMC-SYSTEM-EVIDENCE.md",
+    "separateDispositionRecord": "docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json",
+    "requiredExactReleaseCommit": true,
+    "requiredProtectedArtifactType": "security_protocol_evidence",
+    "registeredLiveEvidenceCount": 0,
+    "technicalDisposition": "pending_evidence",
+    "humanDisposition": "pending",
+    "pendingHumanIsTechnicalFailure": false,
+    "assessmentFinding": "not_assessed",
+    "claimBoundary": "The CMMC system mapping is the controlled security-protocol description. It becomes verified FDACS proof of operation only after exact-release technical results and the protected package are registered live. Human review remains separate; assessor findings are not created by the product."
+  },
+  "technicalChecks": [
+    {
+      "checkId": "FDACS-DB-SOURCE-GATE",
+      "state": "not_tested",
+      "result": "The isolated retention, archive, identity/attendance, investigator export, CMMC binding, and chain-verifier source contract was satisfied locally, but the source revision is unpublished and is not an authoritative green technical result."
+    },
+    {
+      "checkId": "FDACS-DB-LIVE-MIGRATIONS",
+      "state": "passed",
+      "result": "Six forward migrations applied transactionally to the isolated live project."
+    },
+    {
+      "checkId": "FDACS-DB-LIVE-ACCESS-BOUNDARY",
+      "state": "passed",
+      "result": "Zero browser table privileges, zero browser execute privileges across 102 FDACS routines, zero non-FDACS tables, all FDACS tables forced-RLS, and 64 explicit restrictive deny policies."
+    },
+    {
+      "checkId": "FDACS-DB-LIVE-FUNCTION-BOUNDARY",
+      "state": "passed",
+      "result": "The last inherited trigger-function execute grant was removed live; anon and authenticated now have zero execute privileges across all FDACS routines. All 49 legacy security-definer routines with a fixed public search path are protected by zero anon/authenticated CREATE privilege on that schema."
+    },
+    {
+      "checkId": "FDACS-DB-LIVE-CHAIN-VERIFIERS",
+      "state": "passed",
+      "result": "All five chain verifiers returned valid with zero failures; record-access and investigator-export chains each contain the real preflight event."
+    },
+    {
+      "checkId": "FDACS-DB-LIVE-EXPORT-GENERATION",
+      "state": "passed",
+      "result": "A real boundary-scoped export was generated and its payload digest independently recomputed and matched."
+    },
+    {
+      "checkId": "FDACS-DB-LIVE-EXPORT-FAIL-CLOSED",
+      "state": "passed",
+      "result": "Negative tests rejected an unauthorized actor, rejected finalization without the exact matching protected artifact, and rejected delivery before finalization; the ledger remained one generated event with zero finalized or delivered events."
+    },
+    {
+      "checkId": "FDACS-DB-ENCRYPTED-EXPORT-FINALIZATION",
+      "state": "not_tested",
+      "result": "External AES-256-GCM key custody is not verified, so no protected inspection_export was fabricated and the export remains non-final."
+    },
+    {
+      "checkId": "FDACS-DB-BACKUP-RESTORE",
+      "state": "not_tested",
+      "result": "A candidate-bound restore test has not been executed."
+    },
+    {
+      "checkId": "FDACS-DB-HA-FAILOVER",
+      "state": "not_tested",
+      "result": "A candidate-bound HA failover test has not been executed."
+    },
+    {
+      "checkId": "FDACS-DB-STUDENT-DOSSIER",
+      "state": "not_tested",
+      "result": "The database contains zero student enrollments, so no real student dossier or identity-attendance chain can yet be tested."
+    }
+  ],
+  "activationState": {
+    "fdacsDsLicenseVerified": false,
+    "fdacsOnlineMethodAccepted": false,
+    "clerkIdentityVerified": false,
+    "piiEncryptionKeyCustodyVerified": false,
+    "backupRestoreTestVerified": false,
+    "haFailoverTestVerified": false,
+    "investigatorAccessTestVerified": false,
+    "productionRuntimeAuthorized": false
+  },
+  "humanReview": {
+    "state": "pending",
+    "pendingIsTechnicalFailure": false,
+    "completionRequiredForTechnicalPass": false,
+    "assessmentFinding": "not_assessed"
+  },
+  "openBlockers": [
+    "Register a final exact-release SYS-FDACS-DATABASE CMMC security-protocol package after objective-level technical tests complete.",
+    "Verify external AES-256-GCM encryption-key custody and run a protected export finalization test.",
+    "Run and hash backup/restore and HA failover tests against the exact release candidate.",
+    "Run an authorized non-production or first-live student workflow to verify automatic enrollment/completion archival and the scoped student dossier.",
+    "Verify FDACS DS license and online method acceptance before authorizing the production runtime.",
+    "Complete the controlled FDACS investigator access and delivery walkthrough."
+  ],
+  "claimBoundary": "This record proves the listed live database observations and negative fail-closed tests at the recorded time. It does not prove FDACS licensure, FDACS approval, CMMC certification, backup restoration, HA failover, encryption-key custody, a finalized encrypted investigator export, or a real student workflow."
+}

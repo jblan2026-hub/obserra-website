@@ -1,25 +1,26 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import ContactExperience from "./ContactExperience";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./contact.css";
 
 export const metadata: Metadata = {
-  title: "Contact | Obserra Executive Protection & Intelligence LLC",
+  title: `Contact | ${LEGAL_ENTITY_NAME}`,
   description:
-    "Contact OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC for enterprise cybersecurity advisory, executive protection, intelligence, EIOS product briefings, Academy licensing, and scoped implementation planning.",
+    `Contact ${LEGAL_ENTITY_NAME} for enterprise cybersecurity advisory, executive protection, intelligence, EIOS product briefings, Academy licensing, and scoped implementation planning.`,
   alternates: { canonical: "/contact" },
-  keywords: ["contact obserra", "obserra consultation", "executive protection consulting", "cybersecurity advisory contact"],
+  keywords: [`contact ${LEGAL_ENTITY_NAME}`, `${LEGAL_ENTITY_NAME} consultation`, "executive protection consulting", "cybersecurity advisory contact"],
   openGraph: {
-    title: "Contact Obserra | Confidential Enterprise Consultation",
+    title: `Contact ${LEGAL_ENTITY_NAME} | Confidential Enterprise Consultation`,
     description: "Start a confidential conversation on cybersecurity, protection, intelligence, EIOS, and professional training.",
     url: "https://www.obserrallc.com/contact",
     type: "website",
-    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: "Contact Obserra" }],
+    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: `Contact ${LEGAL_ENTITY_NAME}` }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Contact Obserra | Confidential Enterprise Consultation",
-    description: "Engage Obserra for executive cybersecurity, protection, and intelligence advisory.",
+    title: `Contact ${LEGAL_ENTITY_NAME} | Confidential Enterprise Consultation`,
+    description: `Engage ${LEGAL_ENTITY_NAME} for executive cybersecurity, protection, and intelligence advisory.`,
     images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
   },
 };
@@ -45,6 +46,8 @@ const engagementTracks = [
   },
 ];
 
+const legalEntityMailName = encodeURIComponent(LEGAL_ENTITY_NAME);
+
 const growthLinks = [
   {
     label: "Publish tracked LinkedIn post",
@@ -60,7 +63,7 @@ const growthLinks = [
   },
   {
     label: "Send tracked referral email",
-    href: "mailto:?subject=Obserra%20Enterprise%20Intelligence&body=Explore%20Obserra%20enterprise%20intelligence%20and%20security%20solutions%3A%20https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Demail%26utm_medium%3Dreferral%26utm_campaign%3Dlead_acceleration",
+    href: `mailto:?subject=${legalEntityMailName}%20Enterprise%20Intelligence&body=Explore%20${legalEntityMailName}%20enterprise%20intelligence%20and%20security%20solutions%3A%20https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Demail%26utm_medium%3Dreferral%26utm_campaign%3Dlead_acceleration`,
   },
 ];
 
@@ -79,11 +82,11 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
     "@graph": [
       {
         "@type": "ContactPage",
-        name: "Contact Obserra",
+        name: `Contact ${LEGAL_ENTITY_NAME}`,
         url: "https://www.obserrallc.com/contact",
         mainEntity: {
           "@type": "Organization",
-          name: "Obserra Executive Protection & Intelligence LLC",
+          name: LEGAL_ENTITY_NAME,
           url: "https://www.obserrallc.com",
           email: "info@obserrallc.com",
           contactPoint: {
@@ -108,8 +111,8 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
     <main className="contact-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(contactSchema) }} />
       <header className="contact-nav">
-        <a href="/" className="contact-brand" aria-label="Obserra home">
-          <Image src="/brand/obserra-logo.png" alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" width={286} height={55} />
+        <a href="/" className="contact-brand" aria-label={`${LEGAL_ENTITY_NAME} home`}>
+          <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
           <span>CONTACT</span>
         </a>
         <nav aria-label="Contact navigation">
@@ -123,14 +126,14 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
       </header>
 
       <section className="contact-hero">
-        <p className="contact-eyebrow">OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC</p>
+        <p className="contact-eyebrow">{LEGAL_ENTITY_NAME}</p>
         <h1>Start a focused conversation on the work you need done.</h1>
         <p>
-          Engage Obserra for cybersecurity leadership, protective intelligence, executive protection advisory,
+          Engage {LEGAL_ENTITY_NAME} for cybersecurity leadership, protective intelligence, executive protection advisory,
           enterprise risk guidance, AI governance, and productized intelligence solutions including EIOS with commercial delivery discipline.
         </p>
         <div className="contact-actions">
-          <a className="contact-button" href="mailto:info@obserrallc.com?subject=Obserra%20Confidential%20Consultation">Request executive consultation</a>
+          <a className="contact-button" href={`mailto:info@obserrallc.com?subject=${legalEntityMailName}%20Confidential%20Consultation`}>Request executive consultation</a>
           <a className="contact-outline" href="/services">Review enterprise services</a>
         </div>
       </section>
@@ -152,7 +155,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
           <p className="contact-eyebrow">BUYER CONFIDENCE</p>
           <h2>Built for enterprise leaders who cannot afford unclear answers.</h2>
           <p>
-            Obserra engagements are scoped, security-conscious, and outcome-oriented. We align executive context,
+            {LEGAL_ENTITY_NAME} engagements are scoped, security-conscious, and outcome-oriented. We align executive context,
             risk posture, and practical execution without disrupting critical operating paths.
           </p>
         </div>
@@ -183,9 +186,9 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
       </section>
 
       <footer className="contact-footer">
-        <Image src="/brand/obserra-logo.png" alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" width={180} height={35} />
+        <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={180} height={35} />
         <p>
-          Copyright Obserra Executive Protection &amp; Intelligence LLC. All rights reserved. Proprietary material.
+          Copyright OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC. All rights reserved. Proprietary material.
           No unauthorized reproduction, distribution, recording, or use.
         </p>
       </footer>

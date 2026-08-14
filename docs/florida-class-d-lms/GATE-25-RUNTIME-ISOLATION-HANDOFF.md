@@ -16,7 +16,7 @@ Gate 25 uses `scripts/florida-class-d-runtime-isolation-audit.mjs --enforce`. Th
 
 ## Security objective
 
-Regulated server modules must fail closed when `OBSERRA_SUPABASE_URL` or the required service-role credential is absent. They must not silently fall back to a repository-embedded project URL. Production project identifiers, service-role values, provider secrets, license numbers, and other protected runtime values must remain outside public source.
+Regulated server modules must fail closed when `OBSERRA_FDACS_SUPABASE_URL` or the required service-role credential is absent. They must not silently fall back to a repository-embedded project URL. Production project identifiers, service-role values, provider secrets, license numbers, and other protected runtime values must remain outside public source.
 
 The approved configuration boundary is server-only explicit environment configuration using HTTPS and protected credentials. No regulated browser component may receive service-role credentials.
 
@@ -24,7 +24,7 @@ The approved configuration boundary is server-only explicit environment configur
 
 The runtime-isolation remediation removed the embedded Supabase project URL fallback from every regulated module identified by the Gate 25 enforcing inventory, including acceptance, completion, completion documents, completion packet, exam, exam administration, exam monitoring, exam retest, LIAS, live feed, live persistence, live reporting, secure media, base persistence, polls, quality/CAPA, scheduling, student certificate, make-up certification, make-up administration, recorded make-up, and regulatory observer access.
 
-These services now require explicit protected `OBSERRA_SUPABASE_URL` HTTPS configuration and preserve the protected service-role credential boundary. When required runtime configuration is absent or invalid, the regulated service fails closed with its service-specific configuration error.
+These services now require explicit protected `OBSERRA_FDACS_SUPABASE_URL` HTTPS configuration and preserve the protected service-role credential boundary. When required runtime configuration is absent or invalid, the regulated service fails closed with its service-specific configuration error.
 
 ## Acceptance evidence
 
@@ -53,6 +53,14 @@ Gate 25 acceptance criteria are satisfied at the accepted source/build head:
 4. Existing regulated tests, Gates 1 through 24, lint, and the production Next.js build are green.
 5. The mandatory Gate 25 CI enforcement step is green.
 6. The Gate 25 handoff and restart/audit records are being synchronized to the accepted Gate 25 baseline.
+
+## Gate 37 revalidation
+
+The resumed 208-path candidate initially failed the enforcing Gate 25 scan because `lib/florida-class-d-runtime-readiness.ts` embedded the isolated Supabase origin as a string literal while checking exact project binding. The failure was retained and not reclassified as a passing result.
+
+The remediation preserves the exact-project allowlist but derives the expected HTTPS origin from `REQUIRED_FDACS_SUPABASE_PROJECT_REF`, matching the existing Gate 26 pattern. The readiness check still requires both explicit `OBSERRA_FDACS_SUPABASE_URL` and exact `OBSERRA_FDACS_SUPABASE_PROJECT_REF`, and still requires the protected service-role credential. It does not introduce a fallback or expose a credential.
+
+The enforcing rerun inspected 36 regulated modules and returned zero files with findings. This is local candidate evidence only until the exact PR head passes the mandatory GitHub Gate 25 step. Human review remains `pending`; production activation and CUI processing remain unauthorized.
 
 ## Production boundary
 

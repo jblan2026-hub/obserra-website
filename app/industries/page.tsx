@@ -2,22 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Building2, Brain, GraduationCap, ShieldCheck } from "lucide-react";
 import { industrySolutions } from "./industryData";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./industries.css";
 
 export const metadata: Metadata = {
-  title: "Industries | Obserra Enterprise Intelligence and Security Solutions",
+  title: `Industries | ${LEGAL_ENTITY_NAME} Enterprise Intelligence and Security Solutions`,
   description: "Industry-specific cybersecurity, executive protection, AI governance, intelligence, risk, and EIOS solutions for regulated and high-consequence sectors.",
   alternates: { canonical: "/industries" },
   openGraph: {
-    title: "Obserra Industry Solutions",
+    title: `${LEGAL_ENTITY_NAME} Industry Solutions`,
     description: "Industry-specific executive intelligence, cybersecurity, protection, AI governance, and assurance solutions.",
     url: "https://www.obserrallc.com/industries",
     type: "website",
-    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1344, height: 768, alt: "Obserra industry solutions" }],
+    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1344, height: 768, alt: `${LEGAL_ENTITY_NAME} industry solutions` }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Obserra Industry Solutions",
+    title: `${LEGAL_ENTITY_NAME} Industry Solutions`,
     description: "Industry-specific executive intelligence, cybersecurity, protection, AI governance, and assurance solutions.",
     images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
   },
@@ -29,7 +30,7 @@ export default function IndustriesPage() {
     "@graph": [
       {
         "@type": "CollectionPage",
-        name: "Obserra Industry Solutions",
+        name: `${LEGAL_ENTITY_NAME} Industry Solutions`,
         url: "https://www.obserrallc.com/industries",
         description: "Industry-specific enterprise intelligence, cybersecurity, protection, AI governance, and assurance solutions.",
       },
@@ -49,7 +50,7 @@ export default function IndustriesPage() {
         <div>
           <p className="industry-eyebrow">INDUSTRY SOLUTIONS</p>
           <h1>Enterprise intelligence built around the operating environment.</h1>
-          <p>Obserra aligns cybersecurity, protection, intelligence, AI governance, assurance, and executive decision support to each industry&apos;s regulatory pressure, operational dependencies, and consequence profile.</p>
+          <p>{LEGAL_ENTITY_NAME} aligns cybersecurity, protection, intelligence, AI governance, assurance, and executive decision support to each industry&apos;s regulatory pressure, operational dependencies, and consequence profile.</p>
           <div className="industry-actions">
             <Link href="/contact?interest=enterprise-consultation">Start an industry consultation</Link>
             <Link href="/services">Explore enterprise services</Link>
@@ -86,7 +87,7 @@ export default function IndustriesPage() {
       <section className="industry-operating-model">
         <div>
           <p className="industry-eyebrow">ONE CONNECTED OPERATING MODEL</p>
-          <h2>Industry context flows into every Obserra capability.</h2>
+          <h2>Industry context flows into every {LEGAL_ENTITY_NAME} capability.</h2>
         </div>
         <div className="industry-model-grid">
           <article><ShieldCheck size={20} /><strong>Services</strong><p>Executive advisory and delivery aligned to sector-specific risk.</p><Link href="/services">View services</Link></article>
@@ -97,7 +98,7 @@ export default function IndustriesPage() {
       </section>
 
       <section className="industry-cta">
-        <div><p className="industry-eyebrow">BUILD THE RIGHT ENGAGEMENT</p><h2>Connect industry pressure to a controlled executive action plan.</h2><p>Obserra scopes engagements around the actual operating model, regulatory environment, risk appetite, and decision priorities of the organization.</p></div>
+        <div><p className="industry-eyebrow">BUILD THE RIGHT ENGAGEMENT</p><h2>Connect industry pressure to a controlled executive action plan.</h2><p>{LEGAL_ENTITY_NAME} scopes engagements around the actual operating model, regulatory environment, risk appetite, and decision priorities of the organization.</p></div>
         <Link href="/contact?interest=enterprise-consultation">Request industry consultation</Link>
       </section>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />

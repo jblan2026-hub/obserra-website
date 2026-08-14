@@ -2,7 +2,7 @@
 
 ## Scope
 
-This handoff governs the controlled recorded make-up delivery increment for the Florida Class D LMS operated by **Obserra Executive Protection & Intelligence LLC**. It remains separate from the commercial Obserra Academy Course 1-N / LearnWorlds production workstream.
+This handoff governs the controlled recorded make-up delivery increment for the Florida Class D LMS operated by **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**. It remains separate from the commercial Obserra Academy Course 1-N / LearnWorlds production workstream.
 
 Public state remains `COMING SOON · LMS IN PROGRESS`. The owner reports an active Class DI instructor license and a pending Class DS school/training facility application. Production recorded make-up delivery remains fail closed until the Class DS and production activation gates are satisfied.
 

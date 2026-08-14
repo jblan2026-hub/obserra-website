@@ -58,8 +58,8 @@ export function floridaClassDRecordedMakeupEnabled() {
 }
 
 function config() {
-  const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
+  const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+  const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   const mediaOrigin = process.env.OBSERRA_FDACS_RECORDED_MEDIA_ORIGIN?.trim().replace(/\/$/, "") || "";
   if (!key || !url.startsWith("https://") || !mediaOrigin.startsWith("https://")) {
     throw new FloridaClassDMakeupError("Recorded make-up delivery is not configured.", 503, "FDACS_RECORDED_MAKEUP_NOT_CONFIGURED");

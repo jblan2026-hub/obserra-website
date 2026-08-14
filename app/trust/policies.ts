@@ -1,3 +1,5 @@
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+
 export type TrustPolicy = {
   slug: string;
   title: string;
@@ -10,8 +12,8 @@ export const trustPolicies: TrustPolicy[] = [
   {
     slug: "trust-brief",
     title: "Enterprise Trust Brief",
-    description: "A concise procurement overview of Obserra security, privacy, governance, and service protections.",
-    summary: "Obserra applies secure-by-design, least-privilege, data-minimization, governed-access, and accountable-delivery principles across services, software, and training.",
+    description: `A concise procurement overview of ${LEGAL_ENTITY_NAME} security, privacy, governance, and service protections.`,
+    summary: `${LEGAL_ENTITY_NAME} applies secure-by-design, least-privilege, data-minimization, governed-access, and accountable-delivery principles across services, software, and training.`,
     sections: [
       { heading: "Security and Governance", points: ["Secure-by-design and secure-by-default practices guide product and service delivery.", "Access is limited by business need, role, and contractual scope.", "Material security events are handled through documented escalation and response processes."] },
       { heading: "Privacy and Data Handling", points: ["Data collection is limited to service delivery, billing, security, support, and legal obligations.", "Sensitive information should be transferred only through approved governed channels.", "Retention and deletion follow contractual, operational, and legal requirements."] },
@@ -21,8 +23,8 @@ export const trustPolicies: TrustPolicy[] = [
   {
     slug: "privacy-policy",
     title: "Privacy Policy",
-    description: "How Obserra collects, uses, and safeguards personal and business information.",
-    summary: "Obserra processes personal information for service delivery, security, billing, and legal obligations.",
+    description: `How ${LEGAL_ENTITY_NAME} collects, uses, and safeguards personal and business information.`,
+    summary: `${LEGAL_ENTITY_NAME} processes personal information for service delivery, security, billing, and legal obligations.`,
     sections: [
       { heading: "Data Collected", points: ["Contact details, business details, inquiry information, and service preferences.", "Billing and transaction information for paid services and Academy purchases.", "Website analytics events used for operational performance and conversion measurement."] },
       { heading: "Use of Data", points: ["Responding to inquiries, scheduling consultations, and delivering purchased services.", "Security monitoring, fraud prevention, and compliance with legal obligations.", "Improving product, service, and training quality."] },
@@ -32,7 +34,7 @@ export const trustPolicies: TrustPolicy[] = [
   {
     slug: "responsible-ai-policy",
     title: "Responsible AI Policy",
-    description: "Principles governing Obserra use of artificial intelligence in products, services, and internal operations.",
+    description: `Principles governing ${LEGAL_ENTITY_NAME} use of artificial intelligence in products, services, and internal operations.`,
     summary: "AI use must remain governed, explainable, proportionate to risk, and subject to appropriate human oversight.",
     sections: [
       { heading: "Governance Principles", points: ["AI use is evaluated for business purpose, data sensitivity, legal obligations, security risk, and potential harm.", "Human review is required for consequential recommendations, approvals, or actions where appropriate.", "AI generated output is treated as decision support and must be validated before material use."] },
@@ -44,7 +46,7 @@ export const trustPolicies: TrustPolicy[] = [
     slug: "subprocessor-disclosure",
     title: "Subprocessor Disclosure",
     description: "Categories of third parties that may support hosting, payments, analytics, communications, and service delivery.",
-    summary: "Obserra uses service providers only where needed for legitimate business operations and applies contractual and access controls appropriate to the service.",
+    summary: `${LEGAL_ENTITY_NAME} uses service providers only where needed for legitimate business operations and applies contractual and access controls appropriate to the service.`,
     sections: [
       { heading: "Service Provider Categories", points: ["Cloud hosting and application delivery providers.", "Payment processing and transaction service providers.", "Authentication, communications, analytics, monitoring, and support providers."] },
       { heading: "Governance", points: ["Provider access is limited to the purpose and scope of the service.", "Material providers are evaluated based on security, privacy, operational, and contractual considerations.", "Specific enterprise subprocessor information may be provided during contracting where applicable."] },
@@ -53,7 +55,7 @@ export const trustPolicies: TrustPolicy[] = [
   {
     slug: "data-retention-and-deletion",
     title: "Data Retention and Deletion",
-    description: "How Obserra determines retention periods and handles deletion requests.",
+    description: `How ${LEGAL_ENTITY_NAME} determines retention periods and handles deletion requests.`,
     summary: "Information is retained only as long as needed for service delivery, security, accounting, legal, contractual, or legitimate operational purposes.",
     sections: [
       { heading: "Retention", points: ["Account, transaction, service, and support records are retained according to operational and legal need.", "Security logs may be retained for investigation, fraud prevention, audit, and resilience purposes.", "Contractual retention terms supersede general practices where agreed."] },
@@ -67,24 +69,24 @@ export const trustPolicies: TrustPolicy[] = [
     summary: "Prompt reporting enables containment, investigation, communication, and recovery.",
     sections: [
       { heading: "Report an Incident", points: ["Send suspected security, privacy, account, payment, or access incidents to info@obserrallc.com.", "Include affected service, date and time, observed behavior, relevant identifiers, and contact information.", "Do not include unnecessary sensitive information in ordinary email."] },
-      { heading: "Response", points: ["Reports are triaged based on severity, scope, customer impact, and legal obligations.", "Obserra may request additional information, preserve evidence, restrict access, or coordinate with affected providers.", "Customer notification obligations follow applicable law and governing agreements."] },
+      { heading: "Response", points: ["Reports are triaged based on severity, scope, customer impact, and legal obligations.", `${LEGAL_ENTITY_NAME} may request additional information, preserve evidence, restrict access, or coordinate with affected providers.`, "Customer notification obligations follow applicable law and governing agreements."] },
     ],
   },
   {
     slug: "terms-of-use",
     title: "Terms of Use",
-    description: "Rules and legal terms for use of Obserra websites and public content.",
+    description: `Rules and legal terms for use of ${LEGAL_ENTITY_NAME} websites and public content.`,
     summary: "Use of this website constitutes acceptance of these terms.",
     sections: [
       { heading: "Permitted Use", points: ["Use the website for lawful business inquiry, education, and product evaluation.", "Do not misuse automation, scraping, or disruption techniques against site services."] },
-      { heading: "Intellectual Property", points: ["All Obserra trademarks, content, and product materials are proprietary unless otherwise stated.", "No reproduction, redistribution, or derivative use without written permission."] },
+      { heading: "Intellectual Property", points: [`All ${LEGAL_ENTITY_NAME} trademarks, content, and product materials are proprietary unless otherwise stated.`, "No reproduction, redistribution, or derivative use without written permission."] },
       { heading: "Liability", points: ["Information is provided for business evaluation and does not constitute legal advice.", "To the maximum extent permitted by law, liability is limited as described in executed agreements."] },
     ],
   },
   {
     slug: "software-license-agreement",
     title: "Software License Agreement",
-    description: "License terms for Obserra applications and software assets.",
+    description: `License terms for ${LEGAL_ENTITY_NAME} applications and software assets.`,
     summary: "Software is licensed, not sold, under scope and restrictions defined by agreement.",
     sections: [
       { heading: "License Grant", points: ["Non-exclusive, non-transferable license for contracted use case and term.", "Usage is limited to authorized users, environments, and workloads."] },
@@ -100,7 +102,7 @@ export const trustPolicies: TrustPolicy[] = [
     sections: [
       { heading: "Enrollment", points: ["Access is granted after successful payment verification.", "Learner access may be restricted to the purchased course and authorized account context."] },
       { heading: "Completion and Certificates", points: ["Certificates require completion standards published in-course.", "Certificates are training completion records and not occupational licenses or academic credit."] },
-      { heading: "Access Controls", points: ["Obserra may revoke access for abuse, sharing, or policy violations.", "Automated extraction, content copying, and redistribution are prohibited."] },
+      { heading: "Access Controls", points: [`${LEGAL_ENTITY_NAME} may revoke access for abuse, sharing, or policy violations.`, "Automated extraction, content copying, and redistribution are prohibited."] },
     ],
   },
   {
@@ -111,7 +113,7 @@ export const trustPolicies: TrustPolicy[] = [
     sections: [
       { heading: "Academy Digital Purchases", points: ["Refund requests must be submitted within 7 days of purchase and before substantial course completion.", "No refund for accounts with significant completion progress or policy abuse."] },
       { heading: "Service Engagements", points: ["Cancellation and refund terms follow signed scope and commercial agreements.", "Work already performed, reserved resources, or pass-through costs may be non-refundable."] },
-      { heading: "Request Process", points: ["Submit requests to info@obserrallc.com with invoice reference and reason.", "Obserra targets a business response within 5 business days."] },
+      { heading: "Request Process", points: ["Submit requests to info@obserrallc.com with invoice reference and reason.", `${LEGAL_ENTITY_NAME} targets a business response within 5 business days.`] },
     ],
   },
   {
@@ -128,18 +130,18 @@ export const trustPolicies: TrustPolicy[] = [
   {
     slug: "acceptable-use-policy",
     title: "Acceptable Use Policy",
-    description: "Acceptable and prohibited use of Obserra websites, services, and software.",
+    description: `Acceptable and prohibited use of ${LEGAL_ENTITY_NAME} websites, services, and software.`,
     summary: "Users must not misuse systems, data, or access mechanisms.",
     sections: [
       { heading: "Prohibited Activities", points: ["Unauthorized access, scanning, scraping, or disruption attempts.", "Use of services for unlawful, abusive, or harmful activities.", "Credential sharing or circumvention of access controls."] },
-      { heading: "Security Cooperation", points: ["Users must promptly report discovered vulnerabilities or suspicious activity.", "Obserra may suspend access to protect systems and customers."] },
+      { heading: "Security Cooperation", points: ["Users must promptly report discovered vulnerabilities or suspicious activity.", `${LEGAL_ENTITY_NAME} may suspend access to protect systems and customers.`] },
     ],
   },
   {
     slug: "accessibility-statement",
     title: "Accessibility Statement",
-    description: "Obserra commitment to accessible digital experiences.",
-    summary: "Obserra works to improve usability and accessibility across device types.",
+    description: `${LEGAL_ENTITY_NAME} commitment to accessible digital experiences.`,
+    summary: `${LEGAL_ENTITY_NAME} works to improve usability and accessibility across device types.`,
     sections: [
       { heading: "Accessibility Commitment", points: ["Design and development practices target practical accessibility and readability.", "Continuous improvements are prioritized based on user feedback and audits."] },
       { heading: "Support Requests", points: ["If you need assistance accessing content, contact info@obserrallc.com.", "Provide the page URL and issue details for rapid support."] },
@@ -148,29 +150,29 @@ export const trustPolicies: TrustPolicy[] = [
   {
     slug: "security-and-responsible-disclosure",
     title: "Security and Responsible Disclosure",
-    description: "How to report security issues responsibly to Obserra.",
-    summary: "Obserra supports coordinated disclosure and security-first issue handling.",
+    description: `How to report security issues responsibly to ${LEGAL_ENTITY_NAME}.`,
+    summary: `${LEGAL_ENTITY_NAME} supports coordinated disclosure and security-first issue handling.`,
     sections: [
       { heading: "How to Report", points: ["Report vulnerabilities to info@obserrallc.com with technical details and reproduction steps.", "Do not publicly disclose vulnerabilities before coordinated review."] },
       { heading: "Safe Testing Rules", points: ["No data exfiltration, social engineering, denial of service, destructive testing, or access to data that is not yours.", "Testing must remain lawful, narrowly scoped, and limited to publicly accessible systems.", "Stop testing and report immediately if sensitive information is encountered."] },
-      { heading: "Response Process", points: ["Obserra acknowledges reports and coordinates remediation based on severity.", "Validated findings are handled through internal security governance.", "Good faith research does not authorize access beyond applicable law or these safe testing rules."] },
+      { heading: "Response Process", points: [`${LEGAL_ENTITY_NAME} acknowledges reports and coordinates remediation based on severity.`, "Validated findings are handled through internal security governance.", "Good faith research does not authorize access beyond applicable law or these safe testing rules."] },
     ],
   },
   {
     slug: "third-party-and-open-source-notices",
     title: "Third-Party and Open-Source Notices",
     description: "Notices and attributions for third-party and open-source components.",
-    summary: "Obserra solutions may include third-party and open-source components under their respective licenses.",
+    summary: `${LEGAL_ENTITY_NAME} solutions may include third-party and open-source components under their respective licenses.`,
     sections: [
       { heading: "Component Licensing", points: ["Third-party components retain their original license terms.", "Required attributions and notices are provided to customers where applicable."] },
-      { heading: "Customer Responsibility", points: ["Customers must comply with relevant third-party license obligations.", "Open-source obligations do not transfer proprietary rights in Obserra materials."] },
+      { heading: "Customer Responsibility", points: ["Customers must comply with relevant third-party license obligations.", `Open-source obligations do not transfer proprietary rights in ${LEGAL_ENTITY_NAME} materials.`] },
     ],
   },
   {
     slug: "data-handling-statement",
     title: "Data Handling Statement",
     description: "Operational controls for handling client and user information.",
-    summary: "Obserra follows controlled handling, minimization, and access governance principles.",
+    summary: `${LEGAL_ENTITY_NAME} follows controlled handling, minimization, and access governance principles.`,
     sections: [
       { heading: "Handling Principles", points: ["Least-privilege access and purpose-limited processing.", "Retention and deletion aligned to contract and legal obligations.", "Security monitoring and incident response governance."] },
       { heading: "Sensitive Information", points: ["Sensitive files are accepted only through governed channels.", "Email should not be used for high-sensitivity file transfer."] },
@@ -180,7 +182,7 @@ export const trustPolicies: TrustPolicy[] = [
     slug: "cookie-disclosure",
     title: "Cookie Disclosure",
     description: "Disclosure of cookie or similar tracking technologies used on the website.",
-    summary: "Obserra uses limited technical and analytics-related browser storage where required.",
+    summary: `${LEGAL_ENTITY_NAME} uses limited technical and analytics-related browser storage where required.`,
     sections: [
       { heading: "Cookie Categories", points: ["Essential cookies for authentication/session continuity where applicable.", "Analytics signals to understand traffic and conversion behavior."] },
       { heading: "Controls", points: ["Users can manage cookies through browser settings.", "Disabling some cookies may reduce site functionality."] },
@@ -192,17 +194,17 @@ export const trustPolicies: TrustPolicy[] = [
     description: "Disclosures regarding jurisdiction, availability, and service licensing boundaries.",
     summary: "Service availability, legal scope, and licensing obligations vary by location and engagement type.",
     sections: [
-      { heading: "Service Area", points: ["Obserra serves commercial clients subject to legal and operational feasibility.", "Some services may be limited or unavailable in certain jurisdictions."] },
+      { heading: "Service Area", points: [`${LEGAL_ENTITY_NAME} serves commercial clients subject to legal and operational feasibility.`, "Some services may be limited or unavailable in certain jurisdictions."] },
       { heading: "Licensing", points: ["Where services require specific licensure, delivery is limited to qualified personnel and lawful scope.", "Customers are responsible for their own regulatory and jurisdictional compliance obligations."] },
     ],
   },
   {
     slug: "certificate-disclaimer",
     title: "Certificate Disclaimer",
-    description: "Clarifies scope and legal meaning of Obserra training certificates.",
-    summary: "Obserra certificates verify course completion only.",
+    description: `Clarifies scope and legal meaning of ${LEGAL_ENTITY_NAME} training certificates.`,
+    summary: `${LEGAL_ENTITY_NAME} certificates verify course completion only.`,
     sections: [
-      { heading: "Scope", points: ["Certificates document successful completion of specified Obserra training.", "Certificates are not state licenses, academic credits, or third-party certifications."] },
+      { heading: "Scope", points: [`Certificates document successful completion of specified ${LEGAL_ENTITY_NAME} training.`, "Certificates are not state licenses, academic credits, or third-party certifications."] },
       { heading: "Verification", points: ["Employers or partners should treat certificates as completion evidence only.", "Certificate validity may be revoked for fraud or misuse."] },
     ],
   },
@@ -210,7 +212,7 @@ export const trustPolicies: TrustPolicy[] = [
     slug: "course-intellectual-property-terms",
     title: "Course Intellectual-Property Terms",
     description: "Intellectual-property terms for course materials and learner access.",
-    summary: "All Academy materials remain proprietary to Obserra unless explicitly licensed otherwise.",
+    summary: `All Academy materials remain proprietary to ${LEGAL_ENTITY_NAME} unless explicitly licensed otherwise.`,
     sections: [
       { heading: "Ownership", points: ["Course videos, slides, modules, assessments, and certificate assets are protected IP.", "Purchase grants learner access rights, not ownership transfer."] },
       { heading: "Restrictions", points: ["No recording, sharing, resale, classroom redistribution, or derivative reuse without permission.", "Automated scraping, extraction, or model training on content is prohibited."] },

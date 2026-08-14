@@ -147,6 +147,3 @@ jobs:
 
       - name: Build production application
         run: npm run build
-- name: GitHub Copilot CLI
-
-  uses: austenstone/copilot-cli@v3.2

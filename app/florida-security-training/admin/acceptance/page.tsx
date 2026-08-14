@@ -5,7 +5,7 @@ import AcceptanceConsole from "./AcceptanceConsole";
 import "../../live-classroom.css";
 
 export const metadata: Metadata = {
-  title: "Florida Class D Acceptance Evidence | Obserra",
+  title: "Florida Class D Acceptance Evidence | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   robots: { index: false, follow: false },
 };
 

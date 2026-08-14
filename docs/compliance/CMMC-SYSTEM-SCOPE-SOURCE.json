@@ -1,0 +1,429 @@
+{
+  "schemaVersion": "2.0",
+  "sourceId": "obserra-cmmc-system-scope-2026-08-14",
+  "sourceState": "final",
+  "workingSnapshotAt": "2026-08-14T18:49:07Z",
+  "workingBaseCommitSha": "0e72459a8940f23976038d85d6394409000f48c5",
+  "workingBranch": "codex/gate37-public-production-hardening",
+  "legalOwner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "repository": "jblan2026-hub/obserra-website",
+  "authorityProfilePath": "docs/compliance/CMMC-AUTHORITY-PROFILE.json",
+  "schemaPath": "docs/compliance/CMMC-SYSTEM-EVIDENCE.schema.json",
+  "objectiveCatalogPaths": [
+    "docs/compliance/CMMC-L2-REV2-OBJECTIVE-CATALOG.json",
+    "docs/compliance/CMMC-REV3-OBJECTIVE-CATALOG.json"
+  ],
+  "scope": {
+    "cuiProcessingAuthorized": false,
+    "formalAssessmentScopeEstablished": false,
+    "includedPathPrefixes": [
+      ".github/",
+      "app/",
+      "docs/",
+      "lib/",
+      "public/",
+      "scripts/",
+      "supabase/",
+      "test/"
+    ],
+    "includedRootFiles": [
+      "package.json",
+      "package-lock.json",
+      "next.config.ts",
+      "proxy.ts",
+      "SECURITY.md",
+      "tsconfig.json",
+      "vercel.json"
+    ],
+    "excludedWorkstreams": [
+      "Applications product workstream"
+    ],
+    "excludedPathPrefixes": [
+      "app/apps/",
+      "app/api/apps/",
+      "app/portal/applications/",
+      "lib/apps/"
+    ],
+    "excludedExactPaths": [
+      ".github/workflows/application-production-pipeline.yml",
+      ".github/workflows/application-release-validation.yml",
+      "scripts/application-market-brain.mjs",
+      "scripts/application-production-worker.mjs",
+      "scripts/application-worker-plan.mjs",
+      "scripts/generate-app-release-bundle.mjs",
+      "scripts/sync-final-apps.mjs",
+      "scripts/validate-application-staging.mjs",
+      "scripts/watch-final-apps.ps1"
+    ]
+  },
+  "claimBoundary": {
+    "permittedClaims": [
+      "This register records engineering alignment, evidence provenance, artifact integrity, control-objective traceability, and readiness gaps for the named systems and exact source revision.",
+      "A final release artifact may be eligible to support an assessment finding only when every fail-closed eligibility condition in this register is satisfied."
+    ],
+    "prohibitedClaims": [
+      "This register does not claim CMMC certification, a CMMC Level 2 status, a MET assessor determination, authorization to process CUI, FedRAMP authorization, FDACS approval, or provider compliance beyond retained evidence.",
+      "Revision 3 engineering alignment does not replace the Revision 2 and June 2018 baseline incorporated by 32 CFR Part 170."
+    ]
+  },
+  "approvedChangeAutomation": {
+    "trigger": "push_to_main_after_approved_merge",
+    "workflowPath": ".github/workflows/cmmc-evidence-governance.yml",
+    "generateCommand": "npm run generate:cmmc-system-evidence",
+    "verifyCommand": "npm run verify:cmmc-evidence",
+    "sourceDriftCommand": "npm run verify:cmmc-authority-drift",
+    "retentionMode": "indefinite_immutable_archive",
+    "failClosed": true,
+    "rule": "Every approved in-scope change must regenerate a bundle bound to the exact merge commit, pass all objective and artifact-integrity checks, and archive the final non-CUI bundle. Standards changes create a blocking drift record and require reviewed mapping updates; automation never silently changes a governing baseline."
+  },
+  "assessmentDispositionPolicy": {
+    "technicalAndHumanResultsSeparated": true,
+    "pendingHumanReviewIsFailure": false,
+    "technicalGateCriteria": {
+      "pass": "Every applicable objective has an objective-specific passed or valid not-applicable result, the result artifact is SHA-256 hashed, and the result is bound to the exact release revision.",
+      "fail": "At least one objective-specific exact-revision technical result is failed.",
+      "pending": "One or more objectives lack an objective-specific exact-revision result; candidate artifacts alone do not pass the gate.",
+      "humanReviewStateAffectsTechnicalOutcome": false
+    },
+    "humanReviewCriteria": {
+      "defaultState": "pending",
+      "completion": "An authorized organization reviewer or assessor completes the applicable review and records a final signed disposition artifact within the authorized scope.",
+      "pending": "No authorized final human disposition artifact has been supplied.",
+      "pendingIsTechnicalFailure": false,
+      "humanCompletionRequiredForTechnicalPass": false
+    },
+    "technicalGreenRule": "An objective is technically green only when an objective-specific, exact-revision, hashed test or examination result is present and passed.",
+    "humanPendingRule": "Organization review or assessor determination may remain pending without converting a passed technical result to failed. The assessment finding remains not_assessed until the authorized human disposition exists.",
+    "operationalRule": "A technically passing control may remain operational while human reconciliation is pending unless law, licensing, safety, security, or an explicit activation policy makes prior human approval a mandatory prerequisite.",
+    "mandatoryPrerequisiteRule": "A mandatory legal, licensing, security, or regulatory prerequisite is never bypassed; the protected function remains fail closed and the pending item is reported as pending rather than technically failed."
+  },
+  "generatedOutputPaths": [
+    "docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json",
+    "docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json.sha256",
+    "docs/compliance/CMMC-SYSTEM-EVIDENCE.json",
+    "docs/compliance/CMMC-SYSTEM-EVIDENCE.md",
+    "docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256",
+    "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json",
+    "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md",
+    "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256",
+    "docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json",
+    "docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md",
+    "docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256",
+    "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json",
+    "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md",
+    "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256"
+  ],
+  "responsibilityTemplate": [
+    {
+      "evidenceOrigin": "product_supplied_evidence",
+      "owner": "OBSERRA engineering",
+      "responsibility": "Provide exact-revision source, configuration, automated test, and provider-export artifacts without representing them as assessor determinations.",
+      "requiredEvidenceState": "available_candidate"
+    },
+    {
+      "evidenceOrigin": "organization_evidence",
+      "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "responsibility": "Approve scope, policies, procedures, roles, operational records, interviews, risk decisions, and remediation evidence for the organization assessment boundary.",
+      "requiredEvidenceState": "final_required"
+    },
+    {
+      "evidenceOrigin": "assessor_determination",
+      "owner": "Authorized assessor or assessment organization",
+      "responsibility": "Determine MET, NOT MET, or NOT APPLICABLE only from final evidence in the authorized assessment scope and sign the determination artifact.",
+      "requiredEvidenceState": "assessor_owned"
+    },
+    {
+      "evidenceOrigin": "customer_responsibility",
+      "owner": "Applicable customer or external tenant owner",
+      "responsibility": "Supply customer-controlled configuration, endpoint, personnel, contractual, and operating evidence where the assessed boundary assigns responsibility to the customer.",
+      "requiredEvidenceState": "not_yet_obtained"
+    }
+  ],
+  "systems": [
+    {
+      "systemId": "SYS-ORG-GOVERNANCE",
+      "systemName": "Enterprise CMMC Governance and Assessment Boundary",
+      "systemType": "organization_governance",
+      "provider": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "accountableRole": "Executive security and compliance owner",
+      "operationalDisposition": "scope_dependent",
+      "scope": {
+        "included": ["All 110 governing Revision 2 requirements and all 320 June 2018 assessment objectives", "All 97 supplemental Revision 3 requirements and all 510 Revision 3 assessment objectives"],
+        "excluded": ["Assessor determinations not supplied by an authorized assessor", "Applications product workstream"],
+        "dataClasses": ["public", "internal_non_cui", "control_metadata"],
+        "environments": ["organization", "repository"]
+      },
+      "claimBoundary": "Provides complete objective inventory and responsibility assignment; it does not assert implementation or a MET finding for objectives lacking final evidence.",
+      "artifacts": [
+        {"artifactId": "EV-ORG-AUTHORITY-PROFILE", "title": "Authoritative CMMC source profile", "path": "docs/compliance/CMMC-AUTHORITY-PROFILE.json", "evidenceOrigin": "organization_evidence", "accountableRole": "Compliance owner", "method": "examine", "claimBoundary": "Establishes exact governing and supplemental publication identities and hashes only."},
+        {"artifactId": "EV-ORG-EVIDENCE-SCHEMA", "title": "Fail-closed evidence schema", "path": "docs/compliance/CMMC-SYSTEM-EVIDENCE.schema.json", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Security engineering", "method": "test", "claimBoundary": "Defines required evidence fields and eligibility rules; it is not proof that a control is MET."},
+        {"artifactId": "EV-ORG-REV2-OBJECTIVES", "title": "Governing Revision 2 objective catalog", "path": "docs/compliance/CMMC-L2-REV2-OBJECTIVE-CATALOG.json", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Compliance engineering", "method": "examine", "claimBoundary": "Machine-readable transcription of NIST SP 800-171A June 2018 assessment objectives."},
+        {"artifactId": "EV-ORG-REV3-OBJECTIVES", "title": "Supplemental Revision 3 objective catalog", "path": "docs/compliance/CMMC-REV3-OBJECTIVE-CATALOG.json", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Compliance engineering", "method": "examine", "claimBoundary": "Machine-readable supplemental forward-engineering assessment objectives; not the current 32 CFR Part 170 baseline."},
+        {"artifactId": "EV-ORG-AUTHORITY-WATCH", "title": "Official authority revision watch definition", "path": "docs/compliance/CMMC-AUTHORITY-WATCH.json", "evidenceOrigin": "organization_evidence", "accountableRole": "Compliance owner", "method": "test", "claimBoundary": "Defines official-source integrity and revision signals; it never silently changes the governing baseline."},
+        {"artifactId": "EV-ORG-AUTHORITY-DRIFT", "title": "Official authority drift check result", "path": "docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json", "evidenceOrigin": "organization_evidence", "accountableRole": "Compliance owner", "method": "test", "claimBoundary": "Time-bound official-source integrity result only; it does not interpret or approve a future publication."},
+        {"artifactId": "EV-ORG-CONTINUITY-HANDOFF", "title": "Machine-readable current workstream and recovery handoff", "path": "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json", "evidenceOrigin": "organization_evidence", "accountableRole": "Compliance records custodian", "method": "examine", "claimBoundary": "Records verified status, blockers, recovery instructions, and link-release rules without representing pending live controls as operational."},
+        {"artifactId": "EV-ORG-AUTOMATION-WORKFLOW", "title": "Approved-change evidence governance workflow", "path": ".github/workflows/cmmc-evidence-governance.yml", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release and compliance engineering", "method": "test", "claimBoundary": "Workflow source defines regeneration, verification, drift review, and archival; exact run evidence is separately retained."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["*"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "obserra_organization", "evidenceState": "organization_evidence_required", "artifactIds": [], "claimBoundary": "Each governing objective requires objective-specific organization evidence and authorized assessment; catalog presence alone is not implementation evidence."},
+        {"baseline": "supplemental_rev3", "controlIds": ["*"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "obserra_organization", "evidenceState": "organization_evidence_required", "artifactIds": [], "claimBoundary": "Each Revision 3 objective is a supplemental engineering target and does not replace the governing Revision 2 assessment baseline."}
+      ]
+    },
+    {
+      "systemId": "SYS-WEBSITE",
+      "systemName": "Public Website",
+      "systemType": "public_web_frontend",
+      "provider": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC and Vercel",
+      "accountableRole": "Website product owner",
+      "operationalDisposition": "operational_with_pending_human_review",
+      "scope": {"included": ["Public website routes", "Public credential presentation", "Security headers and routing controls"], "excluded": ["Applications product routes", "CUI processing"], "dataClasses": ["public", "internal_non_cui_operational_metadata"], "environments": ["production", "preview", "repository"]},
+      "claimBoundary": "Source and test evidence supports public-site security engineering only; provider operation and formal assessment require separate final evidence.",
+      "artifacts": [
+        {"artifactId": "EV-WEBSITE-PROXY", "title": "Website request security boundary", "path": "proxy.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Website engineering", "method": "test", "claimBoundary": "Demonstrates source-level routing and header logic only."},
+        {"artifactId": "EV-WEBSITE-CREDENTIALS", "title": "Verified credential frontend", "path": "app/about/VerifiedCredentials.tsx", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Website engineering", "method": "examine", "claimBoundary": "Demonstrates credential image/link rendering source, not issuer validation by itself."},
+        {"artifactId": "EV-WEBSITE-BADGE-MANIFEST", "title": "Approved credential asset and issuer-observation manifest", "path": "public/badges/eccouncil/asset-manifest.json", "evidenceOrigin": "organization_evidence", "accountableRole": "Credential owner", "method": "test", "claimBoundary": "Records approved local asset identities, hashes, three time-bound live ADG issuer observations, and verification destinations; external issuer pages remain authoritative for credential validity."},
+        {"artifactId": "EV-WEBSITE-BADGE-SCHEMA", "title": "Fail-closed credential asset evidence schema", "path": "public/badges/eccouncil/asset-manifest.schema.json", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Website security engineering", "method": "test", "claimBoundary": "Defines mandatory provenance, hash, issuer-observation, and claim-boundary fields; schema presence is not a live deployment result."},
+        {"artifactId": "EV-WEBSITE-BADGE-GATE", "title": "Credential asset integrity and provenance gate", "path": "scripts/ec-council-badge-integrity.test.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Website security engineering", "method": "test", "claimBoundary": "Fail-closed source gate for the nine authorized assets and three issuer observations; exact CI run and production HTTP evidence remain release-specific."},
+        {"artifactId": "EV-WEBSITE-LEGAL-IDENTITY-AUDIT", "title": "Machine-readable legal identity source audit", "path": "docs/compliance/LEGAL-IDENTITY-AUDIT.json", "evidenceOrigin": "organization_evidence", "accountableRole": "Legal identity owner", "method": "test", "claimBoundary": "Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence."},
+        {"artifactId": "EV-WEBSITE-LEGAL-IDENTITY-SCHEMA", "title": "Legal identity audit machine schema", "path": "docs/compliance/LEGAL-IDENTITY-AUDIT.schema.json", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Website security engineering", "method": "examine", "claimBoundary": "Defines the machine-readable audit contract and mandatory disposition fields; schema presence is not a live operating result."},
+        {"artifactId": "EV-WEBSITE-LEGAL-IDENTITY-GATE", "title": "Fail-closed legal identity drift gate", "path": "scripts/legal-identity-audit.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Website security engineering", "method": "test", "claimBoundary": "Rejects malformed legal names, retired company wording, stale public origins, and unapproved short-name company claims while preserving enumerated product brands and stable technical identifiers."},
+        {"artifactId": "EV-WEBSITE-NEXT-CONFIG", "title": "Website response security and image-delivery configuration", "path": "next.config.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Website security engineering", "method": "examine", "claimBoundary": "Source-level CSP, transport, browser, and image-delivery configuration only; Vercel production behavior requires exact-deployment verification."},
+        {"artifactId": "EV-WEBSITE-CI", "title": "Website continuous integration gate", "path": ".github/workflows/website-ci.yml", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "examine", "claimBoundary": "Shows configured CI controls; a run-specific result is separately required."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.1.1", "3.1.2", "3.3.1", "3.3.2", "3.4.1", "3.4.2", "3.4.3", "3.4.4", "3.4.5", "3.13.1", "3.13.6", "3.13.8", "3.13.11", "3.14.1", "3.14.2", "3.14.3", "3.14.6"], "methods": ["examine", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-WEBSITE-PROXY", "EV-WEBSITE-CREDENTIALS", "EV-WEBSITE-BADGE-MANIFEST", "EV-WEBSITE-BADGE-SCHEMA", "EV-WEBSITE-BADGE-GATE", "EV-WEBSITE-LEGAL-IDENTITY-AUDIT", "EV-WEBSITE-LEGAL-IDENTITY-SCHEMA", "EV-WEBSITE-LEGAL-IDENTITY-GATE", "EV-WEBSITE-NEXT-CONFIG", "EV-WEBSITE-CI"], "claimBoundary": "Artifacts are candidate product evidence for applicable website objectives; exact-release CI, live Vercel operation, organization operation, and assessor determination remain required."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.01.01", "03.01.02", "03.03.01", "03.03.02", "03.04.01", "03.04.02", "03.04.03", "03.04.04", "03.04.05", "03.13.01", "03.13.06", "03.13.08", "03.13.11", "03.14.01", "03.14.02", "03.14.03", "03.14.06", "03.16.01", "03.16.03"], "methods": ["examine", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-WEBSITE-PROXY", "EV-WEBSITE-CREDENTIALS", "EV-WEBSITE-BADGE-MANIFEST", "EV-WEBSITE-BADGE-SCHEMA", "EV-WEBSITE-BADGE-GATE", "EV-WEBSITE-LEGAL-IDENTITY-AUDIT", "EV-WEBSITE-LEGAL-IDENTITY-SCHEMA", "EV-WEBSITE-LEGAL-IDENTITY-GATE", "EV-WEBSITE-NEXT-CONFIG", "EV-WEBSITE-CI"], "claimBoundary": "Supplemental Revision 3 engineering mapping only; exact-release technical results and live provider evidence remain required."}
+      ]
+    },
+    {
+      "systemId": "SYS-ACADEMY-LMS",
+      "systemName": "OBSERRA Academy Learning Management System",
+      "systemType": "learning_management_system",
+      "provider": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC, Vercel, Clerk, Stripe, and Supabase",
+      "accountableRole": "Academy program owner",
+      "operationalDisposition": "scope_dependent",
+      "scope": {"included": ["Course catalog and learner routes", "Entitlement, progress, assessment, and certificate logic", "Florida Class D training workstream"], "excluded": ["Applications product workstream", "Unlicensed regulated production activation"], "dataClasses": ["public", "internal_non_cui", "student_pii", "training_records"], "environments": ["production", "nonproduction", "repository"]},
+      "claimBoundary": "LMS implementation evidence does not establish FDACS approval, learner identity validity, provider availability, or a CMMC finding without the corresponding final records.",
+      "artifacts": [
+        {"artifactId": "EV-LMS-CONTROL-CONTRACT", "title": "Academy fail-closed control contract", "path": "lib/academy-control-contracts.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Academy engineering", "method": "test", "claimBoundary": "Source-level course control enforcement candidate evidence."},
+        {"artifactId": "EV-LMS-PERSISTENCE", "title": "Academy durable learner persistence", "path": "lib/academy-persistence.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Academy engineering", "method": "test", "claimBoundary": "Application persistence logic; live database state requires provider evidence."},
+        {"artifactId": "EV-LMS-CLASSD-GATE", "title": "Florida Class D mandatory CI gate", "path": ".github/workflows/florida-class-d-lms-gates.yml", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "examine", "claimBoundary": "Configured gate definition only; exact run result is separately required."},
+        {"artifactId": "EV-LMS-COMPLETION-STANDARD", "title": "Student completion and certification standard", "path": "docs/florida-class-d-lms/STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md", "evidenceOrigin": "organization_evidence", "accountableRole": "Training compliance owner", "method": "examine", "claimBoundary": "Organization procedure candidate pending final approval and operational evidence."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.1.1", "3.1.2", "3.1.3", "3.1.5", "3.1.6", "3.1.7", "3.1.8", "3.1.10", "3.1.11", "3.1.12", "3.2.1", "3.2.2", "3.3.1", "3.3.2", "3.3.3", "3.3.5", "3.3.8", "3.4.1", "3.4.2", "3.4.3", "3.5.1", "3.5.2", "3.5.3", "3.5.10", "3.8.1", "3.8.3", "3.8.4", "3.8.5", "3.8.7", "3.8.9", "3.12.1", "3.12.3", "3.12.4", "3.13.1", "3.13.8", "3.13.11", "3.14.1", "3.14.2", "3.14.3", "3.14.6"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-LMS-CONTROL-CONTRACT", "EV-LMS-PERSISTENCE", "EV-LMS-CLASSD-GATE", "EV-LMS-COMPLETION-STANDARD"], "claimBoundary": "Candidate evidence is mapped to applicable LMS objectives; organizational training records and assessor conclusions are not inferred."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.01.01", "03.01.02", "03.01.03", "03.01.05", "03.01.08", "03.01.09", "03.01.10", "03.01.11", "03.01.12", "03.02.01", "03.02.02", "03.03.01", "03.03.02", "03.03.03", "03.03.05", "03.03.08", "03.04.01", "03.04.02", "03.04.03", "03.05.01", "03.05.02", "03.05.03", "03.05.12", "03.08.01", "03.08.03", "03.08.04", "03.08.05", "03.08.07", "03.08.09", "03.12.01", "03.12.03", "03.12.05", "03.13.01", "03.13.08", "03.13.11", "03.14.01", "03.14.02", "03.14.03", "03.14.06", "03.16.01", "03.16.03"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-LMS-CONTROL-CONTRACT", "EV-LMS-PERSISTENCE", "EV-LMS-CLASSD-GATE", "EV-LMS-COMPLETION-STANDARD"], "claimBoundary": "Supplemental Revision 3 LMS engineering mapping only."}
+      ]
+    },
+    {
+      "systemId": "SYS-STRIPE-PAYMENTS",
+      "systemName": "Stripe Payment and Academy Fulfillment Boundary",
+      "systemType": "payment_processing",
+      "provider": "Stripe and OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "accountableRole": "Commerce system owner",
+      "operationalDisposition": "fail_closed_pending_mandatory_prerequisite",
+      "scope": {"included": ["Checkout session creation", "Signed webhook fulfillment", "Paid entitlement redemption"], "excluded": ["Storage of payment card data", "Florida Class D activation through generic checkout"], "dataClasses": ["payment_reference", "purchaser_identity_hash", "internal_non_cui"], "environments": ["production", "test", "repository"]},
+      "claimBoundary": "OBSERRA source evidence covers application-side authorization and fulfillment; Stripe provider controls and live account settings require provider exports.",
+      "artifacts": [
+        {"artifactId": "EV-PAYMENT-CHECKOUT", "title": "Authorized checkout route", "path": "app/api/academy/checkout/route.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Commerce engineering", "method": "test", "claimBoundary": "Application-side checkout controls only."},
+        {"artifactId": "EV-PAYMENT-WEBHOOK", "title": "Signed Stripe fulfillment webhook", "path": "app/api/webhook/stripe/route.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Commerce engineering", "method": "test", "claimBoundary": "Application signature/idempotency logic only; live webhook configuration requires Stripe evidence."},
+        {"artifactId": "EV-PAYMENT-INTEGRITY-SQL", "title": "Payment event integrity hardening", "path": "supabase/migrations/20260814061912_academy_payment_event_integrity_hardening.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Database engineering", "method": "examine", "claimBoundary": "Migration source only; applied production state requires a provider query result."},
+        {"artifactId": "EV-PAYMENT-GATE", "title": "Durable commerce verification gate", "path": "scripts/academy-durable-commerce-gate.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "test", "claimBoundary": "Gate source only; exact run evidence remains release-specific."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.1.1", "3.1.2", "3.1.5", "3.3.1", "3.3.2", "3.4.1", "3.4.3", "3.4.4", "3.5.1", "3.5.2", "3.5.3", "3.13.8", "3.14.6"], "methods": ["examine", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-PAYMENT-CHECKOUT", "EV-PAYMENT-WEBHOOK", "EV-PAYMENT-INTEGRITY-SQL", "EV-PAYMENT-GATE"], "claimBoundary": "Candidate application evidence; live Stripe configuration and assessor determination are required separately."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.01.01", "03.01.02", "03.01.05", "03.03.01", "03.03.02", "03.04.01", "03.04.03", "03.04.04", "03.05.01", "03.05.02", "03.05.03", "03.13.08", "03.14.06", "03.16.03"], "methods": ["examine", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-PAYMENT-CHECKOUT", "EV-PAYMENT-WEBHOOK", "EV-PAYMENT-INTEGRITY-SQL", "EV-PAYMENT-GATE"], "claimBoundary": "Supplemental Revision 3 commerce engineering mapping only."}
+      ]
+    },
+    {
+      "systemId": "SYS-STRIPE-IDENTITY",
+      "systemName": "Stripe Identity Student Verification",
+      "systemType": "identity_proofing",
+      "provider": "Stripe Identity and OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "accountableRole": "Regulated training identity owner",
+      "operationalDisposition": "fail_closed_pending_mandatory_prerequisite",
+      "scope": {"included": ["Student verification session creation", "Signed verification webhooks", "Daily course-access identity status"], "excluded": ["Raw identity document storage in OBSERRA databases", "Assessor identity determination"], "dataClasses": ["student_pii", "identity_verification_reference", "verification_status"], "environments": ["production", "test", "repository"]},
+      "claimBoundary": "Application evidence demonstrates fail-closed integration design; a live Stripe verification result and FDACS acceptance are separately required.",
+      "artifacts": [
+        {"artifactId": "EV-IDENTITY-SERVICE", "title": "Student identity verification service", "path": "lib/florida-class-d-identity-verification.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Identity engineering", "method": "test", "claimBoundary": "Server-side state and authorization logic only."},
+        {"artifactId": "EV-IDENTITY-ROUTE", "title": "Protected identity verification API", "path": "app/api/florida-class-d/identity-verification/route.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Identity engineering", "method": "test", "claimBoundary": "Application access gate only."},
+        {"artifactId": "EV-IDENTITY-WEBHOOK", "title": "Stripe Identity signed webhook", "path": "app/api/webhook/stripe-identity/route.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Identity engineering", "method": "test", "claimBoundary": "Webhook verification logic only; provider endpoint configuration is external evidence."},
+        {"artifactId": "EV-IDENTITY-ATTENDANCE-SQL", "title": "Daily identity and attendance database controls", "path": "supabase/migrations/20260814172000_fdacs_class_d_instructor_identity_attendance.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Database engineering", "method": "examine", "claimBoundary": "Migration source only; applied state and live student record are separate evidence."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.1.1", "3.1.2", "3.1.5", "3.3.1", "3.3.2", "3.5.1", "3.5.2", "3.5.3", "3.5.6", "3.5.7", "3.5.10", "3.8.1", "3.8.3", "3.13.8", "3.14.6"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-IDENTITY-SERVICE", "EV-IDENTITY-ROUTE", "EV-IDENTITY-WEBHOOK", "EV-IDENTITY-ATTENDANCE-SQL"], "claimBoundary": "Candidate product evidence for identity proofing and access enforcement; provider result, organization review, and assessor determination remain distinct."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.01.01", "03.01.02", "03.01.05", "03.03.01", "03.03.02", "03.05.01", "03.05.02", "03.05.03", "03.05.04", "03.05.07", "03.05.11", "03.05.12", "03.08.01", "03.08.03", "03.13.08", "03.14.06", "03.16.03"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-IDENTITY-SERVICE", "EV-IDENTITY-ROUTE", "EV-IDENTITY-WEBHOOK", "EV-IDENTITY-ATTENDANCE-SQL"], "claimBoundary": "Supplemental Revision 3 identity engineering mapping only."}
+      ]
+    },
+    {
+      "systemId": "SYS-CLERK-IDENTITY",
+      "systemName": "Clerk Authentication and Session Boundary",
+      "systemType": "authentication_and_session_management",
+      "provider": "Clerk and OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "accountableRole": "Identity platform owner",
+      "operationalDisposition": "fail_closed_pending_mandatory_prerequisite",
+      "scope": {"included": ["User authentication", "Protected route middleware", "Server-side identity activation"], "excluded": ["Student government-ID proofing", "Customer endpoint authentication"], "dataClasses": ["identity_metadata", "session_metadata", "internal_non_cui"], "environments": ["production", "development", "repository"]},
+      "claimBoundary": "Source evidence covers OBSERRA integration; Clerk account policies, MFA enrollment, session controls, logs, and uptime require live provider evidence.",
+      "artifacts": [
+        {"artifactId": "EV-CLERK-CONFIG", "title": "Clerk runtime configuration authority", "path": "lib/clerk-runtime-config.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Identity engineering", "method": "test", "claimBoundary": "Source configuration and fail-closed activation logic only."},
+        {"artifactId": "EV-CLERK-RUNTIME", "title": "Identity runtime health contract", "path": "lib/identity-runtime.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Identity engineering", "method": "test", "claimBoundary": "Nonsecret runtime health evaluation only."},
+        {"artifactId": "EV-CLERK-TEST", "title": "Explicit identity activation tests", "path": "test/identity-explicit-activation.test.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "test", "claimBoundary": "Test definition only until an exact-revision result artifact is retained."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.1.1", "3.1.2", "3.1.5", "3.1.8", "3.1.10", "3.1.11", "3.5.1", "3.5.2", "3.5.3", "3.5.7", "3.5.10", "3.13.8", "3.14.6"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-CLERK-CONFIG", "EV-CLERK-RUNTIME", "EV-CLERK-TEST"], "claimBoundary": "Candidate integration evidence; live Clerk control-plane evidence and organization operation remain required."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.01.01", "03.01.02", "03.01.05", "03.01.08", "03.01.10", "03.01.11", "03.05.01", "03.05.02", "03.05.03", "03.05.07", "03.05.11", "03.05.12", "03.13.08", "03.14.06", "03.16.03"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-CLERK-CONFIG", "EV-CLERK-RUNTIME", "EV-CLERK-TEST"], "claimBoundary": "Supplemental Revision 3 authentication mapping only."}
+      ]
+    },
+    {
+      "systemId": "SYS-FDACS-DATABASE",
+      "systemName": "Isolated FDACS Student Records Database",
+      "systemType": "regulated_pii_database",
+      "provider": "Supabase and OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "accountableRole": "Regulated records custodian",
+      "operationalDisposition": "fail_closed_pending_mandatory_prerequisite",
+      "scope": {"included": ["Florida Class D enrollment, attendance, identity, assessment, completion, and audit records", "Service-only RLS boundary", "Regulatory retention controls"], "excluded": ["Generic Academy commerce data", "Applications data", "CUI"], "dataClasses": ["student_pii", "identity_verification_reference", "training_records", "audit_records"], "environments": ["isolated_fdacs_production", "nonproduction", "repository"]},
+      "claimBoundary": "Live verification on 2026-08-14 proves the isolated project, forced-RLS/browser-deny boundary, zero browser execute grants across FDACS routines, applied audit migrations, source gate, export generation, fail-closed negative tests, and current hash-chain integrity. Backup restoration, HA failover, external encryption-key custody, final encrypted export delivery, real student records, and exact-release objective results remain unverified.",
+      "artifacts": [
+        {"artifactId": "EV-FDACS-RECORDS-SQL", "title": "FDACS regulated records schema", "path": "supabase/migrations/20260813033000_fdacs_class_d_regulated_records.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Database engineering", "method": "examine", "claimBoundary": "Migration source only."},
+        {"artifactId": "EV-FDACS-HARDENING-SQL", "title": "FDACS database security hardening", "path": "supabase/migrations/20260813204215_fdacs_class_d_security_hardening.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Database engineering", "method": "examine", "claimBoundary": "Migration source only; applied grants and policies require live verification."},
+        {"artifactId": "EV-FDACS-PII-SQL", "title": "FDACS PII boundary hardening", "path": "supabase/migrations/20260814170000_fdacs_class_d_pii_boundary_hardening.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Privacy and database engineering", "method": "examine", "claimBoundary": "PII minimization and database policy source only."},
+        {"artifactId": "EV-FDACS-ARCHIVE-SQL", "title": "FDACS automatic enrollment and completion archive", "path": "supabase/migrations/20260814171000_fdacs_class_d_automatic_record_archive.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Regulated records engineering", "method": "examine", "claimBoundary": "Transactional outbox, retry, and dead-letter source; a real student workflow remains required."},
+        {"artifactId": "EV-FDACS-IDENTITY-SQL", "title": "FDACS instructor identity and daily attendance evidence", "path": "supabase/migrations/20260814172000_fdacs_class_d_instructor_identity_attendance.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Identity and regulated records engineering", "method": "examine", "claimBoundary": "Source and live schema only; no real student identity or attendance evidence exists yet."},
+        {"artifactId": "EV-FDACS-AUDIT-SQL", "title": "FDACS investigator audit and CMMC security-protocol binding", "path": "supabase/migrations/20260814173000_fdacs_class_d_investigator_audit_access.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Regulated records custodian", "method": "examine", "claimBoundary": "Audit/export source and live schema; exact-release protected security-protocol evidence is not registered yet."},
+        {"artifactId": "EV-FDACS-DENY-SQL", "title": "FDACS explicit browser-deny and covering-index hardening", "path": "supabase/migrations/20260814174000_fdacs_class_d_audit_performance_and_explicit_deny.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Database engineering", "method": "examine", "claimBoundary": "Explicit restrictive policy and index source; live provider state is separately recorded."},
+        {"artifactId": "EV-FDACS-FUNCTION-HARDENING-SQL", "title": "FDACS trigger-function execute hardening", "path": "supabase/migrations/20260814175000_fdacs_class_d_trigger_function_execute_hardening.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Database engineering", "method": "examine", "claimBoundary": "Removes inherited browser execute permission from the trigger-only routine; the time-bound live result is separately recorded."},
+        {"artifactId": "EV-FDACS-AUDIT-SCHEMA", "title": "FDACS database audit evidence schema", "path": "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.schema.json", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Compliance engineering", "method": "test", "claimBoundary": "Fail-closed minimum field contract for the FDACS database's own machine record; schema conformance does not establish a control finding."},
+        {"artifactId": "EV-FDACS-AUDIT-GATE", "title": "FDACS PII database audit source gate", "path": "scripts/fdacs-pii-database-audit-gate.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "test", "claimBoundary": "Gate definition and local source result only until bound to an exact release revision."},
+        {"artifactId": "EV-FDACS-LIVE-RECEIPT", "title": "FDACS isolated project live verification receipt", "path": "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT-SOURCE.json", "evidenceOrigin": "organization_evidence", "accountableRole": "Regulated records custodian", "method": "test", "claimBoundary": "Organization-captured live provider observations and fail-closed negative tests at 2026-08-14T17:57:49.805602Z; not a provider attestation, assessor determination, or exact-release final evidence."},
+        {"artifactId": "EV-FDACS-DB-GATE", "title": "FDACS database readiness gate", "path": "scripts/florida-class-d-database-readiness-gate.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "test", "claimBoundary": "Gate definition only until exact live and source results are retained."},
+        {"artifactId": "EV-FDACS-RUNTIME-ISOLATION-GATE", "title": "FDACS regulated runtime-isolation gate", "path": "scripts/florida-class-d-runtime-isolation-audit.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Security engineering", "method": "test", "claimBoundary": "Fail-closed source scan for embedded Supabase origins and public secret-class configuration names; exact-release and live runtime results remain separate."},
+        {"artifactId": "EV-FDACS-MIGRATION-MANIFEST", "title": "FDACS deterministic migration manifest generator", "path": "scripts/florida-class-d-migration-manifest.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Database release engineering", "method": "test", "claimBoundary": "Binds the ordered 35-file source lineage and hashes without executing a production migration."},
+        {"artifactId": "EV-FDACS-MIGRATION-PARITY-GATE", "title": "FDACS migration parity and activation-binding gate", "path": "scripts/florida-class-d-migration-parity-gate.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Database release engineering", "method": "test", "claimBoundary": "Validates source lineage, latest version, manifest digest, and candidate-bound activation requirements; production runtime authorization remains false."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.1.1", "3.1.2", "3.1.3", "3.1.4", "3.1.5", "3.1.6", "3.1.7", "3.3.1", "3.3.2", "3.3.3", "3.3.4", "3.3.5", "3.3.8", "3.4.1", "3.4.2", "3.4.3", "3.5.1", "3.5.2", "3.5.3", "3.8.1", "3.8.2", "3.8.3", "3.8.5", "3.8.7", "3.8.9", "3.12.1", "3.12.3", "3.12.4", "3.13.1", "3.13.8", "3.13.11", "3.14.1", "3.14.2", "3.14.3", "3.14.6"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-FDACS-RECORDS-SQL", "EV-FDACS-HARDENING-SQL", "EV-FDACS-PII-SQL", "EV-FDACS-ARCHIVE-SQL", "EV-FDACS-IDENTITY-SQL", "EV-FDACS-AUDIT-SQL", "EV-FDACS-DENY-SQL", "EV-FDACS-FUNCTION-HARDENING-SQL", "EV-FDACS-AUDIT-SCHEMA", "EV-FDACS-AUDIT-GATE", "EV-FDACS-LIVE-RECEIPT", "EV-FDACS-DB-GATE", "EV-FDACS-RUNTIME-ISOLATION-GATE", "EV-FDACS-MIGRATION-MANIFEST", "EV-FDACS-MIGRATION-PARITY-GATE"], "claimBoundary": "Candidate objective support includes a hashed organization-captured live receipt and fail-closed runtime/migration source gates, but exact-release objective-specific technical results, backup/restore, HA, encrypted finalization, and organization evidence remain required before any assessment finding."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.01.01", "03.01.02", "03.01.03", "03.01.04", "03.01.05", "03.01.06", "03.01.07", "03.03.01", "03.03.02", "03.03.03", "03.03.04", "03.03.05", "03.03.08", "03.04.01", "03.04.02", "03.04.03", "03.05.01", "03.05.02", "03.05.03", "03.08.01", "03.08.02", "03.08.03", "03.08.05", "03.08.07", "03.08.09", "03.12.01", "03.12.03", "03.12.05", "03.13.01", "03.13.08", "03.13.11", "03.14.01", "03.14.02", "03.14.03", "03.14.06", "03.16.01", "03.16.03"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-FDACS-RECORDS-SQL", "EV-FDACS-HARDENING-SQL", "EV-FDACS-PII-SQL", "EV-FDACS-ARCHIVE-SQL", "EV-FDACS-IDENTITY-SQL", "EV-FDACS-AUDIT-SQL", "EV-FDACS-DENY-SQL", "EV-FDACS-FUNCTION-HARDENING-SQL", "EV-FDACS-AUDIT-SCHEMA", "EV-FDACS-AUDIT-GATE", "EV-FDACS-LIVE-RECEIPT", "EV-FDACS-DB-GATE", "EV-FDACS-RUNTIME-ISOLATION-GATE", "EV-FDACS-MIGRATION-MANIFEST", "EV-FDACS-MIGRATION-PARITY-GATE"], "claimBoundary": "Supplemental Revision 3 database engineering alignment plus a time-bound live receipt and fail-closed runtime/migration source gates; exact-release objective results remain pending."}
+      ]
+    },
+    {
+      "systemId": "SYS-ACADEMY-DATABASE",
+      "systemName": "Academy Learner and Commerce Database",
+      "systemType": "application_database",
+      "provider": "Supabase and OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "accountableRole": "Academy data owner",
+      "operationalDisposition": "scope_dependent",
+      "scope": {"included": ["Academy catalog, learner, progress, assessment, entitlement, and commerce references", "RLS and service-only functions"], "excluded": ["FDACS isolated student PII records", "Applications data", "Raw payment card data"], "dataClasses": ["learner_pii", "training_records", "payment_reference", "audit_records"], "environments": ["academy_production", "development", "repository"]},
+      "claimBoundary": "Source evidence describes Academy controls; live Supabase state, backup, recovery, and assurance evidence remain external.",
+      "artifacts": [
+        {"artifactId": "EV-ACADEMY-BASELINE-SQL", "title": "Academy publication controls", "path": "supabase/migrations/20260814025522_academy_baseline_publication_controls.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Database engineering", "method": "examine", "claimBoundary": "Migration source only."},
+        {"artifactId": "EV-ACADEMY-COMMERCE-SQL", "title": "Academy durable learner commerce schema", "path": "supabase/migrations/20260814061110_academy_durable_learner_commerce.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Database engineering", "method": "examine", "claimBoundary": "Migration source only."},
+        {"artifactId": "EV-ACADEMY-PERSISTENCE", "title": "Academy persistence service", "path": "lib/academy-persistence.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Academy engineering", "method": "test", "claimBoundary": "Application service source only."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.1.1", "3.1.2", "3.1.3", "3.1.5", "3.3.1", "3.3.2", "3.3.3", "3.4.1", "3.4.2", "3.4.3", "3.5.1", "3.5.2", "3.5.3", "3.8.1", "3.8.3", "3.8.9", "3.12.3", "3.13.1", "3.13.8", "3.14.1", "3.14.2", "3.14.3", "3.14.6"], "methods": ["examine", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-ACADEMY-BASELINE-SQL", "EV-ACADEMY-COMMERCE-SQL", "EV-ACADEMY-PERSISTENCE"], "claimBoundary": "Candidate product evidence; live database and organizational evidence remain required."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.01.01", "03.01.02", "03.01.03", "03.01.05", "03.03.01", "03.03.02", "03.03.03", "03.04.01", "03.04.02", "03.04.03", "03.05.01", "03.05.02", "03.05.03", "03.08.01", "03.08.03", "03.08.09", "03.12.03", "03.13.01", "03.13.08", "03.14.01", "03.14.02", "03.14.03", "03.14.06", "03.16.03"], "methods": ["examine", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-ACADEMY-BASELINE-SQL", "EV-ACADEMY-COMMERCE-SQL", "EV-ACADEMY-PERSISTENCE"], "claimBoundary": "Supplemental Revision 3 Academy database mapping only."}
+      ]
+    },
+    {
+      "systemId": "SYS-EVIDENCE-ARCHIVE",
+      "systemName": "Permanent Non-CUI CMMC Evidence Archive",
+      "systemType": "append_only_evidence_storage",
+      "provider": "Supabase and OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "accountableRole": "Evidence records custodian",
+      "operationalDisposition": "fail_closed_pending_mandatory_prerequisite",
+      "scope": {"included": ["Final hashed non-CUI release evidence", "Append-only event chain", "Indefinite retention policy"], "excluded": ["CUI", "Student PII", "Payment data", "Secrets and credentials"], "dataClasses": ["public", "internal_non_cui", "control_metadata", "artifact_hashes"], "environments": ["evidence_archive_production", "repository"]},
+      "claimBoundary": "The archive accepts only public or internal non-CUI evidence and cannot authorize CUI or sensitive-personal-data storage. The Academy project was rejected as the live target because its service-role boundary contains excluded Applications tables. A dedicated project, paid resilience configuration, restore test, and failover/recovery test remain pending and no HA claim is made.",
+      "artifacts": [
+        {"artifactId": "EV-ARCHIVE-SQL", "title": "Indefinite append-only CMMC evidence archive", "path": "supabase/migrations/20260814161500_cmmc_evidence_indefinite_archive.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Evidence platform engineering", "method": "examine", "claimBoundary": "Migration source only; applied live archive and restoration evidence are separate."},
+        {"artifactId": "EV-ARCHIVE-HA-CONTRACT", "title": "Candidate-bound HA evidence contract", "path": "lib/florida-class-d-ha-evidence.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Resilience engineering", "method": "test", "claimBoundary": "Validates manifest structure and hashes; it does not manufacture provider HA evidence."},
+        {"artifactId": "EV-ARCHIVE-HA-GATE", "title": "HA evidence integrity gate", "path": "scripts/florida-class-d-ha-evidence-integrity-gate.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "test", "claimBoundary": "Gate definition only until an exact-revision result is archived."},
+        {"artifactId": "EV-ARCHIVE-V2-SQL", "title": "Objective-level exact-revision archive contract", "path": "supabase/migrations/20260814180000_cmmc_objective_evidence_contract.sql", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Evidence database engineering", "method": "test", "claimBoundary": "Database enforcement source only; applied production state requires live verification."},
+        {"artifactId": "EV-ARCHIVE-CLIENT", "title": "Release evidence archive verifier and client", "path": "scripts/cmmc-archive-release-evidence.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Evidence platform engineering", "method": "test", "claimBoundary": "Builds, verifies, and submits a final non-CUI package; a successful live RPC receipt is separately required."},
+        {"artifactId": "EV-ARCHIVE-TARGET-DECISION", "title": "Archive isolation and HA activation decision", "path": "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json", "evidenceOrigin": "organization_evidence", "accountableRole": "Evidence records custodian", "method": "examine", "claimBoundary": "Records the rejected shared Academy target, dedicated-project quote, provider HA facts, and pending tests; it is not evidence that HA or the archive is live."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.3.1", "3.3.2", "3.3.3", "3.3.4", "3.3.5", "3.3.8", "3.8.1", "3.8.2", "3.8.3", "3.8.5", "3.8.7", "3.8.9", "3.12.1", "3.12.3", "3.12.4", "3.13.16", "3.14.6"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-ARCHIVE-SQL", "EV-ARCHIVE-HA-CONTRACT", "EV-ARCHIVE-HA-GATE", "EV-ARCHIVE-V2-SQL", "EV-ARCHIVE-CLIENT", "EV-ARCHIVE-TARGET-DECISION"], "claimBoundary": "Candidate archive implementation and organization decision evidence; live immutability, backup, recovery, HA, and retention operation require final provider and organization evidence."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.03.01", "03.03.02", "03.03.03", "03.03.04", "03.03.05", "03.03.08", "03.08.01", "03.08.02", "03.08.03", "03.08.05", "03.08.07", "03.08.09", "03.12.01", "03.12.03", "03.12.05", "03.13.15", "03.14.06", "03.16.01", "03.16.03"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-ARCHIVE-SQL", "EV-ARCHIVE-HA-CONTRACT", "EV-ARCHIVE-HA-GATE", "EV-ARCHIVE-V2-SQL", "EV-ARCHIVE-CLIENT", "EV-ARCHIVE-TARGET-DECISION"], "claimBoundary": "Supplemental Revision 3 archive engineering mapping and pending target decision only."}
+      ]
+    },
+    {
+      "systemId": "SYS-VERCEL-RUNTIME",
+      "systemName": "Vercel Production Runtime and Canonical Routing",
+      "systemType": "cloud_application_runtime",
+      "provider": "Vercel and OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "accountableRole": "Production platform owner",
+      "operationalDisposition": "operational_with_pending_human_review",
+      "scope": {"included": ["Build and deployment", "Canonical domain routing", "Runtime health and availability"], "excluded": ["Unverified duplicate Vercel projects", "Applications product runtime"], "dataClasses": ["public", "internal_non_cui_operational_metadata"], "environments": ["production", "preview", "repository"]},
+      "claimBoundary": "Repository evidence covers deployment intent and gates; live routing, firewall, log, recovery, and availability controls require Vercel control-plane evidence.",
+      "artifacts": [
+        {"artifactId": "EV-VERCEL-CONFIG", "title": "Vercel deployment configuration", "path": "vercel.json", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Platform engineering", "method": "examine", "claimBoundary": "Repository configuration only."},
+        {"artifactId": "EV-VERCEL-HEALTH", "title": "Runtime release identity health route", "path": "app/api/health/route.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Platform engineering", "method": "test", "claimBoundary": "Health contract source only; live response is separate evidence."},
+        {"artifactId": "EV-VERCEL-INTEGRITY-TEST", "title": "Deployment integrity test", "path": "test/vercel-deployment-integrity.test.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "test", "claimBoundary": "Test definition only until exact-run results are retained."},
+        {"artifactId": "EV-VERCEL-E2E-WORKFLOW", "title": "Production E2E operational gate", "path": ".github/workflows/production-e2e-operational-gate.yml", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "examine", "claimBoundary": "Workflow configuration only."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.3.5", "3.4.1", "3.4.2", "3.4.3", "3.4.4", "3.4.5", "3.6.1", "3.6.2", "3.11.1", "3.11.2", "3.12.1", "3.12.3", "3.13.1", "3.13.6", "3.14.1", "3.14.2", "3.14.3", "3.14.6"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-VERCEL-CONFIG", "EV-VERCEL-HEALTH", "EV-VERCEL-INTEGRITY-TEST", "EV-VERCEL-E2E-WORKFLOW"], "claimBoundary": "Candidate runtime integration evidence; provider configuration and operation remain externally evidenced."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.03.05", "03.04.01", "03.04.02", "03.04.03", "03.04.04", "03.04.05", "03.06.01", "03.06.02", "03.11.01", "03.11.02", "03.12.01", "03.12.03", "03.13.01", "03.13.06", "03.14.01", "03.14.02", "03.14.03", "03.14.06", "03.16.01", "03.16.03"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-VERCEL-CONFIG", "EV-VERCEL-HEALTH", "EV-VERCEL-INTEGRITY-TEST", "EV-VERCEL-E2E-WORKFLOW"], "claimBoundary": "Supplemental Revision 3 runtime mapping only."}
+      ]
+    },
+    {
+      "systemId": "SYS-GITHUB-CI",
+      "systemName": "GitHub Source Control and Continuous Integration",
+      "systemType": "source_control_and_ci",
+      "provider": "GitHub and OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "accountableRole": "Repository administrator",
+      "operationalDisposition": "operational_with_pending_human_review",
+      "scope": {"included": ["In-scope source history", "Pull-request gates", "Code scanning and dependency update configuration"], "excluded": ["Applications workstream source and workflows", "Unverified administrator-only settings"], "dataClasses": ["source_code", "internal_non_cui", "security_findings"], "environments": ["repository", "github_actions"]},
+      "claimBoundary": "Workflow source does not prove branch protection, secret scanning, alert state, or a successful run; those require live GitHub records.",
+      "artifacts": [
+        {"artifactId": "EV-GITHUB-CODEQL", "title": "CodeQL workflow", "path": ".github/workflows/codeql.yml", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Repository security", "method": "examine", "claimBoundary": "Configured workflow only."},
+        {"artifactId": "EV-GITHUB-DEPENDABOT", "title": "Dependency update configuration", "path": ".github/dependabot.yml", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Repository security", "method": "examine", "claimBoundary": "Configured update schedule only; alert and PR state are live evidence."},
+        {"artifactId": "EV-GITHUB-SECURITY", "title": "Coordinated vulnerability disclosure policy", "path": "SECURITY.md", "evidenceOrigin": "organization_evidence", "accountableRole": "Security owner", "method": "examine", "claimBoundary": "Published reporting procedure; operational incident records remain separate."},
+        {"artifactId": "EV-GITHUB-LMS-WORKFLOW", "title": "LMS release workflow", "path": ".github/workflows/florida-class-d-lms-gates.yml", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "examine", "claimBoundary": "Workflow definition only."},
+        {"artifactId": "EV-GITHUB-EVIDENCE-WORKFLOW", "title": "CMMC evidence governance workflow", "path": ".github/workflows/cmmc-evidence-governance.yml", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release and compliance engineering", "method": "test", "claimBoundary": "Defines approved-change regeneration and archival; GitHub control-plane enforcement and exact run results remain separate."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.1.5", "3.3.1", "3.3.2", "3.3.5", "3.3.8", "3.4.1", "3.4.3", "3.4.4", "3.4.5", "3.6.1", "3.6.2", "3.11.2", "3.12.1", "3.12.3", "3.12.4", "3.14.1", "3.14.3", "3.14.6"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-GITHUB-CODEQL", "EV-GITHUB-DEPENDABOT", "EV-GITHUB-SECURITY", "EV-GITHUB-LMS-WORKFLOW", "EV-GITHUB-EVIDENCE-WORKFLOW"], "claimBoundary": "Candidate repository configuration evidence; live provider controls and organization operation remain required."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.01.05", "03.03.01", "03.03.02", "03.03.05", "03.03.08", "03.04.01", "03.04.03", "03.04.04", "03.04.05", "03.06.01", "03.06.02", "03.11.02", "03.12.01", "03.12.03", "03.12.05", "03.14.01", "03.14.03", "03.14.06", "03.15.02", "03.16.01", "03.16.03"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-GITHUB-CODEQL", "EV-GITHUB-DEPENDABOT", "EV-GITHUB-SECURITY", "EV-GITHUB-LMS-WORKFLOW", "EV-GITHUB-EVIDENCE-WORKFLOW"], "claimBoundary": "Supplemental Revision 3 source-control mapping only."}
+      ]
+    },
+    {
+      "systemId": "SYS-DAILY-MEDIA",
+      "systemName": "Daily Live Instruction Media",
+      "systemType": "video_conferencing_and_attendance",
+      "provider": "Daily and OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "accountableRole": "Live instruction owner",
+      "operationalDisposition": "fail_closed_pending_mandatory_prerequisite",
+      "scope": {"included": ["Live room creation", "Instructor and learner meeting access", "Attendance and observer evidence"], "excluded": ["Daily provider internal infrastructure", "Unapproved recordings"], "dataClasses": ["student_pii", "attendance_records", "audio_video", "audit_records"], "environments": ["production", "nonproduction", "repository"]},
+      "claimBoundary": "OBSERRA source evidence covers token and attendance integration; Daily security settings, recordings, retention, uptime, and provider assurance require live evidence.",
+      "artifacts": [
+        {"artifactId": "EV-DAILY-MEDIA-SERVICE", "title": "Regulated media service", "path": "lib/florida-class-d-media.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "LMS engineering", "method": "test", "claimBoundary": "Application media access logic only."},
+        {"artifactId": "EV-DAILY-LIVE-SERVICE", "title": "Live classroom persistence", "path": "lib/florida-class-d-live-persistence.ts", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "LMS engineering", "method": "test", "claimBoundary": "Application attendance persistence only."},
+        {"artifactId": "EV-DAILY-MEDIA-GATE", "title": "Media integration verification gate", "path": "scripts/florida-class-d-media-gate.mjs", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Release engineering", "method": "test", "claimBoundary": "Gate source only until an exact-run result exists."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.1.1", "3.1.2", "3.1.3", "3.1.5", "3.3.1", "3.3.2", "3.3.5", "3.5.1", "3.5.2", "3.5.3", "3.8.1", "3.8.3", "3.8.4", "3.8.5", "3.13.1", "3.13.2", "3.13.5", "3.13.8", "3.13.15", "3.14.6"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-DAILY-MEDIA-SERVICE", "EV-DAILY-LIVE-SERVICE", "EV-DAILY-MEDIA-GATE"], "claimBoundary": "Candidate integration evidence; provider settings and organization attendance review are separate."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.01.01", "03.01.02", "03.01.03", "03.01.05", "03.03.01", "03.03.02", "03.03.05", "03.05.01", "03.05.02", "03.05.03", "03.08.01", "03.08.03", "03.08.04", "03.08.05", "03.13.01", "03.13.04", "03.13.08", "03.13.15", "03.14.06", "03.16.03"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-DAILY-MEDIA-SERVICE", "EV-DAILY-LIVE-SERVICE", "EV-DAILY-MEDIA-GATE"], "claimBoundary": "Supplemental Revision 3 media mapping only."}
+      ]
+    },
+    {
+      "systemId": "SYS-DIRECT-DEPENDENCIES",
+      "systemName": "Direct Software Dependency Supply Chain",
+      "systemType": "software_supply_chain",
+      "provider": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC and upstream package publishers",
+      "accountableRole": "Software supply-chain owner",
+      "operationalDisposition": "operational_with_pending_human_review",
+      "scope": {"included": ["Direct production and development dependencies", "Lockfile integrity", "Automated update and code scanning configuration"], "excluded": ["Applications workstream dependencies not exercised by this release", "Unretained upstream attestations"], "dataClasses": ["source_code", "dependency_metadata", "security_findings"], "environments": ["repository", "build"]},
+      "claimBoundary": "Pinned dependency metadata and scanning configuration do not constitute assurance of every upstream component or eliminate vulnerability-management duties.",
+      "artifacts": [
+        {"artifactId": "EV-DEPS-MANIFEST", "title": "Direct dependency manifest", "path": "package.json", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Software engineering", "method": "examine", "claimBoundary": "Declared dependency set only."},
+        {"artifactId": "EV-DEPS-LOCK", "title": "Resolved dependency lockfile", "path": "package-lock.json", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Software engineering", "method": "test", "claimBoundary": "Exact dependency resolution evidence only."},
+        {"artifactId": "EV-DEPS-UPDATES", "title": "Automated dependency update configuration", "path": ".github/dependabot.yml", "evidenceOrigin": "product_supplied_evidence", "accountableRole": "Repository security", "method": "examine", "claimBoundary": "Update configuration only; live alerts, review decisions, and remediation records are separate."}
+      ],
+      "controlMappings": [
+        {"baseline": "governing_rev2", "controlIds": ["3.4.1", "3.4.3", "3.4.4", "3.11.1", "3.11.2", "3.11.3", "3.12.1", "3.12.3", "3.14.1", "3.14.2", "3.14.3", "3.14.6"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-DEPS-MANIFEST", "EV-DEPS-LOCK", "EV-DEPS-UPDATES"], "claimBoundary": "Candidate supply-chain evidence; organization risk decisions and current vulnerability results remain required."},
+        {"baseline": "supplemental_rev3", "controlIds": ["03.04.01", "03.04.03", "03.04.04", "03.11.01", "03.11.02", "03.11.04", "03.12.01", "03.12.03", "03.14.01", "03.14.02", "03.14.03", "03.14.06", "03.16.01", "03.16.02", "03.16.03"], "methods": ["examine", "interview", "test"], "responsibilityOwner": "product_provider", "evidenceState": "candidate_product_evidence", "artifactIds": ["EV-DEPS-MANIFEST", "EV-DEPS-LOCK", "EV-DEPS-UPDATES"], "claimBoundary": "Supplemental Revision 3 supply-chain mapping only."}
+      ]
+    }
+  ]
+}

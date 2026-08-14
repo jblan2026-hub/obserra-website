@@ -79,7 +79,7 @@ begin
       'completionRecordId', new.id,
       'examScore', v_exam_score,
       'passingScore', 128,
-      'provider', 'Obserra Executive Protection & Intelligence LLC',
+      'provider', 'OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC',
       'officialStateCertificate', false,
       'licenseIssued', false
     )

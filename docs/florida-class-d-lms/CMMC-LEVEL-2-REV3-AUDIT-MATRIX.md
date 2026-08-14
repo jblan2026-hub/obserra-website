@@ -2,14 +2,14 @@
 
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update `CMMC-LEVEL-2-REV3-TRACEABILITY.json` and run `npm run generate:cmmc-traceability`.
 
-Registry SHA-256: `11f110691aa6d7c98e65e451862bb8d69726ba6d24244064dd33dc9b1b9dd6bd`
+Registry SHA-256: `c443e65c6893fc7d251b176bb8a98e60a486520fe3fc4bff15d219a0154d6f92`
 Registry schema version: `1.0`
 Registry snapshot date: `2026-08-13`
 Source checkpoint represented by the register: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
 
 ## Audit Claim Boundary
 
-Engineering alignment, evidence traceability, and audit readiness only. This register does not claim CMMC certification, a CMMC status in SPRS, FedRAMP authorization, FDACS approval, or authorization to process CUI.
+Historical requirement-level supporting inventory only. The current objective-level authority is docs/compliance/CMMC-SYSTEM-EVIDENCE.json. This register does not claim CMMC certification, a CMMC status in SPRS, FedRAMP authorization, FDACS approval, authorization to process CUI, or an assessor finding.
 
 NIST SP 800-171 Rev. 3 is the engineering baseline and NIST SP 800-171A Rev. 3 is the assessment procedure baseline for this traceability package. The current CMMC Level 2 rule baseline is retained separately because the current DoD assessment regime continues to reference the 110 NIST SP 800-171 Rev. 2 requirements. The Rev. 2 mappings in this report are a crosswalk aid and do not convert Rev. 3 implementation evidence into a CMMC certification claim.
 
@@ -40,10 +40,10 @@ A requirement status is deliberately conservative. The family default remains in
 | Rev. 3 requirement | Title | Family | Resolved status | Trace records |
 | --- | --- | --- | --- | --- |
 | 03.01.01 | Account Management | Access Control | partial_external_evidence_required | none yet |
-| 03.01.02 | Access Enforcement | Access Control | partial_external_evidence_required | TR-001, TR-002, TR-003, TR-005, TR-006, TR-007, TR-008, TR-009 |
+| 03.01.02 | Access Enforcement | Access Control | partial_external_evidence_required | TR-001, TR-002, TR-003, TR-005, TR-006, TR-007, TR-008, TR-009, TR-022 |
 | 03.01.03 | Information Flow Enforcement | Access Control | partial_external_evidence_required | TR-001, TR-004, TR-007 |
 | 03.01.04 | Separation of Duties | Access Control | partial_external_evidence_required | none yet |
-| 03.01.05 | Least Privilege | Access Control | partial_external_evidence_required | TR-001, TR-002, TR-003, TR-006 |
+| 03.01.05 | Least Privilege | Access Control | partial_external_evidence_required | TR-001, TR-002, TR-003, TR-006, TR-022 |
 | 03.01.06 | Least Privilege – Privileged Accounts | Access Control | partial_external_evidence_required | TR-006 |
 | 03.01.07 | Least Privilege – Privileged Functions | Access Control | partial_external_evidence_required | TR-001, TR-006 |
 | 03.01.08 | Unsuccessful Logon Attempts | Access Control | partial_external_evidence_required | none yet |
@@ -66,8 +66,8 @@ A requirement status is deliberately conservative. The family default remains in
 | 03.03.07 | Time Stamps | Audit and Accountability | partial_external_evidence_required | TR-010 |
 | 03.03.08 | Protection of Audit Information | Audit and Accountability | partial_external_evidence_required | TR-006, TR-010, TR-015, TR-021 |
 | 03.04.01 | Baseline Configuration | Configuration Management | partial_external_evidence_required | TR-005, TR-012, TR-014, TR-017, TR-021 |
-| 03.04.02 | Configuration Settings | Configuration Management | partial_external_evidence_required | TR-003, TR-005 |
-| 03.04.03 | Configuration Change Control | Configuration Management | partial_external_evidence_required | TR-005, TR-012, TR-014, TR-017, TR-018, TR-021 |
+| 03.04.02 | Configuration Settings | Configuration Management | partial_external_evidence_required | TR-003, TR-005, TR-022 |
+| 03.04.03 | Configuration Change Control | Configuration Management | partial_external_evidence_required | TR-005, TR-012, TR-014, TR-017, TR-018, TR-021, TR-022 |
 | 03.04.04 | Impact Analyses | Configuration Management | partial_external_evidence_required | TR-012, TR-014, TR-018 |
 | 03.04.05 | Access Restrictions for Change | Configuration Management | partial_external_evidence_required | TR-018 |
 | 03.04.06 | Least Functionality | Configuration Management | partial_external_evidence_required | TR-003, TR-004, TR-007 |
@@ -112,9 +112,9 @@ A requirement status is deliberately conservative. The family default remains in
 | 03.12.02 | Plan of Action and Milestones | Security Assessment and Monitoring | partial_external_evidence_required | none yet |
 | 03.12.03 | Continuous Monitoring | Security Assessment and Monitoring | organizational_evidence_required | TR-015, TR-016, TR-020, TR-021 |
 | 03.12.05 | Information Exchange | Security Assessment and Monitoring | partial_external_evidence_required | TR-019 |
-| 03.13.01 | Boundary Protection | System and Communications Protection | partial_external_evidence_required | TR-007, TR-013 |
+| 03.13.01 | Boundary Protection | System and Communications Protection | partial_external_evidence_required | TR-007, TR-013, TR-022 |
 | 03.13.04 | Information in Shared System Resources | System and Communications Protection | partial_external_evidence_required | TR-004 |
-| 03.13.06 | Network Communications – Deny by Default – Allow by Exception | System and Communications Protection | partial_external_evidence_required | TR-001, TR-006 |
+| 03.13.06 | Network Communications – Deny by Default – Allow by Exception | System and Communications Protection | partial_external_evidence_required | TR-001, TR-006, TR-022 |
 | 03.13.08 | Transmission and Storage Confidentiality | System and Communications Protection | partial_external_evidence_required | TR-013 |
 | 03.13.09 | Network Disconnect | System and Communications Protection | partial_external_evidence_required | none yet |
 | 03.13.10 | Cryptographic Key Establishment and Management | System and Communications Protection | partial_external_evidence_required | none yet |
@@ -130,7 +130,7 @@ A requirement status is deliberately conservative. The family default remains in
 | 03.15.01 | Policy and Procedures | Planning | organizational_evidence_required | TR-021 |
 | 03.15.02 | System Security Plan | Planning | organizational_evidence_required | TR-021 |
 | 03.15.03 | Rules of Behavior | Planning | organizational_evidence_required | none yet |
-| 03.16.01 | Security Engineering Principles | System and Services Acquisition | partial_external_evidence_required | TR-003, TR-007, TR-012, TR-013, TR-014, TR-018, TR-021 |
+| 03.16.01 | Security Engineering Principles | System and Services Acquisition | partial_external_evidence_required | TR-003, TR-007, TR-012, TR-013, TR-014, TR-018, TR-021, TR-022 |
 | 03.16.02 | Unsupported System Components | System and Services Acquisition | partial_external_evidence_required | TR-011 |
 | 03.16.03 | External System Services | System and Services Acquisition | organizational_evidence_required | TR-008, TR-015, TR-019, TR-020 |
 | 03.17.01 | Supply Chain Risk Management Plan | Supply Chain Risk Management | organizational_evidence_required | TR-019 |
@@ -455,7 +455,7 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Obserra GitHub and Supabase
 
-Gate 29 produces a deterministic regulated migration manifest and binds database promotion to the exact candidate SHA, latest migration version, and manifest digest.
+Gate 29 produces a deterministic regulated migration manifest and binds database promotion to the exact candidate SHA, latest migration version, and manifest digest. Gate 37 reconciles the complete 35-file lineage through version 20260814175000 and pins manifest SHA-256 40eb88f6b8cb6ce2716eb260cde7f29d69d78f0a201e90cd6373ac1ebf2be090; no migration is executed by this source gate.
 
 Evidence:
 
@@ -547,16 +547,17 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Obserra GitHub
 
-Material regulated changes are committed on a controlled branch, associated with PR 56, and accepted only after the exact SHA passes five mandatory workflows.
+Material website and regulated LMS changes are committed on a controlled branch, preserved at exact Git SHAs, and accepted only after the exact pull-request head passes the applicable Website CI, Florida Class D LMS, CodeQL, and CMMC evidence-governance checks. Gate 37 preserves the original 208-path checkpoint at 83364708ae618555ec514d27a93079bad22a7c4c and reconciles the later main history at merge commit 7f9c8f24a2ee1b73cbd0a748e5768486aaf33dbc without rewriting either parent. Three malformed, mis-nested, tag-pinned Copilot CLI action insertions were removed before publication because they made the workflows invalid and introduced an unreviewed supply-chain dependency.
 
 Evidence:
 
 * `.github/workflows/florida-class-d-lms-gates.yml`
 * `.github/workflows/website-ci.yml`
+* `.github/workflows/cmmc-evidence-governance.yml`
+* `.github/workflows/codeql.yml`
 * `.github/workflows/academy-70x-production-gate.yml`
-* `.github/workflows/application-release-validation.yml`
-* `.github/workflows/application-production-pipeline.yml`
 * `docs/florida-class-d-lms/LATEST-HANDOFF.md`
+* `docs/florida-class-d-lms/ACTION-LEDGER-GATE-35-ADDENDUM.md`
 
 Open evidence condition: Branch protection, administrator role review, signing policy, and organizational change approval evidence should be retained for formal assessment.
 
@@ -630,6 +631,29 @@ Evidence:
 
 Open evidence condition: The SSP and organization wide policies remain separate required assessment evidence and are not auto satisfied by this register.
 
+### TR-022 Regulated runtime isolation and explicit FDACS project binding
+
+Status: `implemented_source_evidence`
+
+NIST SP 800-171 Rev. 3: `03.01.02`, `03.01.05`, `03.04.02`, `03.04.03`, `03.13.01`, `03.13.06`, `03.16.01`
+
+Current CMMC Level 2 Rev. 2 crosswalk: `3.1.2`, `3.1.5`, `3.4.2`, `3.4.3`, `3.13.1`, `3.13.6`
+
+Assessment methods: `examine`, `test`
+
+Responsible boundary: Obserra regulated LMS and isolated FDACS Supabase runtime
+
+Regulated Florida Class D server modules require explicit protected Supabase URL and service-role configuration. The readiness and activation controls derive the expected HTTPS origin from the controlled FDACS project reference rather than embedding a repository URL or using a fallback. Gate 25 scans all regulated modules and fails on embedded Supabase origins or public secret-class environment names.
+
+Evidence:
+
+* `lib/florida-class-d-runtime-readiness.ts`
+* `lib/florida-class-d-production-activation.ts`
+* `scripts/florida-class-d-runtime-isolation-audit.mjs`
+* `docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md`
+
+Open evidence condition: Exact-release CI and protected live runtime configuration must still be verified; production activation and CUI processing remain unauthorized.
+
 ## Provisional Asset Scope
 
 | Asset | Provisional category | Evidence state |
@@ -688,17 +712,18 @@ Mapped Rev. 3 requirements: cross framework or program level
 
 ## Current CMMC Rule State
 
-As of 2026-08-13, CMMC Phase II implementation is suspended while Phase I self assessment requirements remain. Current DoD Level 2 enforcement continues to reference the 110 requirements in NIST SP 800-171 Rev. 2.
+The governing Level 2 record is bound to 32 CFR Part 170, the September 2024 CMMC Level 2 Assessment Guide version 2.13, NIST SP 800-171 Revision 2, and NIST SP 800-171A June 2018 as incorporated by reference. This historical supporting register does not infer or declare a CMMC implementation-phase status.
 
-NIST SP 800-171 Rev. 3 is the Obserra engineering baseline. Rev. 2 practice mappings are retained so the evidence package remains usable for the currently enforced CMMC Level 2 assessment baseline.
+NIST SP 800-171 Revision 3 and NIST SP 800-171A Revision 3 are supplemental forward-engineering references only. The authoritative objective-level record, exact source hashes, system separation, evidence ownership, technical results, human disposition, and claim boundaries are maintained in docs/compliance/CMMC-SYSTEM-EVIDENCE.json.
 
 ## Authoritative Sources
 
+* https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170
+* https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf
+* https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final
+* https://csrc.nist.gov/pubs/sp/800/171/a/final
 * https://csrc.nist.gov/pubs/sp/800/171/r3/final
 * https://csrc.nist.gov/pubs/sp/800/171/a/r3/final
-* https://csrc.nist.gov/projects/cprt/catalog
-* https://dowcio.war.gov/CMMC/About/
-* https://www.acquisition.gov/dfars/252.204-7021-contractor-compliance-cybersecurity-maturity-model-certification-level-requirements.
 
 ## Drift Control
 

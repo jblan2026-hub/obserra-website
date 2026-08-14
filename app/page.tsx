@@ -3,13 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import HomeHeader from "./HomeHeader";
 import { ButtonLink, KpiCard, StatusBadge } from "./components/ui/ObserraUI";
+import { LEGAL_ENTITY_NAME } from "../lib/legal-identity";
 import "./executive-mission-control.css";
 import "./executive-mission-control-polish.css";
 
 export const metadata: Metadata = {
-  title: "Obserra | Executive Intelligence for High-Consequence Organizations",
+  title: `${LEGAL_ENTITY_NAME} | Executive Intelligence for High-Consequence Organizations`,
   description:
-    "Obserra unifies executive advisory, cybersecurity, protective intelligence, enterprise applications, and professional training into one decision-focused operating model.",
+    `${LEGAL_ENTITY_NAME} unifies executive advisory, cybersecurity, protective intelligence, enterprise applications, and professional training into one decision-focused operating model.`,
   alternates: { canonical: "/" },
 };
 
@@ -36,17 +37,17 @@ export default function HomePage() {
 
       <section className="mission-hero">
         <div className="mission-hero__visual">
-          <Image src="/brand/visuals/obserra-eios-intelligence-hero.png" alt="Obserra Executive Intelligence Operating System visualization" fill priority sizes="100vw" />
+          <Image src="/brand/visuals/obserra-eios-intelligence-hero.png" alt="Obserra EIOS visualization" fill priority sizes="100vw" />
         </div>
         <div className="mission-hero__copy">
           <p className="obs-eyebrow">EXECUTIVE INTELLIGENCE OPERATING SYSTEM</p>
           <h1>Enterprise intelligence for organizations that cannot afford to be wrong.</h1>
-          <p>Obserra connects executive judgment, cybersecurity, protective intelligence, governance, secure technology, and professional training so leaders can move from fragmented signals to confident, accountable action.</p>
+          <p>{LEGAL_ENTITY_NAME} connects executive judgment, cybersecurity, protective intelligence, governance, secure technology, and professional training so leaders can move from fragmented signals to confident, accountable action.</p>
           <div className="mission-hero__actions">
             <ButtonLink href="/contact?interest=enterprise-consultation">Schedule an executive consultation</ButtonLink>
             <ButtonLink href="/eios" variant="secondary">Explore Obserra EIOS</ButtonLink>
           </div>
-          <div className="mission-assurance" aria-label="Obserra operating assurances">
+          <div className="mission-assurance" aria-label={`${LEGAL_ENTITY_NAME} operating assurances`}>
             <span>Veteran owned</span><span>Executive led</span><span>Secure by design</span><span>Board ready</span>
           </div>
         </div>
@@ -100,7 +101,7 @@ export default function HomePage() {
       <section className="mission-section">
         <div className="mission-heading">
           <div><p className="obs-eyebrow">ENTERPRISE RISK DOMAINS</p><h2>See the whole decision, not another isolated control or report.</h2></div>
-          <p>Obserra correlates risk across functions so executives can evaluate consequence, confidence, urgency, ownership, and expected value in one context.</p>
+          <p>{LEGAL_ENTITY_NAME} correlates risk across functions so executives can evaluate consequence, confidence, urgency, ownership, and expected value in one context.</p>
         </div>
         <div className="mission-domains">
           {domains.map(([label, title, copy]) => <article className="mission-domain" key={title}><span>{label}</span><h3>{title}</h3><p>{copy}</p></article>)}
@@ -109,9 +110,9 @@ export default function HomePage() {
 
       <section className="mission-section mission-proof">
         <article>
-          <p className="obs-eyebrow">WHY OBSERRA</p>
+          <p className="obs-eyebrow">WHY {LEGAL_ENTITY_NAME}</p>
           <h3>Executive judgment backed by technical depth, intelligence discipline, governance, and operational experience.</h3>
-          <p>Obserra is built for organizations that need more than a narrow assessment. The operating model combines senior leadership, evidence-based recommendations, secure technology, and implementation discipline so advice can survive scrutiny and produce measurable outcomes.</p>
+          <p>{LEGAL_ENTITY_NAME} is built for organizations that need more than a narrow assessment. The operating model combines senior leadership, evidence-based recommendations, secure technology, and implementation discipline so advice can survive scrutiny and produce measurable outcomes.</p>
           <div className="mission-hero__actions"><ButtonLink href="/about">Review executive credentials</ButtonLink><ButtonLink href="/trust" variant="secondary">Visit the Trust Center</ButtonLink></div>
         </article>
         <article>
@@ -133,13 +134,13 @@ export default function HomePage() {
 
       <section className="mission-final">
         <p className="obs-eyebrow">START WITH THE DECISION IN FRONT OF YOU</p>
-        <h2>Bring Obserra into the mission before risk becomes consequence.</h2>
+        <h2>Bring {LEGAL_ENTITY_NAME} into the mission before risk becomes consequence.</h2>
         <p>Engage for executive advisory, protective intelligence, EIOS, secure applications, or professional training through one confidential enterprise conversation.</p>
-        <div className="mission-hero__actions"><ButtonLink href="/contact?interest=enterprise-consultation">Talk with Obserra</ButtonLink><ButtonLink href="/apps" variant="secondary">Explore applications</ButtonLink></div>
+        <div className="mission-hero__actions"><ButtonLink href="/contact?interest=enterprise-consultation">Talk with {LEGAL_ENTITY_NAME}</ButtonLink><ButtonLink href="/apps" variant="secondary">Explore applications</ButtonLink></div>
       </section>
 
       <footer className="mission-footer">
-        <Link href="/" aria-label="Obserra home"><Image src="/brand/obserra-logo.png" width={190} height={37} alt="Obserra Executive Protection and Intelligence LLC" /></Link>
+        <Link href="/" aria-label={`${LEGAL_ENTITY_NAME} home`}><Image src="/brand/obserra-logo.png" width={190} height={37} alt={LEGAL_ENTITY_NAME} /></Link>
         <nav aria-label="Footer links"><Link href="/about">Company</Link><Link href="/speaking">Speaking</Link><Link href="/trust">Trust Center</Link><Link href="/academy">Academy</Link><Link href="/contact">Contact</Link></nav>
       </footer>
     </main>

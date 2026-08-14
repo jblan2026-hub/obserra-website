@@ -1,0 +1,1843 @@
+{
+  "schemaVersion": "2.0",
+  "catalogId": "cmmc-level2-nist-sp-800-171a-june-2018-objectives",
+  "sourceAuthorityId": "nist-sp-800-171a-june-2018",
+  "sourcePublication": "NIST SP 800-171A, Assessing Security Requirements for Controlled Unclassified Information, June 2018",
+  "sourceArtifactSha256": "21bf3acc43f4284f723639b82eb71e3ce597fa3610f7e9dcf5e8484e22bc0f71",
+  "sourceUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171A.pdf",
+  "incorporationByReference": "32 CFR 170.2(a)(10)",
+  "controlCount": 110,
+  "objectiveCount": 320,
+  "controls": [
+    {
+      "controlId": "3.1.1",
+      "objectives": [
+        {
+          "objectiveId": "3.1.1[a]",
+          "statement": "authorized users are identified."
+        },
+        {
+          "objectiveId": "3.1.1[b]",
+          "statement": "processes acting on behalf of authorized users are identified."
+        },
+        {
+          "objectiveId": "3.1.1[c]",
+          "statement": "devices (and other systems) authorized to connect to the system are identified."
+        },
+        {
+          "objectiveId": "3.1.1[d]",
+          "statement": "system access is limited to authorized users."
+        },
+        {
+          "objectiveId": "3.1.1[e]",
+          "statement": "system access is limited to processes acting on behalf of authorized users."
+        },
+        {
+          "objectiveId": "3.1.1[f]",
+          "statement": "system access is limited to authorized devices (including other systems)."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.2",
+      "objectives": [
+        {
+          "objectiveId": "3.1.2[a]",
+          "statement": "the types of transactions and functions that authorized users are permitted to execute are defined."
+        },
+        {
+          "objectiveId": "3.1.2[b]",
+          "statement": "system access is limited to the defined types of transactions and functions for authorized users."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.3",
+      "objectives": [
+        {
+          "objectiveId": "3.1.3[a]",
+          "statement": "information flow control policies are defined."
+        },
+        {
+          "objectiveId": "3.1.3[b]",
+          "statement": "methods and enforcement mechanisms for controlling the flow of CUI are defined."
+        },
+        {
+          "objectiveId": "3.1.3[c]",
+          "statement": "designated sources and destinations (e.g., networks, individuals, and devices) for CUI within the system and between interconnected systems are identified."
+        },
+        {
+          "objectiveId": "3.1.3[d]",
+          "statement": "authorizations for controlling the flow of CUI are defined."
+        },
+        {
+          "objectiveId": "3.1.3[e]",
+          "statement": "approved authorizations for controlling the flow of CUI are enforced."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.4",
+      "objectives": [
+        {
+          "objectiveId": "3.1.4[a]",
+          "statement": "the duties of individuals requiring separation are defined."
+        },
+        {
+          "objectiveId": "3.1.4[b]",
+          "statement": "responsibilities for duties that require separation are assigned to separate individuals."
+        },
+        {
+          "objectiveId": "3.1.4[c]",
+          "statement": "access privileges that enable individuals to exercise the duties that require separation are granted to separate individuals."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.5",
+      "objectives": [
+        {
+          "objectiveId": "3.1.5[a]",
+          "statement": "privileged accounts are identified."
+        },
+        {
+          "objectiveId": "3.1.5[b]",
+          "statement": "access to privileged accounts is authorized in accordance with the principle of least privilege."
+        },
+        {
+          "objectiveId": "3.1.5[c]",
+          "statement": "security functions are identified."
+        },
+        {
+          "objectiveId": "3.1.5[d]",
+          "statement": "access to security functions is authorized in accordance with the principle of least privilege."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.6",
+      "objectives": [
+        {
+          "objectiveId": "3.1.6[a]",
+          "statement": "nonsecurity functions are identified."
+        },
+        {
+          "objectiveId": "3.1.6[b]",
+          "statement": "users are required to use non-privileged accounts or roles when accessing nonsecurity functions."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.7",
+      "objectives": [
+        {
+          "objectiveId": "3.1.7[a]",
+          "statement": "privileged functions are defined."
+        },
+        {
+          "objectiveId": "3.1.7[b]",
+          "statement": "non-privileged users are defined."
+        },
+        {
+          "objectiveId": "3.1.7[c]",
+          "statement": "non-privileged users are prevented from executing privileged functions."
+        },
+        {
+          "objectiveId": "3.1.7[d]",
+          "statement": "the execution of privileged functions is captured in audit logs."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.8",
+      "objectives": [
+        {
+          "objectiveId": "3.1.8[a]",
+          "statement": "the means of limiting unsuccessful logon attempts is defined."
+        },
+        {
+          "objectiveId": "3.1.8[b]",
+          "statement": "the defined means of limiting unsuccessful logon attempts is implemented."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.9",
+      "objectives": [
+        {
+          "objectiveId": "3.1.9[a]",
+          "statement": "privacy and security notices required by CUI-specified rules are identified, consistent, and associated with the specific CUI category."
+        },
+        {
+          "objectiveId": "3.1.9[b]",
+          "statement": "privacy and security notices are displayed."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.10",
+      "objectives": [
+        {
+          "objectiveId": "3.1.10[a]",
+          "statement": "the period of inactivity after which the system initiates a session lock is defined."
+        },
+        {
+          "objectiveId": "3.1.10[b]",
+          "statement": "access to the system and viewing of data is prevented by initiating a session lock after the defined period of inactivity."
+        },
+        {
+          "objectiveId": "3.1.10[c]",
+          "statement": "previously visible information is concealed via a pattern-hiding display after the defined period of inactivity."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.11",
+      "objectives": [
+        {
+          "objectiveId": "3.1.11[a]",
+          "statement": "conditions requiring a user session to terminate are defined."
+        },
+        {
+          "objectiveId": "3.1.11[b]",
+          "statement": "a user session is automatically terminated after any of the defined conditions occur."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.12",
+      "objectives": [
+        {
+          "objectiveId": "3.1.12[a]",
+          "statement": "remote access sessions are permitted."
+        },
+        {
+          "objectiveId": "3.1.12[b]",
+          "statement": "the types of permitted remote access are identified."
+        },
+        {
+          "objectiveId": "3.1.12[c]",
+          "statement": "remote access sessions are controlled."
+        },
+        {
+          "objectiveId": "3.1.12[d]",
+          "statement": "remote access sessions are monitored."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.13",
+      "objectives": [
+        {
+          "objectiveId": "3.1.13[a]",
+          "statement": "sessions are identified. cryptographic mechanisms to protect the confidentiality of remote access"
+        },
+        {
+          "objectiveId": "3.1.13[b]",
+          "statement": "sessions are implemented."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.14",
+      "objectives": [
+        {
+          "objectiveId": "3.1.14[a]",
+          "statement": "managed access control points are identified and implemented."
+        },
+        {
+          "objectiveId": "3.1.14[b]",
+          "statement": "remote access is routed through managed network access control points."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.15",
+      "objectives": [
+        {
+          "objectiveId": "3.1.15[a]",
+          "statement": "privileged commands authorized for remote execution are identified."
+        },
+        {
+          "objectiveId": "3.1.15[b]",
+          "statement": "security-relevant information authorized to be accessed remotely is identified."
+        },
+        {
+          "objectiveId": "3.1.15[c]",
+          "statement": "the execution of the identified privileged commands via remote access is authorized."
+        },
+        {
+          "objectiveId": "3.1.15[d]",
+          "statement": "access to the identified security-relevant information via remote access is authorized."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.16",
+      "objectives": [
+        {
+          "objectiveId": "3.1.16[a]",
+          "statement": "wireless access points are identified."
+        },
+        {
+          "objectiveId": "3.1.16[b]",
+          "statement": "wireless access is authorized prior to allowing such connections."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.17",
+      "objectives": [
+        {
+          "objectiveId": "3.1.17[a]",
+          "statement": "wireless access to the system is protected using authentication."
+        },
+        {
+          "objectiveId": "3.1.17[b]",
+          "statement": "wireless access to the system is protected using encryption."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.18",
+      "objectives": [
+        {
+          "objectiveId": "3.1.18[a]",
+          "statement": "mobile devices that process, store, or transmit CUI are identified."
+        },
+        {
+          "objectiveId": "3.1.18[b]",
+          "statement": "mobile device connections are authorized."
+        },
+        {
+          "objectiveId": "3.1.18[c]",
+          "statement": "mobile device connections are monitored and logged."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.19",
+      "objectives": [
+        {
+          "objectiveId": "3.1.19[a]",
+          "statement": "mobile devices and mobile computing platforms that process, store, or transmit CUI are identified."
+        },
+        {
+          "objectiveId": "3.1.19[b]",
+          "statement": "encryption is employed to protect CUI on identified mobile devices and mobile computing platforms."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.20",
+      "objectives": [
+        {
+          "objectiveId": "3.1.20[a]",
+          "statement": "connections to external systems are identified."
+        },
+        {
+          "objectiveId": "3.1.20[b]",
+          "statement": "the use of external systems is identified."
+        },
+        {
+          "objectiveId": "3.1.20[c]",
+          "statement": "connections to external systems are verified."
+        },
+        {
+          "objectiveId": "3.1.20[d]",
+          "statement": "the use of external systems is verified."
+        },
+        {
+          "objectiveId": "3.1.20[e]",
+          "statement": "connections to external systems are controlled/limited."
+        },
+        {
+          "objectiveId": "3.1.20[f]",
+          "statement": "the use of external systems is controlled/limited."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.21",
+      "objectives": [
+        {
+          "objectiveId": "3.1.21[a]",
+          "statement": "the use of portable storage devices containing CUI on external systems is identified and documented."
+        },
+        {
+          "objectiveId": "3.1.21[b]",
+          "statement": "limits on the use of portable storage devices containing CUI on external systems are defined."
+        },
+        {
+          "objectiveId": "3.1.21[c]",
+          "statement": "the use of portable storage devices containing CUI on external systems is limited as defined."
+        }
+      ]
+    },
+    {
+      "controlId": "3.1.22",
+      "objectives": [
+        {
+          "objectiveId": "3.1.22[a]",
+          "statement": "individuals authorized to post or process information on publicly accessible systems are identified."
+        },
+        {
+          "objectiveId": "3.1.22[b]",
+          "statement": "procedures to ensure CUI is not posted or processed on publicly accessible systems are identified."
+        },
+        {
+          "objectiveId": "3.1.22[c]",
+          "statement": "a review process is in place prior to posting of any content to publicly accessible systems."
+        },
+        {
+          "objectiveId": "3.1.22[d]",
+          "statement": "content on publicly accessible systems is reviewed to ensure that it does not include CUI."
+        },
+        {
+          "objectiveId": "3.1.22[e]",
+          "statement": "mechanisms are in place to remove and address improper posting of CUI."
+        }
+      ]
+    },
+    {
+      "controlId": "3.2.1",
+      "objectives": [
+        {
+          "objectiveId": "3.2.1[a]",
+          "statement": "security risks associated with organizational activities involving CUI are identified."
+        },
+        {
+          "objectiveId": "3.2.1[b]",
+          "statement": "policies, standards, and procedures related to the security of the system are identified."
+        },
+        {
+          "objectiveId": "3.2.1[c]",
+          "statement": "managers, systems administrators, and users of the system are made aware of the security risks associated with their activities."
+        },
+        {
+          "objectiveId": "3.2.1[d]",
+          "statement": "managers, systems administrators, and users of the system are made aware of the applicable policies, standards, and procedures related to the security of the system."
+        }
+      ]
+    },
+    {
+      "controlId": "3.2.2",
+      "objectives": [
+        {
+          "objectiveId": "3.2.2[a]",
+          "statement": "information security-related duties, roles, and responsibilities are defined."
+        },
+        {
+          "objectiveId": "3.2.2[b]",
+          "statement": "information security-related duties, roles, and responsibilities are assigned to designated personnel."
+        },
+        {
+          "objectiveId": "3.2.2[c]",
+          "statement": "personnel are adequately trained to carry out their assigned information security-related duties, roles, and responsibilities."
+        }
+      ]
+    },
+    {
+      "controlId": "3.2.3",
+      "objectives": [
+        {
+          "objectiveId": "3.2.3[a]",
+          "statement": "potential indicators associated with insider threats are identified."
+        },
+        {
+          "objectiveId": "3.2.3[b]",
+          "statement": "security awareness training on recognizing and reporting potential indicators of insider threat is provided to managers and employees."
+        }
+      ]
+    },
+    {
+      "controlId": "3.3.1",
+      "objectives": [
+        {
+          "objectiveId": "3.3.1[a]",
+          "statement": "audit logs needed (i.e., event types to be logged) to enable the monitoring, analysis, investigation, and reporting of unlawful or unauthorized system activity are specified."
+        },
+        {
+          "objectiveId": "3.3.1[b]",
+          "statement": "the content of audit records needed to support monitoring, analysis, investigation, and reporting of unlawful or unauthorized system activity is defined."
+        },
+        {
+          "objectiveId": "3.3.1[c]",
+          "statement": "audit records are created (generated)."
+        },
+        {
+          "objectiveId": "3.3.1[d]",
+          "statement": "audit records, once created, contain the defined content."
+        },
+        {
+          "objectiveId": "3.3.1[e]",
+          "statement": "retention requirements for audit records are defined."
+        },
+        {
+          "objectiveId": "3.3.1[f]",
+          "statement": "audit records are retained as defined."
+        }
+      ]
+    },
+    {
+      "controlId": "3.3.2",
+      "objectives": [
+        {
+          "objectiveId": "3.3.2[a]",
+          "statement": "the content of the audit records needed to support the ability to uniquely trace users to their actions is defined."
+        },
+        {
+          "objectiveId": "3.3.2[b]",
+          "statement": "audit records, once created, contain the defined content."
+        }
+      ]
+    },
+    {
+      "controlId": "3.3.3",
+      "objectives": [
+        {
+          "objectiveId": "3.3.3[a]",
+          "statement": "a process for determining when to review logged events is defined."
+        },
+        {
+          "objectiveId": "3.3.3[b]",
+          "statement": "event types being logged are reviewed in accordance with the defined review process."
+        },
+        {
+          "objectiveId": "3.3.3[c]",
+          "statement": "event types being logged are updated based on the review."
+        }
+      ]
+    },
+    {
+      "controlId": "3.3.4",
+      "objectives": [
+        {
+          "objectiveId": "3.3.4[a]",
+          "statement": "personnel or roles to be alerted in the event of an audit logging process failure are identified."
+        },
+        {
+          "objectiveId": "3.3.4[b]",
+          "statement": "types of audit logging process failures for which alert will be generated are defined."
+        },
+        {
+          "objectiveId": "3.3.4[c]",
+          "statement": "identified personnel or roles are alerted in the event of an audit logging process failure."
+        }
+      ]
+    },
+    {
+      "controlId": "3.3.5",
+      "objectives": [
+        {
+          "objectiveId": "3.3.5[a]",
+          "statement": "audit record review, analysis, and reporting processes for investigation and response to indications of unlawful, unauthorized, suspicious, or unusual activity are defined."
+        },
+        {
+          "objectiveId": "3.3.5[b]",
+          "statement": "defined audit record review, analysis, and reporting processes are correlated."
+        }
+      ]
+    },
+    {
+      "controlId": "3.3.6",
+      "objectives": [
+        {
+          "objectiveId": "3.3.6[a]",
+          "statement": "an audit record reduction capability that supports on-demand analysis is provided."
+        },
+        {
+          "objectiveId": "3.3.6[b]",
+          "statement": "a report generation capability that supports on-demand reporting is provided."
+        }
+      ]
+    },
+    {
+      "controlId": "3.3.7",
+      "objectives": [
+        {
+          "objectiveId": "3.3.7[a]",
+          "statement": "internal system clocks are used to generate time stamps for audit records."
+        },
+        {
+          "objectiveId": "3.3.7[b]",
+          "statement": "an authoritative source with which to compare and synchronize internal system clocks is specified."
+        },
+        {
+          "objectiveId": "3.3.7[c]",
+          "statement": "internal system clocks used to generate time stamps for audit records are compared to and synchronized with the specified authoritative time source."
+        }
+      ]
+    },
+    {
+      "controlId": "3.3.8",
+      "objectives": [
+        {
+          "objectiveId": "3.3.8[a]",
+          "statement": "audit information is protected from unauthorized access."
+        },
+        {
+          "objectiveId": "3.3.8[b]",
+          "statement": "audit information is protected from unauthorized modification."
+        },
+        {
+          "objectiveId": "3.3.8[c]",
+          "statement": "audit information is protected from unauthorized deletion."
+        },
+        {
+          "objectiveId": "3.3.8[d]",
+          "statement": "audit logging tools are protected from unauthorized access."
+        },
+        {
+          "objectiveId": "3.3.8[e]",
+          "statement": "audit logging tools are protected from unauthorized modification."
+        },
+        {
+          "objectiveId": "3.3.8[f]",
+          "statement": "audit logging tools are protected from unauthorized deletion."
+        }
+      ]
+    },
+    {
+      "controlId": "3.3.9",
+      "objectives": [
+        {
+          "objectiveId": "3.3.9[a]",
+          "statement": "a subset of privileged users granted access to manage audit logging functionality is defined."
+        },
+        {
+          "objectiveId": "3.3.9[b]",
+          "statement": "management of audit logging functionality is limited to the defined subset of privileged users."
+        }
+      ]
+    },
+    {
+      "controlId": "3.4.1",
+      "objectives": [
+        {
+          "objectiveId": "3.4.1[a]",
+          "statement": "a baseline configuration is established."
+        },
+        {
+          "objectiveId": "3.4.1[b]",
+          "statement": "the baseline configuration includes hardware, software, firmware, and documentation."
+        },
+        {
+          "objectiveId": "3.4.1[c]",
+          "statement": "the baseline configuration is maintained (reviewed and updated) throughout the system development life cycle."
+        },
+        {
+          "objectiveId": "3.4.1[d]",
+          "statement": "a system inventory is established."
+        },
+        {
+          "objectiveId": "3.4.1[e]",
+          "statement": "the system inventory includes hardware, software, firmware, and documentation."
+        },
+        {
+          "objectiveId": "3.4.1[f]",
+          "statement": "the inventory is maintained (reviewed and updated) throughout the system development life cycle."
+        }
+      ]
+    },
+    {
+      "controlId": "3.4.2",
+      "objectives": [
+        {
+          "objectiveId": "3.4.2[a]",
+          "statement": "security configuration settings for information technology products employed in the system are established and included in the baseline configuration."
+        },
+        {
+          "objectiveId": "3.4.2[b]",
+          "statement": "security configuration settings for information technology products employed in the system are enforced."
+        }
+      ]
+    },
+    {
+      "controlId": "3.4.3",
+      "objectives": [
+        {
+          "objectiveId": "3.4.3[a]",
+          "statement": "changes to the system are tracked."
+        },
+        {
+          "objectiveId": "3.4.3[b]",
+          "statement": "changes to the system are reviewed."
+        },
+        {
+          "objectiveId": "3.4.3[c]",
+          "statement": "changes to the system are approved or disapproved."
+        },
+        {
+          "objectiveId": "3.4.3[d]",
+          "statement": "changes to the system are logged."
+        }
+      ]
+    },
+    {
+      "controlId": "3.4.4",
+      "objectives": [
+        {
+          "objectiveId": "3.4.4",
+          "statement": "the security impact of changes to the system is analyzed prior to implementation."
+        }
+      ]
+    },
+    {
+      "controlId": "3.4.5",
+      "objectives": [
+        {
+          "objectiveId": "3.4.5[a]",
+          "statement": "physical access restrictions associated with changes to the system are defined."
+        },
+        {
+          "objectiveId": "3.4.5[b]",
+          "statement": "physical access restrictions associated with changes to the system are documented."
+        },
+        {
+          "objectiveId": "3.4.5[c]",
+          "statement": "physical access restrictions associated with changes to the system are approved."
+        },
+        {
+          "objectiveId": "3.4.5[d]",
+          "statement": "physical access restrictions associated with changes to the system are enforced."
+        },
+        {
+          "objectiveId": "3.4.5[e]",
+          "statement": "logical access restrictions associated with changes to the system are defined."
+        },
+        {
+          "objectiveId": "3.4.5[f]",
+          "statement": "logical access restrictions associated with changes to the system are documented."
+        },
+        {
+          "objectiveId": "3.4.5[g]",
+          "statement": "logical access restrictions associated with changes to the system are approved."
+        },
+        {
+          "objectiveId": "3.4.5[h]",
+          "statement": "logical access restrictions associated with changes to the system are enforced."
+        }
+      ]
+    },
+    {
+      "controlId": "3.4.6",
+      "objectives": [
+        {
+          "objectiveId": "3.4.6[a]",
+          "statement": "essential system capabilities are defined based on the principle of least functionality."
+        },
+        {
+          "objectiveId": "3.4.6[b]",
+          "statement": "the system is configured to provide only the defined essential capabilities."
+        }
+      ]
+    },
+    {
+      "controlId": "3.4.7",
+      "objectives": [
+        {
+          "objectiveId": "3.4.7[a]",
+          "statement": "essential programs are defined."
+        },
+        {
+          "objectiveId": "3.4.7[b]",
+          "statement": "the use of nonessential programs is defined."
+        },
+        {
+          "objectiveId": "3.4.7[c]",
+          "statement": "the use of nonessential programs is restricted, disabled, or prevented as defined."
+        },
+        {
+          "objectiveId": "3.4.7[d]",
+          "statement": "essential functions are defined."
+        },
+        {
+          "objectiveId": "3.4.7[e]",
+          "statement": "the use of nonessential functions is defined."
+        },
+        {
+          "objectiveId": "3.4.7[f]",
+          "statement": "the use of nonessential functions is restricted, disabled, or prevented as defined."
+        },
+        {
+          "objectiveId": "3.4.7[g]",
+          "statement": "essential ports are defined."
+        },
+        {
+          "objectiveId": "3.4.7[h]",
+          "statement": "the use of nonessential ports is defined."
+        },
+        {
+          "objectiveId": "3.4.7[i]",
+          "statement": "the use of nonessential ports is restricted, disabled, or prevented as defined."
+        },
+        {
+          "objectiveId": "3.4.7[j]",
+          "statement": "essential protocols are defined."
+        },
+        {
+          "objectiveId": "3.4.7[k]",
+          "statement": "the use of nonessential protocols is defined."
+        },
+        {
+          "objectiveId": "3.4.7[l]",
+          "statement": "the use of nonessential protocols is restricted, disabled, or prevented as defined."
+        },
+        {
+          "objectiveId": "3.4.7[m]",
+          "statement": "essential services are defined."
+        },
+        {
+          "objectiveId": "3.4.7[n]",
+          "statement": "the use of nonessential services is defined."
+        },
+        {
+          "objectiveId": "3.4.7[o]",
+          "statement": "the use of nonessential services is restricted, disabled, or prevented as defined."
+        }
+      ]
+    },
+    {
+      "controlId": "3.4.8",
+      "objectives": [
+        {
+          "objectiveId": "3.4.8[a]",
+          "statement": "a policy specifying whether whitelisting or blacklisting is to be implemented is specified."
+        },
+        {
+          "objectiveId": "3.4.8[b]",
+          "statement": "the software allowed to execute under whitelisting or denied use under blacklisting is specified."
+        },
+        {
+          "objectiveId": "3.4.8[c]",
+          "statement": "whitelisting to allow the execution of authorized software or blacklisting to prevent the use of unauthorized software is implemented as specified."
+        }
+      ]
+    },
+    {
+      "controlId": "3.4.9",
+      "objectives": [
+        {
+          "objectiveId": "3.4.9[a]",
+          "statement": "a policy for controlling the installation of software by users is established."
+        },
+        {
+          "objectiveId": "3.4.9[b]",
+          "statement": "installation of software by users is controlled based on the established policy."
+        },
+        {
+          "objectiveId": "3.4.9[c]",
+          "statement": "installation of software by users is monitored."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.1",
+      "objectives": [
+        {
+          "objectiveId": "3.5.1[a]",
+          "statement": "system users are identified."
+        },
+        {
+          "objectiveId": "3.5.1[b]",
+          "statement": "processes acting on behalf of users are identified."
+        },
+        {
+          "objectiveId": "3.5.1[c]",
+          "statement": "devices accessing the system are identified."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.2",
+      "objectives": [
+        {
+          "objectiveId": "3.5.2[a]",
+          "statement": "the identity of each user is authenticated or verified as a prerequisite to system access."
+        },
+        {
+          "objectiveId": "3.5.2[b]",
+          "statement": "the identity of each process acting on behalf of a user is authenticated or verified as a prerequisite to system access."
+        },
+        {
+          "objectiveId": "3.5.2[c]",
+          "statement": "the identity of each device accessing or connecting to the system is authenticated or verified as a prerequisite to system access."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.3",
+      "objectives": [
+        {
+          "objectiveId": "3.5.3[a]",
+          "statement": "privileged accounts are identified."
+        },
+        {
+          "objectiveId": "3.5.3[b]",
+          "statement": "multifactor authentication is implemented for local access to privileged accounts."
+        },
+        {
+          "objectiveId": "3.5.3[c]",
+          "statement": "multifactor authentication is implemented for network access to privileged accounts."
+        },
+        {
+          "objectiveId": "3.5.3[d]",
+          "statement": "multifactor authentication is implemented for network access to non-privileged accounts."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.4",
+      "objectives": [
+        {
+          "objectiveId": "3.5.4",
+          "statement": "replay-resistant authentication mechanisms are implemented for network account access to privileged and non-privileged accounts."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.5",
+      "objectives": [
+        {
+          "objectiveId": "3.5.5[a]",
+          "statement": "a period within which identifiers cannot be reused is defined."
+        },
+        {
+          "objectiveId": "3.5.5[b]",
+          "statement": "reuse of identifiers is prevented within the defined period."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.6",
+      "objectives": [
+        {
+          "objectiveId": "3.5.6[a]",
+          "statement": "a period of inactivity after which an identifier is disabled is defined."
+        },
+        {
+          "objectiveId": "3.5.6[b]",
+          "statement": "identifiers are disabled after the defined period of inactivity."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.7",
+      "objectives": [
+        {
+          "objectiveId": "3.5.7[a]",
+          "statement": "password complexity requirements are defined."
+        },
+        {
+          "objectiveId": "3.5.7[b]",
+          "statement": "password change of character requirements are defined."
+        },
+        {
+          "objectiveId": "3.5.7[c]",
+          "statement": "minimum password complexity requirements as defined are enforced when new passwords are created."
+        },
+        {
+          "objectiveId": "3.5.7[d]",
+          "statement": "minimum password change of character requirements as defined are enforced when new passwords are created."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.8",
+      "objectives": [
+        {
+          "objectiveId": "3.5.8[a]",
+          "statement": "the number of generations during which a password cannot be reused is specified."
+        },
+        {
+          "objectiveId": "3.5.8[b]",
+          "statement": "reuse of passwords is prohibited during the specified number of generations."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.9",
+      "objectives": [
+        {
+          "objectiveId": "3.5.9",
+          "statement": "an immediate change to a permanent password is required when a temporary password is used for system logon."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.10",
+      "objectives": [
+        {
+          "objectiveId": "3.5.10[a]",
+          "statement": "passwords are cryptographically protected in storage."
+        },
+        {
+          "objectiveId": "3.5.10[b]",
+          "statement": "passwords are cryptographically protected in transit."
+        }
+      ]
+    },
+    {
+      "controlId": "3.5.11",
+      "objectives": [
+        {
+          "objectiveId": "3.5.11",
+          "statement": "authentication information is obscured during the authentication process."
+        }
+      ]
+    },
+    {
+      "controlId": "3.6.1",
+      "objectives": [
+        {
+          "objectiveId": "3.6.1[a]",
+          "statement": "an operational incident-handling capability is established."
+        },
+        {
+          "objectiveId": "3.6.1[b]",
+          "statement": "the operational incident-handling capability includes preparation."
+        },
+        {
+          "objectiveId": "3.6.1[c]",
+          "statement": "the operational incident-handling capability includes detection."
+        },
+        {
+          "objectiveId": "3.6.1[d]",
+          "statement": "the operational incident-handling capability includes analysis."
+        },
+        {
+          "objectiveId": "3.6.1[e]",
+          "statement": "the operational incident-handling capability includes containment."
+        },
+        {
+          "objectiveId": "3.6.1[f]",
+          "statement": "the operational incident-handling capability includes recovery."
+        },
+        {
+          "objectiveId": "3.6.1[g]",
+          "statement": "the operational incident-handling capability includes user response activities."
+        }
+      ]
+    },
+    {
+      "controlId": "3.6.2",
+      "objectives": [
+        {
+          "objectiveId": "3.6.2[a]",
+          "statement": "incidents are tracked."
+        },
+        {
+          "objectiveId": "3.6.2[b]",
+          "statement": "incidents are documented."
+        },
+        {
+          "objectiveId": "3.6.2[c]",
+          "statement": "authorities to whom incidents are to be reported are identified."
+        },
+        {
+          "objectiveId": "3.6.2[d]",
+          "statement": "organizational officials to whom incidents are to be reported are identified."
+        },
+        {
+          "objectiveId": "3.6.2[e]",
+          "statement": "identified authorities are notified of incidents."
+        },
+        {
+          "objectiveId": "3.6.2[f]",
+          "statement": "identified organizational officials are notified of incidents."
+        }
+      ]
+    },
+    {
+      "controlId": "3.6.3",
+      "objectives": [
+        {
+          "objectiveId": "3.6.3",
+          "statement": "the incident response capability is tested."
+        }
+      ]
+    },
+    {
+      "controlId": "3.7.1",
+      "objectives": [
+        {
+          "objectiveId": "3.7.1",
+          "statement": "system maintenance is performed."
+        }
+      ]
+    },
+    {
+      "controlId": "3.7.2",
+      "objectives": [
+        {
+          "objectiveId": "3.7.2[a]",
+          "statement": "tools used to conduct system maintenance are controlled."
+        },
+        {
+          "objectiveId": "3.7.2[b]",
+          "statement": "techniques used to conduct system maintenance are controlled."
+        },
+        {
+          "objectiveId": "3.7.2[c]",
+          "statement": "mechanisms used to conduct system maintenance are controlled."
+        },
+        {
+          "objectiveId": "3.7.2[d]",
+          "statement": "personnel used to conduct system maintenance are controlled."
+        }
+      ]
+    },
+    {
+      "controlId": "3.7.3",
+      "objectives": [
+        {
+          "objectiveId": "3.7.3",
+          "statement": "equipment to be removed from organizational spaces for off-site maintenance is sanitized of any CUI."
+        }
+      ]
+    },
+    {
+      "controlId": "3.7.4",
+      "objectives": [
+        {
+          "objectiveId": "3.7.4",
+          "statement": "media containing diagnostic and test programs are checked for malicious code before being used in organizational systems that process, store, or transmit CUI."
+        }
+      ]
+    },
+    {
+      "controlId": "3.7.5",
+      "objectives": [
+        {
+          "objectiveId": "3.7.5[a]",
+          "statement": "multifactor authentication is used to establish nonlocal maintenance sessions via external network connections."
+        },
+        {
+          "objectiveId": "3.7.5[b]",
+          "statement": "nonlocal maintenance sessions established via external network connections are terminated when nonlocal maintenance is complete."
+        }
+      ]
+    },
+    {
+      "controlId": "3.7.6",
+      "objectives": [
+        {
+          "objectiveId": "3.7.6",
+          "statement": "maintenance personnel without required access authorization are supervised during maintenance activities."
+        }
+      ]
+    },
+    {
+      "controlId": "3.8.1",
+      "objectives": [
+        {
+          "objectiveId": "3.8.1[a]",
+          "statement": "paper media containing CUI is physically controlled."
+        },
+        {
+          "objectiveId": "3.8.1[b]",
+          "statement": "digital media containing CUI is physically controlled."
+        },
+        {
+          "objectiveId": "3.8.1[c]",
+          "statement": "paper media containing CUI is securely stored."
+        },
+        {
+          "objectiveId": "3.8.1[d]",
+          "statement": "digital media containing CUI is securely stored."
+        }
+      ]
+    },
+    {
+      "controlId": "3.8.2",
+      "objectives": [
+        {
+          "objectiveId": "3.8.2",
+          "statement": "access to CUI on system media is limited to authorized users."
+        }
+      ]
+    },
+    {
+      "controlId": "3.8.3",
+      "objectives": [
+        {
+          "objectiveId": "3.8.3[a]",
+          "statement": "system media containing CUI is sanitized or destroyed before disposal."
+        },
+        {
+          "objectiveId": "3.8.3[b]",
+          "statement": "system media containing CUI is sanitized before it is released for reuse."
+        }
+      ]
+    },
+    {
+      "controlId": "3.8.4",
+      "objectives": [
+        {
+          "objectiveId": "3.8.4[a]",
+          "statement": "media containing CUI is marked with applicable CUI markings."
+        },
+        {
+          "objectiveId": "3.8.4[b]",
+          "statement": "media containing CUI is marked with distribution limitations."
+        }
+      ]
+    },
+    {
+      "controlId": "3.8.5",
+      "objectives": [
+        {
+          "objectiveId": "3.8.5[a]",
+          "statement": "access to media containing CUI is controlled."
+        },
+        {
+          "objectiveId": "3.8.5[b]",
+          "statement": "accountability for media containing CUI is maintained during transport outside of controlled areas."
+        }
+      ]
+    },
+    {
+      "controlId": "3.8.6",
+      "objectives": [
+        {
+          "objectiveId": "3.8.6",
+          "statement": "the confidentiality of CUI stored on digital media is protected during transport using cryptographic mechanisms or alternative physical safeguards."
+        }
+      ]
+    },
+    {
+      "controlId": "3.8.7",
+      "objectives": [
+        {
+          "objectiveId": "3.8.7",
+          "statement": "the use of removable media on system components is controlled."
+        }
+      ]
+    },
+    {
+      "controlId": "3.8.8",
+      "objectives": [
+        {
+          "objectiveId": "3.8.8",
+          "statement": "the use of portable storage devices is prohibited when such devices have no identifiable owner."
+        }
+      ]
+    },
+    {
+      "controlId": "3.8.9",
+      "objectives": [
+        {
+          "objectiveId": "3.8.9",
+          "statement": "the confidentiality of backup CUI is protected at storage locations."
+        }
+      ]
+    },
+    {
+      "controlId": "3.9.1",
+      "objectives": [
+        {
+          "objectiveId": "3.9.1",
+          "statement": "individuals are screened prior to authorizing access to organizational systems containing CUI."
+        }
+      ]
+    },
+    {
+      "controlId": "3.9.2",
+      "objectives": [
+        {
+          "objectiveId": "3.9.2[a]",
+          "statement": "a policy and/or process for terminating system access and any credentials coincident with personnel actions is established."
+        },
+        {
+          "objectiveId": "3.9.2[b]",
+          "statement": "system access and credentials are terminated consistent with personnel actions such as termination or transfer."
+        },
+        {
+          "objectiveId": "3.9.2[c]",
+          "statement": "the system is protected during and after personnel transfer actions."
+        }
+      ]
+    },
+    {
+      "controlId": "3.10.1",
+      "objectives": [
+        {
+          "objectiveId": "3.10.1[a]",
+          "statement": "authorized individuals allowed physical access are identified."
+        },
+        {
+          "objectiveId": "3.10.1[b]",
+          "statement": "physical access to organizational systems is limited to authorized individuals."
+        },
+        {
+          "objectiveId": "3.10.1[c]",
+          "statement": "physical access to equipment is limited to authorized individuals."
+        },
+        {
+          "objectiveId": "3.10.1[d]",
+          "statement": "physical access to operating environments is limited to authorized individuals."
+        }
+      ]
+    },
+    {
+      "controlId": "3.10.2",
+      "objectives": [
+        {
+          "objectiveId": "3.10.2[a]",
+          "statement": "the physical facility where organizational systems reside is protected."
+        },
+        {
+          "objectiveId": "3.10.2[b]",
+          "statement": "the support infrastructure for organizational systems is protected."
+        },
+        {
+          "objectiveId": "3.10.2[c]",
+          "statement": "the physical facility where organizational systems reside is monitored."
+        },
+        {
+          "objectiveId": "3.10.2[d]",
+          "statement": "the support infrastructure for organizational systems is monitored."
+        }
+      ]
+    },
+    {
+      "controlId": "3.10.3",
+      "objectives": [
+        {
+          "objectiveId": "3.10.3[a]",
+          "statement": "visitors are escorted."
+        },
+        {
+          "objectiveId": "3.10.3[b]",
+          "statement": "visitor activity is monitored."
+        }
+      ]
+    },
+    {
+      "controlId": "3.10.4",
+      "objectives": [
+        {
+          "objectiveId": "3.10.4",
+          "statement": "audit logs of physical access are maintained."
+        }
+      ]
+    },
+    {
+      "controlId": "3.10.5",
+      "objectives": [
+        {
+          "objectiveId": "3.10.5[a]",
+          "statement": "physical access devices are identified."
+        },
+        {
+          "objectiveId": "3.10.5[b]",
+          "statement": "physical access devices are controlled."
+        },
+        {
+          "objectiveId": "3.10.5[c]",
+          "statement": "physical access devices are managed."
+        }
+      ]
+    },
+    {
+      "controlId": "3.10.6",
+      "objectives": [
+        {
+          "objectiveId": "3.10.6[a]",
+          "statement": "safeguarding measures for CUI are defined for alternate work sites."
+        },
+        {
+          "objectiveId": "3.10.6[b]",
+          "statement": "safeguarding measures for CUI are enforced for alternate work sites."
+        }
+      ]
+    },
+    {
+      "controlId": "3.11.1",
+      "objectives": [
+        {
+          "objectiveId": "3.11.1[a]",
+          "statement": "the frequency to assess risk to organizational operations, organizational assets, and individuals is defined."
+        },
+        {
+          "objectiveId": "3.11.1[b]",
+          "statement": "risk to organizational operations, organizational assets, and individuals resulting from the operation of an organizational system that processes, stores, or transmits CUI is assessed with the defined frequency."
+        }
+      ]
+    },
+    {
+      "controlId": "3.11.2",
+      "objectives": [
+        {
+          "objectiveId": "3.11.2[a]",
+          "statement": "the frequency to scan for vulnerabilities in organizational systems and applications is defined."
+        },
+        {
+          "objectiveId": "3.11.2[b]",
+          "statement": "vulnerability scans are performed on organizational systems with the defined frequency."
+        },
+        {
+          "objectiveId": "3.11.2[c]",
+          "statement": "vulnerability scans are performed on applications with the defined frequency."
+        },
+        {
+          "objectiveId": "3.11.2[d]",
+          "statement": "vulnerability scans are performed on organizational systems when new vulnerabilities are identified."
+        },
+        {
+          "objectiveId": "3.11.2[e]",
+          "statement": "vulnerability scans are performed on applications when new vulnerabilities are identified."
+        }
+      ]
+    },
+    {
+      "controlId": "3.11.3",
+      "objectives": [
+        {
+          "objectiveId": "3.11.3[a]",
+          "statement": "vulnerabilities are identified."
+        },
+        {
+          "objectiveId": "3.11.3[b]",
+          "statement": "vulnerabilities are remediated in accordance with risk assessments."
+        }
+      ]
+    },
+    {
+      "controlId": "3.12.1",
+      "objectives": [
+        {
+          "objectiveId": "3.12.1[a]",
+          "statement": "the frequency of security control assessments is defined."
+        },
+        {
+          "objectiveId": "3.12.1[b]",
+          "statement": "security controls are assessed with the defined frequency to determine if the controls are effective in their application."
+        }
+      ]
+    },
+    {
+      "controlId": "3.12.2",
+      "objectives": [
+        {
+          "objectiveId": "3.12.2[a]",
+          "statement": "deficiencies and vulnerabilities to be addressed by the plan of action are identified."
+        },
+        {
+          "objectiveId": "3.12.2[b]",
+          "statement": "a plan of action is developed to correct identified deficiencies and reduce or eliminate identified vulnerabilities."
+        },
+        {
+          "objectiveId": "3.12.2[c]",
+          "statement": "the plan of action is implemented to correct identified deficiencies and reduce or eliminate identified vulnerabilities."
+        }
+      ]
+    },
+    {
+      "controlId": "3.12.3",
+      "objectives": [
+        {
+          "objectiveId": "3.12.3",
+          "statement": "security controls are monitored on an ongoing basis to ensure the continued effectiveness of those controls."
+        }
+      ]
+    },
+    {
+      "controlId": "3.12.4",
+      "objectives": [
+        {
+          "objectiveId": "3.12.4[a]",
+          "statement": "a system security plan is developed."
+        },
+        {
+          "objectiveId": "3.12.4[b]",
+          "statement": "the system boundary is described and documented in the system security plan."
+        },
+        {
+          "objectiveId": "3.12.4[c]",
+          "statement": "the system environment of operation is described and documented in the system security plan."
+        },
+        {
+          "objectiveId": "3.12.4[d]",
+          "statement": "the security requirements identified and approved by the designated authority as non-applicable are identified."
+        },
+        {
+          "objectiveId": "3.12.4[e]",
+          "statement": "the method of security requirement implementation is described and documented in the system security plan."
+        },
+        {
+          "objectiveId": "3.12.4[f]",
+          "statement": "the relationship with or connection to other systems is described and documented in the system security plan."
+        },
+        {
+          "objectiveId": "3.12.4[g]",
+          "statement": "the frequency to update the system security plan is defined."
+        },
+        {
+          "objectiveId": "3.12.4[h]",
+          "statement": "system security plan is updated with the defined frequency."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.1",
+      "objectives": [
+        {
+          "objectiveId": "3.13.1[a]",
+          "statement": "the external system boundary is defined."
+        },
+        {
+          "objectiveId": "3.13.1[b]",
+          "statement": "key internal system boundaries are defined."
+        },
+        {
+          "objectiveId": "3.13.1[c]",
+          "statement": "communications are monitored at the external system boundary."
+        },
+        {
+          "objectiveId": "3.13.1[d]",
+          "statement": "communications are monitored at key internal boundaries."
+        },
+        {
+          "objectiveId": "3.13.1[e]",
+          "statement": "communications are controlled at the external system boundary."
+        },
+        {
+          "objectiveId": "3.13.1[f]",
+          "statement": "communications are controlled at key internal boundaries."
+        },
+        {
+          "objectiveId": "3.13.1[g]",
+          "statement": "communications are protected at the external system boundary."
+        },
+        {
+          "objectiveId": "3.13.1[h]",
+          "statement": "communications are protected at key internal boundaries."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.2",
+      "objectives": [
+        {
+          "objectiveId": "3.13.2[a]",
+          "statement": "architectural designs that promote effective information security are identified."
+        },
+        {
+          "objectiveId": "3.13.2[b]",
+          "statement": "software development techniques that promote effective information security are identified."
+        },
+        {
+          "objectiveId": "3.13.2[c]",
+          "statement": "systems engineering principles that promote effective information security are identified."
+        },
+        {
+          "objectiveId": "3.13.2[d]",
+          "statement": "identified architectural designs that promote effective information security are employed."
+        },
+        {
+          "objectiveId": "3.13.2[e]",
+          "statement": "identified software development techniques that promote effective information security are employed."
+        },
+        {
+          "objectiveId": "3.13.2[f]",
+          "statement": "identified systems engineering principles that promote effective information security are employed."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.3",
+      "objectives": [
+        {
+          "objectiveId": "3.13.3[a]",
+          "statement": "user functionality is identified."
+        },
+        {
+          "objectiveId": "3.13.3[b]",
+          "statement": "system management functionality is identified."
+        },
+        {
+          "objectiveId": "3.13.3[c]",
+          "statement": "user functionality is separated from system management functionality."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.4",
+      "objectives": [
+        {
+          "objectiveId": "3.13.4",
+          "statement": "unauthorized and unintended information transfer via shared system resources is prevented."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.5",
+      "objectives": [
+        {
+          "objectiveId": "3.13.5[a]",
+          "statement": "publicly accessible system components are identified."
+        },
+        {
+          "objectiveId": "3.13.5[b]",
+          "statement": "subnetworks for publicly accessible system components are physically or logically separated from internal networks."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.6",
+      "objectives": [
+        {
+          "objectiveId": "3.13.6[a]",
+          "statement": "network communications traffic is denied by default."
+        },
+        {
+          "objectiveId": "3.13.6[b]",
+          "statement": "network communications traffic is allowed by exception."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.7",
+      "objectives": [
+        {
+          "objectiveId": "3.13.7",
+          "statement": "remote devices are prevented from simultaneously establishing non-remote connections with the system and communicating via some other connection to resources in external networks (i.e., split tunneling)."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.8",
+      "objectives": [
+        {
+          "objectiveId": "3.13.8[a]",
+          "statement": "cryptographic mechanisms intended to prevent unauthorized disclosure of CUI are identified."
+        },
+        {
+          "objectiveId": "3.13.8[b]",
+          "statement": "alternative physical safeguards intended to prevent unauthorized disclosure of CUI are identified."
+        },
+        {
+          "objectiveId": "3.13.8[c]",
+          "statement": "either cryptographic mechanisms or alternative physical safeguards are implemented to prevent unauthorized disclosure of CUI during transmission."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.9",
+      "objectives": [
+        {
+          "objectiveId": "3.13.9[a]",
+          "statement": "a period of inactivity to terminate network connections associated with communications sessions is defined."
+        },
+        {
+          "objectiveId": "3.13.9[b]",
+          "statement": "network connections associated with communications sessions are terminated at the end of the sessions."
+        },
+        {
+          "objectiveId": "3.13.9[c]",
+          "statement": "network connections associated with communications sessions are terminated after the defined period of inactivity."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.10",
+      "objectives": [
+        {
+          "objectiveId": "3.13.10[a]",
+          "statement": "cryptographic keys are established whenever cryptography is employed."
+        },
+        {
+          "objectiveId": "3.13.10[b]",
+          "statement": "cryptographic keys are managed whenever cryptography is employed."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.11",
+      "objectives": [
+        {
+          "objectiveId": "3.13.11",
+          "statement": "FIPS-validated cryptography is employed to protect the confidentiality of CUI."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.12",
+      "objectives": [
+        {
+          "objectiveId": "3.13.12[a]",
+          "statement": "collaborative computing devices are identified."
+        },
+        {
+          "objectiveId": "3.13.12[b]",
+          "statement": "collaborative computing devices provide indication to users of devices in use."
+        },
+        {
+          "objectiveId": "3.13.12[c]",
+          "statement": "remote activation of collaborative computing devices is prohibited."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.13",
+      "objectives": [
+        {
+          "objectiveId": "3.13.13[a]",
+          "statement": "use of mobile code is controlled."
+        },
+        {
+          "objectiveId": "3.13.13[b]",
+          "statement": "use of mobile code is monitored."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.14",
+      "objectives": [
+        {
+          "objectiveId": "3.13.14[a]",
+          "statement": "use of Voice over Internet Protocol (VoIP) technologies is controlled."
+        },
+        {
+          "objectiveId": "3.13.14[b]",
+          "statement": "use of Voice over Internet Protocol (VoIP) technologies is monitored."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.15",
+      "objectives": [
+        {
+          "objectiveId": "3.13.15",
+          "statement": "the authenticity of communications sessions is protected."
+        }
+      ]
+    },
+    {
+      "controlId": "3.13.16",
+      "objectives": [
+        {
+          "objectiveId": "3.13.16",
+          "statement": "the confidentiality of CUI at rest is protected."
+        }
+      ]
+    },
+    {
+      "controlId": "3.14.1",
+      "objectives": [
+        {
+          "objectiveId": "3.14.1[a]",
+          "statement": "the time within which to identify system flaws is specified."
+        },
+        {
+          "objectiveId": "3.14.1[b]",
+          "statement": "system flaws are identified within the specified time frame."
+        },
+        {
+          "objectiveId": "3.14.1[c]",
+          "statement": "the time within which to report system flaws is specified."
+        },
+        {
+          "objectiveId": "3.14.1[d]",
+          "statement": "system flaws are reported within the specified time frame."
+        },
+        {
+          "objectiveId": "3.14.1[e]",
+          "statement": "the time within which to correct system flaws is specified."
+        },
+        {
+          "objectiveId": "3.14.1[f]",
+          "statement": "system flaws are corrected within the specified time frame."
+        }
+      ]
+    },
+    {
+      "controlId": "3.14.2",
+      "objectives": [
+        {
+          "objectiveId": "3.14.2[a]",
+          "statement": "designated locations for malicious code protection are identified."
+        },
+        {
+          "objectiveId": "3.14.2[b]",
+          "statement": "protection from malicious code at designated locations is provided."
+        }
+      ]
+    },
+    {
+      "controlId": "3.14.3",
+      "objectives": [
+        {
+          "objectiveId": "3.14.3[a]",
+          "statement": "response actions to system security alerts and advisories are identified."
+        },
+        {
+          "objectiveId": "3.14.3[b]",
+          "statement": "system security alerts and advisories are monitored."
+        },
+        {
+          "objectiveId": "3.14.3[c]",
+          "statement": "actions in response to system security alerts and advisories are taken."
+        }
+      ]
+    },
+    {
+      "controlId": "3.14.4",
+      "objectives": [
+        {
+          "objectiveId": "3.14.4",
+          "statement": "malicious code protection mechanisms are updated when new releases are available."
+        }
+      ]
+    },
+    {
+      "controlId": "3.14.5",
+      "objectives": [
+        {
+          "objectiveId": "3.14.5[a]",
+          "statement": "the frequency for malicious code scans is defined."
+        },
+        {
+          "objectiveId": "3.14.5[b]",
+          "statement": "malicious code scans are performed with the defined frequency."
+        },
+        {
+          "objectiveId": "3.14.5[c]",
+          "statement": "real-time malicious code scans of files from external sources as files are downloaded, opened, or executed are performed."
+        }
+      ]
+    },
+    {
+      "controlId": "3.14.6",
+      "objectives": [
+        {
+          "objectiveId": "3.14.6[a]",
+          "statement": "the system is monitored to detect attacks and indicators of potential attacks."
+        },
+        {
+          "objectiveId": "3.14.6[b]",
+          "statement": "inbound communications traffic is monitored to detect attacks and indicators of potential attacks."
+        },
+        {
+          "objectiveId": "3.14.6[c]",
+          "statement": "outbound communications traffic is monitored to detect attacks and indicators of potential attacks."
+        }
+      ]
+    },
+    {
+      "controlId": "3.14.7",
+      "objectives": [
+        {
+          "objectiveId": "3.14.7[a]",
+          "statement": "authorized use of the system is defined."
+        },
+        {
+          "objectiveId": "3.14.7[b]",
+          "statement": "unauthorized use of the system is identified."
+        }
+      ]
+    }
+  ]
+}
