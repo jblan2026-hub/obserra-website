@@ -124,3 +124,6 @@ jobs:
             --draft \
             --title "Sync approved Academy Studio catalog" \
             --body-file "$body_file"
+            - name: GitHub Copilot CLI
+
+              uses: austenstone/copilot-cli@v3.2
