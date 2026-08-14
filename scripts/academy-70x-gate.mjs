@@ -278,8 +278,8 @@ check("learner layout loads AI native styles", /ai-native-learning\.css/.test(le
 check("package exposes build command", typeof packageJson.scripts?.build === "string");
 check("package exposes lint command", typeof packageJson.scripts?.lint === "string");
 check("package exposes test command", typeof packageJson.scripts?.test === "string");
-check("package uses patched Next 16.2.11", packageJson.dependencies?.next === "16.2.11");
-check("package uses matching eslint config 16.2.11", packageJson.devDependencies?.["eslint-config-next"] === "16.2.11");
+check("package uses patched Next 16.3.1", packageJson.dependencies?.next === "16.3.1");
+check("package uses matching eslint config 16.3.1", packageJson.devDependencies?.["eslint-config-next"] === "16.3.1");
 check("package uses React 19", /^19\./.test(packageJson.dependencies?.react ?? ""));
 check("package uses Stripe SDK", Boolean(packageJson.dependencies?.stripe));
 check("package uses Clerk", Boolean(packageJson.dependencies?.["@clerk/nextjs"]));
