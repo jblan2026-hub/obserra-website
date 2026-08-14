@@ -29,6 +29,12 @@ const REGULATED_FEATURE_FLAGS = [
   "OBSERRA_FDACS_CLASS_D_LIVE_ENABLED",
   "OBSERRA_FDACS_CLASS_D_MEDIA_ENABLED",
   "OBSERRA_FDACS_CLASS_D_SCHEDULING_ENABLED",
+  "OBSERRA_FDACS_CLASS_D_MAKEUP_ENABLED",
+  "OBSERRA_FDACS_CLASS_D_RECORDED_MAKEUP_ENABLED",
+  "OBSERRA_FDACS_CLASS_D_EXAM_ENABLED",
+  "OBSERRA_FDACS_CLASS_D_EXAM_ADMIN_ENABLED",
+  "OBSERRA_FDACS_CLASS_D_COMPLETION_REVIEW_ENABLED",
+  "OBSERRA_FDACS_CLASS_D_LIAS_WORKFLOW_ENABLED",
   "OBSERRA_FDACS_CLASS_D_COMPLETION_DOCUMENTS_ENABLED",
   "OBSERRA_FDACS_CLASS_D_QUALITY_ENABLED",
 ] as const;
@@ -46,6 +52,10 @@ function present(name: string) {
 
 function enabled(name: string) {
   return value(name).toLowerCase() === "enabled";
+}
+
+function trueFlag(name: string) {
+  return value(name).toLowerCase() === "true";
 }
 
 function item(
@@ -133,13 +143,43 @@ function commonProtectedRuntimeItems(): FloridaClassDRuntimeReadinessItem[] {
 }
 
 function featureFlagItems(): FloridaClassDRuntimeReadinessItem[] {
-  return REGULATED_FEATURE_FLAGS.map((name) => item(
+  const namedItems = REGULATED_FEATURE_FLAGS.map((name) => item(
     `flag:${name}`,
     `${name} remains disabled during readiness review`,
     "feature_flag",
     !enabled(name),
     enabled(name) ? "ENABLED. This is a readiness blocker until controlled activation is authorized." : "Disabled/fail closed.",
   ));
+
+  return [
+    ...namedItems,
+    item(
+      "flag:FLORIDA_CLASS_D_PRE_ENROLLMENT_ENABLED",
+      "FLORIDA_CLASS_D_PRE_ENROLLMENT_ENABLED remains false during readiness review",
+      "feature_flag",
+      !trueFlag("FLORIDA_CLASS_D_PRE_ENROLLMENT_ENABLED"),
+      trueFlag("FLORIDA_CLASS_D_PRE_ENROLLMENT_ENABLED")
+        ? "TRUE. Pre-enrollment must remain fail closed until controlled activation is authorized."
+        : "False/fail closed.",
+    ),
+    item(
+      "flag:OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED",
+      "Gate 26 production activation authorization remains disabled during readiness review",
+      "feature_flag",
+      !enabled("OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED"),
+      enabled("OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED")
+        ? "ENABLED. Activation authorization must remain disabled until the final controlled release decision."
+        : "Disabled/fail closed.",
+    ),
+  ];
+}
+
+function enabledFeatureFlags() {
+  return [
+    ...REGULATED_FEATURE_FLAGS.filter((name) => enabled(name)),
+    ...(trueFlag("FLORIDA_CLASS_D_PRE_ENROLLMENT_ENABLED") ? ["FLORIDA_CLASS_D_PRE_ENROLLMENT_ENABLED"] : []),
+    ...(enabled("OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED") ? ["OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED"] : []),
+  ];
 }
 
 function buildReport(
@@ -151,7 +191,7 @@ function buildReport(
     ? blockingKeys.filter((key) => CLASS_DS_LICENSE_KEYS.has(key))
     : [];
   const nonLicenseBlockingKeys = blockingKeys.filter((key) => !CLASS_DS_LICENSE_KEYS.has(key));
-  const enabledFlags = REGULATED_FEATURE_FLAGS.filter((name) => enabled(name));
+  const enabledFlags = enabledFeatureFlags();
   const technicalReadinessComplete = nonLicenseBlockingKeys.length === 0;
   const readyExceptForClassDSLicense = profile === "production"
     && technicalReadinessComplete
@@ -169,7 +209,7 @@ function buildReport(
     blockingKeys,
     nonLicenseBlockingKeys,
     classDSLicenseBlockingKeys,
-    enabledRegulatedFeatureFlags: [...enabledFlags],
+    enabledRegulatedFeatureFlags: enabledFlags,
   };
 }
 
@@ -184,6 +224,8 @@ export const FLORIDA_CLASS_D_RUNTIME_READINESS_POLICY = {
   diLicenseNumberMustRemainPrivate: true,
   privateDocumentBucketRequired: true,
   regulatedFeatureFlagsMustRemainDisabledDuringReadinessReview: true,
+  allKnownRegulatedFeatureFlagsInventoried: true,
+  gate26AuthorizationMustRemainDisabledDuringReadinessReview: true,
   nonProductionEnvironmentMustBeExplicit: true,
   nonProductionAcceptanceAuthorizationMustBeExplicit: true,
   nonProductionSyntheticIdentityOnlyMustBeExplicit: true,
