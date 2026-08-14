@@ -17,6 +17,7 @@ const downloadRoute = source("app/api/apps/download/route.ts");
 const launchPolicy = source("lib/application-launch.ts");
 const nextConfig = source("next.config.ts");
 const environmentExample = source(".env.example");
+const vercelIgnore = source(".vercelignore");
 
 function crisisCommanderRecord() {
   const match = appsData.match(/\{\s*slug: "obserra-cyber-crisis-commander",[\s\S]*?\n\s*\},\n\s*\{/);
@@ -90,4 +91,12 @@ test("Cyber Crisis Commander production environment settings remain intentionall
   assert.match(environmentExample, /^APP_LAUNCH_OBSERRA_CYBER_CRISIS_COMMANDER=$/m);
   assert.match(environmentExample, /^STRIPE_PRICE_OBSERRA_CYBER_CRISIS_COMMANDER_PROFESSIONAL_MONTHLY=$/m);
   assert.match(environmentExample, /^STRIPE_PRICE_OBSERRA_CYBER_CRISIS_COMMANDER_ENTERPRISE_ANNUAL=$/m);
+});
+
+test("Vercel preserves the npm lockfile for reproducible dependency installation", () => {
+  const ignoredPaths = vercelIgnore
+    .split(/\r?\n/)
+    .map((entry) => entry.trim())
+    .filter((entry) => entry && !entry.startsWith("#"));
+  assert.ok(!ignoredPaths.includes("package-lock.json"), "package-lock.json must be present in the Vercel build context");
 });
