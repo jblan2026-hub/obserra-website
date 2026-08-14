@@ -12,6 +12,7 @@ on:
       - "lib/florida-class-d*.ts"
       - "lib/academy*.ts"
       - "proxy.ts"
+      - "next.config.ts"
       - "tsconfig.json"
       - "scripts/florida-class-d-*.mjs"
       - "supabase/functions/academy-public-catalog/**"
@@ -20,6 +21,7 @@ on:
       - "supabase/migrations/*academy*.sql"
       - "docs/florida-class-d-lms/**"
       - "package.json"
+      - "package-lock.json"
       - ".github/workflows/florida-class-d-lms-gates.yml"
   workflow_dispatch:
 
@@ -58,6 +60,9 @@ jobs:
 
       - name: Verify dependency lock remains immutable
         run: git diff --exit-code -- package-lock.json
+
+      - name: Audit production dependencies for high severity vulnerabilities
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Run Florida Class D gated source verification
         run: npm run verify:florida-class-d
