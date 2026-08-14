@@ -303,7 +303,7 @@ export async function publicAcademyCatalog(baseCourses: readonly Course[]) {
   } catch (error) {
     console.error("Academy public catalog control degraded", error);
     return {
-      courses: [...baseCourses],
+      courses: [],
       controls: Object.fromEntries(baseCourses.map((course) => [
         course.id,
         defaultAcademyCourseControl(course.id),
@@ -329,7 +329,7 @@ export async function publicAcademyCourse(baseCourse: Course) {
   } catch (error) {
     console.error(`Academy control degraded for ${baseCourse.id}`, error);
     return {
-      course: baseCourse,
+      course: null,
       control: defaultAcademyCourseControl(baseCourse.id),
       controlPlane: "degraded" as const,
       requestId: null,

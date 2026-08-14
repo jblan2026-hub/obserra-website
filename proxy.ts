@@ -1,5 +1,6 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
-import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { evaluateFloridaClassDMutationBoundary } from "./lib/florida-class-d-mutation-boundary";
 
 const CANONICAL_HOST = "www.obserrallc.com";
 const DEFAULT_OWNER_ORIGIN = "https://owner.obserrallc.com";
@@ -17,6 +18,8 @@ const PROTECTED_PATH_PREFIXES = [
   "/academy/learn",
   "/academy/certificate",
   "/command-center",
+  "/florida-security-training/admin",
+  "/api/florida-class-d/admin",
 ] as const;
 
 type ClerkEnvironment = "test" | "live";
@@ -125,6 +128,35 @@ function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest)
   return response;
 }
 
+function regulatedMutationBoundary(request: NextRequest) {
+  const url = new URL(request.url);
+  const decision = evaluateFloridaClassDMutationBoundary(url.pathname, request.method);
+  if (!decision.regulatedMutation || decision.authorized) return null;
+
+  return applyRouteSecurityHeaders(
+    NextResponse.json(
+      {
+        error: decision.policy === "synthetic_nonproduction_only"
+          ? "Gate 23 acceptance mutation is available only during explicitly authorized synthetic non-production execution."
+          : "Florida Class D regulated mutation execution is not authorized.",
+        code: decision.policy === "synthetic_nonproduction_only"
+          ? "FDACS_ACCEPTANCE_EXECUTION_NOT_AUTHORIZED"
+          : "FDACS_REGULATED_EXECUTION_NOT_AUTHORIZED",
+      },
+      {
+        status: 503,
+        headers: {
+          "cache-control": "private, no-store, max-age=0, must-revalidate",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY",
+          "referrer-policy": "no-referrer",
+        },
+      },
+    ),
+    request,
+  );
+}
+
 function redirectToOwnerSite(request: NextRequest) {
   if (process.env.VERCEL_ENV !== "production") return null;
   const source = new URL(request.url);
@@ -217,7 +249,7 @@ function identityConfigurationResponse(request: NextRequest) {
   return response;
 }
 
-export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+export default clerkMiddleware(async (auth, request) => {
   const ownerRoute = redirectToOwnerSite(request);
   if (ownerRoute) return ownerRoute;
 
@@ -227,28 +259,29 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
   const canonical = canonicalRedirect(request);
   if (canonical) return canonical;
 
+  const regulatedMutation = regulatedMutationBoundary(request);
+  if (regulatedMutation) return regulatedMutation;
+
   if (!authenticationReady()) {
     return identityConfigurationResponse(request);
   }
 
-  const handler = clerkMiddleware(async (auth, clerkRequest) => {
-    if (requiresAuthentication(clerkRequest)) {
-      const { userId } = await auth();
-      if (!userId) {
-        return pathMatchesPrefix(new URL(clerkRequest.url).pathname, "/command-center")
-          ? redirectToIdentityGateway(clerkRequest)
-          : redirectToSignIn(clerkRequest);
-      }
+  if (requiresAuthentication(request)) {
+    const { userId } = await auth();
+    if (!userId) {
+      return pathMatchesPrefix(new URL(request.url).pathname, "/command-center")
+        ? redirectToIdentityGateway(request)
+        : redirectToSignIn(request);
     }
-    return applyRouteSecurityHeaders(NextResponse.next(), clerkRequest);
-  });
+  }
 
-  return handler(request, event);
-}
+  return applyRouteSecurityHeaders(NextResponse.next(), request);
+});
 
 export const config = {
   matcher: [
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     "/(api|trpc)(.*)",
+    "/__clerk/(.*)",
   ],
 };

@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://obserrallc.com/schemas/cmmc-level-2-rev3-traceability.schema.json",
+  "title": "Obserra CMMC Level 2 NIST SP 800-171 Rev. 3 Traceability Register",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "snapshotDate",
+    "program",
+    "framework",
+    "traceability",
+    "scope",
+    "requirements",
+    "withdrawnRequirementIds",
+    "traceRecords",
+    "openAuditGaps"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "snapshotDate": { "type": "string", "format": "date" },
+    "program": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "owner", "repository", "branch", "sourceCheckpoint", "claimBoundary"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "repository": { "type": "string", "minLength": 1 },
+        "branch": { "type": "string", "minLength": 1 },
+        "sourceCheckpoint": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "claimBoundary": { "type": "string", "minLength": 1 }
+      }
+    },
+    "framework": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engineeringBaseline", "cmmcLevel2CurrentRuleBaseline", "officialSources"],
+      "properties": {
+        "engineeringBaseline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["publication", "assessmentPublication", "activeRequirementCount"],
+          "properties": {
+            "publication": { "const": "NIST SP 800-171 Rev. 3" },
+            "assessmentPublication": { "const": "NIST SP 800-171A Rev. 3" },
+            "activeRequirementCount": { "const": 97 }
+          }
+        },
+        "cmmcLevel2CurrentRuleBaseline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["publication", "requirementCount", "ruleState", "crosswalkPurpose"],
+          "properties": {
+            "publication": { "const": "NIST SP 800-171 Rev. 2" },
+            "requirementCount": { "const": 110 },
+            "ruleState": { "type": "string", "minLength": 1 },
+            "crosswalkPurpose": { "type": "string", "minLength": 1 }
+          }
+        },
+        "officialSources": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "traceability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["singleSourceOfTruth", "schema", "generator", "humanReadable", "digest", "ciCommand", "driftPolicy"],
+      "properties": {
+        "singleSourceOfTruth": { "type": "string", "minLength": 1 },
+        "schema": { "type": "string", "minLength": 1 },
+        "generator": { "type": "string", "minLength": 1 },
+        "humanReadable": { "type": "string", "minLength": 1 },
+        "digest": { "type": "string", "minLength": 1 },
+        "ciCommand": { "const": "npm run verify:cmmc-traceability" },
+        "driftPolicy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formalCuiAssessmentScopeEstablished", "sspComplete", "networkDiagramComplete", "assetInventoryComplete", "cuiProcessingAuthorized", "boundary", "excluded", "assets"],
+      "properties": {
+        "formalCuiAssessmentScopeEstablished": { "const": false },
+        "sspComplete": { "type": "boolean" },
+        "networkDiagramComplete": { "type": "boolean" },
+        "assetInventoryComplete": { "type": "boolean" },
+        "cuiProcessingAuthorized": { "const": false },
+        "boundary": { "type": "string", "minLength": 1 },
+        "excluded": { "type": "string", "minLength": 1 },
+        "assets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["asset", "provisionalCategory", "evidenceState"],
+            "properties": {
+              "asset": { "type": "string", "minLength": 1 },
+              "provisionalCategory": { "type": "string", "minLength": 1 },
+              "evidenceState": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "minProperties": 17,
+      "maxProperties": 17,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["family", "defaultStatus", "items"],
+        "properties": {
+          "family": { "type": "string", "minLength": 1 },
+          "defaultStatus": { "$ref": "#/$defs/status" },
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                { "type": "string", "pattern": "^03\\.[0-9]{2}\\.[0-9]{2}$" },
+                { "type": "string", "minLength": 1 }
+              ],
+              "items": false,
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        }
+      }
+    },
+    "withdrawnRequirementIds": {
+      "type": "array",
+      "minItems": 33,
+      "maxItems": 33,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^03\\.[0-9]{2}\\.[0-9]{2}$" }
+    },
+    "traceRecords": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "status", "rev3", "rev2", "implementation", "evidence", "methods", "boundary", "gap"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^TR-[0-9]{3}$" },
+          "title": { "type": "string", "minLength": 1 },
+          "status": { "$ref": "#/$defs/status" },
+          "rev3": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^03\\.[0-9]{2}\\.[0-9]{2}$" }
+          },
+          "rev2": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^3\\.[0-9]{1,2}\\.[0-9]{1,2}$" }
+          },
+          "implementation": { "type": "string", "minLength": 1 },
+          "evidence": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+          "methods": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["examine", "interview", "test"] } },
+          "boundary": { "type": "string", "minLength": 1 },
+          "gap": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "openAuditGaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "status", "requiredFor", "detail"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^GAP-[0-9]{3}$" },
+          "title": { "type": "string", "minLength": 1 },
+          "status": { "const": "open" },
+          "requiredFor": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^03\\.[0-9]{2}\\.[0-9]{2}$" } },
+          "detail": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "status": {
+      "enum": [
+        "implemented_source_evidence",
+        "partial_external_evidence_required",
+        "organizational_evidence_required",
+        "scope_dependent"
+      ]
+    }
+  }
+}

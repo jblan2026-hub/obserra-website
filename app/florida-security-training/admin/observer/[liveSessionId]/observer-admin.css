@@ -1,0 +1,105 @@
+.fdacs-observer-admin__notice {
+  max-width: 1500px;
+  margin: 0 auto 18px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(125, 224, 177, .28);
+  background: rgba(24, 89, 64, .22);
+  color: #d9f5e7;
+}
+
+.fdacs-observer-admin__grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: start;
+}
+
+.fdacs-observer-admin .fdacs-live__form label,
+.fdacs-observer-admin__grant label {
+  display: grid;
+  gap: 7px;
+  color: #aebed1;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.fdacs-observer-admin .fdacs-live__form select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,.14);
+  background: #0d1d30;
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  font: inherit;
+}
+
+.fdacs-observer-admin__grant {
+  margin-top: 16px;
+  display: grid;
+  gap: 15px;
+}
+
+.fdacs-observer-admin__grant > div:not(.fdacs-observer-admin__actions) {
+  display: grid;
+  gap: 5px;
+}
+
+.fdacs-observer-admin__grant small {
+  color: #91a5bd;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.fdacs-observer-admin__grant code {
+  overflow-wrap: anywhere;
+  color: #f7f9fc;
+}
+
+.fdacs-observer-admin__grant textarea {
+  min-height: 118px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.045);
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  font: inherit;
+  resize: vertical;
+}
+
+.fdacs-observer-admin__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fdacs-observer-admin__actions button {
+  border: 1px solid rgba(255,255,255,.14);
+  background: #e8eef6;
+  color: #07111f;
+  font-weight: 800;
+  border-radius: 10px;
+  padding: 10px 13px;
+  cursor: pointer;
+}
+
+.fdacs-observer-admin__actions button.danger {
+  background: #f4d9d9;
+  color: #4b1111;
+}
+
+.fdacs-observer-admin__actions button:disabled,
+.fdacs-observer-admin .fdacs-live__form button:disabled {
+  opacity: .46;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .fdacs-observer-admin__grid { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,245 @@
+{
+  "schemaVersion": "1.0",
+  "snapshotDate": "2026-08-13",
+  "program": {
+    "name": "Obserra Website and Academy CMMC Level 2 Traceability",
+    "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "repository": "jblan2026-hub/obserra-website",
+    "branch": "feature/florida-class-d-lms-foundation",
+    "sourceCheckpoint": "c53e18e33eb7fb6a3bdfc9569b18381b3eef0a19",
+    "claimBoundary": "Engineering alignment, evidence traceability, and audit readiness only. This register does not claim CMMC certification, a CMMC status in SPRS, FedRAMP authorization, FDACS approval, or authorization to process CUI."
+  },
+  "framework": {
+    "engineeringBaseline": {
+      "publication": "NIST SP 800-171 Rev. 3",
+      "assessmentPublication": "NIST SP 800-171A Rev. 3",
+      "activeRequirementCount": 97
+    },
+    "cmmcLevel2CurrentRuleBaseline": {
+      "publication": "NIST SP 800-171 Rev. 2",
+      "requirementCount": 110,
+      "ruleState": "As of 2026-08-13, CMMC Phase II implementation is suspended while Phase I self assessment requirements remain. Current DoD Level 2 enforcement continues to reference the 110 requirements in NIST SP 800-171 Rev. 2.",
+      "crosswalkPurpose": "NIST SP 800-171 Rev. 3 is the Obserra engineering baseline. Rev. 2 practice mappings are retained so the evidence package remains usable for the currently enforced CMMC Level 2 assessment baseline."
+    },
+    "officialSources": [
+      "https://csrc.nist.gov/pubs/sp/800/171/r3/final",
+      "https://csrc.nist.gov/pubs/sp/800/171/a/r3/final",
+      "https://csrc.nist.gov/projects/cprt/catalog",
+      "https://dowcio.war.gov/CMMC/About/",
+      "https://www.acquisition.gov/dfars/252.204-7021-contractor-compliance-cybersecurity-maturity-model-certification-level-requirements."
+    ]
+  },
+  "traceability": {
+    "singleSourceOfTruth": "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.json",
+    "schema": "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.schema.json",
+    "generator": "scripts/cmmc-level2-rev3-traceability.mjs",
+    "humanReadable": "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-AUDIT-MATRIX.md",
+    "digest": "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.sha256",
+    "ciCommand": "npm run verify:cmmc-traceability",
+    "driftPolicy": "CI fails if the source register is invalid, the NIST Rev. 3 catalog is incomplete, a mapped requirement is unknown, evidence references are missing, the generated Markdown differs, or the recorded SHA-256 digest differs."
+  },
+  "scope": {
+    "formalCuiAssessmentScopeEstablished": false,
+    "sspComplete": false,
+    "networkDiagramComplete": false,
+    "assetInventoryComplete": false,
+    "cuiProcessingAuthorized": false,
+    "boundary": "Public website, Obserra Academy and LMS, supporting GitHub backend, Supabase Academy database and Edge Functions, Clerk identity, Stripe commerce, Vercel runtime, and direct dependencies required by those components.",
+    "excluded": "Other Obserra applications and products not used by the website or Academy LMS workstream.",
+    "assets": [
+      {"asset": "GitHub repository and GitHub Actions", "provisionalCategory": "Security Protection Asset candidate", "evidenceState": "Source and CI evidence available."},
+      {"asset": "Vercel obserra-website-live", "provisionalCategory": "CUI Asset or Security Protection Asset candidate depending future CUI use", "evidenceState": "Production runtime visible. Provider and failover evidence incomplete."},
+      {"asset": "Supabase Obserra Academy", "provisionalCategory": "CUI Asset candidate if future CUI is stored, otherwise Security Protection or Contractor Risk Managed Asset candidate", "evidenceState": "Database controls inspectable. Backup and recovery evidence incomplete."},
+      {"asset": "Clerk production identity", "provisionalCategory": "Security Protection Asset and external service provider candidate", "evidenceState": "Integration present. Post deployment identity validation and provider evidence pending."},
+      {"asset": "Stripe production commerce", "provisionalCategory": "External service dependency not intended to receive CUI", "evidenceState": "Commerce health verified. Provider assurance evidence pending."},
+      {"asset": "Daily media service", "provisionalCategory": "CUI Asset or Security Protection Asset candidate depending future information flow", "evidenceState": "Provider configuration and availability evidence pending."},
+      {"asset": "Regulated Class D nonproduction Supabase branch", "provisionalCategory": "Contractor Risk Managed or test environment candidate", "evidenceState": "Synthetic nonproduction only. Production activation prohibited."}
+    ]
+  },
+  "requirements": {
+    "03.01": {
+      "family": "Access Control",
+      "defaultStatus": "partial_external_evidence_required",
+      "items": [
+        ["03.01.01", "Account Management"], ["03.01.02", "Access Enforcement"], ["03.01.03", "Information Flow Enforcement"], ["03.01.04", "Separation of Duties"], ["03.01.05", "Least Privilege"], ["03.01.06", "Least Privilege – Privileged Accounts"], ["03.01.07", "Least Privilege – Privileged Functions"], ["03.01.08", "Unsuccessful Logon Attempts"], ["03.01.09", "System Use Notification"], ["03.01.10", "Device Lock"], ["03.01.11", "Session Termination"], ["03.01.12", "Remote Access"], ["03.01.16", "Wireless Access"], ["03.01.18", "Access Control for Mobile Devices"], ["03.01.20", "Use of External Systems"], ["03.01.22", "Publicly Accessible Content"]
+      ]
+    },
+    "03.02": {"family": "Awareness and Training", "defaultStatus": "organizational_evidence_required", "items": [["03.02.01", "Literacy Training and Awareness"], ["03.02.02", "Role-Based Training"]]},
+    "03.03": {"family": "Audit and Accountability", "defaultStatus": "partial_external_evidence_required", "items": [["03.03.01", "Event Logging"], ["03.03.02", "Audit Record Content"], ["03.03.03", "Audit Record Generation"], ["03.03.04", "Response to Audit Logging Process Failures"], ["03.03.05", "Audit Record Review, Analysis, and Reporting"], ["03.03.06", "Audit Record Reduction and Report Generation"], ["03.03.07", "Time Stamps"], ["03.03.08", "Protection of Audit Information"]]},
+    "03.04": {"family": "Configuration Management", "defaultStatus": "partial_external_evidence_required", "items": [["03.04.01", "Baseline Configuration"], ["03.04.02", "Configuration Settings"], ["03.04.03", "Configuration Change Control"], ["03.04.04", "Impact Analyses"], ["03.04.05", "Access Restrictions for Change"], ["03.04.06", "Least Functionality"], ["03.04.08", "Authorized Software – Allow by Exception"], ["03.04.10", "System Component Inventory"], ["03.04.11", "Information Location"], ["03.04.12", "System and Component Configuration for High-Risk Areas"]]},
+    "03.05": {"family": "Identification and Authentication", "defaultStatus": "partial_external_evidence_required", "items": [["03.05.01", "User Identification and Authentication"], ["03.05.02", "Device Identification and Authentication"], ["03.05.03", "Multi-Factor Authentication"], ["03.05.04", "Replay-Resistant Authentication"], ["03.05.05", "Identifier Management"], ["03.05.07", "Password Management"], ["03.05.11", "Authentication Feedback"], ["03.05.12", "Authenticator Management"]]},
+    "03.06": {"family": "Incident Response", "defaultStatus": "organizational_evidence_required", "items": [["03.06.01", "Incident Handling"], ["03.06.02", "Incident Monitoring, Reporting, and Response Assistance"], ["03.06.03", "Incident Response Testing"], ["03.06.04", "Incident Response Training"], ["03.06.05", "Incident Response Plan"]]},
+    "03.07": {"family": "Maintenance", "defaultStatus": "organizational_evidence_required", "items": [["03.07.04", "Maintenance Tools"], ["03.07.05", "Nonlocal Maintenance"], ["03.07.06", "Maintenance Personnel"]]},
+    "03.08": {"family": "Media Protection", "defaultStatus": "organizational_evidence_required", "items": [["03.08.01", "Media Storage"], ["03.08.02", "Media Access"], ["03.08.03", "Media Sanitization"], ["03.08.04", "Media Marking"], ["03.08.05", "Media Transport"], ["03.08.07", "Media Use"], ["03.08.09", "System Backup – Cryptographic Protection"]]},
+    "03.09": {"family": "Personnel Security", "defaultStatus": "organizational_evidence_required", "items": [["03.09.01", "Personnel Screening"], ["03.09.02", "Personnel Termination and Transfer"]]},
+    "03.10": {"family": "Physical Protection", "defaultStatus": "scope_dependent", "items": [["03.10.01", "Physical Access Authorizations"], ["03.10.02", "Monitoring Physical Access"], ["03.10.06", "Alternate Work Site"], ["03.10.07", "Physical Access Control"], ["03.10.08", "Access Control for Transmission"]]},
+    "03.11": {"family": "Risk Assessment", "defaultStatus": "partial_external_evidence_required", "items": [["03.11.01", "Risk Assessment"], ["03.11.02", "Vulnerability Monitoring and Scanning"], ["03.11.04", "Risk Response"]]},
+    "03.12": {"family": "Security Assessment and Monitoring", "defaultStatus": "partial_external_evidence_required", "items": [["03.12.01", "Security Assessment"], ["03.12.02", "Plan of Action and Milestones"], ["03.12.03", "Continuous Monitoring"], ["03.12.05", "Information Exchange"]]},
+    "03.13": {"family": "System and Communications Protection", "defaultStatus": "partial_external_evidence_required", "items": [["03.13.01", "Boundary Protection"], ["03.13.04", "Information in Shared System Resources"], ["03.13.06", "Network Communications – Deny by Default – Allow by Exception"], ["03.13.08", "Transmission and Storage Confidentiality"], ["03.13.09", "Network Disconnect"], ["03.13.10", "Cryptographic Key Establishment and Management"], ["03.13.11", "Cryptographic Protection"], ["03.13.12", "Collaborative Computing Devices and Applications"], ["03.13.13", "Mobile Code"], ["03.13.15", "Session Authenticity"]]},
+    "03.14": {"family": "System and Information Integrity", "defaultStatus": "partial_external_evidence_required", "items": [["03.14.01", "Flaw Remediation"], ["03.14.02", "Malicious Code Protection"], ["03.14.03", "Security Alerts, Advisories, and Directives"], ["03.14.06", "System Monitoring"], ["03.14.08", "Information Management and Retention"]]},
+    "03.15": {"family": "Planning", "defaultStatus": "organizational_evidence_required", "items": [["03.15.01", "Policy and Procedures"], ["03.15.02", "System Security Plan"], ["03.15.03", "Rules of Behavior"]]},
+    "03.16": {"family": "System and Services Acquisition", "defaultStatus": "partial_external_evidence_required", "items": [["03.16.01", "Security Engineering Principles"], ["03.16.02", "Unsupported System Components"], ["03.16.03", "External System Services"]]},
+    "03.17": {"family": "Supply Chain Risk Management", "defaultStatus": "organizational_evidence_required", "items": [["03.17.01", "Supply Chain Risk Management Plan"], ["03.17.02", "Acquisition Strategies, Tools, and Methods"], ["03.17.03", "Supply Chain Requirements and Processes"]]}
+  },
+  "withdrawnRequirementIds": [
+    "03.01.13", "03.01.14", "03.01.15", "03.01.17", "03.01.19", "03.01.21", "03.02.03", "03.03.09", "03.04.07", "03.04.09", "03.05.06", "03.05.08", "03.05.09", "03.05.10", "03.07.01", "03.07.02", "03.07.03", "03.08.06", "03.08.08", "03.10.03", "03.10.04", "03.10.05", "03.11.03", "03.12.04", "03.13.02", "03.13.03", "03.13.05", "03.13.07", "03.13.14", "03.13.16", "03.14.04", "03.14.05", "03.14.07"
+  ],
+  "traceRecords": [
+    {
+      "id": "TR-001", "title": "Default deny regulated mutation boundary", "status": "implemented_source_evidence",
+      "rev3": ["03.01.02", "03.01.03", "03.01.05", "03.01.07", "03.13.06"], "rev2": ["3.1.1", "3.1.2", "3.1.5", "3.1.6", "3.1.7"],
+      "implementation": "All Florida Class D write operations pass through a global regulated execution boundary before authentication. Unauthorized regulated writes fail closed.",
+      "evidence": ["lib/florida-class-d-mutation-boundary.ts", "proxy.ts", "scripts/florida-class-d-regulated-mutation-boundary-gate.mjs", "docs/florida-class-d-lms/GATE-30-MUTATION-BOUNDARY-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Obserra application and GitHub CI", "gap": "Formal CMMC assessment testing remains separate from source validation."
+    },
+    {
+      "id": "TR-002", "title": "Clerk identity middleware and paid learner authorization", "status": "partial_external_evidence_required",
+      "rev3": ["03.01.02", "03.01.05", "03.05.01", "03.05.03", "03.05.04", "03.05.12", "03.13.15"], "rev2": ["3.1.1", "3.1.2", "3.1.5", "3.5.1", "3.5.2", "3.5.3", "3.5.10"],
+      "implementation": "The website exports Clerk middleware directly and paid Academy media and tutor routes require authenticated identity and current entitlement in preview and production.",
+      "evidence": ["proxy.ts", "app/api/academy/tutor/route.ts", "app/api/academy/media/route.ts", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Shared Obserra and Clerk", "gap": "Production verification, MFA policy, authenticator policy, and Clerk provider assurance remain required."
+    },
+    {
+      "id": "TR-003", "title": "Preview authentication bypass removal", "status": "implemented_source_evidence",
+      "rev3": ["03.01.02", "03.01.05", "03.04.02", "03.04.06", "03.16.01"], "rev2": ["3.1.1", "3.1.2", "3.1.5", "3.4.2", "3.4.6"],
+      "implementation": "Generic Vercel preview authentication exceptions were removed from paid learner media and tutor endpoints so preview follows the production authorization model.",
+      "evidence": ["app/api/academy/tutor/route.ts", "app/api/academy/media/route.ts", "scripts/florida-class-d-website-academy-commerce-gate.mjs"],
+      "methods": ["examine", "test"], "boundary": "Obserra application", "gap": "Deployment verification remains part of release acceptance."
+    },
+    {
+      "id": "TR-004", "title": "Public Academy catalog data minimization", "status": "implemented_source_evidence",
+      "rev3": ["03.01.03", "03.01.22", "03.04.06", "03.13.04", "03.14.08"], "rev2": ["3.1.3", "3.1.22", "3.4.6", "3.13.4"],
+      "implementation": "The public catalog Edge Function is GET only, exposes a public field allowlist, returns only public visible controls, and omits hidden or unpublished records.",
+      "evidence": ["supabase/functions/academy-public-catalog/index.ts", "supabase/config.toml", "scripts/florida-class-d-website-academy-commerce-gate.mjs"],
+      "methods": ["examine", "test"], "boundary": "Shared Obserra and Supabase", "gap": "Provider platform assurance remains external evidence."
+    },
+    {
+      "id": "TR-005", "title": "Academy fail closed publication controls", "status": "implemented_source_evidence",
+      "rev3": ["03.01.02", "03.01.22", "03.04.01", "03.04.02", "03.04.03", "03.14.08"], "rev2": ["3.1.2", "3.1.22", "3.4.1", "3.4.2", "3.4.3"],
+      "implementation": "Missing or malformed Academy course control data resolves to unpublished, invisible, and purchase disabled. The reviewed 60 course baseline is explicitly published by controlled migration.",
+      "evidence": ["lib/academy-control.ts", "supabase/migrations/20260814025522_academy_baseline_publication_controls.sql", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Obserra application and Supabase database", "gap": "Operator approval procedures and formal configuration management policy require organizational evidence."
+    },
+    {
+      "id": "TR-006", "title": "Supabase row level security and privileged function boundary", "status": "partial_external_evidence_required",
+      "rev3": ["03.01.02", "03.01.05", "03.01.06", "03.01.07", "03.03.08", "03.13.06"], "rev2": ["3.1.1", "3.1.2", "3.1.5", "3.1.6", "3.1.7", "3.3.8"],
+      "implementation": "Reviewed Academy data tables use forced row level security with no anonymous or authenticated grants, while reviewed security definer functions are service role only with controlled search paths.",
+      "evidence": ["supabase/migrations/20260814025522_academy_baseline_publication_controls.sql", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Shared Obserra and Supabase", "gap": "Full database role inventory, provider assurance, backup controls, and periodic privilege review evidence remain required."
+    },
+    {
+      "id": "TR-007", "title": "Stripe POST only checkout and same origin enforcement", "status": "implemented_source_evidence",
+      "rev3": ["03.01.02", "03.01.03", "03.04.06", "03.13.01", "03.13.15", "03.16.01"], "rev2": ["3.1.2", "3.1.3", "3.4.6", "3.13.1", "3.13.15"],
+      "implementation": "Stripe Checkout Session creation is POST only, same origin protected, form content type restricted, current course authorization checked, and responses are no store.",
+      "evidence": ["app/api/academy/checkout/route.ts", "app/academy/AcademyClient.tsx", "app/academy/[courseId]/page.tsx", "scripts/florida-class-d-website-academy-commerce-gate.mjs"],
+      "methods": ["examine", "test"], "boundary": "Shared Obserra and Stripe", "gap": "Production verification after deployment and Stripe provider assurance remain required."
+    },
+    {
+      "id": "TR-008", "title": "Signed Stripe webhook and idempotent entitlement fulfillment", "status": "partial_external_evidence_required",
+      "rev3": ["03.01.02", "03.03.01", "03.03.02", "03.03.03", "03.13.15", "03.16.03"], "rev2": ["3.1.2", "3.3.1", "3.3.2", "3.3.3", "3.13.15"],
+      "implementation": "Payment fulfillment requires a Stripe signed webhook and a paid event, and entitlement creation is idempotent.",
+      "evidence": ["app/api/webhook/stripe/route.ts", "app/api/academy/commerce-health/route.ts", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Shared Obserra and Stripe", "gap": "Provider availability, webhook delivery assurance, and production event evidence remain external."
+    },
+    {
+      "id": "TR-009", "title": "Verified purchaser identity for deferred course claims", "status": "implemented_source_evidence",
+      "rev3": ["03.01.02", "03.05.01", "03.05.05", "03.05.12"], "rev2": ["3.1.1", "3.1.2", "3.5.1", "3.5.5", "3.5.10"],
+      "implementation": "Deferred paid course claims require exact user binding or a verified Clerk email matching the paid Stripe purchaser email. Unverified aliases cannot claim access.",
+      "evidence": ["app/api/academy/redeem/route.ts", "scripts/florida-class-d-website-academy-commerce-gate.mjs"],
+      "methods": ["examine", "test"], "boundary": "Shared Obserra, Clerk, and Stripe", "gap": "Provider identity proofing and email verification configuration require external evidence."
+    },
+    {
+      "id": "TR-010", "title": "Audit ledger and regulated evidence preservation", "status": "partial_external_evidence_required",
+      "rev3": ["03.03.01", "03.03.02", "03.03.03", "03.03.05", "03.03.07", "03.03.08", "03.14.08"], "rev2": ["3.3.1", "3.3.2", "3.3.3", "3.3.5", "3.3.7", "3.3.8"],
+      "implementation": "Course publication and regulated operations retain audit events and controlled handoffs. Gate evidence is bound to exact source commits and retained as GitHub artifacts where implemented.",
+      "evidence": ["docs/florida-class-d-lms/ACTION-LEDGER-GATES-29-32-ADDENDUM.md", "docs/florida-class-d-lms/LATEST-HANDOFF.md", ".github/workflows/florida-class-d-lms-gates.yml"],
+      "methods": ["examine", "test"], "boundary": "Obserra GitHub and Supabase", "gap": "Centralized log retention, immutable external archive, alert review cadence, and time synchronization evidence require completion."
+    },
+    {
+      "id": "TR-011", "title": "Dependency vulnerability audit and flaw remediation", "status": "implemented_source_evidence",
+      "rev3": ["03.11.02", "03.14.01", "03.14.03", "03.16.02", "03.17.02"], "rev2": ["3.11.2", "3.12.1", "3.14.1", "3.14.2", "3.14.3"],
+      "implementation": "Production dependencies are locked and CI blocks high severity npm audit findings. Gate 32 remediated vulnerable transitive PostCSS and Sharp dependency paths through a targeted Next.js upgrade.",
+      "evidence": ["package.json", "package-lock.json", ".github/workflows/florida-class-d-lms-gates.yml", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Obserra software supply chain", "gap": "Broader host, code, runtime, and provider vulnerability scanning coverage must be documented for the final CUI scope."
+    },
+    {
+      "id": "TR-012", "title": "Deterministic build and dependency lock integrity", "status": "implemented_source_evidence",
+      "rev3": ["03.04.01", "03.04.03", "03.04.04", "03.04.08", "03.16.01", "03.17.02", "03.17.03"], "rev2": ["3.4.1", "3.4.3", "3.4.4", "3.4.8"],
+      "implementation": "CI installs locked dependencies, verifies lock immutability, runs tests and lint, and builds the production application. Generated Next type drift is committed rather than ignored.",
+      "evidence": ["package-lock.json", "next-env.d.ts", ".github/workflows/florida-class-d-lms-gates.yml"],
+      "methods": ["examine", "test"], "boundary": "Obserra GitHub CI", "gap": "SBOM retention, artifact signing, provenance attestation, and approved software inventory remain additional supply chain evidence targets."
+    },
+    {
+      "id": "TR-013", "title": "Website browser and transport security headers", "status": "partial_external_evidence_required",
+      "rev3": ["03.13.01", "03.13.08", "03.13.11", "03.13.15", "03.16.01"], "rev2": ["3.13.1", "3.13.8", "3.13.11", "3.13.15", "3.13.16"],
+      "implementation": "The website enforces CSP, framing protections, HSTS, MIME sniffing protection, cross origin protections, HTTPS upgrade, and no store handling on transactional routes.",
+      "evidence": ["next.config.ts", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Shared Obserra and Vercel", "gap": "FIPS validated cryptographic module evidence and end to end storage encryption evidence remain required if the future CUI boundary includes these services."
+    },
+    {
+      "id": "TR-014", "title": "Regulated migration manifest and database promotion binding", "status": "implemented_source_evidence",
+      "rev3": ["03.04.01", "03.04.03", "03.04.04", "03.04.11", "03.12.01", "03.16.01"], "rev2": ["3.4.1", "3.4.3", "3.4.4", "3.12.1", "3.12.4"],
+      "implementation": "Gate 29 produces a deterministic regulated migration manifest and binds database promotion to the exact candidate SHA, latest migration version, and manifest digest.",
+      "evidence": ["scripts/florida-class-d-migration-manifest.mjs", "scripts/florida-class-d-migration-parity-gate.mjs", "docs/florida-class-d-lms/GATE-29-MIGRATION-PARITY-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Obserra GitHub and Supabase", "gap": "Production Class D database promotion is intentionally not authorized or performed."
+    },
+    {
+      "id": "TR-015", "title": "Cryptographic HA evidence gate", "status": "partial_external_evidence_required",
+      "rev3": ["03.03.08", "03.08.09", "03.12.01", "03.12.03", "03.14.06", "03.16.03"], "rev2": ["3.3.8", "3.12.1", "3.12.3", "3.13.16", "3.14.6"],
+      "implementation": "Gate 31 requires a candidate bound cryptographic HA evidence manifest covering ten subsystems, per evidence digests, recency, RTO, RPO, and failover testing.",
+      "evidence": ["lib/florida-class-d-ha-evidence.ts", "scripts/florida-class-d-ha-evidence-integrity-gate.mjs", "docs/florida-class-d-lms/GATE-31-HA-EVIDENCE-INTEGRITY-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Shared Obserra and external providers", "gap": "Authentic Vercel, Clerk, Stripe, Daily, document storage, observability, backup and restore, and failover evidence remains incomplete."
+    },
+    {
+      "id": "TR-016", "title": "Runtime monitoring and production telemetry review", "status": "partial_external_evidence_required",
+      "rev3": ["03.03.05", "03.12.03", "03.14.03", "03.14.06"], "rev2": ["3.3.5", "3.12.3", "3.14.3", "3.14.6"],
+      "implementation": "Vercel runtime telemetry identified Clerk middleware failures and Academy degradation, and the findings were remediated in source rather than suppressed.",
+      "evidence": ["docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md", "docs/florida-class-d-lms/ACTION-LEDGER-GATES-29-32-ADDENDUM.md"],
+      "methods": ["examine", "test"], "boundary": "Shared Obserra and Vercel", "gap": "Formal continuous monitoring strategy, alert routing, escalation, retention, and periodic review evidence remain required."
+    },
+    {
+      "id": "TR-017", "title": "Course release identity and certificate payment parity", "status": "implemented_source_evidence",
+      "rev3": ["03.03.02", "03.04.01", "03.04.03", "03.14.08"], "rev2": ["3.3.2", "3.4.1", "3.4.3"],
+      "implementation": "The reviewed Academy baseline has one authoritative release identity, version 1.0.0 and published status, consumed consistently by public API, Stripe metadata, and legacy certificate fallback.",
+      "evidence": ["app/academy/coursePublication.ts", "app/api/academy/checkout/route.ts", "app/academy/certificate/[courseId]/page.tsx", "test/academy-pricing-version-parity.test.mjs", "test/academy-certificate-verification.test.mjs"],
+      "methods": ["examine", "test"], "boundary": "Obserra application", "gap": "Formal release approval procedure remains organizational evidence."
+    },
+    {
+      "id": "TR-018", "title": "GitHub change control and exact SHA validation", "status": "implemented_source_evidence",
+      "rev3": ["03.04.03", "03.04.04", "03.04.05", "03.12.01", "03.16.01"], "rev2": ["3.4.3", "3.4.4", "3.4.5", "3.12.1"],
+      "implementation": "Material regulated changes are committed on a controlled branch, associated with PR 56, and accepted only after the exact SHA passes five mandatory workflows.",
+      "evidence": [".github/workflows/florida-class-d-lms-gates.yml", ".github/workflows/website-ci.yml", ".github/workflows/academy-70x-production-gate.yml", ".github/workflows/application-release-validation.yml", ".github/workflows/application-production-pipeline.yml", "docs/florida-class-d-lms/LATEST-HANDOFF.md"],
+      "methods": ["examine", "test"], "boundary": "Obserra GitHub", "gap": "Branch protection, administrator role review, signing policy, and organizational change approval evidence should be retained for formal assessment."
+    },
+    {
+      "id": "TR-019", "title": "External service inventory and shared responsibility tracking", "status": "partial_external_evidence_required",
+      "rev3": ["03.01.20", "03.04.10", "03.04.11", "03.12.05", "03.16.03", "03.17.01", "03.17.03"], "rev2": ["3.1.20", "3.12.4"],
+      "implementation": "Controlled handoffs identify Vercel, Clerk, Supabase, Stripe, Daily, document storage, observability, and backup dependencies and record which evidence remains provider dependent.",
+      "evidence": ["docs/florida-class-d-lms/LATEST-HANDOFF.md", "docs/florida-class-d-lms/GATE-31-HA-EVIDENCE-INTEGRITY-HANDOFF.md", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "methods": ["examine", "interview"], "boundary": "Shared Obserra and external providers", "gap": "Formal service inventory, contracts, responsibility matrix, provider authorization evidence where required, and CUI flow approval remain incomplete."
+    },
+    {
+      "id": "TR-020", "title": "Backup and restore evidence gap", "status": "organizational_evidence_required",
+      "rev3": ["03.08.09", "03.12.03", "03.16.03"], "rev2": ["3.12.3"],
+      "implementation": "Backup and restore is explicitly tracked as unresolved external evidence rather than assumed from provider capabilities.",
+      "evidence": ["docs/florida-class-d-lms/GATE-31-HA-EVIDENCE-INTEGRITY-HANDOFF.md", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "methods": ["examine", "interview", "test"], "boundary": "Shared Obserra and data storage providers", "gap": "Authoritative backup configuration, encrypted backup evidence, recovery testing, retention, RPO, and RTO must be obtained."
+    },
+    {
+      "id": "TR-021", "title": "CMMC and NIST traceability single source of truth", "status": "implemented_source_evidence",
+      "rev3": ["03.03.08", "03.04.01", "03.04.03", "03.12.01", "03.12.03", "03.15.01", "03.15.02", "03.16.01"], "rev2": ["3.3.8", "3.4.1", "3.4.3", "3.12.1", "3.12.3", "3.12.4"],
+      "implementation": "CMMC and NIST traceability is maintained in one machine readable source register. Human readable audit output and its digest are generated deterministically, and CI fails on schema, catalog, mapping, evidence reference, or generated document drift.",
+      "evidence": ["docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.json", "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.schema.json", "scripts/cmmc-level2-rev3-traceability.mjs", ".github/workflows/florida-class-d-lms-gates.yml"],
+      "methods": ["examine", "test"], "boundary": "Obserra GitHub CI", "gap": "The SSP and organization wide policies remain separate required assessment evidence and are not auto satisfied by this register."
+    }
+  ],
+  "openAuditGaps": [
+    {"id": "GAP-001", "title": "Formal CUI scope and asset categorization", "status": "open", "requiredFor": ["03.04.10", "03.04.11", "03.15.02"], "detail": "Complete the authoritative CMMC Level 2 assessment boundary, asset inventory, network and data flow diagrams, and final asset categories before authorizing CUI."},
+    {"id": "GAP-002", "title": "System Security Plan and organization defined parameters", "status": "open", "requiredFor": ["03.15.01", "03.15.02"], "detail": "Complete the SSP, policies, procedures, rules of behavior, and all applicable Rev. 3 organization defined parameters."},
+    {"id": "GAP-003", "title": "Provider assurance and shared responsibility", "status": "open", "requiredFor": ["03.16.03", "03.17.01", "03.17.03"], "detail": "Retain authoritative security and shared responsibility evidence for Vercel, Clerk, Supabase, Stripe, Daily, document storage, monitoring, and recovery services."},
+    {"id": "GAP-004", "title": "Backup, recovery, RPO, RTO, and failover evidence", "status": "open", "requiredFor": ["03.08.09", "03.12.03"], "detail": "Obtain encrypted backup configuration, recovery test evidence, retention, RPO, RTO, and failover exercise evidence. Do not infer this from vendor marketing."},
+    {"id": "GAP-005", "title": "FIPS validated cryptography boundary if CUI is introduced", "status": "open", "requiredFor": ["03.13.08", "03.13.10", "03.13.11"], "detail": "Identify all cryptographic modules protecting CUI and retain evidence of applicable FIPS validation before CUI processing is authorized."},
+    {"id": "GAP-006", "title": "Organizational, personnel, training, media, physical, and incident evidence", "status": "open", "requiredFor": ["03.02.01", "03.02.02", "03.06.01", "03.06.02", "03.06.03", "03.06.04", "03.06.05", "03.08.01", "03.08.02", "03.08.03", "03.08.04", "03.08.05", "03.08.07", "03.09.01", "03.09.02", "03.10.01", "03.10.02", "03.10.06", "03.10.07", "03.10.08"], "detail": "Collect and approve the non code evidence required by the final assessment scope."},
+    {"id": "GAP-007", "title": "Current CMMC Level 2 Rev. 2 assessment crosswalk completion", "status": "open", "requiredFor": [], "detail": "Trace records include applicable Rev. 2 practice IDs. A complete formal 110 practice crosswalk must be reviewed against current DoD assessment artifacts before an assessment package is declared complete."}
+  ]
+}

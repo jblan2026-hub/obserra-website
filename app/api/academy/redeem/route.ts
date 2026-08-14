@@ -10,11 +10,14 @@ function normalizeEmail(value: string | null | undefined) {
   return value?.trim().toLowerCase() ?? "";
 }
 
-async function authenticatedUserOwnsPurchaserEmail(userId: string, purchaserEmail: string) {
+async function authenticatedUserOwnsVerifiedPurchaserEmail(userId: string, purchaserEmail: string) {
   const client = await clerkClient();
   const user = await client.users.getUser(userId);
   const expected = normalizeEmail(purchaserEmail);
-  return expected.length > 0 && user.emailAddresses.some((item) => normalizeEmail(item.emailAddress) === expected);
+  return expected.length > 0 && user.emailAddresses.some((item) => (
+    item.verification?.status === "verified" &&
+    normalizeEmail(item.emailAddress) === expected
+  ));
 }
 
 export async function GET(request: Request) {
@@ -59,7 +62,10 @@ export async function GET(request: Request) {
 
     if (!authorizedClaim && identityMode === "guest-email" && !sessionUserId) {
       const purchaserEmail = session.customer_details?.email ?? session.customer_email;
-      authorizedClaim = await authenticatedUserOwnsPurchaserEmail(identity.userId, purchaserEmail ?? "");
+      authorizedClaim = await authenticatedUserOwnsVerifiedPurchaserEmail(
+        identity.userId,
+        purchaserEmail ?? "",
+      );
     }
 
     if (!authorizedClaim) {
@@ -67,7 +73,7 @@ export async function GET(request: Request) {
         courseId,
         sessionId: session.id,
         identityMode,
-        reason: "authenticated-account-does-not-match-purchaser",
+        reason: "verified-authenticated-account-does-not-match-purchaser",
       });
       return NextResponse.redirect(new URL(`/academy/${courseId}?enrollment=claim-email-mismatch`, requestUrl));
     }

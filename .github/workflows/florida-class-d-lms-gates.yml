@@ -1,0 +1,125 @@
+name: Florida Class D LMS Gates
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app/florida-security-training/**"
+      - "app/academy/**"
+      - "app/api/florida-class-d/**"
+      - "app/api/academy/**"
+      - "app/api/webhook/stripe/**"
+      - "lib/florida-class-d*.ts"
+      - "lib/academy*.ts"
+      - "proxy.ts"
+      - "next.config.ts"
+      - "tsconfig.json"
+      - "scripts/florida-class-d-*.mjs"
+      - "scripts/cmmc-level2-rev3-traceability.mjs"
+      - "supabase/functions/academy-public-catalog/**"
+      - "supabase/config.toml"
+      - "supabase/migrations/*fdacs_class_d*.sql"
+      - "supabase/migrations/*academy*.sql"
+      - "docs/florida-class-d-lms/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/florida-class-d-lms-gates.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: florida-class-d-lms-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ""
+  CLERK_SECRET_KEY: ""
+  STRIPE_SECRET_KEY: ""
+  STRIPE_WEBHOOK_SECRET: ""
+
+jobs:
+  regulated-source-gates:
+    name: Gates 1-33 and website compatibility
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout website
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify dependency lock remains immutable
+        run: git diff --exit-code -- package-lock.json
+
+      - name: Audit production dependencies for high severity vulnerabilities
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Run Florida Class D gated source verification
+        run: npm run verify:florida-class-d
+
+      - name: Run Gate 22 runtime readiness source verification
+        run: node scripts/florida-class-d-runtime-readiness-gate.mjs
+
+      - name: Run Gate 23 acceptance evidence source verification
+        run: node scripts/florida-class-d-acceptance-gate.mjs
+
+      - name: Run Gate 24 instructional text-screen source verification
+        run: node scripts/florida-class-d-text-screen-gate.mjs
+
+      - name: Run Gate 25 regulated runtime-isolation enforcement
+        run: node scripts/florida-class-d-runtime-isolation-audit.mjs --enforce
+
+      - name: Run Gate 26 production activation source verification
+        run: node scripts/florida-class-d-production-activation-gate.mjs
+
+      - name: Run Gate 27 resilience and observability source verification
+        run: node scripts/florida-class-d-resilience-observability-gate.mjs
+
+      - name: Run Gate 28 database performance source verification
+        run: node scripts/florida-class-d-database-performance-gate.mjs
+
+      - name: Generate Gate 29 regulated migration manifest
+        run: node scripts/florida-class-d-migration-manifest.mjs --write .regulated-evidence/florida-class-d-migration-manifest.json
+
+      - name: Upload Gate 29 migration manifest evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: florida-class-d-migration-manifest-${{ github.sha }}
+          path: .regulated-evidence/florida-class-d-migration-manifest.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Run Gate 29 migration parity and promotion-manifest verification
+        run: node scripts/florida-class-d-migration-parity-gate.mjs
+
+      - name: Run Gate 30 regulated mutation-boundary verification
+        run: node scripts/florida-class-d-regulated-mutation-boundary-gate.mjs
+
+      - name: Run Gate 31 HA evidence integrity verification
+        run: node scripts/florida-class-d-ha-evidence-integrity-gate.mjs
+
+      - name: Run Gate 32 website Academy commerce security verification
+        run: node scripts/florida-class-d-website-academy-commerce-gate.mjs
+
+      - name: Run Gate 33 CMMC Level 2 Rev 3 traceability verification
+        run: npm run verify:cmmc-traceability
+
+      - name: Run repository contract tests
+        run: npm test
+
+      - name: Run static quality validation
+        run: npm run lint
+
+      - name: Build production application
+        run: npm run build

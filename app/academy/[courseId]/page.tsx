@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { courseForId } from "../../../lib/academy";
 import { publicAcademyCourse } from "../../../lib/academy-control";
+import AcademyCheckoutForm from "../AcademyCheckoutForm";
 import { publicationForCourse } from "../coursePublication";
 import "./course-page.css";
 
@@ -136,9 +137,12 @@ export default async function AcademyCoursePage({
 
             <div className="academy-course-actions">
               {purchaseAvailable ? (
-                <a className="academy-course-checkout" href={`/api/academy/checkout?course=${course.id}`}>
-                  Purchase secure enrollment · {money.format(course.price)}
-                </a>
+                <AcademyCheckoutForm
+                  courseId={course.id}
+                  label={`Purchase secure enrollment · ${money.format(course.price)}`}
+                  source="course-detail"
+                  className="academy-course-checkout"
+                />
               ) : (
                 <span className="academy-course-checkout" aria-disabled="true">
                   New enrollment is temporarily unavailable
@@ -183,9 +187,12 @@ export default async function AcademyCoursePage({
               {publication.version ? <div><dt>Course version</dt><dd>{publication.version}</dd></div> : null}
             </dl>
             {purchaseAvailable ? (
-              <a className="academy-course-checkout academy-course-card-cta" href={`/api/academy/checkout?course=${course.id}`}>
-                Buy secure enrollment
-              </a>
+              <AcademyCheckoutForm
+                courseId={course.id}
+                label="Buy secure enrollment"
+                source="course-card"
+                className="academy-course-checkout academy-course-card-cta"
+              />
             ) : (
               <span className="academy-course-checkout academy-course-card-cta" aria-disabled="true">
                 New purchases paused

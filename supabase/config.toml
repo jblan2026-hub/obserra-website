@@ -1,0 +1,12 @@
+project_id = "obserra-website"
+
+[storage.buckets.fdacs-class-d-completion-documents]
+public = false
+file_size_limit = "10MiB"
+allowed_mime_types = ["application/pdf"]
+
+[functions.academy-public-catalog]
+verify_jwt = false
+
+[functions.academy-owner-control]
+verify_jwt = true

@@ -1,8 +1,8 @@
 "use client";
 
-import { track } from "@vercel/analytics";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import AcademyCheckoutForm from "./AcademyCheckoutForm";
 import type { Course, CourseLevel, Department } from "./courseData";
 
 const money = new Intl.NumberFormat("en-US", {
@@ -203,12 +203,12 @@ export default function AcademyControlledClient({
               </div>
               <div className="academy-feature-actions">
                 <a href={`/academy/${featuredCourse.id}`}>Preview course</a>
-                <a
-                  href={`/api/academy/checkout?course=${featuredCourse.id}`}
-                  onClick={() => track("academy_checkout_started", { course: featuredCourse.id, source: "featured" })}
-                >
-                  Enroll securely
-                </a>
+                <AcademyCheckoutForm
+                  courseId={featuredCourse.id}
+                  label="Enroll securely"
+                  source="featured"
+                  className="academy-checkout-button"
+                />
               </div>
             </article>
           </div>
@@ -285,12 +285,12 @@ export default function AcademyControlledClient({
                 <footer><b>{money.format(course.price)}</b><em>· {course.duration}</em></footer>
                 <div className="course-card-actions">
                   <a href={`/academy/${course.id}`}>View details</a>
-                  <a
-                    href={`/api/academy/checkout?course=${course.id}`}
-                    onClick={() => track("academy_checkout_started", { course: course.id, source: "catalog" })}
-                  >
-                    Enroll securely
-                  </a>
+                  <AcademyCheckoutForm
+                    courseId={course.id}
+                    label="Enroll securely"
+                    source="catalog"
+                    className="academy-checkout-button"
+                  />
                 </div>
               </article>
             ))}

@@ -70,7 +70,7 @@ export default function CertificateView({
 
         <div className="certificate-meta">
           <span>Academy division<strong>{department} Department</strong></span>
-          <span>Course version<strong>{normalizedVersion}</strong></span>
+          <span>Course Version<strong>{normalizedVersion}</strong></span>
           <span>Instructional hours<strong>{trainingHours}</strong></span>
           <span>Verification ID<strong>{certificateId}</strong></span>
         </div>
@@ -86,13 +86,13 @@ export default function CertificateView({
           <div className="certificate-signature">
             <span className="signature-mark">Dr. Jody Blanchard</span>
             <b>DR. JODY BLANCHARD</b>
-            <small>Founder and Owner. This completion record is digitally signed by Dr. Jody Blanchard and issued by {LEGAL_NAME}.</small>
+            <small>Founder and CEO. This completion record is digitally signed by Dr. Jody Blanchard and issued by {LEGAL_NAME}.</small>
           </div>
         </div>
 
         <div className="certificate-verification">
           <span>Completion date <b>{completionDate}</b></span>
-          <span>Course version <b>{normalizedVersion}</b></span>
+          <span>Course Version <b>{normalizedVersion}</b></span>
           <span>Signature algorithm <b>{signatureAlgorithm}</b></span>
           <span>Signing key fingerprint <b>{publicKeyFingerprint.slice(0, 16)}...{publicKeyFingerprint.slice(-16)}</b></span>
           <span>Verify online <b><a href={verificationUrl}>Certificate verification record</a></b></span>

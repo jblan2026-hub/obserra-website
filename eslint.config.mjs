@@ -12,6 +12,12 @@ export default defineConfig([
       "react/no-unescaped-entities": "off",
     },
   },
+  {
+    files: ["app/florida-security-training/live/**/LiveClassroom.tsx"],
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
   globalIgnores([
     ".next/**",
     "out/**",

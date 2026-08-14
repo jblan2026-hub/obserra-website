@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import CertificateView from "./CertificateView";
 import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
 import { verifyCertificateClaim } from "../../../../lib/certificate-signing";
-import { publicationForCourse } from "../../coursePublication";
+import { BASELINE_COURSE_VERSION, publicationForCourse } from "../../coursePublication";
 
 export default async function CertificatePage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
@@ -34,7 +34,9 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
   const signed = progress.signedCertificate;
   const publication = publicationForCourse(courseId);
   const courseTitle = signed.schemaVersion === "1.1" ? signed.courseTitle : course.title;
-  const courseVersion = signed.schemaVersion === "1.1" ? signed.courseVersion : (publication.version || "1.0.0");
+  const courseVersion = signed.schemaVersion === "1.1"
+    ? signed.courseVersion
+    : (publication.version || BASELINE_COURSE_VERSION);
 
   const user = await (await clerkClient()).users.getUser(userId);
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();

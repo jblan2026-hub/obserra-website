@@ -1,0 +1,109 @@
+.fdacs-schedule__success {
+  max-width: 1500px;
+  margin: 0 auto 18px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(125, 224, 177, .28);
+  background: rgba(24, 89, 64, .22);
+  color: #d9f5e7;
+}
+
+.fdacs-schedule__grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(330px, .7fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.fdacs-schedule__form label {
+  display: grid;
+  gap: 7px;
+  color: #aebed1;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.fdacs-schedule__form select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,.14);
+  background: #0d1d30;
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  font: inherit;
+}
+
+.fdacs-schedule__dates {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.fdacs-schedule__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.fdacs-schedule__preview {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.fdacs-schedule__preview article {
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.03);
+}
+
+.fdacs-schedule__preview article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fdacs-schedule__preview span { color: #dbe6f2; font-variant-numeric: tabular-nums; }
+.fdacs-schedule__preview em { color: #91a5bd; font-style: normal; font-size: 12px; }
+
+.fdacs-schedule__results {
+  max-width: 1400px;
+  margin: 22px auto 0;
+}
+
+.fdacs-schedule__session-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 7px;
+}
+
+.fdacs-schedule__session-list > div {
+  display: grid;
+  grid-template-columns: 90px 70px minmax(220px, .8fr) minmax(260px, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 9px;
+  background: rgba(255,255,255,.025);
+}
+
+.fdacs-schedule__session-list span { color: #aebed1; }
+.fdacs-schedule__session-list code { overflow-wrap: anywhere; color: #dce8f4; }
+
+@media (max-width: 1050px) {
+  .fdacs-schedule__grid { grid-template-columns: 1fr; }
+  .fdacs-schedule__dates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 680px) {
+  .fdacs-schedule__dates,
+  .fdacs-schedule__row { grid-template-columns: 1fr; }
+  .fdacs-schedule__session-list > div { grid-template-columns: 1fr; }
+}
