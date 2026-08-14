@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import { BASELINE_COURSE_VERSION, publicationForCourse } from "../../../academy/coursePublication";
 import { courseForId } from "../../../../lib/academy";
 import { publicAcademyCourse } from "../../../../lib/academy-control";
 import {
@@ -15,7 +16,6 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const CLAIM_POLICY = "purchaser-email-match-v1";
-const INITIAL_COURSE_VERSION = "1.0.0";
 const NO_STORE = "private, no-store, max-age=0";
 
 function unavailableRedirect(requestUrl: URL, reason: string) {
@@ -108,11 +108,13 @@ export async function POST(request: Request) {
     const identityMode = identity.userId ? "authenticated" : "guest-email";
     const stripe = getStripe();
     const studioCourse = studioCourseIsApproved(course.id) ? studioCourseForId(course.id) : null;
+    const publication = publicationForCourse(course.id);
     const license = studioLicenseMetadata(course.id);
     const certificate = studioCertificateMetadata(course.id);
-    const courseVersion = studioCourse?.version && /^\d+\.\d+\.\d+$/.test(studioCourse.version)
-      ? studioCourse.version
-      : INITIAL_COURSE_VERSION;
+    const courseVersion = publication.version && /^\d+\.\d+\.\d+$/.test(publication.version)
+      ? publication.version
+      : BASELINE_COURSE_VERSION;
+    const courseReleaseStatus = publication.releaseStatus ?? "published";
     const successUrl = new URL("/academy/success", requestUrl);
     successUrl.searchParams.set("course", course.id);
     successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
@@ -124,6 +126,7 @@ export async function POST(request: Request) {
       courseId: course.id,
       courseTitle: course.title,
       courseVersion,
+      courseReleaseStatus,
       clerkUserId: identity.userId ?? "",
       purchaserReference,
       identityMode,
@@ -163,6 +166,7 @@ export async function POST(request: Request) {
               metadata: {
                 obserraCourseId: course.id,
                 courseVersion,
+                courseReleaseStatus,
                 department: course.department,
                 level: course.level,
                 entitlementCode: license.entitlementCode,
@@ -195,6 +199,7 @@ export async function POST(request: Request) {
     response.headers.set("x-obserra-claim-policy", CLAIM_POLICY);
     response.headers.set("x-obserra-catalog-parity", studioCourse ? "governed-studio" : "baseline-fallback");
     response.headers.set("x-obserra-course-version", courseVersion);
+    response.headers.set("x-obserra-course-release-status", courseReleaseStatus);
     response.headers.set("x-obserra-course-lifecycle", runtimeCourse.control.lifecycle);
     response.headers.set("x-obserra-course-control-revision", String(runtimeCourse.control.revision));
     response.headers.set("x-obserra-existing-entitlements", "preserved");
