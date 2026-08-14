@@ -29,8 +29,20 @@ jobs:
             'https://www.obserrallc.com/api/health' \
             -D /tmp/website-health-headers.txt -o /tmp/website-health.json
           jq -e '.service == "obserra-website" and .status == "live" and .contract == "website-liveness-v1"' /tmp/website-health.json >/dev/null
+          jq -e --arg expected_project_id 'prj_lxTKKDa9sbhht7FaigiaF1PONMiC' '
+            .routing.expectedProjectId == $expected_project_id and
+            .routing.observedProjectId == $expected_project_id and
+            .routing.authority == "verified" and
+            .routing.verified == true and
+            (.routing.deploymentId | test("^dpl_[A-Za-z0-9]+$")) and
+            (.routing.gitCommitSha | test("^[0-9a-f]{40}$"))
+          ' /tmp/website-health.json >/dev/null
           grep -Eqi '^cache-control:[[:space:]]*no-store' /tmp/website-health-headers.txt
           grep -Eqi '^x-obserra-health-contract:[[:space:]]*website-liveness-v1' /tmp/website-health-headers.txt
+          grep -Eqi '^x-obserra-routing-authority:[[:space:]]*verified' /tmp/website-health-headers.txt
+          grep -Eqi '^x-obserra-vercel-project-id:[[:space:]]*prj_lxTKKDa9sbhht7FaigiaF1PONMiC' /tmp/website-health-headers.txt
+          grep -Eqi '^x-obserra-vercel-deployment-id:[[:space:]]*dpl_[A-Za-z0-9]+' /tmp/website-health-headers.txt
+          grep -Eqi '^x-obserra-release-commit:[[:space:]]*[0-9a-f]{40}' /tmp/website-health-headers.txt
 
       - name: Verify homepage and security headers
         shell: bash

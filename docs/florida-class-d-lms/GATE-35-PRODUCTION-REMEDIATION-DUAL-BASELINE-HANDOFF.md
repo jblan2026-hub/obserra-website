@@ -24,6 +24,8 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 - GitHub candidate: PR #78; initial candidate commit `f1ff531a3f015c85d5028be2e7c79aef90cd7f4a`; exact candidate tree `02b81adc614b75caba5b0441a31e6ddf42a2bda8`
 - Merged release: `2189c73ff5ba15ea07aa51ab84da23112403a720`
 - Intended READY deployment: `dpl_6ERkFxUAKg6yjnrJVQ649dLeM6rz`
+- Alias-propagation correction: PR #80 / verified merge `d35917f417d24489ffd5877b989f36dbb3bbb613` / intended READY deployment `dpl_DxojVNKBd9hJtcjXth3QptKei4Lw`
+- Active routing-evidence branch: `codex/gate36-routing-rebind`
 - Previously observed live deployment: `dpl_FYdopKa9RE5XMGMJecQ11AGMe3vb`
 - Intended Vercel authority: `obserra-website-live` / `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`
 - Duplicate Vercel claimants: `obserra-website-lcn2` and `obserra-integrated-services`
@@ -54,7 +56,7 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 3. The scheduled production end-to-end workflow now asserts the POST-only checkout, real website liveness, live identity/commerce dependencies, durable fulfillment, and regulated readiness contracts without creating a payment.
 4. Live commerce is fail closed because the Stripe secret and webhook runtime configuration are not available to the serving deployment.
 5. Live identity is intentionally disabled or degraded because a verified live Clerk control-plane configuration has not been activated.
-6. Both canonical domains remain reported against three Git-linked Vercel projects, so exclusive routing ownership is unverified.
+6. Repository-propagated aliases are removed and operator control-plane evidence shows the canonicals only on the intended project, but an older lcn2 deployment still owns both deployment-level aliases and serves live canonical traffic. Exclusive runtime ownership remains unverified.
 7. Durable Academy learner, progress, assessment, certificate, payment-event, and audit code is deployed, and the live service-only schema is ready. Runtime storage remains fail closed until its dedicated protected Vercel variables are configured.
 8. Stripe webhook event-ID idempotency and the durable provider-event ledger are deployed, but live Stripe and webhook configuration remains unavailable and commerce health correctly returns HTTP 503.
 9. GitHub `main` branch protection, required status checks, rulesets, Dependabot alerts, and secret-scanning state remain external administrator controls tracked by issue #60.
@@ -67,7 +69,7 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 2. Correct production operational monitoring to assert the real website, identity, commerce, webhook, Academy, and regulated fail-closed contracts.
 3. Harden Academy payment initiation against cross-site and GET mutation behavior and add durable Stripe event processing evidence.
 4. Reconcile Academy learner state with service-only durable storage while preserving existing entitlements and a controlled migration path.
-5. Remove repository-level canonical aliases after direct Vercel ownership cleanup and retain exact routing evidence.
+5. Remove repository-level canonical aliases, establish intended-only Vercel project configuration, and require live project/deployment/commit identity before accepting canonical routing.
 6. Verify and activate production Clerk and Stripe configuration only through their authorized control planes.
 7. Validate database advisors, migrations, runtime routes, complete learner lifecycle, payment fulfillment, recovery, CI, CodeQL, and live deployment.
 8. Keep Florida Class D regulated production and CUI processing fail closed until every external prerequisite is objectively satisfied.
@@ -78,9 +80,9 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 - Deterministic human-readable matrix: `docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MATRIX.md`
 - Validation schema: `docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.schema.json`
 - Input digest record: `docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.sha256`
-- Dual-baseline SHA-256: `632dc6f7b64ef3a9b798705823b05f85a8abb2de131c3eafb7c972873e0dea38`
-- Current Rev. 3 traceability SHA-256: `ab63297c4b6dcccd8e7a6e1b03ded72d150b163217db77832c90d783432de226`
-- Current production-evidence SHA-256: `4e55e06e0ade82072afc7ee5f0aa4434782acb28b6007909af08031322b198d5`
+- Dual-baseline SHA-256: `c49494b4ac9fc739b5ac9f4ae826e6100b0acfdcea95464f51db4b287aba2c60`
+- Current Rev. 3 traceability SHA-256: `11f110691aa6d7c98e65e451862bb8d69726ba6d24244064dd33dc9b1b9dd6bd`
+- Current production-evidence SHA-256: `dd6f912527b864fb1de870a12355ea2edcbb379d6ce66363bc50eaaaea9b1b71`
 - CI verification command: `npm run verify:cmmc-dual-baseline`
 - CI workflow now runs Gate 35 and validates exact catalog counts, identifier dispositions, trace references, local evidence existence, generated report drift, and input digests.
 
@@ -120,18 +122,20 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 1. Verify and configure dedicated Vercel production variables for the live Academy Supabase URL, service-role credential, and purchaser-email HMAC secret without exposing values.
 2. Verify and activate matching live Clerk credentials and the explicit identity runtime switch.
 3. Verify live Stripe key, account charge capability, and signed webhook endpoint secret, then validate webhook delivery without creating a fabricated charge.
-4. Remove canonical-domain attachments from the two duplicate Vercel projects only, after the required action-time confirmation, and verify both domains remain on `obserra-website-live`.
-5. Deploy the governed removal of static repository aliases, which were found to reassert the duplicate assignments after the administrator detach action, then directly verify exclusive Vercel ownership.
+4. Deploy the routing-evidence liveness change from the intended project so the newly configured canonicals are assigned to its current production deployment.
+5. Verify canonical `/api/health` reports project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`, an exact deployment ID, and exact Git commit SHA; verify the older lcn2 deployment loses both canonical aliases; then close issue #76 with retained evidence.
 6. Re-run the production operational workflow. It must remain red until website liveness, live identity, live Stripe, signed webhook verification, durable storage, and Class D readiness truthfully pass.
 
 ## Latest live runtime and routing recheck
 
-- GitHub merge SHA `2189c73ff5ba15ea07aa51ab84da23112403a720` is deployed to all three Git-linked Vercel projects. Intended deployment `dpl_6ERkFxUAKg6yjnrJVQ649dLeM6rz` is READY and production-targeted.
+- PR #80 verified merge SHA `d35917f417d24489ffd5877b989f36dbb3bbb613` is deployed to all three Git-linked Vercel projects. Intended deployment `dpl_DxojVNKBd9hJtcjXth3QptKei4Lw` is READY and production-targeted.
 - `GET /api/health` returns HTTP 200 with `website-liveness-v1`.
 - Academy commerce health remains HTTP 503 and reports the new Stripe-event-ID/durable-Supabase contract, but identity, Stripe/webhook, durable Academy storage, and purchaser identity hashing are unavailable.
 - Florida Class D liveness returns HTTP 200 and `live`; readiness returns HTTP 503 and `not_ready`.
-- Direct Vercel project reads still list both canonical domains on all three projects: `obserra-website-live`, `obserra-website-lcn2`, and `obserra-integrated-services`.
-- The exact-merge deployment on each project is READY. The canonical homepage still returned cached HTML marked with older lcn2 deployment `dpl_FYdopKa9RE5XMGMJecQ11AGMe3vb` while the new API routes were reachable, so this does not resolve exclusive domain ownership.
+- Operator control-plane screenshots show both canonicals on `obserra-website-live`; `www` is valid and the apex is attached with Vercel's optional DNS modernization recommendation. No DNS change is required for this remediation. Both duplicate project overviews show no production domain/deployment.
+- Direct inspection of the latest duplicate deployments confirms neither includes a canonical alias. However, older lcn2 deployment `dpl_AYZXGVZurpGcKXLSzvKrudM7rt5w` still lists both canonicals and a cache-busted canonical request still returns that deployment marker; the apex redirect still includes `_vercel_share`. Exclusive live routing is therefore not accepted.
+- The intended PR #80 deployment build completed successfully with no build errors, but its Vercel commit status is `failure` / dashboard state `Checks Failed`; lcn2 is `success`. No runtime requests are recorded on the intended deployment. This is retained as a postdeployment-control failure, not hidden or misreported as a build failure.
+- The current candidate makes `/api/health` report nonsecret `VERCEL_PROJECT_ID`, `VERCEL_DEPLOYMENT_ID`, and `VERCEL_GIT_COMMIT_SHA`; the production operational gate requires the intended project ID and exact-form deployment/commit values.
 
 ## Evidence update rule
 

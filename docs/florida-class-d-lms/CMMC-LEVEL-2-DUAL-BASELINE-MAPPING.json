@@ -5,7 +5,7 @@
     "name": "Obserra CMMC Level 2 Dual-Baseline Mapping",
     "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
     "repository": "jblan2026-hub/obserra-website",
-    "workingBranch": "codex/production-readiness-cmmc-dual-baseline",
+    "workingBranch": "codex/gate36-routing-rebind",
     "startingSourceSha": "ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88",
     "claimBoundary": "Engineering implementation, evidence traceability, and assessment readiness only. This mapping does not claim a MET assessment result, CMMC certification, CMMC status in SPRS, authorization to process CUI, FedRAMP authorization, or FDACS approval."
   },
