@@ -137,21 +137,26 @@ requireText(clerkConfigPath, clerkConfig, ".trim()", "environment normalization"
 requireText(clerkConfigPath, clerkConfig, 'process.env.VERCEL_ENV === "production"', "production environment enforcement");
 requireText(clerkConfigPath, clerkConfig, "production_requires_live_keys", "live-key production policy");
 forbidText(clerkConfigPath, clerkConfig, "console.", "secret-adjacent logging in configuration parser");
+forbidText(clerkConfigPath, clerkConfig, "process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY =", "runtime publishable-key environment mutation");
+forbidText(clerkConfigPath, clerkConfig, "process.env.CLERK_PUBLISHABLE_KEY =", "runtime Clerk publishable-key environment mutation");
+forbidText(clerkConfigPath, clerkConfig, "process.env.CLERK_SECRET_KEY =", "runtime Clerk secret-key environment mutation");
 
 const identity = read(identityPath);
-requireText(identityPath, identity, "prepareClerkRuntime()", "centralized runtime preparation");
+requireText(identityPath, identity, "prepareClerkRuntime()", "centralized runtime inspection");
 requireText(identityPath, identity, "reasonCodes", "nonsecret diagnostic reason codes");
 forbidText(identityPath, identity, "CLERK_SECRET_KEY", "direct secret-key handling outside centralized configuration");
 
 const layout = read(layoutPath);
 requireText(layoutPath, layout, 'import { prepareClerkRuntime } from "../lib/clerk-runtime-config"', "centralized Clerk layout configuration");
-requireText(layoutPath, layout, "publishableKey={clerkRuntime.publishableKey}", "explicit normalized publishable key");
+requireText(layoutPath, layout, "publishableKey={clerkRuntime.publishableKey}", "explicit validated publishable key");
 forbidText(layoutPath, layout, "function isValidClerkConfiguration", "duplicated Clerk validator");
 
 const proxy = read(proxyPath);
-requireText(proxyPath, proxy, 'import { prepareClerkRuntime } from "./lib/clerk-runtime-config"', "centralized Clerk middleware configuration");
-requireText(proxyPath, proxy, "prepareClerkRuntime();", "pre-middleware Clerk normalization");
+requireText(proxyPath, proxy, 'import { prepareClerkRuntime } from "./lib/clerk-runtime-config"', "centralized Clerk middleware readiness inspection");
+requireText(proxyPath, proxy, "function authenticationReady()", "fail-closed Clerk readiness boundary");
+requireText(proxyPath, proxy, "return prepareClerkRuntime().ready;", "side-effect-free Clerk readiness check");
 requireText(proxyPath, proxy, "export default clerkMiddleware(", "direct Clerk middleware export");
+forbidText(proxyPath, proxy, "\nprepareClerkRuntime();\n", "module-load Clerk runtime normalization");
 forbidText(proxyPath, proxy, "function clerkPublishableEnvironment", "duplicated publishable-key validator");
 forbidText(proxyPath, proxy, "function clerkSecretEnvironment", "duplicated secret-key validator");
 
