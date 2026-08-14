@@ -66,6 +66,12 @@ Deployment-level evidence still blocks closure. Older lcn2 deployment `dpl_AYZXG
 
 The intended PR #80 deployment also reports `Checks Failed` in the operator Vercel view (supplemental screenshot SHA-256 `4630169cea566661c1593b22fdcdbc19903dc50746c84e4ac6a043579e9caa1b`). Direct GitHub combined status corroborates `Vercel – obserra-website-live: failure` while lcn2 is `success`. Intended build logs contain no build error and show successful compilation, TypeScript, 159-page generation, output deployment, and build-cache upload; no runtime requests are recorded on the intended deployment. The exact provider-side postdeployment check is not exposed by the connected read interface and must not be disabled or reclassified without its result. If the routing-evidence release repeats this state, inspect and correct the named check through the authorized Vercel project view before accepting the deployment.
 
+## Post-PR #82 deployment-check finding
+
+PR #82 merged as GitHub-verified SHA `2dde838ee176e6f450abeca2daad96ab377ed931`. Exact intended deployment `dpl_5wuL2pUUGcpgk6z7HgvZyVrQLbpd` reached READY but remained Staged. Vercel Deployment Details now exposes the causal results: Clerk DNS incomplete for `obserrallc.com`, one nonmatching Clerk/Vercel alias status, skipped TypeCheck because the package script was absent, the required canonical operational job rejecting the old promoted revision's identity headers, and custom-domain assignment blocked by those failed checks.
+
+Project settings confirm `www.obserrallc.com` is valid on `obserra-website-live` and the apex redirects to it. The canonical health contract now reports the intended Vercel project but still serves prior deployment `dpl_FdYBScoDxVX3bDFkk2dTwyvxtBPa` at commit `0e72459a8940f23976038d85d6394409000f48c5`. Gate 38 fixes the source-controlled TypeCheck and promotion-order deadlock. It deliberately leaves the third-party Clerk DNS dependency open and requires exact-SHA post-promotion evidence before closure.
+
 ## NIST SP 800-171 Rev. 3 / CMMC mapping
 
 Primary mappings:

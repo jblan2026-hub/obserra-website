@@ -3,13 +3,13 @@
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update the controlled source records and run `npm run generate:cmmc-system-evidence`.
 
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-- **Bundle:** `obserra-cmmc-working-6d6e1bac9936c891e31332d6`
+- **Bundle:** `obserra-cmmc-working-fcd75b18420e2ca8519af449`
 - **Bundle state:** `working_evidence_inventory`
-- **Generated at:** `2026-08-14T18:49:07Z`
-- **Git base/HEAD reference:** `0e72459a8940f23976038d85d6394409000f48c5`
+- **Generated at:** `2026-08-14T20:27:30Z`
+- **Git base/HEAD reference:** `f7cbb936c79433eadf3977e6c18d9b8c5448fa0e`
 - **Revision binding:** `working_tree_digest`
 - **Exact release:** not assigned; working evidence inventory
-- **In-scope tree SHA-256:** `6d6e1bac9936c891e31332d636d936e0560ededd6838a6df6496e9022e0c8594` (516 paths)
+- **In-scope tree SHA-256:** `fcd75b18420e2ca8519af44915ed4849bfa5c9c2e3a41ce95b7175a625163000` (516 paths)
 
 ## Paired audit views
 
@@ -110,7 +110,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | `EV-ORG-REV3-OBJECTIVES` — Supplemental Revision 3 objective catalog<br>`docs/compliance/CMMC-REV3-OBJECTIVE-CATALOG.json` | product_supplied_evidence | working | examine/not_run | `c361cc383d10f4e3feec61ca23c08189fc47fcf3692c8b20c833d02c2e370b42` | no | Machine-readable supplemental forward-engineering assessment objectives; not the current 32 CFR Part 170 baseline. |
 | `EV-ORG-AUTHORITY-WATCH` — Official authority revision watch definition<br>`docs/compliance/CMMC-AUTHORITY-WATCH.json` | organization_evidence | working | test/not_run | `5897c965e79152332bd615a7755d64eb6ee513673a57b59ec05b9333f7765f43` | no | Defines official-source integrity and revision signals; it never silently changes the governing baseline. |
 | `EV-ORG-AUTHORITY-DRIFT` — Official authority drift check result<br>`docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json` | organization_evidence | working | test/not_run | `fb8523a07d3cfdf8065cdacc641c7ff62692c5a65baeaa6d2664973cf7d15490` | no | Time-bound official-source integrity result only; it does not interpret or approve a future publication. |
-| `EV-ORG-CONTINUITY-HANDOFF` — Machine-readable current workstream and recovery handoff<br>`docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json` | organization_evidence | working | examine/not_run | `a67a0acc63d29fafa32153c691544bfaf20dd46c441d6de453518bb0a6f0c3c0` | no | Records verified status, blockers, recovery instructions, and link-release rules without representing pending live controls as operational. |
+| `EV-ORG-CONTINUITY-HANDOFF` — Machine-readable current workstream and recovery handoff<br>`docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json` | organization_evidence | working | examine/not_run | `9c639b7ed46c1861b7d8a50f54970015c5abf1161079a5ee0077c8a0d3ae3a0d` | no | Records verified status, blockers, recovery instructions, and link-release rules without representing pending live controls as operational. |
 | `EV-ORG-AUTOMATION-WORKFLOW` — Approved-change evidence governance workflow<br>`.github/workflows/cmmc-evidence-governance.yml` | product_supplied_evidence | working | test/not_run | `ad0f5a0f309b5ae285bdd60d5b61ec50cecb196446bcb060b0cc9a8037ae3e35` | no | Workflow source defines regeneration, verification, drift review, and archival; exact run evidence is separately retained. |
 
 ### Objective-level CMMC evidence mapping
@@ -976,7 +976,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | `EV-WEBSITE-BADGE-MANIFEST` — Approved credential asset and issuer-observation manifest<br>`public/badges/eccouncil/asset-manifest.json` | organization_evidence | working | test/not_run | `b3fb489e362a03bb0ec379423c86847bf73221644f8bd0957d0a5afb06165ca9` | no | Records approved local asset identities, hashes, three time-bound live ADG issuer observations, and verification destinations; external issuer pages remain authoritative for credential validity. |
 | `EV-WEBSITE-BADGE-SCHEMA` — Fail-closed credential asset evidence schema<br>`public/badges/eccouncil/asset-manifest.schema.json` | product_supplied_evidence | working | test/not_run | `b4a7ae42ee34b8c0b5d3a0970f4f021c9402f0395b459bd862934038b38342a4` | no | Defines mandatory provenance, hash, issuer-observation, and claim-boundary fields; schema presence is not a live deployment result. |
 | `EV-WEBSITE-BADGE-GATE` — Credential asset integrity and provenance gate<br>`scripts/ec-council-badge-integrity.test.mjs` | product_supplied_evidence | working | test/not_run | `93aa89a30a6f1af8ad94bff04eb57a01fde308947e6525cf82592f5c53e17d9a` | no | Fail-closed source gate for the nine authorized assets and three issuer observations; exact CI run and production HTTP evidence remain release-specific. |
-| `EV-WEBSITE-LEGAL-IDENTITY-AUDIT` — Machine-readable legal identity source audit<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.json` | organization_evidence | working | test/not_run | `3fcc21b3685a6a546334f603c2718ec4294d97cc46c3b0b422e95b3c013c25ff` | no | Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence. |
+| `EV-WEBSITE-LEGAL-IDENTITY-AUDIT` — Machine-readable legal identity source audit<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.json` | organization_evidence | working | test/not_run | `cd06d1212493680eed14b1414cc068a144adc83b334c7f31b42e4a43a6985323` | no | Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence. |
 | `EV-WEBSITE-LEGAL-IDENTITY-SCHEMA` — Legal identity audit machine schema<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.schema.json` | product_supplied_evidence | working | examine/not_run | `37d5bc13bed30feafb4a7c661ed867a74e432062c98ff262aecad006404d9314` | no | Defines the machine-readable audit contract and mandatory disposition fields; schema presence is not a live operating result. |
 | `EV-WEBSITE-LEGAL-IDENTITY-GATE` — Fail-closed legal identity drift gate<br>`scripts/legal-identity-audit.mjs` | product_supplied_evidence | working | test/not_run | `6323945d11fc056b0205f2f18f259779aef12a3e94ece8a69560ddc482895605` | no | Rejects malformed legal names, retired company wording, stale public origins, and unapproved short-name company claims while preserving enumerated product brands and stable technical identifiers. |
 | `EV-WEBSITE-NEXT-CONFIG` — Website response security and image-delivery configuration<br>`next.config.ts` | product_supplied_evidence | working | examine/not_run | `3edc6fcbb55452e7d751b754b6200f7c3ec4d44fa3933fabb8047e54d0602767` | no | Source-level CSP, transport, browser, and image-delivery configuration only; Vercel production behavior requires exact-deployment verification. |
@@ -2675,7 +2675,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | `EV-ARCHIVE-HA-GATE` — HA evidence integrity gate<br>`scripts/florida-class-d-ha-evidence-integrity-gate.mjs` | product_supplied_evidence | working | test/not_run | `1d93a4baec5f6589a237b1b9243ac50749f5fedfd687395859bfa2aade69441f` | no | Gate definition only until an exact-revision result is archived. |
 | `EV-ARCHIVE-V2-SQL` — Objective-level exact-revision archive contract<br>`supabase/migrations/20260814180000_cmmc_objective_evidence_contract.sql` | product_supplied_evidence | working | test/not_run | `ba26fc28ad69ef1d6e6ce519045a9b2b81fb61d939d368c8175022a54069c02f` | no | Database enforcement source only; applied production state requires live verification. |
 | `EV-ARCHIVE-CLIENT` — Release evidence archive verifier and client<br>`scripts/cmmc-archive-release-evidence.mjs` | product_supplied_evidence | working | test/not_run | `7cb24fef4e259750ad2f256f437fb0155ba0ca40b6c8b8608271ae8a6047c778` | no | Builds, verifies, and submits a final non-CUI package; a successful live RPC receipt is separately required. |
-| `EV-ARCHIVE-TARGET-DECISION` — Archive isolation and HA activation decision<br>`docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json` | organization_evidence | working | examine/not_run | `a67a0acc63d29fafa32153c691544bfaf20dd46c441d6de453518bb0a6f0c3c0` | no | Records the rejected shared Academy target, dedicated-project quote, provider HA facts, and pending tests; it is not evidence that HA or the archive is live. |
+| `EV-ARCHIVE-TARGET-DECISION` — Archive isolation and HA activation decision<br>`docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json` | organization_evidence | working | examine/not_run | `9c639b7ed46c1861b7d8a50f54970015c5abf1161079a5ee0077c8a0d3ae3a0d` | no | Records the rejected shared Academy target, dedicated-project quote, provider HA facts, and pending tests; it is not evidence that HA or the archive is live. |
 
 ### Objective-level CMMC evidence mapping
 
@@ -2823,7 +2823,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | `EV-VERCEL-CONFIG` — Vercel deployment configuration<br>`vercel.json` | product_supplied_evidence | working | examine/not_run | `e00c4b0c3eefeeb92f645d76216028352c14887bd8dc457ba36c9e86e086ecba` | no | Repository configuration only. |
 | `EV-VERCEL-HEALTH` — Runtime release identity health route<br>`app/api/health/route.ts` | product_supplied_evidence | working | test/not_run | `21c66454da5685f46348ba2523035f5d7ae865ace0fce8671c74755b6123f221` | no | Health contract source only; live response is separate evidence. |
 | `EV-VERCEL-INTEGRITY-TEST` — Deployment integrity test<br>`test/vercel-deployment-integrity.test.mjs` | product_supplied_evidence | working | test/not_run | `433ac5c09c3acafee82b6b6b3085d0a614e840f16d3d71418e5239f48d994ecb` | no | Test definition only until exact-run results are retained. |
-| `EV-VERCEL-E2E-WORKFLOW` — Production E2E operational gate<br>`.github/workflows/production-e2e-operational-gate.yml` | product_supplied_evidence | working | examine/not_run | `c20e3948bdb444ff75e228ff850a66a3acb1eb869b952878dd132e7f46c575ad` | no | Workflow configuration only. |
+| `EV-VERCEL-E2E-WORKFLOW` — Production E2E operational gate<br>`.github/workflows/production-e2e-operational-gate.yml` | product_supplied_evidence | working | examine/not_run | `dfc79cfde0d421f2761b3c0d8ede2dc2cfd538d591b8a4f76dd130fcfb4ad0d5` | no | Workflow configuration only. |
 
 ### Objective-level CMMC evidence mapping
 
@@ -3462,7 +3462,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 
 | Artifact | Origin | State | Method/result | SHA-256 | Finding eligible | Claim boundary |
 | --- | --- | --- | --- | --- | --- | --- |
-| `EV-DEPS-MANIFEST` — Direct dependency manifest<br>`package.json` | product_supplied_evidence | working | examine/not_run | `5e546b3c3635add0ac84e7f2435316aa7171d6db47a8109c43533f05ed031c8c` | no | Declared dependency set only. |
+| `EV-DEPS-MANIFEST` — Direct dependency manifest<br>`package.json` | product_supplied_evidence | working | examine/not_run | `cf8846f9dc74f9f0c99b2c93e281b81b9bee1489d5f5769cc125ee2295a563da` | no | Declared dependency set only. |
 | `EV-DEPS-LOCK` — Resolved dependency lockfile<br>`package-lock.json` | product_supplied_evidence | working | test/not_run | `c141f331d71fd23a5e6b78bc4ab89599953075edab941f8ea426b5c53b6e1b3e` | no | Exact dependency resolution evidence only. |
 | `EV-DEPS-UPDATES` — Automated dependency update configuration<br>`.github/dependabot.yml` | product_supplied_evidence | working | examine/not_run | `fd437addfe0da4b9de09c8876f5ac23c3fdaefc4de60c3569851cf4899809fa3` | no | Update configuration only; live alerts, review decisions, and remediation records are separate. |
 
