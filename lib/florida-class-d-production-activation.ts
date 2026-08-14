@@ -3,6 +3,10 @@ import "server-only";
 const SHA40 = /^[0-9a-f]{40}$/i;
 const CANONICAL_PUBLIC_ORIGIN = "https://www.obserrallc.com";
 const REQUIRED_DOCUMENT_BUCKET = "fdacs-class-d-completion-documents";
+const NONPRODUCTION_ENVIRONMENTS = new Set(["development", "sandbox", "staging", "uat"]);
+const MAX_HA_RTO_MINUTES = 60;
+const MAX_HA_RPO_MINUTES = 15;
+const MAX_FAILOVER_TEST_AGE_DAYS = 90;
 
 export const FLORIDA_CLASS_D_REGULATED_FEATURE_FLAGS = [
   "OBSERRA_FDACS_CLASS_D_LIVE_ENABLED",
@@ -16,6 +20,19 @@ export const FLORIDA_CLASS_D_REGULATED_FEATURE_FLAGS = [
   "OBSERRA_FDACS_CLASS_D_LIAS_WORKFLOW_ENABLED",
   "OBSERRA_FDACS_CLASS_D_COMPLETION_DOCUMENTS_ENABLED",
   "OBSERRA_FDACS_CLASS_D_QUALITY_ENABLED",
+] as const;
+
+export const FLORIDA_CLASS_D_HA_STATUS_KEYS = [
+  "OBSERRA_FDACS_HA_EDGE_DNS_STATUS",
+  "OBSERRA_FDACS_HA_APPLICATION_STATUS",
+  "OBSERRA_FDACS_HA_IDENTITY_STATUS",
+  "OBSERRA_FDACS_HA_DATABASE_STATUS",
+  "OBSERRA_FDACS_HA_MEDIA_STATUS",
+  "OBSERRA_FDACS_HA_DOCUMENT_STORAGE_STATUS",
+  "OBSERRA_FDACS_HA_COMMERCE_STATUS",
+  "OBSERRA_FDACS_HA_OBSERVABILITY_STATUS",
+  "OBSERRA_FDACS_HA_BACKUP_RESTORE_STATUS",
+  "OBSERRA_FDACS_HA_FAILOVER_EXERCISE_STATUS",
 ] as const;
 
 export type FloridaClassDProductionActivationCheck = {
@@ -40,7 +57,7 @@ export type FloridaClassDProductionActivationReport = {
 };
 
 export const FLORIDA_CLASS_D_PRODUCTION_ACTIVATION_POLICY = {
-  policyVersion: "2026-08-13-gate-26-v1",
+  policyVersion: "2026-08-13-gate-26-v2",
   canonicalPublicOrigin: CANONICAL_PUBLIC_ORIGIN,
   exactReleaseBindingRequired: true,
   exactUatReleaseBindingRequired: true,
@@ -58,6 +75,12 @@ export const FLORIDA_CLASS_D_PRODUCTION_ACTIVATION_POLICY = {
   explicitOwnerReleaseApprovalRequired: true,
   explicitProductionActivationAuthorizationRequired: true,
   perFeatureFlagsRemainIndependentlyRequired: true,
+  explicitNonProductionExecutionAuthorizationRequired: true,
+  syntheticIdentityOnlyRequiredForNonProductionExecution: true,
+  highAvailabilityRequiredForAllProductionSubsystems: true,
+  maxRtoMinutes: MAX_HA_RTO_MINUTES,
+  maxRpoMinutes: MAX_HA_RPO_MINUTES,
+  maxFailoverTestAgeDays: MAX_FAILOVER_TEST_AGE_DAYS,
   reportExposesSecretValues: false,
 } as const;
 
@@ -81,6 +104,22 @@ function validSha(input: string) {
   return SHA40.test(input);
 }
 
+function integerValue(name: string) {
+  const raw = value(name);
+  if (!/^\d+$/.test(raw)) return null;
+  const parsed = Number(raw);
+  return Number.isSafeInteger(parsed) ? parsed : null;
+}
+
+function recentTimestamp(name: string, maxAgeDays: number) {
+  const raw = value(name);
+  if (!raw) return false;
+  const timestamp = Date.parse(raw);
+  if (!Number.isFinite(timestamp)) return false;
+  const ageMs = Date.now() - timestamp;
+  return ageMs >= 0 && ageMs <= maxAgeDays * 24 * 60 * 60 * 1000;
+}
+
 function check(
   key: string,
   label: string,
@@ -96,6 +135,43 @@ function check(
     detail: ready ? readyDetail : blockedDetail,
     sensitive,
   };
+}
+
+function highAvailabilityChecks(): FloridaClassDProductionActivationCheck[] {
+  const statusChecks = FLORIDA_CLASS_D_HA_STATUS_KEYS.map((name) => check(
+    `ha:${name}`,
+    `${name} verified`,
+    exact(name, "verified"),
+    "Verified HA evidence is recorded.",
+    `${name} must be verified with authentic production-readiness evidence before activation.`,
+  ));
+  const rto = integerValue("OBSERRA_FDACS_HA_RTO_MINUTES");
+  const rpo = integerValue("OBSERRA_FDACS_HA_RPO_MINUTES");
+
+  return [
+    ...statusChecks,
+    check(
+      "ha:rto",
+      `Recovery time objective is ${MAX_HA_RTO_MINUTES} minutes or less`,
+      rto !== null && rto > 0 && rto <= MAX_HA_RTO_MINUTES,
+      "RTO target is within the controlled HA threshold.",
+      `OBSERRA_FDACS_HA_RTO_MINUTES must be a positive integer no greater than ${MAX_HA_RTO_MINUTES}.`,
+    ),
+    check(
+      "ha:rpo",
+      `Recovery point objective is ${MAX_HA_RPO_MINUTES} minutes or less`,
+      rpo !== null && rpo >= 0 && rpo <= MAX_HA_RPO_MINUTES,
+      "RPO target is within the controlled HA threshold.",
+      `OBSERRA_FDACS_HA_RPO_MINUTES must be an integer from 0 through ${MAX_HA_RPO_MINUTES}.`,
+    ),
+    check(
+      "ha:recent_failover_test",
+      `End-to-end failover exercise completed within ${MAX_FAILOVER_TEST_AGE_DAYS} days`,
+      recentTimestamp("OBSERRA_FDACS_HA_LAST_FAILOVER_TEST_AT", MAX_FAILOVER_TEST_AGE_DAYS),
+      "Recent end-to-end failover exercise is recorded.",
+      `OBSERRA_FDACS_HA_LAST_FAILOVER_TEST_AT must contain a valid timestamp no older than ${MAX_FAILOVER_TEST_AGE_DAYS} days.`,
+    ),
+  ];
 }
 
 function coreChecks(): FloridaClassDProductionActivationCheck[] {
@@ -243,6 +319,7 @@ function coreChecks(): FloridaClassDProductionActivationCheck[] {
       "Rollback verification recorded.",
       "OBSERRA_FDACS_ROLLBACK_STATUS must be verified.",
     ),
+    ...highAvailabilityChecks(),
     check(
       "owner_release_approval",
       "Owner release approval recorded",
@@ -263,6 +340,21 @@ function baseProductionConditionsReady() {
 
 export function floridaClassDProductionActivationAuthorized() {
   return baseProductionConditionsReady() && activationAuthorizationMarkerReady();
+}
+
+export function floridaClassDNonProductionExecutionAuthorized() {
+  const runtimeEnvironment = value("OBSERRA_FDACS_RUNTIME_ENVIRONMENT").toLowerCase();
+  return (
+    value("VERCEL_ENV").toLowerCase() !== "production" &&
+    NONPRODUCTION_ENVIRONMENTS.has(runtimeEnvironment) &&
+    enabled("OBSERRA_FDACS_NONPROD_ACCEPTANCE_AUTHORIZED") &&
+    enabled("OBSERRA_FDACS_SYNTHETIC_IDENTITY_ONLY") &&
+    enabled("OBSERRA_FDACS_NONPROD_EXECUTION_AUTHORIZED")
+  );
+}
+
+export function floridaClassDRegulatedExecutionAuthorized() {
+  return floridaClassDProductionActivationAuthorized() || floridaClassDNonProductionExecutionAuthorized();
 }
 
 export function getFloridaClassDProductionActivationReport(): FloridaClassDProductionActivationReport {
