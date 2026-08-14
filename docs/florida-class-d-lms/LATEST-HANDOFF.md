@@ -2,92 +2,198 @@
 
 Snapshot: 2026-08-14 ET
 
-This is the current restart authority for the Florida Class D LMS, Obserra Academy website and commerce hardening, and CMMC Level 2 / NIST SP 800-171 Rev. 3 audit-traceability workstream for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**.
+This is the current restart authority for the Obserra public website, Academy/LMS, regulated Florida Class D workstream, and CMMC Level 2 / NIST SP 800-171 Rev. 3 audit-traceability program for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**.
 
-## Repository authority
+## Current scope
 
 Repository: `jblan2026-hub/obserra-website`
 
-Current hardening branch: `feature/cmmc-level2-rev3-audit-package`
+Production branch: `main`
 
-Current pull request: `PR #58`
+Current audit synchronization branch: `docs/production-recovery-audit-2026-08-14`
 
-Base: `main`
+The authorized workstream is limited to the public website, Obserra Academy/LMS, GitHub backend supporting those services, Supabase Academy data services, Clerk identity, Stripe commerce, Vercel runtime/routing, Academy course publication, and their direct dependencies. Unrelated Obserra application products remain outside scope.
 
-Gate 33 / PR #56 was merged to `main` at:
+## Current production authority
 
-`7bb1272847d1f6426ba1cb1b73cf42ea6aee0662`
+Verified GitHub production merge SHA:
 
-The current scope is limited to the public website, Obserra Academy/LMS, GitHub backend supporting those services, Supabase Academy data services, Clerk identity, Stripe commerce, Vercel runtime/routing, Academy course publication, and direct dependencies required by those components. Other Obserra application products are outside this workstream.
+`2261e2bd11bce0986976a2b366ece8949f129f0c`
+
+Verified Vercel production deployment:
+
+`dpl_Hv9fdpMbFUrbGCqh3zzuN9ct2Ayp`
+
+Canonical domains directly observed on that deployment:
+
+- `www.obserrallc.com`
+- `obserrallc.com`
+
+The current production deployment is READY. Public root and Academy were verified available after recovery. Academy retains the reviewed 60-course nonregulated catalog.
 
 ## Controlled restart records
 
-Read these before changing regulated or audit behavior:
+Read these records before changing production, regulated, identity, payment, deployment, or audit behavior:
 
-1. `HANDOFF.md`
-2. `LATEST-HANDOFF.md`
-3. `ACTION-LEDGER.md`
-4. `ACTION-LEDGER-GATES-29-32-ADDENDUM.md`
-5. `ACTION-LEDGER-GATE-33-ADDENDUM.md`
-6. `ACTION-LEDGER-GATE-34-ADDENDUM.md`
-7. `GATE-29-MIGRATION-PARITY-HANDOFF.md`
-8. `GATE-30-MUTATION-BOUNDARY-HANDOFF.md`
-9. `GATE-31-HA-EVIDENCE-INTEGRITY-HANDOFF.md`
-10. `GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md`
-11. `GATE-33-CMMC-LEVEL-2-REV3-TRACEABILITY-HANDOFF.md`
-12. `GATE-34-PRODUCTION-IDENTITY-ROUTING-CMMC-EVIDENCE-HANDOFF.md`
-13. `CMMC-LEVEL-2-REV3-TRACEABILITY.json`
-14. `CMMC-LEVEL-2-REV3-TRACEABILITY.schema.json`
-15. `CMMC-LEVEL-2-REV3-AUDIT-MATRIX.md`
-16. `CMMC-LEVEL-2-REV3-TRACEABILITY.sha256`
-17. `CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.json`
-18. `CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.md`
-19. `CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.sha256`
-20. `DS-SUBMISSION-LMS-GUIDE-CONTROL.md`
+1. `LATEST-HANDOFF.md`
+2. `PRODUCTION-RECOVERY-2026-08-14-HANDOFF.md`
+3. `ACTION-LEDGER-PRODUCTION-RECOVERY-2026-08-14.md`
+4. `ACTION-LEDGER.md`
+5. `ACTION-LEDGER-GATES-29-32-ADDENDUM.md`
+6. `ACTION-LEDGER-GATE-33-ADDENDUM.md`
+7. `ACTION-LEDGER-GATE-34-ADDENDUM.md`
+8. `GATE-29-MIGRATION-PARITY-HANDOFF.md`
+9. `GATE-30-MUTATION-BOUNDARY-HANDOFF.md`
+10. `GATE-31-HA-EVIDENCE-INTEGRITY-HANDOFF.md`
+11. `GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md`
+12. `GATE-33-CMMC-LEVEL-2-REV3-TRACEABILITY-HANDOFF.md`
+13. `GATE-34-PRODUCTION-IDENTITY-ROUTING-CMMC-EVIDENCE-HANDOFF.md`
+14. `CMMC-LEVEL-2-REV3-TRACEABILITY.json`
+15. `CMMC-LEVEL-2-REV3-TRACEABILITY.schema.json`
+16. `CMMC-LEVEL-2-REV3-AUDIT-MATRIX.md`
+17. `CMMC-LEVEL-2-REV3-TRACEABILITY.sha256`
+18. `CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.json`
+19. `CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.md`
+20. `CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.sha256`
+21. `DS-SUBMISSION-LMS-GUIDE-CONTROL.md`
 
-Historical verifier literals remain historical evidence and must not be rewritten merely because a later gate exists.
+Historical records and failed intermediate releases are retained as audit evidence and must not be rewritten to make the recovery appear linear or failure free.
 
-## Exact Gate 34 source checkpoint
+## Production recovery authority
 
-The completed Gate 34 source checkpoint before final documentation synchronization is:
+The complete production incident and recovery chronology is recorded in:
 
-`0dbc9f6ce5b082161720f3b9a166482033d919f2`
+`PRODUCTION-RECOVERY-2026-08-14-HANDOFF.md`
 
-All five mandatory workflows passed on that exact SHA:
+`ACTION-LEDGER-PRODUCTION-RECOVERY-2026-08-14.md`
 
-- Florida Class D LMS Gates #537.
-- Website CI #2285.
-- Academy 70x Production Gate #1275.
-- Application Release Validation #964.
-- Application Production Pipeline #984.
+The recovery sequence includes Gate 34 canonical routing/identity changes, Gate 35 removal of runtime environment mutation, Gate 36 conditional Clerk isolation, Vercel deployment-integrity correction, and explicit fail-closed identity activation.
 
-The regulated job is named `Gates 1-34 and website compatibility`. Locked dependency installation, immutable lockfile verification, high-severity production dependency audit, Gates 1 through 34, repository tests, lint, and production build passed.
+Current production merge `2261e2bd...` was created from exact validated PR #73 head:
 
-Documentation/evidence synchronization commits after `0dbc9f6c...` change the PR head. The final documentation head must pass the same five workflows before becoming final Gate 34 authority.
+`d6ffd3b31a6d4eb69e39fbe856d1248528d5e071`
 
-## Historical checkpoints retained
+Required checks on that exact head passed:
 
-Gates 1 through 31 five-green historical authority:
+- Florida Class D LMS Gates #562.
+- Website CI #2330.
+- CodeQL Advanced #28.
 
-`99ef49f4b43ee0cd0da6f147a4566e4d22a47aa8`
+## Current website and Academy acceptance state
 
-Gate 32 source checkpoint:
+Verified production behavior on the current READY deployment includes:
 
-`c53e18e33eb7fb6a3bdfc9569b18381b3eef0a19`
+- public root available;
+- public Academy available;
+- reviewed 60-course nonregulated Academy catalog available;
+- canonical custom domains bound to the exact current deployment;
+- `GET /api/academy/checkout?...` returns HTTP 405 with `Allow: POST`, preventing the non-destructive validation request from creating a Stripe Checkout Session;
+- commerce health returns no-store and truthfully reports the current degraded provider state rather than enabling checkout;
+- current production deployment had no error/fatal runtime logs in the checked post-recovery window; and
+- Florida Class D remains excluded from generic Academy commerce and production activation.
 
-Gate 33 final validated documentation authority before merge:
+No live POST checkout was performed during recovery verification.
 
-`4891b3b0f1c8a4ad4aa7c9804dd683e22e03b5d2`
+## Identity security boundary
 
-Gate 33 merge commit:
+Identity is intentionally fail closed and currently not production enabled.
 
-`7bb1272847d1f6426ba1cb1b73cf42ea6aee0662`
+Authoritative runtime control:
 
-These remain immutable audit evidence.
+`OBSERRA_IDENTITY_RUNTIME_ENABLED`
+
+Secure default:
+
+`false`
+
+The current architecture requires explicit identity activation plus accepted Clerk production configuration before Clerk middleware/provider execution is considered ready.
+
+When identity is unavailable:
+
+- public informational content remains available;
+- protected/authenticated routes remain unavailable or redirect through the controlled configuration-required boundary;
+- Florida Class D regulated mutation controls execute before identity delegation; and
+- no public availability dependency is created on Clerk initialization.
+
+Do not set `OBSERRA_IDENTITY_RUNTIME_ENABLED=true` until the production Clerk instance and matching live protected configuration are verified through the provider control plane.
+
+Never place Clerk secret values in Git, audit documents, public issues, logs, or chat.
+
+## Stripe commerce boundary
+
+Current production commerce health reports:
+
+- `operational: false`
+- payment provider unavailable
+- webhook verification unavailable
+- identity degraded
+- idempotent fulfillment retained
+
+Source controls remain secure and fail closed:
+
+- Checkout Session creation is POST-only.
+- Same-origin validation is required.
+- Current Academy purchase authorization is rechecked.
+- GET checkout returns 405.
+- Webhook fulfillment requires Stripe signature validation and paid status.
+- Deferred redemption revalidates payment and verified purchaser identity.
+- Generic Academy commerce cannot activate Florida Class D.
+
+The protected production Stripe secret and webhook secret must be restored/verified through the Stripe/Vercel control planes. Do not place their values in Git or chat.
+
+After provider configuration is restored, redeploy a verified `main` release and prove healthy commerce status before any real payment transaction test.
+
+## Vercel deployment-integrity controls
+
+The production recovery identified two deployment-control defects and closed them in source.
+
+First, the Vercel project Ignored Build Step did not recognize a root-level `proxy.ts` change and canceled the Gate 36 production deployment. The repository now contains:
+
+`lib/proxy-release-fingerprint.ts`
+
+`test/vercel-deployment-integrity.test.mjs`
+
+The test calculates the exact Git blob identity of `proxy.ts` and requires the `lib/` sentinel to remain synchronized. The existing Vercel project rule recognizes `lib/`, so a governed proxy change cannot silently reproduce the observed skip condition under the current rule.
+
+The SHA-1 sentinel is only a Git object identity for deployment relevance. It is not represented as CMMC cryptographic evidence.
+
+Second, `.vercelignore` previously excluded `package-lock.json`. That exclusion was removed. Vercel now receives the same lockfile that CI installs and audits, restoring CI-to-production dependency-resolution parity.
+
+The regulated workflow explicitly verifies both controls.
+
+## Academy database boundary
+
+Main Supabase project:
+
+`Obserra Academy`
+
+Project ref:
+
+`nwxnyqlyzyufgoadtqxs`
+
+Direct production checks during recovery found:
+
+- 60 published/purchasable nonregulated Academy course controls;
+- zero Class D/security-officer-like publication controls; and
+- zero production `fdacs_class_d_*` objects.
+
+No Florida Class D production schema promotion has occurred.
+
+Regulated synthetic nonproduction project:
+
+`obserra-fdacs-lms-nonprod`
+
+Project ref:
+
+`jeklrsratrijrsamdauv`
+
+Its purpose remains regulated synthetic acceptance only.
 
 ## Gate 29 through Gate 31 regulated controls
 
-The Class D regulated migration lineage contains exactly 29 migrations. Latest regulated migration version:
+The authoritative Class D migration lineage remains exactly 29 migrations.
+
+Latest regulated migration version:
 
 `20260814011203`
 
@@ -95,190 +201,115 @@ Canonical migration manifest SHA-256:
 
 `a2099d8610f0427fa2f85cb7a47efaa2af4b899be21952b0fcacaadd15e8e453`
 
-Gate 30 enforces the global default-deny Class D mutation boundary before authentication. Normal regulated writes require production regulated-execution authorization. Gate 23 acceptance mutations are separately restricted to explicit regulated nonproduction authorization.
+Gate 30 preserves the default-deny Class D mutation boundary. Normal regulated mutations require production regulated-execution authorization. Gate 23 acceptance mutation remains separately restricted to explicitly authorized synthetic nonproduction execution.
 
-Gate 31 requires candidate-bound cryptographic HA evidence for exactly ten service areas: edge/DNS, application runtime, identity, database, media, document storage, commerce, observability, backup/restore, and failover. Missing, stale, incomplete, mismatched, or tampered evidence fails closed. No provider HA evidence has been fabricated.
+Gate 31 requires candidate-bound cryptographic HA evidence for exactly ten service areas: edge/DNS, application runtime, identity, database, media, document storage, commerce, observability, backup/restore, and failover.
 
-## Gate 32 website, Academy, database, identity, and payment controls
+Missing, stale, incomplete, mismatched, or tampered evidence fails closed. Authentic provider backup, recovery, RPO, RTO, and failover evidence remains incomplete and has not been inferred from vendor marketing.
 
-Validated controls retained through Gate 34 include:
+## CMMC Level 2 and NIST SP 800-171 Rev. 3 traceability
 
-- The reviewed nonregulated Academy baseline contains 60 published/purchasable course controls.
-- Zero Class D/security-officer-like controls are included in that baseline.
-- Academy control failure defaults to unpublished, invisible, and non-purchasable.
-- Public catalog is GET-only, public-field-limited, public-visible-only, no-store, and source-controlled.
-- Paid Academy media and tutor access require authenticated identity and entitlement in preview and production.
-- Stripe Checkout Session creation is POST-only, same-origin protected, and no-store.
-- GET checkout is rejected with 405 in the validated source.
-- Stripe fulfillment requires signed webhooks and paid status and remains idempotent.
-- Deferred redemption revalidates the paid session and verified Clerk email ownership.
-- Generic Academy commerce does not activate Florida Class D.
-- Academy backend data paths retain forced-RLS/no-client-grant posture where designed as service-only paths.
-- Reviewed Academy release identity is version `1.0.0`, status `published`.
-- Production dependency audit blocks high-severity findings.
+Primary engineering baseline:
 
-Canonical Academy database migrations added during Gate 32 hardening:
+**NIST SP 800-171 Rev. 3**
 
-`supabase/migrations/20260814025503_academy_worker_fk_performance_indexes.sql`
+Assessment-procedure baseline:
 
-`supabase/migrations/20260814025522_academy_baseline_publication_controls.sql`
+**NIST SP 800-171A Rev. 3**
 
-## Gate 33 CMMC Level 2 / Rev. 3 traceability
+The current CMMC Level 2 Rev. 2 practice crosswalk remains separately maintained for the currently enforced DoD assessment regime.
 
-Primary engineering baseline: **NIST SP 800-171 Rev. 3**.
-
-Assessment-procedure baseline: **NIST SP 800-171A Rev. 3**.
-
-Current CMMC Level 2 crosswalk: the 110 NIST SP 800-171 Rev. 2 practice identifiers remain separately maintained for the current DoD assessment regime.
-
-Authoritative requirements/register source:
+### Primary machine-readable requirements register
 
 `CMMC-LEVEL-2-REV3-TRACEABILITY.json`
 
-Generated human audit matrix:
+Generated human matrix:
 
 `CMMC-LEVEL-2-REV3-AUDIT-MATRIX.md`
 
-Current Gate 33 register SHA-256:
+Current requirements-register SHA-256:
 
 `7119dd9f2b00aa6f9b23bca7a4f4677303e80066c1936dee4b5ae136d1b0eab3`
 
-The Rev. 3 register includes 97 active requirements, 33 withdrawn numbered identifiers, provisional asset scope, implementation traces, Rev. 2 cross-references, evidence references, assessment methods, responsibility boundaries, and explicit gaps. The human matrix is generated, not manually maintained.
-
-Formal CUI assessment scope established: false.
-
-SSP complete: false.
-
-Asset inventory complete: false.
-
-CUI processing authorized: false.
-
-## Gate 34 production identity and routing hardening
-
-Gate 34 creates one Clerk runtime configuration authority:
-
-`lib/clerk-runtime-config.ts`
-
-It normalizes Clerk's supported publishable-key environment names, trims harmless surrounding whitespace, validates matching key environments, requires live keys in Vercel production, and returns only nonsecret diagnostic reason codes. Layout, middleware, and identity health now consume the same authority. Secret values are not retained in audit evidence.
-
-`vercel.json` now source-controls exactly these production aliases:
-
-- `www.obserrallc.com`
-- `obserrallc.com`
-
-This is intended to prevent canonical custom domains from remaining pinned to an older READY deployment after a verified production release.
-
-## Gate 34 production evidence no-drift package
+### Production evidence register
 
 Machine-readable source:
 
 `CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.json`
 
-Generated human-readable evidence:
+Generated human-readable audit view:
 
 `CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.md`
 
-Digest:
+Current production-evidence SHA-256:
 
-`CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.sha256`
+`1730a06349965a50d873b18af7ab8b36366bc3f00c2eed85a285ceed0b380ed4`
 
-Current machine-source SHA-256:
-
-`f0cab58487e732d08fd5a1f340a86fa18f991b5fa38210abbfa8e7ffbc2546cb`
-
-Generator/verifier:
-
-`scripts/cmmc-level2-rev3-production-evidence.mjs`
-
-Permanent read-only validation:
+The human view and digest were regenerated deterministically from the machine source. The temporary write-capable recovery bootstrap workflow was removed immediately afterward. Permanent validation remains read only through:
 
 `npm run verify:cmmc-production-evidence`
 
-Official NIST OSCAL provenance is pinned to `usnistgov/oscal-content`, path `nist.gov/SP800-171/rev3/json/NIST_SP800-171_rev3_catalog.json`, blob SHA:
+The production evidence now includes 12 PRE records covering identity, canonical routing, exact-SHA release/runtime validation, Stripe, Academy database controls, no-drift audit traceability, HA/recovery, regulated Class D separation, GitHub branch enforcement, GitHub code security/dependency monitoring, Vercel deployment integrity, and the production incident recovery.
 
-`1bc9d5ab5f57329c1ab5553b4d2b27ea54d9d13f`
+## GitHub security and change-control boundary
 
-Gate 34 production evidence includes `PRE-009 GitHub protected-branch enforcement gap` so the repository control-plane weakness is machine-readable rather than hidden in prose.
+Source-controlled GitHub security hardening completed within available authority:
 
-The temporary write-capable Gate 34 bootstrap workflow was removed after generated artifacts were produced. No permanent write-capable CMMC evidence workflow remains.
+- CodeQL Advanced enabled and operating for GitHub Actions and JavaScript/TypeScript.
+- Obserra-specific coordinated vulnerability disclosure policy in `SECURITY.md`.
+- Dependabot version-update configuration retained for subsystem-grouped npm dependencies.
+- GitHub Actions dependency-update review tightened to weekly.
+- GitHub issue #60 created as the controlled administrator work item for remaining provider-side repository security settings.
 
-## GitHub branch-protection gap
+Direct GitHub control-plane inspection still reports:
 
-Direct repository inspection on 2026-08-14 found `main` with:
+- `main` protected: false;
+- branch protection enforcement disabled;
+- required status-check enforcement off; and
+- repository rulesets: none.
 
-- `protected: false`
-- branch-protection enforcement disabled
-- required status-check enforcement off
+The Dependabot alerts API reported alerts disabled. Secret-scanning/push-protection state could not be verified through the current integration.
 
-This is an open configuration/change-control gap mapped to Rev. 3 requirements including `03.01.05`, `03.04.03`, `03.04.05`, `03.12.01`, and `03.16.01`.
+These conditions remain open evidence gaps. Voluntary CI discipline is not represented as equivalent to technical branch enforcement.
 
-The current connected GitHub toolset exposes no branch-protection/ruleset mutation. Therefore the gap remains open until an authorized GitHub administrator enables and evidences a `main` protection/ruleset requiring the governed pull-request path and mandatory release checks.
+GitHub issue #60 must remain open until an authorized administrator enables and evidences the required `main` ruleset/protection, required checks, force-push/deletion restrictions, governed bypass handling, Dependabot alerts/security updates, and supported secret-scanning/push-protection controls.
 
-Do not represent voluntary five-green validation as equivalent to technical branch enforcement.
+## Florida Class D regulated production boundary
 
-## Live Supabase boundary
+Florida Class D production authorized: **false**.
 
-Main project: `Obserra Academy`
+CUI processing authorized: **false**.
 
-Project ref: `nwxnyqlyzyufgoadtqxs`
+Production Class D schema promoted: **false**.
 
-Last directly observed state: `ACTIVE_HEALTHY`.
+Nothing in the production website recovery authorizes real regulated enrollment, learner access, scheduling, instruction, examination, LIAS production execution, official completion release, observer access, Class D database mutation, or regulated production activation.
 
-Production Class D schema objects: zero.
+The historical Gate 23 18-of-18 synthetic acceptance record is not candidate-bound to the current release and cannot be reused as final regulated acceptance.
 
-Regulated nonproduction branch: `obserra-fdacs-lms-nonprod`
+Class D production still requires at minimum:
 
-Project ref: `jeklrsratrijrsamdauv`
+- applicable Class DS authorization;
+- applicable DI instructor authorization;
+- fresh exact-candidate Gate 23 synthetic acceptance;
+- production database promotion from the exact candidate;
+- authentic provider HA, backup/recovery, RPO/RTO, and failover evidence;
+- security acceptance;
+- rollback evidence; and
+- explicit production activation prerequisites.
 
-Purpose: synthetic regulated acceptance only.
+No CI result, provider state, source commit, handoff, filing packet, or audit mapping is FDACS approval or CMMC certification.
 
-No Class D production database promotion has occurred.
+## Formal CUI / CMMC assessment boundary
 
-The connected Supabase control plane does not expose authoritative backup/restore configuration evidence. Backup, restore, retention, recovery testing, RPO, RTO, and failover remain unverified rather than assumed.
+Formal CUI assessment scope established: false.
 
-## Live Vercel and canonical routing boundary
+SSP complete: false.
 
-Team: `ObserraLLC`
+Final asset inventory complete: false.
 
-Team slug: `obserra`
+CUI processing authorized: false.
 
-Team ID: `team_xpUE1GefY2JHuFFCqbAdnZAj`
-
-Project: `obserra-website-live`
-
-Project ID: `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`
-
-Gate 33 merge deployment:
-
-`dpl_7e9hNGYHF1M7xxkvYQHqN6kzZxwY`
-
-Source SHA:
-
-`7bb1272847d1f6426ba1cb1b73cf42ea6aee0662`
-
-Observed state: READY.
-
-However, direct runtime logs established that canonical traffic remained on older deployment:
-
-`dpl_8VC9x6gKpPjmB2DXyQx1FxDfyEi8`
-
-Older source SHA:
-
-`80473277620e05acd5359330a706204703c999f0`
-
-That routing drift is the reason Gate 34 source-controls the canonical aliases. After PR #58 merge, both domains must be verified against the exact new production deployment before routing acceptance is closed.
-
-## Florida Class D production boundary
-
-Florida Class D production remains **fail closed**.
-
-Nothing in Gates 29 through 34 authorizes public regulated enrollment, real regulated learner access, production Class D scheduling, instruction, examination access, LIAS production execution, official completion release, regulated observer access, Class D production database promotion, CUI processing, or regulated runtime activation.
-
-The historical Gate 23 18-of-18 synthetic UAT record is not candidate-bound to the current release and cannot be reused as final acceptance.
-
-Class D production still requires, at minimum, applicable licensing/authorization, fresh exact-candidate UAT, production database promotion from the exact candidate, authentic HA/recovery evidence, security acceptance, rollback evidence, and explicit production activation prerequisites.
-
-No CI result, handoff, source commit, provider state, or evidence mapping is FDACS approval or CMMC certification.
+Before any future authorization to process CUI, complete the contract-specific CUI boundary, asset categorization, SSP, network/data-flow diagrams, organization-defined parameters, policies/procedures, provider responsibility evidence, applicable FIPS evidence, personnel/physical/media/training/incident evidence, and formal assessment artifacts.
 
 ## Controlled filing baseline
 
@@ -291,14 +322,14 @@ Private controlled filing baseline remains:
 - Curriculum SHA-256 `e76928fefc11a0640f02c80f02af4c2aacbecee39d09f38dbd9776653c2863fd`.
 - Examination SHA-256 `240e297682e157221e33ec830bef026e829116ac5f57c5de5565fa244241467e`.
 
-`DS-SUBMISSION-LMS-GUIDE-CONTROL.md` remains older public metadata and must not be represented as synchronized with the private filing baseline until a controlled revision lands.
+`DS-SUBMISSION-LMS-GUIDE-CONTROL.md` remains older public metadata and must not be represented as synchronized with the current private filing baseline until a controlled revision actually lands.
 
 ## Next governed actions
 
-1. Validate the final Gate 34 documentation/evidence head with all five mandatory workflows.
-2. Confirm PR #58 is mergeable and still limited to website/Academy/LMS dependencies.
-3. Merge PR #58 under the existing owner authorization only after the exact final head is five green.
-4. Verify the new Vercel production deployment is READY, bound to the exact merge SHA, and owns both canonical custom domains.
-5. Verify canonical production Clerk authentication/identity, Academy 60-course catalog, POST-only checkout, GET checkout 405, Stripe commerce health, signed-webhook readiness, security headers, runtime telemetry, and Class D fail-closed behavior.
-6. Enable/evidence GitHub `main` branch protection/ruleset through an authorized administrative path and close `PRE-009` only after direct verification.
-7. Continue authentic provider HA/recovery evidence collection and complete formal CUI scope, SSP, organization-defined parameters, policies/procedures, and organizational assessment evidence before any CUI authorization or broader CMMC claim.
+1. Merge this audit-only synchronization only after exact-head CMMC production-evidence verification, regulated workflow validation, Website CI, and CodeQL where triggered.
+2. Keep application source frozen unless a production defect is found.
+3. Restore/verify Clerk production configuration through the provider control plane, then enable `OBSERRA_IDENTITY_RUNTIME_ENABLED=true` and redeploy only after the identity instance is verified.
+4. Restore/verify Stripe production secret and webhook secret through the provider/runtime control planes, redeploy, then verify commerce health before any real payment test.
+5. Complete GitHub issue #60 through an authorized GitHub administrative path and retain direct control-plane evidence before closing `PRE-009`/the remaining GitHub security gap.
+6. Continue collecting authentic provider HA, recovery, security, and shared-responsibility evidence for Gate 31 and the CMMC package.
+7. Keep Florida Class D and CUI processing fail closed until their separate objective prerequisites are complete.
