@@ -1,6 +1,7 @@
 export type ApplicationLaunchResolution =
   | { status: "ready"; url: string; environmentKey: string }
-  | { status: "not-configured" | "not-approved"; environmentKey: string };
+  | { status: "not-configured"; environmentKey: string }
+  | { status: "not-approved"; environmentKey: string };
 
 export function applicationLaunchEnvironmentKey(slug: string) {
   return `APP_LAUNCH_${slug.replace(/[^a-z0-9]+/gi, "_").toUpperCase()}`;
