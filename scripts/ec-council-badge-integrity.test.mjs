@@ -96,7 +96,7 @@ test("every authorized asset exists, matches its digest and dimensions, and is s
     assert.match(credential.sha256, /^[a-f0-9]{64}$/);
     assert.match(credential.assetPath, /^\/badges\/eccouncil\/[a-z0-9-]+\.(png|svg)$/);
     const relativeAssetPath = credential.assetPath.replace(/^\//, "");
-    const assetPath = path.join(repositoryRoot, "public", relativeAssetPath.replace(/^badges\/eccouncil\//, "badges/eccouncil/"));
+    const assetPath = path.join(repositoryRoot, "public", relativeAssetPath);
     assert.equal(path.dirname(assetPath), assetDirectory, `${credential.id}: asset escaped the authorized directory`);
     assert.equal(existsSync(assetPath), true, `${credential.id}: asset is missing`);
     const bytes = readFileSync(assetPath);
