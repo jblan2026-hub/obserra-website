@@ -2,10 +2,10 @@
 
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update `CMMC-LEVEL-2-REV3-TRACEABILITY.json` and run `npm run generate:cmmc-traceability`.
 
-Registry SHA-256: `7119dd9f2b00aa6f9b23bca7a4f4677303e80066c1936dee4b5ae136d1b0eab3`
+Registry SHA-256: `ab63297c4b6dcccd8e7a6e1b03ded72d150b163217db77832c90d783432de226`
 Registry schema version: `1.0`
 Registry snapshot date: `2026-08-13`
-Source checkpoint represented by the register: `c53e18e33eb7fb6a3bdfc9569b18381b3eef0a19`
+Source checkpoint represented by the register: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
 
 ## Audit Claim Boundary
 
@@ -174,14 +174,16 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Shared Obserra and Clerk
 
-The website exports Clerk middleware directly and paid Academy media and tutor routes require authenticated identity and current entitlement in preview and production.
+The website conditionally delegates to validated Clerk middleware, reports the validated identity environment without exposing keys, fails protected routes closed when identity is unavailable, and requires authenticated identity plus current durable entitlement for paid Academy media and tutor access.
 
 Evidence:
 
 * `proxy.ts`
+* `lib/identity-runtime.ts`
+* `lib/academy.ts`
 * `app/api/academy/tutor/route.ts`
 * `app/api/academy/media/route.ts`
-* `docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md`
+* `docs/florida-class-d-lms/GATE-35-PRODUCTION-REMEDIATION-DUAL-BASELINE-HANDOFF.md`
 
 Open evidence condition: Production verification, MFA policy, authenticator policy, and Clerk provider assurance remain required.
 
@@ -263,12 +265,16 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Shared Obserra and Supabase
 
-Reviewed Academy data tables use forced row level security with no anonymous or authenticated grants, while reviewed security definer functions are service role only with controlled search paths.
+Reviewed Academy publication and durable learner-commerce tables use forced row level security with no anonymous or authenticated grants. Nine durable learner-commerce security-definer functions are service-role only with an empty search path, and learner and assessment audit tables reject update and delete operations.
 
 Evidence:
 
 * `supabase/migrations/20260814025522_academy_baseline_publication_controls.sql`
-* `docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md`
+* `supabase/migrations/20260814061110_academy_durable_learner_commerce.sql`
+* `supabase/migrations/20260814061912_academy_payment_event_integrity_hardening.sql`
+* `lib/academy-persistence.ts`
+* `scripts/academy-durable-commerce-gate.mjs`
+* `docs/florida-class-d-lms/GATE-35-PRODUCTION-REMEDIATION-DUAL-BASELINE-HANDOFF.md`
 
 Open evidence condition: Full database role inventory, provider assurance, backup controls, and periodic privilege review evidence remain required.
 
@@ -290,7 +296,9 @@ Evidence:
 
 * `app/api/academy/checkout/route.ts`
 * `app/academy/AcademyClient.tsx`
+* `app/catalog/page.tsx`
 * `app/academy/[courseId]/page.tsx`
+* `lib/academy-request.ts`
 * `scripts/florida-class-d-website-academy-commerce-gate.mjs`
 
 Open evidence condition: Production verification after deployment and Stripe provider assurance remain required.
@@ -307,13 +315,17 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Shared Obserra and Stripe
 
-Payment fulfillment requires a Stripe signed webhook and a paid event, and entitlement creation is idempotent.
+Payment fulfillment requires a Stripe-signed webhook and paid status. Each provider event is transactionally recorded in the service-only Academy payment ledger using the Stripe event ID as the idempotency authority before an entitlement is fulfilled or placed into paid-pending-claim state.
 
 Evidence:
 
 * `app/api/webhook/stripe/route.ts`
 * `app/api/academy/commerce-health/route.ts`
-* `docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md`
+* `lib/academy-persistence.ts`
+* `supabase/migrations/20260814061110_academy_durable_learner_commerce.sql`
+* `supabase/migrations/20260814061912_academy_payment_event_integrity_hardening.sql`
+* `scripts/academy-durable-commerce-gate.mjs`
+* `docs/florida-class-d-lms/GATE-35-PRODUCTION-REMEDIATION-DUAL-BASELINE-HANDOFF.md`
 
 Open evidence condition: Provider availability, webhook delivery assurance, and production event evidence remain external.
 
@@ -329,11 +341,14 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Shared Obserra, Clerk, and Stripe
 
-Deferred paid course claims require exact user binding or a verified Clerk email matching the paid Stripe purchaser email. Unverified aliases cannot claim access.
+Deferred paid course claims require exact user binding or a verified Clerk email matching the paid Stripe purchaser email. Guest purchaser email is HMAC-SHA-256 protected in durable storage, and a claim cannot succeed unless a signed webhook has already recorded the paid checkout event.
 
 Evidence:
 
 * `app/api/academy/redeem/route.ts`
+* `lib/academy-persistence.ts`
+* `supabase/migrations/20260814061110_academy_durable_learner_commerce.sql`
+* `supabase/migrations/20260814061912_academy_payment_event_integrity_hardening.sql`
 * `scripts/florida-class-d-website-academy-commerce-gate.mjs`
 
 Open evidence condition: Provider identity proofing and email verification configuration require external evidence.
@@ -350,12 +365,14 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Obserra GitHub and Supabase
 
-Course publication and regulated operations retain audit events and controlled handoffs. Gate evidence is bound to exact source commits and retained as GitHub artifacts where implemented.
+Course publication, paid fulfillment, assessment, learner progress, and regulated operations retain controlled audit events. Academy assessment and learner event records are append-only. Gate evidence is bound to source checkpoints and retained as GitHub artifacts where implemented.
 
 Evidence:
 
 * `docs/florida-class-d-lms/ACTION-LEDGER-GATES-29-32-ADDENDUM.md`
+* `docs/florida-class-d-lms/ACTION-LEDGER-GATE-35-ADDENDUM.md`
 * `docs/florida-class-d-lms/LATEST-HANDOFF.md`
+* `supabase/migrations/20260814061110_academy_durable_learner_commerce.sql`
 * `.github/workflows/florida-class-d-lms-gates.yml`
 
 Open evidence condition: Centralized log retention, immutable external archive, alert review cadence, and time synchronization evidence require completion.
@@ -482,12 +499,15 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Shared Obserra and Vercel
 
-Vercel runtime telemetry identified Clerk middleware failures and Academy degradation, and the findings were remediated in source rather than suppressed.
+Vercel runtime telemetry identified Clerk middleware failures and Academy degradation. Source remediation includes a noncached website liveness contract and a scheduled production operational gate that requires live Clerk, Stripe account capability, signed webhook configuration, durable Academy storage, and regulated LMS readiness instead of suppressing degradation.
 
 Evidence:
 
-* `docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md`
-* `docs/florida-class-d-lms/ACTION-LEDGER-GATES-29-32-ADDENDUM.md`
+* `app/api/health/route.ts`
+* `app/api/academy/commerce-health/route.ts`
+* `.github/workflows/production-e2e-operational-gate.yml`
+* `docs/florida-class-d-lms/GATE-35-PRODUCTION-REMEDIATION-DUAL-BASELINE-HANDOFF.md`
+* `docs/florida-class-d-lms/ACTION-LEDGER-GATE-35-ADDENDUM.md`
 
 Open evidence condition: Formal continuous monitoring strategy, alert routing, escalation, retention, and periodic review evidence remain required.
 
@@ -595,13 +615,17 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Obserra GitHub CI
 
-CMMC and NIST traceability is maintained in one machine readable source register. Human readable audit output and its digest are generated deterministically, and CI fails on schema, catalog, mapping, evidence reference, or generated document drift.
+CMMC and NIST traceability is maintained in machine-readable registers. The Gate 35 dual-baseline register explicitly enumerates all 110 Rev. 2 assessment requirements, all 97 active Rev. 3 engineering requirements, and all 33 withdrawn Rev. 3 identifiers. Human-readable output and digests are generated deterministically, and CI fails on schema, catalog, mapping, evidence reference, or generated-document drift.
 
 Evidence:
 
 * `docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.json`
 * `docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.schema.json`
 * `scripts/cmmc-level2-rev3-traceability.mjs`
+* `docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.json`
+* `docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.schema.json`
+* `docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MATRIX.md`
+* `scripts/cmmc-level2-dual-baseline.mjs`
 * `.github/workflows/florida-class-d-lms-gates.yml`
 
 Open evidence condition: The SSP and organization wide policies remain separate required assessment evidence and are not auto satisfied by this register.

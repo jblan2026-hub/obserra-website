@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://obserrallc.com/schemas/cmmc-level-2-dual-baseline-mapping.schema.json",
+  "title": "Obserra CMMC Level 2 Rev. 2 and Rev. 3 Dual-Baseline Mapping",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "snapshotDate",
+    "program",
+    "baselines",
+    "scopeState",
+    "mappingPolicy",
+    "authoritativeSources",
+    "outputs",
+    "rev2Families"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "snapshotDate": { "type": "string", "format": "date" },
+    "program": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "owner", "repository", "workingBranch", "startingSourceSha", "claimBoundary"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "repository": { "type": "string", "minLength": 1 },
+        "workingBranch": { "type": "string", "minLength": 1 },
+        "startingSourceSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "claimBoundary": { "type": "string", "minLength": 1 }
+      }
+    },
+    "baselines": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cmmcLevel2Assessment", "forwardEngineering"],
+      "properties": {
+        "cmmcLevel2Assessment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["publication", "assessmentPublication", "requirementCount", "assessmentStatus"],
+          "properties": {
+            "publication": { "const": "NIST SP 800-171 Rev. 2" },
+            "assessmentPublication": { "const": "NIST SP 800-171A Jun2018" },
+            "requirementCount": { "const": 110 },
+            "assessmentStatus": { "const": "not_assessed" }
+          }
+        },
+        "forwardEngineering": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["publication", "assessmentPublication", "activeRequirementCount", "withdrawnIdentifierCount", "registry"],
+          "properties": {
+            "publication": { "const": "NIST SP 800-171 Rev. 3" },
+            "assessmentPublication": { "const": "NIST SP 800-171A Rev. 3" },
+            "activeRequirementCount": { "const": 97 },
+            "withdrawnIdentifierCount": { "const": 33 },
+            "registry": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "scopeState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formalCuiAssessmentScopeEstablished", "sspComplete", "assetInventoryComplete", "networkAndDataFlowDiagramsComplete", "cuiProcessingAuthorized"],
+      "properties": {
+        "formalCuiAssessmentScopeEstablished": { "const": false },
+        "sspComplete": { "type": "boolean" },
+        "assetInventoryComplete": { "type": "boolean" },
+        "networkAndDataFlowDiagramsComplete": { "type": "boolean" },
+        "cuiProcessingAuthorized": { "const": false }
+      }
+    },
+    "mappingPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["directIdentifierRule", "implementationRule", "assessmentRule", "rev3OnlyRule"],
+      "properties": {
+        "directIdentifierRule": { "type": "string", "minLength": 1 },
+        "implementationRule": { "type": "string", "minLength": 1 },
+        "assessmentRule": { "type": "string", "minLength": 1 },
+        "rev3OnlyRule": { "type": "string", "minLength": 1 }
+      }
+    },
+    "authoritativeSources": {
+      "type": "array",
+      "minItems": 6,
+      "uniqueItems": true,
+      "items": { "type": "string", "format": "uri" }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "generator", "humanReadable", "digest", "ciCommand"],
+      "properties": {
+        "schema": { "type": "string", "minLength": 1 },
+        "generator": { "type": "string", "minLength": 1 },
+        "humanReadable": { "type": "string", "minLength": 1 },
+        "digest": { "type": "string", "minLength": 1 },
+        "ciCommand": { "const": "npm run verify:cmmc-dual-baseline" }
+      }
+    },
+    "rev2Families": {
+      "type": "object",
+      "minProperties": 14,
+      "maxProperties": 14,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "name", "requirements"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z]{2}$" },
+          "name": { "type": "string", "minLength": 1 },
+          "requirements": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "array",
+              "prefixItems": [
+                { "type": "string", "pattern": "^3\\.[0-9]{1,2}\\.[0-9]{1,2}$" },
+                { "type": "string", "minLength": 1 }
+              ],
+              "items": false,
+              "minItems": 2,
+              "maxItems": 2
+            }
+          }
+        }
+      }
+    }
+  }
+}

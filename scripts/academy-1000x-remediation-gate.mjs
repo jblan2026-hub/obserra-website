@@ -51,6 +51,8 @@ check("rollback hashes valid", cases.every((item) => /^[a-f0-9]{64}$/.test(item.
 const requiredFiles = [
   "app/api/obserra/intelligence/route.ts",
   "app/api/health/route.ts",
+  "app/api/florida-class-d/health/live/route.ts",
+  "app/api/florida-class-d/health/ready/route.ts",
   "app/api/academy/checkout/route.ts",
   "app/api/webhook/stripe/route.ts",
   "app/api/academy/assessment/route.ts",
@@ -72,7 +74,7 @@ for (const term of [
   "draftPullRequestOnly: true",
   "sourceHashValidationRequired: true",
   "rollbackEvidenceRequired: true",
-  "directDefaultBranchWriteAllowed: false",
+  "directProductionWriteAllowed: false",
   "automaticMergeAllowed: false",
   "automaticProductionDeploymentAllowed: false",
   "verify:academy-release"
@@ -83,7 +85,9 @@ check("intelligence advertises MITRE and OWASP mapping requirements", intelligen
 check("intelligence schema supports remediation contract", /schemaVersion:\s*\"1\.1\"/.test(intelligence));
 
 const checkout = read("app/api/academy/checkout/route.ts");
-check("checkout remains fail closed", /STRIPE_WEBHOOK_SECRET/.test(checkout) && /not-ready/.test(checkout));
+check("checkout remains fail closed", /STRIPE_WEBHOOK_SECRET/.test(checkout) && /configuration-required/.test(checkout));
+check("checkout requires durable storage", /academyStorageHealth/.test(checkout) && /durable-storage-unavailable/.test(checkout));
+check("checkout requires configured identity", /identity\.configured/.test(checkout) && /identity-configuration-required/.test(checkout));
 check("checkout preserves entitlement evidence", /entitlementType/.test(checkout) && /entitlementCode/.test(checkout));
 
 const webhook = read("app/api/webhook/stripe/route.ts");

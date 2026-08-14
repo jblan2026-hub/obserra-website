@@ -477,7 +477,8 @@
   font-size: 12px;
 }
 
-.course-offering-card footer a {
+.course-offering-card footer a,
+.course-offering-card footer .academy-course-buy-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -490,10 +491,15 @@
   font-weight: 900;
   min-width: 100px;
   box-shadow: 0 10px 18px rgba(0, 0, 0, 0.22);
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .course-offering-card footer a:hover,
-.course-offering-card footer a:focus-visible {
+.course-offering-card footer a:focus-visible,
+.course-offering-card footer .academy-course-buy-button:hover,
+.course-offering-card footer .academy-course-buy-button:focus-visible {
   filter: brightness(1.06);
 }
 
@@ -575,7 +581,8 @@
   color: #d8ecf9;
 }
 
-.academy-flagship-list li a {
+.academy-flagship-list li a,
+.academy-flagship-list li .academy-flagship-buy-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -586,15 +593,21 @@
   text-decoration: none;
   background: linear-gradient(140deg, rgba(13, 51, 79, 0.78) 0%, rgba(8, 34, 54, 0.85) 100%);
   color: #eaf7ff;
+  width: 100%;
+  font: inherit;
+  cursor: pointer;
 }
 
 .academy-flagship-list li a:hover,
-.academy-flagship-list li a:focus-visible {
+.academy-flagship-list li a:focus-visible,
+.academy-flagship-list li .academy-flagship-buy-button:hover,
+.academy-flagship-list li .academy-flagship-buy-button:focus-visible {
   border-color: #f4ba55;
   transform: translateY(-1px);
 }
 
-.academy-flagship-list li a strong {
+.academy-flagship-list li a strong,
+.academy-flagship-list li .academy-flagship-buy-button strong {
   color: #ffd18a;
   font-size: 13px;
   white-space: nowrap;

@@ -1,6 +1,6 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { courseForId, grantCourseAccess } from "../../../../lib/academy";
+import { claimCourseAccess, courseForId } from "../../../../lib/academy";
 import { safeIdentity } from "../../../../lib/identity-runtime";
 import { getStripe } from "../../../../lib/stripe";
 
@@ -78,7 +78,13 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL(`/academy/${courseId}?enrollment=claim-email-mismatch`, requestUrl));
     }
 
-    await grantCourseAccess(identity.userId, courseId, session.id);
+    const purchaserEmail = session.customer_details?.email ?? session.customer_email ?? undefined;
+    await claimCourseAccess({
+      userId: identity.userId,
+      courseId,
+      checkoutSessionId: session.id,
+      purchaserEmail: sessionUserId ? undefined : purchaserEmail,
+    });
     console.info("academy paid enrollment confirmed", {
       courseId,
       sessionId: session.id,
@@ -87,7 +93,9 @@ export async function GET(request: Request) {
     });
     return NextResponse.redirect(new URL(`/academy/learn/${courseId}?enrollment=confirmed`, requestUrl));
   } catch (error) {
-    console.error("academy enrollment redemption failed", error);
+    console.error("academy enrollment redemption failed", {
+      error: error instanceof Error ? error.name : "unknown",
+    });
     return NextResponse.redirect(new URL(`/academy/${courseId}?enrollment=verification-unavailable`, requestUrl));
   }
 }
