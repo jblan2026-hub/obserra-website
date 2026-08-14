@@ -17,6 +17,9 @@ const proxyPath = "proxy.ts";
 const contractsPath = "lib/academy-control-contracts.ts";
 const controlPath = "lib/academy-control.ts";
 const checkoutPath = "app/api/academy/checkout/route.ts";
+const checkoutFormPath = "app/academy/AcademyCheckoutForm.tsx";
+const academyClientPath = "app/academy/AcademyControlledClient.tsx";
+const academyCoursePagePath = "app/academy/[courseId]/page.tsx";
 const redeemPath = "app/api/academy/redeem/route.ts";
 const webhookPath = "app/api/webhook/stripe/route.ts";
 const supabaseConfigPath = "supabase/config.toml";
@@ -30,6 +33,9 @@ const proxy = read(proxyPath);
 const contracts = read(contractsPath);
 const control = read(controlPath);
 const checkout = read(checkoutPath);
+const checkoutForm = read(checkoutFormPath);
+const academyClient = read(academyClientPath);
+const academyCoursePage = read(academyCoursePagePath);
 const redeem = read(redeemPath);
 const webhook = read(webhookPath);
 const supabaseConfig = read(supabaseConfigPath);
@@ -82,12 +88,32 @@ requireText(workerIndexesPath, workerIndexes, "academy_worker_slot_status_comman
 // Deno Edge Function source must remain outside the Next.js application type-check boundary.
 requireText(tsconfigPath, tsconfig, '"supabase/functions/**"', "Supabase Edge Function type-check exclusion");
 
+// Creating a Stripe Checkout Session is a state-changing operation and must be POST-only with same-origin CSRF protection.
+requireText(checkoutPath, checkout, "export async function POST(request: Request)", "POST checkout handler");
+requireText(checkoutPath, checkout, "export async function GET()", "non-mutating GET handler");
+requireText(checkoutPath, checkout, "rejectedRequest(405", "GET method rejection");
+requireText(checkoutPath, checkout, 'response.headers.set("allow", "POST")', "POST Allow header");
+requireText(checkoutPath, checkout, 'request.headers.get("origin")', "Origin validation");
+requireText(checkoutPath, checkout, "new URL(origin).origin === requestUrl.origin", "same-origin comparison");
+requireText(checkoutPath, checkout, "isSupportedFormContentType(request)", "form content-type restriction");
+requireText(checkoutPath, checkout, "await request.formData()", "form body parsing");
+forbidText(checkoutPath, checkout, 'requestUrl.searchParams.get("course")', "query-string checkout mutation input");
+
+// Academy UI purchase actions must submit POST forms rather than mutation links.
+requireText(checkoutFormPath, checkoutForm, 'action="/api/academy/checkout"', "checkout form action");
+requireText(checkoutFormPath, checkoutForm, 'method="post"', "checkout POST method");
+requireText(checkoutFormPath, checkoutForm, 'type="hidden" name="course"', "course form field");
+requireText(academyClientPath, academyClient, "<AcademyCheckoutForm", "catalog POST checkout component");
+requireText(academyCoursePagePath, academyCoursePage, "<AcademyCheckoutForm", "course-page POST checkout component");
+forbidText(academyClientPath, academyClient, "/api/academy/checkout?course=", "legacy GET checkout link");
+forbidText(academyCoursePagePath, academyCoursePage, "/api/academy/checkout?course=", "legacy GET checkout link");
+
 // Academy checkout must fail closed without current catalog authorization and Stripe webhook verification.
 requireText(checkoutPath, checkout, "STRIPE_SECRET_KEY", "Stripe secret readiness check");
 requireText(checkoutPath, checkout, "STRIPE_WEBHOOK_SECRET", "Stripe webhook readiness check");
 requireText(checkoutPath, checkout, 'runtimeCourse.controlPlane !== "operational"', "operational control-plane requirement");
 requireText(checkoutPath, checkout, "!runtimeCourse.control.purchaseEnabled", "purchase authorization requirement");
-requireText(checkoutPath, checkout, 'response.headers.set("cache-control", "private, no-store, max-age=0")', "no-store commerce response");
+requireText(checkoutPath, checkout, 'response.headers.set("cache-control", NO_STORE)', "no-store commerce response");
 
 // Deferred payment claims must re-fetch the paid Stripe session and match a verified Clerk email address.
 requireText(redeemPath, redeem, "checkout.sessions.retrieve(sessionId)", "Stripe session re-verification");
@@ -111,4 +137,4 @@ forbidText(checkoutPath, checkout.toLowerCase(), "florida-class-d", "Florida Cla
 forbidText(redeemPath, redeem.toLowerCase(), "florida-class-d", "Florida Class D generic Academy redemption coupling");
 forbidText(webhookPath, webhook.toLowerCase(), "florida-class-d", "Florida Class D generic Stripe fulfillment coupling");
 
-console.log("Gate 32 passed: website identity, Academy publication/control plane, database dependencies, commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
+console.log("Gate 32 passed: website identity, Academy publication/control plane, database dependencies, POST-only commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
