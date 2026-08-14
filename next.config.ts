@@ -67,6 +67,22 @@ const nextConfig: NextConfig = {
         headers: transactionalRouteHeaders,
       },
       {
+        source: "/api/webhook/stripe",
+        headers: transactionalRouteHeaders,
+      },
+      {
+        source: "/api/academy/:path*",
+        headers: transactionalRouteHeaders,
+      },
+      {
+        source: "/api/florida-class-d/:path*",
+        headers: transactionalRouteHeaders,
+      },
+      {
+        source: "/academy/success",
+        headers: transactionalRouteHeaders,
+      },
+      {
         source: "/portal/orders/:path*",
         headers: transactionalRouteHeaders,
       },
@@ -77,6 +93,14 @@ const nextConfig: NextConfig = {
       {
         source: "/academy/enroll/:path*",
         headers: transactionalRouteHeaders,
+      },
+      {
+        source: "/sign-in/:path*",
+        headers: protectedRouteHeaders,
+      },
+      {
+        source: "/sign-up/:path*",
+        headers: protectedRouteHeaders,
       },
       {
         source: "/portal/:path*",
