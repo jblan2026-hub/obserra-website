@@ -155,8 +155,17 @@ const proxy = read(proxyPath);
 requireText(proxyPath, proxy, 'import { prepareClerkRuntime } from "./lib/clerk-runtime-config"', "centralized Clerk middleware readiness inspection");
 requireText(proxyPath, proxy, "function authenticationReady()", "fail-closed Clerk readiness boundary");
 requireText(proxyPath, proxy, "return prepareClerkRuntime().ready;", "side-effect-free Clerk readiness check");
-requireText(proxyPath, proxy, "export default clerkMiddleware(", "direct Clerk middleware export");
-forbidText(proxyPath, proxy, "\nprepareClerkRuntime();\n", "module-load Clerk runtime normalization");
+requireText(proxyPath, proxy, "function preIdentityBoundary(request: NextRequest)", "pre-identity routing and regulated boundary");
+requireText(proxyPath, proxy, "return regulatedMutationBoundary(request);", "regulated boundary before Clerk invocation");
+requireText(proxyPath, proxy, "function getConfiguredClerkHandler()", "lazy Clerk middleware factory");
+requireText(proxyPath, proxy, "configuredClerkHandler = clerkMiddleware(", "conditional Clerk middleware integration");
+requireText(proxyPath, proxy, "await auth()", "protected-route Clerk authentication");
+requireText(proxyPath, proxy, "export default async function proxy(request: NextRequest, event: NextFetchEvent)", "availability-safe proxy export");
+requireText(proxyPath, proxy, "if (!authenticationReady())", "identity configuration readiness guard");
+requireText(proxyPath, proxy, "return await getConfiguredClerkHandler()(request, event);", "configured Clerk delegation");
+requireText(proxyPath, proxy, "catch {", "Clerk initialization/runtime failure containment");
+requireText(proxyPath, proxy, "return identityConfigurationResponse(request);", "fail-closed identity fallback");
+forbidText(proxyPath, proxy, "export default clerkMiddleware(", "unconditional Clerk middleware export");
 forbidText(proxyPath, proxy, "function clerkPublishableEnvironment", "duplicated publishable-key validator");
 forbidText(proxyPath, proxy, "function clerkSecretEnvironment", "duplicated secret-key validator");
 
@@ -172,4 +181,4 @@ if (mode === "write") {
   if (read(digestPath) !== expectedDigest) fail(`${digestPath} drifted from machine-readable source`);
 }
 
-console.log(`Gate 34 passed: production identity, canonical routing, Rev. 3/CMMC evidence mapping, generated audit view, and SHA-256 no-drift controls verified (${digest}).`);
+console.log(`Gate 34 passed: production identity availability isolation, canonical routing, Rev. 3/CMMC evidence mapping, generated audit view, and SHA-256 no-drift controls verified (${digest}).`);
