@@ -41,6 +41,13 @@ for (const [value, message] of [
   ["readyForOwnerActivationDecision", "the readiness report must separate readiness from final activation"],
   ["unauthorizedEnabledFeatureFlags", "feature flags enabled before authorization must be identified"],
   ["secretsExposed: false", "Gate 26 reports must suppress secret values"],
+  ["highAvailabilityRequiredForAllProductionSubsystems: true", "high availability must be mandatory for the entire production service chain"],
+  ["maxRtoMinutes: MAX_HA_RTO_MINUTES", "Gate 26 must enforce a measurable RTO ceiling"],
+  ["maxRpoMinutes: MAX_HA_RPO_MINUTES", "Gate 26 must enforce a measurable RPO ceiling"],
+  ["maxFailoverTestAgeDays: MAX_FAILOVER_TEST_AGE_DAYS", "Gate 26 must require a current failover exercise"],
+  ["floridaClassDNonProductionExecutionAuthorized", "non-production execution must remain an explicit separate authorization path"],
+  ["OBSERRA_FDACS_NONPROD_EXECUTION_AUTHORIZED", "non-production execution must require an explicit authorization marker"],
+  ["OBSERRA_FDACS_SYNTHETIC_IDENTITY_ONLY", "non-production execution must remain synthetic-identity-only"],
 ]) requireText(activation, value, message);
 
 const exactBindingChecks = [
@@ -50,6 +57,27 @@ const exactBindingChecks = [
 for (const value of exactBindingChecks) {
   requireText(activation, value, "candidate, accepted UAT, and deployed SHAs must match exactly");
 }
+
+for (const haKey of [
+  "OBSERRA_FDACS_HA_EDGE_DNS_STATUS",
+  "OBSERRA_FDACS_HA_APPLICATION_STATUS",
+  "OBSERRA_FDACS_HA_IDENTITY_STATUS",
+  "OBSERRA_FDACS_HA_DATABASE_STATUS",
+  "OBSERRA_FDACS_HA_MEDIA_STATUS",
+  "OBSERRA_FDACS_HA_DOCUMENT_STORAGE_STATUS",
+  "OBSERRA_FDACS_HA_COMMERCE_STATUS",
+  "OBSERRA_FDACS_HA_OBSERVABILITY_STATUS",
+  "OBSERRA_FDACS_HA_BACKUP_RESTORE_STATUS",
+  "OBSERRA_FDACS_HA_FAILOVER_EXERCISE_STATUS",
+  "OBSERRA_FDACS_HA_RTO_MINUTES",
+  "OBSERRA_FDACS_HA_RPO_MINUTES",
+  "OBSERRA_FDACS_HA_LAST_FAILOVER_TEST_AT",
+]) requireText(activation, haKey, `Gate 26 HA evidence must include ${haKey}`);
+
+requireText(activation, "MAX_HA_RTO_MINUTES = 60", "RTO must be 60 minutes or less unless the controlled policy is deliberately revised");
+requireText(activation, "MAX_HA_RPO_MINUTES = 15", "RPO must be 15 minutes or less unless the controlled policy is deliberately revised");
+requireText(activation, "MAX_FAILOVER_TEST_AGE_DAYS = 90", "end-to-end failover evidence must be refreshed at least every 90 days");
+requireText(activation, "recentTimestamp(\"OBSERRA_FDACS_HA_LAST_FAILOVER_TEST_AT\"", "Gate 26 must enforce failover-test recency at runtime");
 
 for (const flag of [
   "OBSERRA_FDACS_CLASS_D_LIVE_ENABLED",
@@ -86,4 +114,4 @@ requireText(activationPage, "secrets suppressed", "Gate 26 console must explicit
 requireText(workflow, "Run Gate 26 production activation source verification", "the dedicated regulated workflow must make Gate 26 mandatory");
 requireText(workflow, "node scripts/florida-class-d-production-activation-gate.mjs", "the Gate 26 verifier must run in CI");
 
-console.log("Florida Class D Gate 26 passed: exact-release production activation authorization, candidate-bound UAT and deployment binding, complete regulated feature inventory, live/scheduling/enrollment/exam fail-closed integration, protected owner decision visibility, and mandatory CI enforcement are validated in source.");
+console.log("Florida Class D Gate 26 passed: exact-release production activation authorization, candidate-bound UAT and deployment binding, mandatory HA across the complete production service chain, measured recovery objectives, current failover evidence, complete regulated feature inventory, live/scheduling/enrollment/exam fail-closed integration, explicit synthetic non-production separation, protected owner decision visibility, and mandatory CI enforcement are validated in source.");
