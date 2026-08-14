@@ -1,0 +1,72 @@
+name: Website Zero-Warning Cleanup Once
+
+on:
+  push:
+    branches:
+      - feature/cyber-crisis-commander-sales-handoff
+    paths:
+      - .github/workflows/lint-cleanup-once.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: website-zero-warning-cleanup-once
+  cancel-in-progress: false
+
+jobs:
+  remove-known-warning:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact feature branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: feature/cyber-crisis-commander-sales-handoff
+          fetch-depth: 0
+
+      - name: Configure Node.js 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Remove the unused assessment outcome binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("app/academy/courseExperience.ts")
+          text = path.read_text(encoding="utf-8")
+          target = "    const outcome = course.outcomes[index % course.outcomes.length];\n"
+          count = text.count(target)
+          if count != 1:
+              raise SystemExit(f"Expected one unused outcome binding, found {count}")
+          path.write_text(text.replace(target, "", 1), encoding="utf-8")
+          PY
+          git diff --check
+
+      - name: Install and validate the immutable website graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global npm@11 --no-audit --no-fund
+          test "$(npm --version | cut -d. -f1)" = "11"
+          npm ci --ignore-scripts --no-audit --no-fund
+          git diff --exit-code -- package-lock.json
+          npm test
+          npm run lint -- --max-warnings=0
+
+      - name: Commit the warning cleanup and remove this one-time workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/academy/courseExperience.ts
+          git rm .github/workflows/lint-cleanup-once.yml
+          git commit -m "fix: remove unused Academy assessment binding"
+          git push origin HEAD:feature/cyber-crisis-commander-sales-handoff
