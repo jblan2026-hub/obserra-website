@@ -12,15 +12,18 @@ on:
       - "app/api/webhook/stripe/**"
       - "lib/clerk-runtime-config.ts"
       - "lib/identity-runtime.ts"
+      - "lib/proxy-release-fingerprint.ts"
       - "lib/florida-class-d*.ts"
       - "lib/academy*.ts"
       - "proxy.ts"
+      - ".vercelignore"
       - "next.config.ts"
       - "tsconfig.json"
       - "vercel.json"
       - "scripts/florida-class-d-*.mjs"
       - "scripts/cmmc-level2-rev3-traceability.mjs"
       - "scripts/cmmc-level2-rev3-production-evidence.mjs"
+      - "test/vercel-deployment-integrity.test.mjs"
       - "supabase/functions/academy-public-catalog/**"
       - "supabase/config.toml"
       - "supabase/migrations/*fdacs_class_d*.sql"
@@ -48,7 +51,7 @@ env:
 
 jobs:
   regulated-source-gates:
-    name: Gates 1-34 and website compatibility
+    name: Gates 1-34 and production deployment integrity
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -123,6 +126,9 @@ jobs:
 
       - name: Run Gate 34 production identity, routing, and CMMC evidence verification
         run: npm run verify:cmmc-production-evidence
+
+      - name: Run production deployment integrity verification
+        run: node --test test/vercel-deployment-integrity.test.mjs
 
       - name: Run repository contract tests
         run: npm test
