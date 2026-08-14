@@ -18,7 +18,7 @@ export const EXPECTED_FLORIDA_CLASS_D_MIGRATIONS = [
   "20260813052100_fdacs_class_d_makeup_access.sql",
   "20260813052200_fdacs_class_d_makeup_constraints.sql",
   "20260813052400_fdacs_class_d_makeup_certification.sql",
-  "20260813052500_fdacs_class_d_makeup_security.sql",
+  "20260813052500_fdacs_class_d_makeup_certification_security.sql",
   "20260813053000_fdacs_class_d_recorded_makeup_playback.sql",
   "20260813060000_fdacs_class_d_final_exam.sql",
   "20260813061000_fdacs_class_d_exam_bank_admin.sql",
