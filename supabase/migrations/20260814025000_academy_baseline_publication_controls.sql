@@ -65,9 +65,6 @@ with baseline(course_id) as (
     ('custom-ai-native-app-strategy'),
     ('data-driven-risk-intelligence')
 ),
-request_context as (
-  select gen_random_uuid() as request_id
-),
 inserted as (
   insert into public.academy_course_controls (
     course_id,
@@ -114,7 +111,7 @@ select
   inserted.course_id,
   'system:baseline-reviewed-catalog',
   'baseline-published',
-  request_context.request_id,
+  gen_random_uuid(),
   null,
   jsonb_build_object(
     'course_id', inserted.course_id,
@@ -128,5 +125,4 @@ select
     'created_at', inserted.created_at,
     'updated_at', inserted.updated_at
   )
-from inserted
-cross join request_context;
+from inserted;
