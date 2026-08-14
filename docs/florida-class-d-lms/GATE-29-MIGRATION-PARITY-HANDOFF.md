@@ -14,7 +14,7 @@ Production remains fail closed. Gate 29 does not apply a production database mig
 
 Gate 29 makes regulated database promotion depend on the exact ordered Class D migration lineage and a deterministic SHA-256 promotion manifest. Schema similarity alone is not sufficient production evidence.
 
-The verified controlled lineage contains exactly 29 regulated migrations, beginning with `20260813033000_fdacs_class_d_regulated_records.sql` and ending with `20260814011203_fdacs_class_d_fk_performance_indexes.sql`.
+The current verified controlled lineage contains exactly 35 regulated migrations, beginning with `20260813033000_fdacs_class_d_regulated_records.sql` and ending with `20260814175000_fdacs_class_d_trigger_function_execute_hardening.sql`.
 
 ## Lineage reconciliation
 
@@ -45,7 +45,7 @@ The manifest lineage was corrected to that exact filename before the promotion d
 `scripts/florida-class-d-migration-manifest.mjs`:
 
 - enumerates only `fdacs_class_d` migration files;
-- requires the exact expected ordered 29-file lineage;
+- requires the exact expected ordered 35-file lineage;
 - fails on missing, extra, reordered, or renamed regulated migrations;
 - computes SHA-256 for every migration file from the exact checked-out bytes;
 - builds a deterministic canonical JSON manifest;
@@ -55,9 +55,9 @@ The manifest lineage was corrected to that exact filename before the promotion d
 
 The validated deterministic manifest values are:
 
-- migration count: `29`;
-- latest migration version: `20260814011203`;
-- migration manifest SHA-256: `a2099d8610f0427fa2f85cb7a47efaa2af4b899be21952b0fcacaadd15e8e453`.
+- migration count: `35`;
+- latest migration version: `20260814175000`;
+- migration manifest SHA-256: `40eb88f6b8cb6ce2716eb260cde7f29d69d78f0a201e90cd6373ac1ebf2be090`.
 
 The deterministic manifest does not contain learner PII, credentials, license values, protected exam content, or database connection details.
 
@@ -66,8 +66,8 @@ The deterministic manifest does not contain learner PII, credentials, license va
 Gate 26 production activation now verifies all of the following:
 
 - `OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA` is a valid Git SHA and exactly matches the frozen production release candidate SHA;
-- `OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION` exactly equals `20260814011203`;
-- `OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256` exactly equals `a2099d8610f0427fa2f85cb7a47efaa2af4b899be21952b0fcacaadd15e8e453`;
+- `OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION` exactly equals `20260814175000`;
+- `OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256` exactly equals `40eb88f6b8cb6ce2716eb260cde7f29d69d78f0a201e90cd6373ac1ebf2be090`;
 - `OBSERRA_FDACS_DB_PROMOTION_STATUS` remains `verified`;
 - all other Gate 26 production, licensing, HA, rollback, security, and owner-approval conditions remain satisfied.
 
@@ -82,6 +82,8 @@ The regulated non-production branch is:
 - parent project: `nwxnyqlyzyufgoadtqxs`.
 
 Its applied regulated migration history contains exactly 29 Class D versions, including the recovered security migration `20260813204215` and Gate 28 migration `20260814011203`.
+
+Gate 37 extends the controlled source lineage by six forward-only isolated FDACS audit, archival, identity/attendance, investigator-access, performance/explicit-deny, and trigger-function execute-hardening migrations through `20260814175000`. Their provider observations are recorded separately in `FDACS-PII-DATABASE-AUDIT-SOURCE.json`; production runtime authorization remains false. The earlier 29-version non-production snapshot is retained as historical evidence and is not misrepresented as parity with the current 35-file candidate.
 
 Gate 28 post-migration verification found zero Class D foreign-key constraints without a covering index and zero Class D `unindexed_foreign_keys` advisor findings.
 

@@ -2,7 +2,7 @@
 
 ## Scope
 
-This handoff governs the regulated Florida Class D final-examination subsystem for **Obserra Executive Protection & Intelligence LLC**. It remains separate from the commercial Academy Course 1-N / LearnWorlds workstream.
+This handoff governs the regulated Florida Class D final-examination subsystem for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**. It remains separate from the commercial Academy Course 1-N / LearnWorlds workstream.
 
 Public state remains `COMING SOON · LMS IN PROGRESS`. The owner reports an active Class DI instructor license and a pending Class DS school/training facility application. Examination delivery remains fail closed until the applicable licensing, Division-approval, production-database, and release gates are satisfied.
 

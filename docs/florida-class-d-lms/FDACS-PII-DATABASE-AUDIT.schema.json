@@ -1,0 +1,238 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://www.obserrallc.com/schemas/fdacs-pii-database-audit-v1.1.json",
+  "title": "FDACS isolated student-record PII database audit record",
+  "description": "Minimum fail-closed machine contract for the FDACS database's own live audit record and CMMC-mapped proof of security protocols.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "recordId",
+    "recordState",
+    "observedAt",
+    "legalOwner",
+    "systemId",
+    "systemName",
+    "provider",
+    "providerProjectName",
+    "providerProjectRef",
+    "region",
+    "classification",
+    "liveAuthorityPolicy",
+    "scopeBoundary",
+    "retention",
+    "governingSources",
+    "sourceMigrations",
+    "liveVerification",
+    "liveAuditPackageTest",
+    "cmmcSecurityProtocolProof",
+    "technicalChecks",
+    "activationState",
+    "humanReview",
+    "openBlockers",
+    "claimBoundary",
+    "generatedFrom",
+    "summary"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "1.1"},
+    "recordId": {"type": "string", "minLength": 20},
+    "recordState": {"enum": ["live_hardened_activation_pending", "live_authorized"]},
+    "observedAt": {"type": "string", "minLength": 20},
+    "legalOwner": {"const": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC"},
+    "systemId": {"const": "SYS-FDACS-DATABASE"},
+    "systemName": {"type": "string", "minLength": 3},
+    "provider": {"const": "Supabase"},
+    "providerProjectName": {"const": "OBSERRA FDACS Student Records Production"},
+    "providerProjectRef": {"const": "ggkxgjhsbgbifiqrhavr"},
+    "region": {"const": "us-east-1"},
+    "classification": {"const": "regulated_student_pii_non_cui"},
+    "liveAuthorityPolicy": {"type": "string", "minLength": 20},
+    "scopeBoundary": {
+      "type": "object",
+      "required": ["studentPiiAuthorized", "cuiAuthorized", "paymentDataAuthorized", "academyDataAuthorized", "applicationsWorkstreamDataAuthorized", "identityDocumentImagesAuthorized", "nonFdacsTableCount"],
+      "properties": {
+        "studentPiiAuthorized": {"const": true},
+        "cuiAuthorized": {"const": false},
+        "paymentDataAuthorized": {"const": false},
+        "academyDataAuthorized": {"const": false},
+        "applicationsWorkstreamDataAuthorized": {"const": false},
+        "identityDocumentImagesAuthorized": {"const": false},
+        "nonFdacsTableCount": {"const": 0}
+      }
+    },
+    "retention": {
+      "type": "object",
+      "required": ["minimumYears", "operationalYears", "automaticDeletionEnabled", "legalHoldSupported", "finalExportRequiresProtectedArtifact"],
+      "properties": {
+        "minimumYears": {"minimum": 2},
+        "operationalYears": {"minimum": 2},
+        "automaticDeletionEnabled": {"const": false},
+        "legalHoldSupported": {"const": true},
+        "finalExportRequiresProtectedArtifact": {"const": true}
+      }
+    },
+    "governingSources": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["authorityId", "title", "exactVersion", "officialUrl", "requirements"],
+        "properties": {
+          "authorityId": {"type": "string", "minLength": 3},
+          "title": {"type": "string", "minLength": 3},
+          "exactVersion": {"type": "string", "minLength": 3},
+          "officialUrl": {"type": "string", "pattern": "^https://"},
+          "requirements": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 3}}
+        }
+      }
+    },
+    "sourceMigrations": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["path", "providerMigrationVersion", "providerMigrationName", "liveApplied", "sha256"],
+        "properties": {
+          "path": {"type": "string", "pattern": "^supabase/migrations/[0-9]{14}_fdacs_class_d_.*\\.sql$"},
+          "providerMigrationVersion": {"type": "string", "pattern": "^[0-9]{14}$"},
+          "providerMigrationName": {"type": "string", "minLength": 3},
+          "liveApplied": {"const": true},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "liveVerification": {
+      "type": "object",
+      "required": [
+        "providerMigrationCount",
+        "fdacsTableCount",
+        "nonFdacsTableCount",
+        "fdacsTablesWithoutForcedRls",
+        "explicitBrowserDenyPolicyCount",
+        "anonOrAuthenticatedTablePrivilegeCount",
+        "fdacsFunctionCount",
+        "anonOrAuthenticatedFunctionExecutePrivilegeCount",
+        "anonCreatePrivilegeOnPublicSchema",
+        "authenticatedCreatePrivilegeOnPublicSchema",
+        "securityAdvisorFindingCount",
+        "securityAdvisorErrorOrWarningCount",
+        "unindexedForeignKeyFindingCount",
+        "chainVerification"
+      ],
+      "properties": {
+        "providerMigrationCount": {"type": "integer", "minimum": 1},
+        "fdacsTableCount": {"type": "integer", "minimum": 1},
+        "nonFdacsTableCount": {"const": 0},
+        "fdacsTablesWithoutForcedRls": {"const": 0},
+        "explicitBrowserDenyPolicyCount": {"type": "integer", "minimum": 1},
+        "anonOrAuthenticatedTablePrivilegeCount": {"const": 0},
+        "fdacsFunctionCount": {"type": "integer", "minimum": 1},
+        "anonOrAuthenticatedFunctionExecutePrivilegeCount": {"const": 0},
+        "anonCreatePrivilegeOnPublicSchema": {"const": false},
+        "authenticatedCreatePrivilegeOnPublicSchema": {"const": false},
+        "securityAdvisorFindingCount": {"const": 0},
+        "securityAdvisorErrorOrWarningCount": {"const": 0},
+        "unindexedForeignKeyFindingCount": {"const": 0},
+        "chainVerification": {
+          "type": "array",
+          "minItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["chain", "valid", "recordCount", "failureCount", "headSha256"],
+            "properties": {
+              "chain": {"type": "string", "minLength": 3},
+              "valid": {"const": true},
+              "recordCount": {"type": "integer", "minimum": 0},
+              "failureCount": {"const": 0}
+            }
+          }
+        }
+      }
+    },
+    "liveAuditPackageTest": {
+      "type": "object",
+      "required": ["requestReference", "exportId", "exportSchema", "classification", "payloadSha256", "payloadDigestRecomputed", "exportEventSha256", "artifactState", "eligibleAsFinalFdacsRecordEvidence", "studentPiiIncluded", "result", "negativeTests"],
+      "properties": {
+        "requestReference": {"type": "string", "minLength": 3},
+        "exportId": {"type": "string", "minLength": 36},
+        "exportSchema": {"const": "obserra.fdacs.class-d.investigator-audit.v2"},
+        "classification": {"const": "internal_sensitive_non_pii"},
+        "payloadSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "payloadDigestRecomputed": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "exportEventSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "artifactState": {"const": "generated_unarchived"},
+        "eligibleAsFinalFdacsRecordEvidence": {"const": false},
+        "studentPiiIncluded": {"const": false},
+        "result": {"const": "passed_generation_and_hash_recording"},
+        "negativeTests": {
+          "type": "object",
+          "required": ["unauthorizedActorRejected", "finalizationWithoutMatchingProtectedArtifactRejected", "deliveryBeforeFinalizationRejected", "exportEventCountAfterTests", "finalizedEventCountAfterTests", "deliveredEventCountAfterTests"],
+          "properties": {
+            "unauthorizedActorRejected": {"const": true},
+            "finalizationWithoutMatchingProtectedArtifactRejected": {"const": true},
+            "deliveryBeforeFinalizationRejected": {"const": true},
+            "exportEventCountAfterTests": {"const": 1},
+            "finalizedEventCountAfterTests": {"const": 0},
+            "deliveredEventCountAfterTests": {"const": 0}
+          }
+        }
+      }
+    },
+    "cmmcSecurityProtocolProof": {
+      "type": "object",
+      "required": ["systemId", "centralMachineRecord", "centralHumanExtract", "separateDispositionRecord", "requiredExactReleaseCommit", "requiredProtectedArtifactType", "registeredLiveEvidenceCount", "technicalDisposition", "humanDisposition", "pendingHumanIsTechnicalFailure", "assessmentFinding", "claimBoundary", "centralMachineSha256", "centralHumanSha256", "separateDispositionSha256", "mappedObjectiveCount", "centralTechnicalDisposition", "centralHumanDisposition"],
+      "properties": {
+        "systemId": {"const": "SYS-FDACS-DATABASE"},
+        "requiredExactReleaseCommit": {"const": true},
+        "requiredProtectedArtifactType": {"const": "security_protocol_evidence"},
+        "registeredLiveEvidenceCount": {"minimum": 0},
+        "technicalDisposition": {"enum": ["passed", "failed", "pending_evidence"]},
+        "humanDisposition": {"const": "pending"},
+        "pendingHumanIsTechnicalFailure": {"const": false},
+        "assessmentFinding": {"const": "not_assessed"},
+        "centralMachineSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "centralHumanSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "separateDispositionSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "mappedObjectiveCount": {"type": "integer", "minimum": 1},
+        "claimBoundary": {"type": "string", "minLength": 20}
+      }
+    },
+    "technicalChecks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["checkId", "state", "result"],
+        "properties": {
+          "checkId": {"type": "string", "pattern": "^FDACS-DB-"},
+          "state": {"enum": ["passed", "failed", "not_tested"]},
+          "result": {"type": "string", "minLength": 3}
+        }
+      }
+    },
+    "activationState": {
+      "type": "object",
+      "required": ["fdacsDsLicenseVerified", "fdacsOnlineMethodAccepted", "clerkIdentityVerified", "piiEncryptionKeyCustodyVerified", "backupRestoreTestVerified", "haFailoverTestVerified", "investigatorAccessTestVerified", "productionRuntimeAuthorized"]
+    },
+    "humanReview": {
+      "type": "object",
+      "required": ["state", "pendingIsTechnicalFailure", "completionRequiredForTechnicalPass", "assessmentFinding"],
+      "properties": {
+        "state": {"const": "pending"},
+        "pendingIsTechnicalFailure": {"const": false},
+        "completionRequiredForTechnicalPass": {"const": false},
+        "assessmentFinding": {"const": "not_assessed"}
+      }
+    },
+    "openBlockers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 3}},
+    "claimBoundary": {"type": "string", "minLength": 20},
+    "generatedFrom": {
+      "type": "object",
+      "required": ["source", "evidenceSchema", "generator", "sourceGate"]
+    },
+    "summary": {
+      "type": "object",
+      "required": ["liveMigrationsApplied", "liveTechnicalChecksPassed", "liveTechnicalChecksFailed", "liveTechnicalChecksNotTested", "allLiveChainsValid", "productionRuntimeAuthorized", "humanReview", "assessmentFinding"]
+    }
+  }
+}

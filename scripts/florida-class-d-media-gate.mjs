@@ -34,8 +34,8 @@ assert(studentApi.includes('requireFloridaClassDSignedInUser') && instructorApi.
 assert(studentLiveApi.includes('floridaClassDLiveMediaEnabled') && studentLiveApi.includes('secureMediaRequired: true'), "regulated student live join fails closed unless secure media is enabled");
 assert(studentUi.includes('/api/florida-class-d/media?liveSessionId=') && studentUi.includes('<iframe') && studentUi.includes('allow="camera; microphone; fullscreen; display-capture; autoplay"'), "student live classroom embeds the authenticated media surface");
 assert(instructorUi.includes('/api/florida-class-d/admin/media?liveSessionId=') && instructorUi.includes('<iframe') && instructorUi.includes('disabled={!media?.joinUrl}'), "instructor console embeds media and blocks lesson start until secure media is provisioned");
-assert(studentUi.includes('attendance and instructional-time evidence remain independent from the media provider') || studentUi.includes('attendance and instructional-time evidence remain independent'), "student UI preserves independent Obserra attendance evidence boundary");
-assert(instructorUi.includes('Obserra remains the system of record for attendance and instructional time'), "instructor UI preserves Obserra as the attendance system of record");
+assert(studentUi.includes('OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC attendance and instructional-time evidence remain independent from the media provider'), "student UI preserves the full-legal-name attendance evidence boundary");
+assert(instructorUi.includes('OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC remains the system of record for attendance and instructional time'), "instructor UI preserves the full legal entity as the attendance system of record");
 
 if (process.exitCode) {
   console.error("\nFlorida Class D secure live media gate FAILED.");

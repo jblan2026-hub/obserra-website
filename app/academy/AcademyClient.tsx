@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import AcademyCheckoutForm from "./AcademyCheckoutForm";
 import { courses, type CourseLevel, type Department } from "./courseData";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const departments: (Department | "All")[] = ["All", "Cyber", "Protection", "Intelligence", "Technologies"];
@@ -99,7 +100,7 @@ export default function AcademyClient() {
   return (
     <main>
       <header className="masthead">
-        <a href="/" className="brand" aria-label="Obserra home"><Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} /><span className="product-label">ACADEMY</span></a>
+        <a href="/" className="brand" aria-label={`${LEGAL_ENTITY_NAME} home`}><Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} /><span className="product-label">ACADEMY</span></a>
         <div className="masthead-actions"><a href="/services" className="nav-link">Services</a><a href="/apps" className="nav-link">Applications</a><a href="/contact" className="nav-link">Contact</a><a href="/contact?interest=enterprise-training" className="nav-link">Enterprise training</a></div>
       </header>
 
@@ -148,7 +149,7 @@ export default function AcademyClient() {
 
       <section className="academy-purchase-assurance"><h2>Commercial purchase assurance</h2><div><span>Secure Stripe checkout</span><span>Authorized learner access</span><span>Obserrian AI Tutor</span><span>Authoritative course grounding</span><span>Saved progress</span><span>Assessment based completion</span><span>Certificate record</span><span>Enterprise support available</span></div><p>Questions about enrollment, team licensing, access, or certificates can be directed to <a href="mailto:info@obserrallc.com">info@obserrallc.com</a>.</p></section>
 
-      <footer className="site-footer"><Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={180} height={35} /><p>Obserra Technologies learning product. Proprietary to Obserra Executive Protection &amp; Intelligence LLC. Unauthorized downloading, recording, copying, sharing, distribution, or classroom use is prohibited.</p></footer>
+      <footer className="site-footer"><Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={180} height={35} /><p>Obserra Academy learning product. Proprietary to {LEGAL_ENTITY_NAME}. Unauthorized downloading, recording, copying, sharing, distribution, or classroom use is prohibited.</p></footer>
     </main>
   );
 }

@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { Course } from "../courseData";
 import type { AssessmentQuestion, LessonBrief } from "../courseExperience";
 import type { CourseProgress } from "../../../lib/academy";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./learning.css";
 import "./brand-overrides.css";
 
@@ -102,7 +103,7 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
     <div className="learner-watermark" aria-hidden="true">{watermark}</div>
     <header className="learning-header">
       <a href="/academy" className="learning-brand">
-        <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={220} height={42} />
+        <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={220} height={42} />
         <b>ACADEMY</b>
       </a>
       <a href="/academy" className="exit-course">Exit course</a>
@@ -150,7 +151,7 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
           <div className="video-top"><span>OBSERRA ACADEMY</span><span>PROPRIETARY TRAINING</span></div>
           <div className="video-orb" />
           <div className="video-copy"><p>{lesson.format}</p><h2>{lesson.title}</h2><span>{lesson.videoDuration} guided professional learning session</span></div>
-          <div className="video-controls"><i /><span>Original Obserra instruction grounded in authoritative sources</span><b>AI NATIVE</b></div>
+          <div className="video-controls"><i /><span>Original Obserra Academy instruction grounded in authoritative sources</span><b>AI NATIVE</b></div>
         </div>
 
         <div className="lesson-content">
@@ -207,7 +208,7 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
           </section>
 
           <section className="authority-section" aria-label="Authoritative grounding">
-            <div className="section-heading"><p className="learning-kicker">Why Obserra teaches it</p><h3>Authoritative grounding</h3></div>
+            <div className="section-heading"><p className="learning-kicker">Why Obserra Academy teaches it</p><h3>Authoritative grounding</h3></div>
             <div className="authority-grid">
               {lesson.authorities.map((authority) => <article key={authority.reference}>
                 <span>{authority.publisher}</span>
@@ -299,6 +300,6 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
         {notice && <p className="learning-notice">{notice}</p>}
       </section>}
     </div>
-    <footer className="learning-footer">Copyright Obserra Executive Protection &amp; Intelligence LLC. Proprietary training material. Unauthorized recording, downloading, copying, or redistribution is prohibited.</footer>
+    <footer className="learning-footer">Copyright {LEGAL_ENTITY_NAME}. Proprietary training material. Unauthorized recording, downloading, copying, or redistribution is prohibited.</footer>
   </main>;
 }

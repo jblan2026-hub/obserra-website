@@ -4,7 +4,7 @@ import { listFloridaClassDLiasWorkflowQueue } from "../../../../lib/florida-clas
 import "../../live-classroom.css";
 
 export const metadata: Metadata = {
-  title: "Florida Class D Completion Packets | Obserra",
+  title: "Florida Class D Completion Packets | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   robots: { index: false, follow: false },
 };
 

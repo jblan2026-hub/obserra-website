@@ -2,13 +2,14 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 type InquiryCategory =
   | "Executive protection or urgent travel support"
   | "Protective intelligence"
   | "Cybersecurity advisory"
   | "Fractional CISO leadership"
-  | "Obserra application or product demonstration"
+  | "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC application or product demonstration"
   | "Obserra EIOS executive briefing"
   | "Academy learner support"
   | "Enterprise training"
@@ -25,7 +26,7 @@ const categories: InquiryCategory[] = [
   "Protective intelligence",
   "Cybersecurity advisory",
   "Fractional CISO leadership",
-  "Obserra application or product demonstration",
+  "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC application or product demonstration",
   "Obserra EIOS executive briefing",
   "Academy learner support",
   "Enterprise training",
@@ -36,8 +37,8 @@ const categories: InquiryCategory[] = [
 const interestMap: Record<string, InquiryCategory> = {
   "enterprise-consultation": "Cybersecurity advisory",
   "capability-review": "Strategic partnership or general inquiry",
-  "application-demo": "Obserra application or product demonstration",
-  applications: "Obserra application or product demonstration",
+  "application-demo": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC application or product demonstration",
+  applications: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC application or product demonstration",
   eios: "Obserra EIOS executive briefing",
   "eios-demo": "Obserra EIOS executive briefing",
   protection: "Executive protection or urgent travel support",
@@ -67,9 +68,9 @@ export default function ContactExperience({ initialInterest }: { initialInterest
 
   const responseTime = useMemo(() => {
     if (urgency === "Urgent") return "Urgent priority selected. Include a direct phone number and the time-sensitive outcome you need.";
-    if (urgency === "Same business day") return "Same-business-day priority selected. Obserra will review availability and respond as promptly as practical.";
+    if (urgency === "Same business day") return `Same-business-day priority selected. ${LEGAL_ENTITY_NAME} will review availability and respond as promptly as practical.`;
     if (urgency === "This week") return "This-week priority selected. Include your desired decision or meeting date.";
-    return "Standard priority selected. Provide enough context for Obserra to route your inquiry efficiently.";
+    return `Standard priority selected. Provide enough context for ${LEGAL_ENTITY_NAME} to route your inquiry efficiently.`;
   }, [urgency]);
 
   function buildInquiryBody(includePortalRequest = false) {
@@ -88,7 +89,7 @@ export default function ContactExperience({ initialInterest }: { initialInterest
         "Business need and desired outcome:",
         summary || "Not provided",
         "",
-        "Please do not send sensitive attachments by ordinary email. Obserra will provide secure exchange instructions when required.",
+        `Please do not send sensitive attachments by ordinary email. ${LEGAL_ENTITY_NAME} will provide secure exchange instructions when required.`,
       ].join("\n"),
     );
   }
@@ -96,21 +97,21 @@ export default function ContactExperience({ initialInterest }: { initialInterest
   function submitInquiry(event: FormEvent) {
     event.preventDefault();
     track("contact_inquiry_submitted", { category, urgency, method, confidential });
-    const subject = encodeURIComponent(`Obserra Inquiry | ${category}`);
+    const subject = encodeURIComponent(`${LEGAL_ENTITY_NAME} Inquiry | ${category}`);
     window.location.href = `mailto:info@obserrallc.com?subject=${subject}&body=${buildInquiryBody()}`;
   }
 
   function requestSecurePortal() {
     track("contact_secure_portal_requested", { category });
-    const subject = encodeURIComponent(`Obserra Secure Exchange Request | ${category}`);
+    const subject = encodeURIComponent(`${LEGAL_ENTITY_NAME} Secure Exchange Request | ${category}`);
     window.location.href = `mailto:info@obserrallc.com?subject=${subject}&body=${buildInquiryBody(true)}`;
   }
 
   return (
-    <section className="contact-experience" aria-label="Schedule or submit an Obserra inquiry">
+    <section className="contact-experience" aria-label={`Schedule or submit an ${LEGAL_ENTITY_NAME} inquiry`}>
       <div className="contact-experience-intro">
-        <p className="contact-eyebrow">BEGIN AN OBSERRA ENGAGEMENT</p>
-        <h2>Connect with the right Obserra capability.</h2>
+        <p className="contact-eyebrow">BEGIN AN {LEGAL_ENTITY_NAME} ENGAGEMENT</p>
+        <h2>Connect with the right {LEGAL_ENTITY_NAME} capability.</h2>
         <p>
           Select the outcome you need, indicate the appropriate priority, and provide enough context for a focused response.
           Do not include sensitive attachments in ordinary email.
@@ -130,9 +131,9 @@ export default function ContactExperience({ initialInterest }: { initialInterest
           >
             View consultation availability
           </a>
-          <div className="schedule-embed-wrap" aria-label="Obserra consultation scheduling">
+          <div className="schedule-embed-wrap" aria-label={`${LEGAL_ENTITY_NAME} consultation scheduling`}>
             <iframe
-              title="Schedule an Obserra executive consultation"
+              title={`Schedule an ${LEGAL_ENTITY_NAME} executive consultation`}
               src={schedulingUrl}
               loading="lazy"
               referrerPolicy="strict-origin-when-cross-origin"
@@ -208,7 +209,7 @@ export default function ContactExperience({ initialInterest }: { initialInterest
           </form>
 
           <p className="secure-note">
-            The form prepares a structured message in your email application. Obserra will provide a governed secure-exchange method when confidential files are required.
+            The form prepares a structured message in your email application. {LEGAL_ENTITY_NAME} will provide a governed secure-exchange method when confidential files are required.
           </p>
         </article>
       </div>

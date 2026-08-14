@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, Brain, GraduationCap, ShieldCheck, Building2, Radar } from "lucide-react";
 import { industryMap, industrySolutions } from "../industryData";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export async function generateStaticParams() {
   return industrySolutions.map((industry) => ({ industry: industry.slug }));
@@ -13,11 +14,11 @@ export async function generateMetadata({ params }: { params: Promise<{ industry:
   const industry = industryMap[slug];
   if (!industry) return {};
   return {
-    title: `${industry.name} Solutions | Obserra`,
+    title: `${industry.name} Solutions | ${LEGAL_ENTITY_NAME}`,
     description: industry.summary,
     alternates: { canonical: `/industries/${industry.slug}` },
     openGraph: {
-      title: `${industry.name} Solutions | Obserra`,
+      title: `${industry.name} Solutions | ${LEGAL_ENTITY_NAME}`,
       description: industry.summary,
       url: `https://www.obserrallc.com/industries/${industry.slug}`,
       type: "website",
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ industry:
     },
     twitter: {
       card: "summary_large_image",
-      title: `${industry.name} Solutions | Obserra`,
+      title: `${industry.name} Solutions | ${LEGAL_ENTITY_NAME}`,
       description: industry.summary,
       images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
     },
@@ -49,7 +50,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
         name: `${industry.name} enterprise intelligence and security solutions`,
         serviceType: `${industry.name} cybersecurity, executive protection, AI governance, and enterprise intelligence`,
         description: industry.summary,
-        provider: { "@type": "Organization", name: "Obserra Executive Protection & Intelligence LLC", url: "https://www.obserrallc.com" },
+        provider: { "@type": "Organization", name: LEGAL_ENTITY_NAME, url: "https://www.obserrallc.com" },
         url: `https://www.obserrallc.com/industries/${industry.slug}`,
       },
       {
@@ -92,12 +93,12 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
       </section>
 
       <section className="industry-linked-capabilities">
-        <div><p className="industry-eyebrow">CONNECTED OBSERRA CAPABILITIES</p><h2>Move from industry context to governed action.</h2></div>
+        <div><p className="industry-eyebrow">CONNECTED {LEGAL_ENTITY_NAME} CAPABILITIES</p><h2>Move from industry context to governed action.</h2></div>
         <div className="industry-linked-grid">
           <article><ShieldCheck size={20} /><strong>Enterprise services</strong><div>{industry.serviceSlugs.map((slug) => <Link key={slug} href={`/services/${slug}`}>{slug.replaceAll("-", " ")} <ArrowRight size={13} /></Link>)}</div></article>
           <article><Brain size={20} /><strong>EIOS capabilities</strong><div>{industry.eiosCapabilities.map((slug) => <Link key={slug} href={`/eios/${slug}`}>{slug.replaceAll("-", " ")} <ArrowRight size={13} /></Link>)}</div></article>
           <article><GraduationCap size={20} /><strong>Academy pathways</strong><ul>{industry.academyPathways.map((item) => <li key={item}>{item}</li>)}</ul><Link href="/academy/enterprise">Build an enterprise learning plan</Link></article>
-          <article><Building2 size={20} /><strong>Trust and assurance</strong><p>Review Obserra security architecture, framework alignment, policies, and procurement pathways.</p><Link href="/trust">Open Trust Center</Link></article>
+          <article><Building2 size={20} /><strong>Trust and assurance</strong><p>Review {LEGAL_ENTITY_NAME} security architecture, framework alignment, policies, and procurement pathways.</p><Link href="/trust">Open Trust Center</Link></article>
         </div>
       </section>
 

@@ -100,6 +100,18 @@ type ConsoleState = {
   textScreenViews?: TextScreenView[];
 };
 
+type IdentityContext = {
+  enrollmentId?: string;
+  studentLegalName?: string;
+  verificationSessionId?: string;
+  providerStatus?: string;
+  documentCheckStatus?: string;
+  selfieCheckStatus?: string;
+  instructorFileId?: string;
+  existingIdentityAttestationId?: string | null;
+  existingDailyIdentityCheckinId?: string | null;
+};
+
 function asSeconds(value: unknown) {
   return typeof value === "number" && Number.isFinite(value) ? Math.max(0, value) : 0;
 }
@@ -142,6 +154,26 @@ async function adminApi(body: Record<string, unknown>) {
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Instructor live-class request failed.");
   return payload;
+}
+
+async function identityContext(enrollmentId: string, liveSessionId: string) {
+  const query = new URLSearchParams({ enrollmentId, liveSessionId });
+  const response = await fetch(`/api/florida-class-d/admin/identity?${query}`, { cache: "no-store" });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Controlled identity evidence is unavailable.");
+  return (payload?.context ?? {}) as IdentityContext;
+}
+
+async function identityAdminApi(body: Record<string, unknown>) {
+  const response = await fetch("/api/florida-class-d/admin/identity", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    cache: "no-store",
+    body: JSON.stringify(body),
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Controlled identity evidence could not be recorded.");
+  return payload as { result?: Record<string, unknown> };
 }
 
 function generatePresenceCode() {
@@ -290,16 +322,104 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     const approved = window.confirm(`Certify Day ${day} attendance for ${studentName(student)} as ${label}? The LMS-derived instructional and break time will be retained with the instructor attestation.`);
     if (!approved) return;
     try {
-      await adminApi({
+      const certification = await adminApi({
         action: "certify_day",
         enrollmentId: student.id,
         day,
         attendanceStatus,
         idempotencyKey: `fdacs-live-day-${day}-${student.id}`,
       });
+      const entryId = certification?.result?.entryId;
+      const context = await identityContext(student.id, liveSessionId);
+      if (
+        typeof entryId !== "string" ||
+        typeof context.existingDailyIdentityCheckinId !== "string" ||
+        typeof context.existingIdentityAttestationId !== "string" ||
+        typeof context.instructorFileId !== "string"
+      ) {
+        throw new Error("Daily attendance was recorded, but controlled daily identity evidence is incomplete. Completion remains blocked.");
+      }
+      await identityAdminApi({
+        action: "daily_attendance_attestation",
+        enrollmentId: student.id,
+        anchorLiveSessionId: liveSessionId,
+        attendanceEntryId: entryId,
+        identityAttestationId: context.existingIdentityAttestationId,
+        instructorFileId: context.instructorFileId,
+        attestedAt: new Date().toISOString(),
+        correlationId: crypto.randomUUID(),
+      });
       await refresh();
     } catch (certificationError) {
       setError(certificationError instanceof Error ? certificationError.message : "Daily attendance certification failed.");
+    }
+  }
+
+  async function verifyDailyIdentity(student: StudentRow) {
+    if (!student.id || !day) return;
+    try {
+      let context = await identityContext(student.id, liveSessionId);
+      if (
+        context.providerStatus !== "verified" ||
+        context.documentCheckStatus !== "verified" ||
+        context.selfieCheckStatus !== "verified" ||
+        typeof context.verificationSessionId !== "string" ||
+        typeof context.instructorFileId !== "string"
+      ) {
+        throw new Error("Automated government-ID and matching-selfie verification has not passed for this student.");
+      }
+
+      let identityAttestationId = context.existingIdentityAttestationId;
+      if (!identityAttestationId) {
+        const photoIdType = window.prompt(
+          "Enter the observed U.S. photo-ID type: state_driver_license, state_identification_card, us_passport, or federal_photo_identification",
+          "state_driver_license",
+        )?.trim();
+        const allowedPhotoIdTypes = new Set(["state_driver_license", "state_identification_card", "us_passport", "federal_photo_identification"]);
+        if (!photoIdType || !allowedPhotoIdTypes.has(photoIdType)) throw new Error("A supported U.S. state or federal photo-ID type is required.");
+        const jurisdiction = window.prompt("Enter the two-letter state/territory code, or USA for a federal document:", "FL")?.trim().toUpperCase();
+        if (!jurisdiction || !/^[A-Z]{2,3}$/.test(jurisdiction)) throw new Error("A valid issuing jurisdiction is required.");
+        const attested = window.confirm(
+          `Attest for ${context.studentLegalName ?? studentName(student)}: I am the assigned Class DI instructor, I observed the student and the student's U.S. state or federal issued photo identification, and I verified that the live student matches that identification.`,
+        );
+        if (!attested) return;
+        const identityResult = await identityAdminApi({
+          action: "identity_attestation",
+          enrollmentId: student.id,
+          verificationSessionId: context.verificationSessionId,
+          instructorFileId: context.instructorFileId,
+          observedPhotoIdType: photoIdType,
+          issuingJurisdiction: jurisdiction,
+          attestedAt: new Date().toISOString(),
+          correlationId: crypto.randomUUID(),
+        });
+        identityAttestationId = typeof identityResult.result?.identityAttestationId === "string"
+          ? identityResult.result.identityAttestationId
+          : null;
+        if (!identityAttestationId) throw new Error("The instructor identity attestation was not recorded.");
+        context = await identityContext(student.id, liveSessionId);
+      }
+
+      if (context.existingDailyIdentityCheckinId) {
+        window.alert(`Day ${day} identity check-in is already recorded for ${studentName(student)}.`);
+        return;
+      }
+      const dailyAttested = window.confirm(
+        `Day ${day} check-in for ${context.studentLegalName ?? studentName(student)}: I am the assigned Class DI instructor, I observed this student live before instruction today, and I verified the student against the controlled identity record.`,
+      );
+      if (!dailyAttested) return;
+      await identityAdminApi({
+        action: "daily_identity_checkin",
+        enrollmentId: student.id,
+        anchorLiveSessionId: liveSessionId,
+        identityAttestationId,
+        instructorFileId: context.instructorFileId,
+        attestedAt: new Date().toISOString(),
+        correlationId: crypto.randomUUID(),
+      });
+      await refresh();
+    } catch (identityError) {
+      setError(identityError instanceof Error ? identityError.message : "Daily identity check-in failed.");
     }
   }
 
@@ -414,7 +534,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
           <div className="fdacs-live__stage-frame fdacs-live__media-frame">
             {media?.joinUrl ? (
               <iframe
-                title="Obserra Florida Class D instructor secure live video classroom"
+                title="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Florida Class D instructor secure live video classroom"
                 src={media.joinUrl}
                 allow="camera; microphone; fullscreen; display-capture; autoplay"
                 referrerPolicy="no-referrer"
@@ -427,7 +547,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
               </div>
             )}
           </div>
-          <p className="fdacs-live__fineprint">Instructor video, audio, screen sharing, and prejoin device checks are delivered through the secure media room. Recording is disabled by default. Obserra remains the system of record for attendance and instructional time.</p>
+          <p className="fdacs-live__fineprint">Instructor video, audio, screen sharing, and prejoin device checks are delivered through the secure media room. Recording is disabled by default. OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC remains the system of record for attendance and instructional time.</p>
           {presenceCode ? <div className="fdacs-live__presence-code"><small>CURRENT PRESENCE CODE</small><strong>{presenceCode}</strong><span>Read or display this code to the live class. Do not post it in the student Q&amp;A feed.</span></div> : null}
 
           <div className="fdacs-live__instructor-controls">
@@ -451,7 +571,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
 
           <section className="fdacs-live__panel fdacs-live__roster-panel">
             <div className="fdacs-live__panel-head"><h2>Live attendance and full-course time roster</h2><span>{students.length} students</span></div>
-            <p className="fdacs-live__muted">The roster separates live connection, credited instructional presence, tracked breaks, uncredited time, and participation evidence for each student. After Lesson 4 ends, the instructor must certify the day. Break time remains visible but cannot become instructional credit.</p>
+            <p className="fdacs-live__muted">Before the first lesson, the assigned Class DI instructor must verify each live student and record today&apos;s identity check-in. The LMS will not issue the student&apos;s single-device instructional lease without it. After Lesson 4 ends, certify the server-derived attendance ledger and sign the separate end-of-day attendance attestation.</p>
             <div className="fdacs-live__roster">
               {students.map((student) => {
                 const live = student.liveTime;
@@ -468,6 +588,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
                     <span><small>Course breaks</small><b>{formatDuration(student.courseTime?.breakPresenceSeconds)}</b></span>
                     <span><small>Course uncredited</small><b>{formatDuration(student.courseTime?.uncreditedConnectedSeconds)}</b></span>
                     <span className="fdacs-live__roster-actions">
+                      <button type="button" onClick={() => void verifyDailyIdentity(student)}>Verify Day {day ?? "–"} identity</button>
                       {absent ? <button type="button" onClick={() => void restorePresence(student)}>Review absence</button> : null}
                       {canCertifyDay ? <button type="button" onClick={() => void certifyDay(student)}>Certify {suggested.replace("_", " ")}</button> : <em>Awaiting day end</em>}
                     </span>

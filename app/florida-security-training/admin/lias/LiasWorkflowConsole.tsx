@@ -82,7 +82,7 @@ export default function LiasWorkflowConsole({ initialQueue }: Props) {
 
       <section className="fdacs-live__panel">
         <h2>Successful completion reporting queue</h2>
-        <p>Obserra prepares and tracks the reporting workflow. Authorized staff still complete the official LIAS transaction. The official FDACS-16103 is accepted into the LMS only after LIAS confirmation.</p>
+        <p>OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC prepares and tracks the reporting workflow. Authorized staff still complete the official LIAS transaction. The official FDACS-16103 is accepted into the LMS only after LIAS confirmation.</p>
         <div className="fdacs-completion-admin__grid">
           {queue.map((item) => {
             const current = fields[item.id] || {};

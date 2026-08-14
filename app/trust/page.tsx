@@ -2,15 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { alignmentAuthorities, alignmentDisclaimer } from "../../lib/control-alignment";
 import { trustPolicies } from "./policies";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./trust.css";
 
 export const metadata: Metadata = {
   title: "Enterprise Trust Center | Security, Privacy, AI Governance, and Procurement",
   description:
-    "Review Obserra security architecture, privacy practices, responsible AI controls, framework alignment, procurement pathways, verified credentials, and buyer protections.",
+    `Review ${LEGAL_ENTITY_NAME} security architecture, privacy practices, responsible AI controls, framework alignment, procurement pathways, verified credentials, and buyer protections.`,
   alternates: { canonical: "/trust" },
   keywords: [
-    "Obserra trust center",
+    `${LEGAL_ENTITY_NAME} trust center`,
     "enterprise security review",
     "responsible AI governance",
     "NIST aligned security",
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     "responsible disclosure",
   ],
   openGraph: {
-    title: "Obserra Enterprise Trust Center",
+    title: `${LEGAL_ENTITY_NAME} Enterprise Trust Center`,
     description:
       "Security architecture, privacy, responsible AI, framework alignment, verified credentials, procurement support, and buyer assurance.",
     url: "https://www.obserrallc.com/trust",
@@ -30,13 +31,13 @@ export const metadata: Metadata = {
         url: "/brand/visuals/obserra-cybersecurity.png",
         width: 1344,
         height: 768,
-        alt: "Obserra Enterprise Trust Center",
+        alt: `${LEGAL_ENTITY_NAME} Enterprise Trust Center`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Obserra Enterprise Trust Center",
+    title: `${LEGAL_ENTITY_NAME} Enterprise Trust Center`,
     description:
       "Security, privacy, responsible AI, framework alignment, procurement pathways, and buyer assurance.",
     images: ["/brand/visuals/obserra-cybersecurity.png"],
@@ -63,11 +64,13 @@ const architecture = [
   ["Responsible AI controls", "Human oversight, permissions, explainability, model governance, data-use constraints, rollback, and kill-switch concepts where applicable."],
 ];
 
+const legalEntityMailName = encodeURIComponent(LEGAL_ENTITY_NAME);
+
 const procurementPaths = [
-  ["Security questionnaire", "Request support for a customer or third-party security assessment.", "mailto:info@obserrallc.com?subject=Obserra%20Security%20Questionnaire%20Request"],
-  ["Vendor assurance package", "Request available security, privacy, legal, and operational assurance materials.", "mailto:info@obserrallc.com?subject=Obserra%20Vendor%20Assurance%20Package"],
+  ["Security questionnaire", "Request support for a customer or third-party security assessment.", `mailto:info@obserrallc.com?subject=${legalEntityMailName}%20Security%20Questionnaire%20Request`],
+  ["Vendor assurance package", "Request available security, privacy, legal, and operational assurance materials.", `mailto:info@obserrallc.com?subject=${legalEntityMailName}%20Vendor%20Assurance%20Package`],
   ["Architecture briefing", "Schedule a review of deployment, integration, security, governance, and data-handling architecture.", "/contact?interest=architecture-briefing"],
-  ["NDA and procurement coordination", "Coordinate confidentiality, procurement, contracting, and enterprise evaluation requirements.", "mailto:info@obserrallc.com?subject=Obserra%20NDA%20and%20Procurement%20Coordination"],
+  ["NDA and procurement coordination", "Coordinate confidentiality, procurement, contracting, and enterprise evaluation requirements.", `mailto:info@obserrallc.com?subject=${legalEntityMailName}%20NDA%20and%20Procurement%20Coordination`],
 ];
 
 const verifiedCredentials = [
@@ -84,13 +87,13 @@ export default function TrustCenterPage() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Obserra Enterprise Trust Center",
+    name: `${LEGAL_ENTITY_NAME} Enterprise Trust Center`,
     url: "https://www.obserrallc.com/trust",
     description:
-      "Enterprise security, privacy, responsible AI, procurement, framework alignment, verified credentials, and buyer assurance information for Obserra.",
+      `Enterprise security, privacy, responsible AI, procurement, framework alignment, verified credentials, and buyer assurance information for ${LEGAL_ENTITY_NAME}.`,
     isPartOf: {
       "@type": "WebSite",
-      name: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      name: LEGAL_ENTITY_NAME,
       url: "https://www.obserrallc.com",
     },
   };
@@ -100,13 +103,13 @@ export default function TrustCenterPage() {
       <div className="trust-wrap">
         <header className="trust-hero">
           <div>
-            <p className="trust-eyebrow">OBSERRA ENTERPRISE TRUST CENTER</p>
+            <p className="trust-eyebrow">{LEGAL_ENTITY_NAME} ENTERPRISE TRUST CENTER</p>
             <h1>Trust evidence for organizations that require security, accountability, and executive assurance.</h1>
             <p className="trust-lead">
-              Review Obserra security principles, privacy practices, responsible AI controls, framework alignment, procurement pathways, verified credentials, and published policies for services, software, applications, and professional training.
+              Review {LEGAL_ENTITY_NAME} security principles, privacy practices, responsible AI controls, framework alignment, procurement pathways, verified credentials, and published policies for services, software, applications, and professional training.
             </p>
             <div className="trust-hero-actions">
-              <a href="mailto:info@obserrallc.com?subject=Obserra%20Enterprise%20Trust%20Review">Start a trust review</a>
+              <a href={`mailto:info@obserrallc.com?subject=${legalEntityMailName}%20Enterprise%20Trust%20Review`}>Start a trust review</a>
               <Link href="/contact?interest=architecture-briefing">Request an architecture briefing</Link>
             </div>
           </div>
@@ -122,7 +125,7 @@ export default function TrustCenterPage() {
           </aside>
         </header>
 
-        <section className="trust-assurance" aria-label="Obserra assurance principles">
+        <section className="trust-assurance" aria-label={`${LEGAL_ENTITY_NAME} assurance principles`}>
           <article><strong>Secure by design</strong><span>Security, least privilege, governed access, auditability, resilience, and accountable delivery are built into the operating model.</span></article>
           <article><strong>Privacy and minimization</strong><span>Information is collected, used, retained, and disclosed only for legitimate service, security, billing, support, and legal purposes.</span></article>
           <article><strong>Responsible AI</strong><span>AI use is risk based, governed, subject to human oversight, and constrained by data handling, permissions, and accountability requirements.</span></article>
@@ -221,8 +224,8 @@ export default function TrustCenterPage() {
             <p>Send the request type, affected service, organization, deadline, and relevant reference information. Do not include unnecessary sensitive data in ordinary email.</p>
           </div>
           <div className="trust-contact-actions">
-            <a href="mailto:info@obserrallc.com?subject=Obserra%20Security%20or%20Procurement%20Review">Start a trust review</a>
-            <Link href="/contact?interest=enterprise-consultation">Contact Obserra</Link>
+            <a href={`mailto:info@obserrallc.com?subject=${legalEntityMailName}%20Security%20or%20Procurement%20Review`}>Start a trust review</a>
+            <Link href="/contact?interest=enterprise-consultation">Contact {LEGAL_ENTITY_NAME}</Link>
           </div>
         </section>
       </div>

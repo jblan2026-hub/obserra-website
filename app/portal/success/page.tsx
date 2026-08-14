@@ -3,9 +3,10 @@ import Link from "next/link";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createCustomerSuccessSnapshot } from "./customerSuccess";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
-  title: "Customer Success Center | Obserra",
+  title: `Customer Success Center | ${LEGAL_ENTITY_NAME}`,
   description: "Protected customer workspace for subscriptions, adoption, licensing, renewals, support, and executive value reporting.",
   robots: { index: false, follow: false },
 };

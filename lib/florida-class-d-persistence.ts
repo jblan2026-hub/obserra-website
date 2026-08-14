@@ -77,15 +77,11 @@ type EnrollmentReviewInput = {
 };
 
 function configuredServiceRoleKey() {
-  return (
-    process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() ||
-    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ||
-    ""
-  );
+  return process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
 }
 
 function getConfig(): SupabaseConfig {
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
+  const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   const serviceRoleKey = configuredServiceRoleKey();
   if (!serviceRoleKey) {
     throw new FloridaClassDPersistenceError(
@@ -189,6 +185,14 @@ async function supabaseRequest<T>(path: string, init: RequestInit = {}): Promise
     );
   }
   return payload as T;
+}
+
+/**
+ * Server-only request boundary for the dedicated FDACS student-record project.
+ * Callers must use narrowly scoped database RPCs for newly hardened tables.
+ */
+export async function floridaClassDPersistenceRequest<T>(path: string, init: RequestInit = {}) {
+  return supabaseRequest<T>(path, init);
 }
 
 export async function recordFloridaClassDAttendance(

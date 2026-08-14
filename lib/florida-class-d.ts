@@ -23,7 +23,7 @@ export type FloridaClassDLiveLesson = {
 export const FLORIDA_CLASS_D_COURSE = {
   id: "florida-class-d-40-hour",
   title: "Florida Class D Security Officer Training",
-  provider: "Obserra Executive Protection & Intelligence LLC",
+  provider: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   instructionalHours: 40,
   instructionalDays: 5,
   hoursPerDay: 8,

@@ -2,7 +2,7 @@
 
 ## Scope
 
-This controlled handoff supplements `docs/florida-class-d-lms/HANDOFF.md` for the regulated Florida Class D school/LMS workstream of **Obserra Executive Protection & Intelligence LLC**. It remains separate from the commercial Obserra Academy Course 1 through Course N / LearnWorlds course-production handoffs.
+This controlled handoff supplements `docs/florida-class-d-lms/HANDOFF.md` for the regulated Florida Class D school/LMS workstream of **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**. It remains separate from the commercial Obserra Academy Course 1 through Course N / LearnWorlds course-production handoffs.
 
 Public state remains `COMING SOON · LMS IN PROGRESS`. The owner reports an active Florida Class DI instructor license and a pending Florida Class DS school/training facility application. Regulated live instruction, production cohort scheduling, paid enrollment, final-examination access, completion issuance, LIAS execution, and public launch remain fail closed until the applicable regulatory and production gates are satisfied.
 

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import styles from "./ObserraGuide.module.css";
 
 type MessageAction = { href: string; label: string };
@@ -27,14 +28,14 @@ function pageContext(pathname: string): PageContext {
   if (pathname.startsWith("/academy")) {
     return {
       label: "Academy Advisor",
-      welcome: "I can help you compare courses, understand secure enrollment, access training, or learn how Obserra certificates are earned.",
+      welcome: "I can help you compare courses, understand secure enrollment, access training, or learn how Obserra Academy certificates are earned.",
       prompts: ["Recommend a course", "How does enrollment work?", "How do I earn a certificate?", "Enterprise training"],
     };
   }
   if (pathname.startsWith("/apps")) {
     return {
       label: "Product Advisor",
-      welcome: "I can help you evaluate Obserra applications, compare use cases, request a product briefing, or identify the right solution for your organization.",
+      welcome: `I can help you evaluate ${LEGAL_ENTITY_NAME} applications, compare use cases, request a product briefing, or identify the right solution for your organization.`,
       prompts: ["Recommend an application", "Show EIOS", "Request a product demo", "Discuss enterprise pricing"],
     };
   }
@@ -55,20 +56,20 @@ function pageContext(pathname: string): PageContext {
   if (pathname.startsWith("/about")) {
     return {
       label: "Executive Concierge",
-      welcome: "I can help you understand Obserra leadership, credentials, speaking capabilities, and the best path to begin an engagement.",
-      prompts: ["About Obserra", "Leadership credentials", "Book a speaker", "Start a conversation"],
+      welcome: `I can help you understand ${LEGAL_ENTITY_NAME} leadership, credentials, speaking capabilities, and the best path to begin an engagement.`,
+      prompts: [`About ${LEGAL_ENTITY_NAME}`, "Leadership credentials", "Book a speaker", "Start a conversation"],
     };
   }
   if (pathname.startsWith("/contact")) {
     return {
       label: "Engagement Concierge",
-      welcome: "Tell me what you are trying to accomplish and I will direct you to the most relevant Obserra service, application, training, or briefing.",
+      welcome: `Tell me what you are trying to accomplish and I will direct you to the most relevant ${LEGAL_ENTITY_NAME} service, application, training, or briefing.`,
       prompts: ["I need cybersecurity help", "I need executive protection", "I want a product demo", "I need team training"],
     };
   }
   return {
     label: "Executive Intelligence Advisor",
-    welcome: "I can help you discover Obserra applications, professional services, Academy training, EIOS capabilities, and the right next step for your organization.",
+    welcome: `I can help you discover ${LEGAL_ENTITY_NAME} applications, professional services, Academy training, EIOS capabilities, and the right next step for your organization.`,
     prompts: ["Explore applications", "Find professional training", "Review services", "Speak with an advisor"],
   };
 }
@@ -90,7 +91,7 @@ function response(question: string, pathname: string): Message {
   if (/app|application|software|product|demo|pricing/.test(input)) {
     return {
       from: "guide",
-      text: "Obserra applications support cybersecurity, AI governance, cyber risk, control evidence, vulnerability prioritization, executive exposure, and enterprise intelligence. Product availability is stated clearly on each commercial product page.",
+      text: `${LEGAL_ENTITY_NAME} applications support cybersecurity, AI governance, cyber risk, control evidence, vulnerability prioritization, executive exposure, and enterprise intelligence. Product availability is stated clearly on each commercial product page.`,
       actions: [
         { href: "/apps", label: "Browse applications" },
         { href: "/contact?interest=applications", label: "Request product guidance" },
@@ -112,7 +113,7 @@ function response(question: string, pathname: string): Message {
   if (/pay|price|buy|checkout|enroll|stripe|access/.test(input)) {
     return {
       from: "guide",
-      text: "Choose an available course and select Enroll securely. Checkout is hosted by Stripe. An authenticated learner can receive direct account-based fulfillment; a guest purchase remains pending until the purchaser claims it using the verified payer email. Access is granted only after Obserra verifies Stripe's signed payment webhook.",
+      text: `Choose an available course and select Enroll securely. Checkout is hosted by Stripe. An authenticated learner can receive direct account-based fulfillment; a guest purchase remains pending until the purchaser claims it using the verified payer email. Access is granted only after ${LEGAL_ENTITY_NAME} verifies Stripe's signed payment webhook.`,
       actions: [{ href: "/academy#courses", label: "Choose a course" }],
     };
   }
@@ -128,7 +129,7 @@ function response(question: string, pathname: string): Message {
   if (/protect|executive protection|travel|threat|physical security/.test(input)) {
     return {
       from: "guide",
-      text: "Obserra supports executive protection planning, protective intelligence, travel risk, digital exposure, and threat-informed security decisions for leaders and organizations.",
+      text: `${LEGAL_ENTITY_NAME} supports executive protection planning, protective intelligence, travel risk, digital exposure, and threat-informed security decisions for leaders and organizations.`,
       actions: [
         { href: "/protection-intelligence", label: "Explore protection" },
         { href: "/contact?interest=protection", label: "Request consultation" },
@@ -139,7 +140,7 @@ function response(question: string, pathname: string): Message {
   if (/cyber|ciso|incident|risk|governance|identity|grc|ai governance/.test(input)) {
     return {
       from: "guide",
-      text: "Obserra provides executive cybersecurity advisory, fractional CISO leadership, incident readiness, risk and governance, identity access management, GRC, AI governance, and secure technology consulting.",
+      text: `${LEGAL_ENTITY_NAME} provides executive cybersecurity advisory, fractional CISO leadership, incident readiness, risk and governance, identity access management, GRC, AI governance, and secure technology consulting.`,
       actions: [
         { href: "/services", label: "Review services" },
         { href: "/contact?interest=cybersecurity", label: "Discuss your priority" },
@@ -150,7 +151,7 @@ function response(question: string, pathname: string): Message {
   if (/about|leadership|credential|speaker|speaking|jody|blanchard/.test(input)) {
     return {
       from: "guide",
-      text: "Obserra is veteran-owned and executive-led by Dr. Jody Blanchard, combining Fortune 500 cybersecurity leadership, military intelligence, protection, governance, technology, and professional education experience.",
+      text: `${LEGAL_ENTITY_NAME} is veteran-owned and executive-led by Dr. Jody Blanchard, combining Fortune 500 cybersecurity leadership, military intelligence, protection, governance, technology, and professional education experience.`,
       actions: [
         { href: "/about", label: "Meet the leadership" },
         { href: "/contact?interest=speaking", label: "Request a briefing or speaker" },
@@ -161,15 +162,15 @@ function response(question: string, pathname: string): Message {
   if (/contact|consult|advisor|quote|speak|help|enterprise/.test(input)) {
     return {
       from: "guide",
-      text: "Obserra can help scope a confidential advisory engagement, product briefing, enterprise training program, or protection and intelligence requirement.",
-      actions: [{ href: "/contact", label: "Contact Obserra" }],
+      text: `${LEGAL_ENTITY_NAME} can help scope a confidential advisory engagement, product briefing, enterprise training program, or protection and intelligence requirement.`,
+      actions: [{ href: "/contact", label: `Contact ${LEGAL_ENTITY_NAME}` }],
     };
   }
 
   const context = pageContext(pathname);
   return {
     from: "guide",
-    text: `I am currently your ${context.label}. I can guide you to an Obserra application, service, Academy course, EIOS briefing, or confidential consultation.`,
+    text: `I am currently your ${context.label}. I can guide you to a ${LEGAL_ENTITY_NAME} application, service, Academy course, EIOS briefing, or confidential consultation.`,
     actions: [
       { href: "/apps", label: "Applications" },
       { href: "/services", label: "Services" },
@@ -245,7 +246,7 @@ export default function ObserraGuide() {
             <div className={styles.brand}>
               <Image
                 src="/brand/obserra-logo.png"
-                alt="Obserra Executive Protection and Intelligence LLC"
+                alt={LEGAL_ENTITY_NAME}
                 width={170}
                 height={33}
                 className={styles.brandLogo}
@@ -285,7 +286,7 @@ export default function ObserraGuide() {
               id="obserrian-question"
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder="Ask about Obserra"
+              placeholder={`Ask about ${LEGAL_ENTITY_NAME}`}
               autoComplete="off"
             />
             <button type="submit" aria-label="Send question to Obserrian">Send</button>

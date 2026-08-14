@@ -28,12 +28,12 @@ type LiveInteractionType =
   | "poll_response";
 
 function serviceRoleKey() {
-  return process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+  return process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
 }
 
 function config() {
   const key = serviceRoleKey();
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
+  const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   if (!key) throw new FloridaClassDLivePersistenceError("Class D live persistence is not configured.", 503, "FDACS_LIVE_PERSISTENCE_NOT_CONFIGURED");
   if (!url.startsWith("https://")) throw new FloridaClassDLivePersistenceError("Class D live persistence URL is invalid.", 503, "FDACS_LIVE_PERSISTENCE_INVALID_URL");
   return { key, url };

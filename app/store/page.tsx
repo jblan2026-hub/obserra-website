@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
-  title: "Store | Obserra",
-  description: "Purchase Obserra applications, courses, subscriptions, advisory services, and enterprise offerings through one secure commercial storefront.",
+  title: `Store | ${LEGAL_ENTITY_NAME}`,
+  description: `Purchase ${LEGAL_ENTITY_NAME} applications, courses, subscriptions, advisory services, and enterprise offerings through one secure commercial storefront.`,
   alternates: { canonical: "/store" },
 };
 
@@ -12,7 +13,7 @@ const categories = [
   {
     eyebrow: "APPLICATIONS",
     title: "Enterprise software and SaaS",
-    copy: "Subscribe to Obserra applications, launch entitled SaaS services, retrieve subscription-bound keys, and download approved releases.",
+    copy: `Subscribe to ${LEGAL_ENTITY_NAME} applications, launch entitled SaaS services, retrieve subscription-bound keys, and download approved releases.`,
     href: "/apps",
     action: "Browse applications",
     status: "Stripe subscriptions",
@@ -44,7 +45,7 @@ const categories = [
 ];
 
 const commerceControls = [
-  ["Secure payments", "Stripe-hosted checkout keeps payment-card data outside Obserra application code."],
+  ["Secure payments", `Stripe-hosted checkout keeps payment-card data outside ${LEGAL_ENTITY_NAME} application code.`],
   ["Subscription enforcement", "Application access is revalidated and denied automatically when billing is inactive."],
   ["Protected delivery", "Approved software releases use authenticated entitlement checks and short-lived signed URLs."],
   ["Customer fulfillment", "Purchases route to the protected portal for launch, licensing, downloads, billing, and support."],
@@ -58,8 +59,8 @@ export default function StorePage() {
   return (
     <main className="min-h-svh bg-[linear-gradient(180deg,#03101d,#061b2d)] font-[Sora,'Avenir_Next',sans-serif] text-[#edf8ff]">
       <header className="relative z-20 grid gap-4 border-b border-[#6db8d833] bg-[#03101de8] px-4 py-4 backdrop-blur-md md:sticky md:top-0 md:flex md:items-center md:justify-between md:px-[max(5vw,24px)]">
-        <Link href="/" className="flex items-center gap-3 text-[11px] font-black tracking-[0.13em] text-white no-underline" aria-label="Obserra home">
-          <Image className="h-auto w-[min(220px,70vw)] md:w-[260px]" src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
+        <Link href="/" className="flex items-center gap-3 text-[11px] font-black tracking-[0.13em] text-white no-underline" aria-label={`${LEGAL_ENTITY_NAME} home`}>
+          <Image className="h-auto w-[min(220px,70vw)] md:w-[260px]" src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
           <span>COMMERCIAL STORE</span>
         </Link>
         <nav className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center md:gap-3.5" aria-label="Store navigation">
@@ -79,9 +80,9 @@ export default function StorePage() {
 
       <section className="grid gap-6 bg-[radial-gradient(circle_at_88%_12%,#1e648b4a,transparent_34%)] px-4 pb-7 pt-11 md:px-[max(5vw,24px)] md:pb-10 md:pt-[72px] xl:grid-cols-[minmax(0,1fr)_minmax(260px,.45fr)]">
         <div>
-          <p className={eyebrow}>OBSERRA COMMERCIAL PLATFORM</p>
+          <p className={eyebrow}>{LEGAL_ENTITY_NAME} COMMERCIAL PLATFORM</p>
           <h1 className="mt-3 max-w-[1050px] text-[clamp(36px,11vw,52px)] font-black leading-[0.98] tracking-[-0.05em] md:text-[clamp(40px,5vw,72px)]">Applications, courses, subscriptions, and executive services in one secure store.</h1>
-          <p className="max-w-4xl text-[17px] leading-[1.65] text-[#b8d5e6]">Choose the offering that fits your organization, complete secure checkout where available, and manage access through the Obserra customer portal.</p>
+          <p className="max-w-4xl text-[17px] leading-[1.65] text-[#b8d5e6]">Choose the offering that fits your organization, complete secure checkout where available, and manage access through the {LEGAL_ENTITY_NAME} customer portal.</p>
           <div className="mt-5 grid gap-3 sm:flex sm:flex-wrap">
             <Link className={primaryButton} href="/apps">Shop applications</Link>
             <Link className={secondaryButton} href="/academy">Shop courses</Link>
@@ -112,7 +113,7 @@ export default function StorePage() {
 
       <section className="px-4 py-8 md:px-[max(5vw,24px)]">
         <div className="grid items-end gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(260px,.55fr)]">
-          <div><p className={eyebrow}>SHOP BY OFFERING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Start with one capability and expand across the Obserra platform.</h2></div>
+          <div><p className={eyebrow}>SHOP BY OFFERING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Start with one capability and expand across the {LEGAL_ENTITY_NAME} platform.</h2></div>
           <p className="m-0 text-[17px] leading-[1.65] text-[#b8d5e6]">Each category routes to its production purchase, enrollment, subscription, or consultation workflow.</p>
         </div>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -138,7 +139,7 @@ export default function StorePage() {
       </section>
 
       <section className="grid items-center gap-6 bg-[radial-gradient(circle_at_90%_10%,#1e648b3d,transparent_35%),#06192a] px-4 py-10 md:px-[max(5vw,24px)] xl:grid-cols-[minmax(0,1fr)_auto]">
-        <div><p className={eyebrow}>ENTERPRISE PURCHASING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Need bundled applications, team training, deployment support, or a custom agreement?</h2><p className="text-[17px] leading-[1.65] text-[#b8d5e6]">Obserra can coordinate enterprise pricing, procurement documentation, implementation planning, and controlled deployment.</p></div>
+        <div><p className={eyebrow}>ENTERPRISE PURCHASING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Need bundled applications, team training, deployment support, or a custom agreement?</h2><p className="text-[17px] leading-[1.65] text-[#b8d5e6]">{LEGAL_ENTITY_NAME} can coordinate enterprise pricing, procurement documentation, implementation planning, and controlled deployment.</p></div>
         <div className="grid gap-3 sm:flex sm:flex-wrap xl:justify-end"><Link className={primaryButton} href="/contact?interest=enterprise-commerce">Contact enterprise sales</Link><Link className={secondaryButton} href="/portal">Open customer portal</Link></div>
       </section>
     </main>

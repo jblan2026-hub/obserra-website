@@ -2,14 +2,14 @@
 
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update the dual-baseline JSON and the controlled Rev. 3 registry, then run `npm run generate:cmmc-dual-baseline`.
 
-Dual-baseline registry SHA-256: `c49494b4ac9fc739b5ac9f4ae826e6100b0acfdcea95464f51db4b287aba2c60`
-Linked Rev. 3 registry SHA-256: `11f110691aa6d7c98e65e451862bb8d69726ba6d24244064dd33dc9b1b9dd6bd`
+Dual-baseline registry SHA-256: `4b2aa78ac8c65502e592bea396e349d16b5fa94658f18364db3ca5b2bd816a60`
+Linked Rev. 3 registry SHA-256: `c443e65c6893fc7d251b176bb8a98e60a486520fe3fc4bff15d219a0154d6f92`
 Snapshot date: `2026-08-14`
 Starting source SHA: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
 
 ## Claim boundary
 
-Engineering implementation, evidence traceability, and assessment readiness only. This mapping does not claim a MET assessment result, CMMC certification, CMMC status in SPRS, authorization to process CUI, FedRAMP authorization, or FDACS approval.
+Historical requirement-level supporting mapping only; docs/compliance/CMMC-SYSTEM-EVIDENCE.json is the current objective-level authority. This mapping does not claim a MET assessment result, CMMC certification, CMMC status in SPRS, authorization to process CUI, FedRAMP authorization, FDACS approval, or an assessor determination.
 
 Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provider evidence can support an assessment, but it cannot produce a MET result without evaluating all applicable NIST SP 800-171A Jun2018 determination statements in the approved assessment scope.
 
@@ -20,7 +20,7 @@ Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provid
 | Rev. 2 assessment requirements | 110 |
 | Rev. 2 identifiers still active under the same Rev. 3 number | 77 |
 | Rev. 2 identifiers withdrawn in Rev. 3 | 33 |
-| Rev. 2 requirements with explicit implementation trace records | 40 |
+| Rev. 2 requirements with explicit implementation trace records | 41 |
 | Active Rev. 3 requirements | 97 |
 | Rev. 3-only active requirements without a same-number Rev. 2 item | 9 |
 | Withdrawn Rev. 3 identifiers retained | 33 |
@@ -30,10 +30,10 @@ Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provid
 | Rev. 2 | Family | Requirement | Assessment | Rev. 3 identifier disposition | Implementation traces | Evidence state |
 | --- | --- | --- | --- | --- | --- | --- |
 | 3.1.1 | AC / Access Control | Authorized Access Control | not_assessed | 03.01.01 active | TR-001, TR-002, TR-003, TR-006, TR-009 | trace evidence available; assessment pending |
-| 3.1.2 | AC / Access Control | Transaction and Function Control | not_assessed | 03.01.02 active | TR-001, TR-002, TR-003, TR-005, TR-006, TR-007, TR-008, TR-009 | trace evidence available; assessment pending |
+| 3.1.2 | AC / Access Control | Transaction and Function Control | not_assessed | 03.01.02 active | TR-001, TR-002, TR-003, TR-005, TR-006, TR-007, TR-008, TR-009, TR-022 | trace evidence available; assessment pending |
 | 3.1.3 | AC / Access Control | Control CUI Flow | not_assessed | 03.01.03 active | TR-004, TR-007 | trace evidence available; assessment pending |
 | 3.1.4 | AC / Access Control | Separation of Duties | not_assessed | 03.01.04 active | none | evidence mapping required |
-| 3.1.5 | AC / Access Control | Least Privilege | not_assessed | 03.01.05 active | TR-001, TR-002, TR-003, TR-006 | trace evidence available; assessment pending |
+| 3.1.5 | AC / Access Control | Least Privilege | not_assessed | 03.01.05 active | TR-001, TR-002, TR-003, TR-006, TR-022 | trace evidence available; assessment pending |
 | 3.1.6 | AC / Access Control | Non-Privileged Account Use | not_assessed | 03.01.06 active | TR-001, TR-006 | trace evidence available; assessment pending |
 | 3.1.7 | AC / Access Control | Privileged Functions | not_assessed | 03.01.07 active | TR-001, TR-006 | trace evidence available; assessment pending |
 | 3.1.8 | AC / Access Control | Unsuccessful Logon Attempts | not_assessed | 03.01.08 active | none | evidence mapping required |
@@ -64,8 +64,8 @@ Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provid
 | 3.3.8 | AU / Audit and Accountability | Audit Protection | not_assessed | 03.03.08 active | TR-006, TR-010, TR-015, TR-021 | trace evidence available; assessment pending |
 | 3.3.9 | AU / Audit and Accountability | Audit Management | not_assessed | 03.03.09 withdrawn | none | evidence mapping required |
 | 3.4.1 | CM / Configuration Management | System Baselining | not_assessed | 03.04.01 active | TR-005, TR-012, TR-014, TR-017, TR-021 | trace evidence available; assessment pending |
-| 3.4.2 | CM / Configuration Management | Security Configuration Enforcement | not_assessed | 03.04.02 active | TR-003, TR-005 | trace evidence available; assessment pending |
-| 3.4.3 | CM / Configuration Management | System Change Management | not_assessed | 03.04.03 active | TR-005, TR-012, TR-014, TR-017, TR-018, TR-021 | trace evidence available; assessment pending |
+| 3.4.2 | CM / Configuration Management | Security Configuration Enforcement | not_assessed | 03.04.02 active | TR-003, TR-005, TR-022 | trace evidence available; assessment pending |
+| 3.4.3 | CM / Configuration Management | System Change Management | not_assessed | 03.04.03 active | TR-005, TR-012, TR-014, TR-017, TR-018, TR-021, TR-022 | trace evidence available; assessment pending |
 | 3.4.4 | CM / Configuration Management | Security Impact Analysis | not_assessed | 03.04.04 active | TR-012, TR-014, TR-018 | trace evidence available; assessment pending |
 | 3.4.5 | CM / Configuration Management | Access Restrictions for Change | not_assessed | 03.04.05 active | TR-018 | trace evidence available; assessment pending |
 | 3.4.6 | CM / Configuration Management | Least Functionality | not_assessed | 03.04.06 active | TR-003, TR-004, TR-007 | trace evidence available; assessment pending |
@@ -116,12 +116,12 @@ Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provid
 | 3.12.2 | CA / Security Assessment | Operational Plan of Action | not_assessed | 03.12.02 active | none | evidence mapping required |
 | 3.12.3 | CA / Security Assessment | Security Control Monitoring | not_assessed | 03.12.03 active | TR-015, TR-016, TR-020, TR-021 | trace evidence available; assessment pending |
 | 3.12.4 | CA / Security Assessment | System Security Plan | not_assessed | 03.12.04 withdrawn | TR-014, TR-019, TR-021 | trace evidence available; assessment pending |
-| 3.13.1 | SC / System and Communications Protection | Boundary Protection | not_assessed | 03.13.01 active | TR-007, TR-013 | trace evidence available; assessment pending |
+| 3.13.1 | SC / System and Communications Protection | Boundary Protection | not_assessed | 03.13.01 active | TR-007, TR-013, TR-022 | trace evidence available; assessment pending |
 | 3.13.2 | SC / System and Communications Protection | Security Engineering | not_assessed | 03.13.02 withdrawn | none | evidence mapping required |
 | 3.13.3 | SC / System and Communications Protection | Role Separation | not_assessed | 03.13.03 withdrawn | none | evidence mapping required |
 | 3.13.4 | SC / System and Communications Protection | Shared Resource Control | not_assessed | 03.13.04 active | TR-004 | trace evidence available; assessment pending |
 | 3.13.5 | SC / System and Communications Protection | Public-Access System Separation | not_assessed | 03.13.05 withdrawn | none | evidence mapping required |
-| 3.13.6 | SC / System and Communications Protection | Network Communication by Exception | not_assessed | 03.13.06 active | none | evidence mapping required |
+| 3.13.6 | SC / System and Communications Protection | Network Communication by Exception | not_assessed | 03.13.06 active | TR-022 | trace evidence available; assessment pending |
 | 3.13.7 | SC / System and Communications Protection | Split Tunneling | not_assessed | 03.13.07 withdrawn | none | evidence mapping required |
 | 3.13.8 | SC / System and Communications Protection | Data in Transit | not_assessed | 03.13.08 active | TR-013 | trace evidence available; assessment pending |
 | 3.13.9 | SC / System and Communications Protection | Connections Termination | not_assessed | 03.13.09 active | none | evidence mapping required |
@@ -145,10 +145,10 @@ Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provid
 | Rev. 3 | Family | Requirement | Same-number Rev. 2 | Implementation traces |
 | --- | --- | --- | --- | --- |
 | 03.01.01 | Access Control | Account Management | 3.1.1 | none |
-| 03.01.02 | Access Control | Access Enforcement | 3.1.2 | TR-001, TR-002, TR-003, TR-005, TR-006, TR-007, TR-008, TR-009 |
+| 03.01.02 | Access Control | Access Enforcement | 3.1.2 | TR-001, TR-002, TR-003, TR-005, TR-006, TR-007, TR-008, TR-009, TR-022 |
 | 03.01.03 | Access Control | Information Flow Enforcement | 3.1.3 | TR-001, TR-004, TR-007 |
 | 03.01.04 | Access Control | Separation of Duties | 3.1.4 | none |
-| 03.01.05 | Access Control | Least Privilege | 3.1.5 | TR-001, TR-002, TR-003, TR-006 |
+| 03.01.05 | Access Control | Least Privilege | 3.1.5 | TR-001, TR-002, TR-003, TR-006, TR-022 |
 | 03.01.06 | Access Control | Least Privilege – Privileged Accounts | 3.1.6 | TR-006 |
 | 03.01.07 | Access Control | Least Privilege – Privileged Functions | 3.1.7 | TR-001, TR-006 |
 | 03.01.08 | Access Control | Unsuccessful Logon Attempts | 3.1.8 | none |
@@ -171,8 +171,8 @@ Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provid
 | 03.03.07 | Audit and Accountability | Time Stamps | 3.3.7 | TR-010 |
 | 03.03.08 | Audit and Accountability | Protection of Audit Information | 3.3.8 | TR-006, TR-010, TR-015, TR-021 |
 | 03.04.01 | Configuration Management | Baseline Configuration | 3.4.1 | TR-005, TR-012, TR-014, TR-017, TR-021 |
-| 03.04.02 | Configuration Management | Configuration Settings | 3.4.2 | TR-003, TR-005 |
-| 03.04.03 | Configuration Management | Configuration Change Control | 3.4.3 | TR-005, TR-012, TR-014, TR-017, TR-018, TR-021 |
+| 03.04.02 | Configuration Management | Configuration Settings | 3.4.2 | TR-003, TR-005, TR-022 |
+| 03.04.03 | Configuration Management | Configuration Change Control | 3.4.3 | TR-005, TR-012, TR-014, TR-017, TR-018, TR-021, TR-022 |
 | 03.04.04 | Configuration Management | Impact Analyses | 3.4.4 | TR-012, TR-014, TR-018 |
 | 03.04.05 | Configuration Management | Access Restrictions for Change | 3.4.5 | TR-018 |
 | 03.04.06 | Configuration Management | Least Functionality | 3.4.6 | TR-003, TR-004, TR-007 |
@@ -217,9 +217,9 @@ Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provid
 | 03.12.02 | Security Assessment and Monitoring | Plan of Action and Milestones | 3.12.2 | none |
 | 03.12.03 | Security Assessment and Monitoring | Continuous Monitoring | 3.12.3 | TR-015, TR-016, TR-020, TR-021 |
 | 03.12.05 | Security Assessment and Monitoring | Information Exchange | Rev. 3-only | TR-019 |
-| 03.13.01 | System and Communications Protection | Boundary Protection | 3.13.1 | TR-007, TR-013 |
+| 03.13.01 | System and Communications Protection | Boundary Protection | 3.13.1 | TR-007, TR-013, TR-022 |
 | 03.13.04 | System and Communications Protection | Information in Shared System Resources | 3.13.4 | TR-004 |
-| 03.13.06 | System and Communications Protection | Network Communications – Deny by Default – Allow by Exception | 3.13.6 | TR-001, TR-006 |
+| 03.13.06 | System and Communications Protection | Network Communications – Deny by Default – Allow by Exception | 3.13.6 | TR-001, TR-006, TR-022 |
 | 03.13.08 | System and Communications Protection | Transmission and Storage Confidentiality | 3.13.8 | TR-013 |
 | 03.13.09 | System and Communications Protection | Network Disconnect | 3.13.9 | none |
 | 03.13.10 | System and Communications Protection | Cryptographic Key Establishment and Management | 3.13.10 | none |
@@ -235,7 +235,7 @@ Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provid
 | 03.15.01 | Planning | Policy and Procedures | Rev. 3-only | TR-021 |
 | 03.15.02 | Planning | System Security Plan | Rev. 3-only | TR-021 |
 | 03.15.03 | Planning | Rules of Behavior | Rev. 3-only | none |
-| 03.16.01 | System and Services Acquisition | Security Engineering Principles | Rev. 3-only | TR-003, TR-007, TR-012, TR-013, TR-014, TR-018, TR-021 |
+| 03.16.01 | System and Services Acquisition | Security Engineering Principles | Rev. 3-only | TR-003, TR-007, TR-012, TR-013, TR-014, TR-018, TR-021, TR-022 |
 | 03.16.02 | System and Services Acquisition | Unsupported System Components | Rev. 3-only | TR-011 |
 | 03.16.03 | System and Services Acquisition | External System Services | Rev. 3-only | TR-008, TR-015, TR-019, TR-020 |
 | 03.17.01 | Supply Chain Risk Management | Supply Chain Risk Management Plan | Rev. 3-only | TR-019 |
@@ -259,10 +259,12 @@ Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provid
 
 ## Authoritative sources
 
+- https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170
 - https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170/subpart-D/section-170.16
 - https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170/subpart-D/section-170.17
 - https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf
 - https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final
+- https://csrc.nist.gov/pubs/sp/800/171/a/final
 - https://csrc.nist.gov/pubs/sp/800/171/r3/final
 - https://csrc.nist.gov/pubs/sp/800/171/a/r3/final
 

@@ -5,6 +5,7 @@ import { ArrowRight, ShieldCheck, Brain, Briefcase, Users, Binary, Landmark, Boo
 import "../apps/apps.css";
 import "./services.css";
 import { serviceCatalog } from "./serviceCatalog";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
   title: "Enterprise Services | Cybersecurity, Protection, Intelligence, Risk and AI Governance",
@@ -21,15 +22,15 @@ export const metadata: Metadata = {
     "digital forensics consulting",
   ],
   openGraph: {
-    title: "Obserra Enterprise Services",
+    title: `${LEGAL_ENTITY_NAME} Enterprise Services`,
     description: "Executive-ready advisory and delivery across cybersecurity, protection, intelligence, AI governance, risk, resilience, and professional training.",
     url: "https://www.obserrallc.com/services",
     type: "website",
-    images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: "Obserra enterprise services" }],
+    images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: `${LEGAL_ENTITY_NAME} enterprise services` }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Obserra Enterprise Services",
+    title: `${LEGAL_ENTITY_NAME} Enterprise Services`,
     description: "Cybersecurity, executive protection, intelligence, risk, AI governance, resilience, and training for high-consequence organizations.",
     images: ["/brand/visuals/obserra-cybersecurity.png"],
   },
@@ -81,7 +82,7 @@ export default function ServicesPage() {
     "@graph": [
       {
         "@type": "ItemList",
-        name: "Obserra Enterprise Services",
+        name: `${LEGAL_ENTITY_NAME} Enterprise Services`,
         itemListElement: serviceCatalog.map((service, index) => ({
           "@type": "ListItem",
           position: index + 1,
@@ -94,7 +95,7 @@ export default function ServicesPage() {
         serviceType: "Enterprise cybersecurity, protection, intelligence, risk, AI governance, and advisory services",
         provider: {
           "@type": "Organization",
-          name: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+          name: LEGAL_ENTITY_NAME,
           url: "https://www.obserrallc.com",
         },
         areaServed: "Global",
@@ -105,8 +106,8 @@ export default function ServicesPage() {
   return (
     <main className="apps-page services-page">
       <header className="apps-nav">
-        <a href="/" className="apps-brand" aria-label="Obserra home">
-          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
+        <a href="/" className="apps-brand" aria-label={`${LEGAL_ENTITY_NAME} home`}>
+          <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
           <span>ENTERPRISE SERVICES</span>
         </a>
         <nav aria-label="Services navigation">
@@ -224,11 +225,11 @@ export default function ServicesPage() {
         <div>
           <p className="apps-eyebrow">EXECUTIVE CONSULTATION</p>
           <h2>Start with the decision, exposure, deadline, and business outcome that matter most.</h2>
-          <p>Obserra will use the initial inquiry to determine the appropriate service line, engagement model, information requirements, and next commercial step. Pricing is provided only after scope and delivery requirements are understood.</p>
+          <p>{LEGAL_ENTITY_NAME} will use the initial inquiry to determine the appropriate service line, engagement model, information requirements, and next commercial step. Pricing is provided only after scope and delivery requirements are understood.</p>
         </div>
         <div className="services-consultation-actions">
           <a className="apps-button" href="/contact?interest=enterprise-services">Open consultation workflow</a>
-          <a className="apps-outline" href="mailto:info@obserrallc.com?subject=Obserra%20Enterprise%20Services%20Inquiry">Email enterprise services</a>
+          <a className="apps-outline" href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`${LEGAL_ENTITY_NAME} Enterprise Services Inquiry`)}`}>Email enterprise services</a>
         </div>
       </section>
 
