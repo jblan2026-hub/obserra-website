@@ -21,6 +21,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - name: Verify website liveness contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --max-time 30 \
+            'https://www.obserrallc.com/api/health' \
+            -D /tmp/website-health-headers.txt -o /tmp/website-health.json
+          jq -e '.service == "obserra-website" and .status == "live" and .contract == "website-liveness-v1"' /tmp/website-health.json >/dev/null
+          grep -Eqi '^cache-control:[[:space:]]*no-store' /tmp/website-health-headers.txt
+          grep -Eqi '^x-obserra-health-contract:[[:space:]]*website-liveness-v1' /tmp/website-health-headers.txt
+
       - name: Verify homepage and security headers
         shell: bash
         run: |
@@ -32,6 +43,8 @@ jobs:
           grep -Eqi '^content-security-policy:' /tmp/home-headers.txt
           grep -Eqi '^x-content-type-options:[[:space:]]*nosniff' /tmp/home-headers.txt
           grep -Eqi '^x-frame-options:[[:space:]]*DENY' /tmp/home-headers.txt
+          grep -Eqi '^x-obserra-identity-status:[[:space:]]*ready' /tmp/home-headers.txt
+          grep -Eqi '^x-obserra-identity-environment:[[:space:]]*live' /tmp/home-headers.txt
 
       - name: Verify Academy catalog and legal controls
         shell: bash
@@ -42,29 +55,76 @@ jobs:
           grep -Eqi 'Stripe checkout|checkout.stripe.com' /tmp/academy.html
           grep -Eqi 'not a state license|not.*professional certification|not third-party certification' /tmp/academy.html
           grep -Eqi 'Certificate of Training|completion record' /tmp/academy.html
-          grep -Eqi '/api/academy/checkout\?course=' /tmp/academy.html
+          grep -Eqi 'action="/api/academy/checkout"' /tmp/academy.html
+          grep -Eqi 'method="post"' /tmp/academy.html
+          if grep -Eqi '/api/academy/checkout\?course=' /tmp/academy.html; then
+            echo 'Academy contains a retired GET mutation link.' >&2
+            exit 1
+          fi
 
-      - name: Verify protected checkout and authentication handoff
+      - name: Verify checkout method and same-origin boundaries without creating a payment
         shell: bash
         run: |
           set -euo pipefail
-          curl --silent --show-error --location --max-time 30 \
-            'https://www.obserrallc.com/api/academy/checkout?course=zero-trust-strategy' \
-            -D /tmp/checkout-headers.txt -o /tmp/checkout.html
-          grep -Eqi 'Sign In|SECURE CUSTOMER ACCESS|clerk' /tmp/checkout.html
-          grep -Eqi 'redirect_url|zero-trust-strategy' /tmp/checkout.html
+          checkout_status=$(curl --silent --show-error --max-time 30 \
+            'https://www.obserrallc.com/api/academy/checkout' \
+            -D /tmp/checkout-headers.txt -o /tmp/checkout.json -w '%{http_code}')
+          test "$checkout_status" = "405"
+          grep -Eqi '^allow:[[:space:]]*POST' /tmp/checkout-headers.txt
           grep -Eqi '^cache-control:[[:space:]].*(private|no-cache|no-store)' /tmp/checkout-headers.txt
 
-      - name: Reject development identity configuration in production
+          cross_origin_status=$(curl --silent --show-error --max-time 30 \
+            --request POST \
+            --header 'Origin: https://invalid.example' \
+            --header 'Content-Type: application/x-www-form-urlencoded' \
+            --data 'course=zero-trust-strategy' \
+            'https://www.obserrallc.com/api/academy/checkout' \
+            -o /tmp/cross-origin-checkout.json -w '%{http_code}')
+          test "$cross_origin_status" = "403"
+
+      - name: Verify live identity, Stripe, webhook, and durable fulfillment dependencies
         shell: bash
         run: |
           set -euo pipefail
-          cat /tmp/home.html /tmp/academy.html /tmp/checkout.html > /tmp/production-pages.html
+          health_status=$(curl --silent --show-error --max-time 30 \
+            'https://www.obserrallc.com/api/academy/commerce-health' \
+            -D /tmp/commerce-headers.txt -o /tmp/commerce-health.json -w '%{http_code}')
+          test "$health_status" = "200"
+          jq -e '
+            .operational == true and
+            .paymentProvider == "stripe" and
+            .providerVerification.environment == "live" and
+            .providerVerification.connected == true and
+            .providerVerification.chargesEnabled == true and
+            .webhookVerification == "required" and
+            .identity == "available" and
+            .identityEnvironment == "live" and
+            .durableStorage == "available" and
+            .storageSchema == "academy-durable-state-v1" and
+            .purchaserIdentityHashing == "available" and
+            .fulfillment.idempotencyKey == "stripe-event-id" and
+            .fulfillment.auditLedger == "durable-supabase"
+          ' /tmp/commerce-health.json >/dev/null
+
+          cat /tmp/home.html /tmp/academy.html > /tmp/production-pages.html
           if grep -Eqi 'pk_test_|clerk\.accounts\.dev|clerkstage\.dev' /tmp/production-pages.html; then
             echo 'Production is using a Clerk development identity configuration.' >&2
             exit 1
           fi
-          grep -Eqi 'pk_live_' /tmp/production-pages.html
+
+      - name: Verify Florida Class D LMS liveness and production readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --max-time 30 \
+            'https://www.obserrallc.com/api/florida-class-d/health/live' \
+            -o /tmp/lms-live.json
+          jq -e '.service == "florida-class-d-lms" and .status == "live"' /tmp/lms-live.json >/dev/null
+
+          curl --fail --silent --show-error --max-time 30 \
+            'https://www.obserrallc.com/api/florida-class-d/health/ready' \
+            -o /tmp/lms-ready.json
+          jq -e '.service == "florida-class-d-lms" and .status == "ready"' /tmp/lms-ready.json >/dev/null
 
       - name: Verify canonical domain redirect
         shell: bash

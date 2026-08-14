@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { lessonBrief } from "../../../academy/courseExperience";
 import { markLessonComplete } from "../../../../lib/academy";
+import { validateAcademyJsonMutation } from "../../../../lib/academy-request";
 
 const responseHeaders = {
   "cache-control": "private, no-store, max-age=0",
@@ -9,6 +10,10 @@ const responseHeaders = {
 };
 
 export async function POST(request: Request) {
+  const rejection = validateAcademyJsonMutation(request);
+  if (rejection) {
+    return NextResponse.json({ error: rejection.error }, { status: rejection.status, headers: responseHeaders });
+  }
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers: responseHeaders });
 

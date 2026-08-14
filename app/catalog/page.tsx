@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { courses } from "../academy/courseData";
+import AcademyCheckoutForm from "../academy/AcademyCheckoutForm";
 import {
   academyFlagshipCatalog,
 } from "./catalogData";
@@ -173,7 +174,7 @@ export default function CatalogPage() {
                   <strong>{money.format(course.price)}</strong>
                   <span>per learner</span>
                 </div>
-                <a href={`/api/academy/checkout?course=${course.id}`}>Buy now</a>
+                <AcademyCheckoutForm courseId={course.id} label="Buy now" source="course-card" className="academy-course-buy-button" />
               </footer>
               <a className="section-link" href={`/academy/${course.id}`}>Preview course</a>
             </article>
@@ -191,10 +192,7 @@ export default function CatalogPage() {
           <ol className="academy-flagship-list">
             {academyFlagshipCourses.map((course) => (
               <li key={course.id}>
-                <a href={`/api/academy/checkout?course=${course.id}`}>
-                  <span>{course.title}</span>
-                  <strong>{money.format(course.price)}</strong>
-                </a>
+                <AcademyCheckoutForm courseId={course.id} label={`${course.title} · ${money.format(course.price)}`} source="course-card" className="academy-flagship-buy-button" />
               </li>
             ))}
           </ol>

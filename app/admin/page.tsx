@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { courses } from "../academy/courseData";
-import { academyStateFromUser, getAcademyAggregateMetrics, getAcademyCommerceMetrics, ownerEmailAllowed } from "../../lib/academy";
+import { getAcademyAggregateMetrics, getAcademyCommerceMetrics, ownerEmailAllowed } from "../../lib/academy";
 import AcademyCommerceProvisioner from "./AcademyCommerceProvisioner";
 import "./admin.css";
 import "./admin-refine.css";
@@ -17,7 +17,6 @@ export default async function AdminPage() {
   const emails = user?.emailAddresses.map((item) => item.emailAddress) ?? [];
   if (!ownerEmailAllowed(emails)) notFound();
 
-  const state = academyStateFromUser(user!);
   const [metrics, commerce] = await Promise.all([getAcademyAggregateMetrics(), getAcademyCommerceMetrics()]);
   const grossRevenue = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(commerce.grossUsdCents / 100);
   const paidCheckouts = commerce.available ? commerce.paidCheckouts : 0;
@@ -35,15 +34,13 @@ export default async function AdminPage() {
     <section className="admin-hero"><p>Signed in owner: {emails[0]}</p><h1>Obserra site administration</h1><p>Protected Academy controls, commerce performance, traffic intelligence, and release readiness for OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC.</p></section>
     <section className="admin-grid">
       <article><span>Catalog courses</span><strong>{courses.length}</strong><small>Structured paid courses in Academy</small></article>
-      <article><span>Learner accounts observed</span><strong>{metrics.learnerAccounts}</strong><small>Clerk accounts scanned for Academy state</small></article>
+      <article><span>Learner accounts observed</span><strong>{metrics.learnerAccounts}</strong><small>Durable Academy learner records</small></article>
       <article><span>Anonymous paid access</span><strong>Secure</strong><small>Signed, server-verified learner access</small></article>
-      <article><span>Verified enrollments</span><strong>{metrics.enrollments}</strong><small>Historic account-backed records</small></article>
+      <article><span>Verified enrollments</span><strong>{metrics.enrollments}</strong><small>Active durable learner records</small></article>
       <article><span>Stripe paid checkouts</span><strong>{commerce.available ? commerce.paidCheckouts : "—"}</strong><small>Live payment-provider count</small></article>
       <article><span>Gross USD collected</span><strong>{commerce.available ? grossRevenue : "—"}</strong><small>Payment-provider reported total</small></article>
-      <article><span>Issued certificates</span><strong>{metrics.certificates}</strong><small>Historic account-backed records</small></article>
+      <article><span>Issued certificates</span><strong>{metrics.certificates}</strong><small>Signed durable completion records</small></article>
       <article><span>Enrollment coverage</span><strong>{enrollmentCoverage}</strong><small>Paid checkouts compared with stored enrollments</small></article>
-      <article><span>Your enrolled courses</span><strong>{Object.keys(state.entitlements).length}</strong><small>Owner legacy learner records</small></article>
-      <article><span>Your certificates</span><strong>{Object.values(state.progress).filter((item) => item.certificateId).length}</strong><small>Owner legacy completion records</small></article>
     </section>
     <section className="admin-section"><h2>Commerce provisioning</h2><AcademyCommerceProvisioner /></section>
     <section className="admin-section"><h2>Website activity and tracking</h2><p>Privacy-first page views, top pages, conversion events, traffic sources, and API execution traces are available in private Vercel and Stripe consoles. Use the links below for rapid operational review.</p><div className="admin-action-row"><a href="https://vercel.com/obserra/obserra-website-live/analytics" target="_blank" rel="noreferrer">Open Vercel Web Analytics</a><a href="https://vercel.com/obserra/obserra-website-live/observability" target="_blank" rel="noreferrer">Open Vercel Observability</a><a href="https://dashboard.stripe.com/payments" target="_blank" rel="noreferrer">Open Stripe Payments</a><a href="https://dashboard.stripe.com/events" target="_blank" rel="noreferrer">Open Stripe Events</a></div></section>

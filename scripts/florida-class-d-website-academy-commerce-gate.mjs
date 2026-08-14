@@ -25,6 +25,8 @@ const mediaPath = "app/api/academy/media/route.ts";
 const tutorPath = "app/api/academy/tutor/route.ts";
 const redeemPath = "app/api/academy/redeem/route.ts";
 const webhookPath = "app/api/webhook/stripe/route.ts";
+const persistencePath = "lib/academy-persistence.ts";
+const durableMigrationPath = "supabase/migrations/20260814061110_academy_durable_learner_commerce.sql";
 const supabaseConfigPath = "supabase/config.toml";
 const publicCatalogPath = "supabase/functions/academy-public-catalog/index.ts";
 const baselinePublicationPath = "supabase/migrations/20260814025522_academy_baseline_publication_controls.sql";
@@ -44,6 +46,8 @@ const media = read(mediaPath);
 const tutor = read(tutorPath);
 const redeem = read(redeemPath);
 const webhook = read(webhookPath);
+const persistence = read(persistencePath);
+const durableMigration = read(durableMigrationPath);
 const supabaseConfig = read(supabaseConfigPath);
 const publicCatalog = read(publicCatalogPath);
 const baselinePublication = read(baselinePublicationPath);
@@ -155,6 +159,8 @@ requireText(checkoutPath, checkout, "STRIPE_SECRET_KEY", "Stripe secret readines
 requireText(checkoutPath, checkout, "STRIPE_WEBHOOK_SECRET", "Stripe webhook readiness check");
 requireText(checkoutPath, checkout, 'runtimeCourse.controlPlane !== "operational"', "operational control-plane requirement");
 requireText(checkoutPath, checkout, "!runtimeCourse.control.purchaseEnabled", "purchase authorization requirement");
+requireText(checkoutPath, checkout, "academyStorageHealth", "durable fulfillment readiness check");
+requireText(checkoutPath, checkout, "identity.configured", "configured identity requirement");
 requireText(checkoutPath, checkout, 'response.headers.set("cache-control", NO_STORE)', "no-store commerce response");
 
 // Deferred payment claims must re-fetch the paid Stripe session and match a verified Clerk email address.
@@ -163,6 +169,7 @@ requireText(redeemPath, redeem, 'session.payment_status === "paid"', "paid redem
 requireText(redeemPath, redeem, 'session.metadata?.courseId === courseId', "course-bound redemption requirement");
 requireText(redeemPath, redeem, 'item.verification?.status === "verified"', "verified Clerk email requirement");
 requireText(redeemPath, redeem, "authenticatedUserOwnsVerifiedPurchaserEmail", "verified purchaser-email ownership check");
+requireText(redeemPath, redeem, "claimCourseAccess", "durable paid checkout claim");
 
 // Fulfillment must be driven by signed Stripe webhooks and only after a paid event.
 requireText(webhookPath, webhook, 'request.headers.get("stripe-signature")', "Stripe signature header");
@@ -170,7 +177,24 @@ requireText(webhookPath, webhook, "webhooks.constructEvent", "Stripe signature v
 requireText(webhookPath, webhook, 'event.type === "checkout.session.completed"', "checkout completion event");
 requireText(webhookPath, webhook, 'session.payment_status === "paid"', "paid status check");
 requireText(webhookPath, webhook, 'event.type === "checkout.session.async_payment_succeeded"', "async payment success event");
-requireText(webhookPath, webhook, "grantCourseAccess", "post-payment entitlement grant");
+requireText(webhookPath, webhook, "recordPaidCheckout", "durable post-payment event recording");
+requireText(webhookPath, webhook, "event.id", "Stripe-event idempotency key");
+
+// Academy fulfillment and learner state must be durable, service-only, auditable, and contain no fabricated rows.
+for (const table of ["academy_learner_state", "academy_payment_events", "academy_assessment_records", "academy_learner_events"]) {
+  requireText(durableMigrationPath, durableMigration, `create table if not exists public.${table}`, `${table} durable table`);
+  requireText(durableMigrationPath, durableMigration, `alter table public.${table} force row level security`, `${table} forced RLS`);
+  requireText(durableMigrationPath, durableMigration, `revoke all on public.${table} from public, anon, authenticated`, `${table} public access revocation`);
+}
+requireText(durableMigrationPath, durableMigration, "academy_reject_audit_mutation", "append-only audit trigger");
+requireText(durableMigrationPath, durableMigration, "answers_retained boolean not null default false", "assessment answer minimization");
+for (const rpc of ["academy_record_paid_checkout", "academy_claim_paid_checkout", "academy_get_learner_state", "academy_complete_lesson", "academy_record_assessment", "academy_storage_health"]) {
+  requireText(durableMigrationPath, durableMigration, `grant execute on function public.${rpc}`, `${rpc} service-only grant`);
+  requireText(persistencePath, persistence, `"${rpc}"`, `${rpc} server-side client`);
+}
+requireText(persistencePath, persistence, "OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY", "dedicated Academy service credential");
+requireText(persistencePath, persistence, "OBSERRA_ACADEMY_EMAIL_HASH_SECRET", "purchaser email HMAC secret");
+forbidText(persistencePath, persistence, "NEXT_PUBLIC_", "client-exposed persistence credential");
 
 // Florida Class D remains controlled by its dedicated activation authority and must not be unlocked by generic Academy commerce.
 requireText(productionActivationPath, productionActivation, "production", "regulated production activation source");

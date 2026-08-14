@@ -9,6 +9,7 @@ on:
       - "app/academy/**"
       - "app/api/florida-class-d/**"
       - "app/api/academy/**"
+      - "app/api/health/**"
       - "app/api/webhook/stripe/**"
       - "lib/clerk-runtime-config.ts"
       - "lib/identity-runtime.ts"
@@ -23,6 +24,8 @@ on:
       - "scripts/florida-class-d-*.mjs"
       - "scripts/cmmc-level2-rev3-traceability.mjs"
       - "scripts/cmmc-level2-rev3-production-evidence.mjs"
+      - "scripts/cmmc-level2-dual-baseline.mjs"
+      - "scripts/academy-durable-commerce-gate.mjs"
       - "test/vercel-deployment-integrity.test.mjs"
       - "supabase/functions/academy-public-catalog/**"
       - "supabase/config.toml"
@@ -51,7 +54,7 @@ env:
 
 jobs:
   regulated-source-gates:
-    name: Gates 1-34 and production deployment integrity
+    name: Gates 1-35 and production deployment integrity
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -126,6 +129,12 @@ jobs:
 
       - name: Run Gate 34 production identity, routing, and CMMC evidence verification
         run: npm run verify:cmmc-production-evidence
+
+      - name: Run Gate 35 durable Academy commerce verification
+        run: npm run verify:academy-durable-commerce
+
+      - name: Run Gate 35 complete CMMC Level 2 dual-baseline verification
+        run: npm run verify:cmmc-dual-baseline
 
       - name: Run production deployment integrity verification
         run: node --test test/vercel-deployment-integrity.test.mjs

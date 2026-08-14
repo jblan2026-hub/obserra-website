@@ -48,6 +48,8 @@ check("deterministic workload digest", digest.length === 64);
 
 const requiredFiles = [
   "app/api/health/route.ts",
+  "app/api/florida-class-d/health/live/route.ts",
+  "app/api/florida-class-d/health/ready/route.ts",
   "app/api/obserra/intelligence/route.ts",
   "app/api/academy/commerce-health/route.ts",
   "app/api/academy/checkout/route.ts",
@@ -61,7 +63,9 @@ const requiredFiles = [
 for (const file of requiredFiles) check(`required file ${file}`, exists(file));
 
 const checkout = read("app/api/academy/checkout/route.ts");
-check("checkout fails closed without webhook", /STRIPE_WEBHOOK_SECRET/.test(checkout) && /not-ready/.test(checkout));
+check("checkout fails closed without webhook", /STRIPE_WEBHOOK_SECRET/.test(checkout) && /configuration-required/.test(checkout));
+check("checkout fails closed without durable storage", /academyStorageHealth/.test(checkout) && /durable-storage-unavailable/.test(checkout));
+check("checkout fails closed without identity", /identity\.configured/.test(checkout) && /identity-configuration-required/.test(checkout));
 check("checkout disables public cache", /cache-control/i.test(checkout) && /no-store/i.test(checkout));
 check("checkout uses Stripe session", /checkout\.sessions\.create/.test(checkout));
 check("checkout includes course metadata", /courseId/.test(checkout));
@@ -99,7 +103,7 @@ const simulatedRequests = synthetic.flatMap((course) => flowFields.map((field) =
 check("2500 course-flow endpoints simulated", simulatedRequests.length === 2500);
 check("all simulated endpoints local", simulatedRequests.every((url) => url.startsWith("/")));
 
-const purchaseEvents = synthetic.map((course, index) => ({
+const staticPurchaseContracts = synthetic.map((course, index) => ({
   courseId: course.id,
   sessionId: `cs_test_${String(index + 1).padStart(4, "0")}`,
   purchaser: `learner-${index + 1}@example.invalid`,
@@ -108,15 +112,16 @@ const purchaseEvents = synthetic.map((course, index) => ({
   entitlementCreated: true,
   certificateEligible: false,
 }));
-check("500 purchase events simulated", purchaseEvents.length === 500);
-check("all purchase sessions unique", new Set(purchaseEvents.map((event) => event.sessionId)).size === 500);
-check("all purchases require verified webhook", purchaseEvents.every((event) => event.webhookVerified));
-check("all purchases create entitlement", purchaseEvents.every((event) => event.entitlementCreated));
+check("500 static purchase contracts generated", staticPurchaseContracts.length === 500);
+check("all static purchase sessions unique", new Set(staticPurchaseContracts.map((event) => event.sessionId)).size === 500);
+check("all static purchase contracts require verified webhook", staticPurchaseContracts.every((event) => event.webhookVerified));
+check("all static purchase contracts require entitlement creation", staticPurchaseContracts.every((event) => event.entitlementCreated));
 
 console.log(JSON.stringify({
   gate: "academy-site-commerce-500x",
   courses: 500,
-  purchaseEvents: 500,
+  staticPurchaseContracts: 500,
+  productionTransactionsCreated: 0,
   flowEndpoints: simulatedRequests.length,
   discoveredPages: pageFiles.length,
   authenticatedIntelligence: true,

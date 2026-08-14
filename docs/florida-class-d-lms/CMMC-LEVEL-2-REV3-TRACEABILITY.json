@@ -5,8 +5,8 @@
     "name": "Obserra Website and Academy CMMC Level 2 Traceability",
     "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
     "repository": "jblan2026-hub/obserra-website",
-    "branch": "feature/florida-class-d-lms-foundation",
-    "sourceCheckpoint": "c53e18e33eb7fb6a3bdfc9569b18381b3eef0a19",
+    "branch": "codex/production-readiness-cmmc-dual-baseline",
+    "sourceCheckpoint": "ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88",
     "claimBoundary": "Engineering alignment, evidence traceability, and audit readiness only. This register does not claim CMMC certification, a CMMC status in SPRS, FedRAMP authorization, FDACS approval, or authorization to process CUI."
   },
   "framework": {
@@ -95,8 +95,8 @@
     {
       "id": "TR-002", "title": "Clerk identity middleware and paid learner authorization", "status": "partial_external_evidence_required",
       "rev3": ["03.01.02", "03.01.05", "03.05.01", "03.05.03", "03.05.04", "03.05.12", "03.13.15"], "rev2": ["3.1.1", "3.1.2", "3.1.5", "3.5.1", "3.5.2", "3.5.3", "3.5.10"],
-      "implementation": "The website exports Clerk middleware directly and paid Academy media and tutor routes require authenticated identity and current entitlement in preview and production.",
-      "evidence": ["proxy.ts", "app/api/academy/tutor/route.ts", "app/api/academy/media/route.ts", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "implementation": "The website conditionally delegates to validated Clerk middleware, reports the validated identity environment without exposing keys, fails protected routes closed when identity is unavailable, and requires authenticated identity plus current durable entitlement for paid Academy media and tutor access.",
+      "evidence": ["proxy.ts", "lib/identity-runtime.ts", "lib/academy.ts", "app/api/academy/tutor/route.ts", "app/api/academy/media/route.ts", "docs/florida-class-d-lms/GATE-35-PRODUCTION-REMEDIATION-DUAL-BASELINE-HANDOFF.md"],
       "methods": ["examine", "test"], "boundary": "Shared Obserra and Clerk", "gap": "Production verification, MFA policy, authenticator policy, and Clerk provider assurance remain required."
     },
     {
@@ -123,36 +123,36 @@
     {
       "id": "TR-006", "title": "Supabase row level security and privileged function boundary", "status": "partial_external_evidence_required",
       "rev3": ["03.01.02", "03.01.05", "03.01.06", "03.01.07", "03.03.08", "03.13.06"], "rev2": ["3.1.1", "3.1.2", "3.1.5", "3.1.6", "3.1.7", "3.3.8"],
-      "implementation": "Reviewed Academy data tables use forced row level security with no anonymous or authenticated grants, while reviewed security definer functions are service role only with controlled search paths.",
-      "evidence": ["supabase/migrations/20260814025522_academy_baseline_publication_controls.sql", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "implementation": "Reviewed Academy publication and durable learner-commerce tables use forced row level security with no anonymous or authenticated grants. Nine durable learner-commerce security-definer functions are service-role only with an empty search path, and learner and assessment audit tables reject update and delete operations.",
+      "evidence": ["supabase/migrations/20260814025522_academy_baseline_publication_controls.sql", "supabase/migrations/20260814061110_academy_durable_learner_commerce.sql", "supabase/migrations/20260814061912_academy_payment_event_integrity_hardening.sql", "lib/academy-persistence.ts", "scripts/academy-durable-commerce-gate.mjs", "docs/florida-class-d-lms/GATE-35-PRODUCTION-REMEDIATION-DUAL-BASELINE-HANDOFF.md"],
       "methods": ["examine", "test"], "boundary": "Shared Obserra and Supabase", "gap": "Full database role inventory, provider assurance, backup controls, and periodic privilege review evidence remain required."
     },
     {
       "id": "TR-007", "title": "Stripe POST only checkout and same origin enforcement", "status": "implemented_source_evidence",
       "rev3": ["03.01.02", "03.01.03", "03.04.06", "03.13.01", "03.13.15", "03.16.01"], "rev2": ["3.1.2", "3.1.3", "3.4.6", "3.13.1", "3.13.15"],
       "implementation": "Stripe Checkout Session creation is POST only, same origin protected, form content type restricted, current course authorization checked, and responses are no store.",
-      "evidence": ["app/api/academy/checkout/route.ts", "app/academy/AcademyClient.tsx", "app/academy/[courseId]/page.tsx", "scripts/florida-class-d-website-academy-commerce-gate.mjs"],
+      "evidence": ["app/api/academy/checkout/route.ts", "app/academy/AcademyClient.tsx", "app/catalog/page.tsx", "app/academy/[courseId]/page.tsx", "lib/academy-request.ts", "scripts/florida-class-d-website-academy-commerce-gate.mjs"],
       "methods": ["examine", "test"], "boundary": "Shared Obserra and Stripe", "gap": "Production verification after deployment and Stripe provider assurance remain required."
     },
     {
       "id": "TR-008", "title": "Signed Stripe webhook and idempotent entitlement fulfillment", "status": "partial_external_evidence_required",
       "rev3": ["03.01.02", "03.03.01", "03.03.02", "03.03.03", "03.13.15", "03.16.03"], "rev2": ["3.1.2", "3.3.1", "3.3.2", "3.3.3", "3.13.15"],
-      "implementation": "Payment fulfillment requires a Stripe signed webhook and a paid event, and entitlement creation is idempotent.",
-      "evidence": ["app/api/webhook/stripe/route.ts", "app/api/academy/commerce-health/route.ts", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "implementation": "Payment fulfillment requires a Stripe-signed webhook and paid status. Each provider event is transactionally recorded in the service-only Academy payment ledger using the Stripe event ID as the idempotency authority before an entitlement is fulfilled or placed into paid-pending-claim state.",
+      "evidence": ["app/api/webhook/stripe/route.ts", "app/api/academy/commerce-health/route.ts", "lib/academy-persistence.ts", "supabase/migrations/20260814061110_academy_durable_learner_commerce.sql", "supabase/migrations/20260814061912_academy_payment_event_integrity_hardening.sql", "scripts/academy-durable-commerce-gate.mjs", "docs/florida-class-d-lms/GATE-35-PRODUCTION-REMEDIATION-DUAL-BASELINE-HANDOFF.md"],
       "methods": ["examine", "test"], "boundary": "Shared Obserra and Stripe", "gap": "Provider availability, webhook delivery assurance, and production event evidence remain external."
     },
     {
       "id": "TR-009", "title": "Verified purchaser identity for deferred course claims", "status": "implemented_source_evidence",
       "rev3": ["03.01.02", "03.05.01", "03.05.05", "03.05.12"], "rev2": ["3.1.1", "3.1.2", "3.5.1", "3.5.5", "3.5.10"],
-      "implementation": "Deferred paid course claims require exact user binding or a verified Clerk email matching the paid Stripe purchaser email. Unverified aliases cannot claim access.",
-      "evidence": ["app/api/academy/redeem/route.ts", "scripts/florida-class-d-website-academy-commerce-gate.mjs"],
+      "implementation": "Deferred paid course claims require exact user binding or a verified Clerk email matching the paid Stripe purchaser email. Guest purchaser email is HMAC-SHA-256 protected in durable storage, and a claim cannot succeed unless a signed webhook has already recorded the paid checkout event.",
+      "evidence": ["app/api/academy/redeem/route.ts", "lib/academy-persistence.ts", "supabase/migrations/20260814061110_academy_durable_learner_commerce.sql", "supabase/migrations/20260814061912_academy_payment_event_integrity_hardening.sql", "scripts/florida-class-d-website-academy-commerce-gate.mjs"],
       "methods": ["examine", "test"], "boundary": "Shared Obserra, Clerk, and Stripe", "gap": "Provider identity proofing and email verification configuration require external evidence."
     },
     {
       "id": "TR-010", "title": "Audit ledger and regulated evidence preservation", "status": "partial_external_evidence_required",
       "rev3": ["03.03.01", "03.03.02", "03.03.03", "03.03.05", "03.03.07", "03.03.08", "03.14.08"], "rev2": ["3.3.1", "3.3.2", "3.3.3", "3.3.5", "3.3.7", "3.3.8"],
-      "implementation": "Course publication and regulated operations retain audit events and controlled handoffs. Gate evidence is bound to exact source commits and retained as GitHub artifacts where implemented.",
-      "evidence": ["docs/florida-class-d-lms/ACTION-LEDGER-GATES-29-32-ADDENDUM.md", "docs/florida-class-d-lms/LATEST-HANDOFF.md", ".github/workflows/florida-class-d-lms-gates.yml"],
+      "implementation": "Course publication, paid fulfillment, assessment, learner progress, and regulated operations retain controlled audit events. Academy assessment and learner event records are append-only. Gate evidence is bound to source checkpoints and retained as GitHub artifacts where implemented.",
+      "evidence": ["docs/florida-class-d-lms/ACTION-LEDGER-GATES-29-32-ADDENDUM.md", "docs/florida-class-d-lms/ACTION-LEDGER-GATE-35-ADDENDUM.md", "docs/florida-class-d-lms/LATEST-HANDOFF.md", "supabase/migrations/20260814061110_academy_durable_learner_commerce.sql", ".github/workflows/florida-class-d-lms-gates.yml"],
       "methods": ["examine", "test"], "boundary": "Obserra GitHub and Supabase", "gap": "Centralized log retention, immutable external archive, alert review cadence, and time synchronization evidence require completion."
     },
     {
@@ -193,8 +193,8 @@
     {
       "id": "TR-016", "title": "Runtime monitoring and production telemetry review", "status": "partial_external_evidence_required",
       "rev3": ["03.03.05", "03.12.03", "03.14.03", "03.14.06"], "rev2": ["3.3.5", "3.12.3", "3.14.3", "3.14.6"],
-      "implementation": "Vercel runtime telemetry identified Clerk middleware failures and Academy degradation, and the findings were remediated in source rather than suppressed.",
-      "evidence": ["docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md", "docs/florida-class-d-lms/ACTION-LEDGER-GATES-29-32-ADDENDUM.md"],
+      "implementation": "Vercel runtime telemetry identified Clerk middleware failures and Academy degradation. Source remediation includes a noncached website liveness contract and a scheduled production operational gate that requires live Clerk, Stripe account capability, signed webhook configuration, durable Academy storage, and regulated LMS readiness instead of suppressing degradation.",
+      "evidence": ["app/api/health/route.ts", "app/api/academy/commerce-health/route.ts", ".github/workflows/production-e2e-operational-gate.yml", "docs/florida-class-d-lms/GATE-35-PRODUCTION-REMEDIATION-DUAL-BASELINE-HANDOFF.md", "docs/florida-class-d-lms/ACTION-LEDGER-GATE-35-ADDENDUM.md"],
       "methods": ["examine", "test"], "boundary": "Shared Obserra and Vercel", "gap": "Formal continuous monitoring strategy, alert routing, escalation, retention, and periodic review evidence remain required."
     },
     {
@@ -228,8 +228,8 @@
     {
       "id": "TR-021", "title": "CMMC and NIST traceability single source of truth", "status": "implemented_source_evidence",
       "rev3": ["03.03.08", "03.04.01", "03.04.03", "03.12.01", "03.12.03", "03.15.01", "03.15.02", "03.16.01"], "rev2": ["3.3.8", "3.4.1", "3.4.3", "3.12.1", "3.12.3", "3.12.4"],
-      "implementation": "CMMC and NIST traceability is maintained in one machine readable source register. Human readable audit output and its digest are generated deterministically, and CI fails on schema, catalog, mapping, evidence reference, or generated document drift.",
-      "evidence": ["docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.json", "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.schema.json", "scripts/cmmc-level2-rev3-traceability.mjs", ".github/workflows/florida-class-d-lms-gates.yml"],
+      "implementation": "CMMC and NIST traceability is maintained in machine-readable registers. The Gate 35 dual-baseline register explicitly enumerates all 110 Rev. 2 assessment requirements, all 97 active Rev. 3 engineering requirements, and all 33 withdrawn Rev. 3 identifiers. Human-readable output and digests are generated deterministically, and CI fails on schema, catalog, mapping, evidence reference, or generated-document drift.",
+      "evidence": ["docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.json", "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.schema.json", "scripts/cmmc-level2-rev3-traceability.mjs", "docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.json", "docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.schema.json", "docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MATRIX.md", "scripts/cmmc-level2-dual-baseline.mjs", ".github/workflows/florida-class-d-lms-gates.yml"],
       "methods": ["examine", "test"], "boundary": "Obserra GitHub CI", "gap": "The SSP and organization wide policies remain separate required assessment evidence and are not auto satisfied by this register."
     }
   ],

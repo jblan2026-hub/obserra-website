@@ -240,13 +240,19 @@ function getConfiguredClerkHandler(): NextMiddleware {
     if (requiresAuthentication(request)) {
       const { userId } = await auth();
       if (!userId) {
-        return pathMatchesPrefix(new URL(request.url).pathname, "/command-center")
+        const response = pathMatchesPrefix(new URL(request.url).pathname, "/command-center")
           ? redirectToIdentityGateway(request)
           : redirectToSignIn(request);
+        response.headers.set("X-Obserra-Identity-Status", "ready");
+        response.headers.set("X-Obserra-Identity-Environment", prepareClerkRuntime().environment ?? "unavailable");
+        return response;
       }
     }
 
-    return applyRouteSecurityHeaders(NextResponse.next(), request);
+    const response = applyRouteSecurityHeaders(NextResponse.next(), request);
+    response.headers.set("X-Obserra-Identity-Status", "ready");
+    response.headers.set("X-Obserra-Identity-Environment", prepareClerkRuntime().environment ?? "unavailable");
+    return response;
   });
 
   return configuredClerkHandler;

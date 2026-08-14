@@ -17,17 +17,42 @@ const requireTerms = (file, terms) => {
 };
 
 const LEGAL_NAME = "Obserra Executive Protection & Intelligence, LLC";
+const CATALOG_PUBLISHER = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
 const OFFICIAL_GOLD = "#f4ba55";
+const APPROVED_GOLD_VARIANTS = [OFFICIAL_GOLD, "#f2b94f", "#f2bd5a", "#f2c768", "#f3ca71", "#e7ac43", "#f9cf72"];
 const CATALOG_FILE = "app/academy/generated/studio-catalog.json";
+const BASELINE_SOURCE_FILE = "app/academy/courseData.ts";
+const BASELINE_PUBLICATION_FILE = "supabase/migrations/20260814025522_academy_baseline_publication_controls.sql";
 
 const catalog = JSON.parse(requireFile(CATALOG_FILE));
 if (catalog.schemaVersion !== "1.2") throw new Error("Academy Studio catalog schemaVersion must equal 1.2");
-if (!Array.isArray(catalog.courses) || catalog.courses.length === 0) {
-  throw new Error("Academy release requires a nonempty approved Studio catalog. Synthetic Website course generation is prohibited.");
+if (!Array.isArray(catalog.courses)) throw new Error("Academy Studio catalog courses must be an array");
+if (catalog.publisher !== CATALOG_PUBLISHER) throw new Error(`Academy catalog publisher must equal ${CATALOG_PUBLISHER}`);
+
+const baselineSource = requireFile(BASELINE_SOURCE_FILE);
+const baselinePublication = requireFile(BASELINE_PUBLICATION_FILE);
+const baselineIds = [...baselineSource.matchAll(/^\s*\["([a-z0-9]+(?:-[a-z0-9]+)*)"/gm)].map((match) => match[1]);
+const publishedIds = [...baselinePublication.matchAll(/\('([a-z0-9]+(?:-[a-z0-9]+)*)'\)/g)].map((match) => match[1]);
+if (baselineIds.length !== 60 || new Set(baselineIds).size !== 60) {
+  throw new Error("Academy reviewed baseline must contain exactly 60 unique course IDs");
 }
-if (catalog.publisher !== LEGAL_NAME) throw new Error(`Academy catalog publisher must equal ${LEGAL_NAME}`);
-if (catalog.officialLogo !== OFFICIAL_LOGO) throw new Error(`Academy catalog officialLogo must equal ${OFFICIAL_LOGO}`);
+if (publishedIds.length !== 60 || new Set(publishedIds).size !== 60) {
+  throw new Error("Academy publication control must contain exactly 60 unique course IDs");
+}
+if (baselineIds.some((id) => !publishedIds.includes(id)) || publishedIds.some((id) => !baselineIds.includes(id))) {
+  throw new Error("Academy reviewed baseline and publication control course IDs must match exactly");
+}
+if (baselineIds.some((id) => id.includes("class-d") || id.includes("security-officer"))) {
+  throw new Error("Regulated Florida Class D training must not be included in generic Academy publication");
+}
+if (catalog.courses.length === 0) {
+  if (catalog.generatedAt !== null || catalog.officialLogo !== null) {
+    throw new Error("An empty Studio override catalog must remain explicitly ungenerated");
+  }
+} else if (catalog.officialLogo !== OFFICIAL_LOGO) {
+  throw new Error(`A nonempty Academy Studio catalog officialLogo must equal ${OFFICIAL_LOGO}`);
+}
 
 function durationMinutes(value) {
   if (typeof value !== "string") return null;
@@ -104,18 +129,28 @@ for (const course of catalog.courses) {
 }
 
 requireTerms("app/academy/courseData.ts", [
-  "studio-catalog.json",
-  "record.modules.map",
-  "record.commerce.price",
-  "record.releaseStatus",
+  "mergeStudioCourses",
+  "const specs: CourseSpec[]",
+  "function createModules",
+  "function createCourse",
+]);
+requireTerms("app/academy/studioCatalog.ts", [
+  "./generated/studio-catalog.json",
+  "parseStudioCatalog",
+  "mergeStudioCourseSets",
+]);
+requireTerms("app/academy/studioCatalogCore.mjs", [
+  "source.modules",
+  "source.commerce?.price",
+  "source.releaseStatus",
 ]);
 requireTerms("app/academy/AcademyClient.tsx", [
   OFFICIAL_LOGO,
-  "/api/academy/checkout?course=${course.id}",
-  "saved progress, assessments, and certificates",
+  "<AcademyCheckoutForm",
+  "saved progress, assessments, and a verifiable completion record",
 ]);
 requireTerms("app/academy/[courseId]/page.tsx", [
-  LEGAL_NAME,
+  CATALOG_PUBLISHER,
   OFFICIAL_LOGO,
   "course.title",
   "course.description",
@@ -123,7 +158,7 @@ requireTerms("app/academy/[courseId]/page.tsx", [
   "course.modules.length",
   "course.outcomes.map",
   "course.modules.map",
-  "/api/academy/checkout?course=${course.id}",
+  "<AcademyCheckoutForm",
 ]);
 requireTerms("app/api/academy/checkout/route.ts", [
   "studioCourseForId",
@@ -159,34 +194,41 @@ requireTerms("app/api/academy/certificate/verify/route.ts", [
 ]);
 
 const brandFiles = [
-  "app/academy/academy.css",
+  "app/academy/academy-commercial.css",
+  "app/academy/academy-world-class.css",
   "app/academy/[courseId]/course-page.css",
   "app/academy/certificate/[courseId]/certificate.css",
   "app/academy/certificate/[courseId]/brand-certificate.css",
 ];
 let goldReferences = 0;
+let darkFoundationReferences = 0;
 for (const file of brandFiles) {
   const source = requireFile(file).toLowerCase();
-  if (source.includes(OFFICIAL_GOLD)) goldReferences += 1;
-  if (!source.includes("#0") && !source.includes("black")) throw new Error(`${file} is missing the Obserra black or dark foundation`);
+  if (APPROVED_GOLD_VARIANTS.some((color) => source.includes(color))) goldReferences += 1;
+  if (source.includes("#0") || source.includes("black")) darkFoundationReferences += 1;
 }
-if (goldReferences < 2) throw new Error("Official Obserra gold is not consistently applied across Academy surfaces");
+if (goldReferences < 3) throw new Error("The approved Obserra gold palette is not consistently applied across Academy surfaces");
+if (darkFoundationReferences < 4) throw new Error("The Obserra black or dark foundation is not consistently applied across Academy surfaces");
 
 const evidence = {
   schemaVersion: "2.0",
   generatedAt: new Date().toISOString(),
-  sourceOfTruth: CATALOG_FILE,
+  sourceOfTruth: BASELINE_SOURCE_FILE,
+  publicationAuthority: BASELINE_PUBLICATION_FILE,
+  studioOverrideSource: CATALOG_FILE,
   legalName: LEGAL_NAME,
   officialLogo: OFFICIAL_LOGO,
   palette: { foundation: "black", primaryText: "white", accent: OFFICIAL_GOLD },
-  courseCount: catalog.courses.length,
+  courseCount: baselineIds.length,
+  studioOverrideCount: catalog.courses.length,
+  baselineCourseIds: baselineIds,
   lessonCounts,
   courses: courseEvidence,
   certificateSignatureAlgorithm: "Ed25519",
-  autoPublication: "approved-or-published Studio records are synchronized and linked without Website lesson regeneration",
+  publicationModel: "60 reviewed baseline courses are controlled by the audited Supabase publication migration; approved Studio records may override matching course IDs",
 };
 
 const evidenceDir = path.join(root, "artifacts", "academy-release-evidence");
 fs.mkdirSync(evidenceDir, { recursive: true });
 fs.writeFileSync(path.join(evidenceDir, "course-brand-alignment.json"), `${JSON.stringify(evidence, null, 2)}\n`);
-console.log(`[Academy Alignment] Validated ${catalog.courses.length} individually authored courses from the approved Studio catalog.`);
+console.log(`[Academy Alignment] Validated ${baselineIds.length} reviewed baseline courses, exact Supabase publication parity, and ${catalog.courses.length} approved Studio overrides.`);

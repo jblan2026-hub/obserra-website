@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { BASELINE_COURSE_VERSION, publicationForCourse } from "../../../academy/coursePublication";
 import { courseForId } from "../../../../lib/academy";
 import { publicAcademyCourse } from "../../../../lib/academy-control";
+import { academyPurchaserHashConfigured, academyStorageHealth } from "../../../../lib/academy-persistence";
 import {
   studioCertificateMetadata,
   studioCourseForId,
@@ -102,8 +103,20 @@ export async function POST(request: Request) {
 
   const course = runtimeCourse.course;
 
+  const identity = await safeIdentity();
+  if (!identity.configured) {
+    return unavailableRedirect(requestUrl, "identity-configuration-required");
+  }
   try {
-    const identity = await safeIdentity();
+    await academyStorageHealth();
+  } catch {
+    return unavailableRedirect(requestUrl, "durable-storage-unavailable");
+  }
+  if (!identity.userId && !academyPurchaserHashConfigured()) {
+    return unavailableRedirect(requestUrl, "purchaser-identity-storage-unavailable");
+  }
+
+  try {
     const purchaserReference = identity.userId ?? `guest_${randomUUID()}`;
     const identityMode = identity.userId ? "authenticated" : "guest-email";
     const stripe = getStripe();
