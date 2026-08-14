@@ -16,9 +16,9 @@ Live Supabase checkpoint: migrations `20260814061110_academy_durable_learner_com
 
 Validated release checkpoint: exact PR head `30f967e2374883aa917ef9bba2e05b7a030e4c19` passed Florida Gates #568, Website CI #2340, CodeQL #38, Academy 70x #1295, and the repository-triggered application workflows. Vercel successfully built verified merge SHA `2189c73ff5ba15ea07aa51ab84da23112403a720` in the intended project. Local Gate 32, Gate 35 durable commerce, 110/97 dual-baseline validation, Academy alignment, Academy 70x/500x/1000x/2000x, targeted lint, non-incremental TypeScript, and all 51 repository tests also pass.
 
-Current evidence digests: Rev. 3 traceability `ab63297c4b6dcccd8e7a6e1b03ded72d150b163217db77832c90d783432de226`; production evidence `cc9ca9647d163c27d75d480585a34b4173cb19fb5a5e863f46d6ecbace30178e`; complete dual baseline `632dc6f7b64ef3a9b798705823b05f85a8abb2de131c3eafb7c972873e0dea38`.
+Current evidence digests: Rev. 3 traceability `ab63297c4b6dcccd8e7a6e1b03ded72d150b163217db77832c90d783432de226`; production evidence `4e55e06e0ade82072afc7ee5f0aa4434782acb28b6007909af08031322b198d5`; complete dual baseline `632dc6f7b64ef3a9b798705823b05f85a8abb2de131c3eafb7c972873e0dea38`.
 
-Immediate continuation: detach both canonical domains from `obserra-website-lcn2` and `obserra-integrated-services` only, preserving them on `obserra-website-live`; verify exclusive routing; remove static aliases through a governed source change; then configure and verify the three dedicated Academy Vercel secrets, live Clerk, and live Stripe/webhook controls. Re-run the non-mutating production operational gate after every provider dependency is healthy.
+Immediate continuation: deploy the governed removal of static aliases from `vercel.json`, verify whether Vercel now retains both canonical domains only on `obserra-website-live`, and repeat the duplicate-project detach if either propagated assignment remains. Then configure and verify the three dedicated Academy Vercel secrets, live Clerk, and live Stripe/webhook controls. Re-run the non-mutating production operational gate after every provider dependency is healthy.
 
 Latest live recheck: `/api/health` is HTTP 200 with the new liveness contract. Commerce is HTTP 503 with the new Stripe-event-ID and durable-Supabase contract, but identity, Stripe/webhook, Academy storage, and purchaser HMAC are unavailable. Class D is live but not ready. The canonical homepage still returned cached HTML marked with old lcn2 deployment `dpl_FYdopKa9RE5XMGMJecQ11AGMe3vb` while new API routes were live. All three projects have READY exact-merge deployments and still list both canonical domains, so exclusive routing is not verified.
 
@@ -245,7 +245,7 @@ Generated human audit view:
 
 Current production-evidence SHA-256:
 
-`cc9ca9647d163c27d75d480585a34b4173cb19fb5a5e863f46d6ecbace30178e`
+`4e55e06e0ade82072afc7ee5f0aa4434782acb28b6007909af08031322b198d5`
 
 The production evidence contains 12 PRE records covering identity, canonical routing, exact-SHA runtime validation, Stripe, Academy database controls, no-drift evidence, HA/recovery, regulated Class D separation, GitHub branch enforcement, GitHub code security/dependency monitoring, Vercel deployment integrity, and production incident recovery.
 

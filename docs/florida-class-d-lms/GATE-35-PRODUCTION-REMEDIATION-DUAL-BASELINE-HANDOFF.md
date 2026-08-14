@@ -80,7 +80,7 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 - Input digest record: `docs/florida-class-d-lms/CMMC-LEVEL-2-DUAL-BASELINE-MAPPING.sha256`
 - Dual-baseline SHA-256: `632dc6f7b64ef3a9b798705823b05f85a8abb2de131c3eafb7c972873e0dea38`
 - Current Rev. 3 traceability SHA-256: `ab63297c4b6dcccd8e7a6e1b03ded72d150b163217db77832c90d783432de226`
-- Current production-evidence SHA-256: `cc9ca9647d163c27d75d480585a34b4173cb19fb5a5e863f46d6ecbace30178e`
+- Current production-evidence SHA-256: `4e55e06e0ade82072afc7ee5f0aa4434782acb28b6007909af08031322b198d5`
 - CI verification command: `npm run verify:cmmc-dual-baseline`
 - CI workflow now runs Gate 35 and validates exact catalog counts, identifier dispositions, trace references, local evidence existence, generated report drift, and input digests.
 
@@ -121,7 +121,7 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 2. Verify and activate matching live Clerk credentials and the explicit identity runtime switch.
 3. Verify live Stripe key, account charge capability, and signed webhook endpoint secret, then validate webhook delivery without creating a fabricated charge.
 4. Remove canonical-domain attachments from the two duplicate Vercel projects only, after the required action-time confirmation, and verify both domains remain on `obserra-website-live`.
-5. Remove static repository aliases only after exclusive Vercel ownership is directly verified.
+5. Deploy the governed removal of static repository aliases, which were found to reassert the duplicate assignments after the administrator detach action, then directly verify exclusive Vercel ownership.
 6. Re-run the production operational workflow. It must remain red until website liveness, live identity, live Stripe, signed webhook verification, durable storage, and Class D readiness truthfully pass.
 
 ## Latest live runtime and routing recheck

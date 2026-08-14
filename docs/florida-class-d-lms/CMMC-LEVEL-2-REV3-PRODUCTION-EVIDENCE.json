@@ -48,11 +48,11 @@
       "status": "external_evidence_required",
       "rev3": ["03.04.01", "03.04.02", "03.04.03", "03.04.05", "03.12.03", "03.13.01", "03.13.06", "03.16.01", "03.16.03"],
       "rev2": ["3.4.1", "3.4.2", "3.4.3", "3.4.5", "3.12.3", "3.13.1"],
-      "implementation": "All three Git-linked Vercel projects produced READY production deployments for verified merge SHA 2189c73ff5ba15ea07aa51ab84da23112403a720, and direct project inspection still lists both canonical domains on intended authority obserra-website-live plus duplicate claimants obserra-website-lcn2 and obserra-integrated-services. Intended deployment dpl_6ERkFxUAKg6yjnrJVQ649dLeM6rz is READY, but a canonical homepage response still carried cached deployment marker dpl_FYdopKa9RE5XMGMJecQ11AGMe3vb from obserra-website-lcn2 while new API routes were live. Exclusive production project ownership is not established.",
+      "implementation": "All three Git-linked Vercel projects produced READY production deployments for verified merge SHA 2189c73ff5ba15ea07aa51ab84da23112403a720. The administrator completed the requested duplicate-project detach action, but immediate direct inspection still listed both canonical domains on all three projects because vercel.json continued propagating the aliases to every linked project. Gate 35 now removes that static propagation and requires canonical domains to be controlled only through intended project obserra-website-live. Exclusive ownership remains unverified until the governed source release is deployed and the direct project and canonical runtime rechecks pass.",
       "evidence": ["vercel.json", "proxy.ts", "docs/florida-class-d-lms/PRODUCTION-RECOVERY-2026-08-14-HANDOFF.md", "docs/florida-class-d-lms/VERCEL-CANONICAL-DOMAIN-OWNERSHIP-GAP.md"],
       "methods": ["examine", "test"],
       "boundary": "Obserra application and Vercel edge/runtime control plane",
-      "gap": "An authorized Vercel administrator must keep both canonical domains only on obserra-website-live, remove them from obserra-website-lcn2 and obserra-integrated-services, and provide direct ownership/live-routing evidence. After that control-plane cleanup is verified, remove the static canonical alias declaration from vercel.json through a governed release so duplicate repo-linked projects cannot recreate the conflict. GitHub issue #76 tracks closure."
+      "gap": "Deploy the governed removal of static canonical aliases, directly verify both canonical domains remain only on obserra-website-live, repeat the duplicate-project detach if Vercel retained either propagated assignment, and prove live canonical traffic is served by the intended project. GitHub issue #76 remains open until all closure evidence is retained."
     },
     {
       "id": "PRE-003",

@@ -61,6 +61,8 @@ Gate 34 now source-controls exactly these Vercel production aliases in `vercel.j
 
 No Vercel project was created or moved and no DNS ownership change was performed. Post-merge acceptance must prove both canonical domains resolve to the exact accepted Gate 34 production deployment.
 
+Gate 35 supersedes this Gate 34 alias mechanism. Direct inspection proved the shared `vercel.json` alias declaration propagated both canonical domains to three Git-linked projects. Gate 35 removes the source alias property and requires the canonical domains to be governed only in the intended Vercel project control plane.
+
 ## Clerk identity remediation
 
 The earlier code had separate Clerk configuration validators in layout, middleware, and identity health logic. Gate 34 replaces those duplicated interpretations with one server-side authority:
