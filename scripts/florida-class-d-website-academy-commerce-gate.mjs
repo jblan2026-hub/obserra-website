@@ -21,6 +21,8 @@ const checkoutPath = "app/api/academy/checkout/route.ts";
 const checkoutFormPath = "app/academy/AcademyCheckoutForm.tsx";
 const academyClientPath = "app/academy/AcademyControlledClient.tsx";
 const academyCoursePagePath = "app/academy/[courseId]/page.tsx";
+const mediaPath = "app/api/academy/media/route.ts";
+const tutorPath = "app/api/academy/tutor/route.ts";
 const redeemPath = "app/api/academy/redeem/route.ts";
 const webhookPath = "app/api/webhook/stripe/route.ts";
 const supabaseConfigPath = "supabase/config.toml";
@@ -38,6 +40,8 @@ const checkout = read(checkoutPath);
 const checkoutForm = read(checkoutFormPath);
 const academyClient = read(academyClientPath);
 const academyCoursePage = read(academyCoursePagePath);
+const media = read(mediaPath);
+const tutor = read(tutorPath);
 const redeem = read(redeemPath);
 const webhook = read(webhookPath);
 const supabaseConfig = read(supabaseConfigPath);
@@ -58,10 +62,10 @@ requireText(nextConfigPath, nextConfig, "poweredByHeader: false", "framework dis
 requireText(nextConfigPath, nextConfig, '"object-src \'none\'"', "CSP object blocking");
 requireText(nextConfigPath, nextConfig, '"frame-ancestors \'none\'"', "CSP framing protection");
 requireText(nextConfigPath, nextConfig, '"upgrade-insecure-requests"', "CSP transport upgrade");
-requireText(nextConfigPath, nextConfig, 'Strict-Transport-Security', "HSTS header");
-requireText(nextConfigPath, nextConfig, 'max-age=63072000; includeSubDomains; preload', "long-lived HSTS policy");
-requireText(nextConfigPath, nextConfig, 'X-Content-Type-Options', "MIME sniffing protection");
-requireText(nextConfigPath, nextConfig, 'Cross-Origin-Opener-Policy', "cross-origin opener protection");
+requireText(nextConfigPath, nextConfig, "Strict-Transport-Security", "HSTS header");
+requireText(nextConfigPath, nextConfig, "max-age=63072000; includeSubDomains; preload", "long-lived HSTS policy");
+requireText(nextConfigPath, nextConfig, "X-Content-Type-Options", "MIME sniffing protection");
+requireText(nextConfigPath, nextConfig, "Cross-Origin-Opener-Policy", "cross-origin opener protection");
 requireText(nextConfigPath, nextConfig, 'source: "/api/academy/:path*"', "Academy API no-store headers");
 requireText(nextConfigPath, nextConfig, 'source: "/api/webhook/stripe"', "Stripe webhook no-store headers");
 requireText(nextConfigPath, nextConfig, 'source: "/api/florida-class-d/:path*"', "Class D API no-store headers");
@@ -75,6 +79,15 @@ requireText(contractsPath, contracts, "publicVisible: false", "non-public defaul
 requireText(contractsPath, contracts, "purchaseEnabled: false", "non-purchasable default");
 requireText(controlPath, control, "courses: []", "empty degraded public catalog");
 requireText(controlPath, control, "course: null", "unavailable degraded public course");
+
+// Paid Academy media and AI tutor access must never bypass authentication or entitlement checks in preview.
+for (const [path, source] of [[mediaPath, media], [tutorPath, tutor]]) {
+  requireText(path, source, "await auth()", "Clerk authentication");
+  requireText(path, source, "academyStateWithOwnerAccess", "entitlement lookup");
+  requireText(path, source, "Paid course access is required", "paid entitlement enforcement");
+  forbidText(path, source, 'process.env.VERCEL_ENV === "preview"', "preview authentication bypass");
+  forbidText(path, source, "ownerPreview", "preview entitlement bypass");
+}
 
 // The public catalog is intentionally unauthenticated at the gateway, GET-only, field-limited, and public-visible-only.
 requireText(supabaseConfigPath, supabaseConfig, "[functions.academy-public-catalog]", "public catalog function config");
@@ -155,4 +168,4 @@ forbidText(checkoutPath, checkout.toLowerCase(), "florida-class-d", "Florida Cla
 forbidText(redeemPath, redeem.toLowerCase(), "florida-class-d", "Florida Class D generic Academy redemption coupling");
 forbidText(webhookPath, webhook.toLowerCase(), "florida-class-d", "Florida Class D generic Stripe fulfillment coupling");
 
-console.log("Gate 32 passed: website headers, identity, Academy publication/control plane, database dependencies, POST-only commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
+console.log("Gate 32 passed: website headers, identity, Academy paid media/tutor access, publication/control plane, database dependencies, POST-only commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
