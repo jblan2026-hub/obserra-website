@@ -83,58 +83,65 @@ Deno.serve(async (request: Request) => {
         return json(requestId, 400, { error: "Invalid course identifier", requestId });
       }
 
-      const [controlResult, overrideResult] = await Promise.all([
-        admin
-          .from("academy_course_controls")
-          .select("course_id, lifecycle, public_visible, purchase_enabled, preserve_existing_entitlements, revision, updated_at")
-          .eq("course_id", courseId)
-          .maybeSingle(),
-        admin
-          .from("academy_course_content_overrides")
-          .select("course_id, course_summary, content_hash, revision, updated_at")
-          .eq("course_id", courseId)
-          .maybeSingle(),
-      ]);
+      const controlResult = await admin
+        .from("academy_course_controls")
+        .select("course_id, lifecycle, public_visible, purchase_enabled, preserve_existing_entitlements, revision, updated_at")
+        .eq("course_id", courseId)
+        .eq("public_visible", true)
+        .maybeSingle();
 
       if (controlResult.error) throw controlResult.error;
-      if (overrideResult.error) throw overrideResult.error;
 
       const control = controlResult.data ? mapControl(controlResult.data) : defaultControl(courseId);
-      const courseOverride = control.publicVisible && overrideResult.data
-        ? mapOverride(overrideResult.data)
-        : null;
+      if (!control.publicVisible) {
+        return json(requestId, 200, {
+          schemaVersion: "1.0",
+          control,
+          courseOverride: null,
+          requestId,
+        });
+      }
+
+      const overrideResult = await admin
+        .from("academy_course_content_overrides")
+        .select("course_id, course_summary, content_hash, revision, updated_at")
+        .eq("course_id", courseId)
+        .maybeSingle();
+
+      if (overrideResult.error) throw overrideResult.error;
 
       return json(requestId, 200, {
         schemaVersion: "1.0",
         control,
-        courseOverride,
+        courseOverride: overrideResult.data ? mapOverride(overrideResult.data) : null,
         requestId,
       });
     }
 
-    const [controlsResult, overridesResult] = await Promise.all([
-      admin
-        .from("academy_course_controls")
-        .select("course_id, lifecycle, public_visible, purchase_enabled, preserve_existing_entitlements, revision, updated_at")
-        .order("course_id"),
-      admin
-        .from("academy_course_content_overrides")
-        .select("course_id, course_summary, content_hash, revision, updated_at")
-        .order("course_id"),
-    ]);
+    const controlsResult = await admin
+      .from("academy_course_controls")
+      .select("course_id, lifecycle, public_visible, purchase_enabled, preserve_existing_entitlements, revision, updated_at")
+      .eq("public_visible", true)
+      .order("course_id");
 
     if (controlsResult.error) throw controlsResult.error;
-    if (overridesResult.error) throw overridesResult.error;
 
     const controlByCourse = new Map(
       (controlsResult.data ?? []).map((row) => [row.course_id, mapControl(row)]),
     );
-    const courseOverrides = (overridesResult.data ?? [])
-      .map((row) => mapOverride(row))
-      .filter((row) => {
-        const control = controlByCourse.get(String(row.courseId)) ?? defaultControl(String(row.courseId));
-        return control.publicVisible;
-      });
+    const publicCourseIds = Array.from(controlByCourse.keys());
+
+    let courseOverrides: ReturnType<typeof mapOverride>[] = [];
+    if (publicCourseIds.length > 0) {
+      const overridesResult = await admin
+        .from("academy_course_content_overrides")
+        .select("course_id, course_summary, content_hash, revision, updated_at")
+        .in("course_id", publicCourseIds)
+        .order("course_id");
+
+      if (overridesResult.error) throw overridesResult.error;
+      courseOverrides = (overridesResult.data ?? []).map((row) => mapOverride(row));
+    }
 
     return json(requestId, 200, {
       schemaVersion: "1.0",
