@@ -1,0 +1,115 @@
+name: Application Sales Handoff Verification
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+    paths:
+      - app/apps/**
+      - app/api/apps/**
+      - lib/application-launch.ts
+      - lib/app-entitlements.ts
+      - lib/unified-entitlements.ts
+      - lib/release-delivery.ts
+      - next.config.ts
+      - package.json
+      - package-lock.json
+      - vercel.json
+      - .env.example
+      - .vercelignore
+      - docs/CYBER-CRISIS-COMMANDER-SALES-HANDOFF.md
+      - docs/PRODUCTION-READINESS-SOURCE-OF-TRUTH.md
+      - test/application-sales-handoff.test.mjs
+      - .github/workflows/application-sales-handoff.yml
+  pull_request:
+    paths:
+      - app/apps/**
+      - app/api/apps/**
+      - lib/application-launch.ts
+      - lib/app-entitlements.ts
+      - lib/unified-entitlements.ts
+      - lib/release-delivery.ts
+      - next.config.ts
+      - package.json
+      - package-lock.json
+      - vercel.json
+      - .env.example
+      - .vercelignore
+      - docs/CYBER-CRISIS-COMMANDER-SALES-HANDOFF.md
+      - docs/PRODUCTION-READINESS-SOURCE-OF-TRUTH.md
+      - test/application-sales-handoff.test.mjs
+      - .github/workflows/application-sales-handoff.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: application-sales-handoff-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-fail-closed-handoff:
+    name: Verify commerce, launch, download, and deployment boundaries
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout website
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Configure Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+
+      - name: Run application handoff contract tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p security-evidence
+          node --test test/application-sales-handoff.test.mjs | tee security-evidence/application-sales-handoff.tap
+
+      - name: Record auditable source context
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "commit=${GITHUB_SHA}"
+            echo "repository=${GITHUB_REPOSITORY}"
+            echo "workflow=${GITHUB_WORKFLOW}"
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "canonical_marketing_slug=obserra-cyber-crisis-commander"
+            echo "saas_runtime_project=not-created"
+            echo "commercial_status=Coming Soon"
+            echo "launch_setting=APP_LAUNCH_OBSERRA_CYBER_CRISIS_COMMANDER"
+            echo "vercel_lockfile_required=package-lock.json"
+            echo "vercel_install_command=npm ci"
+            echo "node_runtime=22.x"
+          } > security-evidence/application-sales-handoff-context.txt
+          sha256sum \
+            .vercelignore \
+            package.json \
+            package-lock.json \
+            vercel.json \
+            app/apps/appsData.ts \
+            app/apps/storefront.ts \
+            app/apps/commerce.ts \
+            app/apps/'[slug]'/page.tsx \
+            app/apps/'[slug]'/subscribe/page.tsx \
+            app/api/apps/access/route.ts \
+            app/api/apps/checkout/route.ts \
+            app/api/apps/download/route.ts \
+            lib/application-launch.ts \
+            next.config.ts \
+            test/application-sales-handoff.test.mjs \
+            > security-evidence/application-sales-handoff.sha256
+
+      - name: Upload application handoff evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: application-sales-handoff-evidence
+          path: security-evidence/
+          if-no-files-found: error
+          retention-days: 30
