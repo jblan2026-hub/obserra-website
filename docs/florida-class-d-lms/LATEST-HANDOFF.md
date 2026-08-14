@@ -4,23 +4,23 @@
 
 Gate 35 production remediation and CMMC dual-baseline work is active. Continue from `GATE-35-PRODUCTION-REMEDIATION-DUAL-BASELINE-HANDOFF.md` and `ACTION-LEDGER-GATE-35-ADDENDUM.md`. The current assessment mapping must cover all 110 NIST SP 800-171 Rev. 2 requirements and all 97 active NIST SP 800-171 Rev. 3 requirements while preserving the 33 withdrawn Rev. 3 identifiers. Do not treat the Rev. 3 engineering overlay as a substitute for the current CMMC Level 2 assessment baseline.
 
-Gate 35 evidence-continuation branch: `codex/gate35-live-evidence`
+Gate 35 routing-evidence continuation branch: `codex/gate36-routing-rebind`
 
 Gate 35 starting SHA: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
 
 Gate 35 implementation checkpoint: `c39f7ce2617b391a4df631227e4683bb320b81db`
 
-Gate 35 release: PR #78 merged to `main` at verified GitHub merge SHA `2189c73ff5ba15ea07aa51ab84da23112403a720`. Intended Vercel deployment `dpl_6ERkFxUAKg6yjnrJVQ649dLeM6rz` is READY and production-targeted for that exact SHA.
+Gate 35 implementation release: PR #78 merged to `main` at verified GitHub merge SHA `2189c73ff5ba15ea07aa51ab84da23112403a720`. Gate 35 live-evidence synchronization: PR #79 merged at `aca9ece5ac8080265491f26972084856b100a138`. Canonical alias propagation correction: PR #80 merged at verified SHA `d35917f417d24489ffd5877b989f36dbb3bbb613`; intended deployment `dpl_DxojVNKBd9hJtcjXth3QptKei4Lw` is READY and production-targeted for that exact SHA.
 
 Live Supabase checkpoint: migrations `20260814061110_academy_durable_learner_commerce` and `20260814061912_academy_payment_event_integrity_hardening` are applied to `nwxnyqlyzyufgoadtqxs`. The four new service-only tables are empty, forced-RLS protected, and backed by nine service-only functions plus append-only audit triggers. Stripe replays bind every material event field and claims bind the signed-webhook course version. The matching code is deployed, but the Vercel Academy storage variables are not configured, so the runtime remains fail closed.
 
-Validated release checkpoint: exact PR head `30f967e2374883aa917ef9bba2e05b7a030e4c19` passed Florida Gates #568, Website CI #2340, CodeQL #38, Academy 70x #1295, and the repository-triggered application workflows. Vercel successfully built verified merge SHA `2189c73ff5ba15ea07aa51ab84da23112403a720` in the intended project. Local Gate 32, Gate 35 durable commerce, 110/97 dual-baseline validation, Academy alignment, Academy 70x/500x/1000x/2000x, targeted lint, non-incremental TypeScript, and all 51 repository tests also pass.
+Validated release checkpoint: PR #78 exact head `30f967e2374883aa917ef9bba2e05b7a030e4c19` passed Florida Gates #568, Website CI #2340, CodeQL #38, Academy 70x #1295, and the repository-triggered application workflows. PR #80 exact head `0ba22b1a0b33793d703b1a7ba344ddd95367b552` passed Florida Gates #570, Website CI #2344, and CodeQL #42. Vercel successfully built verified merge SHA `d35917f417d24489ffd5877b989f36dbb3bbb613` in all three linked projects. The current routing-evidence candidate adds nonsecret Vercel project, deployment, and release identity to `/api/health` and makes intended-project verification mandatory in the live operational gate.
 
-Current evidence digests: Rev. 3 traceability `ab63297c4b6dcccd8e7a6e1b03ded72d150b163217db77832c90d783432de226`; production evidence `4e55e06e0ade82072afc7ee5f0aa4434782acb28b6007909af08031322b198d5`; complete dual baseline `632dc6f7b64ef3a9b798705823b05f85a8abb2de131c3eafb7c972873e0dea38`.
+Current evidence digests: Rev. 3 traceability `11f110691aa6d7c98e65e451862bb8d69726ba6d24244064dd33dc9b1b9dd6bd`; production evidence `dd6f912527b864fb1de870a12355ea2edcbb379d6ce66363bc50eaaaea9b1b71`; complete dual baseline `c49494b4ac9fc739b5ac9f4ae826e6100b0acfdcea95464f51db4b287aba2c60`.
 
-Immediate continuation: deploy the governed removal of static aliases from `vercel.json`, verify whether Vercel now retains both canonical domains only on `obserra-website-live`, and repeat the duplicate-project detach if either propagated assignment remains. Then configure and verify the three dedicated Academy Vercel secrets, live Clerk, and live Stripe/webhook controls. Re-run the non-mutating production operational gate after every provider dependency is healthy.
+Immediate continuation: validate and merge the routing-evidence candidate so a new intended-project deployment receives the canonicals, then require `/api/health` to report project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`, an exact `dpl_` deployment ID, and the exact Git commit SHA before closing issue #76. Then configure and verify the three dedicated Academy Vercel secrets, live Clerk, and live Stripe/webhook controls. Re-run the non-mutating production operational gate after every provider dependency is healthy.
 
-Latest live recheck: `/api/health` is HTTP 200 with the new liveness contract. Commerce is HTTP 503 with the new Stripe-event-ID and durable-Supabase contract, but identity, Stripe/webhook, Academy storage, and purchaser HMAC are unavailable. Class D is live but not ready. The canonical homepage still returned cached HTML marked with old lcn2 deployment `dpl_FYdopKa9RE5XMGMJecQ11AGMe3vb` while new API routes were live. All three projects have READY exact-merge deployments and still list both canonical domains, so exclusive routing is not verified.
+Latest live recheck: `/api/health` is HTTP 200 with the liveness contract. Commerce remains HTTP 503 because identity, Stripe/webhook, Academy storage, and purchaser HMAC are unavailable; Class D is live but not ready. Operator Vercel control-plane screenshots show both canonicals on `obserra-website-live` and no production domain on either duplicate. Direct deployment inspection confirms the latest duplicate deployments do not carry canonical aliases, but the older lcn2 deployment `dpl_AYZXGVZurpGcKXLSzvKrudM7rt5w` still lists both and canonical HTML is still served by that deployment. The intended PR #80 build completed successfully, but Vercel marks its postdeployment checks failed while lcn2 is successful; the intended deployment has no recorded runtime requests. Routing ownership therefore remains unverified pending the instrumented intended-project deployment and live recheck.
 
 Application product routes, application billing, and application implementation files are outside Gate 35 and must not be modified, staged, restored, or claimed. Any application changes visible in Git belong to the separate concurrent workstream.
 
@@ -233,7 +233,7 @@ Generated human matrix:
 
 Authoritative requirements-register SHA-256, verified directly from `CMMC-LEVEL-2-REV3-TRACEABILITY.sha256`:
 
-`ab63297c4b6dcccd8e7a6e1b03ded72d150b163217db77832c90d783432de226`
+`11f110691aa6d7c98e65e451862bb8d69726ba6d24244064dd33dc9b1b9dd6bd`
 
 Production-evidence machine source:
 
@@ -245,7 +245,7 @@ Generated human audit view:
 
 Current production-evidence SHA-256:
 
-`4e55e06e0ade82072afc7ee5f0aa4434782acb28b6007909af08031322b198d5`
+`dd6f912527b864fb1de870a12355ea2edcbb379d6ce66363bc50eaaaea9b1b71`
 
 The production evidence contains 12 PRE records covering identity, canonical routing, exact-SHA runtime validation, Stripe, Academy database controls, no-drift evidence, HA/recovery, regulated Class D separation, GitHub branch enforcement, GitHub code security/dependency monitoring, Vercel deployment integrity, and production incident recovery.
 

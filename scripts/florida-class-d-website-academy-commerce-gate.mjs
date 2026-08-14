@@ -15,6 +15,8 @@ function forbidText(path, source, text, label = text) {
 
 const proxyPath = "proxy.ts";
 const nextConfigPath = "next.config.ts";
+const websiteHealthPath = "app/api/health/route.ts";
+const productionWorkflowPath = ".github/workflows/production-e2e-operational-gate.yml";
 const contractsPath = "lib/academy-control-contracts.ts";
 const controlPath = "lib/academy-control.ts";
 const checkoutPath = "app/api/academy/checkout/route.ts";
@@ -36,6 +38,8 @@ const tsconfigPath = "tsconfig.json";
 
 const proxy = read(proxyPath);
 const nextConfig = read(nextConfigPath);
+const websiteHealth = read(websiteHealthPath);
+const productionWorkflow = read(productionWorkflowPath);
 const contracts = read(contractsPath);
 const control = read(controlPath);
 const checkout = read(checkoutPath);
@@ -71,6 +75,20 @@ requireText(proxyPath, proxy, "catch {", "Clerk runtime failure containment");
 requireText(proxyPath, proxy, '"/(api|trpc)(.*)"', "API matcher");
 requireText(proxyPath, proxy, '"/__clerk/(.*)"', "Clerk internal matcher");
 forbidText(proxyPath, proxy, "export default clerkMiddleware(", "unconditional Clerk middleware export that can fail public traffic before fallback");
+
+// Canonical liveness must identify the nonsecret Vercel project, deployment, and
+// release SHA so routing ownership can be verified from a live response rather
+// than inferred from identical source deployed to multiple projects.
+requireText(websiteHealthPath, websiteHealth, 'const INTENDED_VERCEL_PROJECT_ID = "prj_lxTKKDa9sbhht7FaigiaF1PONMiC"', "intended Vercel project authority");
+requireText(websiteHealthPath, websiteHealth, 'systemValue("VERCEL_PROJECT_ID")', "observed Vercel project identity");
+requireText(websiteHealthPath, websiteHealth, 'systemValue("VERCEL_DEPLOYMENT_ID")', "observed Vercel deployment identity");
+requireText(websiteHealthPath, websiteHealth, 'systemValue("VERCEL_GIT_COMMIT_SHA")', "observed release commit identity");
+requireText(websiteHealthPath, websiteHealth, '"x-obserra-routing-authority"', "machine-readable routing authority header");
+requireText(websiteHealthPath, websiteHealth, 'verified: routingAuthority === "verified"', "explicit routing authority result");
+requireText(productionWorkflowPath, productionWorkflow, '.routing.expectedProjectId == $expected_project_id', "live expected-project assertion");
+requireText(productionWorkflowPath, productionWorkflow, '.routing.observedProjectId == $expected_project_id', "live observed-project assertion");
+requireText(productionWorkflowPath, productionWorkflow, '.routing.authority == "verified"', "live routing authority assertion");
+requireText(productionWorkflowPath, productionWorkflow, '^x-obserra-vercel-project-id:', "live project identity header assertion");
 
 // The public website and sensitive routes must retain secure transport, framing, caching, and disclosure defaults.
 requireText(nextConfigPath, nextConfig, "poweredByHeader: false", "framework disclosure disabled");

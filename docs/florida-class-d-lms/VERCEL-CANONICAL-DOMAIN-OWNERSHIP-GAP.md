@@ -56,6 +56,16 @@ The administrator completed the requested duplicate-project detach action, but d
 
 After the source release is deployed, directly verify project-domain state. If either duplicate still retains a canonical domain, repeat the detach from that duplicate project only. Preserve both domains on `obserra-website-live` and do not change DNS or delete domains/projects.
 
+## Post-PR #80 reconciliation
+
+PR #80 removed the source alias declaration and merged at verified SHA `d35917f417d24489ffd5877b989f36dbb3bbb613` after Florida Gates #570, Website CI #2344, and CodeQL #42 passed. The resulting intended deployment is `dpl_DxojVNKBd9hJtcjXth3QptKei4Lw`; the current lcn2 and integrated-services deployments are `dpl_obbgqpKWWNfDGDwys4ozGzkmbvWq` and `dpl_7hGZTYhpz6YESxQi2ZGpkgSjgavb`. All three are READY and the two current duplicate deployments have no canonical aliases.
+
+The authorized administrator then supplied Vercel control-plane screenshots showing both canonical domains on `obserra-website-live`, no production domain on `obserra-website-lcn2`, and no production deployment on `obserra-integrated-services`. Their supplemental SHA-256 values are `59c77fd73b9a7666a817c04ff2feba6b6bfd26745043378d4a1279774f23af42`, `6a04bbfed63a6f439ba9ede634dcf85a7bf0b4ec1e4394d4bb76762e8cc3ceb6`, and `1d992d25527b4f29c1dd029a0a784abbe1d94b226375623f4ef68e9240af646b`, respectively. The apex screenshot contains Vercel's DNS modernization recommendation and states the legacy Vercel record continues to work; DNS is deliberately unchanged.
+
+Deployment-level evidence still blocks closure. Older lcn2 deployment `dpl_AYZXGVZurpGcKXLSzvKrudM7rt5w` retains both canonical aliases, live canonical HTML contains that deployment marker, and the apex redirect contains `_vercel_share`. The routing-evidence release therefore adds the nonsecret Vercel project ID, deployment ID, and Git commit SHA to the no-store health contract. It reports `verified` only when the serving project is `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`, and the production operational gate requires that result.
+
+The intended PR #80 deployment also reports `Checks Failed` in the operator Vercel view (supplemental screenshot SHA-256 `4630169cea566661c1593b22fdcdbc19903dc50746c84e4ac6a043579e9caa1b`). Direct GitHub combined status corroborates `Vercel – obserra-website-live: failure` while lcn2 is `success`. Intended build logs contain no build error and show successful compilation, TypeScript, 159-page generation, output deployment, and build-cache upload; no runtime requests are recorded on the intended deployment. The exact provider-side postdeployment check is not exposed by the connected read interface and must not be disabled or reclassified without its result. If the routing-evidence release repeats this state, inspect and correct the named check through the authorized Vercel project view before accepting the deployment.
+
 ## NIST SP 800-171 Rev. 3 / CMMC mapping
 
 Primary mappings:
@@ -79,7 +89,7 @@ Do not close GitHub issue #76 or mark canonical routing evidence implemented sol
 Closure requires:
 
 1. Direct Vercel project-domain evidence showing only `obserra-website-live` owns the two canonical domains.
-2. Live canonical request evidence tied to that project and an accepted READY deployment.
+2. Live canonical `/api/health` evidence reporting intended project ID `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`, an accepted READY deployment ID, the exact Git commit SHA, and routing authority `verified`.
 3. Governed removal of static canonical aliases from `vercel.json` after project-level ownership is verified.
 4. CI and CodeQL validation of the source change.
 5. Updated machine-readable and generated human-readable CMMC production evidence with a new SHA-256 digest.

@@ -2,7 +2,7 @@
 
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update `CMMC-LEVEL-2-REV3-TRACEABILITY.json` and run `npm run generate:cmmc-traceability`.
 
-Registry SHA-256: `ab63297c4b6dcccd8e7a6e1b03ded72d150b163217db77832c90d783432de226`
+Registry SHA-256: `11f110691aa6d7c98e65e451862bb8d69726ba6d24244064dd33dc9b1b9dd6bd`
 Registry schema version: `1.0`
 Registry snapshot date: `2026-08-13`
 Source checkpoint represented by the register: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
@@ -499,7 +499,7 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Shared Obserra and Vercel
 
-Vercel runtime telemetry identified Clerk middleware failures and Academy degradation. Source remediation includes a noncached website liveness contract and a scheduled production operational gate that requires live Clerk, Stripe account capability, signed webhook configuration, durable Academy storage, and regulated LMS readiness instead of suppressing degradation.
+Vercel runtime telemetry identified Clerk middleware failures, Academy degradation, and canonical traffic served by an unintended duplicate project. Source remediation includes a noncached website liveness contract that reports the nonsecret Vercel project ID, deployment ID, and Git commit SHA; it verifies the observed project against the intended authority. The scheduled production operational gate requires that routing evidence plus live Clerk, Stripe account capability, signed webhook configuration, durable Academy storage, and regulated LMS readiness instead of suppressing degradation.
 
 Evidence:
 
