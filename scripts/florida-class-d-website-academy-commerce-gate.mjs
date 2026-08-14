@@ -14,6 +14,7 @@ function forbidText(path, source, text, label = text) {
 }
 
 const proxyPath = "proxy.ts";
+const nextConfigPath = "next.config.ts";
 const contractsPath = "lib/academy-control-contracts.ts";
 const controlPath = "lib/academy-control.ts";
 const checkoutPath = "app/api/academy/checkout/route.ts";
@@ -30,6 +31,7 @@ const productionActivationPath = "lib/florida-class-d-production-activation.ts";
 const tsconfigPath = "tsconfig.json";
 
 const proxy = read(proxyPath);
+const nextConfig = read(nextConfigPath);
 const contracts = read(contractsPath);
 const control = read(controlPath);
 const checkout = read(checkoutPath);
@@ -50,6 +52,22 @@ requireText(proxyPath, proxy, "export default clerkMiddleware(", "direct Clerk m
 requireText(proxyPath, proxy, '"/(api|trpc)(.*)"', "API matcher");
 requireText(proxyPath, proxy, '"/__clerk/(.*)"', "Clerk internal matcher");
 forbidText(proxyPath, proxy, "const handler = clerkMiddleware(", "nested Clerk middleware handler");
+
+// The public website and sensitive routes must retain secure transport, framing, caching, and disclosure defaults.
+requireText(nextConfigPath, nextConfig, "poweredByHeader: false", "framework disclosure disabled");
+requireText(nextConfigPath, nextConfig, '"object-src \'none\'"', "CSP object blocking");
+requireText(nextConfigPath, nextConfig, '"frame-ancestors \'none\'"', "CSP framing protection");
+requireText(nextConfigPath, nextConfig, '"upgrade-insecure-requests"', "CSP transport upgrade");
+requireText(nextConfigPath, nextConfig, 'Strict-Transport-Security', "HSTS header");
+requireText(nextConfigPath, nextConfig, 'max-age=63072000; includeSubDomains; preload', "long-lived HSTS policy");
+requireText(nextConfigPath, nextConfig, 'X-Content-Type-Options', "MIME sniffing protection");
+requireText(nextConfigPath, nextConfig, 'Cross-Origin-Opener-Policy', "cross-origin opener protection");
+requireText(nextConfigPath, nextConfig, 'source: "/api/academy/:path*"', "Academy API no-store headers");
+requireText(nextConfigPath, nextConfig, 'source: "/api/webhook/stripe"', "Stripe webhook no-store headers");
+requireText(nextConfigPath, nextConfig, 'source: "/api/florida-class-d/:path*"', "Class D API no-store headers");
+requireText(nextConfigPath, nextConfig, 'source: "/academy/success"', "Academy payment-return no-store headers");
+requireText(nextConfigPath, nextConfig, 'source: "/sign-in/:path*"', "sign-in no-store headers");
+requireText(nextConfigPath, nextConfig, 'source: "/sign-up/:path*"', "sign-up no-store headers");
 
 // Missing or malformed Academy control data must fail closed.
 requireText(contractsPath, contracts, 'lifecycle: "unpublished"', "unpublished default lifecycle");
@@ -137,4 +155,4 @@ forbidText(checkoutPath, checkout.toLowerCase(), "florida-class-d", "Florida Cla
 forbidText(redeemPath, redeem.toLowerCase(), "florida-class-d", "Florida Class D generic Academy redemption coupling");
 forbidText(webhookPath, webhook.toLowerCase(), "florida-class-d", "Florida Class D generic Stripe fulfillment coupling");
 
-console.log("Gate 32 passed: website identity, Academy publication/control plane, database dependencies, POST-only commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
+console.log("Gate 32 passed: website headers, identity, Academy publication/control plane, database dependencies, POST-only commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
