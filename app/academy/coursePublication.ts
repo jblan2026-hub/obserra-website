@@ -1,5 +1,7 @@
 import { studioCoursePublicationMetadataById } from "./studioCatalog";
 
+export const BASELINE_COURSE_VERSION = "1.0.0";
+
 export type CoursePublicationView = {
   source: "academy-production-studio" | "live-production-contract";
   prerequisites: string[];
@@ -43,8 +45,8 @@ export function publicationForCourse(courseId: string): CoursePublicationView {
       certificateIssued: true,
       credentialDisclaimer: "Completion is a course completion record and is not professional certification, licensure, accreditation, or regulatory approval.",
       acknowledgementRequired: true,
-      version: null,
-      releaseStatus: null,
+      version: BASELINE_COURSE_VERSION,
+      releaseStatus: "published",
     };
   }
 
