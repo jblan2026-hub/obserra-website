@@ -1,12 +1,16 @@
 import "server-only";
 
 const SHA40 = /^[0-9a-f]{40}$/i;
+const SHA256_HEX = /^[0-9a-f]{64}$/i;
 const CANONICAL_PUBLIC_ORIGIN = "https://www.obserrallc.com";
 const REQUIRED_DOCUMENT_BUCKET = "fdacs-class-d-completion-documents";
 const NONPRODUCTION_ENVIRONMENTS = new Set(["development", "sandbox", "staging", "uat"]);
 const MAX_HA_RTO_MINUTES = 60;
 const MAX_HA_RPO_MINUTES = 15;
 const MAX_FAILOVER_TEST_AGE_DAYS = 90;
+
+export const EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION = "20260814011203";
+export const EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256 = "a2099d8610f0427fa2f85cb7a47efaa2af4b899be21952b0fcacaadd15e8e453";
 
 export const FLORIDA_CLASS_D_REGULATED_FEATURE_FLAGS = [
   "OBSERRA_FDACS_CLASS_D_LIVE_ENABLED",
@@ -57,7 +61,7 @@ export type FloridaClassDProductionActivationReport = {
 };
 
 export const FLORIDA_CLASS_D_PRODUCTION_ACTIVATION_POLICY = {
-  policyVersion: "2026-08-13-gate-26-v2",
+  policyVersion: "2026-08-13-gate-29-v1",
   canonicalPublicOrigin: CANONICAL_PUBLIC_ORIGIN,
   exactReleaseBindingRequired: true,
   exactUatReleaseBindingRequired: true,
@@ -68,6 +72,9 @@ export const FLORIDA_CLASS_D_PRODUCTION_ACTIVATION_POLICY = {
   activeClassDSLicenseRequired: true,
   privateClassDILicenseRequired: true,
   databasePromotionVerificationRequired: true,
+  migrationManifestRequired: true,
+  databasePromotionSourceMustMatchCandidate: true,
+  databaseAppliedMigrationVersionRequired: true,
   divisionApprovedExamBankAuthorizationRequired: true,
   liasProcedureVerificationRequired: true,
   securityAcceptanceRequired: true,
@@ -102,6 +109,10 @@ function present(name: string) {
 
 function validSha(input: string) {
   return SHA40.test(input);
+}
+
+function validSha256(input: string) {
+  return SHA256_HEX.test(input);
 }
 
 function integerValue(name: string) {
@@ -183,6 +194,9 @@ function coreChecks(): FloridaClassDProductionActivationCheck[] {
   const serviceRolePresent = present("OBSERRA_SUPABASE_SERVICE_ROLE_KEY") || present("SUPABASE_SERVICE_ROLE_KEY");
   const mediaProvider = value("OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER").toLowerCase();
   const documentsBucket = value("OBSERRA_FDACS_DOCUMENTS_BUCKET");
+  const dbPromotionSourceSha = value("OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA");
+  const appliedMigrationVersion = value("OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION");
+  const migrationManifestSha256 = value("OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256").toLowerCase();
 
   return [
     check(
@@ -290,6 +304,27 @@ function coreChecks(): FloridaClassDProductionActivationCheck[] {
       exact("OBSERRA_FDACS_DB_PROMOTION_STATUS", "verified"),
       "Database promotion status is verified.",
       "OBSERRA_FDACS_DB_PROMOTION_STATUS must be verified after controlled production migration and post-migration checks.",
+    ),
+    check(
+      "database_promotion_source_sha",
+      "Production database promotion source matches frozen candidate",
+      validSha(candidate) && validSha(dbPromotionSourceSha) && dbPromotionSourceSha.toLowerCase() === candidate.toLowerCase(),
+      "Database promotion source SHA matches the frozen release candidate.",
+      "OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA must be a 40-character SHA exactly matching the frozen release candidate.",
+    ),
+    check(
+      "database_applied_migration_version",
+      "Production database latest applied regulated migration exactly matches source",
+      appliedMigrationVersion === EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION,
+      "Applied regulated migration version matches the controlled source lineage.",
+      `OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION must equal ${EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION}.`,
+    ),
+    check(
+      "database_migration_manifest_sha256",
+      "Production database promotion manifest matches controlled migration lineage",
+      validSha256(migrationManifestSha256) && migrationManifestSha256 === EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256,
+      "Database promotion manifest SHA-256 matches the controlled regulated migration manifest.",
+      "OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256 must exactly match the source-controlled regulated migration manifest digest.",
     ),
     check(
       "exam_bank_authorization",
