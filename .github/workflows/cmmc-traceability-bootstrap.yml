@@ -1,0 +1,61 @@
+name: CMMC Traceability Bootstrap
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout controlled branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/florida-class-d-lms-foundation
+          fetch-depth: 0
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Correct obsolete Academy media evidence reference
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          const file = "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.json";
+          const oldPath = "app/api/academy/lesson/[courseId]/[lessonIndex]/route.ts";
+          const newPath = "app/api/academy/media/route.ts";
+          const source = fs.readFileSync(file, "utf8");
+          const matches = source.split(oldPath).length - 1;
+          if (matches !== 2) throw new Error(`Expected exactly 2 obsolete evidence references, found ${matches}.`);
+          const updated = source.replaceAll(oldPath, newPath);
+          JSON.parse(updated);
+          fs.writeFileSync(file, updated, "utf8");
+          NODE
+
+      - name: Generate machine bound human audit artifacts
+        run: node scripts/cmmc-level2-rev3-traceability.mjs --write
+
+      - name: Verify generated artifacts before commit
+        run: node scripts/cmmc-level2-rev3-traceability.mjs --check
+
+      - name: Verify clean patch formatting
+        run: git diff --check
+
+      - name: Commit generated artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.json
+          git add docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-AUDIT-MATRIX.md
+          git add docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-TRACEABILITY.sha256
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+            exit 0
+          fi
+          git commit -m "compliance: generate CMMC Level 2 Rev 3 audit artifacts"
+          git push origin HEAD:feature/florida-class-d-lms-foundation
