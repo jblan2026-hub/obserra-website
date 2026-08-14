@@ -51,11 +51,11 @@ function regulatedMigrationFiles() {
 function assertExactLineage(actual) {
   const expected = [...EXPECTED_FLORIDA_CLASS_D_MIGRATIONS];
   if (actual.length !== expected.length) {
-    throw new Error(`Expected ${expected.length} regulated Class D migrations, found ${actual.length}.`);
+    throw new Error(`Expected ${expected.length} regulated Class D migrations, found ${actual.length}. Runner lineage: ${actual.join(",")}`);
   }
   for (let index = 0; index < expected.length; index += 1) {
     if (actual[index] !== expected[index]) {
-      throw new Error(`Migration lineage mismatch at position ${index + 1}: expected ${expected[index]}, found ${actual[index] ?? "missing"}.`);
+      throw new Error(`Migration lineage mismatch at position ${index + 1}: expected ${expected[index]}, found ${actual[index] ?? "missing"}. Runner lineage: ${actual.join(",")}`);
     }
   }
 }
