@@ -1,0 +1,46 @@
+name: Gate 34 CMMC Production Evidence Bootstrap
+
+on:
+  push:
+    branches:
+      - feature/cmmc-level2-rev3-audit-package
+    paths:
+      - "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.json"
+      - "scripts/cmmc-level2-rev3-production-evidence.mjs"
+      - ".github/workflows/cmmc-gate34-bootstrap.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/cmmc-level2-rev3-audit-package
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate Gate 34 human-readable evidence and digest
+        run: node scripts/cmmc-level2-rev3-production-evidence.mjs --write
+
+      - name: Verify Gate 34 generated evidence
+        run: node scripts/cmmc-level2-rev3-production-evidence.mjs --check
+
+      - name: Commit generated artifacts
+        run: |
+          status="$(git status --porcelain -- docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.md docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.sha256)"
+          if [ -z "$status" ]; then
+            echo "Generated evidence already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.md docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.sha256
+          git commit -m "compliance: regenerate Gate 34 production evidence artifacts"
+          git push origin HEAD:feature/cmmc-level2-rev3-audit-package
