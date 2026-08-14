@@ -96,15 +96,8 @@ export function prepareClerkRuntime(): ClerkRuntimeStatus {
 
   const normalizationApplied = Boolean(
     (publishable.raw && publishable.raw !== publishableKey) ||
-      (rawSecret && rawSecret !== normalizedSecret) ||
-      (publishableKey && publishable.source === "CLERK_PUBLISHABLE_KEY"),
+      (rawSecret && rawSecret !== normalizedSecret),
   );
-
-  if (publishableKey) {
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = publishableKey;
-    process.env.CLERK_PUBLISHABLE_KEY = publishableKey;
-  }
-  if (normalizedSecret) process.env.CLERK_SECRET_KEY = normalizedSecret;
 
   const ready = reasonCodes.length === 0 && Boolean(publishableEnv && secretEnv);
 
