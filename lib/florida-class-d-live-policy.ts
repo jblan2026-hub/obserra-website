@@ -1,7 +1,9 @@
 import "server-only";
 
+import { floridaClassDProductionActivationAuthorized } from "./florida-class-d-production-activation";
+
 export const FLORIDA_CLASS_D_LIVE_POLICY = {
-  policyVersion: "2026-08-13-live-v1",
+  policyVersion: "2026-08-13-live-v2",
   physicalInstructionLocationState: "FL",
   tlsRequired: true,
   singleDeviceRequired: true,
@@ -23,6 +25,7 @@ export const FLORIDA_CLASS_D_LIVE_POLICY = {
   handRaiseEnabled: true,
   pollsEnabled: true,
   interactionRetentionRequired: true,
+  globalProductionActivationRequired: true,
 } as const;
 
 function enabled(value: string | undefined) {
@@ -31,6 +34,7 @@ function enabled(value: string | undefined) {
 
 export function floridaClassDLiveInstructionEnabled() {
   return (
+    floridaClassDProductionActivationAuthorized() &&
     enabled(process.env.OBSERRA_FDACS_CLASS_D_LIVE_ENABLED) &&
     process.env.OBSERRA_FDACS_DS_LICENSE_STATUS?.trim().toLowerCase() === "active" &&
     Boolean(process.env.OBSERRA_FDACS_DS_LICENSE_NUMBER?.trim()) &&
