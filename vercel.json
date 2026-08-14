@@ -1,4 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm ci",
   "ignoreCommand": "git diff --name-only HEAD^ HEAD | grep -Eq '^(app/|components/|lib/|public/|styles/|package.json$|package-lock.json$|next.config\\.|middleware\\.|tsconfig.json$|vercel.json$)' && exit 1 || exit 0"
 }
