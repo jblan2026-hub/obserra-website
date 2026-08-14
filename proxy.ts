@@ -23,10 +23,6 @@ const PROTECTED_PATH_PREFIXES = [
   "/api/florida-class-d/admin",
 ] as const;
 
-// Normalize Clerk's supported publishable-key names and harmless surrounding
-// whitespace before clerkMiddleware initializes. Secret values are never logged.
-prepareClerkRuntime();
-
 function authenticationReady() {
   return prepareClerkRuntime().ready;
 }
