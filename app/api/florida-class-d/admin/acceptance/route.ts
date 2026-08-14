@@ -11,6 +11,7 @@ import {
   type FloridaClassDAcceptanceStatus,
 } from "../../../../../lib/florida-class-d-acceptance";
 import { FloridaClassDExamError } from "../../../../../lib/florida-class-d-exam";
+import { floridaClassDNonProductionExecutionAuthorized } from "../../../../../lib/florida-class-d-production-activation";
 
 function errorResponse(error: unknown) {
   if (error instanceof FloridaClassDAuthorizationError) return NextResponse.json({ error: error.message }, { status: error.status });
@@ -33,6 +34,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const actor = await requireFloridaClassDStaff(["school_admin", "compliance_admin"]);
+    if (!floridaClassDNonProductionExecutionAuthorized()) {
+      throw new FloridaClassDExamError(
+        "Gate 23 acceptance mutation is authorized only in an explicitly approved synthetic non-production execution environment.",
+        503,
+        "FDACS_ACCEPTANCE_EXECUTION_NOT_AUTHORIZED",
+      );
+    }
     const body = await request.json() as Record<string, unknown>;
     const action = typeof body.action === "string" ? body.action : "";
 
