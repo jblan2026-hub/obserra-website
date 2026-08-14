@@ -1,6 +1,7 @@
 export type ClerkEnvironment = "test" | "live";
 
 export type ClerkRuntimeReason =
+  | "runtime_disabled"
   | "publishable_key_missing"
   | "publishable_key_invalid"
   | "secret_key_missing"
@@ -15,6 +16,7 @@ export type ClerkRuntimeStatus = {
   reasonCodes: ClerkRuntimeReason[];
   normalizationApplied: boolean;
   publishableSource: "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" | "CLERK_PUBLISHABLE_KEY" | null;
+  runtimeEnabled: boolean;
 };
 
 function decodeBase64Url(value: string) {
@@ -68,6 +70,7 @@ function sourcePublishableKey() {
 }
 
 export function prepareClerkRuntime(): ClerkRuntimeStatus {
+  const runtimeEnabled = process.env.OBSERRA_IDENTITY_RUNTIME_ENABLED?.trim().toLowerCase() === "true";
   const publishable = sourcePublishableKey();
   const rawSecret = process.env.CLERK_SECRET_KEY;
   const normalizedSecret = rawSecret?.trim() || undefined;
@@ -76,6 +79,8 @@ export function prepareClerkRuntime(): ClerkRuntimeStatus {
   const publishableEnv = publishableEnvironment(publishableKey);
   const secretEnv = secretEnvironment(normalizedSecret);
   const reasonCodes: ClerkRuntimeReason[] = [];
+
+  if (!runtimeEnabled) reasonCodes.push("runtime_disabled");
 
   if (!publishableKey) reasonCodes.push("publishable_key_missing");
   else if (!publishableEnv) reasonCodes.push("publishable_key_invalid");
@@ -99,7 +104,7 @@ export function prepareClerkRuntime(): ClerkRuntimeStatus {
       (rawSecret && rawSecret !== normalizedSecret),
   );
 
-  const ready = reasonCodes.length === 0 && Boolean(publishableEnv && secretEnv);
+  const ready = runtimeEnabled && reasonCodes.length === 0 && Boolean(publishableEnv && secretEnv);
 
   return {
     ready,
@@ -108,5 +113,6 @@ export function prepareClerkRuntime(): ClerkRuntimeStatus {
     reasonCodes,
     normalizationApplied,
     publishableSource: publishable.source,
+    runtimeEnabled,
   };
 }
