@@ -1,0 +1,330 @@
+{
+  "schemaVersion": "1.2.0",
+  "standardId": "obserra-cinematic-enterprise-v1",
+  "standardName": "Obserra EPI Academy Cinematic Enterprise Learning Standard",
+  "qualityClass": "cinematic-enterprise",
+  "appliesTo": {
+    "allAcademyCourses": true,
+    "allDepartments": true,
+    "allCourseLevels": true,
+    "legacyCourseRebuilds": true,
+    "qualityTierDowngradeAllowed": false
+  },
+  "intent": {
+    "targetExperience": "Cinematic executive learning with realistic human delivery, Fortune 500 presentation discipline, and film-quality visual storytelling.",
+    "comparisonBoundary": "The standard uses cinematic craft and executive communication quality as design targets. It does not claim affiliation with a film studio, production company, employer, or Fortune 500 company.",
+    "primaryFailureToPrevent": "Wrong-person attribution, wrong voice attribution, robotic avatar delivery, static presenter footage, generic stock montage, weak audio, repetitive scenes, low-quality template production, and unbranded course openings."
+  },
+  "brand": {
+    "academyName": "Obserra EPI Academy",
+    "shortBusinessName": "Obserra EPI",
+    "epiMeaning": "Executive Protection & Intelligence",
+    "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "officialWebsite": "https://www.obserrallc.com",
+    "officialWebsiteDisplay": "www.obserrallc.com",
+    "officialLogoPath": "/brand/obserra-logo.png",
+    "presenterName": "Dr. Jody Blanchard",
+    "presenterTitle": "Founder and CEO",
+    "canonicalPortraitPath": "/leadership/dr-jody-blanchard-executive.webp",
+    "approvedLowerThird": [
+      "Dr. Jody Blanchard",
+      "Founder and CEO",
+      "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      "www.obserrallc.com"
+    ],
+    "palette": ["#050B18", "#0B1730", "#C9A227", "#FFFFFF", "#53B7FF"],
+    "standaloneObserraAllowedAsAcademyOrBusinessName": false,
+    "alternateOwnerTitleAllowed": false,
+    "additionalOwnerTitleAllowed": false,
+    "currentOrFormerEmployerReferenceAllowed": false,
+    "logoModificationProhibited": true,
+    "officialLogoRequiredOnTitlePage": true,
+    "presenterLowerThirdRequired": true
+  },
+  "courseOpening": {
+    "requiredForEveryCourse": true,
+    "mustOccurBeforeInstruction": true,
+    "sequence": [
+      "official-branded-course-title-page",
+      "required-learner-disclaimer",
+      "on-camera-dr-jody-blanchard-introduction",
+      "course-orientation-and-transition-to-module-one"
+    ],
+    "titlePageSeconds": {
+      "minimum": 3,
+      "target": 5,
+      "maximum": 7
+    },
+    "disclaimerSeconds": {
+      "minimum": 8,
+      "target": 10,
+      "maximum": 15
+    },
+    "introMaster": {
+      "minimumWidthPixels": 3840,
+      "minimumHeightPixels": 2160,
+      "aspectRatio": "16:9",
+      "highestProviderQualityRequired": true,
+      "upscaleWhenSourceBelow4K": true,
+      "upscaleMayNotAlterIdentity": true,
+      "upscaleMayNotRetouchFace": true,
+      "upscaleMayNotChangeVoice": true,
+      "final1080pOnlyIntroProhibitedWhen4KSupported": true
+    },
+    "commonLearnerDisclaimer": "Obserra EPI Academy courses provide educational and professional-development content. They do not constitute legal, regulatory, medical, investigative, or organization-specific advice; do not authorize action outside the learner's role; and do not confer professional certification, licensure, accreditation, or regulatory approval. Scenarios may be fictional or composite. Learners must follow applicable law, policy, contractual obligations, and authorized escalation procedures.",
+    "syntheticMediaDisclosure": "This course may use the authorized digital likeness and voice of Dr. Jody Blanchard only when his exact owner-approved face and exact owner-approved voice are used by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC.",
+    "intellectualPropertyNotice": "Copyright OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC. All course content, media, frameworks, assessments, and learner materials are proprietary unless expressly identified otherwise.",
+    "courseSpecificDisclaimerRequired": true,
+    "disclaimerMustBeInTranscript": true,
+    "disclaimerMustBeInCourseMetadata": true,
+    "learnerAcknowledgementRequired": true
+  },
+  "courseVideoArchitecture": {
+    "requiredInstructionalModules": 5,
+    "courseWelcomeSeconds": {
+      "minimum": 60,
+      "target": 75,
+      "maximum": 90
+    },
+    "moduleAnchorFilmSeconds": {
+      "minimum": 300,
+      "target": 420,
+      "maximum": 480
+    },
+    "courseTrailerSeconds": {
+      "minimum": 45,
+      "target": 55,
+      "maximum": 60
+    },
+    "moduleVisualPackSeconds": {
+      "minimum": 45,
+      "target": 60,
+      "maximum": 90
+    },
+    "minimumFinishedVideoMinutesPerCourse": 27,
+    "targetFinishedVideoMinutesPerCourse": 37,
+    "presenterScreenTimePercent": {
+      "minimum": 35,
+      "maximum": 55
+    },
+    "cinematicVisualTimePercent": {
+      "minimum": 45,
+      "maximum": 65
+    },
+    "maximumUnbrokenAvatarSeconds": 20,
+    "minimumMeaningfulSceneChangesPerMinute": 6,
+    "minimumDistinctVisualContextsPerModule": 4,
+    "chapterStructureRequired": true,
+    "scenePlanRequired": true,
+    "shotListRequired": true,
+    "editDecisionListRequired": true
+  },
+  "storyAndInstruction": {
+    "requiredModuleArc": [
+      "executive or operational hook",
+      "business and mission context",
+      "evidence and uncertainty",
+      "decision authority and tradeoffs",
+      "realistic instructional scenario",
+      "applied action and reflection"
+    ],
+    "requiredCourseElements": [
+      "official branded course title page",
+      "learner disclaimer and acknowledgement",
+      "course-specific on-camera introduction from Dr. Jody Blanchard using the exact approved face and voice",
+      "five cinematic module anchor films",
+      "five module visual packs",
+      "practical scenario in every module",
+      "knowledge check after every module",
+      "final assessment",
+      "captions",
+      "verified transcript",
+      "learner workbook or job aid",
+      "source and rights register"
+    ],
+    "unsupportedClaimsProhibited": true,
+    "fictionalScenarioDisclosureRequired": true,
+    "bindingAndAdvisorySourceDistinctionRequired": true
+  },
+  "presenterPerformance": {
+    "authorizedAvatarAndVoiceOnly": true,
+    "exactOwnerFaceRequiredWhenOwnerNameOrTitleAppears": true,
+    "exactOwnerVoiceRequiredWhenOwnerNameOrTitleAppears": true,
+    "ownerName": "Dr. Jody Blanchard",
+    "soleApprovedOwnerTitle": "Founder and CEO",
+    "identityPreservationRequired": true,
+    "voiceIdentityPreservationRequired": true,
+    "recognizableAppearancePreservationRequired": true,
+    "scriptMayChangeByCourse": true,
+    "wardrobeMayChangeByCourse": true,
+    "backgroundMayChangeByCourse": true,
+    "lightingAndFramingMayChangeByCourse": true,
+    "poseMayChangeByCourse": true,
+    "alternateOrAdditionalOwnerTitlesProhibited": true,
+    "currentOrFormerEmployerReferencesProhibited": true,
+    "faceReshapingProhibited": true,
+    "beautificationAndSkinSmoothingProhibited": true,
+    "ageOrHairModificationProhibited": true,
+    "voiceSubstitutionProhibited": true,
+    "naturalBlinkingRequired": true,
+    "naturalBreathingAndMicroMovementRequired": true,
+    "directEyeContactRequired": true,
+    "restrainedExecutiveGesturesRequired": true,
+    "sentenceLevelPacingVariationRequired": true,
+    "naturalPausesRequired": true,
+    "pronunciationGlossaryRequired": true,
+    "roboticCadenceProhibited": true,
+    "continuousMonologueWithoutVisualReliefProhibited": true,
+    "lipSyncReviewRequired": true,
+    "likenessReviewRequired": true,
+    "exactVoiceReviewRequired": true,
+    "ownerVisualAndAuditoryApprovalAuthoritative": true
+  },
+  "visualMaster": {
+    "container": "MP4",
+    "videoCodec": "H.264",
+    "minimumWidthPixels": 1920,
+    "minimumHeightPixels": 1080,
+    "defaultAspectRatio": "16:9",
+    "acceptedFrameRates": [23.976, 24, 25, 29.97, 30],
+    "colorSpace": "Rec.709",
+    "scanType": "progressive",
+    "cameraLanguage": [
+      "motivated slow push or pull",
+      "controlled medium close-up",
+      "establishing shot",
+      "detail insert",
+      "over-the-shoulder decision shot",
+      "environmental cutaway"
+    ],
+    "visualStyle": [
+      "realistic enterprise environments",
+      "dark navy and black base",
+      "restrained gold accents",
+      "subtle holographic blue where appropriate",
+      "motivated cinematic lighting",
+      "shallow depth of field where appropriate",
+      "clean composition with safe text space"
+    ],
+    "staticSlideMaximumSeconds": 10,
+    "generatedTextInsideSceneProhibited": true,
+    "thirdPartyLogosProhibited": true,
+    "publicFigureLikenessProhibited": true,
+    "genericStockMontageAsPrimaryVisualProhibited": true
+  },
+  "audioMaster": {
+    "sampleRateHz": 48000,
+    "channels": 2,
+    "targetIntegratedLufs": -16,
+    "acceptableIntegratedLufsRange": {
+      "minimum": -18,
+      "maximum": -14
+    },
+    "maximumTruePeakDbtp": -1,
+    "dialoguePriority": true,
+    "cleanAudioRequired": true,
+    "clippingProhibited": true,
+    "backgroundMusicOptional": true,
+    "backgroundMusicMustNotMaskDialogue": true,
+    "licensedOrOriginalMusicOnly": true,
+    "musicFreeMasterRequired": true,
+    "speechCleanupRequired": true,
+    "speechCleanupMustNotAlterVoiceIdentity": true
+  },
+  "editingAndMotion": {
+    "openingHookSeconds": 5,
+    "visualResetIntervalSeconds": {
+      "minimum": 4,
+      "maximum": 12
+    },
+    "transitions": "restrained and motivated",
+    "rapidTemplateTransitionsProhibited": true,
+    "gratuitousCameraMotionProhibited": true,
+    "lowerThirdMaximumAppearancesPerVideo": 2,
+    "lowerThirdSafeAreaRequired": true,
+    "brandStingMaximumSeconds": 3,
+    "endCardMaximumSeconds": 5
+  },
+  "learnWorldsDelivery": {
+    "videoLearningActivityRequired": true,
+    "openingSequenceBeforeLessonsRequired": true,
+    "titlePageActivityRequired": true,
+    "disclaimerAcknowledgementRequired": true,
+    "instructorIntroActivityRequired": true,
+    "selectableCaptionsRequired": true,
+    "verifiedTranscriptRequired": true,
+    "chapterMarkersRequired": true,
+    "thumbnailRequired": true,
+    "knowledgeCheckAfterModuleVideoRequired": true,
+    "mobilePlaybackRequired": true,
+    "desktopPlaybackRequired": true,
+    "reducedMotionAlternativeRequired": true,
+    "downloadableTranscriptRequired": true,
+    "videoCompletionRuleRequired": true,
+    "coursePlayerBrandReviewRequired": true,
+    "placeholderTemplateContentProhibited": true
+  },
+  "accessibility": {
+    "wcagTarget": "2.2 AA",
+    "captionAccuracyPercentMinimum": 99,
+    "speakerIdentificationWhenNeeded": true,
+    "meaningfulSoundDescriptionRequired": true,
+    "flashingContentProhibited": true,
+    "colorOnlyMeaningProhibited": true,
+    "textSafeAreaRequired": true
+  },
+  "automatedValidation": {
+    "sha256Required": true,
+    "videoStreamRequired": true,
+    "audioStreamRequiredForPresenterVideo": true,
+    "minimumResolutionRequired": true,
+    "courseIntro4KResolutionRequired": true,
+    "titlePageAssetRequired": true,
+    "disclaimerAssetRequired": true,
+    "officialLogoReferenceRequired": true,
+    "ownerNameTitleCompanyWebsiteParityRequired": true,
+    "exactOwnerIdentityEvidenceRequired": true,
+    "durationRangeRequired": true,
+    "audioSampleRateRequired": true,
+    "pathContainmentRequired": true,
+    "captionFileRequiredForPresenterVideo": true,
+    "transcriptFileRequiredForPresenterVideo": true
+  },
+  "manualValidation": {
+    "ownerApprovalRequired": true,
+    "likenessApprovalRequired": true,
+    "exactVoiceApprovalRequired": true,
+    "pronunciationApprovalRequired": true,
+    "lipSyncApprovalRequired": true,
+    "cinematicRealismApprovalRequired": true,
+    "instructionalAccuracyApprovalRequired": true,
+    "brandApprovalRequired": true,
+    "disclaimerApprovalRequired": true,
+    "rightsAndProvenanceApprovalRequired": true,
+    "learnWorldsPlaybackApprovalRequired": true
+  },
+  "releaseProhibitions": [
+    "course lessons begin before the required branded opening sequence",
+    "course intro final master below 3840 by 2160 when 4K is supported",
+    "missing official title page, learner disclaimer, or instructor introduction",
+    "Dr. Jody Blanchard name or Founder and CEO title displayed over any person other than the exact approved owner",
+    "any voice other than the exact approved owner voice used with Dr. Jody Blanchard's name or title",
+    "alternate or additional owner title",
+    "current or former employer name, logo, or identifiable reference",
+    "standalone Obserra used as the Academy or short business name",
+    "wrong legal company name or wrong website",
+    "registered logo or palette changed",
+    "single static avatar for an entire module",
+    "robotic or evenly metered speech",
+    "unreviewed synthetic voice",
+    "face reshaping, beautification, skin smoothing, age change, or voice substitution",
+    "placeholder people or template copy",
+    "generic stock footage unrelated to the learning objective",
+    "unsupported facts or invented case claims",
+    "embedded illegible text generated inside scenes",
+    "unlicensed music or third-party assets",
+    "publication without captions and transcript",
+    "publication without owner approval",
+    "quality reduction based on credit balance"
+  ]
+}

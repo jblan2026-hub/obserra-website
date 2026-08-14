@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import HomeHeader from "./HomeHeader";
+import CinematicMedia from "./components/marketing/CinematicMedia";
+import WebsiteCampaignAds from "./components/marketing/WebsiteCampaignAds";
 import { ButtonLink, KpiCard, StatusBadge } from "./components/ui/ObserraUI";
 import "./executive-mission-control.css";
 import "./executive-mission-control-polish.css";
+import "./cinematic-media.css";
 
 export const metadata: Metadata = {
   title: "Obserra | Executive Intelligence for High-Consequence Organizations",
@@ -30,13 +33,22 @@ const domains = [
 ];
 
 export default function HomePage() {
+  const cinematicMediaEnabled = process.env.NEXT_PUBLIC_OBSERRA_CINEMATIC_MEDIA_ENABLED === "true";
+
   return (
     <main className="mission-home">
       <HomeHeader />
 
       <section className="mission-hero">
         <div className="mission-hero__visual">
-          <Image src="/brand/visuals/obserra-eios-intelligence-hero.png" alt="Obserra Executive Intelligence Operating System visualization" fill priority sizes="100vw" />
+          <CinematicMedia
+            enabled={cinematicMediaEnabled}
+            src="/media/pollo/site/obserra-eios-intelligence-hero-loop-12s.mp4"
+            poster="/brand/visuals/obserra-eios-intelligence-hero.png"
+            alt="Obserra Executive Intelligence Operating System visualization"
+            priority
+            sizes="100vw"
+          />
         </div>
         <div className="mission-hero__copy">
           <p className="obs-eyebrow">EXECUTIVE INTELLIGENCE OPERATING SYSTEM</p>
@@ -92,9 +104,18 @@ export default function HomePage() {
           </div>
           <div className="mission-hero__actions"><ButtonLink href="/eios">Explore the platform</ButtonLink><ButtonLink href="/contact?interest=eios-demo" variant="secondary">Request an EIOS briefing</ButtonLink></div>
         </div>
-        <Link href="/eios" className="mission-platform__visual" aria-label="Explore the Obserra EIOS platform">
-          <Image src="/eios/eios-overview-marketing.png" width={1200} height={675} alt="Obserra EIOS executive dashboard" sizes="(max-width: 1100px) 100vw, 55vw" />
-        </Link>
+        <div className="mission-platform__visual" aria-label="Obserra EIOS platform visualization">
+          <CinematicMedia
+            enabled={cinematicMediaEnabled}
+            src="/media/pollo/site/obserra-eios-platform-loop-12s.mp4"
+            poster="/eios/eios-overview-marketing.png"
+            alt="Obserra EIOS executive dashboard"
+            fit="contain"
+            className="mission-platform__media"
+            sizes="(max-width: 1100px) 100vw, 55vw"
+          />
+          <Link className="mission-platform__media-link" href="/eios" aria-label="Explore the Obserra EIOS platform">Explore the platform →</Link>
+        </div>
       </section>
 
       <section className="mission-section">
@@ -106,6 +127,8 @@ export default function HomePage() {
           {domains.map(([label, title, copy]) => <article className="mission-domain" key={title}><span>{label}</span><h3>{title}</h3><p>{copy}</p></article>)}
         </div>
       </section>
+
+      <WebsiteCampaignAds enabled={cinematicMediaEnabled} />
 
       <section className="mission-section mission-proof">
         <article>
@@ -126,7 +149,7 @@ export default function HomePage() {
 
       <section className="mission-section">
         <div className="mission-academy">
-          <div><p className="obs-eyebrow">OBSERRA ACADEMY</p><h2>Build workforce capability for the decisions that matter now.</h2><p>Purchase professional training through secure Stripe checkout, receive account-based course access, save progress, complete assessments, and generate an Obserra Certificate of Training after meeting the published standard.</p><div className="mission-hero__actions"><ButtonLink href="/academy">Browse Academy courses</ButtonLink><ButtonLink href="/academy/enterprise" variant="secondary">Explore enterprise training</ButtonLink></div></div>
+          <div><p className="obs-eyebrow">OBSERRA ACADEMY</p><h2>Build workforce capability for the decisions that matter now.</h2><p>Purchase professional training through the governed LearnWorlds checkout, receive account-based course access, save progress, complete assessments, and generate an Obserra Certificate of Training after meeting the published standard.</p><div className="mission-hero__actions"><ButtonLink href="/academy">Browse Academy courses</ButtonLink><ButtonLink href="/academy/enterprise" variant="secondary">Explore enterprise training</ButtonLink></div></div>
           <div className="mission-academy__steps"><span><b>1</b>Select the right course or learning path</span><span><b>2</b>Sign in and pay securely</span><span><b>3</b>Receive immediate account-based access</span><span><b>4</b>Complete, assess, and certify</span></div>
         </div>
       </section>

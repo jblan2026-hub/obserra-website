@@ -4,6 +4,9 @@ import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { courses as academyCourses } from "../academy/courseCatalog";
+import { academyStateFromUser } from "../../lib/academy";
+import { learnWorldsProductForCourse } from "../../lib/learnworlds";
 import "./portal.css";
 
 export const metadata: Metadata = {
@@ -14,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 const dashboardModules = [
-  { eyebrow: "ACADEMY", title: "Learning workspace", copy: "Browse available training, resume account-based learning, and review course completion requirements.", href: "/academy", action: "Open Academy", state: "Available" },
+  { eyebrow: "ACADEMY", title: "Learning workspace", copy: "Review your Academy course shells, resume entitled learning, and track which programs are available or still in production.", href: "/portal#academy-shells", action: "View course shells", state: "Available" },
   { eyebrow: "APPLICATIONS", title: "Obserra applications", copy: "Review secure enterprise applications and request deployment, licensing, or technical evaluation support.", href: "/apps", action: "View applications", state: "Available" },
   { eyebrow: "CERTIFICATES", title: "Completion records", copy: "Request certificate assistance, verification support, or corrections to approved completion records.", href: "/contact?interest=certificate-support", action: "Certificate support", state: "Support-enabled" },
   { eyebrow: "LICENSING", title: "Enterprise licensing", copy: "Coordinate renewals, procurement, user allocation, team training, and application deployment planning.", href: "/contact?interest=enterprise-licensing", action: "Contact licensing", state: "Request-based" },
@@ -33,6 +36,53 @@ const roadmap = [
   ["API credentials", "Future", "Scoped API credentials will be introduced only with rotation, revocation, least privilege, logging, and tenant isolation."],
 ];
 
+const departmentOrder = ["Cyber", "Technologies", "Protection", "Intelligence"] as const;
+const departmentLabels = {
+  Cyber: "Cybersecurity and executive risk",
+  Technologies: "AI, data, software, and technology",
+  Protection: "Executive protection and safety",
+  Intelligence: "Intelligence and leadership",
+} as const;
+
+function learnerShellState(courseId: string, enrolledCourseIds: Set<string>) {
+  if (enrolledCourseIds.has(courseId)) {
+    return {
+      label: "Enrolled",
+      tone: "enrolled",
+      href: `/academy/learn/${courseId}`,
+      action: "Open course",
+      note: "Your learner entitlement is active.",
+    } as const;
+  }
+
+  const product = learnWorldsProductForCourse(courseId);
+  if (product?.status === "published") {
+    return {
+      label: "Available",
+      tone: "available",
+      href: `/academy/${courseId}`,
+      action: "View course",
+      note: "Course publication and enrollment are active.",
+    } as const;
+  }
+  if (product?.status === "sandbox") {
+    return {
+      label: "Pilot shell",
+      tone: "pilot",
+      href: null,
+      action: null,
+      note: "The course shell is visible while media and learner testing are completed.",
+    } as const;
+  }
+  return {
+    label: "In production",
+    tone: "production",
+    href: null,
+    action: null,
+    note: "The governed course shell is ready while lessons, media, assessment, and release evidence are finalized.",
+  } as const;
+}
+
 export default async function PortalPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in?redirect_url=/portal");
@@ -40,6 +90,9 @@ export default async function PortalPage() {
   const user = await currentUser();
   const displayName = user?.firstName || user?.username || user?.primaryEmailAddress?.emailAddress?.split("@")[0] || "Customer";
   const primaryEmail = user?.primaryEmailAddress?.emailAddress || "Verified Obserra account";
+  const academyState = academyStateFromUser({ privateMetadata: user?.privateMetadata ?? {} });
+  const enrolledCourseIds = new Set(Object.keys(academyState.entitlements));
+  const mappedShellCount = academyCourses.filter((course) => learnWorldsProductForCourse(course.id)).length;
 
   return (
     <main className="portal-page">
@@ -49,7 +102,7 @@ export default async function PortalPage() {
           <span>CUSTOMER DASHBOARD</span>
         </Link>
         <nav aria-label="Portal navigation">
-          <Link href="/academy">Academy</Link><Link href="/apps">Applications</Link><Link href="/trust">Trust</Link><Link href="/contact">Contact</Link>
+          <Link href="#academy-shells">My courses</Link><Link href="/academy">Academy</Link><Link href="/apps">Applications</Link><Link href="/trust">Trust</Link><Link href="/contact">Contact</Link>
           <Link className="portal-cta" href="/contact?interest=customer-support">Get support</Link>
           <div className="portal-account-bar" aria-label="Account menu"><UserButton /></div>
         </nav>
@@ -60,7 +113,7 @@ export default async function PortalPage() {
           <p className="portal-eyebrow">AUTHENTICATED CUSTOMER WORKSPACE</p>
           <h1 id="dashboard-title">Welcome, {displayName}.</h1>
           <p>Your Obserra identity is verified. This dashboard centralizes active customer pathways and shows which account capabilities are available, request-based, controlled, or still pending production data integration.</p>
-          <div className="portal-actions"><Link className="portal-button" href="/academy">Continue to Academy</Link><Link className="portal-outline" href="/contact?interest=customer-support">Open customer support</Link></div>
+          <div className="portal-actions"><Link className="portal-button" href="#academy-shells">View course shells</Link><Link className="portal-outline" href="/contact?interest=customer-support">Open customer support</Link></div>
         </div>
         <aside className="portal-profile" aria-label="Authenticated account summary">
           <div className="portal-profile-head"><div><span>VERIFIED ACCOUNT</span><strong>{displayName}</strong><p>{primaryEmail}</p></div><UserButton /></div>
@@ -70,9 +123,56 @@ export default async function PortalPage() {
 
       <section className="portal-kpis" aria-label="Customer dashboard status">
         <article><span>IDENTITY STATUS</span><strong>Verified</strong><p>Clerk-authenticated session</p></article>
-        <article><span>AVAILABLE PATHWAYS</span><strong>8</strong><p>Customer service modules</p></article>
-        <article><span>DATA INTEGRITY</span><strong>No simulation</strong><p>Only verified records will display</p></article>
-        <article><span>SECURITY MODEL</span><strong>Fail closed</strong><p>Protected routes and phased access</p></article>
+        <article><span>COURSE SHELLS</span><strong>{academyCourses.length}</strong><p>Visible Academy programs</p></article>
+        <article><span>MY ENROLLMENTS</span><strong>{enrolledCourseIds.size}</strong><p>Verified learner entitlements</p></article>
+        <article><span>LEARNWORLDS MAPPINGS</span><strong>{mappedShellCount}</strong><p>Governed commercial mappings</p></article>
+      </section>
+
+      <section className="portal-section portal-learning-shells" id="academy-shells" aria-labelledby="academy-shells-title">
+        <div className="portal-section-heading">
+          <div><p className="portal-eyebrow">MY ACADEMY</p><h2 id="academy-shells-title">Your course dashboard now includes every governed Academy shell.</h2></div>
+          <p>Course shells are visible before final video and production release so learners can see the planned catalog. A shell does not grant enrollment, unlock protected lessons, or authorize purchase. Only verified entitlements and published courses activate learner actions.</p>
+        </div>
+        <div className="portal-shell-legend" aria-label="Course shell status legend">
+          <span className="portal-shell-badge enrolled">Enrolled</span>
+          <span className="portal-shell-badge available">Available</span>
+          <span className="portal-shell-badge pilot">Pilot shell</span>
+          <span className="portal-shell-badge production">In production</span>
+        </div>
+        {departmentOrder.map((department) => {
+          const departmentCourses = academyCourses.filter((course) => course.department === department);
+          if (!departmentCourses.length) return null;
+          return (
+            <section className="portal-shell-group" key={department} aria-labelledby={`shell-group-${department.toLowerCase()}`}>
+              <div className="portal-shell-group-heading">
+                <div><p className="portal-eyebrow">{department.toUpperCase()}</p><h3 id={`shell-group-${department.toLowerCase()}`}>{departmentLabels[department]}</h3></div>
+                <span>{departmentCourses.length} course{departmentCourses.length === 1 ? "" : "s"}</span>
+              </div>
+              <div className="portal-course-shell-grid">
+                {departmentCourses.map((course) => {
+                  const shell = learnerShellState(course.id, enrolledCourseIds);
+                  return (
+                    <article className="portal-course-shell" key={course.id}>
+                      <div className="portal-course-shell-top">
+                        <span className={`portal-shell-badge ${shell.tone}`}>{shell.label}</span>
+                        <small>{course.level}</small>
+                      </div>
+                      <p className="portal-course-track">{course.track}</p>
+                      <h4>{course.title}</h4>
+                      <p>{course.description}</p>
+                      <dl>
+                        <div><dt>Duration</dt><dd>{course.duration}</dd></div>
+                        <div><dt>Modules</dt><dd>{course.modules.length}</dd></div>
+                      </dl>
+                      <p className="portal-course-shell-note">{shell.note}</p>
+                      {shell.href && shell.action ? <Link href={shell.href}>{shell.action} →</Link> : <span className="portal-shell-disabled" aria-disabled="true">Learner access opens after release</span>}
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
       </section>
 
       <section className="portal-workspace" aria-labelledby="workspace-title">

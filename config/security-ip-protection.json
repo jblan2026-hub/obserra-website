@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0.0",
+  "policyId": "obserra-security-ip-protection-v1",
+  "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "classification": "CONFIDENTIAL BUSINESS IP",
+  "securityObjective": "Protect Obserra source code, course intellectual property, prompts, scripts, media source files, learner data, identity data, commerce data, assessment data, certificates, credentials, and operational records through least privilege, data minimization, encryption, isolation, auditability, and fail-closed release controls.",
+  "truthBoundary": {
+    "absoluteSecurityGuaranteePossible": false,
+    "requiredOperatingPosition": "No system can be guaranteed impossible to access or steal. Obserra must apply defense in depth, minimize exposed data, restrict access, encrypt protected data, detect leakage, and stop release when a control is not proven."
+  },
+  "repository": {
+    "requiredVisibility": "private",
+    "publicRepositoryAllowed": false,
+    "forkingAllowed": false,
+    "outsideCollaboratorsAllowed": false,
+    "requiredOwner": "jblan2026-hub",
+    "requiredCodeOwner": "@jblan2026-hub",
+    "requiredDefaultBranch": "main",
+    "requiredPullRequestReview": true,
+    "directPushToMainAllowed": false,
+    "forcePushAllowed": false,
+    "branchDeletionAllowed": false,
+    "requiredSignedCommits": true,
+    "requiredSecretScanning": true,
+    "requiredPushProtection": true,
+    "requiredDependabotAlerts": true,
+    "requiredDependencyReview": true,
+    "requiredSecurityWorkflow": ".github/workflows/security-ip-protection-gate.yml",
+    "publicForkExposureReviewRequiredAfterVisibilityChange": true
+  },
+  "dataClasses": {
+    "public": [
+      "approved website copy",
+      "approved public course titles and descriptions",
+      "approved public poster images",
+      "approved final public marketing videos",
+      "public business contact information"
+    ],
+    "internal": [
+      "release status",
+      "non-sensitive architecture diagrams",
+      "sanitized test fixtures",
+      "operational checklists without credentials"
+    ],
+    "confidential": [
+      "course manuscripts",
+      "lesson scripts",
+      "assessment banks",
+      "answer keys",
+      "Pollo and HeyGen production prompts",
+      "storyboards",
+      "shot lists",
+      "source registers",
+      "unreleased pricing strategy",
+      "unreleased product roadmaps",
+      "provider asset identifiers",
+      "rights and provenance records",
+      "audit evidence"
+    ],
+    "restricted": [
+      "database credentials",
+      "API keys",
+      "access tokens",
+      "private keys",
+      "webhook secrets",
+      "learner identity data",
+      "learner progress",
+      "assessment responses",
+      "certificate signing material",
+      "payment data",
+      "voice clone source audio",
+      "avatar training footage",
+      "customer data",
+      "regulated data",
+      "security incident evidence"
+    ]
+  },
+  "storageRules": {
+    "publicRepository": [
+      "approved public runtime code after repository is private or intentionally open sourced",
+      "approved final public marketing assets",
+      "sanitized configuration without credentials"
+    ],
+    "privateRepositoryOrEncryptedVault": [
+      "course source IP",
+      "production prompts",
+      "scripts and storyboards",
+      "assessment banks and answer keys",
+      "unreleased product strategy",
+      "audit evidence",
+      "source media"
+    ],
+    "secretStoreOnly": [
+      "database URLs",
+      "database passwords",
+      "API keys",
+      "access tokens",
+      "private keys",
+      "webhook secrets",
+      "certificate signing keys"
+    ],
+    "prohibited": [
+      "credentials in Git history",
+      "database dumps in Git",
+      "learner exports in Git",
+      "raw voice or avatar training files in Git",
+      "customer or regulated data in external AI prompts",
+      "unapproved IP in public issue comments, pull request bodies, or workflow logs"
+    ]
+  },
+  "databaseSecurity": {
+    "publicBrowserDatabaseAccessAllowed": false,
+    "databaseCredentialsInBrowserAllowed": false,
+    "directClientDatabaseConnectionAllowed": false,
+    "serviceRoleKeyInBrowserAllowed": false,
+    "serverSideOnlyAccess": true,
+    "leastPrivilegeServiceIdentityRequired": true,
+    "rowLevelAuthorizationRequiredWhereSupported": true,
+    "encryptionInTransitRequired": true,
+    "encryptionAtRestRequired": true,
+    "pointInTimeRecoveryRequired": true,
+    "immutableBackupRequired": true,
+    "backupRestoreTestRequired": true,
+    "auditLoggingRequired": true,
+    "secretRotationRequired": true,
+    "productionAndDevelopmentSeparationRequired": true,
+    "externalMediaDatabaseAccessAllowed": false
+  },
+  "externalAIProviders": {
+    "customerDataAllowed": false,
+    "learnerDataAllowed": false,
+    "regulatedDataAllowed": false,
+    "secretDataAllowed": false,
+    "databaseDataAllowed": false,
+    "unpublishedAssessmentAnswersAllowed": false,
+    "minimumNecessaryPromptingRequired": true,
+    "privateWorkspaceRequired": true,
+    "providerTrainingOptOutRequiredWhereAvailable": true,
+    "assetProvenanceRequired": true,
+    "ownerApprovalRequired": true
+  },
+  "websiteMediaBoundary": {
+    "sameOriginStaticFilesOnly": true,
+    "externalMediaHostsAllowed": false,
+    "externalIframesAllowed": false,
+    "externalScriptsAllowed": false,
+    "databaseAccessAllowed": false,
+    "identityAccessAllowed": false,
+    "commerceAccessAllowed": false,
+    "LMSAuthoringAccessAllowed": false,
+    "runtimeProviderAPIAllowed": false,
+    "featureFlagDefault": false,
+    "posterFallbackRequired": true,
+    "reducedMotionFallbackRequired": true
+  },
+  "releaseRequirements": [
+    "repository-visibility-private",
+    "secret-scan-passed",
+    "ip-leak-scan-passed",
+    "dependency-review-passed",
+    "database-isolation-tests-passed",
+    "same-origin-media-policy-passed",
+    "security-headers-passed",
+    "current-head-ci-passed",
+    "owner-approval-recorded"
+  ],
+  "incidentResponse": {
+    "credentialLeakAction": "Revoke and rotate immediately, remove from active files, rewrite history when required, review logs, and document the incident.",
+    "ipExposureAction": "Make the repository private immediately, identify forks and clones where possible, remove sensitive active files, migrate source IP to a private repository or encrypted vault, and document residual exposure.",
+    "databaseExposureAction": "Disable compromised credentials, isolate the database, preserve forensic evidence, rotate secrets, review audit logs, assess notification duties, restore from verified backups if required, and document corrective actions."
+  }
+}

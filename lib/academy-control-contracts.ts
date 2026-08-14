@@ -1,7 +1,9 @@
+import "server-only";
+
 import type { Course } from "../app/academy/courseData";
 import type { KnowledgeCheck, LessonBrief } from "../app/academy/courseExperience";
 
-export const ACADEMY_PUBLIC_CATALOG_URL =
+export const ACADEMY_PRIVATE_CATALOG_URL =
   "https://nwxnyqlyzyufgoadtqxs.supabase.co/functions/v1/academy-public-catalog";
 
 export const ACADEMY_OWNER_EDGE_URL =
@@ -115,12 +117,12 @@ export type AcademyOwnerVerificationResponse = {
 export function defaultAcademyCourseControl(courseId: string): AcademyCourseControl {
   return {
     courseId,
-    lifecycle: "published",
-    publicVisible: true,
-    purchaseEnabled: true,
+    lifecycle: "unpublished",
+    publicVisible: false,
+    purchaseEnabled: false,
     preserveExistingEntitlements: true,
     revision: 0,
     updatedAt: null,
-    reason: null,
+    reason: "control-authority-unavailable",
   };
 }

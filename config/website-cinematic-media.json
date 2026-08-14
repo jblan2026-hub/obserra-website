@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "1.0.0",
+  "manifestId": "obserra-website-pollo-cinematic-v1",
+  "provider": "pollo-ai",
+  "integrationMode": "manual-web-subscription",
+  "featureFlag": "NEXT_PUBLIC_OBSERRA_CINEMATIC_MEDIA_ENABLED",
+  "defaultEnabled": false,
+  "brand": {
+    "legalName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "logoPath": "/brand/obserra-logo.png",
+    "palette": ["#050B18", "#0B1730", "#C9A227", "#FFFFFF", "#53B7FF"],
+    "visualDirection": "premium enterprise documentary with realistic lighting, controlled camera movement, dark navy and black architecture, restrained gold, white, and subtle holographic blue",
+    "personalPhotoRequired": false,
+    "generatedLogoProhibited": true,
+    "generatedCriticalTextProhibited": true,
+    "thirdPartyLogosProhibited": true,
+    "publicFigureLikenessProhibited": true
+  },
+  "delivery": {
+    "container": "MP4",
+    "videoCodec": "H.264",
+    "minimumWidthPixels": 1920,
+    "minimumHeightPixels": 1080,
+    "frameRate": 24,
+    "colorSpace": "Rec.709",
+    "audioForBackgroundLoops": false,
+    "loopSeamRequired": true,
+    "posterFallbackRequired": true,
+    "pauseControlRequired": true,
+    "reducedMotionFallbackRequired": true,
+    "ownerApprovalRequired": true,
+    "sha256Required": true
+  },
+  "assets": [
+    {
+      "id": "site-hero-eios",
+      "role": "homepage-hero-loop",
+      "durationSeconds": 12,
+      "aspectRatio": "16:9",
+      "outputPath": "/media/pollo/site/obserra-eios-intelligence-hero-loop-12s.mp4",
+      "posterPath": "/brand/visuals/obserra-eios-intelligence-hero.png",
+      "status": "planned"
+    },
+    {
+      "id": "site-platform-eios",
+      "role": "homepage-platform-loop",
+      "durationSeconds": 12,
+      "aspectRatio": "16:9",
+      "outputPath": "/media/pollo/site/obserra-eios-platform-loop-12s.mp4",
+      "posterPath": "/eios/eios-overview-marketing.png",
+      "status": "planned"
+    },
+    {
+      "id": "ad-eios",
+      "role": "website-campaign-ad",
+      "durationSeconds": 15,
+      "aspectRatio": "16:9",
+      "outputPath": "/media/pollo/ads/obserra-eios-executive-intelligence-15s.mp4",
+      "posterPath": "/brand/visuals/obserra-eios.png",
+      "destinationPath": "/eios",
+      "status": "planned"
+    },
+    {
+      "id": "ad-academy",
+      "role": "website-campaign-ad",
+      "durationSeconds": 15,
+      "aspectRatio": "16:9",
+      "outputPath": "/media/pollo/ads/obserra-academy-cinematic-learning-15s.mp4",
+      "posterPath": "/brand/visuals/obserra-academy.png",
+      "destinationPath": "/academy",
+      "status": "planned"
+    },
+    {
+      "id": "ad-protection-intelligence",
+      "role": "website-campaign-ad",
+      "durationSeconds": 15,
+      "aspectRatio": "16:9",
+      "outputPath": "/media/pollo/ads/obserra-protection-intelligence-15s.mp4",
+      "posterPath": "/brand/visuals/obserra-protection-intelligence.png",
+      "destinationPath": "/protection-intelligence",
+      "status": "planned"
+    },
+    {
+      "id": "ad-cybersecurity",
+      "role": "website-campaign-ad",
+      "durationSeconds": 15,
+      "aspectRatio": "16:9",
+      "outputPath": "/media/pollo/ads/obserra-cybersecurity-executive-risk-15s.mp4",
+      "posterPath": "/brand/visuals/obserra-cybersecurity.png",
+      "destinationPath": "/services/cybersecurity-consulting",
+      "status": "planned"
+    }
+  ],
+  "releaseGate": [
+    "approved-pollo-prompt",
+    "official-brand-review",
+    "cinematic-realism-review",
+    "no-generated-logo-or-critical-text",
+    "no-third-party-marks-or-public-figure-likeness",
+    "technical-master-validation",
+    "seamless-loop-validation-where-applicable",
+    "poster-fallback-validation",
+    "reduced-motion-validation",
+    "desktop-mobile-performance-review",
+    "owner-approval",
+    "feature-flag-enable-after-all-assets-present"
+  ]
+}

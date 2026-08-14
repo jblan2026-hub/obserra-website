@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "enforced",
+  "effectiveDate": "2026-08-12",
+  "owner": "Dr. Jody Blanchard",
+  "ownerTitle": "Founder and CEO",
+  "academy": "Obserra EPI Academy",
+  "ownerDirective": "Every learner-facing section of every current and future course must use the complete LearnWorlds category architecture verified from the actual target school. No exceptions.",
+  "actualSiteEvidence": {
+    "target": "Obserra EPI LearnWorlds school Add learning activity interface",
+    "source": "Owner-supplied current authenticated screenshots",
+    "verifiedAt": "2026-08-12",
+    "record": "docs/academy-media-pipeline/ACTUAL-SITE-ACTIVITY-INVENTORY-2026-08-12.md"
+  },
+  "requiredLearnerFacingSections": [
+    "Course Opening and Orientation",
+    "Instructional Module 1",
+    "Instructional Module 2",
+    "Instructional Module 3",
+    "Instructional Module 4",
+    "Instructional Module 5",
+    "Final Assessment and Course Completion",
+    "Authoritative Resource Library"
+  ],
+  "requiredCategoryFolders": [
+    "01_Multimedia",
+    "02_Ebook",
+    "03_Exams",
+    "04_Self_Assessment",
+    "05_Forms",
+    "06_Certificates",
+    "07_Social",
+    "08_Embed",
+    "09_Evidence_and_QA"
+  ],
+  "verifiedOptions": {
+    "Multimedia": [
+      "Video (interactive)",
+      "PDF",
+      "SCORM / HTML5 package",
+      "LTI - setup needed",
+      "Presentation",
+      "Audio",
+      "YouTube"
+    ],
+    "Ebook": [
+      "Welcome",
+      "Course overview",
+      "Main content",
+      "FAQ",
+      "Summary",
+      "Course completion"
+    ],
+    "Exams": [
+      "Graded SCORM",
+      "Graded LTI - setup needed",
+      "Text assignment",
+      "File assignment",
+      "Video assignment",
+      "Audio assignment"
+    ],
+    "SelfAssessment": [
+      "Assess your knowledge",
+      "Write your views / goals / emotions",
+      "Upload your work",
+      "Record your short video",
+      "Record your audio"
+    ],
+    "Forms": [
+      "Introduce yourself",
+      "Course evaluation (short)",
+      "Course evaluation (long)",
+      "Instructor evaluation (short)",
+      "Instructor evaluation (long)",
+      "Pre-event feedback form"
+    ],
+    "Certificates": [
+      "Certificate",
+      "Certificate of completion"
+    ],
+    "Social": [
+      "Introduce yourself",
+      "Think and Share",
+      "Ask questions and discuss",
+      "Self-Reflection",
+      "Assessment discussion",
+      "Certification and exam activities"
+    ],
+    "Embed": [
+      "Embed",
+      "Slideshare",
+      "External link"
+    ]
+  },
+  "minimumInstructionalModuleStack": {
+    "Multimedia": [
+      "OWNER PRODUCTION REQUIRED interactive-video slot",
+      "video script and production-support package",
+      "substantive SCORM / HTML5 lesson",
+      "branded presentation or presentation-ready source",
+      "accessible PDF quick reference or job aid",
+      "audio summary script and specification",
+      "verified rationale for conditional external multimedia"
+    ],
+    "Ebook": [
+      "overview and objectives",
+      "main content",
+      "FAQ",
+      "summary and key takeaways",
+      "complete written alternative"
+    ],
+    "Exams": [
+      "native-template module knowledge check",
+      "answer rationale and objective mapping",
+      "pass mark and attempt policy",
+      "applied text or file assignment when objective requires an artifact",
+      "controlled rationale for unused verified exam options"
+    ],
+    "SelfAssessment": [
+      "knowledge or confidence self-assessment",
+      "reflection prompt",
+      "privacy and accessibility decision for upload or recorded-media options"
+    ],
+    "Forms": [
+      "module action, decision, feedback, or practice form"
+    ],
+    "Certificates": [
+      "NOT APPLICABLE - COURSE-LEVEL COMPLETION CONTROL unless explicitly approved"
+    ],
+    "Social": [
+      "moderated discussion or reflection activity",
+      "prompt, moderator, conduct rule, sensitive-information warning, completion treatment"
+    ],
+    "Embed": [
+      "verified official primary-source external link or approved embed"
+    ],
+    "EvidenceAndQA": [
+      "actual-site evidence",
+      "activity configuration",
+      "completion rule",
+      "import, playback, score, and persistence result",
+      "accessibility result",
+      "desktop and mobile result",
+      "owner approval state"
+    ]
+  },
+  "folderContentRule": {
+    "emptyFoldersAllowed": false,
+    "unusedOptionRequiresRationale": true,
+    "requiredRationaleFilename": "NOT-USED-RATIONALE.md",
+    "categoryFolderMustContain": [
+      "actual learner-facing material or upload artifact",
+      "native activity copy and configuration record",
+      "completion rule",
+      "QA evidence",
+      "or controlled not-used rationale"
+    ]
+  },
+  "videoPolicy": {
+    "assistantGeneratedCourseVideoAllowed": false,
+    "connectedProviderVideoGenerationAllowed": false,
+    "additionalProviderCreditSpendAllowed": false,
+    "producerAndFinalApprover": "Dr. Jody Blanchard",
+    "pendingSlotLabel": "OWNER PRODUCTION REQUIRED"
+  },
+  "assessmentPolicyReference": "config/academy-course-section-assessment-policy.json",
+  "actualSiteVerificationPolicyReference": "config/academy-actual-site-verification-policy.json",
+  "acceptance": {
+    "fileExistenceIsCompletionProof": false,
+    "authenticatedLearnWorldsBuildRequired": true,
+    "saveReopenPersistenceRequired": true,
+    "desktopAndMobileTestingRequired": true,
+    "ownerApprovalRequired": true,
+    "statusBeforeEvidence": "PENDING AUTHENTICATED TEST"
+  },
+  "noExceptions": true
+}

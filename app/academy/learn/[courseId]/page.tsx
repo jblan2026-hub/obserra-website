@@ -1,8 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
-import CoursePlayer from "../CoursePlayer";
+import CourseOpeningGate from "../CourseOpeningGate";
 import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
 import { finalAssessmentQuestions, lessonBrief } from "../../courseExperience";
+import { courseOpeningForCourse } from "../../courseOpening";
 
 export default async function LearnCoursePage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params;
@@ -22,8 +23,9 @@ export default async function LearnCoursePage({ params }: { params: Promise<{ co
     .filter((lesson): lesson is NonNullable<typeof lesson> => Boolean(lesson));
 
   return (
-    <CoursePlayer
+    <CourseOpeningGate
       course={course}
+      opening={courseOpeningForCourse(course)}
       initialProgress={state.progress[courseId] ?? { completedLessons: [] }}
       lessons={lessons}
       assessment={finalAssessmentQuestions(course.id)}

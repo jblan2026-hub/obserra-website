@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "enforced",
+  "effectiveDate": "2026-08-12",
+  "owner": "Dr. Jody Blanchard",
+  "ownerTitle": "Founder and CEO",
+  "academy": "Obserra EPI Academy",
+  "requirement": "Every learner-facing section of every course must contain its own LearnWorlds native-template assessment activity.",
+  "scope": {
+    "allCurrentCourses": true,
+    "allFutureCourses": true,
+    "learnerFacingSectionsOnly": true,
+    "administrativePackageFoldersExcluded": true
+  },
+  "standardFiveModuleCoursePattern": [
+    {
+      "section": "Welcome and orientation",
+      "assessmentType": "self-assessment",
+      "filenamePrefix": "selfassessment_",
+      "minimumQuestions": 5,
+      "graded": false
+    },
+    {
+      "section": "Module 1",
+      "assessmentType": "exam",
+      "filenamePrefix": "exam_",
+      "minimumQuestions": 5,
+      "graded": true,
+      "minimumPassingPercent": 80
+    },
+    {
+      "section": "Module 2",
+      "assessmentType": "exam",
+      "filenamePrefix": "exam_",
+      "minimumQuestions": 5,
+      "graded": true,
+      "minimumPassingPercent": 80
+    },
+    {
+      "section": "Module 3",
+      "assessmentType": "exam",
+      "filenamePrefix": "exam_",
+      "minimumQuestions": 5,
+      "graded": true,
+      "minimumPassingPercent": 80
+    },
+    {
+      "section": "Module 4",
+      "assessmentType": "exam",
+      "filenamePrefix": "exam_",
+      "minimumQuestions": 5,
+      "graded": true,
+      "minimumPassingPercent": 80
+    },
+    {
+      "section": "Module 5",
+      "assessmentType": "exam",
+      "filenamePrefix": "exam_",
+      "minimumQuestions": 5,
+      "graded": true,
+      "minimumPassingPercent": 80
+    },
+    {
+      "section": "Final assessment and completion",
+      "assessmentType": "exam",
+      "filenamePrefix": "exam_",
+      "minimumQuestions": 25,
+      "graded": true,
+      "minimumPassingPercent": 80
+    },
+    {
+      "section": "Authoritative resource library",
+      "assessmentType": "self-assessment",
+      "filenamePrefix": "selfassessment_",
+      "minimumQuestions": 5,
+      "graded": false
+    }
+  ],
+  "nativeTemplate": {
+    "source": "Owner-supplied native LearnWorlds Question Bank Template downloaded from the actual target school workflow",
+    "sha256": "23e591abe440b3c05139a44543d9626ef17c251d42f30881e6e49f51e027ad7e",
+    "sheetOrder": [
+      "Instructions",
+      "Examples",
+      "Questions"
+    ],
+    "questionsHeaders": [
+      "Group",
+      "Type",
+      "Question",
+      "CorAns",
+      "Answer1",
+      "Answer2",
+      "Answer3",
+      "Answer4",
+      "Answer5",
+      "Answer6",
+      "Answer7",
+      "Answer8",
+      "Answer9",
+      "Answer10",
+      "CorrectExplanation",
+      "IncorrectExplanation"
+    ],
+    "mustPreserveUntouchedOriginal": true,
+    "mustPopulateCopyOnly": true,
+    "plainTextRequired": true
+  },
+  "questionQuality": {
+    "mapToSectionObjectives": true,
+    "testApplicationAndJudgment": true,
+    "plausibleDistractors": true,
+    "correctAndIncorrectFeedbackRequiredWhereSupported": true,
+    "currentOfficialSourcesRequiredForSourceBasedQuestions": true,
+    "ambiguousOrTrickQuestionsProhibited": true
+  },
+  "acceptanceEvidence": {
+    "structuralValidationRequired": true,
+    "authenticatedDraftImportRequired": true,
+    "questionCountAndGroupsVerified": true,
+    "correctAnswerMappingVerified": true,
+    "passMarkAndAttemptSettingsVerified": true,
+    "saveReopenPersistenceVerified": true,
+    "desktopAndMobilePreviewRequired": true,
+    "runtimeAcceptanceRequiredBeforeReadyClaim": true
+  },
+  "currentCybersecurityFoundationsImplementation": {
+    "package": "Obserra-EPI-Academy-Cybersecurity-Foundations-LearnWorlds-Section-Assessments-v2.2.0.zip",
+    "sha256": "f80171e10b612d85d3d48d8ba467e529fb1b0677bafc994eccf84021083002c5",
+    "learnerFacingSections": 8,
+    "assessmentFiles": 8,
+    "totalQuestions": 60,
+    "structuralValidation": "PASSED",
+    "authenticatedLearnWorldsImport": "NOT_PERFORMED",
+    "runtimeAcceptance": "NOT_PROVEN"
+  },
+  "noExceptions": true
+}

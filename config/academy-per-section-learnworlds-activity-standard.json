@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "1.0.0",
+  "status": "enforced",
+  "effectiveDate": "2026-08-12",
+  "owner": "Dr. Jody Blanchard",
+  "soleApprovedTitle": "Founder and CEO",
+  "academy": "Obserra EPI Academy",
+  "shortBusinessName": "Obserra EPI",
+  "epiMeaning": "Executive Protection & Intelligence",
+  "legalCompany": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "officialWebsite": "https://www.obserrallc.com",
+  "ownerDirective": "Every substantive section of every course must use the verified LearnWorlds activity categories and include a category-complete learning stack. Group package folders by activity category and then by section. The owner must not have to repeat this requirement.",
+  "actualSiteVerificationRequiredBeforeGeneration": true,
+  "noExceptions": true,
+  "assistantVideoGeneration": "PROHIBITED",
+  "videoStatusUntilOwnerDelivery": "OWNER PRODUCTION REQUIRED",
+  "verifiedActivityCategories": {
+    "Multimedia": [
+      "Video (interactive)",
+      "PDF",
+      "SCORM / HTML5 package",
+      "LTI",
+      "Presentation",
+      "Audio",
+      "YouTube"
+    ],
+    "Ebook": [
+      "Welcome",
+      "Course overview",
+      "Main content",
+      "FAQ",
+      "Summary",
+      "Course completion"
+    ],
+    "Exams": [
+      "Native graded exam using actual downloaded template",
+      "Graded SCORM",
+      "Text assignment",
+      "File assignment",
+      "Video assignment",
+      "Audio assignment"
+    ],
+    "Self-Assessment": [
+      "Assess your knowledge",
+      "Write your views / goals / emotions",
+      "Upload your work",
+      "Record your short video",
+      "Record your audio"
+    ],
+    "Forms": [
+      "Introduce yourself",
+      "Course evaluation (short)",
+      "Course evaluation (long)",
+      "Instructor evaluation (short)",
+      "Instructor evaluation (long)",
+      "Pre-event feedback form"
+    ],
+    "Certificates": [
+      "Certificate",
+      "Certificate of completion"
+    ],
+    "Social": [
+      "Introduce yourself",
+      "Think and Share",
+      "Ask questions and discuss",
+      "Self-Reflection",
+      "Assessment discussion",
+      "Certification and exam activities"
+    ],
+    "Embed": [
+      "Embed",
+      "Slideshare",
+      "External link"
+    ]
+  },
+  "requiredPerSection": {
+    "Ebook": [
+      "Section Overview and Objectives",
+      "Section Main Content",
+      "Section FAQ and Key Terms",
+      "Section Summary and Takeaways"
+    ],
+    "Multimedia": [
+      "Interactive SCORM / HTML5 instructional activity",
+      "PDF learner handout or job aid",
+      "PPTX presentation and PDF export",
+      "Audio-ready narration script and transcript",
+      "Interactive video insertion point marked OWNER PRODUCTION REQUIRED",
+      "Approved thumbnail, poster, or section background image"
+    ],
+    "Exams": [
+      "Five-question module knowledge check using actual native template or validated Graded SCORM",
+      "Applied Text assignment or File assignment",
+      "Video or Audio learner assignment specification when pedagogically appropriate",
+      "Scoring, feedback, retry, and completion rules"
+    ],
+    "Self-Assessment": [
+      "Assess Your Knowledge",
+      "Section Reflection and Goals",
+      "Upload Your Work when an artifact is produced"
+    ],
+    "Forms": [
+      "Section check-in, confidence, application, or feedback form"
+    ],
+    "Social": [
+      "Think and Share",
+      "Ask questions and discuss",
+      "Self-Reflection",
+      "Assessment discussion when graded assessment is used"
+    ],
+    "Embed": [
+      "Verified official external resource or embed"
+    ],
+    "Completion": [
+      "Meaningful completion gate; visit-only completion prohibited for substantive learning"
+    ]
+  },
+  "courseOpeningRequired": [
+    "Welcome Ebook",
+    "Course overview Ebook",
+    "Official title and identity page",
+    "Learner disclosures and acknowledgement",
+    "Owner welcome marked OWNER PRODUCTION REQUIRED until supplied",
+    "Accessible written transcript and introduction script",
+    "Introduce yourself form or social activity",
+    "Baseline self-assessment",
+    "Learner goals form or reflection",
+    "Learner workbook download"
+  ],
+  "courseEndingRequired": [
+    "Comprehensive review and final summary",
+    "Final graded assessment using actual current native template",
+    "80 percent minimum passing score unless owner changes it",
+    "Final applied action plan or assignment",
+    "Course evaluation form",
+    "Final self-reflection",
+    "Certification and exam discussion when applicable",
+    "Certificate or certificate of completion",
+    "Course completion Ebook",
+    "Final accessibility and resource index"
+  ],
+  "folderArchitecture": [
+    "00_COURSE_ADMINISTRATION",
+    "01_EBOOK",
+    "02_MULTIMEDIA",
+    "03_EXAMS_AND_ASSIGNMENTS",
+    "04_SELF_ASSESSMENT",
+    "05_FORMS",
+    "06_SOCIAL",
+    "07_EMBED_AND_EXTERNAL_LINKS",
+    "08_CERTIFICATES_AND_COMPLETION",
+    "09_OWNER_VIDEO_PRODUCTION_REQUIRED",
+    "10_AUTHORITATIVE_RESOURCES",
+    "11_ACCESSIBILITY_TRANSCRIPTS_AND_CAPTIONS",
+    "12_QA_EVIDENCE_AND_RELEASE"
+  ],
+  "courseLevelLifecycleExceptions": {
+    "Certificate": "Course-level unless a future owner-approved verified module credential design exists.",
+    "Certificate of completion": "Course-level unless a future owner-approved verified module credential design exists.",
+    "Course completion": "Course-level closing activity.",
+    "Welcome": "Course-opening activity; each section instead receives Section Overview and Objectives."
+  },
+  "completionEvidenceRequired": [
+    "Actual current LearnWorlds options and templates checked",
+    "Every required category mapped",
+    "Every mapped activity has a real artifact and completion rule",
+    "Native-template imports pass in the actual Draft course",
+    "SCORM launch, state retention, completion, and scoring pass",
+    "Forms and assignments save and reopen",
+    "Accessibility alternatives exist",
+    "Desktop and mobile pass",
+    "Owner approval is recorded"
+  ],
+  "governingDocument": "docs/academy-media-pipeline/PER-SECTION-LEARNWORLDS-ACTIVITY-ARCHITECTURE.md"
+}

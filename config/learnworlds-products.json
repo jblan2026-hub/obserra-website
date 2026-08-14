@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0",
+  "schoolId": "6a7a693d353feb69c94c7654",
+  "schoolName": "Obserra EPI Academy",
+  "contactEmail": "info@obserrallc.com",
+  "schoolUrl": "https://obserraepillc.learnworlds.com",
+  "authorDashboardUrl": "https://obserraepillc.learnworlds.com/author/dashboard",
+  "apiUrl": "https://obserraepillc.learnworlds.com/admin/api/",
+  "customDomain": "https://academy.obserrallc.com",
+  "domainStatus": "cname-created-pending-learnworlds-verification",
+  "stripeStatus": "connected-sandbox-validation-required",
+  "apiStatus": "credentials-created-secrets-not-stored-in-repository",
+  "products": [
+    {
+      "courseId": "cybersecurity-foundations",
+      "learnWorldsCourseId": "cybersecurity-foundations-for-new-professionals",
+      "productId": "cybersecurity_foundations_for_new_professionals",
+      "packageId": "package_6a7b2d3710387",
+      "publicUrl": "https://obserraepillc.learnworlds.com/course/cybersecurity-foundations-for-new-professionals",
+      "checkoutUrl": "https://obserraepillc.learnworlds.com/payment?product_id=cybersecurity-foundations-for-new-professionals&type=course&packageId=package_6a7b2d3710387",
+      "cartUrl": "https://obserraepillc.learnworlds.com/cart?product_id=cybersecurity-foundations-for-new-professionals&type=course&packageId=package_6a7b2d3710387",
+      "status": "sandbox"
+    }
+  ]
+}

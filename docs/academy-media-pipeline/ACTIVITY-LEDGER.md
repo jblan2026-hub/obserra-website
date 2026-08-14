@@ -1,0 +1,648 @@
+# Obserra Academy HeyGen and Pollo Pipeline Activity Ledger
+
+Owner: OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
+
+Recorded: 2026-08-11
+
+Last updated: 2026-08-11
+
+Status: Permanent chronological audit record
+
+## Activity 1: Commercial context recovered
+
+Read the active LearnWorlds commercial branch and pull request. Confirmed that the website already contains the Academy catalog, Clerk identity, Stripe checkout, signed webhook fulfillment, learner entitlements, course progress, assessments, and signed certificate functionality.
+
+## Activity 2: Annual service decision recorded
+
+Recorded the owner's annual HeyGen and Pollo AI subscriptions and the instruction to maximize both subscriptions across multiple quality-controlled platforms.
+
+## Activity 3: Provider responsibilities assigned
+
+Assigned HeyGen as the consistent instructor and presenter layer. Assigned Pollo AI as the cinematic visual, explainer, website, and social campaign layer. Prohibited duplicate presenter production and uncontrolled provider overlap.
+
+## Activity 4: Commercial API boundary established
+
+Recorded that annual web subscriptions do not automatically authorize separate API usage. Set the production system to manual-first and API-ready. No paid API automation is enabled.
+
+## Activity 5: Annual portfolio model designed
+
+Defined a five-course-per-month, twelve-month operating model with ten flagship courses, fifteen standard courses, and thirty-five catalog courses.
+
+Baseline governed output target at that stage:
+
+```text
+HeyGen assets: 250
+Pollo assets: 335
+Total assets: 585
+```
+
+## Activity 6: Deterministic media factory implemented
+
+Added `scripts/academy-media-factory.mjs` to read the governed Academy catalog and generate course-specific HeyGen and Pollo jobs, prompts, platforms, aspect ratios, durations, destinations, idempotency keys, approvals, disclosures, and quality gates.
+
+## Activity 7: Annual configuration implemented
+
+Added `config/academy-media-factory.json` with annual targets, tier assignments, brand controls, disclosure language, and provider-specific quality gates.
+
+## Activity 8: Automated tests implemented
+
+Added tests that:
+
+1. Generate a full synthetic 60-course portfolio.
+2. Reject catalogs below the minimum expected size.
+3. Validate the real Academy catalog and exact governed asset totals.
+
+## Activity 9: Repository release gate updated
+
+Added:
+
+```text
+npm run plan:academy-media
+npm run validate:academy-media
+```
+
+Added `validate:academy-media` to the governed Academy release validation sequence.
+
+## Activity 10: Operating documentation created
+
+Created the multiplatform README, account setup checklist, annual pipeline design, publishing matrix, owner-only service actions, acceptance states, and quality controls.
+
+## Activity 11: First canary package created
+
+Created the Cybersecurity Foundations production pack containing:
+
+1. A complete HeyGen welcome script.
+2. Five module briefs.
+3. A HeyGen sales trailer script.
+4. Pollo cinematic prompts.
+5. Three vertical short themes.
+6. A LinkedIn executive clip brief.
+7. An acceptance checklist.
+
+## Activity 12: Pull request expanded
+
+Updated pull request 55 to include LearnWorlds commerce and the HeyGen and Pollo annual media pipeline, exact blockers, owner actions, and acceptance gates.
+
+## Activity 13: Core CI evidence captured
+
+For code-bearing commit `f55d454d0d4468561d6a439c97c1d035b2aa7a8c`, the following GitHub Actions completed successfully:
+
+1. Website CI.
+2. Academy 70x Production Gate.
+3. Application Production Pipeline.
+4. Application Release Validation.
+
+Website CI reported:
+
+```text
+Tests: 50
+Passed: 50
+Failed: 0
+Lint errors: 0
+Existing lint warnings: 1
+Production build: passed
+```
+
+## Activity 14: Real catalog validation strengthened
+
+Added a media-factory test that runs against the real `app/academy/courseData.ts` catalog and requires the governed course, provider, and tier totals.
+
+## Activity 15: Audit records completed
+
+Created the annual media handoff addendum, dedicated failure register, and dedicated activity ledger. All known failed actions and corrections are recorded.
+
+## Activity 16: Owner-managed credit refill decision applied
+
+Recorded that the owner will manually refill HeyGen and Pollo web-subscription credits when needed. Updated the production model to remain quality first while retaining explicit owner control over every refill and any future separately billed API usage.
+
+## Activity 17: Governed service connection configuration implemented
+
+Added `config/academy-media-services.json` with provider roles, exact governed HTTPS endpoints, required manual evidence, required API environment variables, probe timeouts, and fail-closed security controls.
+
+## Activity 18: Media service readiness adapter implemented
+
+Added `lib/academy-media-services.ts`. The adapter defaults HeyGen and Pollo to manual mode, validates exact provider hosts, evaluates manual and API readiness, supports bounded optional probes, and never returns API keys or secret values.
+
+## Activity 19: Owner-only media readiness endpoint implemented
+
+Added `app/api/admin/academy-media/status/route.ts`. The endpoint uses Clerk owner authorization, returns 404 to unauthorized callers, applies no-store and noindex headers, and supports an explicit `?probe=1` sanitized connection check.
+
+## Activity 20: Secure deployment variables documented
+
+Updated `.env.example` with manual-first and separately authorized API variables for HeyGen and Pollo. No credential value was added to source control.
+
+## Activity 21: Governed media receipt and intake pipeline implemented
+
+Added:
+
+```text
+config/academy-media-asset-receipt.schema.json
+scripts/academy-media-intake.mjs
+```
+
+The pipeline creates receipt templates and validates downloaded media, SHA 256 hashes, path containment, captions, transcripts, rights evidence, quality gates, owner approval, synthetic-media disclosure, resolution, duration, streams, and 48 kHz presenter audio.
+
+## Activity 22: Connection and intake tests implemented
+
+Added:
+
+```text
+test/academy-media-services.test.mjs
+test/academy-media-intake.test.mjs
+```
+
+The tests cover provider endpoint governance, secret boundaries, manual-first operation, owner-only status, deterministic receipt preparation, accepted asset validation, unapproved asset rejection, SHA 256 validation, path containment, and optional FFprobe evidence.
+
+## Activity 23: Package commands expanded
+
+Added:
+
+```text
+npm run prepare:academy-media-intake
+npm run validate:academy-media-intake
+npm run validate:academy-media-canary
+```
+
+These commands prepare the complete asset intake tree and enforce the final canary or portfolio acceptance gate after assets are generated and downloaded.
+
+## Activity 24: Current-head CI executed and exact failure captured
+
+GitHub Actions ran the expanded branch. The shared test suite executed 61 tests:
+
+```text
+Passed: 60
+Failed: 1
+```
+
+All four workflows stopped at the same test failure. The failing regression test scanned a broad source-code region and incorrectly treated the internal `process.env.POLLO_API_KEY` request-header reference as evidence that the probe returned a credential.
+
+No deployment, provider generation, billing event, or production cutover occurred.
+
+## Activity 25: Secret-boundary test corrected
+
+Replaced the broad source slice with a precise assertion over the sanitized probe-result object shape. The correction verifies allowed result fields and excludes credential fields.
+
+## Activity 26: Failure recorded and CI restarted
+
+Recorded Failure 6 in the permanent failure register with the exact CI output, root cause, impact, correction, and prevention rule.
+
+## Activity 27: Corrected validation passed
+
+GitHub Actions validated commit `50fea832849c3456626f4ffb0b75627b27bf2c16` and reported all four workflows successful.
+
+Website CI evidence:
+
+```text
+Tests: 61
+Passed: 61
+Failed: 0
+Lint errors: 0
+Existing lint warnings: 1
+Production build: passed
+Generated application routes: 134
+Owner-site separation smoke: passed
+```
+
+## Activity 28: Governed 15-second HeyGen likeness canary added
+
+Added:
+
+```text
+docs/academy-media-pipeline/canary/HEYGEN-15-SECOND-LIKENESS-CANARY.md
+```
+
+The likeness canary must pass before the longer Cybersecurity Foundations welcome video or any portfolio presenter batch is generated.
+
+## Activity 29: Authenticated learner course shells implemented
+
+Added every governed Academy course shell to the protected `/portal` dashboard. The shell view groups courses by department and displays title, track, level, duration, module count, and governed release state.
+
+## Activity 30: Learner shell authorization controls implemented
+
+Shell state resolves in this order:
+
+```text
+Verified Clerk entitlement -> Enrolled
+Published LearnWorlds mapping -> Available
+Sandbox LearnWorlds mapping -> Pilot shell
+No released mapping -> In production
+```
+
+The learner shell dashboard contains no checkout action and does not fabricate enrollment or course readiness.
+
+## Activity 31: Learner shell validation passed
+
+Current-head validation for the learner shell implementation reported:
+
+```text
+Tests: 66
+Passed: 66
+Failed: 0
+Lint errors: 0
+Production build: passed
+Website CI: passed
+Academy 70x Production Gate: passed
+Application Production Pipeline: passed
+Application Release Validation: passed
+```
+
+## Activity 32: Owner rejected robotic and low quality production
+
+Recorded the direction that every course must use realistic, cinematic, Hollywood-caliber craft and Fortune 500 executive communication quality. The existing PMP style was rejected as robotic and below the required professional standard.
+
+The phrase describes a production-quality target. It does not claim affiliation with a film studio or Fortune 500 company.
+
+## Activity 33: Machine-readable cinematic standard implemented
+
+Added:
+
+```text
+config/academy-cinematic-production-standard.json
+```
+
+Standard ID:
+
+```text
+obserra-cinematic-enterprise-v1
+```
+
+The standard applies equally to every course, course level, and department. Tier may change release priority only. Tier may not reduce quality.
+
+## Activity 34: Media architecture standardized across every course
+
+Updated the factory configuration and generator so every course receives:
+
+```text
+HeyGen course welcome: 1
+HeyGen module anchor films: 5
+HeyGen course trailer host: 1
+Pollo module cinematic visual packs: 5
+Pollo website hero loop: 1
+Pollo vertical campaign clips: 3
+Pollo LinkedIn executive clip: 1
+Total assets per course: 17
+```
+
+Updated portfolio target:
+
+```text
+HeyGen assets: 420
+Pollo assets: 600
+Total assets: 1020
+```
+
+## Activity 35: Anti-robotic and cinematic controls enforced
+
+The factory now requires:
+
+1. No uninterrupted avatar segment longer than 20 seconds.
+2. Presenter screen time from 35 to 55 percent.
+3. Cinematic visual time from 45 to 65 percent.
+4. Five module anchor films and five module visual packs per course.
+5. Scene plan, shot list, storyboard, and edit decision list.
+6. 1920 by 1080 minimum master, Rec.709 color, and 48 kHz audio.
+7. Captions, transcript, owner approval, rights evidence, and LearnWorlds playback validation.
+
+## Activity 36: Cinematic standard and canary documentation upgraded
+
+Updated:
+
+```text
+docs/academy-media-pipeline/OBSERRA-CINEMATIC-FORTUNE-500-PRODUCTION-STANDARD.md
+docs/academy-media-pipeline/canary/CYBERSECURITY-FOUNDATIONS-PRODUCTION-PACK.md
+```
+
+The canary now contains a 75 second welcome, scene-by-scene edit plan, five 5 to 8 minute module film briefs, five Pollo module visual packs, LearnWorlds activity requirements, and a 15 category quality scorecard.
+
+## Activity 37: Concurrent file conflicts recorded and corrected
+
+The first configuration update used a stale blob SHA and returned GitHub HTTP 409. A subsequent test create action targeted a path that already existed and returned GitHub HTTP 422.
+
+Both actions were corrected by re-reading the current path and using the current blob SHA. Failures 7 and 8 record exact causes and prevention rules.
+
+## Activity 38: Cinematic handoff addendum created
+
+Added:
+
+```text
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-CINEMATIC-ENTERPRISE-STANDARD.md
+```
+
+The addendum records the standard, asset totals, provider roles, LearnWorlds controls, current blockers, merge boundary, shell transfer boundary, and latest file locations.
+
+## Activity 39: Full cinematic CI failure isolated
+
+GitHub Actions executed the expanded cinematic branch at commit `89fdbdad274d11480f3a7de72cf7f5dded53e9d6`.
+
+Results:
+
+```text
+Tests: 79
+Passed: 78
+Failed: 1
+```
+
+The failing test asserted one exact sentence fragment in the human-readable standard. The document already contained the required anti-robotic policy, but used the phrase `must not feel like a robotic avatar presentation`.
+
+## Activity 40: Cinematic documentation assertion corrected
+
+Updated the contract test to validate durable policy concepts instead of one connective phrase. The corrected assertions require:
+
+```text
+robotic avatar presentation
+no uninterrupted avatar segment may exceed 20 seconds
+full course videos consisting only of a talking avatar
+robotic narration over static slides
+```
+
+Correction commit:
+
+```text
+a04576292044ddc11122b0d08905b6f4987cd9a0
+```
+
+## Activity 41: LearnWorlds 60 shell plan preserved as a non-upload claim
+
+Confirmed that the repository produces a 60 course Draft shell manifest and CSV, but does not claim those shells exist in the authenticated LearnWorlds author account. The owner screenshot still proves only the Cybersecurity Foundations shell.
+
+The shell plan remains a controlled transfer input. Actual LearnWorlds creation requires authenticated evidence for each course.
+
+## Activity 42: Failure register concurrency conflict recorded and corrected
+
+An attempt to append the latest failures used a blob SHA that became stale while related handoff commits were still landing. GitHub returned HTTP 409. The register was refetched and replaced without losing prior failure records. Failure 11 contains the exact record.
+
+## Activity 43: Canonical latest handoff created
+
+Added:
+
+```text
+docs/academy-media-pipeline/LATEST-HANDOFF.md
+```
+
+This file is now the first source every future session must read. It contains the current architecture, cinematic standard, validation state, external truth, blockers, merge boundary, shell transfer boundary, latest document locations, and continuation instruction.
+
+## Activity 44: Restart instructions updated
+
+Updated `docs/OBSERRA-ACADEMY-RESTART-HERE.md` so the canonical latest handoff is read first and every failure, shell transfer boundary, cinematic requirement, and merge blocker remains visible after any conversation reset.
+
+## Activity 45: Website Pollo enhancement scope approved
+
+Recorded the owner direction to use Pollo AI for interactive website enhancements on `www.obserrallc.com`, replace selected static images with cinematic loops, and create official-brand website advertisements.
+
+## Activity 46: Direct Pollo plugin discovery completed
+
+Searched the installable plugin catalog for Pollo AI video generation. No Pollo plugin was returned. Failure 12 records the limitation and prevention rule.
+
+The absence of a plugin does not block repository implementation. It means direct provider rendering cannot be claimed from this environment.
+
+## Activity 47: Accessible cinematic media component implemented
+
+Added:
+
+```text
+app/components/marketing/CinematicMedia.tsx
+```
+
+The component supports static poster fallback, muted loop playback, viewport play and pause, user pause and play, reduced motion fallback, and video error fallback.
+
+## Activity 48: Official-brand campaign advertisements implemented
+
+Added:
+
+```text
+app/components/marketing/WebsiteCampaignAds.tsx
+```
+
+The homepage campaign set includes:
+
+1. Obserra EIOS.
+2. Obserra Academy.
+3. Protection and Intelligence.
+4. Cybersecurity Advisory.
+
+Each advertisement uses an official Obserra poster image, official logo overlay, governed headline, body copy, call to action, and Pollo MP4 path.
+
+## Activity 49: Homepage cinematic media slots implemented
+
+Updated:
+
+```text
+app/page.tsx
+app/cinematic-media.css
+```
+
+The homepage now contains governed video slots for:
+
+1. The main EIOS intelligence hero.
+2. The EIOS platform visualization.
+3. Four campaign advertisements.
+
+The official static images remain the active fallback until approved MP4 assets exist and the feature flag is enabled.
+
+## Activity 50: Website media manifest and fail-closed feature flag implemented
+
+Added:
+
+```text
+config/website-cinematic-media.json
+public/media/pollo/README.md
+```
+
+Updated:
+
+```text
+.env.example
+```
+
+Feature flag:
+
+```text
+NEXT_PUBLIC_OBSERRA_CINEMATIC_MEDIA_ENABLED=false
+```
+
+The manifest governs six initial assets and keeps every asset in `planned` state. The flag remains false until approved files are present, validated, and owner approved.
+
+## Activity 51: Production-ready Pollo website ad pack created
+
+Added:
+
+```text
+docs/pollo-website-campaigns/POLLO-WEBSITE-INTERACTIVE-ADS-PRODUCTION-PACK.md
+```
+
+The pack contains official brand rules, six shot sequences, paste-ready Pollo prompts, four website advertisements, two interactive loops, optional social voiceovers, exact output filenames, and a sixteen point acceptance checklist.
+
+## Activity 52: Website cinematic media validation added
+
+Added:
+
+```text
+test/website-cinematic-media.test.mjs
+```
+
+The tests validate fail-closed activation, poster fallback, video error fallback, viewport playback, user controls, reduced motion, official logo use, campaign coverage, six governed assets, poster availability, and absence of provider credentials or automatic spend authorization.
+
+## Activity 53: Website cinematic ads handoff addendum created
+
+Added:
+
+```text
+docs/LEARNWORLDS-CONTINUOUS-HANDOFF-ADDENDUM-WEBSITE-CINEMATIC-ADS.md
+```
+
+The addendum records the implementation, provider limitation, official brand rules, exact asset paths, current state, next actions, acceptance boundary, and latest file locations.
+
+## Activity 54: Supabase public exposure notice treated as a security incident
+
+The owner reported a Supabase notice that an Obserra Academy table was publicly accessible and directed that all Academy data and intellectual property be made inaccessible to unauthorized parties.
+
+The incident was treated as a potential confidentiality and database compromise risk. No conclusion was made that data had been taken, and no conclusion was made that the environment was uncompromised.
+
+## Activity 55: Supabase project and exposure inventory completed
+
+Confirmed the active project:
+
+```text
+Project: Obserra Academy
+Project reference: nwxnyqlyzyufgoadtqxs
+Region: us-east-1
+Status: ACTIVE_HEALTHY
+```
+
+The initial security advisor and catalog inspection identified public schema tables without RLS, direct anonymous and authenticated grants, security definer views, public security definer RPC execution, a mutable function search path, and a publicly callable Academy catalog Edge Function using a service role client.
+
+## Activity 56: Emergency private database lockdown applied
+
+Applied migration:
+
+```text
+20260811223159 emergency_private_database_lockdown_v2
+```
+
+The migration revoked direct public schema, table, sequence, function, and type privileges from public API roles, preserved service role access, enabled and forced RLS on every public base table, changed public views to security invoker behavior, pinned the mutable function search path, and established deny by default privileges for future database objects.
+
+## Activity 57: Unused public database surfaces restricted
+
+Applied migration:
+
+```text
+20260811224121 disable_unused_public_api_surfaces
+```
+
+The migration attempted to remove anonymous and ordinary authenticated access from unused Storage, Realtime, and GraphQL database surfaces. Supabase retains platform managed grants in these schemas, so the residual platform surface remains an open review item.
+
+Current Storage facts:
+
+```text
+Storage buckets: 0
+Storage RLS: enabled
+Storage policies: 0
+```
+
+## Activity 58: Emergency database containment verified
+
+Post migration verification produced:
+
+```text
+Public schema base tables: 58
+RLS enabled tables: 58
+RLS forced tables: 58
+Anonymous public schema usage: false
+Authenticated public schema usage: false
+Anonymous or authenticated public table grants: 0
+Anonymous or authenticated public function grants: 0
+Public views: 9
+Security invoker public views: 9
+Non security invoker public views: 0
+```
+
+## Activity 59: Supabase security advisor rerun completed
+
+The security advisor was rerun after containment. The prior security errors and warnings were cleared. The remaining notices are informational `RLS Enabled No Policy` findings, consistent with the current deny by default direct API posture.
+
+## Activity 60: Academy catalog Edge Function hardened
+
+Deployed `academy-public-catalog` version 2 with:
+
+```text
+Platform JWT verification: enabled
+Caller role: service_role only
+Wildcard CORS: removed
+Cache policy: private and no store
+Unauthorized response: 404
+Default missing control state: unpublished and not purchasable
+```
+
+The function is no longer intended for direct browser or anonymous access.
+
+## Activity 61: Application compatibility and fail open defect identified
+
+The website server currently calls `academy-public-catalog` without an Authorization header. The new service role requirement blocks that call.
+
+The current website fallback also returns the baseline catalog with default published controls when the control service is unavailable. This is a fail open condition for course visibility and purchase behavior and is the next critical code repair.
+
+## Activity 62: Remaining Edge Function posture inventoried
+
+Current active Edge Functions:
+
+```text
+Total active functions: 13
+Platform JWT verification enabled: 1
+Platform JWT verification disabled: 12
+```
+
+`academy-owner-control` contains custom Clerk JWT and owner identity verification. Every remaining function requires individual authentication and necessity review before security closure.
+
+## Activity 63: Public GitHub intellectual property risk confirmed
+
+Confirmed that `jblan2026-hub/obserra-website` is currently public. Pull request 55 contains internal implementation and production planning material.
+
+The repository must be changed to private, access reviewed, public history exposure assessed, and affected credentials rotated where necessary before merge or production use.
+
+## Activity 64: Dedicated Supabase security handoff created
+
+Added:
+
+```text
+docs/OBSERRA-ACADEMY-SUPABASE-SECURITY-HANDOFF.md
+```
+
+The document records the incident trigger, initial findings, migrations, verification evidence, current containment state, application impact, Edge Function review boundary, GitHub exposure, credential boundary, unresolved risks, next actions, and truth boundary.
+
+## Current state
+
+```text
+Direct anonymous public schema access: blocked
+Direct authenticated public schema access: blocked
+Public schema base tables with RLS enabled and forced: 58 of 58
+Anonymous or authenticated public table grants: 0
+Anonymous or authenticated public function grants: 0
+Public views using security invoker: 9 of 9
+Academy catalog Edge Function: service role only
+Website private catalog integration: not yet repaired
+Website control fallback: fail open and must be corrected
+Remaining Edge Functions reviewed: no
+Supabase credential rotation: not complete
+Forensic access review: not complete
+GitHub repository visibility: public
+GitHub public history review: not complete
+Learner dashboard shells: implemented and previously validated
+60 course LearnWorlds Draft shell manifest: implemented
+Remaining LearnWorlds shells uploaded: not yet proven
+Cinematic enterprise course standard: implemented
+Current course media target: 1020 assets across 60 courses
+Website cinematic media component: implemented
+Homepage hero and platform video slots: implemented
+Four official-brand website advertisements: implemented
+Six governed Pollo website assets: planned
+Pollo website MP4 files rendered: no
+Pollo website MP4 files uploaded: no
+Website cinematic feature flag: false
+HeyGen avatar and voice: owner still refining
+15 second likeness canary: not yet accepted
+Full Cybersecurity Foundations media canary: not yet accepted
+Pull request merged: no
+Website production activation: no
+Academy production cutover: not authorized
+Full security closure: no
+```
