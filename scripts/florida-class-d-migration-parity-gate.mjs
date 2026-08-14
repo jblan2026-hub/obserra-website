@@ -13,13 +13,14 @@ function requireText(source, value, message) {
 }
 
 const result = buildFloridaClassDMigrationManifest();
+const expectedCount = 29;
 const latestVersion = "20260814011203";
 
-if (result.manifest.migrationCount !== 27) {
-  throw new Error(`Gate 29 failed: expected 27 regulated migrations, found ${result.manifest.migrationCount}.`);
+if (result.manifest.migrationCount !== expectedCount) {
+  throw new Error(`Gate 29 failed: expected ${expectedCount} regulated migrations, found ${result.manifest.migrationCount}.`);
 }
-if (EXPECTED_FLORIDA_CLASS_D_MIGRATIONS.length !== 27) {
-  throw new Error(`Gate 29 failed: expected lineage constant must contain exactly 27 migrations.`);
+if (EXPECTED_FLORIDA_CLASS_D_MIGRATIONS.length !== expectedCount) {
+  throw new Error(`Gate 29 failed: expected lineage constant must contain exactly ${expectedCount} migrations.`);
 }
 if (result.manifest.latestVersion !== latestVersion) {
   throw new Error(`Gate 29 failed: latest regulated migration must be ${latestVersion}, found ${result.manifest.latestVersion}.`);
@@ -50,7 +51,7 @@ for (const [value, message] of [
   ["databaseAppliedMigrationVersionRequired: true", "Gate 26 policy must require the applied migration version"],
 ]) requireText(activation, value, message);
 
-requireText(handoff, "exactly 27 regulated migrations", "Gate 29 handoff must preserve the controlled migration count");
+requireText(handoff, "exactly 29 regulated migrations", "Gate 29 handoff must preserve the controlled migration count");
 requireText(handoff, latestVersion, "Gate 29 handoff must preserve the latest regulated migration version");
 requireText(handoff, "deterministic SHA-256 promotion manifest", "Gate 29 handoff must document deterministic promotion evidence");
 requireText(handoff, "No production migration is executed by Gate 29 CI", "Gate 29 handoff must preserve the production fail-closed database boundary");
@@ -63,4 +64,4 @@ for (const value of [
   "node scripts/florida-class-d-migration-parity-gate.mjs",
 ]) requireText(workflow, value, `dedicated Class D workflow is missing Gate 29 control: ${value}`);
 
-console.log(`Florida Class D Gate 29 passed: exact 27-migration lineage, latest version ${latestVersion}, deterministic manifest SHA-256 ${result.sha256}, candidate-bound database promotion evidence, and mandatory CI artifact retention are validated in source.`);
+console.log(`Florida Class D Gate 29 passed: exact ${expectedCount}-migration lineage, latest version ${latestVersion}, deterministic manifest SHA-256 ${result.sha256}, candidate-bound database promotion evidence, and mandatory CI artifact retention are validated in source.`);
