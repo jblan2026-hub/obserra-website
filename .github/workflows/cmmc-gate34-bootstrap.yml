@@ -39,7 +39,8 @@ jobs:
 
       - name: Commit generated artifacts
         run: |
-          if git diff --quiet -- docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.md docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.sha256; then
+          status="$(git status --porcelain -- docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.md docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.sha256)"
+          if [ -z "$status" ]; then
             echo "Generated evidence already current."
             exit 0
           fi
