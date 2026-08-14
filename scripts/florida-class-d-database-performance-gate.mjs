@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-const migrationPath = "supabase/migrations/20260813211000_fdacs_class_d_fk_performance_indexes.sql";
+const migrationPath = "supabase/migrations/20260814011203_fdacs_class_d_fk_performance_indexes.sql";
 const migration = fs.readFileSync(migrationPath, "utf8");
 const securityMigration = fs.readFileSync("supabase/migrations/20260813204215_fdacs_class_d_security_hardening.sql", "utf8");
 const handoff = fs.readFileSync("docs/florida-class-d-lms/GATE-28-DATABASE-PERFORMANCE-HANDOFF.md", "utf8");
