@@ -13,6 +13,9 @@ on:
       - lib/unified-entitlements.ts
       - lib/release-delivery.ts
       - next.config.ts
+      - package.json
+      - package-lock.json
+      - vercel.json
       - .env.example
       - .vercelignore
       - docs/CYBER-CRISIS-COMMANDER-SALES-HANDOFF.md
@@ -28,6 +31,9 @@ on:
       - lib/unified-entitlements.ts
       - lib/release-delivery.ts
       - next.config.ts
+      - package.json
+      - package-lock.json
+      - vercel.json
       - .env.example
       - .vercelignore
       - docs/CYBER-CRISIS-COMMANDER-SALES-HANDOFF.md
@@ -78,10 +84,14 @@ jobs:
             echo "commercial_status=Coming Soon"
             echo "launch_setting=APP_LAUNCH_OBSERRA_CYBER_CRISIS_COMMANDER"
             echo "vercel_lockfile_required=package-lock.json"
+            echo "vercel_install_command=npm ci"
+            echo "node_runtime=22.x"
           } > security-evidence/application-sales-handoff-context.txt
           sha256sum \
             .vercelignore \
+            package.json \
             package-lock.json \
+            vercel.json \
             app/apps/appsData.ts \
             app/apps/storefront.ts \
             app/apps/commerce.ts \
