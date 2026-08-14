@@ -26,7 +26,7 @@ assert(media.includes('privacy: "private"') && media.includes('enforce_unique_us
 assert(media.includes('room_name: room.name') && media.includes('eject_at_token_exp: true') && media.includes('exp: now +'), "meeting tokens are room scoped, expiring, and eject at expiration");
 assert(media.includes('user_id: student.enrollmentId') && media.includes('is_owner: false'), "student Daily identity is bound to the regulated enrollment and is not owner privileged");
 assert(media.includes('enable_screenshare: false') && media.includes('canSend: ["video", "audio"]'), "student token cannot screen share and is limited to camera and microphone media");
-assert(media.includes('user_id: shortInstructorId(userId)') && media.includes('is_owner: true') && media.includes('enable_screenshare: true'), "instructor token is separately identified and can present course material");
+assert(media.includes('user_id: shortInstructorId(actor.userId)') && media.includes('is_owner: true') && media.includes('enable_screenshare: true'), "the authenticated assigned instructor token is separately identified and can present course material");
 assert(media.includes('enable_recording_ui: false') && media.includes('recordingEnabled: false'), "recording controls remain disabled by default");
 assert(media.includes('enable_chat: false') && media.includes('enable_hand_raising: false'), "provider chat and hand raise are disabled so regulated LMS interaction records remain authoritative");
 assert(!media.includes('NEXT_PUBLIC_DAILY') && !studentApi.includes('OBSERRA_FDACS_DAILY_API_KEY') && !instructorApi.includes('OBSERRA_FDACS_DAILY_API_KEY'), "Daily API key is never exposed through browser routes or public configuration");

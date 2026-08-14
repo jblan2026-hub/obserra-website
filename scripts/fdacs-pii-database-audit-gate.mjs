@@ -8,6 +8,9 @@ const files = {
   investigator: "supabase/migrations/20260814173000_fdacs_class_d_investigator_audit_access.sql",
   performance: "supabase/migrations/20260814174000_fdacs_class_d_audit_performance_and_explicit_deny.sql",
   functionHardening: "supabase/migrations/20260814175000_fdacs_class_d_trigger_function_execute_hardening.sql",
+  ownerUat: "supabase/migrations/20260814210337_fdacs_class_d_owner_real_identity_uat.sql",
+  ownerUatInstructionSafety: "supabase/migrations/20260814213309_fdacs_class_d_owner_uat_instruction_safety.sql",
+  ownerUatLiveExecution: "supabase/migrations/20260814215217_fdacs_class_d_owner_uat_live_execution_and_instructor_provisioning.sql",
   manifest: "scripts/florida-class-d-migration-manifest.mjs",
   cmmcSource: "docs/compliance/CMMC-SYSTEM-SCOPE-SOURCE.json",
 };
@@ -26,7 +29,7 @@ function rejectText(label, value, rejected) {
 }
 
 const sql = Object.fromEntries(Object.entries(files).map(([key, path]) => [key, read(path)]));
-const combined = `${sql.boundary}\n${sql.archive}\n${sql.identity}\n${sql.investigator}\n${sql.performance}\n${sql.functionHardening}`;
+const combined = `${sql.boundary}\n${sql.archive}\n${sql.identity}\n${sql.investigator}\n${sql.performance}\n${sql.functionHardening}\n${sql.ownerUat}\n${sql.ownerUatInstructionSafety}\n${sql.ownerUatLiveExecution}`;
 
 for (const expected of [
   "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
@@ -100,6 +103,9 @@ for (const migration of [
   "20260814173000_fdacs_class_d_investigator_audit_access.sql",
   "20260814174000_fdacs_class_d_audit_performance_and_explicit_deny.sql",
   "20260814175000_fdacs_class_d_trigger_function_execute_hardening.sql",
+  "20260814210337_fdacs_class_d_owner_real_identity_uat.sql",
+  "20260814213309_fdacs_class_d_owner_uat_instruction_safety.sql",
+  "20260814215217_fdacs_class_d_owner_uat_live_execution_and_instructor_provisioning.sql",
 ]) requireText("migration manifest", sql.manifest, migration);
 
 for (const expected of [
@@ -116,6 +122,45 @@ for (const expected of [
   "from public, anon, authenticated",
   "to service_role",
 ]) requireText("trigger function execute hardening", sql.functionHardening, expected);
+
+for (const expected of [
+  "owner_uat_noncredit",
+  "interval '14 days'",
+  "capacity,status",
+  "training_credit_eligible boolean not null default true",
+  "fdacs_class_d_completion_noncredit_guard",
+  "fdacs_class_d_lias_noncredit_guard",
+  "fdacs_class_d_identity_self_attestation_guard",
+  "fdacs_class_d_daily_identity_self_attestation_guard",
+  "fdacs_class_d_daily_attendance_self_attestation_guard",
+  "live Stripe Identity evidence",
+  "distinct assigned Class DI instructor",
+  "from public,anon,authenticated,service_role",
+  "to service_role",
+]) requireText("owner real-identity UAT", sql.ownerUat, expected);
+
+for (const expected of [
+  "fdacs_class_d_publish_owner_uat_schedule",
+  "verified active Class DI instructor record",
+  "v_instructor_license_number,null,'FL'",
+  "'schoolLicenseClaimed',false",
+  "fdacs_class_d_reject_student_self_attestation",
+  "Class DI instructor assigned to the enrollment cohort",
+  "from public,anon,authenticated,service_role",
+  "to service_role",
+]) requireText("owner UAT instruction safety", sql.ownerUatInstructionSafety, expected);
+
+for (const expected of [
+  "fdacs_class_d_start_live_session",
+  "only the assigned Class DI instructor may start an owner UAT lesson",
+  "fdacs_class_d_archive_and_register_instructor_file",
+  "fdacs_class_d_owner_uat_instructor_readiness",
+  "fdacs_class_d_verified_active_instructor_expiry_check",
+  "regulated_personnel_pii",
+  "set search_path = ''",
+  "from public,anon,authenticated,service_role",
+  "to service_role",
+]) requireText("owner UAT live execution", sql.ownerUatLiveExecution, expected);
 
 for (const forbidden of [
   "grant select on table public.fdacs_class_d_investigator_audit_exports to anon",
@@ -135,11 +180,11 @@ for (const claim of ["Live verification", "forced-RLS/browser-deny", "remain unv
   if (!fdacsSystem.claimBoundary.includes(claim)) throw new Error(`FDACS PII database audit gate: CMMC claim boundary is missing ${claim}`);
 }
 for (const mapping of fdacsSystem.controlMappings ?? []) {
-  for (const artifactId of ["EV-FDACS-AUDIT-SQL", "EV-FDACS-DENY-SQL", "EV-FDACS-AUDIT-GATE", "EV-FDACS-LIVE-RECEIPT"]) {
+  for (const artifactId of ["EV-FDACS-AUDIT-SQL", "EV-FDACS-DENY-SQL", "EV-FDACS-OWNER-UAT-INSTRUCTION-SAFETY-SQL", "EV-FDACS-OWNER-UAT-LIVE-EXECUTION-SQL", "EV-FDACS-AUDIT-GATE", "EV-FDACS-LIVE-RECEIPT"]) {
     if (!mapping.artifactIds?.includes(artifactId)) throw new Error(`FDACS PII database audit gate: ${mapping.baseline} mapping is missing ${artifactId}`);
   }
   if (!mapping.claimBoundary.includes("exact-release")) throw new Error(`FDACS PII database audit gate: ${mapping.baseline} must preserve the exact-release claim boundary`);
 }
 
 const sha256 = crypto.createHash("sha256").update(combined).digest("hex");
-console.log(`FDACS PII database audit gate passed: isolated retention, automatic archival, daily identity/attendance, investigator export, exact-release CMMC security-protocol mapping, and five independent hash-chain verifiers are present. Source SHA-256 ${sha256}.`);
+console.log(`FDACS PII database audit gate passed: isolated retention, automatic archival, daily identity/attendance, assigned-DI owner-UAT live execution with encrypted instructor provisioning, investigator export, exact-release CMMC security-protocol mapping, and five independent hash-chain verifiers are present. Source SHA-256 ${sha256}.`);

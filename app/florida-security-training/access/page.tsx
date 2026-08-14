@@ -4,12 +4,31 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { LockKeyhole, ShieldCheck } from "lucide-react";
 import { getFloridaClassDIdentityVerificationStatus } from "../../../lib/florida-class-d-identity-verification";
+import { listFloridaClassDStudentLiveSessions } from "../../../lib/florida-class-d-live-persistence";
 import "../florida-security-training.css";
 
 export const metadata: Metadata = {
   title: "Class D Controlled Course Access | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   robots: { index: false, follow: false },
 };
+
+function sessionTime(value: string, timeZone: string) {
+  const parsed = new Date(value);
+  if (!Number.isFinite(parsed.getTime())) return "Schedule pending";
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone,
+      timeZoneName: "short",
+    }).format(parsed);
+  } catch {
+    return parsed.toISOString();
+  }
+}
 
 export default async function FloridaClassDControlledAccessPage() {
   const { userId } = await auth();
@@ -30,6 +49,14 @@ export default async function FloridaClassDControlledAccessPage() {
     status?.instructionalAccessGranted &&
     ["enrolled", "in_progress", "instruction_complete", "exam_eligible"].includes(status.enrollmentStatus ?? ""),
   );
+  let liveSessions: Awaited<ReturnType<typeof listFloridaClassDStudentLiveSessions>> = [];
+  if (active) {
+    try {
+      liveSessions = await listFloridaClassDStudentLiveSessions(userId);
+    } catch {
+      unavailable = true;
+    }
+  }
 
   return (
     <main className="fl-classd">
@@ -51,10 +78,30 @@ export default async function FloridaClassDControlledAccessPage() {
           </div>
         )}
         <div className="fl-classd__actions">
+          {!status?.enrollmentId ? <Link href="/florida-security-training/enroll">Begin controlled enrollment</Link> : null}
           {!status?.instructorAttestationRecorded && status?.enrollmentId ? <Link href="/florida-security-training/identity">Complete identity verification</Link> : null}
           <Link className="secondary" href="/florida-security-training">Return to course information</Link>
         </div>
       </section>
+      {active ? (
+        <section className="fl-classd__section">
+          <h2>Assigned live lessons</h2>
+          <p>Use these release-bound lesson links. Video access remains locked until the assigned instructor starts the lesson and today&apos;s identity check is recorded.</p>
+          {liveSessions.length ? (
+            <div className="fl-classd__automation-grid">
+              {liveSessions.map((session) => (
+                <div key={session.id}>
+                  <b>Day {session.day} · {session.lesson_id}</b>
+                  <span>{sessionTime(session.scheduled_start_at, session.time_zone)} · {session.status}</span>
+                  <Link href={`/florida-security-training/live/${encodeURIComponent(session.id)}`}>Open controlled classroom</Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="fl-classd__notice"><span>No assigned live lessons are currently available.</span></div>
+          )}
+        </section>
+      ) : null}
     </main>
   );
 }

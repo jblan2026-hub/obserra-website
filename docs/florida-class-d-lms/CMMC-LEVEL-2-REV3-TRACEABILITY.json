@@ -180,7 +180,7 @@
     {
       "id": "TR-014", "title": "Regulated migration manifest and database promotion binding", "status": "implemented_source_evidence",
       "rev3": ["03.04.01", "03.04.03", "03.04.04", "03.04.11", "03.12.01", "03.16.01"], "rev2": ["3.4.1", "3.4.3", "3.4.4", "3.12.1", "3.12.4"],
-      "implementation": "Gate 29 produces a deterministic regulated migration manifest and binds database promotion to the exact candidate SHA, latest migration version, and manifest digest. Gate 37 reconciles the complete 35-file lineage through version 20260814175000 and pins manifest SHA-256 40eb88f6b8cb6ce2716eb260cde7f29d69d78f0a201e90cd6373ac1ebf2be090; no migration is executed by this source gate.",
+      "implementation": "Gate 29 produces a deterministic regulated migration manifest and binds database promotion to the exact candidate SHA, latest migration version, and manifest digest. Gate 38 plus its independent-verification remediations reconcile the complete 38-file lineage through version 20260814215217 and pin manifest SHA-256 e44a728ba49b26b51aab2723906e95a08eaba42c5f623a7340ce61ef7d5a1d72. Production runtime authorization remains false.",
       "evidence": ["scripts/florida-class-d-migration-manifest.mjs", "scripts/florida-class-d-migration-parity-gate.mjs", "docs/florida-class-d-lms/GATE-29-MIGRATION-PARITY-HANDOFF.md"],
       "methods": ["examine", "test"], "boundary": "Obserra GitHub and Supabase", "gap": "Production Class D database promotion is intentionally not authorized or performed."
     },

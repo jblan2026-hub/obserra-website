@@ -10,7 +10,7 @@ const studentApi = read("app/api/florida-class-d/live/route.ts");
 const adminApi = read("app/api/florida-class-d/admin/live/route.ts");
 const studentUi = read("app/florida-security-training/live/[liveSessionId]/LiveClassroom.tsx");
 const instructorUi = read("app/florida-security-training/admin/live/[liveSessionId]/InstructorLiveConsole.tsx");
-const handoff = read("docs/florida-class-d-lms/HANDOFF.md");
+const handoff = read("docs/florida-class-d-lms/GATE-9-PARTICIPATION-HANDOFF.md");
 
 function requireText(source, value, message) {
   if (!source.includes(value)) throw new Error(message);
@@ -66,6 +66,6 @@ requireText(studentUi, "Correct-answer data is not exposed through the student l
 requireText(instructorUi, "Structured live poll", "Instructor console must expose the structured poll builder.");
 requireText(instructorUi, "Current poll responses", "Instructor console must expose current poll response count.");
 requireText(instructorUi, "participationLabel", "Instructor roster must display per-student participation evidence.");
-requireText(handoff, "## Gate 9 — Structured Live Polls and Participation Analytics", "The Class D handoff must record Gate 9 polling and analytics controls.");
+requireText(handoff, "## Gate 9 — Structured Live Polls and Participation Analytics", "The dedicated Class D Gate 9 handoff must record polling and analytics controls.");
 
 console.log("Florida Class D Gate 9 passed: structured live polls, one-response controls, student-safe payloads, instructor analytics, and participation evidence validated in source.");

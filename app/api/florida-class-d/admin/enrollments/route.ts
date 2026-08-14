@@ -4,11 +4,15 @@ import {
   requireFloridaClassDStaff,
 } from "../../../../../lib/florida-class-d-auth";
 import {
+  activateFloridaClassDOwnerUatEnrollment,
   assignFloridaClassDCohort,
   FloridaClassDPersistenceError,
   listFloridaClassDPendingEnrollments,
   reviewFloridaClassDEnrollment,
 } from "../../../../../lib/florida-class-d-persistence";
+import {
+  floridaClassDOwnerUatExecutionAuthorized,
+} from "../../../../../lib/florida-class-d-owner-uat";
 
 const responseHeaders = {
   "cache-control": "private, no-store, max-age=0, must-revalidate",
@@ -104,6 +108,25 @@ export async function POST(request: Request) {
       );
       return NextResponse.json(
         { action: "review", reviewId, correlationId, outcome: body.outcome },
+        { headers: responseHeaders },
+      );
+    }
+
+    if (body.action === "activate_owner_uat") {
+      if (!floridaClassDOwnerUatExecutionAuthorized()) {
+        return NextResponse.json(
+          { error: "Exact-release owner UAT is not authorized.", code: "FDACS_OWNER_UAT_NOT_AUTHORIZED" },
+          { status: 503, headers: responseHeaders },
+        );
+      }
+      const result = await activateFloridaClassDOwnerUatEnrollment(
+        { userId: actor.userId, role: actor.role },
+        body.enrollmentId,
+        process.env.VERCEL_GIT_COMMIT_SHA?.trim() || "",
+        correlationId,
+      );
+      return NextResponse.json(
+        { action: "activate_owner_uat", correlationId, result },
         { headers: responseHeaders },
       );
     }

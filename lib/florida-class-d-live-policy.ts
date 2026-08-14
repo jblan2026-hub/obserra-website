@@ -1,5 +1,6 @@
 import "server-only";
 
+import { floridaClassDOwnerUatExecutionAuthorized } from "./florida-class-d-owner-uat";
 import { floridaClassDProductionActivationAuthorized } from "./florida-class-d-production-activation";
 
 export const FLORIDA_CLASS_D_LIVE_POLICY = {
@@ -26,6 +27,7 @@ export const FLORIDA_CLASS_D_LIVE_POLICY = {
   pollsEnabled: true,
   interactionRetentionRequired: true,
   globalProductionActivationRequired: true,
+  ownerUatIsPreviewOnlyAndNoncredit: true,
 } as const;
 
 function enabled(value: string | undefined) {
@@ -33,12 +35,19 @@ function enabled(value: string | undefined) {
 }
 
 export function floridaClassDLiveInstructionEnabled() {
+  const productionAuthorized = floridaClassDProductionActivationAuthorized();
+  const ownerUatAuthorized = floridaClassDOwnerUatExecutionAuthorized();
   return (
-    floridaClassDProductionActivationAuthorized() &&
-    enabled(process.env.OBSERRA_FDACS_CLASS_D_LIVE_ENABLED) &&
-    process.env.OBSERRA_FDACS_DS_LICENSE_STATUS?.trim().toLowerCase() === "active" &&
-    Boolean(process.env.OBSERRA_FDACS_DS_LICENSE_NUMBER?.trim()) &&
-    Boolean(process.env.OBSERRA_FDACS_DI_LICENSE_NUMBER?.trim())
+    enabled(process.env.OBSERRA_FDACS_CLASS_D_LIVE_ENABLED)
+    && (
+      ownerUatAuthorized
+      || (
+        productionAuthorized
+        && process.env.OBSERRA_FDACS_DS_LICENSE_STATUS?.trim().toLowerCase() === "active"
+        && Boolean(process.env.OBSERRA_FDACS_DS_LICENSE_NUMBER?.trim())
+        && Boolean(process.env.OBSERRA_FDACS_DI_LICENSE_NUMBER?.trim())
+      )
+    )
   );
 }
 

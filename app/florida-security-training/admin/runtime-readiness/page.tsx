@@ -4,6 +4,11 @@ import {
   getFloridaClassDProductionRuntimeReadiness,
   type FloridaClassDRuntimeReadinessReport,
 } from "../../../../lib/florida-class-d-runtime-readiness";
+import {
+  getFloridaClassDOwnerUatReport,
+  type FloridaClassDOwnerUatReport,
+} from "../../../../lib/florida-class-d-owner-uat";
+import ProviderReadinessPanel from "./ProviderReadinessPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -36,10 +41,28 @@ function ReadinessChecks({ report }: { report: FloridaClassDRuntimeReadinessRepo
   );
 }
 
+function OwnerUatChecks({ report }: { report: FloridaClassDOwnerUatReport }) {
+  return (
+    <div className="fdacs-completion-admin__grid">
+      {report.checks.map((item) => (
+        <article key={`owner-uat:${item.key}`} className="fdacs-completion-admin__card">
+          <div className="fdacs-completion-admin__card-head">
+            <strong>{item.key.replaceAll("_", " ")}</strong>
+            <span>{item.ready ? "READY" : "BLOCKED"}</span>
+          </div>
+          <p>{item.detail}</p>
+          <small>{item.sensitive ? "Sensitive value suppressed" : "No secret value involved"}</small>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 export default async function FloridaClassDRuntimeReadinessPage() {
   await requireFloridaClassDStaff(["school_admin", "compliance_admin"]);
   const production = getFloridaClassDProductionRuntimeReadiness();
   const nonProduction = getFloridaClassDNonProductionAcceptanceReadiness();
+  const ownerUat = getFloridaClassDOwnerUatReport();
 
   return (
     <main className="fdacs-live fdacs-completion-admin">
@@ -78,6 +101,28 @@ export default async function FloridaClassDRuntimeReadinessPage() {
           <strong>Status: {nonProductionStatus(nonProduction)}</strong>
         </p>
         <ReadinessChecks report={nonProduction} />
+      </section>
+
+      <ProviderReadinessPanel />
+
+      <section className="fdacs-live__panel">
+        <h2>Owner real-identity UAT readiness</h2>
+        <p>
+          This distinct Vercel Preview profile uses the production database and live hosted providers for one
+          exact release. It is owner-only, expires within fourteen days, is never eligible for training credit,
+          and is blocked by the database from creating completion or LIAS records.
+        </p>
+        <p>
+          <strong>Status: {ownerUat.authorized ? "READY FOR NON-CREDIT OWNER UAT" : "FAIL CLOSED"}</strong>
+        </p>
+        <OwnerUatChecks report={ownerUat} />
+        <p>
+          <a href="/florida-security-training/admin/instructor-file">Provision the distinct verified Class DI instructor</a>
+          {" · "}
+          <a href="/florida-security-training/admin/schedule">Publish the exact-release owner-UAT schedule</a>
+          {" · "}
+          <a href="/florida-security-training/admin/enrollments">Activate the verified non-credit enrollment</a>
+        </p>
       </section>
 
       <section className="fdacs-live__panel">

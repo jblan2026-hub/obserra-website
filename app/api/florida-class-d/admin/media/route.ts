@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     if (!liveSessionId) {
       return NextResponse.json({ error: "Live session id is required.", code: "FDACS_MEDIA_SESSION_REQUIRED" }, { status: 400, headers });
     }
-    const access = await getFloridaClassDInstructorMediaAccess(actor.userId, liveSessionId);
+    const access = await getFloridaClassDInstructorMediaAccess(actor, liveSessionId);
     return NextResponse.json(access, { headers });
   } catch (error) {
     return errorResponse(error);

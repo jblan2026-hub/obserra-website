@@ -4,6 +4,7 @@ import {
   getFloridaClassDNonProductionAcceptanceReadiness,
   getFloridaClassDProductionRuntimeReadiness,
 } from "../../../../../lib/florida-class-d-runtime-readiness";
+import { getFloridaClassDOwnerUatReport } from "../../../../../lib/florida-class-d-owner-uat";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export async function GET() {
         readiness: getFloridaClassDProductionRuntimeReadiness(),
         production: getFloridaClassDProductionRuntimeReadiness(),
         nonProductionAcceptance: getFloridaClassDNonProductionAcceptanceReadiness(),
+        ownerUatRealIdentity: getFloridaClassDOwnerUatReport(),
       },
       { status: 200, headers },
     );

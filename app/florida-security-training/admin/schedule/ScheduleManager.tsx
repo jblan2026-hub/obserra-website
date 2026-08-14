@@ -14,6 +14,7 @@ type ScheduledLesson = {
 };
 
 type ScheduleResponse = {
+  cohortId?: string;
   lessonCount?: number;
   lessons?: ScheduledLesson[];
   correlationId?: string;
@@ -44,7 +45,13 @@ async function publishSchedule(body: Record<string, unknown>) {
   return payload as ScheduleResponse;
 }
 
-export default function ScheduleManager() {
+export default function ScheduleManager({
+  ownerUatRequested,
+  ownerUatAuthorized,
+}: {
+  ownerUatRequested: boolean;
+  ownerUatAuthorized: boolean;
+}) {
   const [cohortId, setCohortId] = useState("");
   const [instructorClerkUserId, setInstructorClerkUserId] = useState("");
   const [trainingDates, setTrainingDates] = useState(["", "", "", "", ""]);
@@ -67,6 +74,26 @@ export default function ScheduleManager() {
 
   function setDate(index: number, value: string) {
     setTrainingDates((current) => current.map((date, currentIndex) => currentIndex === index ? value : date));
+  }
+
+  async function prepareOwnerUatCohort() {
+    if (!ownerUatAuthorized) return;
+    if (!window.confirm("Prepare the capacity-one, non-credit cohort bound to this exact Preview release and its expiring authorization evidence?")) return;
+    setBusy(true);
+    setError(null);
+    setResult(null);
+    try {
+      const payload = await publishSchedule({
+        action: "prepare_owner_uat",
+        correlationId: crypto.randomUUID(),
+      });
+      if (!payload.cohortId) throw new Error("The exact-release cohort identifier was not returned.");
+      setCohortId(payload.cohortId);
+    } catch (preparationError) {
+      setError(preparationError instanceof Error ? preparationError.message : "The exact-release owner UAT cohort could not be prepared.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function submit(event: FormEvent) {
@@ -95,7 +122,7 @@ export default function ScheduleManager() {
         </div>
         <div className="fdacs-live__status">
           <strong>5 DAYS · 20 LIVE LESSONS</strong>
-          <small>Schedule publishing remains behind the regulated production gate.</small>
+          <small>{ownerUatRequested ? "Exact-release owner UAT · non-credit" : "Schedule publishing remains behind the regulated production gate."}</small>
         </div>
       </header>
 
@@ -106,8 +133,18 @@ export default function ScheduleManager() {
         <section className="fdacs-live__panel">
           <div className="fdacs-live__panel-head"><h2>Publish cohort schedule</h2><span>controlled</span></div>
           <p className="fdacs-live__muted">Select the five actual instructional dates, local start time, Florida facility time zone, cohort, and licensed instructor account. The server creates four 120-minute live sessions for each day with 15-minute intervals between Lessons 1, 2, and 3.</p>
+          <p className="fdacs-live__muted">The assigned instructor must first have a verified-active record in the <a href="/florida-security-training/admin/instructor-file">Class DI provisioning control</a>.</p>
+          {ownerUatRequested ? (
+            <div className="fdacs-live__panel">
+              <strong>{ownerUatAuthorized ? "Exact-release owner UAT authorization is ready." : "Owner UAT remains fail closed."}</strong>
+              <p>Prepare the capacity-one cohort from the controlled release and expiry values; do not enter or invent a cohort identifier.</p>
+              <button type="button" disabled={busy || !ownerUatAuthorized} onClick={() => void prepareOwnerUatCohort()}>
+                {busy ? "Preparing…" : cohortId ? "Reconfirm exact-release cohort" : "Prepare exact-release owner UAT cohort"}
+              </button>
+            </div>
+          ) : null}
           <form className="fdacs-live__form fdacs-schedule__form" onSubmit={submit}>
-            <label>Cohort UUID<input value={cohortId} onChange={(event) => setCohortId(event.target.value)} placeholder="00000000-0000-0000-0000-000000000000" required /></label>
+            <label>Cohort UUID<input value={cohortId} onChange={(event) => setCohortId(event.target.value)} placeholder="00000000-0000-0000-0000-000000000000" readOnly={ownerUatRequested} required /></label>
             <label>Licensed instructor Clerk user ID<input value={instructorClerkUserId} onChange={(event) => setInstructorClerkUserId(event.target.value)} placeholder="user_..." required /></label>
             <div className="fdacs-schedule__dates">
               {DAYS.map((day, index) => <label key={day}>Day {day}<input type="date" value={trainingDates[index]} onChange={(event) => setDate(index, event.target.value)} required /></label>)}
@@ -116,7 +153,7 @@ export default function ScheduleManager() {
               <label>Daily instruction start<input type="time" value={dayStartLocal} onChange={(event) => setDayStartLocal(event.target.value)} required /></label>
               <label>Facility time zone<select value={timeZone} onChange={(event) => setTimeZone(event.target.value)}><option value="America/New_York">Florida Eastern · America/New_York</option><option value="America/Chicago">Florida Central · America/Chicago</option></select></label>
             </div>
-            <button type="submit" disabled={busy}>{busy ? "Publishing…" : "Publish 5-day / 20-lesson schedule"}</button>
+            <button type="submit" disabled={busy || !cohortId}>{busy ? "Publishing…" : "Publish 5-day / 20-lesson schedule"}</button>
           </form>
         </section>
 
@@ -133,7 +170,7 @@ export default function ScheduleManager() {
         <section className="fdacs-live__panel fdacs-schedule__results">
           <div className="fdacs-live__panel-head"><h2>Generated regulated sessions</h2><span>{result.lessons.length}</span></div>
           <div className="fdacs-schedule__session-list">
-            {result.lessons.map((lesson) => <div key={lesson.live_session_id ?? lesson.lesson_id}><strong>{lesson.lesson_id}</strong><span>Day {lesson.training_day}</span><span>{lesson.scheduled_start_at ? new Date(lesson.scheduled_start_at).toLocaleString() : "Scheduled"}</span><code>{lesson.live_session_id}</code></div>)}
+            {result.lessons.map((lesson) => <div key={lesson.live_session_id ?? lesson.lesson_id}><strong>{lesson.lesson_id}</strong><span>Day {lesson.training_day}</span><span>{lesson.scheduled_start_at ? new Date(lesson.scheduled_start_at).toLocaleString() : "Scheduled"}</span><code>{lesson.live_session_id}</code>{lesson.live_session_id ? <><a href={`/florida-security-training/admin/live/${encodeURIComponent(lesson.live_session_id)}`}>Instructor console</a><a href={`/florida-security-training/live/${encodeURIComponent(lesson.live_session_id)}`}>Student classroom</a></> : null}</div>)}
           </div>
         </section>
       ) : null}

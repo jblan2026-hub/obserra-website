@@ -2,7 +2,7 @@
 
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update `CMMC-LEVEL-2-REV3-TRACEABILITY.json` and run `npm run generate:cmmc-traceability`.
 
-Registry SHA-256: `c443e65c6893fc7d251b176bb8a98e60a486520fe3fc4bff15d219a0154d6f92`
+Registry SHA-256: `894c8dc72b798bb410aaf5198efce9d1fe26eafb7eada22d8fb2f33a25223bac`
 Registry schema version: `1.0`
 Registry snapshot date: `2026-08-13`
 Source checkpoint represented by the register: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
@@ -455,7 +455,7 @@ Assessment methods: `examine`, `test`
 
 Responsible boundary: Obserra GitHub and Supabase
 
-Gate 29 produces a deterministic regulated migration manifest and binds database promotion to the exact candidate SHA, latest migration version, and manifest digest. Gate 37 reconciles the complete 35-file lineage through version 20260814175000 and pins manifest SHA-256 40eb88f6b8cb6ce2716eb260cde7f29d69d78f0a201e90cd6373ac1ebf2be090; no migration is executed by this source gate.
+Gate 29 produces a deterministic regulated migration manifest and binds database promotion to the exact candidate SHA, latest migration version, and manifest digest. Gate 38 plus its independent-verification remediations reconcile the complete 38-file lineage through version 20260814215217 and pin manifest SHA-256 e44a728ba49b26b51aab2723906e95a08eaba42c5f623a7340ce61ef7d5a1d72. Production runtime authorization remains false.
 
 Evidence:
 

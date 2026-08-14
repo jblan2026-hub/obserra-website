@@ -5,16 +5,22 @@
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 - **System:** `SYS-FDACS-DATABASE` — FDACS isolated student-record PII database
 - **Live project:** `OBSERRA FDACS Student Records Production` (`ggkxgjhsbgbifiqrhavr`, `us-east-1`)
-- **Observed:** `2026-08-14T17:57:49.805602Z`
+- **Observed:** `2026-08-14T22:43:09.105533Z`
 - **State:** `live_hardened_activation_pending`
 - **Production runtime authorized:** `false`
-- **Evidence schema:** `docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.schema.json` (SHA-256 `88c031c8a8d8257d15148f8ad62ed7ed7d0aaf4cd31032acb67e1b6f640cadf0`)
+- **Evidence schema:** `docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.schema.json` (SHA-256 `25bedfad1ce177a488a83ec8ff6cf6307d2f24766b5c6961319844608da00a8f`)
 
 ## Live result
 
-6 forward migrations are live. The isolated project contains 64 FDACS tables, 0 non-FDACS tables, 64 explicit restrictive browser-deny policies, 0 browser table privileges, 0 browser execute privileges across 102 FDACS routines, and 0 FDACS tables without forced RLS.
+9 forward migrations are live. The isolated project contains 64 FDACS tables, 0 non-FDACS tables, 64 explicit restrictive browser-deny policies, 0 browser table privileges, 0 browser execute privileges across 114 FDACS routines, and 0 FDACS tables without forced RLS.
 
-Supabase security advisor findings: 0. Unindexed foreign-key findings: 0. Remaining performance observations are informational: 104 unused-index notices on the empty/pre-production workload and 1 Auth allocation notice.
+Supabase security advisor findings: 0. Unindexed foreign-key findings: 0. Remaining performance observations are informational: 102 unused-index notices on the empty/pre-production workload and 1 Auth allocation notice.
+
+## Exact-release owner UAT boundary
+
+Provider migrations `20260814211645` and `20260814213942` establish a capacity-1, Preview-only, non-credit `owner_uat_noncredit` profile. It is bound to an exact release and authorization-evidence digest, expires within 14 days, requires live hosted identity plus a distinct assigned verified-active Class DI instructor, records no Class DS school-license claim for UAT, and cannot coexist with database production authorization.
+
+Transactional live negative tests passed and were rolled back: expiry beyond 14 days rejected `true`; production authorization with unverified gates rejected `true`; wrong-release schedule rejected `true`; schedule without a verified-active assigned DI rejected `true`; valid UAT cohort created then rolled back `true`. Live cohort, enrollment, and session counts remain 0, 0, and 0.
 
 ## Governing FDACS requirements
 
@@ -27,13 +33,17 @@ Supabase security advisor findings: 0. Unindexed foreign-key findings: 0. Remain
 
 | Check | Technical state | Result |
 | --- | --- | --- |
-| `FDACS-DB-SOURCE-GATE` | `not_tested` | The isolated retention, archive, identity/attendance, investigator export, CMMC binding, and chain-verifier source contract was satisfied locally, but the source revision is unpublished and is not an authoritative green technical result. |
-| `FDACS-DB-LIVE-MIGRATIONS` | `passed` | Six forward migrations applied transactionally to the isolated live project. |
-| `FDACS-DB-LIVE-ACCESS-BOUNDARY` | `passed` | Zero browser table privileges, zero browser execute privileges across 102 FDACS routines, zero non-FDACS tables, all FDACS tables forced-RLS, and 64 explicit restrictive deny policies. |
-| `FDACS-DB-LIVE-FUNCTION-BOUNDARY` | `passed` | The last inherited trigger-function execute grant was removed live; anon and authenticated now have zero execute privileges across all FDACS routines. All 49 legacy security-definer routines with a fixed public search path are protected by zero anon/authenticated CREATE privilege on that schema. |
+| `FDACS-DB-SOURCE-GATE` | `passed` | The isolated retention, archive, identity/attendance, investigator export, CMMC binding, and chain-verifier source contract is published at exact GitHub merge commit 2dde838ee176e6f450abeca2daad96ab377ed931 and the fail-closed source gate passed against that revision. |
+| `FDACS-DB-LIVE-MIGRATIONS` | `passed` | Nine forward hardening migrations are live in the isolated project; the provider ledger contains 38 total FDACS migrations and ends with provider version 20260814223854. |
+| `FDACS-DB-LIVE-ACCESS-BOUNDARY` | `passed` | Zero browser table privileges, zero browser execute privileges across 114 FDACS routines, zero non-FDACS tables, all 64 FDACS tables forced-RLS, and 64 explicit restrictive deny policies. |
+| `FDACS-DB-LIVE-FUNCTION-BOUNDARY` | `passed` | Anon and authenticated have zero execute privileges across all FDACS routines. Fifty-five security-definer routines use an empty search path; the 46 legacy routines fixed to public remain protected by zero anon/authenticated CREATE privilege on that schema. |
 | `FDACS-DB-LIVE-CHAIN-VERIFIERS` | `passed` | All five chain verifiers returned valid with zero failures; record-access and investigator-export chains each contain the real preflight event. |
 | `FDACS-DB-LIVE-EXPORT-GENERATION` | `passed` | A real boundary-scoped export was generated and its payload digest independently recomputed and matched. |
 | `FDACS-DB-LIVE-EXPORT-FAIL-CLOSED` | `passed` | Negative tests rejected an unauthorized actor, rejected finalization without the exact matching protected artifact, and rejected delivery before finalization; the ledger remained one generated event with zero finalized or delivered events. |
+| `FDACS-DB-OWNER-UAT-CONTROLS` | `passed` | The exact-release owner UAT profile is Preview-only, capacity one, expires within 14 days, requires live hosted identity and the distinct assigned verified-active Class DI instructor, is non-credit, and has database guards against completion, LIAS, and student self-attestation. |
+| `FDACS-DB-OWNER-UAT-INSTRUCTION-SAFETY` | `passed` | The service-role-only live schedule function requires the exact release and a verified-active assigned Class DI record, emits exactly 20 non-credit lessons, stores no Class DS school-license claim, and remains unavailable to anon and authenticated roles. |
+| `FDACS-DB-OWNER-UAT-NEGATIVE-TESTS` | `passed` | Transactional live tests rejected an expiry beyond 14 days, rejected production authorization while mandatory gates were false, rejected a schedule bound to the wrong release, rejected a schedule without a verified-active assigned Class DI, rejected owner-UAT live start by the wrong actor, rejected start without assigned DI evidence, and rejected verified-active provisioning without a bounded expiration; all test rows were rolled back. |
+| `FDACS-DB-OWNER-UAT-LIVE-EXECUTION` | `passed` | The assigned instructor alone may start an owner-UAT lesson; the start path requires the matching verified-active DI file, accepts no Class DS claim, and the atomic instructor RPC archives only encrypted qualification/license payloads through service-role-only functions with no browser grants. |
 | `FDACS-DB-ENCRYPTED-EXPORT-FINALIZATION` | `not_tested` | External AES-256-GCM key custody is not verified, so no protected inspection_export was fabricated and the export remains non-final. |
 | `FDACS-DB-BACKUP-RESTORE` | `not_tested` | A candidate-bound restore test has not been executed. |
 | `FDACS-DB-HA-FAILOVER` | `not_tested` | A candidate-bound HA failover test has not been executed. |
@@ -68,12 +78,12 @@ Only an exact-release, hashed protected `security_protocol_evidence` package can
 - Register a final exact-release SYS-FDACS-DATABASE CMMC security-protocol package after objective-level technical tests complete.
 - Verify external AES-256-GCM encryption-key custody and run a protected export finalization test.
 - Run and hash backup/restore and HA failover tests against the exact release candidate.
-- Run an authorized non-production or first-live student workflow to verify automatic enrollment/completion archival and the scoped student dossier.
+- Run the authorized exact-release owner UAT with live Stripe Identity, Daily, and a distinct assigned Class DI instructor to verify the real student dossier without awarding training credit.
 - Verify FDACS DS license and online method acceptance before authorizing the production runtime.
 - Complete the controlled FDACS investigator access and delivery walkthrough.
 
 ## Claim boundary
 
-This record proves the listed live database observations and negative fail-closed tests at the recorded time. It does not prove FDACS licensure, FDACS approval, CMMC certification, backup restoration, HA failover, encryption-key custody, a finalized encrypted investigator export, or a real student workflow.
+This record proves the listed live database observations, service-role-only encrypted instructor-provisioning schema, and transactional fail-closed owner-UAT controls at the recorded time. It does not prove FDACS licensure, FDACS approval, CMMC certification, external encryption-key custody, backup restoration, HA failover, a finalized encrypted investigator export, configured external UAT providers, a real instructor file, or a completed real student workflow.
 
 Machine-readable record: `docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json`. Paired digest: `docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256`.

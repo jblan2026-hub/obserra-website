@@ -6,11 +6,18 @@ import {
 import {
   floridaClassDPreEnrollmentEnabled,
 } from "../../../../lib/florida-class-d-enrollment-policy";
+import {
+  floridaClassDOwnerUatEvidenceSha256,
+  floridaClassDOwnerUatExecutionAuthorized,
+  floridaClassDOwnerUatProfileRequested,
+} from "../../../../lib/florida-class-d-owner-uat";
 import { floridaClassDProductionActivationAuthorized } from "../../../../lib/florida-class-d-production-activation";
+import { getFloridaClassDProviderReadiness } from "../../../../lib/florida-class-d-provider-readiness";
 import {
   createFloridaClassDPreEnrollment,
   FloridaClassDPersistenceError,
   getFloridaClassDEnrollmentStatusForUser,
+  listFloridaClassDOpenEnrollmentCohorts,
 } from "../../../../lib/florida-class-d-persistence";
 
 const responseHeaders = {
@@ -29,7 +36,25 @@ type PreEnrollmentRequest = {
 };
 
 function enrollmentEnabled() {
-  return floridaClassDProductionActivationAuthorized() && floridaClassDPreEnrollmentEnabled();
+  const authorized = floridaClassDOwnerUatProfileRequested()
+    ? floridaClassDOwnerUatExecutionAuthorized()
+    : floridaClassDProductionActivationAuthorized();
+  return authorized && floridaClassDPreEnrollmentEnabled();
+}
+
+function executionProfile() {
+  return floridaClassDOwnerUatProfileRequested()
+    ? "owner_uat_noncredit" as const
+    : "production" as const;
+}
+
+function deployedReleaseSha() {
+  return process.env.VERCEL_GIT_COMMIT_SHA?.trim().toLowerCase() || "";
+}
+
+async function ownerUatProviderReadiness(profile: "production" | "owner_uat_noncredit") {
+  if (profile !== "owner_uat_noncredit") return null;
+  return getFloridaClassDProviderReadiness();
 }
 
 function errorResponse(error: unknown) {
@@ -50,8 +75,25 @@ export async function GET() {
   try {
     const { userId } = await requireFloridaClassDSignedInUser();
     const enrollment = await getFloridaClassDEnrollmentStatusForUser(userId);
+    const profile = executionProfile();
+    const configured = enrollmentEnabled();
+    const providerReadiness = configured && !enrollment
+      ? await ownerUatProviderReadiness(profile)
+      : null;
+    const enabled = configured && (providerReadiness?.ready ?? true);
+    const cohorts = enabled && !enrollment
+      ? await listFloridaClassDOpenEnrollmentCohorts(profile, deployedReleaseSha())
+      : [];
     return NextResponse.json(
-      { enrollment, preEnrollmentEnabled: enrollmentEnabled() },
+      {
+        enrollment,
+        cohorts,
+        preEnrollmentEnabled: enabled,
+        executionProfile: profile,
+        trainingCreditEligible: profile === "production",
+        fdacsApprovalClaimed: false,
+        providerReadiness,
+      },
       { headers: responseHeaders },
     );
   } catch (error) {
@@ -61,6 +103,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const { userId } = await requireFloridaClassDSignedInUser();
     if (!enrollmentEnabled()) {
       return NextResponse.json(
         {
@@ -71,7 +114,19 @@ export async function POST(request: Request) {
       );
     }
 
-    const { userId } = await requireFloridaClassDSignedInUser();
+    const profile = executionProfile();
+    const providerReadiness = await ownerUatProviderReadiness(profile);
+    if (providerReadiness && !providerReadiness.ready) {
+      return NextResponse.json(
+        {
+          error: "Live FDACS providers have not passed the protected read-only preflight.",
+          code: "FDACS_OWNER_UAT_PROVIDER_PREFLIGHT_FAILED",
+          providerReadiness,
+        },
+        { status: 503, headers: { ...responseHeaders, "retry-after": "300" } },
+      );
+    }
+
     const body = await request.json().catch(() => null) as PreEnrollmentRequest | null;
     if (
       !body ||
@@ -94,6 +149,9 @@ export async function POST(request: Request) {
       cohortId: body.cohortId,
       acceptedAcknowledgmentCodes: body.acceptedAcknowledgmentCodes,
       correlationId,
+      executionProfile: profile,
+      runtimeReleaseSha: deployedReleaseSha(),
+      authorizationEvidenceSha256: floridaClassDOwnerUatEvidenceSha256(),
     });
 
     return NextResponse.json(
@@ -103,6 +161,9 @@ export async function POST(request: Request) {
         status: "pending_identity",
         instructionalAccessGranted: false,
         examAccessGranted: false,
+        executionProfile: profile,
+        trainingCreditEligible: profile === "production",
+        fdacsApprovalClaimed: false,
       },
       { status: 201, headers: responseHeaders },
     );
