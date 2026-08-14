@@ -1,6 +1,6 @@
 # Obserra Florida Class D LMS Handoff
 
-Snapshot: 2026-08-13 20:53 ET
+Snapshot: 2026-08-13 21:03 ET
 
 ## Authoritative scope
 
@@ -15,6 +15,8 @@ Public state: `COMING SOON · LMS IN PROGRESS`
 ## Audit-preservation rule
 
 The Gates 1-25 baseline language below is preserved from the exact five-green handoff contract at `af4247978c3b1b3aaac45ce7e15f321512cbf71c`. Historical status statements inside that preserved baseline are audit evidence of the accepted state at that time. The later **Current post-baseline state** section is the controlling current-state addendum and must be read together with the preserved baseline.
+
+New material actions are recorded append-only in `ACTION-LEDGER.md`. Do not rewrite historical verifier-contract language merely to record later actions.
 
 ## Release boundary
 
@@ -122,35 +124,62 @@ No production database migration has been applied by this workstream. No product
 
 The Division-approved examination-bank boundary remains a production activation prerequisite. The protected production exam question bank and answer key must not be committed to the public repository.
 
-The configured non-production and production runtime environments, database promotion evidence, rollback evidence, final media/provider configuration, final regulatory submission evidence, owner/admin access procedure, and final production acceptance remain separate controlled work.
+The configured non-production and production runtime environments, database promotion evidence, rollback evidence, final media/provider configuration, final regulatory submission evidence, owner/admin access procedure, authentic HA/failover evidence, and final production acceptance remain separate controlled work.
 
 ## Current post-baseline state
 
-Current branch head at this handoff update: `5e702fe1c27a4149cc1eb8a2383a8a56108dde42`.
+### Exact current validated five-green source checkpoint
+
+`1b6a35bdb289faaa15e5fdc1eb814cd607e65425`
+
+All five primary workflows are green on that exact SHA:
+
+- Florida Class D LMS Gates #422.
+- Website CI #1989.
+- Academy 70x Production Gate #1140.
+- Application Release Validation #829.
+- Application Production Pipeline #848.
+
+Florida Class D LMS Gates #422 passed the complete Gates 1-26 regulated source chain, Gate 22 runtime-readiness verification, Gate 23 acceptance-evidence verification, Gate 24 text-screen timing, Gate 25 runtime-isolation enforcement, Gate 26 production-activation verification, repository contract tests, lint/static quality validation, and the production Next.js build.
+
+Application Production Pipeline #848 also completed successfully, including the final signed-artifact publication contract.
+
+Later documentation-only synchronization commits derive from this exact validated source checkpoint and do not replace it as validated source/build authority unless a later complete validation cycle is recorded.
 
 PR #56 remains open, mergeable, and unmerged at last direct verification.
 
 ### Gate 26 Production Activation Authorization
 
-Gate 26 is now implemented in source and mandatory in the dedicated Florida Class D workflow. It adds a single server-side fail-closed production release boundary requiring exact release-candidate SHA binding, accepted Gate 23 UAT SHA matching that candidate, deployed Vercel Git SHA matching that candidate, production identity/database/media configuration, actual licensing state, database-promotion verification, examination-bank authorization, LIAS procedure verification, security acceptance, rollback verification, owner approval, and explicit final activation authorization.
+Gate 26 is implemented, mandatory, and CI-accepted on the exact current validated checkpoint.
 
-Real learner enrollment, production live instruction, production scheduling, and student final-examination API execution are explicitly bound to Gate 26 plus their independent feature flags. Production remains fail closed.
+Gate 26 requires exact release-candidate SHA binding, accepted Gate 23 UAT SHA matching that candidate, deployed Vercel Git SHA matching that candidate, production identity/database/media configuration, actual licensing state, database-promotion verification, examination-bank authorization, LIAS procedure verification, security acceptance, rollback verification, owner approval, mandatory HA/recovery evidence, and explicit final activation authorization.
+
+License issuance alone cannot activate production.
+
+Current Gate 26 or shared regulated-execution integrations enforced by CI include:
+
+- live instruction;
+- production scheduling;
+- regulated learner enrollment API;
+- student final-examination API;
+- LIAS administration;
+- official completion-document ingestion.
+
+Blocked attempts to add broader Gate 26 mutation coverage are retained in `ACTION-LEDGER.md` and must not be represented as implemented.
 
 ### Mandatory high availability
 
-High availability is mandatory across the complete production service chain. Gate 26 now requires verified evidence for edge/DNS, application runtime, identity, regulated database, live media, completion-document storage, commerce/payment dependency, observability, backup/restore, and end-to-end failover.
+High availability is mandatory across the complete production service chain. Gate 26 requires verified evidence for edge/DNS, application runtime, identity, regulated database, live media, completion-document storage, commerce/payment dependency, observability, backup/restore, and end-to-end failover.
 
-Controlled engineering thresholds are RTO of 60 minutes or less, RPO of 15 minutes or less, and end-to-end failover evidence no older than 90 days at activation. No HA status may be marked verified without authentic retained evidence.
+Controlled engineering thresholds are RTO of **60 minutes or less**, RPO of **15 minutes or less**, and end-to-end failover evidence **no older than 90 days** at activation. No HA status may be marked verified without authentic retained evidence.
 
 ### Gate 22 full regulated feature inventory
 
-Gate 22 now inventories live instruction, media, scheduling, make-up, recorded make-up, exam, exam administration, completion review, LIAS workflow, completion documents, quality, pre-enrollment, and the Gate 26 production-activation authorization marker. These remain fail closed during readiness review.
+Gate 22 inventories live instruction, media, scheduling, make-up, recorded make-up, exam, exam administration, completion review, LIAS workflow, completion documents, quality, pre-enrollment, and the Gate 26 production-activation authorization marker. These remain fail closed during readiness review.
 
-### Current CI result requiring remediation
+### Action ledger
 
-Florida Class D LMS Gates #415 ran against exact head `5e702fe1c27a4149cc1eb8a2383a8a56108dde42` and failed before Gate 26 execution in the existing Gate 3 persistence verifier. The failure was documentation-contract-only: `HANDOFF.md` no longer contained the exact verifier phrase `durable Supabase persistence/admin APIs`. Gate 26 and subsequent CI steps were skipped and therefore have not yet been accepted by CI on that head.
-
-This file restores the complete five-green `af424...` handoff contract, including that exact Gate 3 phrase, while appending Gate 26 and HA as new current-state content. Run #415 remains retained as audit evidence and must not be relabeled green.
+`ACTION-LEDGER.md` is the append-only audit record for all post-baseline material actions. It preserves exact SHAs, workflow results, failed runs #403 and #415, blocked repository writes, production effects, rollback state, filing hashes, HA requirements, and next governed actions.
 
 ## Controlled Class DS filing baseline
 
@@ -167,30 +196,32 @@ Curriculum SHA-256: `e76928fefc11a0640f02c80f02af4c2aacbecee39d09f38dbd9776653c2
 
 Final examination SHA-256: `240e297682e157221e33ec830bef026e829116ac5f57c5de5565fa244241467e`.
 
+The public-repository `DS-SUBMISSION-LMS-GUIDE-CONTROL.md` still contains older v0.9 metadata because replacement writes were blocked before changing GitHub. Its Gate 17-19 verifier-required phrases remain intact. The private v0.15/v1.5 artifact set above remains the filing-artifact authority.
+
 Do not edit controlled filing binaries without a new controlled revision, renewed render/preflight/integrity validation, updated hashes, and synchronized filing controls.
 
 ## Current deployment governance
 
-Existing intended Vercel project remains `obserra-website-live`. Canonical registered domain remains `obserrallc.com`; public host remains `www.obserrallc.com`. Do not create another Vercel project, move the existing project, or change DNS as a workaround. Direct Vercel control-plane verification remains an open production-readiness item in the current connector context.
+Existing intended Vercel project remains `obserra-website-live`. Canonical registered domain remains `obserrallc.com`; public host remains `www.obserrallc.com`. Owner-reported intended Vercel team technical slug remains `obserra`.
+
+Do not create another Vercel project, move the existing project, or change DNS as a workaround. Direct Vercel control-plane verification remains an open production-readiness item in the current connector context.
 
 ## Mandatory audit continuity
 
-Every material LMS, FDACS, CI, UAT, Vercel, database, identity, media, examination, LIAS, filing, HA/recovery, security, or production-readiness action must be recorded with exact SHA or external object, result/evidence, workflow identifiers where applicable, production/regulatory effect, rollback state, unresolved blockers, and next governed action.
+Every material LMS, FDACS, CI, UAT, Vercel, database, identity, media, examination, LIAS, filing, HA/recovery, security, or production-readiness action must be recorded in `ACTION-LEDGER.md` with the exact SHA or external object, result/evidence, workflow identifiers where applicable, production/regulatory effect, rollback state, unresolved blockers, and next governed action.
 
-Historical gate-specific handoffs remain historical evidence. They must not be silently rewritten as current restart authority.
+Historical gate-specific handoffs remain historical evidence. Failed and blocked actions must never be silently rewritten as successful.
 
 ## Next controlled sequence
 
-1. Rerun the complete Gates 1-26 workflow after this restored handoff contract.
-2. Repair any remaining verifier regression without weakening existing controls.
-3. Record final conclusions for all five primary workflows on the resulting exact head.
-4. Continue production-grade Gate 26 integration and HA evidence preparation.
-5. Reconcile the existing authoritative Vercel project without project movement or DNS change.
-6. Close remaining Class DS filing controls.
-7. Freeze the final production candidate and execute a new exact-candidate-bound Gate 23 18-of-18 synthetic UAT run.
-8. Produce authentic HA/failover/recovery evidence for every production dependency.
-9. Complete production database, identity, media, exam-bank, LIAS, commerce, observability, security, rollback, and owner-approval gates.
-10. Do not activate regulated production functions until the Class DS license is actually issued and all final production gates pass.
+1. Treat `1b6a35bdb289faaa15e5fdc1eb814cd607e65425` as the exact current validated five-green source checkpoint.
+2. Continue production resilience and observability engineering as the next controlled milestone.
+3. Produce authentic HA/failover/recovery evidence for every production dependency.
+4. Reconcile the existing authoritative Vercel project without project movement or DNS change.
+5. Close remaining Class DS filing controls.
+6. Freeze the final production candidate and execute a new exact-candidate-bound Gate 23 18-of-18 synthetic UAT run.
+7. Complete production database, identity, media, exam-bank, LIAS, commerce, observability, security, rollback, HA, and owner-approval gates.
+8. Do not activate regulated production functions until the Class DS license is actually issued and all final production conditions pass.
 
 ## Public repository security boundary
 
@@ -198,4 +229,4 @@ Never commit real learner PII, identity documents, protected examination questio
 
 ## Restart instruction
 
-Read `docs/florida-class-d-lms/LATEST-HANDOFF.md`, `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`, `docs/florida-class-d-lms/GATE-24-TEXT-SCREEN-TIMING-HANDOFF.md`, `docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md`, `docs/florida-class-d-lms/DS-SUBMISSION-LMS-GUIDE-CONTROL.md`, and this handoff before continuing. Preserve the exact Gates 1-25 verifier-contract language above. Current Gate 26/HA state is in the post-baseline section. Do not treat CI as FDACS approval, do not apply production migrations from source-gate work, do not generate FDACS-16103 locally, and do not issue a completion certificate for hours alone.
+Read `docs/florida-class-d-lms/LATEST-HANDOFF.md`, `docs/florida-class-d-lms/ACTION-LEDGER.md`, `docs/florida-class-d-lms/GATE-23-NONPRODUCTION-ACCEPTANCE-HANDOFF.md`, `docs/florida-class-d-lms/GATE-24-TEXT-SCREEN-TIMING-HANDOFF.md`, `docs/florida-class-d-lms/GATE-25-RUNTIME-ISOLATION-HANDOFF.md`, `docs/florida-class-d-lms/GATE-26-PRODUCTION-ACTIVATION-HANDOFF.md`, `docs/florida-class-d-lms/DS-SUBMISSION-LMS-GUIDE-CONTROL.md`, and this handoff before continuing. Preserve the exact Gates 1-25 verifier-contract language above. Current Gate 26/HA state is in the post-baseline section. Do not treat CI as FDACS approval, do not apply production migrations from source-gate work, do not generate FDACS-16103 locally, and do not issue a completion certificate for hours alone.
