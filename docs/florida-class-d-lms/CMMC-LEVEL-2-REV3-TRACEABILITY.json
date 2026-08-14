@@ -96,14 +96,14 @@
       "id": "TR-002", "title": "Clerk identity middleware and paid learner authorization", "status": "partial_external_evidence_required",
       "rev3": ["03.01.02", "03.01.05", "03.05.01", "03.05.03", "03.05.04", "03.05.12", "03.13.15"], "rev2": ["3.1.1", "3.1.2", "3.1.5", "3.5.1", "3.5.2", "3.5.3", "3.5.10"],
       "implementation": "The website exports Clerk middleware directly and paid Academy media and tutor routes require authenticated identity and current entitlement in preview and production.",
-      "evidence": ["proxy.ts", "app/api/academy/tutor/route.ts", "app/api/academy/lesson/[courseId]/[lessonIndex]/route.ts", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
+      "evidence": ["proxy.ts", "app/api/academy/tutor/route.ts", "app/api/academy/media/route.ts", "docs/florida-class-d-lms/GATE-32-WEBSITE-ACADEMY-COMMERCE-SECURITY-HANDOFF.md"],
       "methods": ["examine", "test"], "boundary": "Shared Obserra and Clerk", "gap": "Production verification, MFA policy, authenticator policy, and Clerk provider assurance remain required."
     },
     {
       "id": "TR-003", "title": "Preview authentication bypass removal", "status": "implemented_source_evidence",
       "rev3": ["03.01.02", "03.01.05", "03.04.02", "03.04.06", "03.16.01"], "rev2": ["3.1.1", "3.1.2", "3.1.5", "3.4.2", "3.4.6"],
       "implementation": "Generic Vercel preview authentication exceptions were removed from paid learner media and tutor endpoints so preview follows the production authorization model.",
-      "evidence": ["app/api/academy/tutor/route.ts", "app/api/academy/lesson/[courseId]/[lessonIndex]/route.ts", "scripts/florida-class-d-website-academy-commerce-gate.mjs"],
+      "evidence": ["app/api/academy/tutor/route.ts", "app/api/academy/media/route.ts", "scripts/florida-class-d-website-academy-commerce-gate.mjs"],
       "methods": ["examine", "test"], "boundary": "Obserra application", "gap": "Deployment verification remains part of release acceptance."
     },
     {
