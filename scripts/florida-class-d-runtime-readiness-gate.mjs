@@ -60,10 +60,19 @@ assert(page.includes("FAIL CLOSED"), "admin page must preserve fail-closed statu
 assert(page.includes("Class DS license issuance does not automatically activate the regulated LMS"), "admin page must preserve the controlled production activation boundary");
 assert(page.includes("Forty instructional hours alone do not earn a completion certificate"), "runtime page must preserve the no-certificate-for-hours-alone rule");
 
-assert(proxy.includes("export default clerkMiddleware"), "Clerk middleware must be the top-level Next.js proxy handler");
-assert(proxy.includes('"/florida-security-training/admin"') && proxy.includes('"/api/florida-class-d/admin"'), "Florida Class D administrative surfaces must be protected by the proxy authentication boundary");
+assert(
+  proxy.includes("export default async function proxy(request: NextRequest, event: NextFetchEvent)") &&
+    proxy.includes("configuredClerkHandler = clerkMiddleware(") &&
+    proxy.includes("await auth()") &&
+    proxy.includes("if (!authenticationReady())") &&
+    proxy.includes("return identityConfigurationResponse(request);") &&
+    proxy.includes("function preIdentityBoundary(request: NextRequest)") &&
+    proxy.includes("return regulatedMutationBoundary(request);"),
+  "Clerk must be conditionally invoked behind configuration readiness while protected routes and regulated mutations remain fail closed",
+);
+assert(proxy.includes('"/florida-security-training/admin"') && proxy.includes('"/api/florida-class-d/admin"'), "Florida Class D administrative surfaces must remain protected by the proxy authentication boundary");
 
 assert(handoff.includes("does not activate regulated functions") && handoff.includes("never written into the public repository"), "Gate 22 handoff must preserve the non-activating and secret-suppression boundary");
 assert(handoff.includes("passing 170-question final examination at 128/170 or better"), "Gate 22 handoff must preserve the exam-before-certificate rule");
 
-console.log("Florida Class D Gate 22 passed: separated production/non-production readiness profiles, staged Class DS-license-only readiness, protected identity routing, secret suppression, feature-flag fail-closed status, licensing boundaries, and completion controls are validated in source.");
+console.log("Florida Class D Gate 22 passed: separated production/non-production readiness profiles, availability-safe protected identity routing, regulated fail-closed mutation ordering, secret suppression, feature-flag fail-closed status, licensing boundaries, and completion controls are validated in source.");
