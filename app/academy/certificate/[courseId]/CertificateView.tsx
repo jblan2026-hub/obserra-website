@@ -4,7 +4,7 @@ import Image from "next/image";
 import "./certificate.css";
 import "./brand-certificate.css";
 
-const LEGAL_NAME = "Obserra Executive Protection & Intelligence, LLC";
+const LEGAL_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
 const CREDENTIAL_NAME = "Certificate of Course Completion";
 
@@ -55,7 +55,7 @@ export default function CertificateView({
           <div className="academy-seal" aria-label={`Obserra Academy, a training division of ${LEGAL_NAME}`}>
             <span>OA</span>
             <b>OBSERRA ACADEMY</b>
-            <small>A TRAINING DIVISION OF OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE, LLC</small>
+            <small>A TRAINING DIVISION OF OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</small>
           </div>
         </div>
 
@@ -69,9 +69,9 @@ export default function CertificateView({
         <p className="certificate-copy certificate-copy-strong">Completion included every required learning experience and the required final assessment.</p>
 
         <div className="certificate-meta">
-          <span>Academy division<strong>{department} Department</strong></span>
-          <span>Course version<strong>{normalizedVersion}</strong></span>
-          <span>Instructional hours<strong>{trainingHours}</strong></span>
+          <span>Academy Division<strong>{department} Department</strong></span>
+          <span>Course Version<strong>{normalizedVersion}</strong></span>
+          <span>Instructional Hours<strong>{trainingHours}</strong></span>
           <span>Verification ID<strong>{certificateId}</strong></span>
         </div>
 
@@ -91,11 +91,11 @@ export default function CertificateView({
         </div>
 
         <div className="certificate-verification">
-          <span>Completion date <b>{completionDate}</b></span>
-          <span>Course version <b>{normalizedVersion}</b></span>
-          <span>Signature algorithm <b>{signatureAlgorithm}</b></span>
-          <span>Signing key fingerprint <b>{publicKeyFingerprint.slice(0, 16)}...{publicKeyFingerprint.slice(-16)}</b></span>
-          <span>Verify online <b><a href={verificationUrl}>Certificate verification record</a></b></span>
+          <span>Completion Date <b>{completionDate}</b></span>
+          <span>Course Version <b>{normalizedVersion}</b></span>
+          <span>Signature Algorithm <b>{signatureAlgorithm}</b></span>
+          <span>Signing Key Fingerprint <b>{publicKeyFingerprint.slice(0, 16)}...{publicKeyFingerprint.slice(-16)}</b></span>
+          <span>Verify Online <b><a href={verificationUrl}>Certificate verification record</a></b></span>
         </div>
 
         <footer>
