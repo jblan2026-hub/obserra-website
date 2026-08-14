@@ -4,10 +4,11 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { licenseRepository } from "../../../lib/license-repository";
 import { productEntitlementRegistry, seatsAvailable, validateLicenseRecord } from "../../../lib/licensing";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
-  title: "Licenses and Entitlements | Obserra Customer Portal",
-  description: "Review verified Obserra licenses, seat capacity, renewal status, deployment rights, and entitlement policies.",
+  title: `Licenses and Entitlements | ${LEGAL_ENTITY_NAME} Customer Portal`,
+  description: `Review verified ${LEGAL_ENTITY_NAME} licenses, seat capacity, renewal status, deployment rights, and entitlement policies.`,
   robots: { index: false, follow: false },
 };
 
@@ -30,7 +31,7 @@ export default async function LicenseCenterPage() {
       <header className="border-b border-white/10 bg-slate-950/95 px-6 py-5">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold tracking-[0.25em] text-amber-400">OBSERRA CUSTOMER PORTAL</p>
+            <p className="text-xs font-semibold tracking-[0.25em] text-amber-400">{LEGAL_ENTITY_NAME} CUSTOMER PORTAL</p>
             <h1 className="mt-2 text-2xl font-semibold">Licenses and Entitlements</h1>
           </div>
           <nav className="flex flex-wrap gap-3 text-sm">

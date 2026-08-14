@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./eios.css";
 
 const productViews = [
@@ -61,7 +62,7 @@ export default function EiosShowcase() {
             src="/brand/obserra-logo.png"
             width={250}
             height={48}
-            alt="Obserra Executive Protection and Intelligence LLC"
+            alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC"
           />
           <span>
             <b>EIOS</b>
@@ -82,7 +83,7 @@ export default function EiosShowcase() {
         <div className="eios-orbit orbit-one" />
         <div className="eios-orbit orbit-two" />
         <div className="eios-hero-copy">
-          <p className="eios-eyebrow">PROPERTY OF OBSERRA · ENTERPRISE INTELLIGENCE OPERATING SYSTEM</p>
+          <p className="eios-eyebrow">PROPERTY OF {LEGAL_ENTITY_NAME} · ENTERPRISE INTELLIGENCE OPERATING SYSTEM</p>
           <h1>
             From fragmented context in cyber, protection, and risk
             <br />
@@ -149,7 +150,7 @@ export default function EiosShowcase() {
           </h2>
           <p>
             EIOS is designed as an AI-native, secure-by-default enterprise intelligence
-            platform, not a collection of isolated dashboards. It supports the same domains Obserra
+            platform, not a collection of isolated dashboards. It supports the same domains {LEGAL_ENTITY_NAME}
             delivers across advisory and operations: cybersecurity, protective intelligence, identity,
             governance, and enterprise decision accountability.
           </p>
@@ -276,11 +277,11 @@ export default function EiosShowcase() {
           src="/brand/obserra-logo.png"
           width={176}
           height={34}
-          alt="Obserra Executive Protection and Intelligence LLC"
+          alt={LEGAL_ENTITY_NAME}
         />
         <p>
-          Copyright Obserra Executive Protection &amp; Intelligence LLC. EIOS and related visual
-          and product materials are proprietary to Obserra. Unauthorized reproduction,
+          Copyright {LEGAL_ENTITY_NAME}. EIOS and related visual
+          and product materials are proprietary to {LEGAL_ENTITY_NAME}. Unauthorized reproduction,
           distribution, or use is prohibited.
         </p>
       </footer>
@@ -303,7 +304,7 @@ function ProductFrame({ view, prominent = false }: { view: typeof productViews[n
           sizes={prominent ? "(max-width: 900px) 90vw, 54vw" : "(max-width: 900px) 90vw, 63vw"}
           priority={view.id === "overview"}
         />
-        <div className="property-watermark">PROPERTY OF OBSERRA</div>
+        <div className="property-watermark">PROPERTY OF {LEGAL_ENTITY_NAME}</div>
       </div>
       <figcaption>
         <p>{view.eyebrow}</p>

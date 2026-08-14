@@ -1,0 +1,558 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://obserrallc.com/schemas/cmmc-system-evidence-v2.schema.json",
+  "title": "OBSERRA CMMC System Evidence and Finding Eligibility Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "bundleId",
+    "bundleState",
+    "generatedAt",
+    "legalOwner",
+    "sourceDefinition",
+    "schemaReference",
+    "generatorReference",
+    "authorityProfile",
+    "objectiveCatalogs",
+    "auditViews",
+    "repositoryRevision",
+    "scope",
+    "claimBoundary",
+    "assessmentDispositionPolicy",
+    "approvedChangeAutomation",
+    "systems",
+    "summary"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "2.0" },
+    "bundleId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{7,199}$" },
+    "bundleState": {
+      "enum": ["working_evidence_inventory", "final_release_evidence", "final_assessor_import"]
+    },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "legalOwner": { "const": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" },
+    "sourceDefinition": { "$ref": "#/$defs/hashedLocalReference" },
+    "schemaReference": { "$ref": "#/$defs/hashedLocalReference" },
+    "generatorReference": { "$ref": "#/$defs/hashedLocalReference" },
+    "authorityProfile": { "$ref": "#/$defs/hashedLocalReference" },
+    "objectiveCatalogs": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/hashedLocalReference" }
+    },
+    "auditViews": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["machineReadable", "humanReadableExtract", "pairedDigestManifest", "derivation", "verifyCommand"],
+      "properties": {
+        "machineReadable": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "mediaType", "role"],
+          "properties": {
+            "path": { "const": "docs/compliance/CMMC-SYSTEM-EVIDENCE.json" },
+            "mediaType": { "const": "application/json" },
+            "role": { "const": "canonical_machine_readable_record" }
+          }
+        },
+        "humanReadableExtract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "mediaType", "role"],
+          "properties": {
+            "path": { "const": "docs/compliance/CMMC-SYSTEM-EVIDENCE.md" },
+            "mediaType": { "const": "text/markdown" },
+            "role": { "const": "derived_human_readable_extract" }
+          }
+        },
+        "pairedDigestManifest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "algorithm", "coversBothViews"],
+          "properties": {
+            "path": { "const": "docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256" },
+            "algorithm": { "const": "sha256" },
+            "coversBothViews": { "const": true }
+          }
+        },
+        "derivation": { "const": "human_readable_extract_generated_from_same_in_memory_canonical_bundle" },
+        "verifyCommand": { "const": "npm run verify:cmmc-system-evidence" }
+      }
+    },
+    "repositoryRevision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "branch", "headCommitSha", "revisionBinding", "workingTreeState", "workingTreeSha256", "workingTreePathCount", "digestPolicy", "exactReleaseCommitSha"],
+      "properties": {
+        "repository": { "const": "jblan2026-hub/obserra-website" },
+        "branch": { "type": "string", "minLength": 1 },
+        "headCommitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "revisionBinding": { "enum": ["working_tree_digest", "exact_release_commit"] },
+        "workingTreeState": { "enum": ["clean", "dirty"] },
+        "workingTreeSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "workingTreePathCount": { "type": "integer", "minimum": 1 },
+        "digestPolicy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["algorithm", "scope", "generatedOutputsExcluded", "excludedWorkstreamPathsExcluded"],
+          "properties": {
+            "algorithm": { "const": "sha256" },
+            "scope": { "const": "all_in_scope_source_files_at_working_revision" },
+            "generatedOutputsExcluded": { "const": true },
+            "excludedWorkstreamPathsExcluded": { "const": true }
+          }
+        },
+        "exactReleaseCommitSha": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          ]
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["includedSystems", "excludedWorkstreams", "excludedPathPrefixes", "cuiProcessingAuthorized", "formalAssessmentScopeEstablished"],
+      "properties": {
+        "includedSystems": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^SYS-[A-Z0-9-]{2,40}$" }
+        },
+        "excludedWorkstreams": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 3 }
+        },
+        "excludedPathPrefixes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 3 }
+        },
+        "cuiProcessingAuthorized": { "const": false },
+        "formalAssessmentScopeEstablished": { "const": false }
+      }
+    },
+    "claimBoundary": { "$ref": "#/$defs/claimBoundary" },
+    "assessmentDispositionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["technicalAndHumanResultsSeparated", "pendingHumanReviewIsFailure", "technicalGateCriteria", "humanReviewCriteria", "technicalGreenRule", "humanPendingRule", "operationalRule", "mandatoryPrerequisiteRule"],
+      "properties": {
+        "technicalAndHumanResultsSeparated": { "const": true },
+        "pendingHumanReviewIsFailure": { "const": false },
+        "technicalGateCriteria": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pass", "fail", "pending", "humanReviewStateAffectsTechnicalOutcome"],
+          "properties": {
+            "pass": { "type": "string", "minLength": 20 },
+            "fail": { "type": "string", "minLength": 20 },
+            "pending": { "type": "string", "minLength": 20 },
+            "humanReviewStateAffectsTechnicalOutcome": { "const": false }
+          }
+        },
+        "humanReviewCriteria": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["defaultState", "completion", "pending", "pendingIsTechnicalFailure", "humanCompletionRequiredForTechnicalPass"],
+          "properties": {
+            "defaultState": { "const": "pending" },
+            "completion": { "type": "string", "minLength": 20 },
+            "pending": { "type": "string", "minLength": 20 },
+            "pendingIsTechnicalFailure": { "const": false },
+            "humanCompletionRequiredForTechnicalPass": { "const": false }
+          }
+        },
+        "technicalGreenRule": { "type": "string", "minLength": 20 },
+        "humanPendingRule": { "type": "string", "minLength": 20 },
+        "operationalRule": { "type": "string", "minLength": 20 },
+        "mandatoryPrerequisiteRule": { "type": "string", "minLength": 20 }
+      }
+    },
+    "approvedChangeAutomation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trigger", "workflowPath", "generateCommand", "verifyCommand", "sourceDriftCommand", "retentionMode", "failClosed", "rule"],
+      "properties": {
+        "trigger": { "const": "push_to_main_after_approved_merge" },
+        "workflowPath": { "type": "string", "minLength": 3 },
+        "generateCommand": { "type": "string", "minLength": 3 },
+        "verifyCommand": { "type": "string", "minLength": 3 },
+        "sourceDriftCommand": { "type": "string", "minLength": 3 },
+        "retentionMode": { "const": "indefinite_immutable_archive" },
+        "failClosed": { "const": true },
+        "rule": { "type": "string", "minLength": 20 }
+      }
+    },
+    "systems": {
+      "type": "array",
+      "minItems": 10,
+      "items": { "$ref": "#/$defs/systemRecord" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "systemCount",
+        "governingControlCount",
+        "governingObjectiveCount",
+        "rev3ControlCount",
+        "rev3ObjectiveCount",
+        "artifactCount",
+        "findingEligibleArtifactCount",
+        "assessorDeterminationCount",
+        "objectiveMappingCount",
+        "technicalPassedObjectiveCount",
+        "technicalFailedObjectiveCount",
+        "technicalNotTestedObjectiveCount",
+        "humanPendingObjectiveCount",
+        "humanCompletedObjectiveCount",
+        "humanNotRequiredObjectiveCount",
+        "technicalGateDisposition",
+        "humanReviewDisposition",
+        "technicalGatePassRequiresHumanCompletion",
+        "unmappedRequiredObjectiveCount",
+        "failClosed"
+      ],
+      "properties": {
+        "systemCount": { "type": "integer", "minimum": 10 },
+        "governingControlCount": { "const": 110 },
+        "governingObjectiveCount": { "const": 320 },
+        "rev3ControlCount": { "const": 97 },
+        "rev3ObjectiveCount": { "const": 510 },
+        "artifactCount": { "type": "integer", "minimum": 1 },
+        "findingEligibleArtifactCount": { "type": "integer", "minimum": 0 },
+        "assessorDeterminationCount": { "type": "integer", "minimum": 0 },
+        "objectiveMappingCount": { "type": "integer", "minimum": 830 },
+        "technicalPassedObjectiveCount": { "type": "integer", "minimum": 0 },
+        "technicalFailedObjectiveCount": { "type": "integer", "minimum": 0 },
+        "technicalNotTestedObjectiveCount": { "type": "integer", "minimum": 0 },
+        "humanPendingObjectiveCount": { "type": "integer", "minimum": 0 },
+        "humanCompletedObjectiveCount": { "const": 0 },
+        "humanNotRequiredObjectiveCount": { "const": 0 },
+        "technicalGateDisposition": { "enum": ["passed", "failed", "pending_evidence"] },
+        "humanReviewDisposition": { "const": "pending" },
+        "technicalGatePassRequiresHumanCompletion": { "const": false },
+        "unmappedRequiredObjectiveCount": { "const": 0 },
+        "failClosed": { "const": true }
+      }
+    }
+  },
+  "$defs": {
+    "hashedLocalReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "state"],
+      "properties": {
+        "path": { "type": "string", "minLength": 3 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "state": { "const": "final" }
+      }
+    },
+    "claimBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["permittedClaims", "prohibitedClaims"],
+      "properties": {
+        "permittedClaims": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 3 }
+        },
+        "prohibitedClaims": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 3 }
+        }
+      }
+    },
+    "responsibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceOrigin", "owner", "responsibility", "requiredEvidenceState"],
+      "properties": {
+        "evidenceOrigin": {
+          "enum": [
+            "product_supplied_evidence",
+            "organization_evidence",
+            "assessor_determination",
+            "customer_responsibility"
+          ]
+        },
+        "owner": { "type": "string", "minLength": 2 },
+        "responsibility": { "type": "string", "minLength": 5 },
+        "requiredEvidenceState": {
+          "enum": ["available_candidate", "final_required", "not_yet_obtained", "assessor_owned"]
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifactId",
+        "title",
+        "path",
+        "artifactState",
+        "sha256",
+        "hashVerified",
+        "evidenceOrigin",
+        "owner",
+        "exactRevision",
+        "testResult",
+        "claimBoundary",
+        "findingEligible"
+      ],
+      "properties": {
+        "artifactId": { "type": "string", "pattern": "^EV-[A-Z0-9-]{3,60}$" },
+        "title": { "type": "string", "minLength": 3 },
+        "path": { "type": "string", "minLength": 3 },
+        "artifactState": { "enum": ["working", "final", "superseded", "rejected"] },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "hashVerified": { "type": "boolean" },
+        "evidenceOrigin": {
+          "enum": [
+            "product_supplied_evidence",
+            "organization_evidence",
+            "assessor_determination",
+            "customer_responsibility"
+          ]
+        },
+        "owner": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["legalName", "accountableRole"],
+          "properties": {
+            "legalName": { "type": "string", "minLength": 2 },
+            "accountableRole": { "type": "string", "minLength": 2 }
+          }
+        },
+        "exactRevision": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["authorityProfileSha256", "baselineAuthorityIds", "targetGitCommitSha", "workingTreeSha256"],
+          "properties": {
+            "authorityProfileSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "baselineAuthorityIds": {
+              "type": "array",
+              "minItems": 4,
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 3 }
+            },
+            "targetGitCommitSha": {
+              "oneOf": [
+                { "type": "null" },
+                { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+              ]
+            },
+            "workingTreeSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          }
+        },
+        "testResult": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "result", "executedAt", "targetRevision", "resultArtifactSha256"],
+          "properties": {
+            "method": { "enum": ["examine", "interview", "test"] },
+            "result": { "enum": ["passed", "failed", "not_run", "not_applicable"] },
+            "executedAt": {
+              "oneOf": [
+                { "type": "null" },
+                { "type": "string", "format": "date-time" }
+              ]
+            },
+            "targetRevision": {
+              "oneOf": [
+                { "type": "null" },
+                { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+              ]
+            },
+            "resultArtifactSha256": {
+              "oneOf": [
+                { "type": "null" },
+                { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+              ]
+            }
+          }
+        },
+        "claimBoundary": { "type": "string", "minLength": 5 },
+        "findingEligible": { "type": "boolean" }
+      }
+    },
+    "objectiveMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baselineAuthorityId",
+        "assessmentAuthorityId",
+        "controlId",
+        "objectiveId",
+        "objectiveStatement",
+        "methods",
+        "responsibilityOwner",
+        "evidenceState",
+        "artifactIds",
+        "finding",
+        "technicalResult",
+        "humanAssessmentState",
+        "pendingHumanReviewIsFailure",
+        "operationalDisposition",
+        "claimBoundary"
+      ],
+      "properties": {
+        "baselineAuthorityId": { "type": "string", "minLength": 3 },
+        "assessmentAuthorityId": { "type": "string", "minLength": 3 },
+        "controlId": { "type": "string", "pattern": "^(3\\.(?:[1-9]|1[0-4])\\.\\d+|03\\.(?:0[1-9]|1[0-7])\\.\\d{2})$" },
+        "objectiveId": { "type": "string", "minLength": 3 },
+        "objectiveStatement": { "type": "string", "minLength": 5 },
+        "methods": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["examine", "interview", "test"] }
+        },
+        "responsibilityOwner": {
+          "enum": ["product_provider", "obserra_organization", "customer", "assessor"]
+        },
+        "evidenceState": {
+          "enum": [
+            "candidate_product_evidence",
+            "candidate_organization_evidence",
+            "organization_evidence_required",
+            "customer_evidence_required",
+            "assessor_determination_required",
+            "scope_dependent"
+          ]
+        },
+        "artifactIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^EV-[A-Z0-9-]{3,60}$" }
+        },
+        "finding": { "enum": ["not_assessed", "met", "not_met", "not_applicable"] },
+        "technicalResult": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "basis", "exactRevision", "resultArtifactSha256"],
+          "properties": {
+            "state": { "enum": ["not_tested", "passed", "failed", "not_applicable"] },
+            "basis": { "enum": ["candidate_evidence_only", "objective_specific_result", "not_applicable"] },
+            "exactRevision": {
+              "oneOf": [
+                { "type": "null" },
+                { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+              ]
+            },
+            "resultArtifactSha256": {
+              "oneOf": [
+                { "type": "null" },
+                { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+              ]
+            }
+          }
+        },
+        "humanAssessmentState": { "enum": ["pending", "completed", "not_required"] },
+        "pendingHumanReviewIsFailure": { "const": false },
+        "operationalDisposition": {
+          "enum": [
+            "operational_technical_controls_active",
+            "operational_with_pending_human_review",
+            "fail_closed_pending_mandatory_prerequisite",
+            "not_operational",
+            "scope_dependent"
+          ]
+        },
+        "claimBoundary": { "type": "string", "minLength": 5 }
+      }
+    },
+    "systemRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "systemId",
+        "systemName",
+        "systemType",
+        "provider",
+        "owner",
+        "scope",
+        "responsibilities",
+        "claimBoundary",
+        "artifacts",
+        "objectiveMappings",
+        "findingEligibility"
+      ],
+      "properties": {
+        "systemId": { "type": "string", "pattern": "^SYS-[A-Z0-9-]{2,40}$" },
+        "systemName": { "type": "string", "minLength": 3 },
+        "systemType": { "type": "string", "minLength": 3 },
+        "provider": { "type": "string", "minLength": 2 },
+        "owner": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["legalName", "accountableRole"],
+          "properties": {
+            "legalName": { "type": "string", "minLength": 2 },
+            "accountableRole": { "type": "string", "minLength": 2 }
+          }
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["included", "excluded", "dataClasses", "environments"],
+          "properties": {
+            "included": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 2 } },
+            "excluded": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 2 } },
+            "dataClasses": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 2 } },
+            "environments": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 2 } }
+          }
+        },
+        "responsibilities": {
+          "type": "array",
+          "minItems": 4,
+          "items": { "$ref": "#/$defs/responsibility" }
+        },
+        "claimBoundary": { "$ref": "#/$defs/claimBoundary" },
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/artifact" }
+        },
+        "objectiveMappings": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/objectiveMapping" }
+        },
+        "findingEligibility": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["eligible", "reason", "technicalStatus", "humanAssessmentState", "operationalDisposition"],
+          "properties": {
+            "eligible": { "type": "boolean" },
+            "reason": { "type": "string", "minLength": 5 },
+            "technicalStatus": { "enum": ["not_tested", "partially_passed", "passed", "failed", "not_applicable"] },
+            "humanAssessmentState": { "enum": ["pending", "completed", "not_required"] },
+            "operationalDisposition": {
+              "enum": [
+                "operational_technical_controls_active",
+                "operational_with_pending_human_review",
+                "fail_closed_pending_mandatory_prerequisite",
+                "not_operational",
+                "scope_dependent"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

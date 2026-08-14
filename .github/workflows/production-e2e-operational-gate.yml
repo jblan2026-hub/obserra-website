@@ -74,6 +74,31 @@ jobs:
             exit 1
           fi
 
+      - name: Verify authorized EC-Council credential artwork is live
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_url='https://www.obserrallc.com/badges/eccouncil'
+          for asset in \
+            adg-adopt.svg adg-defend.svg adg-govern.svg \
+            ceh.png chfi.png ecih.png eces.png cciso.png cnda.png; do
+            curl --fail --silent --show-error --max-time 30 \
+              "${base_url}/${asset}" -o "/tmp/${asset}"
+            test -s "/tmp/${asset}"
+          done
+          curl --fail --silent --show-error --max-time 30 \
+            "${base_url}/asset-manifest.json" -o /tmp/ec-council-asset-manifest.json
+          jq -e '
+            .recordType == "authorized-ec-council-credential-artwork" and
+            .legalOwner == "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" and
+            (.credentials | length) == 9
+          ' /tmp/ec-council-asset-manifest.json >/dev/null
+          jq -r '.credentials[] | [.sha256, (.assetPath | split("/") | last)] | @tsv' \
+            /tmp/ec-council-asset-manifest.json | while IFS=$'\t' read -r expected asset; do
+              actual=$(sha256sum "/tmp/${asset}" | cut -d' ' -f1)
+              test "$actual" = "$expected"
+            done
+
       - name: Verify checkout method and same-origin boundaries without creating a payment
         shell: bash
         run: |

@@ -4,9 +4,10 @@ import Link from "next/link";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getStripe } from "../../../lib/stripe";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
-  title: "Enterprise Account | Obserra Customer Portal",
+  title: `Enterprise Account | ${LEGAL_ENTITY_NAME} Customer Portal`,
   description: "Protected enterprise account workspace for organization, licensing, billing, and release readiness.",
   robots: { index: false, follow: false },
 };
@@ -99,7 +100,7 @@ export default async function EnterpriseCustomerPage() {
         <Link href="/" className="flex items-center gap-3 text-xs font-black tracking-[0.13em] text-white no-underline">
           <Image
             src="/brand/obserra-logo.png"
-            alt="Obserra Executive Protection and Intelligence LLC"
+            alt={LEGAL_ENTITY_NAME}
             width={286}
             height={55}
             className="h-auto w-[min(250px,68vw)]"

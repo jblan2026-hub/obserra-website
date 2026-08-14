@@ -4,7 +4,7 @@ import "../live-classroom.css";
 import "./observer.css";
 
 export const metadata: Metadata = {
-  title: "Florida Class D Regulatory Observer | Obserra",
+  title: "Florida Class D Regulatory Observer | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   robots: { index: false, follow: false, noarchive: true, nosnippet: true },
 };
 

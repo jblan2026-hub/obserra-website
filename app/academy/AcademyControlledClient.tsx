@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import AcademyCheckoutForm from "./AcademyCheckoutForm";
 import type { Course, CourseLevel, Department } from "./courseData";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -119,10 +120,10 @@ export default function AcademyControlledClient({
   return (
     <main>
       <header className="masthead">
-        <a href="/" className="brand" aria-label="Obserra home">
+        <a href="/" className="brand" aria-label={`${LEGAL_ENTITY_NAME} home`}>
           <Image
             src="/brand/obserra-logo.png"
-            alt="Obserra Executive Protection and Intelligence LLC"
+            alt={LEGAL_ENTITY_NAME}
             width={286}
             height={55}
           />
@@ -343,8 +344,8 @@ export default function AcademyControlledClient({
       </section>
 
       <footer className="site-footer">
-        <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={180} height={35} />
-        <p>Obserra Technologies learning product. Proprietary to Obserra Executive Protection &amp; Intelligence LLC. Unauthorized downloading, recording, copying, sharing, distribution, or classroom use is prohibited.</p>
+        <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={180} height={35} />
+        <p>Obserra Academy learning product. Proprietary to {LEGAL_ENTITY_NAME}. Unauthorized downloading, recording, copying, sharing, distribution, or classroom use is prohibited.</p>
       </footer>
     </main>
   );

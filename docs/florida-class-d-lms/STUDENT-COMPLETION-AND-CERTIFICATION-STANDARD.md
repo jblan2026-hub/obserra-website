@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This controlled standard governs how completion, examination status, certificates, and Florida application documents are described in all student-facing materials for the Obserra Executive Protection & Intelligence LLC Florida Class D Security Officer Training program.
+This controlled standard governs how completion, examination status, certificates, and Florida application documents are described in all student-facing materials for the OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Florida Class D Security Officer Training program.
 
 It applies to LMS onboarding, student handbooks, course syllabi, lesson materials, attendance notices, examination instructions, completion screens, FAQs, application guidance, instructor materials, regulatory submission documentation, and any future marketing or enrollment materials.
 

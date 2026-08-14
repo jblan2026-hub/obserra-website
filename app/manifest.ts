@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Obserra",
-    short_name: "Obserra",
+    name: LEGAL_ENTITY_NAME,
+    short_name: LEGAL_ENTITY_NAME,
     description: "Enterprise intelligence, cybersecurity, protective intelligence, secure technology, and professional training.",
     start_url: "/",
     display: "standalone",

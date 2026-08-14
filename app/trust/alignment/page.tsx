@@ -4,12 +4,13 @@ import {
   alignmentAuthorities,
   alignmentDisclaimer,
 } from "../../../lib/control-alignment";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "../trust.css";
 
 export const metadata: Metadata = {
-  title: "Control and Regulatory Alignment | Obserra Trust Center",
+  title: `Control and Regulatory Alignment | ${LEGAL_ENTITY_NAME} Trust Center`,
   description:
-    "Review Obserra design alignment references for cybersecurity, information security, assurance, privacy, and payment security.",
+    `Review ${LEGAL_ENTITY_NAME} design alignment references for cybersecurity, information security, assurance, privacy, and payment security.`,
   alternates: { canonical: "/trust/alignment" },
 };
 
@@ -22,7 +23,7 @@ export default function ControlAlignmentPage() {
             <p className="trust-eyebrow">CONTROL AND REGULATORY ALIGNMENT</p>
             <h1>One governed alignment model across security, privacy, assurance, and payment protection.</h1>
             <p className="trust-lead">
-              Obserra uses a common control alignment registry across its public website, Academy, applications, services, and enterprise governance work. Applicability remains dependent on the actual service, data, jurisdiction, contract, payment architecture, and deployment scope.
+              {LEGAL_ENTITY_NAME} uses a common control alignment registry across its public website, Academy, applications, services, and enterprise governance work. Applicability remains dependent on the actual service, data, jurisdiction, contract, payment architecture, and deployment scope.
             </p>
             <div className="trust-hero-actions">
               <Link href="/trust">Back to Trust Center</Link>

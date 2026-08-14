@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./enterprise.css";
 
 export const metadata: Metadata = {
@@ -96,7 +97,7 @@ export default function AcademyEnterprisePage() {
           "Enterprise training programs with curated learning paths, cohort delivery, manager reporting, executive briefings, and team licensing.",
         provider: {
           "@type": "Organization",
-          name: "Obserra Executive Protection & Intelligence LLC",
+          name: LEGAL_ENTITY_NAME,
           url: "https://www.obserrallc.com",
         },
         areaServed: "Worldwide",
@@ -121,10 +122,10 @@ export default function AcademyEnterprisePage() {
   return (
     <main className="academy-enterprise">
       <header className="ae-nav">
-        <Link href="/" className="ae-brand" aria-label="Obserra home">
+        <Link href="/" className="ae-brand" aria-label={`${LEGAL_ENTITY_NAME} home`}>
           <Image
             src="/brand/obserra-logo.png"
-            alt="Obserra Executive Protection and Intelligence LLC"
+            alt={LEGAL_ENTITY_NAME}
             width={286}
             height={55}
           />
@@ -144,7 +145,7 @@ export default function AcademyEnterprisePage() {
           <h1>Build shared capability across the people responsible for high consequence decisions.</h1>
           <p>
             Create role based learning paths for executives, cybersecurity teams, AI governance groups, intelligence
-            professionals, and protection teams. Obserra combines self paced training, facilitated sessions, completion
+            professionals, and protection teams. {LEGAL_ENTITY_NAME} combines self paced training, facilitated sessions, completion
             standards, and manager visibility in one enterprise learning model.
           </p>
           <div className="ae-actions">
@@ -240,7 +241,7 @@ export default function AcademyEnterprisePage() {
       <section className="ae-final">
         <p className="ae-eyebrow">BUILD YOUR PROGRAM</p>
         <h2>Turn training into a measurable enterprise capability.</h2>
-        <p>Tell Obserra which roles, teams, and outcomes matter. We will recommend a practical learning path and delivery model.</p>
+        <p>Tell {LEGAL_ENTITY_NAME} which roles, teams, and outcomes matter. We will recommend a practical learning path and delivery model.</p>
         <div className="ae-actions">
           <Link href="/contact?interest=enterprise-training" className="ae-primary">Request enterprise training plan</Link>
           <a href="mailto:info@obserrallc.com" className="ae-secondary">Email Academy Enterprise</a>

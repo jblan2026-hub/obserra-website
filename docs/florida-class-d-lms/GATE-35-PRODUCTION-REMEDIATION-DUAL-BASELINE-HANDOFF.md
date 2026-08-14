@@ -137,6 +137,14 @@ This workstream may change only the public website, Obserra Academy/LMS, Academy
 - The intended PR #80 deployment build completed successfully with no build errors, but its Vercel commit status is `failure` / dashboard state `Checks Failed`; lcn2 is `success`. No runtime requests are recorded on the intended deployment. This is retained as a postdeployment-control failure, not hidden or misreported as a build failure.
 - The current candidate makes `/api/health` report nonsecret `VERCEL_PROJECT_ID`, `VERCEL_DEPLOYMENT_ID`, and `VERCEL_GIT_COMMIT_SHA`; the production operational gate requires the intended project ID and exact-form deployment/commit values.
 
+## Gate 37 publication-resume reconciliation
+
+- The original unpublished 208-path checkpoint remains immutable at commit `83364708ae618555ec514d27a93079bad22a7c4c`, tree `2d75297998906cb0e84666dc4d5c72e9ecaf682b`, parent `0e72459a8940f23976038d85d6394409000f48c5`.
+- GitHub `main` independently advanced from the same base through `885fdacf7cf77896da770f4e6ee1ebc921a13b00`, `a61603991692e3789263dc7d3f2177f172f40369`, and `25cace20213bb4579fde27f996ac9b4d0cb37710`.
+- Local merge commit `7f9c8f24a2ee1b73cbd0a748e5768486aaf33dbc` preserves both histories. The only remote content changes were three malformed, mis-nested `austenstone/copilot-cli@v3.2` insertions and a missing final newline. The third-party action insertions were removed because the workflows would not parse as valid jobs or steps and the tag was not an immutable commit pin. The harmless final newline was retained.
+- Full local revalidation then found and corrected two fail-closed source defects in the checkpoint: Gate 25 removed the last literal regulated Supabase origin while preserving exact protected project binding, and Gate 29 reconciled its stale 29-migration expectation to the complete 35-file lineage ending at `20260814175000` with manifest SHA-256 `40eb88f6b8cb6ce2716eb260cde7f29d69d78f0a201e90cd6373ac1ebf2be090`. Neither correction authorizes production activation or executes a database migration.
+- Publication, pull-request checks, merge, intended-project Vercel deployment, canonical runtime verification, and final exact-release evidence remain pending. Human review remains `pending`; assessment findings remain `not_assessed`; Applications paths remain excluded.
+
 ## Evidence update rule
 
 Every material implementation or control-plane change must update this handoff, the Gate 35 action ledger, the dual-baseline mapping, the production evidence register, and any affected recovery or routing record in the same governed change. A failed or blocked attempt must remain recorded with its effect and next action.

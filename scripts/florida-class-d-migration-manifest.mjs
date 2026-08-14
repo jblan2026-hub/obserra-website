@@ -36,6 +36,12 @@ export const EXPECTED_FLORIDA_CLASS_D_MIGRATIONS = [
   "20260813111000_fdacs_class_d_text_screen_completion_guard.sql",
   "20260813204215_fdacs_class_d_security_hardening.sql",
   "20260814011203_fdacs_class_d_fk_performance_indexes.sql",
+  "20260814170000_fdacs_class_d_pii_boundary_hardening.sql",
+  "20260814171000_fdacs_class_d_automatic_record_archive.sql",
+  "20260814172000_fdacs_class_d_instructor_identity_attendance.sql",
+  "20260814173000_fdacs_class_d_investigator_audit_access.sql",
+  "20260814174000_fdacs_class_d_audit_performance_and_explicit_deny.sql",
+  "20260814175000_fdacs_class_d_trigger_function_execute_hardening.sql",
 ];
 
 function sha256(value) {

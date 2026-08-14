@@ -59,7 +59,7 @@ requireText(observerRoute, "expiresAt: grant.expiresAt", "Observer media API mus
 requireText(observerUi, "window.location.hash", "Observer UI must read the temporary token from the URL fragment.");
 requireText(observerUi, "window.history.replaceState", "Observer UI must remove the access fragment after reading it.");
 requireText(observerUi, 'allow="fullscreen; autoplay"', "Observer iframe must not request camera, microphone, or display-capture browser permissions.");
-requireText(adminUi, "The plaintext access token is not stored by Obserra", "Admin UI must explain observer token handling.");
+requireText(adminUi, "The plaintext access token is not stored by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC", "Admin UI must explain observer token handling using the full legal owner name.");
 requireText(handoff, "temporary view-only observer access", "The Class D handoff must preserve the implemented Gate 7 observer control scope.");
 requireText(handoff, "observer access", "The authoritative handoff must retain observer access in the regulated release boundary.");
 

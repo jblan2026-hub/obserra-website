@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LEGAL_ENTITY_NAME } from "../lib/legal-identity";
 import "./site-header.css";
 
 const navigation = [
@@ -47,9 +48,9 @@ export default function HomeHeader() {
   return (
     <header className="obs-site-header">
       <div className="obs-site-header__brand-row">
-        <Link className="obs-site-header__brand" href="/" aria-label="Obserra home" onClick={closeNavigation}>
+        <Link className="obs-site-header__brand" href="/" aria-label={`${LEGAL_ENTITY_NAME} home`} onClick={closeNavigation}>
           <ObserraMark />
-          <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt="Obserra Executive Protection and Intelligence LLC" />
+          <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt={LEGAL_ENTITY_NAME} />
         </Link>
         <button className="obs-site-header__toggle" type="button" aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="primary-navigation" onClick={() => setOpen((current) => !current)}>
           <span /><span /><span />

@@ -8,7 +8,7 @@ import QualityConsole from "./QualityConsole";
 import "../../live-classroom.css";
 
 export const metadata: Metadata = {
-  title: "Florida Class D Quality Management | Obserra",
+  title: "Florida Class D Quality Management | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   robots: { index: false, follow: false },
 };
 

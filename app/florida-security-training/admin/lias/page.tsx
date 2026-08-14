@@ -5,7 +5,7 @@ import LiasWorkflowConsole from "./LiasWorkflowConsole";
 import "../../live-classroom.css";
 
 export const metadata: Metadata = {
-  title: "Florida Class D LIAS Workflow | Obserra",
+  title: "Florida Class D LIAS Workflow | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   robots: { index: false, follow: false },
 };
 

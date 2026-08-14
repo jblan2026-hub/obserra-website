@@ -22,8 +22,8 @@ export type FloridaClassDStudentCertificate = {
 };
 
 function config() {
-  const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
+  const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+  const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   if (!key || !url.startsWith("https://")) {
     throw new FloridaClassDExamError("Student certificate service is not configured.", 503, "FDACS_CERTIFICATE_NOT_CONFIGURED");
   }
@@ -93,7 +93,7 @@ export async function getFloridaClassDStudentCertificate(clerkUserId: string, do
   const verifiedInstructionalMinutes = Number(payload.verifiedInstructionalMinutes);
   const examScore = Number(payload.examScore);
   const passingScore = Number(payload.passingScore);
-  const provider = typeof payload.provider === "string" ? payload.provider.trim() : "Obserra Executive Protection & Intelligence LLC";
+  const provider = typeof payload.provider === "string" ? payload.provider.trim() : "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
 
   if (!studentLegalName || !courseTitle || !completionDate || !certificateId || instructionalHours !== 40 || verifiedInstructionalMinutes < 2400 || examScore < 128 || passingScore !== 128) {
     throw new FloridaClassDExamError("Completion certificate evidence is incomplete.", 502, "FDACS_CERTIFICATE_EVIDENCE_INVALID");

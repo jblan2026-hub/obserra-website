@@ -4,7 +4,7 @@ Snapshot: 2026-08-13 21:03 ET
 
 ## Authoritative scope
 
-This handoff governs the regulated Florida Class D school and LMS workstream for **Obserra Executive Protection & Intelligence LLC**. It is separate from the commercial Obserra Academy course-production workstream.
+This handoff governs the regulated Florida Class D school and LMS workstream for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**. It is separate from the commercial Obserra Academy course-production workstream.
 
 Branch: `feature/florida-class-d-lms-foundation`
 
@@ -88,7 +88,7 @@ Primary Gate 24 artifacts include `supabase/migrations/20260813110000_fdacs_clas
 
 Gate 25 strengthens the regulated runtime-isolation boundary. `scripts/florida-class-d-runtime-isolation-audit.mjs --enforce` is mandatory in the dedicated Florida Class D workflow and inventories regulated `lib/florida-class-d*.ts` server modules for embedded Supabase project URLs and improper `NEXT_PUBLIC_*` secret-class environment names.
 
-The remediation removed every embedded Supabase project URL fallback identified by the enforcing inventory. Regulated persistence and service modules now require explicit protected `OBSERRA_SUPABASE_URL` HTTPS configuration and protected server-side credentials. Missing or invalid protected runtime configuration fails closed; service-role credentials are not exposed to regulated browser components.
+The remediation removed every embedded Supabase project URL fallback identified by the enforcing inventory. Regulated persistence and service modules now require explicit protected `OBSERRA_FDACS_SUPABASE_URL` HTTPS configuration and protected server-side credentials. Missing or invalid protected runtime configuration fails closed; service-role credentials are not exposed to regulated browser components.
 
 Florida Class D LMS Gates run #367 on `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d` passed the mandatory Gate 25 enforcement with zero findings and then completed repository contract tests, static quality validation/lint, and the production Next.js build successfully.
 

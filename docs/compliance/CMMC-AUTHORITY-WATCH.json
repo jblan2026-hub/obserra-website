@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0",
+  "watchId": "obserra-cmmc-authority-watch-2026-08-14",
+  "legalOwner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "authorityProfilePath": "docs/compliance/CMMC-AUTHORITY-PROFILE.json",
+  "policy": {
+    "cadence": "weekly_and_manual",
+    "silentBaselineUpdatesAllowed": false,
+    "driftDisposition": "fail_closed_pending_review",
+    "rule": "A changed official artifact, a new detected revision identifier, or a changed 32 CFR Part 170 amendment inventory blocks authority freshness. A reviewed authority profile, exact source hash, objective catalogs, system mappings, and release evidence must then be approved and regenerated."
+  },
+  "checks": [
+    {
+      "checkId": "PIN-32-CFR-170",
+      "checkType": "pinned_sha256",
+      "authorityId": "32-cfr-part-170-2026-08-12",
+      "url": "https://www.ecfr.gov/api/versioner/v1/full/2026-08-12/title-32.xml?part=170",
+      "expectedSha256": "3dc8b9bebbe56753206429657cbac24ff32bfd64c75356ba276af38a1032b628"
+    },
+    {
+      "checkId": "PIN-DOD-GUIDE-2-13",
+      "checkType": "pinned_sha256",
+      "authorityId": "dod-cmmc-l2-assessment-guide-v2.13-2024-09",
+      "url": "https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf",
+      "expectedSha256": "0dcaba1626a0d23893981d74dd3f0f2338fff54cece67d81bc811ce76392d867"
+    },
+    {
+      "checkId": "PIN-NIST-171-R2",
+      "checkType": "pinned_sha256",
+      "authorityId": "nist-sp-800-171r2-upd1",
+      "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171r2.pdf",
+      "expectedSha256": "298bdbfcf6a4890a564b225c893230a0b32b2e69e3b98dd898aaeb1d544c5e12"
+    },
+    {
+      "checkId": "PIN-NIST-171A-2018",
+      "checkType": "pinned_sha256",
+      "authorityId": "nist-sp-800-171a-june-2018",
+      "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171A.pdf",
+      "expectedSha256": "21bf3acc43f4284f723639b82eb71e3ce597fa3610f7e9dcf5e8484e22bc0f71"
+    },
+    {
+      "checkId": "PIN-NIST-171-R3",
+      "checkType": "pinned_sha256",
+      "authorityId": "nist-sp-800-171r3-2024-05",
+      "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171r3.pdf",
+      "expectedSha256": "3e4631df8b5d61f40a6e542b52779ef30ddbbfff31e09214fa94ad6e6f5e6d08"
+    },
+    {
+      "checkId": "PIN-NIST-171A-R3",
+      "checkType": "pinned_sha256",
+      "authorityId": "nist-sp-800-171ar3-2024-05",
+      "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171Ar3.pdf",
+      "expectedSha256": "946d963707cdaba19901c49d5c89517adb00844fe5d101e9dac7febc68e34cfa"
+    },
+    {
+      "checkId": "WATCH-32-CFR-170-AMENDMENTS",
+      "checkType": "ecfr_part_versions",
+      "authorityId": "32-cfr-part-170-2026-08-12",
+      "url": "https://www.ecfr.gov/api/versioner/v1/versions/title-32.json?part=170",
+      "expectedPart": "170",
+      "expectedVersionCount": 25,
+      "expectedLatestDate": "2024-12-16"
+    },
+    {
+      "checkId": "WATCH-NIST-171-REVISION",
+      "checkType": "revision_tokens",
+      "authorityId": "nist-sp-800-171r3-2024-05",
+      "url": "https://csrc.nist.gov/Projects/protecting-controlled-unclassified-information/sp-800-171",
+      "pattern": "800-171r([0-9]+)",
+      "expectedRevisions": ["2", "3"]
+    },
+    {
+      "checkId": "WATCH-DOD-L2-GUIDE-REVISION",
+      "checkType": "revision_tokens",
+      "authorityId": "dod-cmmc-l2-assessment-guide-v2.13-2024-09",
+      "url": "https://dodcio.defense.gov/CMMC/Resources-Documentation/",
+      "pattern": "AssessmentGuideL2v([0-9]+)\\.pdf",
+      "expectedRevisions": ["2"]
+    }
+  ]
+}

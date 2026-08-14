@@ -10,8 +10,8 @@ import {
 import "./florida-security-training.css";
 
 export const metadata: Metadata = {
-  title: "Florida Class D Security Officer Training | Obserra",
-  description: "Obserra Executive Protection & Intelligence LLC is building a premium Florida Class D Security Officer Training learning experience. Enrollment is not yet open.",
+  title: "Florida Class D Security Officer Training | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  description: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC is building a premium Florida Class D Security Officer Training learning experience. Enrollment is not yet open.",
   alternates: { canonical: "/florida-security-training" },
 };
 
@@ -24,7 +24,7 @@ export default function FloridaSecurityTrainingPage() {
         <h1>{FLORIDA_CLASS_D_COURSE.title}</h1>
         <p className="fl-classd__lead">A premium regulated-training environment from <strong>{FLORIDA_CLASS_D_COURSE.provider}</strong>, being engineered for live instruction, secure enrollment, verified attendance, student interaction, learning checks, examination controls, training records, and post-course administration.</p>
         <div className="fl-classd__notice"><LockKeyhole size={20} /><div><strong>Enrollment and payment are not yet enabled.</strong><span>This page is a development preview. The regulated course will remain locked until applicable school, curriculum, examination, operational, and launch gates are satisfied.</span></div></div>
-        <div className="fl-classd__actions"><Link href="/contact?interest=florida-class-d-training">Join the interest list</Link><Link className="secondary" href="/academy">Explore Obserra Academy</Link></div>
+        <div className="fl-classd__actions"><Link href="/contact?interest=florida-class-d-training">Join the interest list</Link><Link className="secondary" href="/florida-security-training/access">Authorized student course sign-in</Link></div>
       </section>
 
       <section className="fl-classd__metrics" aria-label="Course structure">
@@ -50,7 +50,7 @@ export default function FloridaSecurityTrainingPage() {
         <div className="fl-classd__automation-grid">{floridaClassDLmsAutomation.map((item, index) => <div key={item}><b>{String(index + 1).padStart(2, "0")}</b><span>{item}</span></div>)}</div>
       </section>
 
-      <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing distinction</strong><p>Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the appropriate state authority. Obserra will not represent this course as state-approved until the applicable approval process is complete.</p></div></section>
+      <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing distinction</strong><p>Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the appropriate state authority. OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC will not represent this course as state-approved until the applicable approval process is complete.</p></div></section>
     </main>
   );
 }

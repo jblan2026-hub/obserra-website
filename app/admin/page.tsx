@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { courses } from "../academy/courseData";
 import { getAcademyAggregateMetrics, getAcademyCommerceMetrics, ownerEmailAllowed } from "../../lib/academy";
 import AcademyCommerceProvisioner from "./AcademyCommerceProvisioner";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./admin.css";
 import "./admin-refine.css";
 
@@ -30,8 +31,8 @@ export default async function AdminPage() {
   });
 
   return <main className="admin-shell">
-    <header><Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} /><span>SECURED OWNER CONTROL ROOM</span></header>
-    <section className="admin-hero"><p>Signed in owner: {emails[0]}</p><h1>Obserra site administration</h1><p>Protected Academy controls, commerce performance, traffic intelligence, and release readiness for OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC.</p></section>
+    <header><Image src="/brand/obserra-logo.png" alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" width={286} height={55} /><span>SECURED OWNER CONTROL ROOM</span></header>
+    <section className="admin-hero"><p>Signed in owner: {emails[0]}</p><h1>{LEGAL_ENTITY_NAME} site administration</h1><p>Protected Academy controls, commerce performance, traffic intelligence, and release readiness for {LEGAL_ENTITY_NAME}.</p></section>
     <section className="admin-grid">
       <article><span>Catalog courses</span><strong>{courses.length}</strong><small>Structured paid courses in Academy</small></article>
       <article><span>Learner accounts observed</span><strong>{metrics.learnerAccounts}</strong><small>Durable Academy learner records</small></article>

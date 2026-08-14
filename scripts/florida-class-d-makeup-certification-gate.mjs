@@ -30,7 +30,7 @@ requireText(security, "from public, anon, authenticated", "Certification RPC mus
 requireText(security, "to service_role", "Certification RPC execute permission must be limited to service_role.");
 
 requireText(service, "certifyFloridaClassDMakeupAtomic", "A server-only certification service is required.");
-requireText(service, "OBSERRA_SUPABASE_SERVICE_ROLE_KEY", "Certification service must use the protected Supabase service-role boundary.");
+requireText(service, "OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY", "Certification service must use the protected Supabase service-role boundary.");
 requireText(service, "/rest/v1/rpc/", "Certification must call the database transaction through the RPC boundary.");
 requireText(service, "idempotencyKey", "Certification must require an idempotency key.");
 requireText(service, "correlationId", "Certification must carry a correlation id.");

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { trustPolicies, trustPolicyMap } from "../policies";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "../trust.css";
 
 export async function generateStaticParams() {
@@ -13,19 +14,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const policy = trustPolicyMap[slug];
   if (!policy) return {};
   return {
-    title: `${policy.title} | Obserra Trust Center`,
+    title: `${policy.title} | ${LEGAL_ENTITY_NAME} Trust Center`,
     description: policy.description,
     alternates: { canonical: `/trust/${policy.slug}` },
     openGraph: {
-      title: `${policy.title} | Obserra Trust Center`,
+      title: `${policy.title} | ${LEGAL_ENTITY_NAME} Trust Center`,
       description: policy.description,
       url: `https://www.obserrallc.com/trust/${policy.slug}`,
       type: "article",
-      images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: `Obserra Trust Policy: ${policy.title}` }],
+      images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: `${LEGAL_ENTITY_NAME} Trust Policy: ${policy.title}` }],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${policy.title} | Obserra Trust Center`,
+      title: `${policy.title} | ${LEGAL_ENTITY_NAME} Trust Center`,
       description: policy.description,
       images: ["/brand/visuals/obserra-cybersecurity.png"],
     },
@@ -40,7 +41,7 @@ export default async function TrustPolicyPage({ params }: { params: Promise<{ sl
   return (
     <main className="trust-page">
       <div className="trust-wrap">
-        <p className="trust-eyebrow">OBSERRA TRUST CENTER</p>
+        <p className="trust-eyebrow">{LEGAL_ENTITY_NAME} TRUST CENTER</p>
         <h1>{policy.title}</h1>
         <p className="trust-lead">{policy.summary}</p>
 
