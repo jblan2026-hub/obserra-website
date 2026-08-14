@@ -20,16 +20,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid lesson media request" }, { status: 400, headers });
   }
 
-  const ownerPreview = process.env.VERCEL_ENV === "preview";
-  if (!ownerPreview) {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers });
-    }
-    const state = await academyStateWithOwnerAccess(userId, courseId);
-    if (!state.entitlements[courseId]) {
-      return NextResponse.json({ error: "Paid course access is required" }, { status: 403, headers });
-    }
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers });
+  }
+  const state = await academyStateWithOwnerAccess(userId, courseId);
+  if (!state.entitlements[courseId]) {
+    return NextResponse.json({ error: "Paid course access is required" }, { status: 403, headers });
   }
 
   const media = lessonMedia(courseId, lessonIndex);
