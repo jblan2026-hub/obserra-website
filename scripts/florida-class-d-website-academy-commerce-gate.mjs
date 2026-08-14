@@ -17,6 +17,7 @@ const proxyPath = "proxy.ts";
 const contractsPath = "lib/academy-control-contracts.ts";
 const controlPath = "lib/academy-control.ts";
 const checkoutPath = "app/api/academy/checkout/route.ts";
+const redeemPath = "app/api/academy/redeem/route.ts";
 const webhookPath = "app/api/webhook/stripe/route.ts";
 const supabaseConfigPath = "supabase/config.toml";
 const publicCatalogPath = "supabase/functions/academy-public-catalog/index.ts";
@@ -26,6 +27,7 @@ const proxy = read(proxyPath);
 const contracts = read(contractsPath);
 const control = read(controlPath);
 const checkout = read(checkoutPath);
+const redeem = read(redeemPath);
 const webhook = read(webhookPath);
 const supabaseConfig = read(supabaseConfigPath);
 const publicCatalog = read(publicCatalogPath);
@@ -59,6 +61,13 @@ requireText(checkoutPath, checkout, 'runtimeCourse.controlPlane !== "operational
 requireText(checkoutPath, checkout, "!runtimeCourse.control.purchaseEnabled", "purchase authorization requirement");
 requireText(checkoutPath, checkout, 'response.headers.set("cache-control", "private, no-store, max-age=0")', "no-store commerce response");
 
+// Deferred payment claims must re-fetch the paid Stripe session and match a verified Clerk email address.
+requireText(redeemPath, redeem, "checkout.sessions.retrieve(sessionId)", "Stripe session re-verification");
+requireText(redeemPath, redeem, 'session.payment_status === "paid"', "paid redemption requirement");
+requireText(redeemPath, redeem, 'session.metadata?.courseId === courseId', "course-bound redemption requirement");
+requireText(redeemPath, redeem, 'item.verification?.status === "verified"', "verified Clerk email requirement");
+requireText(redeemPath, redeem, "authenticatedUserOwnsVerifiedPurchaserEmail", "verified purchaser-email ownership check");
+
 // Fulfillment must be driven by signed Stripe webhooks and only after a paid event.
 requireText(webhookPath, webhook, 'request.headers.get("stripe-signature")', "Stripe signature header");
 requireText(webhookPath, webhook, "webhooks.constructEvent", "Stripe signature verification");
@@ -71,6 +80,7 @@ requireText(webhookPath, webhook, "grantCourseAccess", "post-payment entitlement
 requireText(productionActivationPath, productionActivation, "production", "regulated production activation source");
 requireText(productionActivationPath, productionActivation, "authorize", "regulated authorization source");
 forbidText(checkoutPath, checkout.toLowerCase(), "florida-class-d", "Florida Class D generic Academy checkout coupling");
+forbidText(redeemPath, redeem.toLowerCase(), "florida-class-d", "Florida Class D generic Academy redemption coupling");
 forbidText(webhookPath, webhook.toLowerCase(), "florida-class-d", "Florida Class D generic Stripe fulfillment coupling");
 
-console.log("Gate 32 passed: website identity, Academy control plane, commerce, webhook, and regulated separation are secure-by-default.");
+console.log("Gate 32 passed: website identity, Academy control plane, commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
