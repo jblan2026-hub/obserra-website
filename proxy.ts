@@ -261,8 +261,7 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
   }
 
   try {
-    const clerkHandler = getConfiguredClerkHandler();
-    return await clerkHandler(request, event);
+    return await getConfiguredClerkHandler()(request, event);
   } catch {
     return identityConfigurationResponse(request);
   }
