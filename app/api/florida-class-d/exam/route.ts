@@ -9,6 +9,7 @@ import {
   submitFloridaClassDExam,
 } from "../../../../lib/florida-class-d-exam";
 import { heartbeatFloridaClassDExam } from "../../../../lib/florida-class-d-exam-monitoring";
+import { floridaClassDProductionActivationAuthorized } from "../../../../lib/florida-class-d-production-activation";
 
 const headers = {
   "cache-control": "private, no-store, max-age=0, must-revalidate",
@@ -28,6 +29,10 @@ type Body = {
   correlationId?: unknown;
   pageVisible?: unknown;
 };
+
+function examEnabled() {
+  return floridaClassDProductionActivationAuthorized() && floridaClassDExamEnabled();
+}
 
 function disabled() {
   return NextResponse.json(
@@ -49,7 +54,7 @@ function errorResponse(error: unknown) {
 
 export async function GET() {
   try {
-    if (!floridaClassDExamEnabled()) return disabled();
+    if (!examEnabled()) return disabled();
     const { userId } = await requireFloridaClassDSignedInUser();
     return NextResponse.json(await getFloridaClassDExamState(userId), { headers });
   } catch (error) {
@@ -59,7 +64,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    if (!floridaClassDExamEnabled()) return disabled();
+    if (!examEnabled()) return disabled();
     const { userId, sessionId } = await requireFloridaClassDSignedInUser();
     const body = await request.json().catch(() => null) as Body | null;
     if (!body || typeof body.action !== "string") return NextResponse.json({ error: "Invalid examination request.", code: "FDACS_EXAM_INVALID_REQUEST" }, { status: 400, headers });
