@@ -2,7 +2,7 @@
 
 ## Scope
 
-This controlled handoff governs the regulated Florida Class D make-up-training increment for **Obserra Executive Protection & Intelligence LLC**. It remains separate from the commercial Academy course-production workstream.
+This controlled handoff governs the regulated Florida Class D make-up-training increment for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**. It remains separate from the commercial Academy course-production workstream.
 
 Public state remains `COMING SOON · LMS IN PROGRESS`. The owner reports an active Class DI instructor license and a pending Class DS school/training facility application. Production make-up delivery and all other regulated launch functions remain fail closed until the applicable regulatory and production gates are satisfied.
 

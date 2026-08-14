@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ShieldCheck, Plane, ScanSearch, ArrowRight, Eye, NotebookPen, MapPinned } from "lucide-react";
 import "../apps/apps.css";
 import "../services/services.css";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 const offers = [
   {
@@ -28,7 +29,7 @@ const offers = [
 ];
 
 export const metadata: Metadata = {
-  title: "Protection and Intelligence | Obserra",
+  title: `Protection and Intelligence | ${LEGAL_ENTITY_NAME}`,
   description:
     "Commercial pathway for protective intelligence, executive exposure assessments, and travel risk planning with pilot-first delivery.",
   alternates: { canonical: "/protection-intelligence" },
@@ -40,16 +41,16 @@ export const metadata: Metadata = {
     "commercial security services",
   ],
   openGraph: {
-    title: "Obserra Protection and Intelligence",
+    title: `${LEGAL_ENTITY_NAME} Protection and Intelligence`,
     description:
       "Controlled pilots and design-partner engagements for executive exposure, protective intelligence, and travel risk.",
     url: "https://www.obserrallc.com/protection-intelligence",
     type: "website",
-    images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: "Obserra protection and intelligence" }],
+    images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: `${LEGAL_ENTITY_NAME} protection and intelligence` }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Obserra Protection and Intelligence",
+    title: `${LEGAL_ENTITY_NAME} Protection and Intelligence`,
     description: "Controlled pilots and design-partner engagements for executive exposure, protective intelligence, and travel risk.",
     images: ["/brand/visuals/obserra-cybersecurity.png"],
   },
@@ -65,7 +66,7 @@ export default function ProtectionIntelligencePage() {
         description: "Protective intelligence, executive exposure assessments, and travel risk planning delivered through controlled commercial pilots.",
         provider: {
           "@type": "Organization",
-          name: "Obserra Executive Protection & Intelligence LLC",
+          name: LEGAL_ENTITY_NAME,
           url: "https://www.obserrallc.com",
         },
         areaServed: "Global",
@@ -85,8 +86,8 @@ export default function ProtectionIntelligencePage() {
     <main className="apps-page services-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       <header className="apps-nav">
-        <a href="/" className="apps-brand" aria-label="Obserra home">
-          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
+        <a href="/" className="apps-brand" aria-label={`${LEGAL_ENTITY_NAME} home`}>
+          <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
           <span>PROTECTION AND INTELLIGENCE</span>
         </a>
         <nav aria-label="Protection and intelligence navigation">
@@ -103,7 +104,7 @@ export default function ProtectionIntelligencePage() {
           <p className="apps-eyebrow">SECOND REVENUE ENGINE: PILOT-FIRST PROTECTION AND INTELLIGENCE</p>
           <h1>Protective intelligence and executive exposure services packaged for fast, controlled deployment.</h1>
           <p>
-            Obserra leads with design-partner and controlled pilot engagements before broader commercial rollout.
+            {LEGAL_ENTITY_NAME} leads with design-partner and controlled pilot engagements before broader commercial rollout.
             This path is built for buyers who need clear executive exposure findings, actionable protective intelligence,
             and travel risk readiness without waiting on a large standing program.
           </p>

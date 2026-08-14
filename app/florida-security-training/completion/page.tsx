@@ -6,13 +6,13 @@ import { listCompletionDocumentsForStudent } from "../../../lib/florida-class-d-
 import "../florida-security-training.css";
 
 export const metadata: Metadata = {
-  title: "Florida Class D Completion Documents | Obserra",
+  title: "Florida Class D Completion Documents | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   robots: { index: false, follow: false },
 };
 
 function documentLabel(type: string) {
   if (type === "fdacs_16103") return "FDACS-16103 Certificate of Security Officer Training";
-  if (type === "obserra_course_completion") return "Obserra Course Completion Certificate";
+  if (type === "obserra_course_completion") return "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Course Completion Certificate";
   return "Florida Class D Application Instructions";
 }
 
@@ -39,7 +39,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
           <FileCheck2 size={20} />
           <div>
             <strong>The official training certificate is FDACS-16103.</strong>
-            <span>It is generated through the school&apos;s LIAS reporting workflow only after successful completion. An Obserra-branded certificate may also be provided after the passing examination and completion approval, but it is supplemental and does not replace FDACS-16103.</span>
+            <span>It is generated through the school&apos;s LIAS reporting workflow only after successful completion. An OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC-branded certificate may also be provided after the passing examination and completion approval, but it is supplemental and does not replace FDACS-16103.</span>
           </div>
         </div>
       </section>
@@ -72,7 +72,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
         <div className="fl-classd__section-heading">
           <span>FLORIDA CLASS D APPLICATION</span>
           <h2>Use the official FDACS application process</h2>
-          <p>The FDACS-16103 is the official course-completion evidence students retain for the Class D application. The application itself is submitted to FDACS, not to Obserra.</p>
+          <p>The FDACS-16103 is the official course-completion evidence students retain for the Class D application. The application itself is submitted to FDACS, not to OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC.</p>
         </div>
         <div className="fl-classd__actions">
           <a href="https://laso.fdacs.gov/apply/DApplicationForm.aspx" target="_blank" rel="noreferrer">Open official Class D application <ExternalLink size={16} /></a>
@@ -84,7 +84,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
         <div className="fl-classd__section-heading">
           <span>SUPPLEMENTAL RECORDS</span>
           <h2>School completion and application support</h2>
-          <p>Supplemental Obserra records may be generated only after the passing examination and successful completion approval. They may include your verified legal name, course title, 40 instructional hours, completion date, and a unique certificate identifier. These records do not substitute for the official LIAS-generated FDACS-16103.</p>
+          <p>Supplemental OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC records may be generated only after the passing examination and successful completion approval. They may include your verified legal name, course title, 40 instructional hours, completion date, and a unique certificate identifier. These records do not substitute for the official LIAS-generated FDACS-16103.</p>
         </div>
         <div className="fl-classd__automation-grid">
           {supplemental.map((document) => (

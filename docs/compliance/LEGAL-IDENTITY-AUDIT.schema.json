@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.obserrallc.com/schemas/legal-identity-audit-v2.json",
+  "title": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Legal Identity Audit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "schemaPath",
+    "legalEntityName",
+    "canonicalPublicOrigin",
+    "sourceRevision",
+    "scope",
+    "permittedProductBrands",
+    "identifierBoundary",
+    "cmmcEvidenceMapping",
+    "candidateValidation",
+    "authoritativeTechnicalResult",
+    "releaseFinalization",
+    "humanReview",
+    "assessorDetermination",
+    "eligibleAsFinalEvidence",
+    "claimBoundary"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "obserra.legal-identity-audit.v2" },
+    "schemaPath": { "const": "docs/compliance/LEGAL-IDENTITY-AUDIT.schema.json" },
+    "legalEntityName": { "const": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" },
+    "canonicalPublicOrigin": { "const": "https://www.obserrallc.com" },
+    "sourceRevision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sourceTreeSha256", "checkedFileCount"],
+      "properties": {
+        "kind": { "const": "working_tree_content_digest" },
+        "sourceTreeSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "checkedFileCount": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "scope": { "type": "object" },
+    "permittedProductBrands": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+    "identifierBoundary": { "type": "object" },
+    "cmmcEvidenceMapping": { "type": "object" },
+    "candidateValidation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "gatePath", "outcome", "findingCount"],
+      "properties": {
+        "method": { "const": "source_scan" },
+        "gatePath": { "const": "scripts/legal-identity-audit.mjs" },
+        "outcome": { "const": "satisfied_locally_non_authoritative" },
+        "findingCount": { "const": 0 }
+      }
+    },
+    "authoritativeTechnicalResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "authority", "failClosed", "reason"],
+      "properties": {
+        "state": { "const": "not_tested" },
+        "authority": { "const": "final_approved_production_release" },
+        "failClosed": { "const": true },
+        "reason": { "type": "string", "minLength": 80 }
+      }
+    },
+    "releaseFinalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exactReleaseCommitSha", "approvalState", "publicationState", "productionDeploymentId", "canonicalProductionVerificationState", "finalResultArtifactSha256"],
+      "properties": {
+        "exactReleaseCommitSha": { "type": "null" },
+        "approvalState": { "const": "pending" },
+        "publicationState": { "const": "not_published" },
+        "productionDeploymentId": { "type": "null" },
+        "canonicalProductionVerificationState": { "const": "not_executed" },
+        "finalResultArtifactSha256": { "type": "null" }
+      }
+    },
+    "humanReview": {
+      "type": "object",
+      "required": ["state", "pendingIsTechnicalFailure"],
+      "properties": {
+        "state": { "const": "pending" },
+        "pendingIsTechnicalFailure": { "const": false }
+      }
+    },
+    "assessorDetermination": { "const": "not_assessed" },
+    "eligibleAsFinalEvidence": { "const": false },
+    "claimBoundary": { "type": "string", "minLength": 40 }
+  }
+}

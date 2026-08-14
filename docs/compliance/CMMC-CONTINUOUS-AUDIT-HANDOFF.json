@@ -1,0 +1,271 @@
+{
+  "schemaVersion": "obserra.cmmc.continuity-handoff.v1",
+  "updatedAt": "2026-08-14T18:54:54Z",
+  "legalOwner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "repository": "jblan2026-hub/obserra-website",
+  "workingBranch": "codex/gate37-public-production-hardening",
+  "workingBaseCommitSha": "0e72459a8940f23976038d85d6394409000f48c5",
+  "statusClaim": "implemented_locally_live_activation_pending",
+  "statusRule": "Do not describe the continuous audit record as live until the production migrations, protected workflow secrets, approved main-branch workflow, actual archive write, controlled catalog read, artifact-chain check, access-event-chain check, health check, and paired receipt have all been verified.",
+  "scope": {
+    "included": [
+      "website",
+      "academy_lms",
+      "stripe_payments",
+      "stripe_identity",
+      "clerk_identity",
+      "fdacs_database",
+      "academy_database",
+      "cmmc_evidence_archive",
+      "vercel_runtime",
+      "github_ci",
+      "daily_media",
+      "direct_dependencies",
+      "organization_governance"
+    ],
+    "excludedWorkstream": "Applications product workstream",
+    "excludedPathPrefixes": [
+      "app/apps/",
+      "app/api/apps/",
+      "app/portal/applications/",
+      "lib/apps/"
+    ]
+  },
+  "authorities": [
+    {"authorityId": "32-cfr-part-170-2026-08-12", "role": "governing_regulation"},
+    {"authorityId": "dod-cmmc-l2-assessment-guide-v2.13-2024-09", "role": "governing_assessment_guidance"},
+    {"authorityId": "nist-sp-800-171r2-upd1", "role": "incorporated_governing_requirement_baseline"},
+    {"authorityId": "nist-sp-800-171a-june-2018", "role": "incorporated_governing_assessment_procedure"},
+    {"authorityId": "nist-sp-800-171r3-2024-05", "role": "supplemental_forward_engineering_baseline"},
+    {"authorityId": "nist-sp-800-171ar3-2024-05", "role": "supplemental_forward_assessment_baseline"}
+  ],
+  "canonicalAuditRecord": {
+    "machineReadablePath": "docs/compliance/CMMC-SYSTEM-EVIDENCE.json",
+    "humanReadableExtractPath": "docs/compliance/CMMC-SYSTEM-EVIDENCE.md",
+    "pairedDigestManifestPath": "docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256",
+    "schemaPath": "docs/compliance/CMMC-SYSTEM-EVIDENCE.schema.json",
+    "controlledSourcePath": "docs/compliance/CMMC-SYSTEM-SCOPE-SOURCE.json",
+    "generatorPath": "scripts/cmmc-system-evidence.mjs",
+    "verificationCommand": "npm run verify:cmmc-evidence",
+    "objectiveCoverage": {
+      "governingRev2Objectives": 320,
+      "supplementalRev3Objectives": 510,
+      "uniqueObjectives": 830,
+      "separatedSystemObjectiveMappings": 3048
+    },
+    "currentTechnicalDisposition": {
+      "passed": 0,
+      "failed": 0,
+      "notTested": 3048,
+      "humanPendingIsFailure": false,
+      "assessmentFinding": "not_assessed"
+    }
+  },
+  "approvedChangeAutomation": {
+    "workflowPath": ".github/workflows/cmmc-evidence-governance.yml",
+    "trigger": "push_to_main_after_approved_merge",
+    "applicationsOnlyChangesExcluded": true,
+    "officialSourceDriftFailsClosed": true,
+    "exactRevisionBundleRequired": true,
+    "pairedMachineHumanViewsRequired": true,
+    "permanentArchiveRequired": true,
+    "verifiedReceiptRequired": true
+  },
+  "archiveContract": {
+    "baseMigration": "supabase/migrations/20260814161500_cmmc_evidence_indefinite_archive.sql",
+    "objectiveContractMigration": "supabase/migrations/20260814180000_cmmc_objective_evidence_contract.sql",
+    "archiveClient": "scripts/cmmc-archive-release-evidence.mjs",
+    "sourceGate": "scripts/cmmc-evidence-archive-gate.mjs",
+    "retentionMode": "indefinite",
+    "automaticDeletionEnabled": false,
+    "legalHoldRequired": true,
+    "archiveClassificationBoundary": "public_or_internal_non_cui_only",
+    "studentPiiAccepted": false,
+    "paymentDataAccepted": false,
+    "secretMaterialAccepted": false,
+    "artifactChainVerificationRequired": true,
+    "accessEventChainVerificationRequired": true
+  },
+  "archiveTargetDecision": {
+    "physicalIsolationRequired": true,
+    "academyProjectRejectedAsArchiveTarget": true,
+    "academyProjectRef": "nwxnyqlyzyufgoadtqxs",
+    "reason": "Live inspection found the Academy project also contains Applications workstream tables. A CMMC archive service-role credential there would share authority with the excluded Applications boundary.",
+    "dedicatedProjectState": "awaiting_fresh_cost_confirmation",
+    "quotedProjectCost": {"amountUsd": 10, "recurrence": "monthly", "observedOn": "2026-08-14"},
+    "academyOrApplicationsMutationPerformed": false
+  },
+  "highAvailabilityContract": {
+    "required": true,
+    "currentState": "not_configured_not_tested",
+    "meetsHighAvailability": false,
+    "recoveryObjectives": {"maximumRtoMinutes": 60, "maximumRpoMinutes": 15},
+    "providerFacts": {
+      "projectUsesOnePrimaryRegion": true,
+      "readReplicasAreAsynchronousAndReadOnly": true,
+      "readReplicaRequiresProOrHigherAndSmallComputeOrHigher": true,
+      "pitrIsASeparatePaidAddon": true,
+      "pitrDocumentedWorstCaseRpoMinutes": 2,
+      "inference": "A read-only asynchronous replica provides redundancy but is not, by itself, verified automatic writable-primary failover. HA remains pending until an exact-revision failover and restoration test passes."
+    },
+    "requiredEvidence": [
+      "Dedicated archive project and exact infrastructure configuration",
+      "Physical backup or PITR configuration receipt",
+      "Replica or approved alternate redundancy configuration receipt",
+      "Replication-lag observation",
+      "Exact-release backup restoration test",
+      "Exact-release failover or documented recovery exercise",
+      "Measured RTO and RPO",
+      "SHA-256 hashes for every final test artifact"
+    ],
+    "providerSources": [
+      "https://supabase.com/docs/guides/deployment/going-into-prod",
+      "https://supabase.com/docs/guides/platform/backups",
+      "https://supabase.com/docs/guides/platform/read-replicas/getting-started"
+    ],
+    "additionalAddonCostsConfirmed": false
+  },
+  "websiteCredentialRemediation": {
+    "systemId": "SYS-WEBSITE",
+    "canonicalPage": "https://www.obserrallc.com/about",
+    "liveAuthority": {
+      "observedAt": "2026-08-14T18:54:54Z",
+      "technicalResult": "failed",
+      "vercelProjectId": "prj_lxTKKDa9sbhht7FaigiaF1PONMiC",
+      "vercelProjectName": "obserra-website-live",
+      "deploymentId": "dpl_FdYBScoDxVX3bDFkk2dTwyvxtBPa",
+      "deploymentState": "READY",
+      "deploymentTarget": "production",
+      "deployedCommitSha": "0e72459a8940f23976038d85d6394409000f48c5",
+      "renderedCredentialImageCount": 9,
+      "brokenCredentialImageCount": 9,
+      "nonzeroNaturalDimensionCount": 0,
+      "observedStaleLogicalAssets": [
+        "/badges/eccouncil/adg-adopt.png",
+        "/badges/eccouncil/adg-defend.png",
+        "/badges/eccouncil/adg-govern.png",
+        "/badges/eccouncil/ceh.png",
+        "/badges/eccouncil/chfi.png",
+        "/badges/eccouncil/ecih.png",
+        "/badges/eccouncil/eces.png",
+        "/badges/eccouncil/associate-cciso.png",
+        "/badges/eccouncil/cnda.png"
+      ]
+    },
+    "candidateSource": {
+      "branch": "codex/gate37-public-production-hardening",
+      "workingBaseCommitSha": "0e72459a8940f23976038d85d6394409000f48c5",
+      "exactReleaseCommitSha": null,
+      "publicationState": "not_published",
+      "authoritativeTechnicalState": "not_tested",
+      "eligibleAsFinalEvidence": false,
+      "authorizedCredentialCount": 9,
+      "credentialHolderAuthorizedUploadCount": 6,
+      "liveVerifiedAdgObservationCount": 3,
+      "manifestPath": "public/badges/eccouncil/asset-manifest.json",
+      "schemaPath": "public/badges/eccouncil/asset-manifest.schema.json",
+      "integrityGatePath": "scripts/ec-council-badge-integrity.test.mjs",
+      "localCandidateValidations": [
+        {"check": "credential_manifest_integrity", "outcome": "satisfied_locally_non_authoritative", "result": "Six of six tests were satisfied locally for inventory, live ADG observation binding, exact hashes/dimensions, provenance, authorized-only storage, and stale-fallback rejection."},
+        {"check": "typescript", "outcome": "satisfied_locally_non_authoritative", "result": "./node_modules/.bin/tsc --noEmit completed with exit code 0."},
+        {"check": "next_production_build", "outcome": "satisfied_locally_non_authoritative", "result": "Next.js 16.3.1 candidate build completed with exit code 0 and generated all 163 static pages."},
+        {"check": "local_asset_http", "outcome": "satisfied_locally_non_authoritative", "result": "All nine direct candidate assets returned HTTP 200 with correct image MIME types; all six PNG optimizer paths returned HTTP 200."}
+      ]
+    },
+    "humanReview": "pending",
+    "pendingHumanIsTechnicalFailure": false,
+    "assessmentFinding": "not_assessed",
+    "claimBoundary": "The current production deployment is verified failed for all nine EC-Council images. The candidate source and local HTTP/build validations are non-authoritative; candidate technical state remains not_tested and no production-fix or final-evidence claim is permitted until an exact commit is approved, deployed READY, reverified on the canonical page, and bound to a hashed final result artifact."
+  },
+  "fdacsPiiDatabaseAudit": {
+    "machineReadablePath": "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json",
+    "humanReadablePath": "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md",
+    "pairedDigestPath": "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256",
+    "evidenceSchemaPath": "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.schema.json",
+    "controlledLiveReceiptPath": "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT-SOURCE.json",
+    "sourceGate": "scripts/fdacs-pii-database-audit-gate.mjs",
+    "generator": "scripts/fdacs-pii-database-audit-record.mjs",
+    "verificationCommand": "npm run verify:fdacs-pii-audit",
+    "providerProjectRef": "ggkxgjhsbgbifiqrhavr",
+    "status": "live_hardened_activation_pending",
+    "liveAppliedMigrationCount": 6,
+    "securityAdvisorFindingCount": 0,
+    "unindexedForeignKeyFindingCount": 0,
+    "browserTablePrivilegeCount": 0,
+    "fdacsFunctionCount": 102,
+    "browserFunctionExecutePrivilegeCount": 0,
+    "explicitBrowserDenyPolicyCount": 64,
+    "validChainCount": 5,
+    "failedChainCount": 0,
+    "preflightExportId": "27ea0a5a-1c07-4c68-a37f-eb775df343fb",
+    "preflightPayloadSha256": "588eea7731526ff01704ae06b0b07381ec97340f7d162cb0cd3f3db1bd255d1e",
+    "preflightFinalized": false,
+    "productionRuntimeAuthorized": false,
+    "technicalChecks": {"passed": 6, "failed": 0, "notTested": 5},
+    "humanReview": "pending",
+    "assessmentFinding": "not_assessed",
+    "claimBoundary": "The isolated live database hardening, zero browser routine grants, preflight generation, and three fail-closed export tests are verified. External encryption-key custody, encrypted export finalization, backup/restore, HA failover, real student workflow, licensing prerequisites, and production authorization remain pending."
+  },
+  "legalIdentityAudit": {
+    "machineReadablePath": "docs/compliance/LEGAL-IDENTITY-AUDIT.json",
+    "humanReadablePath": "docs/compliance/LEGAL-IDENTITY-AUDIT.md",
+    "pairedDigestPath": "docs/compliance/LEGAL-IDENTITY-AUDIT.sha256",
+    "schemaPath": "docs/compliance/LEGAL-IDENTITY-AUDIT.schema.json",
+    "gatePath": "scripts/legal-identity-audit.mjs",
+    "verificationCommand": "npm run verify:legal-identity-audit",
+    "legalEntityName": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+    "authoritativeTechnicalState": "not_tested",
+    "candidateValidationOutcome": "satisfied_locally_non_authoritative",
+    "findingCount": 0,
+    "failClosed": true,
+    "humanReview": "pending",
+    "pendingHumanIsTechnicalFailure": false,
+    "assessmentFinding": "not_assessed",
+    "eligibleAsFinalEvidence": false,
+    "applicationsWorkstreamExcluded": true,
+    "claimBoundary": "The generated source audit verifies only that the working-tree candidate satisfies the exact legal-name policy. Its authoritative technical result remains not_tested and cannot become green until an exact approved release is published, deployed READY to production, verified on the canonical endpoint, and bound to a hashed final result artifact."
+  },
+  "verifiedLocalResults": [
+    "Governing Revision 2 catalog contains 110 controls and 320 objectives.",
+    "Supplemental Revision 3 catalog contains 97 controls and 510 objectives.",
+    "Per-system register contains 13 systems and 3048 objective mapping rows with zero unmapped required objectives.",
+    "Paired machine-readable JSON and human-readable Markdown are generated from the same in-memory bundle and bound by a SHA-256 manifest.",
+    "Archive source gate verifies exact revisions, ownership, claim boundaries, assessor-only findings, indefinite retention, immutable evidence, paired views, and both integrity-chain verifiers.",
+    "The isolated live FDACS database has six new audit/retention/identity/hardening migrations, 64 explicit browser-deny policies, zero browser execute grants across 102 FDACS routines, zero security-advisor findings, zero unindexed foreign-key findings, five valid integrity chains, and three verified live fail-closed export observations; the unpublished source gate is not_tested and production authorization remains false.",
+    "The website credential candidate has nine authorized local assets, three live Active ADG issuer observations, a six-of-six integrity result, a clean TypeScript result, a complete Next.js production build, and HTTP 200 results for every direct/optimized asset path; current production still fails all nine images and remains a live blocker.",
+    "The fail-closed legal identity audit generated paired machine/human records, requires the exact legal entity and canonical public origin, preserves only enumerated product brands and stable technical identifiers, maps to CMMC configuration/evidence controls, and records the unpublished candidate as not_tested rather than green.",
+    "The optimized Next.js 16.3.1 candidate build generated all 163 static pages; TypeScript, quiet ESLint, the 57-test Node source suite, and regulated Florida Class D source gates through Gate 21 were satisfied locally. These are non-authoritative candidate validations and do not create a green technical result.",
+    "The stale unsupported CMMC Phase II suspension statement was removed from historical supporting records."
+  ],
+  "liveActivationBlockers": [
+    {"id": "LIVE-001", "state": "pending", "item": "Publish and approve the workflow through the governed GitHub main-branch process."},
+    {"id": "LIVE-002", "state": "pending", "item": "Obtain fresh confirmation for the quoted $10/month dedicated CMMC archive project. The Academy project is rejected because its shared service-role boundary includes Applications tables."},
+    {"id": "LIVE-003", "state": "pending", "item": "Create the dedicated archive project, apply both archive migrations, and verify functions, grants, RLS, immutability, retention constraints, and integrity checks."},
+    {"id": "LIVE-004", "state": "pending", "item": "Confirm any additional Small-compute, read-replica, and PITR costs; configure the approved resilience topology."},
+    {"id": "LIVE-005", "state": "pending", "item": "Run and hash exact-revision backup restoration, replication-lag, and failover/recovery tests; demonstrate RTO at or below 60 minutes and RPO at or below 15 minutes."},
+    {"id": "LIVE-006", "state": "pending", "item": "Configure protected OBSERRA_CMMC_ARCHIVE_URL and OBSERRA_CMMC_ARCHIVE_SERVICE_ROLE_KEY environment secrets for the dedicated boundary."},
+    {"id": "LIVE-007", "state": "pending", "item": "Run an actual approved in-scope change, archive the exact-revision pair, read it through the controlled catalog, verify both chains and health, and retain the machine/human receipt."},
+    {"id": "LIVE-008", "state": "pending", "item": "Release stable continuous-audit links only after LIVE-001 through LIVE-007 are evidenced as complete."},
+    {"id": "LIVE-009", "state": "pending", "item": "Approve and publish the exact website candidate, deploy it through the intended Vercel project, and verify all nine EC-Council images have nonzero dimensions and every ADG link resolves to its individual active issuer record."}
+  ],
+  "continuousAuditLinks": {
+    "released": false,
+    "machineReadable": null,
+    "humanReadable": null,
+    "workflowRuns": null,
+    "reason": "Withheld until an actual production archive receipt and end-to-end approved-change run are verified."
+  },
+  "resumeOrder": [
+    "Regenerate and verify the CMMC evidence pair and website credential manifest after every in-scope source change without modifying Applications paths.",
+    "Obtain publication authorization for the exact final commit, deploy through the intended Vercel project, and reverify the nine website credential images plus three ADG issuer links on the canonical page.",
+    "Obtain the fresh $10/month dedicated-project confirmation; do not use the Academy or FDACS project as the archive target.",
+    "Create the isolated archive project, then apply and verify the archive migrations without modifying Academy or Applications tables.",
+    "Confirm and configure the approved HA/backup topology, then run exact-revision recovery tests.",
+    "Configure and verify the live archive boundary and protected secrets.",
+    "Publish through the governed GitHub approval path and observe the first exact-revision archive run.",
+    "Verify the machine receipt, human receipt, catalog record, artifact chain, access-event chain, archive health, and indefinite retention state.",
+    "Populate and release the stable continuous-audit links.",
+    "Resume LMS, website, payment, identity, HA, FDACS, Academy, dependency, and provider production-readiness work while updating this record."
+  ],
+  "claimBoundary": "This handoff records implementation and verification state. It does not claim CMMC certification, a MET assessment finding, authorization to process CUI, FDACS approval, production archive activation, or completion of any item still marked pending."
+}

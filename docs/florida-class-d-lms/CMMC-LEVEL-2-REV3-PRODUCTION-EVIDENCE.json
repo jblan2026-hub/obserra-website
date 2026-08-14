@@ -2,16 +2,16 @@
   "schemaVersion": "1.0",
   "snapshotDate": "2026-08-14",
   "program": {
-    "name": "Obserra Website and Academy Production Security Evidence",
+    "name": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Website and Academy Production Security Evidence",
     "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
     "repository": "jblan2026-hub/obserra-website",
     "branch": "main",
-    "claimBoundary": "Engineering alignment, release evidence, and audit traceability only. This ledger does not claim CMMC certification, CUI authorization, FedRAMP authorization, or FDACS approval."
+    "claimBoundary": "Historical release-support ledger only; docs/compliance/CMMC-SYSTEM-EVIDENCE.json is the current objective-level authority. This ledger does not claim CMMC certification, CUI authorization, FedRAMP authorization, FDACS approval, or an assessor finding."
   },
   "framework": {
     "engineeringBaseline": "NIST SP 800-171 Rev. 3",
     "assessmentBaseline": "NIST SP 800-171A Rev. 3",
-    "currentCmmcLevel2Crosswalk": "NIST SP 800-171 Rev. 2 practice identifiers retained for the currently enforced DoD CMMC Level 2 assessment baseline.",
+    "currentCmmcLevel2Crosswalk": "Supporting requirement identifiers only. The governing objective-level baseline is 32 CFR Part 170, the September 2024 CMMC Level 2 Assessment Guide version 2.13, NIST SP 800-171 Revision 2, and NIST SP 800-171A June 2018 as incorporated by reference; Revision 3 is supplemental forward engineering.",
     "nistOscalSource": {
       "repository": "usnistgov/oscal-content",
       "path": "nist.gov/SP800-171/rev3/json/NIST_SP800-171_rev3_catalog.json",

@@ -19,7 +19,7 @@ export const floridaClassDRequiredAcknowledgments: readonly FloridaClassDAcknowl
     code: "training-not-license",
     label: "Training and licensure are separate",
     statement:
-      "I understand that completing the Obserra training program does not itself issue a Florida Class D Security Officer license and that applicable state licensing requirements remain separate.",
+      "I understand that completing the OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC training program does not itself issue a Florida Class D Security Officer license and that applicable state licensing requirements remain separate.",
   },
   {
     code: "identity-accuracy",
@@ -37,13 +37,13 @@ export const floridaClassDRequiredAcknowledgments: readonly FloridaClassDAcknowl
     code: "exam-separate-controlled",
     label: "Certification examination is separately controlled",
     statement:
-      "I understand that completing 40 instructional hours does not earn a completion certificate. I must also satisfy examination eligibility requirements and pass the controlled final examination before any Obserra completion certificate, application-handoff document, or official FDACS-16103 certificate can be released.",
+      "I understand that completing 40 instructional hours does not earn a completion certificate. I must also satisfy examination eligibility requirements and pass the controlled final examination before any OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC completion certificate, application-handoff document, or official FDACS-16103 certificate can be released.",
   },
   {
     code: "records-privacy",
     label: "Regulated training records will be retained",
     statement:
-      "I understand that Obserra will maintain regulated training records needed for school administration, compliance, inspection readiness, and applicable legal or regulatory obligations.",
+      "I understand that OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC will maintain regulated training records needed for school administration, compliance, inspection readiness, and applicable legal or regulatory obligations.",
   },
   {
     code: "academic-integrity",

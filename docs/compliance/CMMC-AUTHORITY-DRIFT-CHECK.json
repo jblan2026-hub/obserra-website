@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "1.0",
+  "reportId": "obserra-cmmc-authority-drift-20260814180000Z",
+  "reportState": "final",
+  "legalOwner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "checkedAt": "2026-08-14T18:00:00Z",
+  "authorityProfile": {
+    "path": "docs/compliance/CMMC-AUTHORITY-PROFILE.json",
+    "profileId": "obserra-cmmc-l2-authority-profile-2026-08-12",
+    "sha256": "f93df2f8da8da8f8d29a39105d59231782edf5cda8a2a1bd57c7d31db3e0d0c5"
+  },
+  "watchDefinition": {
+    "path": "docs/compliance/CMMC-AUTHORITY-WATCH.json",
+    "watchId": "obserra-cmmc-authority-watch-2026-08-14",
+    "sha256": "5897c965e79152332bd615a7755d64eb6ee513673a57b59ec05b9333f7765f43"
+  },
+  "overallStatus": "passed",
+  "failClosed": true,
+  "silentBaselineUpdatesAllowed": false,
+  "disposition": "authority_snapshot_current",
+  "checks": [
+    {
+      "checkId": "PIN-32-CFR-170",
+      "checkType": "pinned_sha256",
+      "authorityId": "32-cfr-part-170-2026-08-12",
+      "requestedUrl": "https://www.ecfr.gov/api/versioner/v1/full/2026-08-12/title-32.xml?part=170",
+      "status": "passed",
+      "finalUrl": "https://www.ecfr.gov/api/versioner/v1/full/2026-08-12/title-32.xml?part=170",
+      "contentType": "application/xml; charset=utf-8",
+      "observedBytes": 178061,
+      "observedSha256": "3dc8b9bebbe56753206429657cbac24ff32bfd64c75356ba276af38a1032b628",
+      "expectedSha256": "3dc8b9bebbe56753206429657cbac24ff32bfd64c75356ba276af38a1032b628",
+      "detail": "Official artifact digest matches the pinned authority profile."
+    },
+    {
+      "checkId": "PIN-DOD-GUIDE-2-13",
+      "checkType": "pinned_sha256",
+      "authorityId": "dod-cmmc-l2-assessment-guide-v2.13-2024-09",
+      "requestedUrl": "https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf",
+      "status": "passed",
+      "finalUrl": "https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf",
+      "contentType": "application/pdf",
+      "observedBytes": 2272014,
+      "observedSha256": "0dcaba1626a0d23893981d74dd3f0f2338fff54cece67d81bc811ce76392d867",
+      "expectedSha256": "0dcaba1626a0d23893981d74dd3f0f2338fff54cece67d81bc811ce76392d867",
+      "detail": "Official artifact digest matches the pinned authority profile."
+    },
+    {
+      "checkId": "PIN-NIST-171-R2",
+      "checkType": "pinned_sha256",
+      "authorityId": "nist-sp-800-171r2-upd1",
+      "requestedUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171r2.pdf",
+      "status": "passed",
+      "finalUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171r2.pdf",
+      "contentType": "application/pdf",
+      "observedBytes": 1539170,
+      "observedSha256": "298bdbfcf6a4890a564b225c893230a0b32b2e69e3b98dd898aaeb1d544c5e12",
+      "expectedSha256": "298bdbfcf6a4890a564b225c893230a0b32b2e69e3b98dd898aaeb1d544c5e12",
+      "detail": "Official artifact digest matches the pinned authority profile."
+    },
+    {
+      "checkId": "PIN-NIST-171A-2018",
+      "checkType": "pinned_sha256",
+      "authorityId": "nist-sp-800-171a-june-2018",
+      "requestedUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171A.pdf",
+      "status": "passed",
+      "finalUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171A.pdf",
+      "contentType": "application/pdf",
+      "observedBytes": 1233537,
+      "observedSha256": "21bf3acc43f4284f723639b82eb71e3ce597fa3610f7e9dcf5e8484e22bc0f71",
+      "expectedSha256": "21bf3acc43f4284f723639b82eb71e3ce597fa3610f7e9dcf5e8484e22bc0f71",
+      "detail": "Official artifact digest matches the pinned authority profile."
+    },
+    {
+      "checkId": "PIN-NIST-171-R3",
+      "checkType": "pinned_sha256",
+      "authorityId": "nist-sp-800-171r3-2024-05",
+      "requestedUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171r3.pdf",
+      "status": "passed",
+      "finalUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171r3.pdf",
+      "contentType": "application/pdf",
+      "observedBytes": 1593213,
+      "observedSha256": "3e4631df8b5d61f40a6e542b52779ef30ddbbfff31e09214fa94ad6e6f5e6d08",
+      "expectedSha256": "3e4631df8b5d61f40a6e542b52779ef30ddbbfff31e09214fa94ad6e6f5e6d08",
+      "detail": "Official artifact digest matches the pinned authority profile."
+    },
+    {
+      "checkId": "PIN-NIST-171A-R3",
+      "checkType": "pinned_sha256",
+      "authorityId": "nist-sp-800-171ar3-2024-05",
+      "requestedUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171Ar3.pdf",
+      "status": "passed",
+      "finalUrl": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171Ar3.pdf",
+      "contentType": "application/pdf",
+      "observedBytes": 1228943,
+      "observedSha256": "946d963707cdaba19901c49d5c89517adb00844fe5d101e9dac7febc68e34cfa",
+      "expectedSha256": "946d963707cdaba19901c49d5c89517adb00844fe5d101e9dac7febc68e34cfa",
+      "detail": "Official artifact digest matches the pinned authority profile."
+    },
+    {
+      "checkId": "WATCH-32-CFR-170-AMENDMENTS",
+      "checkType": "ecfr_part_versions",
+      "authorityId": "32-cfr-part-170-2026-08-12",
+      "requestedUrl": "https://www.ecfr.gov/api/versioner/v1/versions/title-32.json?part=170",
+      "status": "passed",
+      "finalUrl": "https://www.ecfr.gov/api/versioner/v1/versions/title-32.json?part=170",
+      "contentType": "application/json; charset=utf-8",
+      "observedBytes": 6239,
+      "observedSha256": "5ede7b14da41219dbd425785e2fd85ec946611906edd937889bbe8366003d841",
+      "expectedPart": "170",
+      "expectedVersionCount": 25,
+      "observedVersionCount": 25,
+      "expectedLatestDate": "2024-12-16",
+      "observedLatestDate": "2024-12-16",
+      "observedDates": [
+        "2024-12-16"
+      ],
+      "detail": "32 CFR Part 170 amendment inventory matches the approved authority snapshot."
+    },
+    {
+      "checkId": "WATCH-NIST-171-REVISION",
+      "checkType": "revision_tokens",
+      "authorityId": "nist-sp-800-171r3-2024-05",
+      "requestedUrl": "https://csrc.nist.gov/Projects/protecting-controlled-unclassified-information/sp-800-171",
+      "status": "passed",
+      "finalUrl": "https://csrc.nist.gov/Projects/protecting-controlled-unclassified-information/sp-800-171",
+      "contentType": "text/html; charset=utf-8",
+      "observedBytes": 49066,
+      "observedSha256": "e2084b844f91870a972830d8fec6aac3617cd3a13fd912ad4a422869606011d5",
+      "pattern": "800-171r([0-9]+)",
+      "expectedRevisions": [
+        "2",
+        "3"
+      ],
+      "observedRevisions": [
+        "2",
+        "3"
+      ],
+      "detail": "Official revision tokens match the approved watch baseline."
+    },
+    {
+      "checkId": "WATCH-DOD-L2-GUIDE-REVISION",
+      "checkType": "revision_tokens",
+      "authorityId": "dod-cmmc-l2-assessment-guide-v2.13-2024-09",
+      "requestedUrl": "https://dodcio.defense.gov/CMMC/Resources-Documentation/",
+      "status": "passed",
+      "finalUrl": "https://dodcio.defense.gov/CMMC/Resources-Documentation/",
+      "contentType": "text/html; charset=utf-8",
+      "observedBytes": 41091,
+      "observedSha256": "7323c27e3649bc418fea63fd9f51093cf79bace71143988e0117a0cdb3c1818a",
+      "pattern": "AssessmentGuideL2v([0-9]+)\\.pdf",
+      "expectedRevisions": [
+        "2"
+      ],
+      "observedRevisions": [
+        "2"
+      ],
+      "detail": "Official revision tokens match the approved watch baseline."
+    }
+  ],
+  "claimBoundary": "This report verifies official-source integrity and revision-watch signals at the recorded time. It does not interpret a changed publication, alter a governing baseline, or establish CMMC certification."
+}

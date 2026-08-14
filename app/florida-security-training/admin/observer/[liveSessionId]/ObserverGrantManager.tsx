@@ -50,7 +50,7 @@ export default function ObserverGrantManager({ liveSessionId }: { liveSessionId:
         durationMinutes,
       });
       setGrant(result);
-      setNotice("Temporary view-only observer access created. Copy the link now. The plaintext access token is not stored by Obserra.");
+      setNotice("Temporary view-only observer access created. Copy the link now. The plaintext access token is not stored by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC.");
     } catch (grantError) {
       setError(grantError instanceof Error ? grantError.message : "Observer access could not be created.");
     } finally {

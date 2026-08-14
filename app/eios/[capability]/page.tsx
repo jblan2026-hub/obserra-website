@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { eiosCapabilities, getEiosCapability } from "../capabilities";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "../product-center.css";
 
 export function generateStaticParams() {
@@ -50,7 +51,7 @@ export default async function EiosCapabilityPage({ params }: { params: Promise<{
         description: entry.summary,
         provider: {
           "@type": "Organization",
-          name: "Obserra Executive Protection & Intelligence LLC",
+          name: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
           url: "https://www.obserrallc.com",
         },
       },
@@ -68,7 +69,7 @@ export default async function EiosCapabilityPage({ params }: { params: Promise<{
   return (
     <main className="eios-product-page">
       <header className="eios-product-nav">
-        <Link href="/" aria-label="Obserra home"><Image src="/brand/obserra-logo.png" alt="Obserra" width={245} height={48} /></Link>
+        <Link href="/" aria-label={`${LEGAL_ENTITY_NAME} home`}><Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={245} height={48} /></Link>
         <nav aria-label="EIOS product navigation">
           <Link href="/eios">EIOS overview</Link>
           <Link href="/apps">Applications</Link>

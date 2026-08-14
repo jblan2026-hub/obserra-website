@@ -2,12 +2,12 @@
   "schemaVersion": "1.0",
   "snapshotDate": "2026-08-14",
   "program": {
-    "name": "Obserra CMMC Level 2 Dual-Baseline Mapping",
+    "name": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC CMMC Dual-Baseline Supporting Mapping",
     "owner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
     "repository": "jblan2026-hub/obserra-website",
     "workingBranch": "codex/gate36-routing-rebind",
     "startingSourceSha": "ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88",
-    "claimBoundary": "Engineering implementation, evidence traceability, and assessment readiness only. This mapping does not claim a MET assessment result, CMMC certification, CMMC status in SPRS, authorization to process CUI, FedRAMP authorization, or FDACS approval."
+    "claimBoundary": "Historical requirement-level supporting mapping only; docs/compliance/CMMC-SYSTEM-EVIDENCE.json is the current objective-level authority. This mapping does not claim a MET assessment result, CMMC certification, CMMC status in SPRS, authorization to process CUI, FedRAMP authorization, FDACS approval, or an assessor determination."
   },
   "baselines": {
     "cmmcLevel2Assessment": {
@@ -38,10 +38,12 @@
     "rev3OnlyRule": "Active Rev. 3 requirements without a same-number Rev. 2 requirement remain visible as Rev. 3-only engineering requirements."
   },
   "authoritativeSources": [
+    "https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170",
     "https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170/subpart-D/section-170.16",
     "https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170/subpart-D/section-170.17",
     "https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf",
     "https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final",
+    "https://csrc.nist.gov/pubs/sp/800/171/a/final",
     "https://csrc.nist.gov/pubs/sp/800/171/r3/final",
     "https://csrc.nist.gov/pubs/sp/800/171/a/r3/final"
   ],

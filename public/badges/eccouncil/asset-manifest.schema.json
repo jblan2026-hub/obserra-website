@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.obserrallc.com/badges/eccouncil/asset-manifest.schema.json",
+  "title": "Authorized EC-Council credential artwork manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "recordType", "legalOwner", "authorizationRule", "recordedAt", "issuerVerificationObservations", "credentials"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": "1.1.0" },
+    "recordType": { "const": "authorized-ec-council-credential-artwork" },
+    "legalOwner": { "const": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" },
+    "authorizationRule": { "type": "string", "minLength": 1 },
+    "recordedAt": { "type": "string", "format": "date-time" },
+    "issuerVerificationObservations": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["credentialId", "verificationUrl", "sourceReference", "verifiedAt", "issuer", "status", "subjectName", "issuedOn", "imageWidth", "imageHeight", "verificationPageIsSourceOfTruth", "claimBoundary"],
+        "properties": {
+          "credentialId": { "type": "string", "pattern": "^ADG-(ADO|DEF|GOV)-[A-Z0-9]+$" },
+          "verificationUrl": { "type": "string", "format": "uri" },
+          "sourceReference": { "type": "string", "format": "uri" },
+          "verifiedAt": { "type": "string", "format": "date-time" },
+          "issuer": { "const": "EC-Council" },
+          "status": { "const": "active" },
+          "subjectName": { "type": "string", "minLength": 1 },
+          "issuedOn": { "const": "2026-07-01" },
+          "imageWidth": { "const": 1200 },
+          "imageHeight": { "const": 630 },
+          "verificationPageIsSourceOfTruth": { "const": true },
+          "claimBoundary": { "type": "string", "minLength": 20 }
+        }
+      }
+    },
+    "credentials": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "displayName", "fullName", "credentialId", "assetPath", "artworkKind", "mimeType", "width", "height", "sha256", "sourceType", "sourceReference", "verificationUrl", "verificationActionLabel"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "displayName": { "type": "string", "minLength": 1 },
+          "fullName": { "type": "string", "minLength": 1 },
+          "credentialId": { "type": ["string", "null"] },
+          "assetPath": { "type": "string", "pattern": "^/badges/eccouncil/[a-z0-9-]+\\.(png|svg)$" },
+          "artworkKind": { "enum": ["issuer-verification-record", "official-badge"] },
+          "mimeType": { "enum": ["image/png", "image/svg+xml"] },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "sourceType": { "enum": ["issuer-api", "credential-holder-authorized-upload"] },
+          "sourceReference": { "type": "string", "minLength": 1 },
+          "verificationUrl": { "type": "string", "format": "uri" },
+          "verificationActionLabel": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

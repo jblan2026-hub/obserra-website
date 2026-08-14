@@ -77,7 +77,7 @@ export default function ObserverClassroom() {
           <div className="fdacs-live__stage-frame fdacs-live__media-frame">
             {media?.joinUrl ? (
               <iframe
-                title="Obserra Florida Class D temporary regulatory observation"
+                title="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Florida Class D temporary regulatory observation"
                 src={media.joinUrl}
                 allow="fullscreen; autoplay"
                 referrerPolicy="no-referrer"

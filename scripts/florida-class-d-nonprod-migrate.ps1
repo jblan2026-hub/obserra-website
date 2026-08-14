@@ -45,7 +45,7 @@ function Get-LocalEnvValue([string]$Name) {
 $runtimeEnvironment = (Get-LocalEnvValue 'OBSERRA_FDACS_RUNTIME_ENVIRONMENT').ToLowerInvariant()
 $acceptanceAuthorized = (Get-LocalEnvValue 'OBSERRA_FDACS_NONPROD_ACCEPTANCE_AUTHORIZED').ToLowerInvariant()
 $syntheticOnly = (Get-LocalEnvValue 'OBSERRA_FDACS_SYNTHETIC_IDENTITY_ONLY').ToLowerInvariant()
-$supabaseUrl = Get-LocalEnvValue 'OBSERRA_SUPABASE_URL'
+$supabaseUrl = Get-LocalEnvValue 'OBSERRA_FDACS_SUPABASE_URL'
 $dsStatus = (Get-LocalEnvValue 'OBSERRA_FDACS_DS_LICENSE_STATUS').ToLowerInvariant()
 $dsLicense = Get-LocalEnvValue 'OBSERRA_FDACS_DS_LICENSE_NUMBER'
 
@@ -67,7 +67,7 @@ if ($dsStatus -eq 'active' -or ![string]::IsNullOrWhiteSpace($dsLicense)) {
 
 $expectedUrl = "https://$ProjectRef.supabase.co"
 if ($supabaseUrl -ne $expectedUrl) {
-    Stop-FailClosed "OBSERRA_SUPABASE_URL does not match the explicitly authorized project reference. Expected $expectedUrl."
+    Stop-FailClosed "OBSERRA_FDACS_SUPABASE_URL does not match the explicitly authorized project reference. Expected $expectedUrl."
 }
 
 $featureFlags = @(

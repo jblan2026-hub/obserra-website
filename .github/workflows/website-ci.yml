@@ -47,6 +47,9 @@ jobs:
       - name: Verify lockfile remains immutable
         run: git diff --exit-code -- package-lock.json
 
+      - name: Verify exact legal identity and generated audit pair
+        run: npm run verify:legal-identity-audit
+
       - name: Run unit and catalog contract tests
         run: npm test
 

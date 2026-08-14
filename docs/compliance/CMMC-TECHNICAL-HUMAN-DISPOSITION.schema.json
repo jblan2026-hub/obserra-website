@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://obserrallc.com/schemas/cmmc-technical-human-disposition-v1.schema.json",
+  "title": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Technical and Human Disposition Audit Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "recordId",
+    "recordState",
+    "generatedAt",
+    "legalOwner",
+    "schemaReference",
+    "generatorReference",
+    "sourceBundle",
+    "technicalGate",
+    "humanReview",
+    "separationInvariant",
+    "systemDispositions",
+    "objectiveDispositions",
+    "summary",
+    "claimBoundary"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "recordId": { "type": "string", "minLength": 16 },
+    "recordState": { "enum": ["working_disposition_record", "final_release_disposition_record"] },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "legalOwner": { "const": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" },
+    "schemaReference": { "$ref": "#/$defs/hashRef" },
+    "generatorReference": { "$ref": "#/$defs/hashRef" },
+    "sourceBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bundleId", "bundleState", "sha256", "revisionBinding", "exactReleaseCommitSha"],
+      "properties": {
+        "path": { "const": "docs/compliance/CMMC-SYSTEM-EVIDENCE.json" },
+        "bundleId": { "type": "string", "minLength": 8 },
+        "bundleState": { "enum": ["working_evidence_inventory", "final_release_evidence"] },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "revisionBinding": { "enum": ["working_tree_digest", "exact_release_commit"] },
+        "exactReleaseCommitSha": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          ]
+        }
+      }
+    },
+    "technicalGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["disposition", "passCriteria", "failCriteria", "pendingCriteria", "passed", "failed", "notTested", "humanReviewStateAffectsOutcome"],
+      "properties": {
+        "disposition": { "enum": ["passed", "failed", "pending_evidence"] },
+        "passCriteria": { "type": "string", "minLength": 20 },
+        "failCriteria": { "type": "string", "minLength": 20 },
+        "pendingCriteria": { "type": "string", "minLength": 20 },
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "notTested": { "type": "integer", "minimum": 0 },
+        "humanReviewStateAffectsOutcome": { "const": false }
+      }
+    },
+    "humanReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["disposition", "completionCriteria", "pendingCriteria", "pending", "completed", "notRequired", "pendingIsTechnicalFailure", "completionRequiredForTechnicalPass"],
+      "properties": {
+        "disposition": { "const": "pending" },
+        "completionCriteria": { "type": "string", "minLength": 20 },
+        "pendingCriteria": { "type": "string", "minLength": 20 },
+        "pending": { "type": "integer", "minimum": 1 },
+        "completed": { "const": 0 },
+        "notRequired": { "const": 0 },
+        "pendingIsTechnicalFailure": { "const": false },
+        "completionRequiredForTechnicalPass": { "const": false }
+      }
+    },
+    "separationInvariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["independentChannels", "allCurrentHumanReviewsPending", "pendingHumanCannotFailTechnicalGate", "findingRemainsNotAssessed"],
+      "properties": {
+        "independentChannels": { "const": true },
+        "allCurrentHumanReviewsPending": { "const": true },
+        "pendingHumanCannotFailTechnicalGate": { "const": true },
+        "findingRemainsNotAssessed": { "const": true }
+      }
+    },
+    "systemDispositions": {
+      "type": "array",
+      "minItems": 10,
+      "items": { "$ref": "#/$defs/systemDisposition" }
+    },
+    "objectiveDispositions": {
+      "type": "array",
+      "minItems": 830,
+      "items": { "$ref": "#/$defs/objectiveDisposition" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["systemCount", "objectiveDispositionCount", "allHumanPending", "technicalAndHumanCountsReconciled", "failClosed"],
+      "properties": {
+        "systemCount": { "type": "integer", "minimum": 10 },
+        "objectiveDispositionCount": { "type": "integer", "minimum": 830 },
+        "allHumanPending": { "const": true },
+        "technicalAndHumanCountsReconciled": { "const": true },
+        "failClosed": { "const": true }
+      }
+    },
+    "claimBoundary": { "type": "string", "minLength": 40 }
+  },
+  "$defs": {
+    "hashRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 3 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "systemDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["systemId", "objectiveCount", "technicalDisposition", "technicalPassed", "technicalFailed", "technicalNotTested", "humanDisposition", "humanPending"],
+      "properties": {
+        "systemId": { "type": "string", "pattern": "^SYS-[A-Z0-9-]+$" },
+        "objectiveCount": { "type": "integer", "minimum": 1 },
+        "technicalDisposition": { "enum": ["passed", "failed", "not_tested", "partially_passed", "not_applicable"] },
+        "technicalPassed": { "type": "integer", "minimum": 0 },
+        "technicalFailed": { "type": "integer", "minimum": 0 },
+        "technicalNotTested": { "type": "integer", "minimum": 0 },
+        "humanDisposition": { "const": "pending" },
+        "humanPending": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "objectiveDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["systemId", "baselineAuthorityId", "assessmentAuthorityId", "controlId", "objectiveId", "technicalResultState", "technicalResultExactRevision", "technicalResultArtifactSha256", "humanReviewState", "pendingHumanReviewIsFailure", "finding"],
+      "properties": {
+        "systemId": { "type": "string", "pattern": "^SYS-[A-Z0-9-]+$" },
+        "baselineAuthorityId": { "type": "string", "minLength": 8 },
+        "assessmentAuthorityId": { "type": "string", "minLength": 8 },
+        "controlId": { "type": "string", "minLength": 5 },
+        "objectiveId": { "type": "string", "minLength": 5 },
+        "technicalResultState": { "enum": ["not_tested", "passed", "failed", "not_applicable"] },
+        "technicalResultExactRevision": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          ]
+        },
+        "technicalResultArtifactSha256": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+          ]
+        },
+        "humanReviewState": { "const": "pending" },
+        "pendingHumanReviewIsFailure": { "const": false },
+        "finding": { "const": "not_assessed" }
+      }
+    }
+  }
+}

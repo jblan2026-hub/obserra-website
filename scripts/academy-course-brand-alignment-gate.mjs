@@ -16,7 +16,7 @@ const requireTerms = (file, terms) => {
   return source;
 };
 
-const LEGAL_NAME = "Obserra Executive Protection & Intelligence, LLC";
+const LEGAL_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
 const CATALOG_PUBLISHER = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
 const OFFICIAL_GOLD = "#f4ba55";

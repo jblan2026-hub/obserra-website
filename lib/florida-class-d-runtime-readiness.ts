@@ -26,6 +26,7 @@ export type FloridaClassDRuntimeReadinessReport = {
 };
 
 const REGULATED_FEATURE_FLAGS = [
+  "OBSERRA_FDACS_IDENTITY_VERIFICATION_ENABLED",
   "OBSERRA_FDACS_CLASS_D_LIVE_ENABLED",
   "OBSERRA_FDACS_CLASS_D_MEDIA_ENABLED",
   "OBSERRA_FDACS_CLASS_D_SCHEDULING_ENABLED",
@@ -70,10 +71,13 @@ function item(
 }
 
 function commonProtectedRuntimeItems(): FloridaClassDRuntimeReadinessItem[] {
-  const explicitSupabaseUrl = value("OBSERRA_SUPABASE_URL");
-  const serviceRolePresent = present("OBSERRA_SUPABASE_SERVICE_ROLE_KEY") || present("SUPABASE_SERVICE_ROLE_KEY");
+  const explicitSupabaseUrl = value("OBSERRA_FDACS_SUPABASE_URL");
+  const serviceRolePresent = present("OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY");
   const mediaProvider = value("OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER").toLowerCase();
   const documentBucket = value("OBSERRA_FDACS_DOCUMENTS_BUCKET");
+  const expectedDatabaseOrigin = "https://ggkxgjhsbgbifiqrhavr.supabase.co";
+  const stripeKey = value("STRIPE_SECRET_KEY");
+  const stripeIdentityWebhook = value("STRIPE_IDENTITY_WEBHOOK_SECRET");
 
   return [
     item(
@@ -85,11 +89,37 @@ function commonProtectedRuntimeItems(): FloridaClassDRuntimeReadinessItem[] {
       true,
     ),
     item(
+      "fdacs_database_boundary",
+      "Dedicated FDACS student-record project exactly bound",
+      "database",
+      explicitSupabaseUrl === expectedDatabaseOrigin && value("OBSERRA_FDACS_SUPABASE_PROJECT_REF") === "ggkxgjhsbgbifiqrhavr",
+      explicitSupabaseUrl === expectedDatabaseOrigin && value("OBSERRA_FDACS_SUPABASE_PROJECT_REF") === "ggkxgjhsbgbifiqrhavr"
+        ? "Dedicated isolated project binding verified; credential and hostname suppressed from report consumers."
+        : "OBSERRA_FDACS_SUPABASE_URL and OBSERRA_FDACS_SUPABASE_PROJECT_REF must exactly identify the isolated FDACS student-record project.",
+      true,
+    ),
+    item(
       "clerk_secret",
       "Clerk server credential configured",
       "identity",
       present("CLERK_SECRET_KEY"),
       present("CLERK_SECRET_KEY") ? "Configured; value suppressed." : "Missing.",
+      true,
+    ),
+    item(
+      "stripe_identity_key",
+      "Stripe Identity server credential configured",
+      "identity",
+      /^sk_(live|test)_[A-Za-z0-9_]+$/.test(stripeKey),
+      /^sk_(live|test)_[A-Za-z0-9_]+$/.test(stripeKey) ? "Configured; value and mode suppressed." : "Missing or invalid Stripe server credential.",
+      true,
+    ),
+    item(
+      "stripe_identity_webhook",
+      "Dedicated Stripe Identity webhook secret configured",
+      "identity",
+      /^whsec_[A-Za-z0-9_]+$/.test(stripeIdentityWebhook),
+      /^whsec_[A-Za-z0-9_]+$/.test(stripeIdentityWebhook) ? "Configured; value suppressed." : "STRIPE_IDENTITY_WEBHOOK_SECRET is missing or invalid.",
       true,
     ),
     item(
@@ -218,6 +248,9 @@ export const FLORIDA_CLASS_D_RUNTIME_READINESS_POLICY = {
   explicitProductionSupabaseUrlRequired: true,
   serviceRoleRequired: true,
   clerkServerCredentialRequired: true,
+  dedicatedFdacsDatabaseBoundaryRequired: true,
+  stripeDocumentAndMatchingSelfieRequired: true,
+  stripeIdentityWebhookSignatureRequired: true,
   dailyProviderRequiredForLiveMedia: true,
   dsStatusMustBeActiveBeforeActivation: true,
   dsLicenseNumberMustRemainPrivate: true,

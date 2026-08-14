@@ -4,7 +4,7 @@ import { createHash, createPrivateKey, createPublicKey, sign, verify } from "nod
 
 export const CERTIFICATE_SIGNATURE_ALGORITHM = "Ed25519" as const;
 export const CERTIFICATE_SIGNER_NAME = "Dr. Jody Blanchard" as const;
-export const CERTIFICATE_ISSUER = "Obserra Executive Protection & Intelligence, LLC" as const;
+export const CERTIFICATE_ISSUER = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" as const;
 
 export type LegacyCertificateClaim = {
   schemaVersion: "1.0";

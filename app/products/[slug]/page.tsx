@@ -6,6 +6,7 @@ import {
   productIntelligence,
   relatedProductIntelligence,
 } from "../../../lib/product-intelligence";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 const siteUrl = "https://www.obserrallc.com";
 
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = findProductIntelligence(slug);
   if (!product) return {};
 
-  const title = `${product.name} | Obserra SaaS`;
+  const title = `${product.name} | ${LEGAL_ENTITY_NAME} SaaS`;
   const description = product.marketing?.shortDescription || product.description;
   const canonical = `${siteUrl}/products/${product.slug}`;
 
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       title: product.marketing?.headline || title,
       description,
       url: canonical,
-      siteName: "Obserra",
+      siteName: LEGAL_ENTITY_NAME,
       type: "website",
     },
     twitter: {
@@ -73,7 +74,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     },
     publisher: {
       "@type": "Organization",
-      name: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+      name: LEGAL_ENTITY_NAME,
       url: siteUrl,
     },
   };
@@ -157,7 +158,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       {related.length > 0 && (
         <section className="border-t border-white/10 px-6 py-16 lg:px-12">
           <div className="mx-auto max-w-7xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">Related Obserra capabilities</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">Related {LEGAL_ENTITY_NAME} capabilities</p>
             <h2 className="mt-3 text-3xl font-semibold">Extend the operating environment</h2>
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               {related.map((entry) => (

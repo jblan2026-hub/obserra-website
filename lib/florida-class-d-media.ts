@@ -37,8 +37,8 @@ function dailyConfig() {
 }
 
 function supabaseConfig() {
-  const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
+  const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+  const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   if (!key || !url.startsWith("https://")) {
     throw new FloridaClassDMediaError("Class D media authorization persistence is not configured.", 503, "FDACS_MEDIA_PERSISTENCE_NOT_CONFIGURED");
   }

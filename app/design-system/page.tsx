@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { ButtonLink, Field, KpiCard, PageIntro, Panel, StatusBadge } from "../components/ui/ObserraUI";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
   title: "Design System",
-  description: "Obserra enterprise design system component validation page.",
+  description: `${LEGAL_ENTITY_NAME} enterprise design system component validation page.`,
   robots: { index: false, follow: false },
 };
 
@@ -12,9 +13,9 @@ export default function DesignSystemPage() {
     <main style={{ minHeight: "100vh", padding: "var(--obs-space-12) 0", background: "var(--obs-color-ink-950)", color: "var(--obs-color-text)" }}>
       <div className="obs-shell obs-stack" style={{ gap: "var(--obs-space-12)" }}>
         <PageIntro
-          eyebrow="OBSERRA DESIGN SYSTEM V1.0"
+          eyebrow={`${LEGAL_ENTITY_NAME} DESIGN SYSTEM V1.0`}
           title="Enterprise components for executive intelligence experiences."
-          copy="This non-indexed validation page proves the shared tokens, controls, cards, states, forms, and responsive behavior used by the Obserra website, Academy, and EIOS product experiences."
+          copy={`This non-indexed validation page proves the shared tokens, controls, cards, states, forms, and responsive behavior used by the ${LEGAL_ENTITY_NAME} website, Obserra Academy, and Obserra EIOS product experiences.`}
           actions={<><ButtonLink href="/" variant="primary">Return home</ButtonLink><ButtonLink href="/trust" variant="secondary">Open Trust Center</ButtonLink></>}
         />
 

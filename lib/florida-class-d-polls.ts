@@ -52,8 +52,8 @@ export class FloridaClassDPollError extends Error {
 }
 
 function config() {
-  const key = process.env.OBSERRA_SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
-  const url = (process.env.OBSERRA_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
+  const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
+  const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   if (!key || !url.startsWith("https://")) {
     throw new FloridaClassDPollError("Class D live poll persistence is not configured.", 503, "FDACS_POLL_PERSISTENCE_NOT_CONFIGURED");
   }

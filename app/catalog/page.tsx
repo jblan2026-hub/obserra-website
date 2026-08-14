@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { courses } from "../academy/courseData";
 import AcademyCheckoutForm from "../academy/AcademyCheckoutForm";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import {
   academyFlagshipCatalog,
 } from "./catalogData";
@@ -56,9 +57,9 @@ const courseTones = [
 ] as const;
 
 export const metadata: Metadata = {
-  title: "Enterprise Product Catalog | Obserra",
+  title: `Enterprise Product Catalog | ${LEGAL_ENTITY_NAME}`,
   description:
-    "Buyable Academy courses, direct checkout, and buyer-ready proof assets for teams evaluating Obserra training and capabilities.",
+    `Buyable Academy courses, direct checkout, and buyer-ready proof assets for teams evaluating ${LEGAL_ENTITY_NAME} training and capabilities.`,
   alternates: { canonical: "/catalog" },
   keywords: [
     "enterprise product catalog",
@@ -69,16 +70,16 @@ export const metadata: Metadata = {
     "paid training",
   ],
   openGraph: {
-    title: "Obserra Enterprise Product Catalog",
+    title: `${LEGAL_ENTITY_NAME} Enterprise Product Catalog`,
     description:
-      "Direct-purchase training offers, proof assets, and clear next steps into Obserra services and applications.",
+      `Direct-purchase training offers, proof assets, and clear next steps into ${LEGAL_ENTITY_NAME} services and applications.`,
     url: "https://www.obserrallc.com/catalog",
     type: "website",
-    images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: "Obserra enterprise product catalog" }],
+    images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: `${LEGAL_ENTITY_NAME} enterprise product catalog` }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Obserra Enterprise Product Catalog",
+    title: `${LEGAL_ENTITY_NAME} Enterprise Product Catalog`,
     description:
       "Direct-purchase training offers and buyer-ready proof assets.",
     images: ["/brand/visuals/obserra-cybersecurity.png"],
@@ -89,8 +90,8 @@ export default function CatalogPage() {
   return (
     <main className="catalog-page">
       <header className="catalog-nav">
-        <a href="/" className="catalog-brand" aria-label="Obserra home">
-          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
+        <a href="/" className="catalog-brand" aria-label={`${LEGAL_ENTITY_NAME} home`}>
+          <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
           <span>ENTERPRISE CATALOG</span>
         </a>
         <nav aria-label="Enterprise catalog navigation">

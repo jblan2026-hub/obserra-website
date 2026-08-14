@@ -5,10 +5,11 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import storeCatalog from "../../apps/store-catalog.json";
 import { marketplaceApps } from "../../apps/appsData";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./commercial-operations.css";
 
 export const metadata: Metadata = {
-  title: "Commercial Operations | Obserra",
+  title: `Commercial Operations | ${LEGAL_ENTITY_NAME}`,
   description: "Protected administration for application commerce, releases, marketing readiness, paid acquisition, and PCI-aligned ecommerce controls.",
   robots: { index: false, follow: false },
 };
@@ -39,7 +40,7 @@ const governanceControls = [
 ];
 
 const pciControls = [
-  ["Payment collection", "Stripe-hosted checkout only; card data is never collected by Obserra application code."],
+  ["Payment collection", `Stripe-hosted checkout only; card data is never collected by ${LEGAL_ENTITY_NAME} application code.`],
   ["Data storage", "No PAN, CVV, magnetic-stripe, or sensitive authentication data stored in the application or repository."],
   ["Webhooks", "Stripe webhook signatures are verified before fulfillment or entitlement actions."],
   ["Access control", "Administrative access is allowlisted and authenticated; production secrets remain outside source control."],
@@ -75,7 +76,7 @@ export default async function CommercialOperationsPage() {
     <main className="commercial-ops-page">
       <header className="commercial-ops-nav">
         <Link href="/" className="commercial-ops-brand">
-          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
+          <Image src="/brand/obserra-logo.png" alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" width={286} height={55} />
           <span>COMMERCIAL OPERATIONS</span>
         </Link>
         <nav><Link href="/apps">Store</Link><Link href="/portal/applications">Fulfillment</Link><Link href="/academy">Academy</Link><Link href="/admin">Admin</Link></nav>
@@ -84,7 +85,7 @@ export default async function CommercialOperationsPage() {
       <section className="commercial-ops-hero">
         <div>
           <p className="commercial-ops-eyebrow">PROTECTED ADMINISTRATION</p>
-          <h1>Operate Obserra applications, courses, releases, subscriptions, marketing, and ecommerce from one governed workspace.</h1>
+          <h1>Operate {LEGAL_ENTITY_NAME} applications, courses, releases, subscriptions, marketing, and ecommerce from one governed workspace.</h1>
           <p>This console reports configuration readiness and controlled operating paths without inventing sales, customer, subscription, license, lead, campaign, revenue, or compliance records.</p>
         </div>
         <aside><span>ADMINISTRATOR</span><strong>{email}</strong><p>Access is limited by OBSERRA_ADMIN_EMAILS.</p></aside>

@@ -4,7 +4,7 @@ import Image from "next/image";
 import "./certificate.css";
 import "./brand-certificate.css";
 
-const LEGAL_NAME = "Obserra Executive Protection & Intelligence, LLC";
+const LEGAL_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
 const CREDENTIAL_NAME = "Certificate of Course Completion";
 
@@ -55,7 +55,7 @@ export default function CertificateView({
           <div className="academy-seal" aria-label={`Obserra Academy, a training division of ${LEGAL_NAME}`}>
             <span>OA</span>
             <b>OBSERRA ACADEMY</b>
-            <small>A TRAINING DIVISION OF OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE, LLC</small>
+            <small>A TRAINING DIVISION OF OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</small>
           </div>
         </div>
 

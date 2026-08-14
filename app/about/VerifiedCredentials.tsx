@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect } from "react";
+import ecCouncilManifest from "../../public/badges/eccouncil/asset-manifest.json";
 
 const credly = [
   ["CISSP", "Certified Information Systems Security Professional", "ISC2", "b0ed2873-a2c1-475c-b233-9052d587c4bf"],
@@ -15,18 +16,6 @@ const credly = [
   ["Security+", "CompTIA Security+", "CompTIA", "ab52b8b0-62dd-4421-bf3e-cc6b27c02031"],
   ["Project+", "CompTIA Project+", "CompTIA", "8b0ed714-41a3-4f19-82f5-82885617c34c"],
   ["NCDA", "NetApp Certified Data Administrator", "NetApp", "e660531d-2431-4bda-8295-2954cfbdbfa3"],
-];
-
-const ec = [
-  ["ADG Adopt", "AI Governance: Adopt", "/badges/eccouncil/adg-adopt.png", "https://aigovernance.eccouncil.org/verify/ADG-ADO-4RQRY6"],
-  ["ADG Defend", "AI Governance: Defend", "/badges/eccouncil/adg-defend.png", "https://aigovernance.eccouncil.org/verify/ADG-DEF-93CTC8"],
-  ["ADG Govern", "AI Governance: Govern", "/badges/eccouncil/adg-govern.png", "https://aigovernance.eccouncil.org/verify/ADG-GOV-9Q8BPK"],
-  ["CEH", "Certified Ethical Hacker", "/badges/eccouncil/ceh.png", "https://aspen.eccouncil.org/verify"],
-  ["CHFI", "Computer Hacking Forensic Investigator", "/badges/eccouncil/chfi.png", "https://aspen.eccouncil.org/verify"],
-  ["ECIH", "EC-Council Certified Incident Handler", "/badges/eccouncil/ecih.png", "https://aspen.eccouncil.org/verify"],
-  ["ECES", "EC-Council Certified Encryption Specialist", "/badges/eccouncil/eces.png", "https://aspen.eccouncil.org/verify"],
-  ["Associate CCISO", "Associate Certified Chief Information Security Officer", "/badges/eccouncil/associate-cciso.png", "https://aspen.eccouncil.org/verify"],
-  ["CNDA", "Certified Network Defense Architect", "/badges/eccouncil/cnda.png", "https://aspen.eccouncil.org/verify"],
 ];
 
 const licenses = [
@@ -57,7 +46,7 @@ const licenses = [
   {
     type: "Class A Private Investigative Agency",
     number: "APPLICATION PENDING",
-    licensedName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE, LLC",
+    licensedName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
     status: "pending",
   },
 ] as const;
@@ -94,13 +83,33 @@ export default function VerifiedCredentials() {
 
       <h3 className="verified-credentials-group-title">EC-Council verified credentials</h3>
       <div className="verified-credentials-grid ec-council-credentials-grid">
-        {ec.map(([name, fullName, image, verify]) => (
-          <article className="verified-credential-card ec-council-credential-card" key={name}>
-            <a className="ec-council-badge-artwork protected-credential-artwork" href={verify} target="_blank" rel="noreferrer" aria-label={`Verify ${name}`} onContextMenu={(event) => event.preventDefault()} onDragStart={(event) => event.preventDefault()}>
-              <Image src={image} alt={`${name} official EC-Council badge`} width={190} height={190} sizes="(max-width: 480px) 180px, (max-width: 760px) 164px, 190px" draggable={false} />
-              <span className="credential-artwork-watermark">VERIFIED · OBSERRA</span>
+        {ecCouncilManifest.credentials.map((credential) => (
+          <article className="verified-credential-card ec-council-credential-card" key={credential.id}>
+            <a
+              className={`ec-council-badge-artwork protected-credential-artwork${credential.artworkKind === "issuer-verification-record" ? " ec-council-badge-artwork--certificate" : ""}`}
+              href={credential.verificationUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${credential.verificationActionLabel}: ${credential.displayName}`}
+              onContextMenu={(event) => event.preventDefault()}
+              onDragStart={(event) => event.preventDefault()}
+            >
+              <Image
+                src={credential.assetPath}
+                alt={`${credential.displayName} official EC-Council ${credential.artworkKind === "issuer-verification-record" ? "credential record" : "badge"}`}
+                width={credential.width}
+                height={credential.height}
+                sizes={credential.artworkKind === "issuer-verification-record" ? "(max-width: 480px) 260px, 220px" : "(max-width: 480px) 180px, (max-width: 760px) 164px, 190px"}
+                draggable={false}
+                unoptimized={credential.mimeType === "image/svg+xml"}
+              />
             </a>
-            <div className="verified-credential-detail"><span>EC-Council</span><strong>{name}</strong><p>{fullName}</p><a className="verified-credential-verify-link" href={verify} target="_blank" rel="noreferrer">Verify credential</a></div>
+            <div className="verified-credential-detail">
+              <span>EC-Council</span>
+              <strong>{credential.displayName}</strong>
+              <p>{credential.fullName}</p>
+              <a className="verified-credential-verify-link" href={credential.verificationUrl} target="_blank" rel="noreferrer">{credential.verificationActionLabel}</a>
+            </div>
           </article>
         ))}
       </div>

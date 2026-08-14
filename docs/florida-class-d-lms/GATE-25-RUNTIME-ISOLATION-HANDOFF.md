@@ -16,7 +16,7 @@ Gate 25 uses `scripts/florida-class-d-runtime-isolation-audit.mjs --enforce`. Th
 
 ## Security objective
 
-Regulated server modules must fail closed when `OBSERRA_SUPABASE_URL` or the required service-role credential is absent. They must not silently fall back to a repository-embedded project URL. Production project identifiers, service-role values, provider secrets, license numbers, and other protected runtime values must remain outside public source.
+Regulated server modules must fail closed when `OBSERRA_FDACS_SUPABASE_URL` or the required service-role credential is absent. They must not silently fall back to a repository-embedded project URL. Production project identifiers, service-role values, provider secrets, license numbers, and other protected runtime values must remain outside public source.
 
 The approved configuration boundary is server-only explicit environment configuration using HTTPS and protected credentials. No regulated browser component may receive service-role credentials.
 
@@ -24,7 +24,7 @@ The approved configuration boundary is server-only explicit environment configur
 
 The runtime-isolation remediation removed the embedded Supabase project URL fallback from every regulated module identified by the Gate 25 enforcing inventory, including acceptance, completion, completion documents, completion packet, exam, exam administration, exam monitoring, exam retest, LIAS, live feed, live persistence, live reporting, secure media, base persistence, polls, quality/CAPA, scheduling, student certificate, make-up certification, make-up administration, recorded make-up, and regulatory observer access.
 
-These services now require explicit protected `OBSERRA_SUPABASE_URL` HTTPS configuration and preserve the protected service-role credential boundary. When required runtime configuration is absent or invalid, the regulated service fails closed with its service-specific configuration error.
+These services now require explicit protected `OBSERRA_FDACS_SUPABASE_URL` HTTPS configuration and preserve the protected service-role credential boundary. When required runtime configuration is absent or invalid, the regulated service fails closed with its service-specific configuration error.
 
 ## Acceptance evidence
 

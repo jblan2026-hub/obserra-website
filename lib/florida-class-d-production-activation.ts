@@ -6,6 +6,7 @@ const SHA40 = /^[0-9a-f]{40}$/i;
 const SHA256_HEX = /^[0-9a-f]{64}$/i;
 const CANONICAL_PUBLIC_ORIGIN = "https://www.obserrallc.com";
 const REQUIRED_DOCUMENT_BUCKET = "fdacs-class-d-completion-documents";
+const REQUIRED_FDACS_SUPABASE_PROJECT_REF = "ggkxgjhsbgbifiqrhavr";
 const NONPRODUCTION_ENVIRONMENTS = new Set(["development", "sandbox", "staging", "uat"]);
 const MAX_HA_RTO_MINUTES = 60;
 const MAX_HA_RPO_MINUTES = 15;
@@ -15,6 +16,7 @@ export const EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION = "20260814011203
 export const EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256 = "a2099d8610f0427fa2f85cb7a47efaa2af4b899be21952b0fcacaadd15e8e453";
 
 export const FLORIDA_CLASS_D_REGULATED_FEATURE_FLAGS = [
+  "OBSERRA_FDACS_IDENTITY_VERIFICATION_ENABLED",
   "OBSERRA_FDACS_CLASS_D_LIVE_ENABLED",
   "OBSERRA_FDACS_CLASS_D_MEDIA_ENABLED",
   "OBSERRA_FDACS_CLASS_D_SCHEDULING_ENABLED",
@@ -69,6 +71,10 @@ export const FLORIDA_CLASS_D_PRODUCTION_ACTIVATION_POLICY = {
   exactUatReleaseBindingRequired: true,
   exactDeploymentReleaseBindingRequired: true,
   liveClerkCredentialsRequired: true,
+  liveStripeIdentityCredentialsRequired: true,
+  automatedGovernmentIdAndMatchingSelfieRequired: true,
+  instructorIdentityAttestationRequired: true,
+  dailyInstructorIdentityCheckinRequired: true,
   protectedDatabaseConfigurationRequired: true,
   dailyMediaConfigurationRequired: true,
   activeClassDSLicenseRequired: true,
@@ -202,13 +208,14 @@ function coreChecks(): FloridaClassDProductionActivationCheck[] {
   const accepted = value("OBSERRA_FDACS_UAT_ACCEPTED_RELEASE_SHA");
   const deployed = value("VERCEL_GIT_COMMIT_SHA");
   const publicOrigin = value("OBSERRA_FDACS_PUBLIC_ORIGIN");
-  const supabaseUrl = value("OBSERRA_SUPABASE_URL");
-  const serviceRolePresent = present("OBSERRA_SUPABASE_SERVICE_ROLE_KEY") || present("SUPABASE_SERVICE_ROLE_KEY");
+  const supabaseUrl = value("OBSERRA_FDACS_SUPABASE_URL");
+  const serviceRolePresent = present("OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY");
   const mediaProvider = value("OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER").toLowerCase();
   const documentsBucket = value("OBSERRA_FDACS_DOCUMENTS_BUCKET");
   const dbPromotionSourceSha = value("OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA");
   const appliedMigrationVersion = value("OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION");
   const migrationManifestSha256 = value("OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256").toLowerCase();
+  const expectedSupabaseOrigin = `https://${REQUIRED_FDACS_SUPABASE_PROJECT_REF}.supabase.co`;
 
   return [
     check(
@@ -264,10 +271,10 @@ function coreChecks(): FloridaClassDProductionActivationCheck[] {
     ),
     check(
       "supabase_url",
-      "Protected Supabase HTTPS runtime configured",
-      supabaseUrl.startsWith("https://"),
-      "Protected HTTPS database origin configured; hostname suppressed.",
-      "OBSERRA_SUPABASE_URL must be configured as HTTPS.",
+      "Dedicated FDACS Supabase project exactly bound",
+      supabaseUrl === expectedSupabaseOrigin && value("OBSERRA_FDACS_SUPABASE_PROJECT_REF") === REQUIRED_FDACS_SUPABASE_PROJECT_REF,
+      "Dedicated FDACS student-record database binding verified; hostname suppressed.",
+      "OBSERRA_FDACS_SUPABASE_URL and OBSERRA_FDACS_SUPABASE_PROJECT_REF must exactly identify the isolated FDACS project.",
       true,
     ),
     check(
@@ -276,6 +283,14 @@ function coreChecks(): FloridaClassDProductionActivationCheck[] {
       serviceRolePresent,
       "Protected database credential configured; value suppressed.",
       "A protected Supabase service-role credential is required.",
+      true,
+    ),
+    check(
+      "stripe_identity_live",
+      "Live Stripe Identity document and matching-selfie service configured",
+      value("STRIPE_SECRET_KEY").startsWith("sk_live_") && /^whsec_[A-Za-z0-9_]+$/.test(value("STRIPE_IDENTITY_WEBHOOK_SECRET")),
+      "Live Stripe Identity key and dedicated signed-webhook secret detected; values suppressed.",
+      "A live Stripe key and dedicated STRIPE_IDENTITY_WEBHOOK_SECRET are required for automated identity verification.",
       true,
     ),
     check(

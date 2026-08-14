@@ -19,7 +19,7 @@ assert(service.includes('FloridaClassDRuntimeProfile = "production" | "nonproduc
 assert(service.includes("getFloridaClassDProductionRuntimeReadiness") && service.includes("getFloridaClassDNonProductionAcceptanceReadiness"), "runtime readiness must expose separate profile evaluators");
 assert(service.includes("readyExceptForClassDSLicense") && service.includes("technicalReadinessComplete"), "production readiness must distinguish technical readiness from Class DS licensing blockers");
 assert(service.includes('const CLASS_DS_LICENSE_KEYS = new Set(["ds_status", "ds_license_number"])'), "Class DS license blockers must be explicitly identified");
-assert(service.includes("OBSERRA_SUPABASE_URL") && service.includes("OBSERRA_SUPABASE_SERVICE_ROLE_KEY"), "readiness must check explicit protected database configuration");
+assert(service.includes("OBSERRA_FDACS_SUPABASE_URL") && service.includes("OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY"), "readiness must check explicit protected database configuration");
 assert(service.includes("CLERK_SECRET_KEY") && service.includes("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"), "readiness must check identity configuration");
 assert(service.includes("OBSERRA_FDACS_DAILY_API_KEY") && service.includes("OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER"), "readiness must check live-media configuration");
 assert(service.includes("OBSERRA_FDACS_DS_LICENSE_STATUS") && service.includes("OBSERRA_FDACS_DS_LICENSE_NUMBER") && service.includes("OBSERRA_FDACS_DI_LICENSE_NUMBER"), "production readiness must check private regulated license configuration without returning values");

@@ -63,7 +63,7 @@ requireText(auth, "compliance_admin", "Compliance-admin role boundary is require
 requireText(auth, "instructor", "Instructor role boundary is required.");
 
 requireText(persistence, 'import "server-only"', "FDACS persistence adapter must remain server-only.");
-requireText(persistence, "OBSERRA_SUPABASE_SERVICE_ROLE_KEY", "Service-role persistence must use a private server environment variable.");
+requireText(persistence, "OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY", "Service-role persistence must use a private server environment variable.");
 if (persistence.includes("NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY")) {
   throw new Error("Service-role persistence key must never be exposed through NEXT_PUBLIC variables.");
 }

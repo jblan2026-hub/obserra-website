@@ -17,7 +17,7 @@ if (!migration.includes("development") || !migration.includes("sandbox") || !mig
   throw new Error("Gate 23 database contract must remain limited to controlled non-production environments.");
 }
 if (!service.includes("FLORIDA_CLASS_D_ACCEPTANCE_DOMAINS")) throw new Error("Gate 23 acceptance service is missing.");
-if (!service.includes('process.env.OBSERRA_SUPABASE_URL?.trim() || ""')) throw new Error("Gate 23 acceptance service must require explicit protected database runtime configuration.");
+if (!service.includes('process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || ""')) throw new Error("Gate 23 acceptance service must require explicit protected database runtime configuration.");
 if (!service.includes("Release commit SHA must be 40 lowercase hexadecimal characters")) throw new Error("Gate 23 acceptance runs must remain release-commit bound.");
 if (!service.includes("synthetic_identity_confirmed: true")) throw new Error("Gate 23 acceptance service must explicitly mark synthetic identity use.");
 if (!service.includes("Passed acceptance checks require an evidence reference")) throw new Error("Gate 23 passed checks must require evidence references.");

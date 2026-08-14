@@ -2,14 +2,14 @@
 
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update the dual-baseline JSON and the controlled Rev. 3 registry, then run `npm run generate:cmmc-dual-baseline`.
 
-Dual-baseline registry SHA-256: `c49494b4ac9fc739b5ac9f4ae826e6100b0acfdcea95464f51db4b287aba2c60`
-Linked Rev. 3 registry SHA-256: `11f110691aa6d7c98e65e451862bb8d69726ba6d24244064dd33dc9b1b9dd6bd`
+Dual-baseline registry SHA-256: `4b2aa78ac8c65502e592bea396e349d16b5fa94658f18364db3ca5b2bd816a60`
+Linked Rev. 3 registry SHA-256: `0e010336455dcc3bb3501849c283c1d28e37f0d4816adcc3dd937ceab6c5bb1f`
 Snapshot date: `2026-08-14`
 Starting source SHA: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
 
 ## Claim boundary
 
-Engineering implementation, evidence traceability, and assessment readiness only. This mapping does not claim a MET assessment result, CMMC certification, CMMC status in SPRS, authorization to process CUI, FedRAMP authorization, or FDACS approval.
+Historical requirement-level supporting mapping only; docs/compliance/CMMC-SYSTEM-EVIDENCE.json is the current objective-level authority. This mapping does not claim a MET assessment result, CMMC certification, CMMC status in SPRS, authorization to process CUI, FedRAMP authorization, FDACS approval, or an assessor determination.
 
 Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provider evidence can support an assessment, but it cannot produce a MET result without evaluating all applicable NIST SP 800-171A Jun2018 determination statements in the approved assessment scope.
 
@@ -259,10 +259,12 @@ Every Rev. 2 requirement is deliberately marked `not_assessed`. Source or provid
 
 ## Authoritative sources
 
+- https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170
 - https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170/subpart-D/section-170.16
 - https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170/subpart-D/section-170.17
 - https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf
 - https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final
+- https://csrc.nist.gov/pubs/sp/800/171/a/final
 - https://csrc.nist.gov/pubs/sp/800/171/r3/final
 - https://csrc.nist.gov/pubs/sp/800/171/a/r3/final
 

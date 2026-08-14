@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import EiosShowcase from "./EiosShowcase";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
-  title: "EIOS | Governed Enterprise Intelligence and Action | Obserra",
+  title: `EIOS | Governed Enterprise Intelligence and Action | ${LEGAL_ENTITY_NAME}`,
   description:
     "EIOS connects enterprise context, helps leaders make evidence-backed decisions, governs authorized action, and independently verifies outcomes.",
   alternates: { canonical: "/eios" },
@@ -42,14 +43,14 @@ export default function EiosPage() {
         description: "A governed Enterprise Intelligence Operating System that connects enterprise context, supports evidence-backed decisions, governs authorized action, and verifies outcomes.",
         provider: {
           "@type": "Organization",
-          name: "Obserra Executive Protection & Intelligence LLC",
+          name: LEGAL_ENTITY_NAME,
           url: "https://www.obserrallc.com"
         },
       },
       {
         "@type": "WebPage",
         url: "https://www.obserrallc.com/eios",
-        name: "EIOS | Governed Enterprise Intelligence and Action | Obserra",
+        name: `EIOS | Governed Enterprise Intelligence and Action | ${LEGAL_ENTITY_NAME}`,
         description: "EIOS connects enterprise context, helps leaders make evidence-backed decisions, governs authorized action, and independently verifies outcomes.",
       },
       {

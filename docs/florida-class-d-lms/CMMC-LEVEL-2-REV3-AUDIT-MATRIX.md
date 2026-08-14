@@ -2,14 +2,14 @@
 
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update `CMMC-LEVEL-2-REV3-TRACEABILITY.json` and run `npm run generate:cmmc-traceability`.
 
-Registry SHA-256: `11f110691aa6d7c98e65e451862bb8d69726ba6d24244064dd33dc9b1b9dd6bd`
+Registry SHA-256: `0e010336455dcc3bb3501849c283c1d28e37f0d4816adcc3dd937ceab6c5bb1f`
 Registry schema version: `1.0`
 Registry snapshot date: `2026-08-13`
 Source checkpoint represented by the register: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
 
 ## Audit Claim Boundary
 
-Engineering alignment, evidence traceability, and audit readiness only. This register does not claim CMMC certification, a CMMC status in SPRS, FedRAMP authorization, FDACS approval, or authorization to process CUI.
+Historical requirement-level supporting inventory only. The current objective-level authority is docs/compliance/CMMC-SYSTEM-EVIDENCE.json. This register does not claim CMMC certification, a CMMC status in SPRS, FedRAMP authorization, FDACS approval, authorization to process CUI, or an assessor finding.
 
 NIST SP 800-171 Rev. 3 is the engineering baseline and NIST SP 800-171A Rev. 3 is the assessment procedure baseline for this traceability package. The current CMMC Level 2 rule baseline is retained separately because the current DoD assessment regime continues to reference the 110 NIST SP 800-171 Rev. 2 requirements. The Rev. 2 mappings in this report are a crosswalk aid and do not convert Rev. 3 implementation evidence into a CMMC certification claim.
 
@@ -688,17 +688,18 @@ Mapped Rev. 3 requirements: cross framework or program level
 
 ## Current CMMC Rule State
 
-As of 2026-08-13, CMMC Phase II implementation is suspended while Phase I self assessment requirements remain. Current DoD Level 2 enforcement continues to reference the 110 requirements in NIST SP 800-171 Rev. 2.
+The governing Level 2 record is bound to 32 CFR Part 170, the September 2024 CMMC Level 2 Assessment Guide version 2.13, NIST SP 800-171 Revision 2, and NIST SP 800-171A June 2018 as incorporated by reference. This historical supporting register does not infer or declare a CMMC implementation-phase status.
 
-NIST SP 800-171 Rev. 3 is the Obserra engineering baseline. Rev. 2 practice mappings are retained so the evidence package remains usable for the currently enforced CMMC Level 2 assessment baseline.
+NIST SP 800-171 Revision 3 and NIST SP 800-171A Revision 3 are supplemental forward-engineering references only. The authoritative objective-level record, exact source hashes, system separation, evidence ownership, technical results, human disposition, and claim boundaries are maintained in docs/compliance/CMMC-SYSTEM-EVIDENCE.json.
 
 ## Authoritative Sources
 
+* https://www.ecfr.gov/current/title-32/subtitle-A/chapter-I/subchapter-G/part-170
+* https://dodcio.defense.gov/Portals/0/Documents/CMMC/AssessmentGuideL2v2.pdf
+* https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final
+* https://csrc.nist.gov/pubs/sp/800/171/a/final
 * https://csrc.nist.gov/pubs/sp/800/171/r3/final
 * https://csrc.nist.gov/pubs/sp/800/171/a/r3/final
-* https://csrc.nist.gov/projects/cprt/catalog
-* https://dowcio.war.gov/CMMC/About/
-* https://www.acquisition.gov/dfars/252.204-7021-contractor-compliance-cybersecurity-maturity-model-certification-level-requirements.
 
 ## Drift Control
 

@@ -34,7 +34,7 @@ The production profile requires the protected technical runtime controls and ret
 Production readiness requires:
 
 1. Clerk publishable and server credentials are configured.
-2. `OBSERRA_SUPABASE_URL` is explicitly configured as HTTPS.
+2. `OBSERRA_FDACS_SUPABASE_URL` is explicitly configured as HTTPS.
 3. A protected Supabase service-role credential is configured server-side.
 4. Daily is configured as the live-media provider and the protected Daily API credential is present.
 5. The private Class DI instructor license value is configured.

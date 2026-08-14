@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This record preserves the controlled scope of the supplemental LMS evidence package prepared for the Florida Class DS Security Officer School or Training Facility application for **Obserra Executive Protection & Intelligence LLC**.
+This record preserves the controlled scope of the supplemental LMS evidence package prepared for the Florida Class DS Security Officer School or Training Facility application for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**.
 
 The supplemental guide does not replace the training curriculum, final examination, or other supporting documents required by FDACS-16003. It explains the proposed online LMS delivery method, attendance controls, security controls, training methods, examination gating, completion standards, certificate controls, records, inspection readiness, quality/CAPA controls, retention governance, non-production acceptance, instructional text-screen timing, regulated runtime isolation, and FDACS/LIAS operating workflow.
 
