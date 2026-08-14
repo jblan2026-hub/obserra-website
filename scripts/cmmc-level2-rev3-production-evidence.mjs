@@ -128,7 +128,7 @@ for (const forbidden of ["sk_live_", "sk_test_", "STRIPE_WEBHOOK_SECRET=", "STRI
 }
 
 const vercelConfig = JSON.parse(read(vercelPath));
-if (JSON.stringify(vercelConfig.alias) !== JSON.stringify(["www.obserrallc.com", "obserrallc.com"])) fail("Vercel production aliases are not source controlled");
+if (Object.hasOwn(vercelConfig, "alias")) fail("canonical aliases must be controlled only by the intended Vercel project, not propagated through vercel.json");
 
 const clerkConfig = read(clerkConfigPath);
 requireText(clerkConfigPath, clerkConfig, "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "Next.js Clerk publishable-key support");

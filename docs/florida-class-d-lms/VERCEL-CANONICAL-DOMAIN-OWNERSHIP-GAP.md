@@ -50,11 +50,11 @@ The current ChatGPT Vercel connector exposes project/deployment inspection but d
 
 ## Source follow-up
 
-`vercel.json` currently declares the canonical domains through its `alias` property. Vercel documentation states that custom aliases can be configured there but now prefers Project Settings.
+`vercel.json` declared the canonical domains through its `alias` property. Vercel documentation states that custom aliases can be configured there but now prefers Project Settings.
 
-After the project-domain cleanup is directly verified, remove the static canonical `alias` declaration from `vercel.json` through a governed pull request. Update Gate 34 so it requires project-domain ownership evidence and forbids static canonical alias propagation. This prevents another repo-linked Vercel project from recreating the conflict on a future deployment.
+The administrator completed the requested duplicate-project detach action, but direct inspection immediately afterward still listed both domains on all three projects. Because all three projects consume the same repository configuration, the static alias declaration was the remaining propagation mechanism. Gate 35 therefore removes the `alias` declaration through a governed pull request and updates Gate 34 evidence validation to forbid static canonical alias propagation. This prevents another repo-linked Vercel project from recreating the conflict on a future deployment.
 
-Do not remove the source aliases before project-level ownership is controlled and verified, because doing so without authoritative project-domain state could create avoidable production routing risk.
+After the source release is deployed, directly verify project-domain state. If either duplicate still retains a canonical domain, repeat the detach from that duplicate project only. Preserve both domains on `obserra-website-live` and do not change DNS or delete domains/projects.
 
 ## NIST SP 800-171 Rev. 3 / CMMC mapping
 
