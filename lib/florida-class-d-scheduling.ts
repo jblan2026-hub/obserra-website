@@ -5,6 +5,7 @@ import {
   getFloridaClassDInstructorLicenseNumber,
   getFloridaClassDSchoolLicenseNumber,
 } from "./florida-class-d-live-policy";
+import { floridaClassDProductionActivationAuthorized } from "./florida-class-d-production-activation";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -41,6 +42,7 @@ function enabled(value: string | undefined) {
 
 export function floridaClassDSchedulingEnabled() {
   return (
+    floridaClassDProductionActivationAuthorized() &&
     enabled(process.env.OBSERRA_FDACS_CLASS_D_SCHEDULING_ENABLED) &&
     process.env.OBSERRA_FDACS_DS_LICENSE_STATUS?.trim().toLowerCase() === "active" &&
     Boolean(getFloridaClassDInstructorLicenseNumber()) &&
