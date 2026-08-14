@@ -51,11 +51,22 @@ const workerIndexes = read(workerIndexesPath);
 const productionActivation = read(productionActivationPath);
 const tsconfig = read(tsconfigPath);
 
-// Clerk must wrap the exported Next.js proxy directly so auth() can detect middleware execution.
-requireText(proxyPath, proxy, "export default clerkMiddleware(", "direct Clerk middleware export");
+// Clerk failure must never take down public pages. Identity is invoked only after
+// canonical/regulatory boundaries, configuration readiness is checked first,
+// protected routes still require auth(), and SDK failures fall back fail-closed.
+requireText(proxyPath, proxy, "function preIdentityBoundary(request: NextRequest)", "pre-identity security boundary");
+requireText(proxyPath, proxy, "return regulatedMutationBoundary(request);", "regulated mutation boundary before identity");
+requireText(proxyPath, proxy, "function getConfiguredClerkHandler()", "lazy Clerk middleware factory");
+requireText(proxyPath, proxy, "configuredClerkHandler = clerkMiddleware(", "Clerk middleware integration");
+requireText(proxyPath, proxy, "await auth()", "protected-route Clerk authentication");
+requireText(proxyPath, proxy, "export default async function proxy(request: NextRequest, event: NextFetchEvent)", "availability-safe proxy export");
+requireText(proxyPath, proxy, "if (!authenticationReady())", "configuration readiness boundary");
+requireText(proxyPath, proxy, "return identityConfigurationResponse(request);", "fail-closed identity fallback");
+requireText(proxyPath, proxy, "return await getConfiguredClerkHandler()(request, event);", "Clerk request delegation");
+requireText(proxyPath, proxy, "catch {", "Clerk runtime failure containment");
 requireText(proxyPath, proxy, '"/(api|trpc)(.*)"', "API matcher");
 requireText(proxyPath, proxy, '"/__clerk/(.*)"', "Clerk internal matcher");
-forbidText(proxyPath, proxy, "const handler = clerkMiddleware(", "nested Clerk middleware handler");
+forbidText(proxyPath, proxy, "export default clerkMiddleware(", "unconditional Clerk middleware export that can fail public traffic before fallback");
 
 // The public website and sensitive routes must retain secure transport, framing, caching, and disclosure defaults.
 requireText(nextConfigPath, nextConfig, "poweredByHeader: false", "framework disclosure disabled");
@@ -168,4 +179,4 @@ forbidText(checkoutPath, checkout.toLowerCase(), "florida-class-d", "Florida Cla
 forbidText(redeemPath, redeem.toLowerCase(), "florida-class-d", "Florida Class D generic Academy redemption coupling");
 forbidText(webhookPath, webhook.toLowerCase(), "florida-class-d", "Florida Class D generic Stripe fulfillment coupling");
 
-console.log("Gate 32 passed: website headers, identity, Academy paid media/tutor access, publication/control plane, database dependencies, POST-only commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
+console.log("Gate 32 passed: public availability is isolated from Clerk failure, protected identity remains fail-closed, website headers, Academy paid media/tutor access, publication/control plane, database dependencies, POST-only commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
