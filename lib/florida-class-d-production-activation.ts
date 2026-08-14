@@ -1,5 +1,7 @@
 import "server-only";
 
+import { getFloridaClassDHaEvidenceReport } from "./florida-class-d-ha-evidence";
+
 const SHA40 = /^[0-9a-f]{40}$/i;
 const SHA256_HEX = /^[0-9a-f]{64}$/i;
 const CANONICAL_PUBLIC_ORIGIN = "https://www.obserrallc.com";
@@ -61,7 +63,7 @@ export type FloridaClassDProductionActivationReport = {
 };
 
 export const FLORIDA_CLASS_D_PRODUCTION_ACTIVATION_POLICY = {
-  policyVersion: "2026-08-13-gate-29-v1",
+  policyVersion: "2026-08-13-gate-31-v1",
   canonicalPublicOrigin: CANONICAL_PUBLIC_ORIGIN,
   exactReleaseBindingRequired: true,
   exactUatReleaseBindingRequired: true,
@@ -85,6 +87,7 @@ export const FLORIDA_CLASS_D_PRODUCTION_ACTIVATION_POLICY = {
   explicitNonProductionExecutionAuthorizationRequired: true,
   syntheticIdentityOnlyRequiredForNonProductionExecution: true,
   highAvailabilityRequiredForAllProductionSubsystems: true,
+  cryptographicHaEvidenceRequired: true,
   maxRtoMinutes: MAX_HA_RTO_MINUTES,
   maxRpoMinutes: MAX_HA_RPO_MINUTES,
   maxFailoverTestAgeDays: MAX_FAILOVER_TEST_AGE_DAYS,
@@ -158,9 +161,18 @@ function highAvailabilityChecks(): FloridaClassDProductionActivationCheck[] {
   ));
   const rto = integerValue("OBSERRA_FDACS_HA_RTO_MINUTES");
   const rpo = integerValue("OBSERRA_FDACS_HA_RPO_MINUTES");
+  const evidence = getFloridaClassDHaEvidenceReport(value("OBSERRA_FDACS_RELEASE_CANDIDATE_SHA"));
 
   return [
     ...statusChecks,
+    check(
+      "ha:evidence_manifest",
+      "Candidate-bound HA evidence manifest is cryptographically verified",
+      evidence.ready,
+      "HA evidence manifest, per-evidence digests, release binding, subsystem coverage, recovery objectives, and evidence recency are verified.",
+      "A valid candidate-bound HA evidence manifest and matching SHA-256 are required. Status markers alone cannot authorize production activation.",
+      true,
+    ),
     check(
       "ha:rto",
       `Recovery time objective is ${MAX_HA_RTO_MINUTES} minutes or less`,
