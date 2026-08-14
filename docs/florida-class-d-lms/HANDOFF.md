@@ -1,6 +1,6 @@
 # Obserra Florida Class D LMS Handoff
 
-Snapshot: 2026-08-13 20:32 ET
+Snapshot: 2026-08-13 20:37 ET
 
 ## Authoritative scope
 
@@ -9,15 +9,13 @@ This handoff governs the regulated Florida Class D school and LMS workstream for
 Repository: `jblan2026-hub/obserra-website`  
 Branch: `feature/florida-class-d-lms-foundation`  
 Pull request: `PR #56`  
-PR state at reconciliation: **open, mergeable, unmerged**.
+PR state: **open, mergeable, unmerged**.
 
 ## Current validated restart checkpoint
 
-The exact validated handoff checkpoint is:
+Validated five-green checkpoint: `af4247978c3b1b3aaac45ce7e15f321512cbf71c`.
 
-`af4247978c3b1b3aaac45ce7e15f321512cbf71c`
-
-All five primary workflows are green on that exact SHA:
+Green on that exact SHA:
 
 - Florida Class D LMS Gates #400.
 - Website CI #1942.
@@ -25,136 +23,95 @@ All five primary workflows are green on that exact SHA:
 - Application Release Validation #807.
 - Application Production Pipeline #826.
 
-The branch later advanced by one documentation-only commit to `e57be5e50c7ecfb0da9052f47bb41267aaf2087c`. Direct comparison showed only `docs/florida-class-d-lms/CURRENT-STATUS-2026-08-13.md` changed between those SHAs. No regulated LMS runtime code changed in that interval.
-
-Historical implementation baselines remain audit evidence. The original accepted Gate 25 implementation baseline is `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d`, validated by Florida Class D LMS Gates run #367. Historical SHAs are not the current restart pointer.
+Historical Gate 25 implementation baseline: `b45f2a021ec0b600abb8f62a2ffc9f026f294f9d`, Florida Class D LMS Gates #367. Historical implementation SHAs remain audit evidence and are not the current restart pointer.
 
 ## Controlled Class D architecture
 
-Gates 1 through 25 are implemented in source. The regulated architecture includes:
+Gates 1 through 25 are implemented in source.
 
-- Five-day / 40-hour course structure.
-- Eighteen required curriculum areas.
-- Four 120-minute live instructional sessions per day.
-- Tracked non-credit breaks.
-- Live instructor media.
-- One-device attendance and presence controls.
-- Recurring security challenges.
-- Learner Q&A and polling.
-- Controlled make-up and recorded make-up workflows.
-- Separate protected 170-question final examination.
-- Passing threshold of 128 correct answers out of 170.
-- Remediation and retest governance.
-- Successful-completion review.
-- LIAS workflow.
-- Completion-document handling.
-- Inspection evidence and export.
-- Quality/CAPA and retention/legal-hold controls.
-- Database promotion readiness.
-- Protected runtime readiness.
-- Gate 23 non-production acceptance evidence.
-- Gate 24 server-authoritative instructional text-screen timing.
-- Gate 25 regulated runtime isolation.
+### Gates 1-4
 
-## Gate 23 through Gate 25 current control state
+Foundation, regulated student records, durable persistence and protected administrative APIs, identity verification, learner acknowledgments, cohort assignment, and regulated enrollment controls are implemented in source. Production enrollment and regulated learner activation remain fail closed.
 
-Gate 23 requires an authorized development, sandbox, staging, or UAT environment, exact release-SHA binding, synthetic identities only, evidence for all 18 required acceptance domains, and fail-closed database finalization. A previous real UAT run finalized 18 of 18 domains for release SHA `10779bc31a86caa1b54721f7a8ca4c9930a9ad61`. Because source advanced, the final production candidate requires a new candidate-bound 18-of-18 run.
+### Gates 5-8
 
-Gate 24 enforces server-authoritative instructional text-screen timing using 60 seconds per 50 words, prorated by actual word count. Timing is tied to the authenticated learner and active device lease. Visible-tab heartbeats feed server-observed time. Acknowledgment is unavailable until the minimum is met. Instructor discussion confirmation is required before closure.
+Live instructor classroom operation, one-device presence, server-authoritative instructional time, security challenges, attendance certification, live media, temporary observer access, and the controlled five-day schedule are implemented in source.
 
-Gate 25 enforces regulated runtime isolation. Regulated server modules require explicit protected `OBSERRA_SUPABASE_URL` HTTPS configuration and protected server-side credentials. Hardcoded regulated Supabase project URLs and secret-class `NEXT_PUBLIC_*` configuration are prohibited. Missing or invalid protected runtime configuration fails closed.
+### Gates 9-15
+
+Participation, controlled make-up, recorded make-up, protected final examination, examination-bank administration boundary, monitoring, remediation, and retest authorization are implemented in source.
+
+### Gates 16-20
+
+Completion review, LIAS workflow, completion documents, student document presentation, inspection packets, quality/CAPA, retention, and legal-hold controls are implemented in source.
+
+### Gates 21-25
+
+Database promotion readiness, protected runtime readiness, Gate 23 non-production acceptance, Gate 24 server-authoritative instructional text-screen timing, and Gate 25 regulated runtime isolation are implemented in source. These controls do not authorize production activation.
+
+## Current regulated control state
+
+Gate 23 requires an authorized non-production environment, exact release-SHA binding, synthetic identities only, evidence for all 18 required acceptance domains, and fail-closed finalization. A previous real UAT run finalized 18 of 18 domains for release SHA `10779bc31a86caa1b54721f7a8ca4c9930a9ad61`. A new final-candidate-bound run is required because source advanced.
+
+Gate 24 uses server-authoritative text-screen timing at 60 seconds per 50 words, prorated by word count, tied to the authenticated learner and active device lease. Acknowledgment remains blocked until the authoritative minimum is met, and instructor discussion confirmation is required before closure.
+
+Gate 25 requires protected server runtime configuration and fails closed when required regulated configuration is absent or invalid. The mandatory runtime-isolation enforcement remains part of the dedicated Class D workflow.
 
 ## Controlled Class DS filing baseline
 
-The current private controlled filing set is:
+Current controlled artifacts:
 
-- Obserra Class DS Online LMS Training Delivery and Compliance Guide v0.15 Live Evidence Only Submission Draft, DOCX.
-- Obserra Class DS Online LMS Training Delivery and Compliance Guide v0.15 Live Evidence Only Submission Draft, PDF, 43 pages.
-- Florida Class DS School Submission Readiness Register v1.5 Live Evidence Only, 6 pages.
+- LMS Guide DOCX v0.15.
+- LMS Guide PDF v0.15, 43 pages.
+- Submission Readiness Register v1.5, 6 pages.
 - FDACS-16003 Prefill Data Sheet v1.3.
-- Florida Class DS Prefiling Compliance Audit v1.5.
+- Prefiling Compliance Audit v1.5.
 - Corporate Entity, Ownership, and Class DS School Location Baseline v1.5.
-- Controlled Pre-Filing Packet v0.15 Live Evidence Only, NOT FOR SUBMISSION until open filing controls close.
+- Controlled Pre-Filing Packet v0.15, not for submission until open filing controls close.
 
-Controlled packet ZIP SHA-256:
+Controlled packet ZIP SHA-256: `8dd6774325054141c03d89c4a34ed9dcacf61a739445c2ed196ecc27d5b035a7`.
 
-`8dd6774325054141c03d89c4a34ed9dcacf61a739445c2ed196ecc27d5b035a7`
+Curriculum SHA-256: `e76928fefc11a0640f02c80f02af4c2aacbecee39d09f38dbd9776653c2863fd`.
 
-Curriculum SHA-256:
-
-`e76928fefc11a0640f02c80f02af4c2aacbecee39d09f38dbd9776653c2863fd`
-
-Final examination SHA-256:
-
-`240e297682e157221e33ec830bef026e829116ac5f57c5de5565fa244241467e`
-
-Do not substitute or edit controlled filing binaries without creating a new controlled revision, rerunning render/preflight/archive validation, and updating all hashes and handoff records.
+Final examination SHA-256: `240e297682e157221e33ec830bef026e829116ac5f57c5de5565fa244241467e`.
 
 ## No mockups or placeholders
 
-All continued LMS work must be real production-grade functionality intended for operational use by students and authorized staff.
+All continued LMS work must be real production-grade functionality intended for operational use by students and authorized staff. No mockup, placeholder, fabricated screenshot, simulated certificate, simulated LIAS output, fake acceptance result, or fake success state may be treated as implementation or filing evidence.
 
-No mockup, placeholder, fabricated screenshot, simulated certificate, simulated LIAS output, fake acceptance result, fake learner workflow, source-rendered interface illustration, client-only compliance timer, simulated acknowledgment, or fake success state may be treated as implementation or filing evidence.
+## Completion and certificate standard
 
-Evidence screenshots must come from implemented screens in the accurately identified environment. Non-production evidence must never be represented as production evidence or FDACS approval.
+Forty instructional hours alone do not complete the course and do not earn a completion certificate. Successful completion requires the full five-day / 2,400-minute record, all required curriculum areas and checks, a passing 170-question final examination at 128/170 or better, cleared blockers, and authorized school/compliance approval. The official FDACS-16103 remains LIAS-generated and must not be synthesized locally.
 
-## Mandatory completion and certificate standard
+## Filing and deployment state
 
-Forty instructional hours alone do not complete the course and do not earn a completion certificate.
+Class DS category: **Tuition/Fee Charging**. Designated filing/training email: **info@obserrallc.com**. The proposed school is online only, with live online instruction from the controlled Florida physical training location. The owner reports no applicable HOA or private-covenant restriction.
 
-Successful completion requires:
-
-1. Full five-day / 2,400-minute instructional record.
-2. All 18 required curriculum areas and required checks.
-3. Passing 170-question final examination at 128/170 or better.
-4. Cleared completion-blocking issues.
-5. Authorized school/compliance completion approval.
-
-Only after successful completion may the learner-specific supplemental Obserra completion record be generated. The official FDACS-16103 remains LIAS-generated and must not be synthesized locally. Successful training does not itself issue a Florida Class D license.
-
-## Filing status
-
-Current owner-confirmed filing facts include:
-
-- Applicant entity is the LLC.
-- Class DS category is **Tuition/Fee Charging**.
-- Designated filing/training email is **info@obserrallc.com**.
-- Proposed school is online only with live online instruction conducted from the controlled Florida physical training location.
-- Owner reports no applicable HOA or private-covenant restriction.
-
-Remaining filing controls include the current FDACS fictitious-name supporting-document expectation, Orange County Business Tax Receipt and section 559.955 evidence, filing-day form/fee/address/instruction verification, protected Class DI information handling, training start-date control, and final compliance/counsel/owner review.
-
-## Vercel deployment governance
-
-The existing intended public Vercel project is `obserra-website-live`. The canonical registered company domain is `obserrallc.com`, with `www.obserrallc.com` as the public website host.
-
-The owner reports the intended current Vercel team technical slug is `obserra`. Direct connector verification of the authoritative project/team/deployment binding remains outstanding.
-
-Do not create another Vercel project, move the existing project, or change DNS as a workaround.
+The existing intended Vercel project remains `obserra-website-live`. Canonical registered domain: `obserrallc.com`; public website host: `www.obserrallc.com`. Do not create another project, move the existing project, or change DNS as a workaround.
 
 ## Production boundary
 
-Production regulated functions remain **fail closed**.
-
-Public paid enrollment, regulated learner access, production scheduling, live Class D instruction, production examination access, LIAS production execution, completion/certificate release, observer production access, regulated database promotion, and runtime activation remain disabled until actual Class DS authorization and final production gates pass.
-
-No CI result, source commit, UAT result, screenshot, filing draft, Class A record, corporate record, Vercel state, or deployment state is FDACS approval.
+Production regulated functions remain **fail closed**. Public paid enrollment, regulated learner access, production scheduling, live Class D instruction, production examination access, LIAS production execution, completion/certificate release, regulated database promotion, and runtime activation remain disabled until actual Class DS authorization and final production gates pass. No CI result, source commit, UAT result, screenshot, filing draft, or deployment state is FDACS approval.
 
 ## Mandatory audit continuity rule
 
-Every material LMS, FDACS, Vercel, CI, UAT, database, identity, media, examination, LIAS, completion, filing, security, or production-readiness action must update the controlled handoff set before the work session is considered complete.
+Every material LMS, FDACS, Vercel, CI, UAT, database, identity, media, examination, LIAS, filing, security, or production-readiness action must update the controlled handoff state. Each action record must preserve the exact SHA or external object, result/evidence, workflow identifiers where applicable, production and regulatory impact, rollback state, unresolved blockers, and next governed action.
 
-At minimum each update must record the exact SHA or external object acted on, what changed, evidence/result, workflow/run identifiers where applicable, security/regulatory impact, production-boundary effect, rollback state, unresolved blockers, and next governed action.
+`CURRENT-STATUS-2026-08-13.md`, `LATEST-HANDOFF.md`, this file, applicable gate handoffs, and `DS-SUBMISSION-LMS-GUIDE-CONTROL.md` must remain synchronized in authority. Historical gate records remain historical evidence and must defer current state to `LATEST-HANDOFF.md`.
 
-`CURRENT-STATUS-2026-08-13.md`, `LATEST-HANDOFF.md`, this file, the applicable gate handoff, and `DS-SUBMISSION-LMS-GUIDE-CONTROL.md` must remain synchronized. Historical implementation baselines must remain labeled as historical.
+## Audit action history
+
+- `af4247978c3b1b3aaac45ce7e15f321512cbf71c`: all five primary workflows green, runs #400/#1942/#1118/#807/#826.
+- `e57be5e50c7ecfb0da9052f47bb41267aaf2087c`: documentation-only current-status synchronization.
+- `b838c691f8d42d9160fb762e124b3ae172a2b1b8`: synchronized `LATEST-HANDOFF.md` and established mandatory audit continuity.
+- `89a408b618fabe5741fbf857d9e3e9939ea1aa69`: synchronized consolidated handoff. Website CI #1951, Academy 70x #1121, Release Validation #810, and Production Pipeline #829 passed. Florida Class D LMS Gates #403 failed only because the consolidated handoff had lost the verifier-required `### Gates 1-4` heading. This update restores that contract.
 
 ## Next controlled sequence
 
-1. Keep the controlled handoff set synchronized with every action.
-2. Continue production-grade LMS implementation only.
-3. Close the remaining Class DS filing controls.
+1. Revalidate the complete Class D workflow after this handoff fix.
+2. Synchronize remaining controlled handoff and submission-control records.
+3. Continue production-grade LMS readiness buildout.
 4. Reconcile the existing authoritative Vercel project without project movement or DNS change.
-5. Freeze the final production candidate SHA.
-6. Run the final candidate-bound Gate 23 18-of-18 non-production acceptance using synthetic identities.
-7. Complete production database, runtime, media, examination-bank, LIAS, security, rollback, and owner-approval gates.
-8. Do not activate regulated production functions until the Class DS license is actually issued and final production approval gates pass.
+5. Freeze the final production candidate and execute candidate-bound non-production acceptance.
+6. Complete production database, runtime, media, examination-bank, LIAS, security, rollback, and owner-approval gates.
+7. Do not activate regulated production functions until the Class DS license is actually issued and final production approval gates pass.
