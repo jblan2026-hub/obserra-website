@@ -34,7 +34,7 @@ export const EXPECTED_FLORIDA_CLASS_D_MIGRATIONS = [
   "20260813111000_fdacs_class_d_text_screen_completion_guard.sql",
   "20260813204215_fdacs_class_d_security_hardening.sql",
   "20260814011203_fdacs_class_d_fk_performance_indexes.sql",
-] as const;
+];
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
