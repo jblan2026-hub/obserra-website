@@ -1,6 +1,10 @@
 name: CMMC Traceability Bootstrap
 
 on:
+  push:
+    branches: [feature/florida-class-d-lms-foundation]
+    paths:
+      - ".github/workflows/cmmc-traceability-bootstrap.yml"
   workflow_dispatch:
 
 permissions:
