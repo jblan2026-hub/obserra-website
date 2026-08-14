@@ -14,6 +14,7 @@ on:
       - lib/release-delivery.ts
       - next.config.ts
       - .env.example
+      - .vercelignore
       - docs/CYBER-CRISIS-COMMANDER-SALES-HANDOFF.md
       - docs/PRODUCTION-READINESS-SOURCE-OF-TRUTH.md
       - test/application-sales-handoff.test.mjs
@@ -28,6 +29,7 @@ on:
       - lib/release-delivery.ts
       - next.config.ts
       - .env.example
+      - .vercelignore
       - docs/CYBER-CRISIS-COMMANDER-SALES-HANDOFF.md
       - docs/PRODUCTION-READINESS-SOURCE-OF-TRUTH.md
       - test/application-sales-handoff.test.mjs
@@ -43,7 +45,7 @@ concurrency:
 
 jobs:
   verify-fail-closed-handoff:
-    name: Verify commerce, launch, and download release boundaries
+    name: Verify commerce, launch, download, and deployment boundaries
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -51,7 +53,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
       - name: Configure Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: "22"
 
@@ -75,8 +77,11 @@ jobs:
             echo "saas_runtime_project=not-created"
             echo "commercial_status=Coming Soon"
             echo "launch_setting=APP_LAUNCH_OBSERRA_CYBER_CRISIS_COMMANDER"
+            echo "vercel_lockfile_required=package-lock.json"
           } > security-evidence/application-sales-handoff-context.txt
           sha256sum \
+            .vercelignore \
+            package-lock.json \
             app/apps/appsData.ts \
             app/apps/storefront.ts \
             app/apps/commerce.ts \
