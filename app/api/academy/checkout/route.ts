@@ -16,18 +16,70 @@ export const maxDuration = 60;
 
 const CLAIM_POLICY = "purchaser-email-match-v1";
 const INITIAL_COURSE_VERSION = "1.0.0";
+const NO_STORE = "private, no-store, max-age=0";
 
 function unavailableRedirect(requestUrl: URL, reason: string) {
   const response = NextResponse.redirect(new URL(`/academy?enrollment=${reason}`, requestUrl));
   response.headers.set("x-obserra-commerce-status", reason);
   response.headers.set("x-obserra-webhook-verification", "required");
-  response.headers.set("cache-control", "private, no-store, max-age=0");
+  response.headers.set("cache-control", NO_STORE);
   return response;
 }
 
-export async function GET(request: Request) {
+function rejectedRequest(status: number, error: string) {
+  return NextResponse.json(
+    { error },
+    {
+      status,
+      headers: {
+        "cache-control": NO_STORE,
+        "x-content-type-options": "nosniff",
+      },
+    },
+  );
+}
+
+function isSameOrigin(request: Request, requestUrl: URL) {
+  const origin = request.headers.get("origin");
+  if (!origin) return false;
+  try {
+    return new URL(origin).origin === requestUrl.origin;
+  } catch {
+    return false;
+  }
+}
+
+function isSupportedFormContentType(request: Request) {
+  const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
+  return contentType.startsWith("application/x-www-form-urlencoded") ||
+    contentType.startsWith("multipart/form-data");
+}
+
+export async function GET() {
+  const response = rejectedRequest(405, "Method not allowed");
+  response.headers.set("allow", "POST");
+  return response;
+}
+
+export async function POST(request: Request) {
   const requestUrl = new URL(request.url);
-  const baseCourse = courseForId(requestUrl.searchParams.get("course") ?? "");
+
+  if (!isSameOrigin(request, requestUrl)) {
+    return rejectedRequest(403, "Forbidden");
+  }
+  if (!isSupportedFormContentType(request)) {
+    return rejectedRequest(415, "Unsupported media type");
+  }
+
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return rejectedRequest(400, "Invalid request body");
+  }
+
+  const courseValue = formData.get("course");
+  const baseCourse = courseForId(typeof courseValue === "string" ? courseValue : "");
 
   if (!baseCourse || !process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     return unavailableRedirect(requestUrl, "configuration-required");
@@ -147,7 +199,7 @@ export async function GET(request: Request) {
     response.headers.set("x-obserra-course-control-revision", String(runtimeCourse.control.revision));
     response.headers.set("x-obserra-existing-entitlements", "preserved");
     response.headers.set("x-obserra-webhook-verification", "required");
-    response.headers.set("cache-control", "private, no-store, max-age=0");
+    response.headers.set("cache-control", NO_STORE);
     return response;
   } catch {
     const response = NextResponse.redirect(
@@ -155,7 +207,7 @@ export async function GET(request: Request) {
     );
     response.headers.set("x-obserra-commerce-status", "checkout-unavailable");
     response.headers.set("x-obserra-existing-entitlements", "preserved");
-    response.headers.set("cache-control", "private, no-store, max-age=0");
+    response.headers.set("cache-control", NO_STORE);
     return response;
   }
 }
