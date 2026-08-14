@@ -1,5 +1,6 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
+import { prepareClerkRuntime } from "./lib/clerk-runtime-config";
 import { evaluateFloridaClassDMutationBoundary } from "./lib/florida-class-d-mutation-boundary";
 
 const CANONICAL_HOST = "www.obserrallc.com";
@@ -22,40 +23,12 @@ const PROTECTED_PATH_PREFIXES = [
   "/api/florida-class-d/admin",
 ] as const;
 
-type ClerkEnvironment = "test" | "live";
-
-function decodeBase64Url(value: string) {
-  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
-  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
-  return atob(padded);
-}
-
-function clerkPublishableEnvironment(value: string | undefined): ClerkEnvironment | null {
-  if (!value || value !== value.trim()) return null;
-  const match = /^pk_(test|live)_([A-Za-z0-9_-]+)$/.exec(value);
-  if (!match) return null;
-
-  try {
-    const decoded = decodeBase64Url(match[2]);
-    if (!decoded.endsWith("$")) return null;
-    const frontendApi = decoded.slice(0, -1);
-    if (!/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,}$/i.test(frontendApi)) return null;
-    return match[1] as ClerkEnvironment;
-  } catch {
-    return null;
-  }
-}
-
-function clerkSecretEnvironment(value: string | undefined): ClerkEnvironment | null {
-  if (!value || value !== value.trim()) return null;
-  const match = /^sk_(test|live)_([A-Za-z0-9_-]{20,})$/.exec(value);
-  return match ? (match[1] as ClerkEnvironment) : null;
-}
+// Normalize Clerk's supported publishable-key names and harmless surrounding
+// whitespace before clerkMiddleware initializes. Secret values are never logged.
+prepareClerkRuntime();
 
 function authenticationReady() {
-  const publishableEnvironment = clerkPublishableEnvironment(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-  const secretEnvironment = clerkSecretEnvironment(process.env.CLERK_SECRET_KEY);
-  return Boolean(publishableEnvironment && secretEnvironment && publishableEnvironment === secretEnvironment);
+  return prepareClerkRuntime().ready;
 }
 
 function ownerOrigin() {

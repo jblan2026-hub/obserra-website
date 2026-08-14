@@ -9,6 +9,8 @@
     "test": "node --test",
     "generate:cmmc-traceability": "node scripts/cmmc-level2-rev3-traceability.mjs --write",
     "verify:cmmc-traceability": "node scripts/cmmc-level2-rev3-traceability.mjs --check",
+    "generate:cmmc-production-evidence": "node scripts/cmmc-level2-rev3-production-evidence.mjs --write",
+    "verify:cmmc-production-evidence": "node scripts/cmmc-level2-rev3-production-evidence.mjs --check",
     "test:academy-alignment": "node scripts/academy-course-brand-alignment-gate.mjs",
     "test:academy-70x": "node scripts/academy-70x-gate.mjs",
     "test:academy-500x": "node scripts/academy-500x-workload-gate.mjs",
