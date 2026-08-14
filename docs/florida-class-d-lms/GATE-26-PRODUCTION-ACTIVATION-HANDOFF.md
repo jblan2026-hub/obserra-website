@@ -1,6 +1,6 @@
 # Gate 26 Production Activation Authorization Handoff
 
-Snapshot: 2026-08-13 21:02 ET
+Snapshot: 2026-08-13 21:04 ET
 
 ## Status
 
@@ -73,9 +73,9 @@ HA is mandatory for the complete production service chain:
 
 Gate 26 currently enforces:
 
-- RTO of **60 minutes or less**;
-- RPO of **15 minutes or less**;
-- a successful end-to-end failover exercise **no older than 90 days** at activation.
+- RTO of 60 minutes or less;
+- RPO of 15 minutes or less;
+- a successful end-to-end failover exercise no older than 90 days at activation.
 
 Every HA evidence-state marker must be supported by authentic retained evidence. Vendor service claims alone do not satisfy the Obserra production verification requirement.
 
@@ -114,7 +114,7 @@ Mandatory workflow step:
 
 Dedicated workflow job:
 
-`Gates 1-26 and website compatibility`
+`Gates 1-27 and website compatibility`
 
 The verifier confirms exact release binding, production prerequisites, complete regulated feature inventory, HA evidence inputs, recovery objectives, failover-test recency, protected staff visibility, dedicated Gate 26 handoff, and the source integrations listed above.
 
@@ -129,8 +129,9 @@ Important milestones include:
 - `ff6d1d5a99fd6a0f5d3f5dda1ec1e7b38f4e1d23`: bound LIAS administration to shared regulated execution authorization.
 - `e9d908b5c1f2c173a5ba3839faab459c0c4ca90e`: bound official completion-document ingestion to shared regulated execution authorization.
 - `1b6a35bdb289faaa15e5fdc1eb814cd607e65425`: exact current five-green source checkpoint, including Gate 26 CI acceptance.
+- `337dcd6c3a86ac77736836941d24c00dc417febe`: first Gate 27 workflow head. Florida Class D LMS Gates #435 failed in Gate 26 only because this handoff had formatting inserted inside the verifier-required RTO/RPO literals. Gate 27 was skipped. No Gate 26 implementation logic failed.
 
-Historical failed runs #403 and #415 remain preserved in the action ledger and must not be relabeled successful.
+Historical failed runs #403, #415, and #435 remain preserved in the action ledger and must not be relabeled successful.
 
 ## Production and regulatory boundary
 
@@ -142,8 +143,8 @@ Official FDACS-16103 remains LIAS-generated and must not be synthesized by Obser
 
 ## Next governed actions
 
-1. Preserve `1b6a35bdb289faaa15e5fdc1eb814cd607e65425` as the current exact validated Gate 26 five-green source checkpoint.
-2. Continue production resilience and observability engineering as the next controlled milestone.
+1. Preserve `1b6a35bdb289faaa15e5fdc1eb814cd607e65425` as the current exact validated Gate 26 five-green source checkpoint until Gate 27 earns its own complete validation checkpoint.
+2. Re-run the complete Gates 1-27 workflow after restoring the exact Gate 26 verifier literals.
 3. Produce authentic HA, failover, backup/restore, observability, and recovery evidence for every production dependency.
 4. Reconcile the authoritative existing Vercel project directly without project movement or DNS change.
 5. Freeze the final production candidate and execute a new exact-candidate-bound 18-of-18 Gate 23 synthetic UAT acceptance.
