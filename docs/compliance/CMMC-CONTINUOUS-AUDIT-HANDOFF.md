@@ -3,9 +3,9 @@
 > GENERATED FROM `CMMC-CONTINUOUS-AUDIT-HANDOFF.json`. DO NOT EDIT THIS EXTRACT MANUALLY.
 
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-- **Updated:** `2026-08-14T18:54:54Z`
-- **Repository/branch:** `jblan2026-hub/obserra-website` / `codex/gate37-public-production-hardening`
-- **Base commit:** `0e72459a8940f23976038d85d6394409000f48c5`
+- **Updated:** `2026-08-14T22:43:09Z`
+- **Repository/branch:** `jblan2026-hub/obserra-website` / `codex/fdacs-baseline-completion`
+- **Base commit:** `2dde838ee176e6f450abeca2daad96ab377ed931`
 - **Status:** `implemented_locally_live_activation_pending`
 
 Do not describe the continuous audit record as live until the production migrations, protected workflow secrets, approved main-branch workflow, actual archive write, controlled catalog read, artifact-chain check, access-event-chain check, health check, and paired receipt have all been verified.
@@ -65,9 +65,9 @@ Human review is `pending`; pending human review is not a technical failure; the 
 - Verification: `npm run verify:fdacs-pii-audit`
 - Live status: `live_hardened_activation_pending`
 
-6 migrations are live in the isolated project. Provider results: 0 security findings, 0 unindexed foreign keys, 0 browser table privileges, 0 browser execute privileges across 102 FDACS routines, 64 explicit deny policies, and 5 valid/0 failed chains. Technical checks are 6 passed, 0 failed, and 5 not tested. Human review is `pending`; finding is `not_assessed`.
+9 migrations are live in the isolated project. Provider results: 0 security findings, 0 unindexed foreign keys, 0 browser table privileges, 0 browser execute privileges across 114 FDACS routines, 64 explicit deny policies, and 5 valid/0 failed chains. Technical checks are 11 passed, 0 failed, and 4 not tested. Human review is `pending`; finding is `not_assessed`.
 
-Preflight export `27ea0a5a-1c07-4c68-a37f-eb775df343fb` has payload SHA-256 `588eea7731526ff01704ae06b0b07381ec97340f7d162cb0cd3f3db1bd255d1e` and remains correctly non-final. The isolated live database hardening, zero browser routine grants, preflight generation, and three fail-closed export tests are verified. External encryption-key custody, encrypted export finalization, backup/restore, HA failover, real student workflow, licensing prerequisites, and production authorization remain pending.
+Preflight export `27ea0a5a-1c07-4c68-a37f-eb775df343fb` has payload SHA-256 `588eea7731526ff01704ae06b0b07381ec97340f7d162cb0cd3f3db1bd255d1e` and remains correctly non-final. The isolated live database hardening, zero browser routine grants, preflight generation, three fail-closed export tests, and exact-release non-credit owner-UAT controls—including service-only scheduling, assigned-instructor live execution, bounded verified-active Class DI evidence, application-envelope-encrypted instructor-file archival, and no Class DS school-license claim—are verified. External provider configuration, the authentic instructor evidence upload, the real owner student workflow, encryption-key custody, encrypted export finalization, backup/restore, HA failover, licensing prerequisites, and production authorization remain pending.
 
 ## Legal identity source audit
 
@@ -104,7 +104,7 @@ Excluded: **Applications product workstream** — `app/apps/`, `app/api/apps/`, 
 - Per-system register contains 13 systems and 3048 objective mapping rows with zero unmapped required objectives.
 - Paired machine-readable JSON and human-readable Markdown are generated from the same in-memory bundle and bound by a SHA-256 manifest.
 - Archive source gate verifies exact revisions, ownership, claim boundaries, assessor-only findings, indefinite retention, immutable evidence, paired views, and both integrity-chain verifiers.
-- The isolated live FDACS database has six new audit/retention/identity/hardening migrations, 64 explicit browser-deny policies, zero browser execute grants across 102 FDACS routines, zero security-advisor findings, zero unindexed foreign-key findings, five valid integrity chains, and three verified live fail-closed export observations; the unpublished source gate is not_tested and production authorization remains false.
+- The isolated live FDACS database has nine controlled audit/retention/identity/owner-UAT hardening migrations, 64 explicit browser-deny policies, zero browser execute grants across 114 FDACS routines, zero security-advisor findings, zero unindexed foreign-key findings, five valid integrity chains, and rollback-only fail-closed owner-UAT tests; real instructor/student records remain absent and production authorization remains false.
 - The website credential candidate has nine authorized local assets, three live Active ADG issuer observations, a six-of-six integrity result, a clean TypeScript result, a complete Next.js production build, and HTTP 200 results for every direct/optimized asset path; current production still fails all nine images and remains a live blocker.
 - The fail-closed legal identity audit generated paired machine/human records, requires the exact legal entity and canonical public origin, preserves only enumerated product brands and stable technical identifiers, maps to CMMC configuration/evidence controls, and records the unpublished candidate as not_tested rather than green.
 - The optimized Next.js 16.3.1 candidate build generated all 163 static pages; TypeScript, quiet ESLint, the 57-test Node source suite, and regulated Florida Class D source gates through Gate 21 were satisfied locally. These are non-authoritative candidate validations and do not create a green technical result.
@@ -123,6 +123,8 @@ Excluded: **Applications product workstream** — `app/apps/`, `app/api/apps/`, 
 | `LIVE-007` | `pending` | Run an actual approved in-scope change, archive the exact-revision pair, read it through the controlled catalog, verify both chains and health, and retain the machine/human receipt. |
 | `LIVE-008` | `pending` | Release stable continuous-audit links only after LIVE-001 through LIVE-007 are evidenced as complete. |
 | `LIVE-009` | `pending` | Approve and publish the exact website candidate, deploy it through the intended Vercel project, and verify all nine EC-Council images have nonzero dimensions and every ADG link resolves to its individual active issuer record. |
+| `LIVE-010` | `pending` | Publish the exact FDACS candidate, deploy a Vercel Preview, and—only after action-time owner confirmation—place the protected Supabase, live Stripe Identity, Daily, and record-encryption settings in the intended project. |
+| `LIVE-011` | `pending` | Use authentic bounded-expiration Class DI evidence for a distinct instructor principal, then run the capacity-one, non-credit, exact-release owner student UAT with real identity and video while retaining no secret or PII in repository evidence. |
 
 ## Continuous audit links
 

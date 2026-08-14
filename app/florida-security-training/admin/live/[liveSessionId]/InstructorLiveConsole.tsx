@@ -324,6 +324,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     try {
       const certification = await adminApi({
         action: "certify_day",
+        liveSessionId,
         enrollmentId: student.id,
         day,
         attendanceStatus,
@@ -496,7 +497,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     setPollBusy(true);
     setError(null);
     try {
-      await adminApi({ action: "poll_close", pollId: activePoll.id });
+      await adminApi({ action: "poll_close", liveSessionId, pollId: activePoll.id });
       await refresh();
     } catch (pollError) {
       setError(pollError instanceof Error ? pollError.message : "Live poll could not be closed.");

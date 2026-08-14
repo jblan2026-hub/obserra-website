@@ -1,6 +1,10 @@
 import "server-only";
 
 import { getFloridaClassDHaEvidenceReport } from "./florida-class-d-ha-evidence";
+import {
+  floridaClassDOwnerUatExecutionAuthorized,
+  floridaClassDOwnerUatProfileRequested,
+} from "./florida-class-d-owner-uat";
 
 const SHA40 = /^[0-9a-f]{40}$/i;
 const SHA256_HEX = /^[0-9a-f]{64}$/i;
@@ -12,8 +16,8 @@ const MAX_HA_RTO_MINUTES = 60;
 const MAX_HA_RPO_MINUTES = 15;
 const MAX_FAILOVER_TEST_AGE_DAYS = 90;
 
-export const EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION = "20260814175000";
-export const EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256 = "40eb88f6b8cb6ce2716eb260cde7f29d69d78f0a201e90cd6373ac1ebf2be090";
+export const EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION = "20260814215217";
+export const EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256 = "e44a728ba49b26b51aab2723906e95a08eaba42c5f623a7340ce61ef7d5a1d72";
 
 export const FLORIDA_CLASS_D_REGULATED_FEATURE_FLAGS = [
   "OBSERRA_FDACS_IDENTITY_VERIFICATION_ENABLED",
@@ -92,6 +96,10 @@ export const FLORIDA_CLASS_D_PRODUCTION_ACTIVATION_POLICY = {
   perFeatureFlagsRemainIndependentlyRequired: true,
   explicitNonProductionExecutionAuthorizationRequired: true,
   syntheticIdentityOnlyRequiredForNonProductionExecution: true,
+  distinctOwnerRealIdentityUatRequired: true,
+  ownerRealIdentityUatIsPreviewOnly: true,
+  ownerRealIdentityUatIsNoncredit: true,
+  ownerRealIdentityUatCannotAuthorizeProduction: true,
   highAvailabilityRequiredForAllProductionSubsystems: true,
   cryptographicHaEvidenceRequired: true,
   maxRtoMinutes: MAX_HA_RTO_MINUTES,
@@ -245,6 +253,13 @@ function coreChecks(): FloridaClassDProductionActivationCheck[] {
       value("VERCEL_ENV").toLowerCase() === "production",
       "Production environment confirmed.",
       "VERCEL_ENV must be production.",
+    ),
+    check(
+      "owner_uat_profile_disabled",
+      "Owner UAT profile is disabled for production activation",
+      !floridaClassDOwnerUatProfileRequested(),
+      "Owner UAT profile is disabled.",
+      "Owner UAT authorization markers must be removed before any production activation decision.",
     ),
     check(
       "canonical_public_origin",
@@ -408,6 +423,7 @@ export function floridaClassDNonProductionExecutionAuthorized() {
   const runtimeEnvironment = value("OBSERRA_FDACS_RUNTIME_ENVIRONMENT").toLowerCase();
   return (
     value("VERCEL_ENV").toLowerCase() !== "production" &&
+    !floridaClassDOwnerUatProfileRequested() &&
     NONPRODUCTION_ENVIRONMENTS.has(runtimeEnvironment) &&
     enabled("OBSERRA_FDACS_NONPROD_ACCEPTANCE_AUTHORIZED") &&
     enabled("OBSERRA_FDACS_SYNTHETIC_IDENTITY_ONLY") &&
@@ -416,7 +432,11 @@ export function floridaClassDNonProductionExecutionAuthorized() {
 }
 
 export function floridaClassDRegulatedExecutionAuthorized() {
-  return floridaClassDProductionActivationAuthorized() || floridaClassDNonProductionExecutionAuthorized();
+  return (
+    floridaClassDProductionActivationAuthorized()
+    || floridaClassDNonProductionExecutionAuthorized()
+    || floridaClassDOwnerUatExecutionAuthorized()
+  );
 }
 
 export function getFloridaClassDProductionActivationReport(): FloridaClassDProductionActivationReport {

@@ -21,6 +21,7 @@ const PROTECTED_PATH_PREFIXES = [
   "/command-center",
   "/florida-security-training/admin",
   "/florida-security-training/access",
+  "/florida-security-training/enroll",
   "/florida-security-training/identity",
   "/florida-security-training/live",
   "/florida-security-training/exam",

@@ -10,6 +10,8 @@ import {
   floridaClassDIdentityErrorStatus,
   getFloridaClassDIdentityVerificationStatus,
 } from "../../../../lib/florida-class-d-identity-verification";
+import { floridaClassDOwnerUatProfileRequested } from "../../../../lib/florida-class-d-owner-uat";
+import { floridaClassDProductionActivationAuthorized } from "../../../../lib/florida-class-d-production-activation";
 
 const responseHeaders = {
   "cache-control": "private, no-store, max-age=0, must-revalidate",
@@ -61,6 +63,12 @@ export async function GET() {
         identityImagesStoredByLms: false,
         biometricTemplatesStoredByLms: false,
         instructorAttestationRequired: true,
+        executionProfile: status.executionProfile
+          ?? (floridaClassDOwnerUatProfileRequested() ? "owner_uat_noncredit" : "production_or_synthetic_acceptance"),
+        trainingCreditEligible: status.enrollmentId
+          ? status.trainingCreditEligible === true
+          : floridaClassDProductionActivationAuthorized() && !floridaClassDOwnerUatProfileRequested(),
+        fdacsApprovalClaimed: false,
       },
       { headers: responseHeaders },
     );

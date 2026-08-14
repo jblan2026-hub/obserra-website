@@ -4,6 +4,10 @@ import {
   FloridaClassDAuthorizationError,
   requireFloridaClassDStaff,
 } from "../../../../lib/florida-class-d-auth";
+import {
+  floridaClassDOwnerUatProfileRequested,
+  getFloridaClassDOwnerUatReport,
+} from "../../../../lib/florida-class-d-owner-uat";
 import ScheduleManager from "./ScheduleManager";
 import "../../live-classroom.css";
 import "./schedule.css";
@@ -17,5 +21,7 @@ export default async function FloridaClassDScheduleAdminPage() {
     if (error instanceof FloridaClassDAuthorizationError) notFound();
     throw error;
   }
-  return <ScheduleManager />;
+  const ownerUatRequested = floridaClassDOwnerUatProfileRequested();
+  const ownerUatAuthorized = ownerUatRequested && getFloridaClassDOwnerUatReport().authorized;
+  return <ScheduleManager ownerUatRequested={ownerUatRequested} ownerUatAuthorized={ownerUatAuthorized} />;
 }

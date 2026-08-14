@@ -6,6 +6,7 @@ import {
 import {
   FloridaClassDSchedulingError,
   floridaClassDSchedulingEnabled,
+  prepareFloridaClassDOwnerUatCohort,
   publishFloridaClassDCohortSchedule,
 } from "../../../../../lib/florida-class-d-scheduling";
 
@@ -17,6 +18,7 @@ const headers = {
 };
 
 type Body = {
+  action?: unknown;
   cohortId?: unknown;
   trainingDates?: unknown;
   dayStartLocal?: unknown;
@@ -43,12 +45,27 @@ export async function POST(request: Request) {
   try {
     if (!floridaClassDSchedulingEnabled()) {
       return NextResponse.json(
-        { error: "Class D production scheduling is not yet enabled.", code: "FDACS_SCHEDULE_NOT_ENABLED" },
+        { error: "Class D controlled scheduling is not yet enabled.", code: "FDACS_SCHEDULE_NOT_ENABLED" },
         { status: 503, headers: { ...headers, "retry-after": "86400" } },
       );
     }
     const actor = await requireFloridaClassDStaff(["school_admin", "compliance_admin"]);
     const body = await request.json().catch(() => null) as Body | null;
+    if (body?.action === "prepare_owner_uat") {
+      const correlationId = typeof body.correlationId === "string" ? body.correlationId : crypto.randomUUID();
+      const cohortId = await prepareFloridaClassDOwnerUatCohort(actor, correlationId);
+      return NextResponse.json(
+        {
+          action: "prepare_owner_uat",
+          cohortId,
+          correlationId,
+          executionProfile: "owner_uat_noncredit",
+          trainingCreditEligible: false,
+          fdacsApprovalClaimed: false,
+        },
+        { status: 201, headers },
+      );
+    }
     if (
       !body ||
       typeof body.cohortId !== "string" ||

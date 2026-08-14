@@ -100,11 +100,18 @@ requireText(readiness, "FLORIDA_CLASS_D_PRE_ENROLLMENT_ENABLED", "Gate 22 must i
 requireText(readiness, "OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED", "Gate 22 must require Gate 26 authorization to remain disabled during readiness review");
 
 requireText(livePolicy, 'import { floridaClassDProductionActivationAuthorized }', "live instruction must import the Gate 26 authorization boundary");
-requireText(livePolicy, "floridaClassDProductionActivationAuthorized() &&", "live instruction must fail closed behind Gate 26");
+requireText(livePolicy, "const productionAuthorized = floridaClassDProductionActivationAuthorized()", "live instruction must evaluate Gate 26 independently");
+requireText(livePolicy, "productionAuthorized", "live instruction production execution must fail closed behind Gate 26");
+requireText(livePolicy, "ownerUatAuthorized", "live instruction may recognize only the distinct controlled owner-UAT path outside production");
 requireText(scheduling, 'import { floridaClassDProductionActivationAuthorized }', "production scheduling must import Gate 26");
-requireText(scheduling, "floridaClassDProductionActivationAuthorized() &&", "production scheduling must fail closed behind Gate 26");
+requireText(scheduling, "if (floridaClassDOwnerUatProfileRequested())", "partial owner-UAT configuration must select the restricted scheduling branch");
+requireText(scheduling, "return floridaClassDOwnerUatExecutionAuthorized();", "owner-UAT scheduling must require the complete controlled authorization");
+requireText(scheduling, "floridaClassDProductionActivationAuthorized()", "production scheduling must fail closed behind Gate 26");
 requireText(enrollmentRoute, 'import { floridaClassDProductionActivationAuthorized }', "regulated enrollment API must import Gate 26");
-requireText(enrollmentRoute, "floridaClassDProductionActivationAuthorized() && floridaClassDPreEnrollmentEnabled()", "regulated enrollment must require Gate 26 and its independent enrollment flag");
+requireText(enrollmentRoute, "const authorized = floridaClassDOwnerUatProfileRequested()", "partial owner-UAT configuration must not fall back to production enrollment");
+requireText(enrollmentRoute, "? floridaClassDOwnerUatExecutionAuthorized()", "regulated owner-UAT enrollment must require its complete authorization");
+requireText(enrollmentRoute, ": floridaClassDProductionActivationAuthorized();", "regulated production enrollment must independently require Gate 26");
+requireText(enrollmentRoute, "return authorized && floridaClassDPreEnrollmentEnabled();", "regulated enrollment must retain its independent enrollment flag");
 requireText(examRoute, 'import { floridaClassDProductionActivationAuthorized }', "student examination API must import Gate 26");
 requireText(examRoute, "floridaClassDProductionActivationAuthorized() && floridaClassDExamEnabled()", "student examination must require Gate 26 and its independent exam flag");
 

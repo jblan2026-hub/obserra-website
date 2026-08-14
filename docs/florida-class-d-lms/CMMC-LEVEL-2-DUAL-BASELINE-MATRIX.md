@@ -3,7 +3,7 @@
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update the dual-baseline JSON and the controlled Rev. 3 registry, then run `npm run generate:cmmc-dual-baseline`.
 
 Dual-baseline registry SHA-256: `4b2aa78ac8c65502e592bea396e349d16b5fa94658f18364db3ca5b2bd816a60`
-Linked Rev. 3 registry SHA-256: `c443e65c6893fc7d251b176bb8a98e60a486520fe3fc4bff15d219a0154d6f92`
+Linked Rev. 3 registry SHA-256: `894c8dc72b798bb410aaf5198efce9d1fe26eafb7eada22d8fb2f33a25223bac`
 Snapshot date: `2026-08-14`
 Starting source SHA: `ffb08fb2e9cb9033d9a3faf68c653e90c28a7b88`
 

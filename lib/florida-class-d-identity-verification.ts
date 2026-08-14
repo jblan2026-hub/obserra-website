@@ -11,6 +11,10 @@ import {
   floridaClassDProductionActivationAuthorized,
   floridaClassDRegulatedExecutionAuthorized,
 } from "./florida-class-d-production-activation";
+import {
+  floridaClassDOwnerUatExecutionAuthorized,
+  floridaClassDOwnerUatPublicOrigin,
+} from "./florida-class-d-owner-uat";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const PROVIDER_ERROR_PATTERN = /^[a-z0-9_]{3,100}$/;
@@ -39,6 +43,8 @@ export class FloridaClassDIdentityVerificationError extends Error {
 export type FloridaClassDIdentityVerificationStatus = {
   enrollmentId: string | null;
   enrollmentStatus?: string | null;
+  executionProfile?: "production" | "owner_uat_noncredit" | null;
+  trainingCreditEligible?: boolean | null;
   identityStatus?: string | null;
   verificationSessionId?: string | null;
   provider?: "stripe_identity";
@@ -62,6 +68,8 @@ export function floridaClassDAutomatedIdentityVerificationEnabled() {
 }
 
 function publicOrigin() {
+  const ownerUatOrigin = floridaClassDOwnerUatPublicOrigin();
+  if (ownerUatOrigin) return ownerUatOrigin;
   const configured = process.env.OBSERRA_FDACS_PUBLIC_ORIGIN?.trim() || "";
   try {
     const url = new URL(configured);
@@ -112,9 +120,10 @@ function configuredStripeMode() {
     );
   }
   const livemode = key.startsWith("sk_live_");
-  if (livemode && !floridaClassDProductionActivationAuthorized()) {
+  const ownerUat = floridaClassDOwnerUatExecutionAuthorized();
+  if (livemode && !floridaClassDProductionActivationAuthorized() && !ownerUat) {
     throw new FloridaClassDIdentityVerificationError(
-      "Live identity verification is unavailable until controlled production activation.",
+      "Live identity verification is unavailable outside controlled production activation or the restricted owner UAT profile.",
       503,
       "FDACS_LIVE_IDENTITY_NOT_AUTHORIZED",
     );
@@ -126,7 +135,10 @@ function configuredStripeMode() {
       "FDACS_TEST_IDENTITY_NOT_AUTHORIZED",
     );
   }
-  return { livemode };
+  return {
+    livemode,
+    executionProfile: ownerUat ? "owner_uat_noncredit" as const : livemode ? "production" as const : "synthetic_acceptance" as const,
+  };
 }
 
 function requireUuid(value: string, field: string) {
@@ -220,6 +232,10 @@ export async function createFloridaClassDAutomatedIdentityVerification(input: {
           require_matching_selfie: true,
         },
       },
+      metadata: {
+        fdacs_enrollment_id: input.enrollmentId,
+        fdacs_execution_profile: mode.executionProfile,
+      },
     },
     { idempotencyKey },
   );
@@ -240,6 +256,8 @@ export async function createFloridaClassDAutomatedIdentityVerification(input: {
         p_enrollment_id: input.enrollmentId,
         p_provider_session_id: session.id,
         p_provider_livemode: session.livemode,
+        p_execution_profile: mode.executionProfile,
+        p_runtime_release_sha: process.env.VERCEL_GIT_COMMIT_SHA?.trim() || null,
         p_consent_version: input.consentVersion,
         p_consented_at: new Date().toISOString(),
         p_actor_clerk_user_id: input.actorClerkUserId,

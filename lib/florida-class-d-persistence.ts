@@ -54,6 +54,9 @@ type PreEnrollmentInput = {
   cohortId: string;
   acceptedAcknowledgmentCodes: readonly string[];
   correlationId: string;
+  executionProfile: "production" | "owner_uat_noncredit";
+  runtimeReleaseSha: string;
+  authorizationEvidenceSha256: string | null;
 };
 
 type IdentityVerificationInput = {
@@ -305,6 +308,9 @@ export async function createFloridaClassDPreEnrollment(
       p_cohort_id: input.cohortId,
       p_policy_version: FLORIDA_CLASS_D_ENROLLMENT_POLICY_VERSION,
       p_acknowledgments: input.acceptedAcknowledgmentCodes,
+      p_execution_profile: input.executionProfile,
+      p_runtime_release_sha: input.runtimeReleaseSha,
+      p_authorization_evidence_sha256: input.authorizationEvidenceSha256,
       p_correlation_id: input.correlationId,
     }),
   });
@@ -389,7 +395,7 @@ function tableQuery(table: string, filters: Record<string, string>) {
 
 export async function getFloridaClassDEnrollmentStatusForUser(userId: string) {
   const query = new URLSearchParams({
-    select: "id,status,cohort_id,student_identity_id,enrolled_at,created_at,updated_at",
+    select: "id,status,cohort_id,student_identity_id,enrolled_at,created_at,updated_at,execution_profile,training_credit_eligible",
     clerk_user_id: `eq.${userId}`,
     order: "created_at.desc",
     limit: "1",
@@ -400,9 +406,63 @@ export async function getFloridaClassDEnrollmentStatusForUser(userId: string) {
   return rows[0] ?? null;
 }
 
+export async function listFloridaClassDOpenEnrollmentCohorts(
+  executionProfile: "production" | "owner_uat_noncredit",
+  runtimeReleaseSha: string,
+) {
+  if (!/^[0-9a-f]{40}$/i.test(runtimeReleaseSha)) {
+    throw new FloridaClassDPersistenceError(
+      "The deployed release identity is unavailable.",
+      503,
+      "FDACS_RELEASE_IDENTITY_UNAVAILABLE",
+    );
+  }
+  const query = new URLSearchParams({
+    select: "id,cohort_code,start_date,end_date,status,execution_profile,uat_expires_at,release_commit_sha",
+    status: "eq.scheduled",
+    execution_profile: `eq.${executionProfile}`,
+    order: "start_date.asc,cohort_code.asc",
+    limit: "20",
+  });
+  if (executionProfile === "owner_uat_noncredit") {
+    query.set("release_commit_sha", `eq.${runtimeReleaseSha.toLowerCase()}`);
+    query.set("uat_expires_at", `gt.${new Date().toISOString()}`);
+  }
+  return supabaseRequest<Record<string, unknown>[]>(
+    `fdacs_class_d_cohorts?${query.toString()}`,
+  );
+}
+
+export async function activateFloridaClassDOwnerUatEnrollment(
+  actor: { userId: string; role: FloridaClassDStaffRole },
+  enrollmentId: string,
+  runtimeReleaseSha: string,
+  correlationId: string,
+) {
+  requireUuid(enrollmentId, "enrollment id");
+  requireUuid(correlationId, "correlation id");
+  if (!/^[0-9a-f]{40}$/i.test(runtimeReleaseSha)) {
+    throw new FloridaClassDPersistenceError(
+      "The deployed release identity is unavailable.",
+      503,
+      "FDACS_RELEASE_IDENTITY_UNAVAILABLE",
+    );
+  }
+  return supabaseRequest<Record<string, unknown>>("rpc/fdacs_class_d_activate_owner_uat_enrollment", {
+    method: "POST",
+    body: JSON.stringify({
+      p_enrollment_id: enrollmentId,
+      p_release_commit_sha: runtimeReleaseSha.toLowerCase(),
+      p_actor_role: actor.role,
+      p_actor_clerk_user_id: actor.userId,
+      p_correlation_id: correlationId,
+    }),
+  });
+}
+
 export async function listFloridaClassDPendingEnrollments() {
   const query = new URLSearchParams({
-    select: "id,status,cohort_id,student_identity_id,created_at,fdacs_class_d_student_identities(id,legal_name,date_of_birth,identity_status)",
+    select: "id,status,cohort_id,student_identity_id,execution_profile,training_credit_eligible,created_at,fdacs_class_d_student_identities(id,legal_name,identity_status)",
     or: "(status.eq.pending_identity,status.eq.pending_entitlement)",
     order: "created_at.asc",
     limit: "250",
