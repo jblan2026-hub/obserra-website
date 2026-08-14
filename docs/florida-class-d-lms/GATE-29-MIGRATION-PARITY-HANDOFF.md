@@ -14,14 +14,34 @@ Production remains fail closed. Gate 29 does not apply a production database mig
 
 Gate 29 makes regulated database promotion depend on the exact ordered Class D migration lineage and a deterministic SHA-256 promotion manifest. Schema similarity alone is not sufficient production evidence.
 
-The controlled lineage contains exactly 27 regulated migrations, beginning with `20260813033000_fdacs_class_d_regulated_records.sql` and ending with `20260814011203_fdacs_class_d_fk_performance_indexes.sql`.
+The verified controlled lineage contains exactly 29 regulated migrations, beginning with `20260813033000_fdacs_class_d_regulated_records.sql` and ending with `20260814011203_fdacs_class_d_fk_performance_indexes.sql`.
+
+## Lineage reconciliation
+
+The first Gate 29 manifest attempt did not reach lineage validation because the `.mjs` generator contained a TypeScript-only `as const` token. Florida Class D LMS Gates run #453 failed at manifest generation with a JavaScript syntax error. That failed run remains audit evidence.
+
+After the parser fix, the manifest generator correctly reported that source contained 30 regulated migration files while the regulated non-production database recorded 29 applied regulated migrations.
+
+Direct source and Supabase history comparison identified exactly one source-only migration:
+
+`20260813112000_fdacs_class_d_security_hardening.sql`
+
+Its executable SQL was semantically identical to the later applied migration:
+
+`20260813204215_fdacs_class_d_security_hardening.sql`
+
+Both pin the same three internal functions to `search_path = public`, revoke execute from `public`, `anon`, and `authenticated`, grant execute to `service_role`, and commit. The earlier file differed only by explanatory comments. It was not referenced by a source gate and was not present in the applied regulated non-production migration history.
+
+The unapplied duplicate was removed from source at commit `bd83c77a9a69a6454a0b03c58da0e1a802ef767e` so a fresh production promotion will follow the same 29-version lineage already verified in non-production rather than executing equivalent hardening twice under different versions.
+
+The Gate 29 expected lineage was then reconciled to the exact 29 source filenames that match the regulated non-production migration versions and names.
 
 ## Deterministic manifest
 
 `scripts/florida-class-d-migration-manifest.mjs`:
 
 - enumerates only `fdacs_class_d` migration files;
-- requires the exact expected ordered 27-file lineage;
+- requires the exact expected ordered 29-file lineage;
 - fails on missing, extra, reordered, or renamed regulated migrations;
 - computes SHA-256 for every migration file from the exact checked-out bytes;
 - builds a deterministic canonical JSON manifest;
@@ -51,7 +71,7 @@ The regulated non-production branch is:
 - project ref: `jeklrsratrijrsamdauv`
 - parent project: `nwxnyqlyzyufgoadtqxs`
 
-Its applied migration history includes the recovered security migration `20260813204215` and Gate 28 migration `20260814011203`.
+Its applied regulated migration history contains exactly 29 Class D versions, including the recovered security migration `20260813204215` and Gate 28 migration `20260814011203`.
 
 Gate 28 post-migration verification found zero Class D foreign-key constraints without a covering index and zero Class D `unindexed_foreign_keys` advisor findings.
 
@@ -101,9 +121,9 @@ No production migration is executed by Gate 29 CI.
 
 ## Validation sequence
 
-1. Generate the manifest in CI and capture the deterministic SHA-256 for the exact regulated source lineage.
+1. Generate the manifest in CI and capture the deterministic SHA-256 for the exact 29-version regulated source lineage.
 2. Bind that digest and latest migration version into Gate 26 source controls.
-3. Require the deployment/promotion evidence variables to match the source-controlled digest, version, and release candidate SHA.
+3. Require deployment/promotion evidence variables to match the source-controlled digest, version, and release candidate SHA.
 4. Run the complete Gates 1-29 workflow, repository tests, lint, and production build.
 5. Establish a new exact five-green source checkpoint only after all five primary workflows pass on the same SHA.
 6. Do not apply any production database migration until the separately governed production-promotion sequence is authorized.
