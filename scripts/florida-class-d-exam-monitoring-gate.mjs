@@ -34,8 +34,14 @@ requireText(adminApi, 'body.action === "authorize_resume"', "Admin API must supp
 requireText(adminApi, 'body.action === "invalidate"', "Admin API must support auditable invalidation.");
 requireText(student, 'document.visibilityState === "visible"', "Student exam must report page visibility.");
 requireText(student, "Examination paused for monitoring review", "Student experience must visibly pause after a monitoring interruption.");
+requireText(student, 'role="alert"', "Student examination errors and monitoring pauses must be announced accessibly.");
+requireText(student, "busyAction", "Student examination actions must prevent duplicate start, save, and submit requests.");
+requireText(student, "<fieldset", "Student examination answer choices must expose a semantic grouped control.");
+requireText(student, "questionHeadingRef", "Question navigation must move keyboard and assistive-technology focus to the new question.");
 requireText(staff, "Authorize controlled resume", "Staff console must expose controlled resume review.");
 requireText(staff, "Invalidate attempt", "Staff console must expose controlled invalidation.");
+requireText(staff, 'role="alert"', "Staff examination-monitor errors must be announced accessibly.");
+requireText(staff, "Administrative reason for exam attempt", "Staff exam actions must expose an accessible reason field.");
 requireText(handoff, "# Florida Class D Gate 14 Handoff", "Gate 14 requires its own handoff record.");
 
 console.log("Florida Class D Gate 14 passed: active exam monitoring, one-session/one-device enforcement, visibility interruption, staff-authorized resume, examiner monitoring, and auditable invalidation are validated in source.");

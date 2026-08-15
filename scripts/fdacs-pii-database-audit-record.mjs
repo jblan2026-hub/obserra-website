@@ -80,11 +80,17 @@ try {
 
 if (source.legalOwner !== "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC") fail("legal owner mismatch");
 if (source.providerProjectRef !== "ggkxgjhsbgbifiqrhavr" || source.systemId !== "SYS-FDACS-DATABASE") fail("isolated project or system identity mismatch");
-if (source.scopeBoundary.nonFdacsTableCount !== 0 || source.liveVerification.nonFdacsTableCount !== 0) fail("non-FDACS tables are present in the isolated boundary");
+if (source.scopeBoundary.nonFdacsTableCount !== 2 || source.liveVerification.nonFdacsTableCount !== 2) fail("governed non-FDACS table count mismatch");
+if (source.scopeBoundary.governedCmmcEvidenceTableCount !== 2 || source.liveVerification.governedCmmcEvidenceTableCount !== 2) fail("governed CMMC archive table count mismatch");
+if (source.scopeBoundary.unauthorizedNonFdacsTableCount !== 0 || source.liveVerification.unauthorizedNonFdacsTableCount !== 0) fail("unauthorized non-FDACS tables are present in the isolated boundary");
 if (source.liveVerification.anonOrAuthenticatedTablePrivilegeCount !== 0 || source.liveVerification.fdacsTablesWithoutForcedRls !== 0) fail("browser privileges or non-forced RLS detected");
 if (source.liveVerification.anonOrAuthenticatedFunctionExecutePrivilegeCount !== 0) fail("browser execute privilege detected on an FDACS routine");
 if (source.liveVerification.anonCreatePrivilegeOnPublicSchema !== false || source.liveVerification.authenticatedCreatePrivilegeOnPublicSchema !== false) fail("browser role can create an object in the fixed security-definer search path");
 if (source.liveVerification.securityAdvisorErrorOrWarningCount !== 0 || source.liveVerification.unindexedForeignKeyFindingCount !== 0) fail("unresolved provider security severity or foreign-key indexing finding");
+if (source.liveVerification.securityAdvisorFindingCount !== 2) fail("expected two INFO-only RPC archive policy notices");
+const cmmcArchive = source.liveVerification.cmmcEvidenceArchive;
+if (cmmcArchive?.retentionMode !== "indefinite" || cmmcArchive?.legalHoldEnforced !== true || cmmcArchive?.automaticDeletionEnabled !== false || cmmcArchive?.cuiAccepted !== false) fail("CMMC archive retention or CUI boundary mismatch");
+if (cmmcArchive?.archiveChainVerified !== true || cmmcArchive?.eventChainVerified !== true || cmmcArchive?.humanPendingRecordCount !== 1 || cmmcArchive?.findingEligibleRecordCount !== 0) fail("CMMC archive chain or human/finding boundary mismatch");
 if (source.retention.minimumYears !== 2 || source.retention.automaticDeletionEnabled !== false) fail("retention contract mismatch");
 if (source.liveVerification.chainVerification.some((chain) => chain.valid !== true || chain.failureCount !== 0)) fail("live chain verification failed");
 if (source.liveAuditPackageTest.payloadSha256 !== source.liveAuditPackageTest.payloadDigestRecomputed) fail("live export payload digest mismatch");
@@ -157,9 +163,9 @@ const lines = [
   "",
   "## Live result",
   "",
-  `${record.sourceMigrations.length} forward migrations are live. The isolated project contains ${record.liveVerification.fdacsTableCount} FDACS tables, ${record.liveVerification.nonFdacsTableCount} non-FDACS tables, ${record.liveVerification.explicitBrowserDenyPolicyCount} explicit restrictive browser-deny policies, ${record.liveVerification.anonOrAuthenticatedTablePrivilegeCount} browser table privileges, ${record.liveVerification.anonOrAuthenticatedFunctionExecutePrivilegeCount} browser execute privileges across ${record.liveVerification.fdacsFunctionCount} FDACS routines, and ${record.liveVerification.fdacsTablesWithoutForcedRls} FDACS tables without forced RLS.`,
+  `${record.sourceMigrations.length} forward FDACS migrations are live. The isolated project contains ${record.liveVerification.fdacsTableCount} FDACS tables, ${record.liveVerification.governedCmmcEvidenceTableCount} governed CMMC evidence tables, ${record.liveVerification.unauthorizedNonFdacsTableCount} unauthorized non-FDACS tables, ${record.liveVerification.explicitBrowserDenyPolicyCount} explicit restrictive browser-deny policies, ${record.liveVerification.anonOrAuthenticatedTablePrivilegeCount} browser table privileges, ${record.liveVerification.anonOrAuthenticatedFunctionExecutePrivilegeCount} browser execute privileges across ${record.liveVerification.fdacsFunctionCount} FDACS routines, and ${record.liveVerification.fdacsTablesWithoutForcedRls} FDACS tables without forced RLS.`,
   "",
-  `Supabase security advisor findings: ${record.liveVerification.securityAdvisorFindingCount}. Unindexed foreign-key findings: ${record.liveVerification.unindexedForeignKeyFindingCount}. Remaining performance observations are informational: ${record.liveVerification.unusedIndexInfoCount} unused-index notices on the empty/pre-production workload and ${record.liveVerification.authConnectionAllocationInfoCount} Auth allocation notice.`,
+  `Supabase security advisor findings: ${record.liveVerification.securityAdvisorFindingCount}, both INFO-only notices for deliberate forced-RLS, no-policy, RPC-only CMMC archive tables. Error or warning findings: ${record.liveVerification.securityAdvisorErrorOrWarningCount}. Unindexed foreign-key findings: ${record.liveVerification.unindexedForeignKeyFindingCount}. Remaining performance observations are informational: ${record.liveVerification.unusedIndexInfoCount} unused-index notices on the empty/pre-production workload and ${record.liveVerification.authConnectionAllocationInfoCount} Auth allocation notice.`,
   "",
   "## Exact-release owner UAT boundary",
   "",

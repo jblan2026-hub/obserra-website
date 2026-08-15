@@ -56,6 +56,10 @@ function enabled(name: string) {
   return value(name).toLowerCase() === "enabled";
 }
 
+function trueFlag(name: string) {
+  return value(name).toLowerCase() === "true";
+}
+
 function check(
   key: string,
   ready: boolean,
@@ -182,9 +186,9 @@ function checks(): FloridaClassDOwnerUatCheck[] {
     ),
     check(
       "identity_runtime_enabled",
-      enabled("OBSERRA_IDENTITY_RUNTIME_ENABLED"),
+      trueFlag("OBSERRA_IDENTITY_RUNTIME_ENABLED"),
       "The fail-closed Clerk runtime is explicitly enabled.",
-      "OBSERRA_IDENTITY_RUNTIME_ENABLED must be explicitly enabled for protected UAT routes.",
+      "OBSERRA_IDENTITY_RUNTIME_ENABLED must be true for protected UAT routes.",
     ),
     check(
       "clerk_identity",

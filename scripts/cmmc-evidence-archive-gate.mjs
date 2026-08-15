@@ -7,6 +7,7 @@ const read = (file) => {
 
 const base = read("supabase/migrations/20260814161500_cmmc_evidence_indefinite_archive.sql");
 const contract = read("supabase/migrations/20260814180000_cmmc_objective_evidence_contract.sql");
+const manifestPrecedenceFix = read("supabase/migrations/20260815133133_cmmc_archive_manifest_precedence_fix.sql");
 const client = read("scripts/cmmc-archive-release-evidence.mjs");
 const workflow = read(".github/workflows/cmmc-evidence-governance.yml");
 const schema = JSON.parse(read("docs/compliance/CMMC-SYSTEM-EVIDENCE.schema.json"));
@@ -64,8 +65,33 @@ for (const [value, message] of [
   ["grant execute on function public.cmmc_archive_evidence_v2", "only the controlled v2 RPC must be granted"],
 ]) requireText(contract, value, message);
 
+for (const content of [contract, manifestPrecedenceFix]) {
+  requireText(
+    content,
+    "(p_evidence_contract ->> 'machineReadableArtifactSha256') ||",
+    "machine-readable digest extraction must be parenthesized before manifest concatenation",
+  );
+  requireText(
+    content,
+    "(p_evidence_contract ->> 'humanReadableExtractSha256') ||",
+    "human-readable digest extraction must be parenthesized before manifest concatenation",
+  );
+}
+requireText(
+  manifestPrecedenceFix,
+  "create or replace function public.cmmc_archive_evidence_v2",
+  "forward-only manifest precedence correction must replace the controlled archive RPC",
+);
+requireText(
+  manifestPrecedenceFix,
+  "grant execute on function public.cmmc_archive_evidence_v2",
+  "manifest precedence correction must preserve service-role-only execution",
+);
+
 if ((contract.match(/\$\$/g) ?? []).length % 2 !== 0) throw new Error("CMMC archive gate failed: migration dollar quotes are unbalanced");
 if (/\b(drop table|truncate table)\b/i.test(contract)) throw new Error("CMMC archive gate failed: objective contract migration contains destructive table operations");
+if ((manifestPrecedenceFix.match(/\$\$/g) ?? []).length % 2 !== 0) throw new Error("CMMC archive gate failed: manifest precedence correction dollar quotes are unbalanced");
+if (/\b(drop table|truncate table)\b/i.test(manifestPrecedenceFix)) throw new Error("CMMC archive gate failed: manifest precedence correction contains destructive table operations");
 
 for (const [value, message] of [
   ['bundle.bundleState !== "final_release_evidence"', "client must reject non-final bundles"],

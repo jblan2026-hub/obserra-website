@@ -34,6 +34,8 @@ requireText(service, "getFloridaClassDCompletionReadiness", "Gate 16 requires se
 requireText(service, "approveFloridaClassDCompletion", "Gate 16 requires protected successful-completion approval.");
 
 requireText(api, "requireFloridaClassDStaff([\"compliance_admin\"])", "Completion approval must require the compliance-admin role.");
+requireText(api, "if (!floridaClassDRegulatedExecutionAuthorized()) return executionBlocked();", "Completion approval must fail closed before accepting a regulated write outside an authorized production runtime.");
+requireText(api, "FDACS_REGULATED_EXECUTION_NOT_AUTHORIZED", "Completion approval must return the shared fail-closed execution code outside an authorized production runtime.");
 requireText(api, 'body.action !== "approve_completion"', "Completion admin API must expose only the controlled approval action in this gate.");
 requireText(ui, "Approve completion & prepare LIAS queue", "The administrative console must expose the controlled completion action.");
 requireText(ui, "does not automate or scrape the FDACS LIAS portal", "The console must disclose the manual LIAS boundary.");

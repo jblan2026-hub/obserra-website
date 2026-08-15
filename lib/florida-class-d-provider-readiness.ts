@@ -6,14 +6,45 @@ import { verifyFloridaClassDMediaProviderConnection } from "./florida-class-d-me
 import { getFloridaClassDOwnerUatReport } from "./florida-class-d-owner-uat";
 import { floridaClassDPersistenceRequest } from "./florida-class-d-persistence";
 
+const REQUIRED_STRIPE_IDENTITY_WEBHOOK_EVENTS = [
+  "identity.verification_session.processing",
+  "identity.verification_session.requires_input",
+  "identity.verification_session.verified",
+  "identity.verification_session.canceled",
+  "identity.verification_session.redacted",
+] as const;
+
 type ProviderCheck = {
   provider: "supabase" | "stripe_identity" | "daily" | "fdacs_instructor";
   ready: boolean;
   detail: string;
 };
 
+async function liveStripeIdentityWebhookReady(origin: string) {
+  const expectedUrl = `${origin}/api/webhook/stripe-identity`;
+  const stripe = getStripe();
+  let startingAfter: string | undefined;
+
+  do {
+    const page = await stripe.webhookEndpoints.list({ limit: 100, starting_after: startingAfter });
+    const endpoint = page.data.find((candidate) => {
+      const enabledEvents = new Set(candidate.enabled_events);
+      return candidate.url === expectedUrl
+        && candidate.livemode === true
+        && candidate.status === "enabled"
+        && (enabledEvents.has("*") || REQUIRED_STRIPE_IDENTITY_WEBHOOK_EVENTS.every((event) => enabledEvents.has(event)));
+    });
+    if (endpoint) return true;
+    if (!page.has_more) return false;
+    startingAfter = page.data.at(-1)?.id;
+  } while (startingAfter);
+
+  return false;
+}
+
 export async function getFloridaClassDProviderReadiness() {
   const checks: ProviderCheck[] = [];
+  const ownerUatReport = getFloridaClassDOwnerUatReport();
 
   try {
     const health = await floridaClassDPersistenceRequest<Record<string, unknown>>(
@@ -35,14 +66,25 @@ export async function getFloridaClassDProviderReadiness() {
   try {
     const liveModeConfigured = process.env.STRIPE_SECRET_KEY?.trim().startsWith("sk_live_") === true;
     if (!liveModeConfigured) throw new Error("live Stripe Identity is not configured");
-    const sessions = await getStripe().identity.verificationSessions.list({ limit: 1 });
+    const webhookSecretConfigured = /^whsec_[A-Za-z0-9_]+$/.test(
+      process.env.STRIPE_IDENTITY_WEBHOOK_SECRET?.trim() || "",
+    );
+    const origin = ownerUatReport.publicOrigin;
+    if (!webhookSecretConfigured || !origin) throw new Error("live Stripe Identity webhook is not configured");
+    const stripe = getStripe();
+    const sessions = await stripe.identity.verificationSessions.list({ limit: 1 });
+    const webhookReady = await liveStripeIdentityWebhookReady(origin);
     checks.push({
       provider: "stripe_identity",
-      ready: Array.isArray(sessions.data) && sessions.data.every((session) => session.livemode === true),
-      detail: "Live Stripe Identity authenticated successfully; no verification-session contents are exposed.",
+      ready: Array.isArray(sessions.data)
+        && sessions.data.every((session) => session.livemode === true)
+        && webhookReady,
+      detail: webhookReady
+        ? "Live Stripe Identity authenticated and an enabled exact-Preview signed webhook subscribes to every handled verification event; no session contents or endpoint values are exposed."
+        : "Live Stripe Identity authenticated, but its enabled exact-Preview signed webhook event contract is incomplete.",
     });
   } catch {
-    checks.push({ provider: "stripe_identity", ready: false, detail: "Stripe Identity authentication or product access is unavailable." });
+    checks.push({ provider: "stripe_identity", ready: false, detail: "Stripe Identity authentication, product access, or exact-Preview signed webhook configuration is unavailable." });
   }
 
   try {
@@ -53,7 +95,7 @@ export async function getFloridaClassDProviderReadiness() {
   }
 
   try {
-    const requiredThrough = getFloridaClassDOwnerUatReport().expiresAt?.slice(0, 10);
+    const requiredThrough = ownerUatReport.expiresAt?.slice(0, 10);
     if (!requiredThrough) throw new Error("owner UAT expiration is unavailable");
     const readiness = await getFloridaClassDOwnerUatInstructorReadiness(requiredThrough);
     checks.push({

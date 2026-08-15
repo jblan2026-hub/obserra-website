@@ -51,6 +51,8 @@ function assertGlobalBoundary() {
   const proxyRequirements = [
     ["mutation boundary import", /from\s+["']\.\/lib\/florida-class-d-mutation-boundary["']/],
     ["boundary evaluation call", /evaluateFloridaClassDMutationBoundary\s*\(/],
+    ["exact-origin authorization call", /floridaClassDMutationOriginAuthorized\s*\(request\.url,\s*request\.headers\.get\(["']origin["']\)\)/],
+    ["cross-origin rejection response", /FDACS_REGULATED_ORIGIN_REJECTED/],
     ["default-deny 503 response", /FDACS_REGULATED_EXECUTION_NOT_AUTHORIZED/],
     ["acceptance-specific fail-closed response", /FDACS_ACCEPTANCE_EXECUTION_NOT_AUTHORIZED/],
     ["all API routes are matched", /["']\/(?:\(api\|trpc\)|api)[^"']*["']/],
@@ -64,6 +66,8 @@ function assertGlobalBoundary() {
     ["regulated API prefix", /\/api\/florida-class-d/],
     ["all write methods", /POST[\s\S]*PUT[\s\S]*PATCH[\s\S]*DELETE/],
     ["exact Gate 23 acceptance path", /\/api\/florida-class-d\/admin\/acceptance/],
+    ["missing Origin rejection", /if\s*\(!originHeader\)\s*return false/],
+    ["exact same-origin comparison", /new URL\(originHeader\)\.origin\s*===\s*new URL\(requestUrl\)\.origin/],
     ["synthetic non-production acceptance authorization", NONPRODUCTION_EXECUTION_CALL],
     ["shared regulated execution authorization", SHARED_EXECUTION_CALL],
   ];
@@ -104,7 +108,7 @@ function main() {
     console.log(`${entry.routeDefenseInDepth ? "GLOBAL+ROUTE" : "GLOBAL"} ${entry.routePath} [${entry.methods.join(", ")}]`);
   }
 
-  console.log("Gate 30 regulated mutation boundary verification passed: default-deny global execution control covers all discovered Class D mutation routes, Gate 23 acceptance is synthetic-nonproduction-only, and route-level guards remain defense in depth where implemented.");
+  console.log("Gate 30 regulated mutation boundary verification passed: default-deny global execution control and exact same-origin enforcement cover all discovered Class D mutation routes, Gate 23 acceptance is synthetic-nonproduction-only, and route-level guards remain defense in depth where implemented.");
 }
 
 main();

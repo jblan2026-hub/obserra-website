@@ -1,7 +1,10 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse, type NextFetchEvent, type NextMiddleware, type NextRequest } from "next/server";
 import { prepareClerkRuntime } from "./lib/clerk-runtime-config";
-import { evaluateFloridaClassDMutationBoundary } from "./lib/florida-class-d-mutation-boundary";
+import {
+  evaluateFloridaClassDMutationBoundary,
+  floridaClassDMutationOriginAuthorized,
+} from "./lib/florida-class-d-mutation-boundary";
 
 const CANONICAL_HOST = "www.obserrallc.com";
 const DEFAULT_OWNER_ORIGIN = "https://owner.obserrallc.com";
@@ -109,20 +112,30 @@ function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest)
 function regulatedMutationBoundary(request: NextRequest) {
   const url = new URL(request.url);
   const decision = evaluateFloridaClassDMutationBoundary(url.pathname, request.method);
-  if (!decision.regulatedMutation || decision.authorized) return null;
+  if (!decision.regulatedMutation) return null;
+
+  if (decision.authorized && floridaClassDMutationOriginAuthorized(request.url, request.headers.get("origin"))) {
+    return null;
+  }
+
+  const originRejected = decision.authorized;
 
   return applyRouteSecurityHeaders(
     NextResponse.json(
       {
-        error: decision.policy === "synthetic_nonproduction_only"
+        error: originRejected
+          ? "Florida Class D regulated mutations require an exact same-origin request."
+          : decision.policy === "synthetic_nonproduction_only"
           ? "Gate 23 acceptance mutation is available only during explicitly authorized synthetic non-production execution."
           : "Florida Class D regulated mutation execution is not authorized.",
-        code: decision.policy === "synthetic_nonproduction_only"
+        code: originRejected
+          ? "FDACS_REGULATED_ORIGIN_REJECTED"
+          : decision.policy === "synthetic_nonproduction_only"
           ? "FDACS_ACCEPTANCE_EXECUTION_NOT_AUTHORIZED"
           : "FDACS_REGULATED_EXECUTION_NOT_AUTHORIZED",
       },
       {
-        status: 503,
+        status: originRejected ? 403 : 503,
         headers: {
           "cache-control": "private, no-store, max-age=0, must-revalidate",
           "x-content-type-options": "nosniff",

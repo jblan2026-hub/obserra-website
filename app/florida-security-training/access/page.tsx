@@ -83,6 +83,15 @@ export default async function FloridaClassDControlledAccessPage() {
           <Link className="secondary" href="/florida-security-training">Return to course information</Link>
         </div>
       </section>
+      <section className="fl-classd__section" aria-labelledby="protected-access-sequence">
+        <h2 id="protected-access-sequence">Protected identity and video sequence</h2>
+        <div className="fl-classd__automation-grid">
+          <div><b>1</b><span>Controlled enrollment establishes the release-bound learner record.</span></div>
+          <div><b>2</b><span>Stripe hosts the government-ID image and selfie check. The LMS does not store copies or biometric templates.</span></div>
+          <div><b>3</b><span>The assigned licensed Class DI instructor completes the separate personal photo-ID attestation.</span></div>
+          <div><b>4</b><span>The assigned lesson link opens short-lived secure video only after enrollment, identity, instructor, schedule, and single-device controls pass.</span></div>
+        </div>
+      </section>
       {active ? (
         <section className="fl-classd__section">
           <h2>Assigned live lessons</h2>

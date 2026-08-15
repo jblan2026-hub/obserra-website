@@ -85,7 +85,7 @@ check("intelligence advertises MITRE and OWASP mapping requirements", intelligen
 check("intelligence schema supports remediation contract", /schemaVersion:\s*\"1\.1\"/.test(intelligence));
 
 const checkout = read("app/api/academy/checkout/route.ts");
-check("checkout remains fail closed", /STRIPE_WEBHOOK_SECRET/.test(checkout) && /configuration-required/.test(checkout));
+check("checkout remains fail closed", /academyCommerceWebhookConfigured/.test(checkout) && /configuration-required/.test(checkout));
 check("checkout requires durable storage", /academyStorageHealth/.test(checkout) && /durable-storage-unavailable/.test(checkout));
 check("checkout requires configured identity", /identity\.configured/.test(checkout) && /identity-configuration-required/.test(checkout));
 check("checkout preserves entitlement evidence", /entitlementType/.test(checkout) && /entitlementCode/.test(checkout));

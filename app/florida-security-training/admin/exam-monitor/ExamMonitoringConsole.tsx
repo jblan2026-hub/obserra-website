@@ -69,7 +69,7 @@ export default function ExamMonitoringConsole() {
         <div><span>OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</span><h1>Class D Examination Monitor</h1></div>
         <div className="fdacs-live__status"><strong>STAFF CONTROLLED</strong><small>Active attempts · interruption review · controlled resume · invalidation</small></div>
       </header>
-      {error ? <div className="fdacs-live__alert">{error}</div> : null}
+      {error ? <div className="fdacs-live__alert" role="alert">{error}</div> : null}
       <section className="fdacs-live__panel">
         <div className="fdacs-live__section-heading"><div><span className="fdacs-live__eyebrow">ACTIVE FINAL EXAMINATIONS</span><h2>{attempts.length} monitored attempt{attempts.length === 1 ? "" : "s"}</h2></div><button type="button" onClick={() => void refresh()}>Refresh</button></div>
         {attempts.length === 0 ? <p>No active examination attempts are currently visible to this staff account.</p> : null}
@@ -85,6 +85,7 @@ export default function ExamMonitoringConsole() {
               <p><b>Last heartbeat:</b> {attempt.lastHeartbeatAt ? new Date(attempt.lastHeartbeatAt).toLocaleString() : "None recorded"}</p>
               {attempt.interruptedAt ? <p><b>Interrupted:</b> {new Date(attempt.interruptedAt).toLocaleString()} · {attempt.interruptionReason ?? "Reason pending"}</p> : null}
               <textarea
+                aria-label={`Administrative reason for exam attempt ${attempt.attemptId.slice(0, 8)}`}
                 value={reasonByAttempt[attempt.attemptId] ?? ""}
                 onChange={(event) => setReasonByAttempt((current) => ({ ...current, [attempt.attemptId]: event.target.value }))}
                 placeholder="Document the reason for resume authorization or invalidation"

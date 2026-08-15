@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 import { courseForId } from "../../../lib/academy";
 import { publicAcademyCourse } from "../../../lib/academy-control";
 import AcademyCheckoutForm from "../AcademyCheckoutForm";
+import AcademyCommerceNotice from "../AcademyCommerceNotice";
 import { publicationForCourse } from "../coursePublication";
 import "./course-page.css";
+import "../academy-payment.css";
 
 const LEGAL_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
@@ -54,8 +56,10 @@ export async function generateMetadata({
 
 export default async function AcademyCoursePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ courseId: string }>;
+  searchParams: Promise<{ enrollment?: string; checkout?: string; session_id?: string }>;
 }) {
   const baseCourse = courseForId((await params).courseId);
   if (!baseCourse) notFound();
@@ -63,6 +67,7 @@ export default async function AcademyCoursePage({
   if (!runtime.course) notFound();
 
   const course = runtime.course;
+  const commerceState = await searchParams;
   const publication = publicationForCourse(course.id);
   const purchaseAvailable = runtime.controlPlane === "operational" && runtime.control.purchaseEnabled;
   const passingScoreLabel = `${publication.passingScore} percent completion standard`;
@@ -114,6 +119,11 @@ export default async function AcademyCoursePage({
       </header>
 
       <section className="academy-course-hero">
+        <AcademyCommerceNotice
+          status={commerceState.enrollment ?? commerceState.checkout}
+          courseId={course.id}
+          sessionId={commerceState.session_id}
+        />
         <div className="academy-course-eyebrow-row">
           <p>{course.track} · {course.level}</p>
           <span>{purchaseAvailable ? "Paid enrollment" : "Enrollment paused"}</span>

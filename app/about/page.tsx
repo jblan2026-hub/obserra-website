@@ -5,10 +5,11 @@ import VerifiedCredentials from "./VerifiedCredentials";
 import { LEGAL_ENTITY_NAME } from "../../lib/legal-identity";
 import "./about.css";
 import "./about-extra.css";
+import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 
 export const metadata: Metadata = {
   title: `About ${LEGAL_ENTITY_NAME} | Executive Leadership for High-Consequence Decisions`,
-  description: `Meet Dr. Jody Blanchard, founder and CEO of ${LEGAL_ENTITY_NAME}, and learn why organizations engage ${LEGAL_ENTITY_NAME} for cybersecurity, intelligence, governance, protection, and executive decision support.`,
+  description: `Meet Dr. Jody Blanchard, founder and Chief Executive Officer of ${LEGAL_ENTITY_NAME}, and review the leadership experience behind its cybersecurity, intelligence, governance, protection, and technology work.`,
   alternates: { canonical: "/about" },
   keywords: [`about ${LEGAL_ENTITY_NAME}`, "Dr. Jody Blanchard", "executive cybersecurity advisor", "enterprise risk leadership", "protective intelligence"],
   openGraph: {
@@ -56,7 +57,7 @@ export default function AboutPage() {
       {
         "@type": "Person",
         name: "Dr. Jody Blanchard",
-        jobTitle: "Founder and CEO",
+        jobTitle: "Founder and Chief Executive Officer",
         worksFor: { "@type": "Organization", name: LEGAL_ENTITY_NAME, url: "https://www.obserrallc.com" },
         image: "https://www.obserrallc.com/leadership/dr-jody-blanchard-executive.webp",
         url: "https://www.obserrallc.com/about",
@@ -71,13 +72,10 @@ export default function AboutPage() {
   };
 
   return (
-    <main className="about-page">
+    <>
+      <EnterpriseHeader section="Leadership and company" />
+      <main className="about-page enterprise-page-main">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }} />
-
-      <header className="about-nav">
-        <Link href="/" className="about-brand"><Image src="/brand/obserra-logo.png" width={286} height={55} priority alt={LEGAL_ENTITY_NAME} /></Link>
-        <nav><Link href="/">Home</Link><Link href="/services">Services</Link><Link href="/apps">Applications</Link><Link href="/industries">Industries</Link><Link href="/academy">Academy</Link><Link href="/trust">Trust</Link><Link href="/contact?interest=enterprise-consultation" className="about-nav-cta">Talk with {LEGAL_ENTITY_NAME}</Link></nav>
-      </header>
 
       <section className="about-hero">
         <div className="about-grid" />
@@ -90,17 +88,19 @@ export default function AboutPage() {
         <aside className="about-signal"><span>WHY {LEGAL_ENTITY_NAME}</span><strong>Senior judgment.<br />Integrated expertise.<br />Accountable outcomes.</strong><p>Built for organizations facing material risk, fragmented ownership, or decisions that cannot wait for another disconnected assessment.</p></aside>
       </section>
 
+      <EnterpriseProofBand />
+
       <section className="about-profile">
         <div className="founder-profile-card">
-          <div className="profile-visual profile-photo-frame"><Image className="profile-photo" src="/leadership/dr-jody-blanchard-executive.webp" width={1200} height={1500} quality={95} sizes="(max-width: 800px) 86vw, 360px" priority alt={`Dr. Jody Blanchard, Founder and CEO of ${LEGAL_ENTITY_NAME}`} /></div>
-          <div className="profile-photo-label"><span>DR. JODY BLANCHARD</span><strong>FOUNDER &amp; CEO</strong><small>EXECUTIVE CYBERSECURITY · INTELLIGENCE · GOVERNANCE</small></div>
+          <div className="profile-visual profile-photo-frame"><Image className="profile-photo" src="/leadership/dr-jody-blanchard-executive.webp" width={1200} height={1500} quality={95} sizes="(max-width: 800px) 86vw, 360px" priority alt={`Dr. Jody Blanchard, Founder and Chief Executive Officer of ${LEGAL_ENTITY_NAME}`} /></div>
+          <div className="profile-photo-label"><span>DR. JODY BLANCHARD</span><strong>FOUNDER &amp; CHIEF EXECUTIVE OFFICER</strong><small>EXECUTIVE CYBERSECURITY · INTELLIGENCE · GOVERNANCE</small></div>
         </div>
         <div>
           <p className="about-kicker">FOUNDER &amp; BUSINESS EXECUTIVE</p>
           <h2>Executive experience designed to create business value, not another layer of advice.</h2>
-          <p>Dr. Jody Blanchard is an award-winning business and cybersecurity executive, two-time Fortune 500 Chief Information Security Officer, former military intelligence leader, author, educator, and trusted advisor to boards, C-suite leaders, and operating teams. Across more than 25 years of leadership in complex and regulated environments, he has built, transformed, and governed security and risk programs where business continuity, reputation, regulatory exposure, technology investment, and human safety were directly connected.</p>
+          <p>Dr. Jody Blanchard is an award-winning business and cybersecurity executive, two-time Fortune 500 Chief Information Security Officer, former military intelligence leader, author, and educator. Across more than 25 years of leadership in complex and regulated environments, he has built, transformed, and governed security and risk programs where business continuity, reputation, regulatory exposure, technology investment, and human safety were directly connected.</p>
           <p>His value to clients is the ability to see the whole decision. He combines enterprise strategy, cybersecurity, intelligence analysis, governance, financial and operational judgment, executive communication, and disciplined execution to identify what is material, define who must act, and build a path that can withstand board, customer, regulator, and operational scrutiny.</p>
-          <p>{LEGAL_ENTITY_NAME} was created to give organizations access to that integrated capability. The company helps clients close the gap between fragmented expertise and executive accountability through senior advisory, protective intelligence, secure applications, professional training, and governed implementation support. Engagements are designed to improve decision quality, reduce exposure, accelerate execution, and create measurable enterprise value.</p>
+          <p>{LEGAL_ENTITY_NAME} was created to give organizations access to that integrated capability. The company connects senior advisory, protective intelligence, secure technology, professional learning, and governed implementation support. Each engagement is designed around an explicit decision, defined authority, controlled information boundaries, accountable delivery, and evidence of accepted work.</p>
           <div className="about-actions"><Link className="about-button" href="/contact?interest=enterprise-consultation">Book an executive consultation</Link><Link className="about-outline" href="/apps">Explore {LEGAL_ENTITY_NAME} applications</Link></div>
         </div>
       </section>
@@ -131,7 +131,8 @@ export default function AboutPage() {
 
       <section className="about-cta"><p className="about-kicker">ENGAGE {LEGAL_ENTITY_NAME}</p><h2>Bring integrated executive leadership to the risk, decision, or transformation in front of you.</h2><p>Begin with a confidential consultation, evaluate an application, strengthen the workforce through Obserra Academy, or engage {LEGAL_ENTITY_NAME} for focused cybersecurity, intelligence, governance, protection, and enterprise-risk support.</p><div><Link className="about-button" href="/contact?interest=enterprise-consultation">Talk with {LEGAL_ENTITY_NAME}</Link><Link className="about-outline" href="/academy">View Academy courses</Link></div></section>
 
-      <footer className="about-footer"><Image src="/brand/obserra-logo.png" width={180} height={35} alt={LEGAL_ENTITY_NAME} /><p>Copyright {LEGAL_ENTITY_NAME}. Obserra, EIOS, Academy materials, and related visual and product content are proprietary to {LEGAL_ENTITY_NAME}.</p></footer>
-    </main>
+      </main>
+      <EnterpriseFooter />
+    </>
   );
 }

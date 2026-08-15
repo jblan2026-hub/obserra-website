@@ -202,6 +202,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   const [pollOptions, setPollOptions] = useState(["", "", "", ""]);
   const [correctOptionIndex, setCorrectOptionIndex] = useState<number | null>(null);
   const [pollBusy, setPollBusy] = useState(false);
+  const [mediaBusy, setMediaBusy] = useState(false);
   const [clockMs, setClockMs] = useState(0);
   const autoCheckIssued = useRef(false);
 
@@ -214,12 +215,18 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   }, [liveSessionId]);
 
   const loadMedia = useCallback(async () => {
-    const response = await fetch(`/api/florida-class-d/admin/media?liveSessionId=${encodeURIComponent(liveSessionId)}`, { cache: "no-store" });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Unable to provision instructor video.");
-    const access = payload as MediaAccess;
-    if (!access.joinUrl) throw new Error("Secure live video did not return a join URL.");
-    setMedia(access);
+    setMediaBusy(true);
+    try {
+      const response = await fetch(`/api/florida-class-d/admin/media?liveSessionId=${encodeURIComponent(liveSessionId)}`, { cache: "no-store" });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Unable to provision instructor video.");
+      const access = payload as MediaAccess;
+      if (!access.joinUrl || !access.tokenExpiresAt) throw new Error("Secure instructor video did not return complete time-bounded access.");
+      setMedia(access);
+      setError(null);
+    } finally {
+      setMediaBusy(false);
+    }
   }, [liveSessionId]);
 
   useEffect(() => {
@@ -232,6 +239,17 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
       window.clearInterval(timer);
     };
   }, [loadMedia, refresh]);
+
+  useEffect(() => {
+    if (!media?.tokenExpiresAt) return;
+    const refreshExpiringMedia = () => {
+      const expiresAt = Date.parse(media.tokenExpiresAt ?? "");
+      if (!Number.isFinite(expiresAt) || expiresAt - Date.now() > 10 * 60_000) return;
+      void loadMedia().catch((mediaError) => setError(mediaError instanceof Error ? mediaError.message : "Secure instructor video access could not be renewed."));
+    };
+    const timer = window.setInterval(refreshExpiringMedia, 60_000);
+    return () => window.clearInterval(timer);
+  }, [loadMedia, media?.tokenExpiresAt]);
 
   useEffect(() => {
     const initialTick = window.setTimeout(() => setClockMs(Date.now()), 0);
@@ -347,7 +365,6 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
         attendanceEntryId: entryId,
         identityAttestationId: context.existingIdentityAttestationId,
         instructorFileId: context.instructorFileId,
-        attestedAt: new Date().toISOString(),
         correlationId: crypto.randomUUID(),
       });
       await refresh();
@@ -391,7 +408,6 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
           instructorFileId: context.instructorFileId,
           observedPhotoIdType: photoIdType,
           issuingJurisdiction: jurisdiction,
-          attestedAt: new Date().toISOString(),
           correlationId: crypto.randomUUID(),
         });
         identityAttestationId = typeof identityResult.result?.identityAttestationId === "string"
@@ -415,7 +431,6 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
         anchorLiveSessionId: liveSessionId,
         identityAttestationId,
         instructorFileId: context.instructorFileId,
-        attestedAt: new Date().toISOString(),
         correlationId: crypto.randomUUID(),
       });
       await refresh();
@@ -528,7 +543,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
         </div>
       </header>
 
-      {error ? <div className="fdacs-live__alert">{error}</div> : null}
+      {error ? <div className="fdacs-live__alert" role="alert">{error}</div> : null}
 
       <section className="fdacs-live__grid">
         <div className="fdacs-live__stage">
@@ -545,6 +560,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
                 <span>SECURE INSTRUCTOR MEDIA</span>
                 <h2>{state?.session?.lesson_id ?? "Florida Class D Live Lesson"}</h2>
                 <p>The regulated lesson cannot start until the secure room and short-lived instructor token are provisioned.</p>
+                <button type="button" disabled={mediaBusy} onClick={() => void loadMedia().catch((mediaError) => setError(mediaError instanceof Error ? mediaError.message : "Unable to provision instructor video."))}>{mediaBusy ? "Connecting video…" : "Reconnect secure video"}</button>
               </div>
             )}
           </div>
@@ -605,7 +621,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
           <section className="fdacs-live__panel">
             <div className="fdacs-live__panel-head"><h2>Instructor prompt</h2><span>interactive</span></div>
             <form className="fdacs-live__form" onSubmit={submitPrompt}>
-              <textarea value={classPrompt} onChange={(event) => setClassPrompt(event.target.value)} placeholder="Ask the class a question, launch a discussion prompt, or give an instruction" maxLength={4000} />
+              <textarea aria-label="Instructor announcement or class prompt" value={classPrompt} onChange={(event) => setClassPrompt(event.target.value)} placeholder="Ask the class a question, launch a discussion prompt, or give an instruction" maxLength={4000} />
               <button type="submit">Send to class</button>
             </form>
           </section>
@@ -621,9 +637,9 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
               </div>
             ) : (
               <form className="fdacs-live__form fdacs-live__poll-builder" onSubmit={createPoll}>
-                <textarea value={pollQuestion} onChange={(event) => setPollQuestion(event.target.value)} placeholder="Ask a live knowledge or participation question" maxLength={1000} />
+                <textarea aria-label="Live poll question" value={pollQuestion} onChange={(event) => setPollQuestion(event.target.value)} placeholder="Ask a live knowledge or participation question" maxLength={1000} />
                 {pollOptions.map((option, index) => (
-                  <input key={index} value={option} onChange={(event) => updatePollOption(index, event.target.value)} placeholder={`Option ${index + 1}${index > 1 ? " (optional)" : ""}`} maxLength={500} />
+                  <input aria-label={`Poll option ${index + 1}`} key={index} value={option} onChange={(event) => updatePollOption(index, event.target.value)} placeholder={`Option ${index + 1}${index > 1 ? " (optional)" : ""}`} maxLength={500} />
                 ))}
                 <label>Optional correct answer
                   <select value={correctOptionIndex === null ? "" : String(correctOptionIndex)} onChange={(event) => setCorrectOptionIndex(event.target.value === "" ? null : Number(event.target.value))}>
@@ -639,7 +655,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
 
           <section className="fdacs-live__panel">
             <div className="fdacs-live__panel-head"><h2>Student questions</h2><span>{questions.length}</span></div>
-            <div className="fdacs-live__feed">
+            <div className="fdacs-live__feed" aria-live="polite" aria-relevant="additions text">
               {questions.map((question) => (
                 <button className="fdacs-live__question-card" type="button" key={question.id} onClick={() => setAnswerTarget(question)}>
                   <b>STUDENT QUESTION</b>
@@ -651,7 +667,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
             {answerTarget ? (
               <form className="fdacs-live__form" onSubmit={submitAnswer}>
                 <p>Answering: <strong>{answerTarget.content}</strong></p>
-                <textarea value={answerText} onChange={(event) => setAnswerText(event.target.value)} placeholder="Instructor answer" maxLength={4000} />
+                <textarea aria-label="Answer to the selected student question" value={answerText} onChange={(event) => setAnswerText(event.target.value)} placeholder="Instructor answer" maxLength={4000} />
                 <button type="submit">Send answer</button>
               </form>
             ) : null}

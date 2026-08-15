@@ -27,6 +27,7 @@ const assessmentFile = "app/api/academy/assessment/route.ts";
 const progressFile = "app/api/academy/progress/route.ts";
 const commerceHealthFile = "app/api/academy/commerce-health/route.ts";
 const operationalWorkflowFile = ".github/workflows/production-e2e-operational-gate.yml";
+const websiteCiWorkflowFile = ".github/workflows/website-ci.yml";
 
 const migration = read(migrationFile);
 const eventHardening = read(eventHardeningFile);
@@ -40,6 +41,7 @@ const assessment = read(assessmentFile);
 const progress = read(progressFile);
 const commerceHealth = read(commerceHealthFile);
 const operationalWorkflow = read(operationalWorkflowFile);
+const websiteCiWorkflow = read(websiteCiWorkflowFile);
 
 const tables = [
   "academy_learner_state",
@@ -120,7 +122,7 @@ requireText(checkoutFile, checkout, "isSameOrigin", "checkout same-origin enforc
 requireText(checkoutFile, checkout, "isSupportedFormContentType", "checkout media-type enforcement");
 requireText(checkoutFile, checkout, "academyStorageHealth", "pre-payment durable fulfillment health");
 requireText(checkoutFile, checkout, "identity.configured", "pre-payment identity health");
-requireText(checkoutFile, checkout, "STRIPE_WEBHOOK_SECRET", "pre-payment signed webhook readiness");
+requireText(checkoutFile, checkout, "academyCommerceWebhookConfigured", "centralized pre-payment signed webhook readiness");
 requireText(checkoutFile, checkout, "checkout.sessions.create", "real Stripe Checkout session creation");
 forbidText(checkoutFile, checkout, 'requestUrl.searchParams.get("course")', "GET payment mutation input");
 
@@ -167,6 +169,8 @@ for (const text of [
 requireText(operationalWorkflowFile, operationalWorkflow, "Origin: https://invalid.example", "non-mutating checkout boundary probe");
 forbidText(operationalWorkflowFile, operationalWorkflow, "checkout.sessions.create", "live payment creation in production gate");
 forbidText(operationalWorkflowFile, operationalWorkflow, "sk_live_", "embedded live Stripe credential");
+forbidText(websiteCiWorkflowFile, websiteCiWorkflow, "secrets.STRIPE_SECRET_KEY", "routine CI access to the Stripe API secret");
+forbidText(websiteCiWorkflowFile, websiteCiWorkflow, "secrets.STRIPE_WEBHOOK_SECRET", "routine CI access to the Stripe webhook secret");
 
 console.log(JSON.stringify({
   gate: "academy-durable-commerce-gate-35",

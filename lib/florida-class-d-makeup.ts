@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { FloridaClassDStaffRole } from "./florida-class-d-auth";
+import { floridaClassDSupabaseServerConfigAuthorized } from "./florida-class-d-supabase-config";
 import {
   getFloridaClassDInstructorLicenseNumber,
   getFloridaClassDSchoolLicenseNumber,
@@ -79,7 +80,7 @@ export const FLORIDA_CLASS_D_MAKEUP_POLICY = {
 function config() {
   const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
   const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
-  if (!key || !url.startsWith("https://")) {
+  if (!floridaClassDSupabaseServerConfigAuthorized(url, key)) {
     throw new FloridaClassDMakeupError("Class D make-up persistence is not configured.", 503, "FDACS_MAKEUP_PERSISTENCE_NOT_CONFIGURED");
   }
   return { key, url };

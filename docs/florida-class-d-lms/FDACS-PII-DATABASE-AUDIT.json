@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "1.2",
-  "recordId": "fdacs-pii-database-audit-2026-08-14T22:43:09Z",
+  "schemaVersion": "1.3",
+  "recordId": "fdacs-pii-database-audit-2026-08-15T13:36:54Z",
   "recordState": "live_hardened_activation_pending",
-  "observedAt": "2026-08-14T22:43:09.105533Z",
+  "observedAt": "2026-08-15T13:36:54Z",
   "legalOwner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   "systemId": "SYS-FDACS-DATABASE",
   "systemName": "FDACS isolated student-record PII database",
@@ -19,7 +19,9 @@
     "academyDataAuthorized": false,
     "applicationsWorkstreamDataAuthorized": false,
     "identityDocumentImagesAuthorized": false,
-    "nonFdacsTableCount": 0
+    "nonFdacsTableCount": 2,
+    "governedCmmcEvidenceTableCount": 2,
+    "unauthorizedNonFdacsTableCount": 0
   },
   "retention": {
     "minimumYears": 2,
@@ -123,10 +125,12 @@
     }
   ],
   "liveVerification": {
-    "providerMigrationCount": 38,
+    "providerMigrationCount": 41,
     "fdacsTableCount": 64,
-    "publicTableCount": 64,
-    "nonFdacsTableCount": 0,
+    "publicTableCount": 66,
+    "nonFdacsTableCount": 2,
+    "governedCmmcEvidenceTableCount": 2,
+    "unauthorizedNonFdacsTableCount": 0,
     "fdacsTablesWithoutForcedRls": 0,
     "explicitBrowserDenyPolicyCount": 64,
     "anonOrAuthenticatedTablePrivilegeCount": 0,
@@ -137,11 +141,11 @@
     "anonCreatePrivilegeOnPublicSchema": false,
     "authenticatedCreatePrivilegeOnPublicSchema": false,
     "serviceRoleDirectAuditTablePrivilegeCount": 0,
-    "securityAdvisorFindingCount": 0,
+    "securityAdvisorFindingCount": 2,
     "securityAdvisorErrorOrWarningCount": 0,
     "unindexedForeignKeyFindingCount": 0,
-    "performanceAdvisorInfoCount": 103,
-    "unusedIndexInfoCount": 102,
+    "performanceAdvisorInfoCount": 108,
+    "unusedIndexInfoCount": 107,
     "authConnectionAllocationInfoCount": 1,
     "archiveQueueHealthy": true,
     "archiveQueueCounts": {
@@ -198,7 +202,23 @@
         "failureCount": 0,
         "headSha256": "0ba5ccc37e71a709f7841722f010aa863e504e35f02139f6653081b73b149105"
       }
-    ]
+    ],
+    "cmmcEvidenceArchive": {
+      "archiveId": "94804a9c-e4d6-40aa-bae3-8af12f5bada0",
+      "releaseSha": "b932ddce02ab90d58060f700e003d2abddec2aa2",
+      "archivedAt": "2026-08-15T13:33:44.298039+00:00",
+      "recordCount": 1,
+      "eventCount": 2,
+      "artifactBytes": 9384135,
+      "retentionMode": "indefinite",
+      "legalHoldEnforced": true,
+      "automaticDeletionEnabled": false,
+      "cuiAccepted": false,
+      "humanPendingRecordCount": 1,
+      "findingEligibleRecordCount": 0,
+      "archiveChainVerified": true,
+      "eventChainVerified": true
+    }
   },
   "ownerUatControlVerification": {
     "migrationApplied": true,
@@ -279,9 +299,9 @@
     "pendingHumanIsTechnicalFailure": false,
     "assessmentFinding": "not_assessed",
     "claimBoundary": "The CMMC system mapping is the controlled security-protocol description. It becomes verified FDACS proof of operation only after exact-release technical results and the protected package are registered live. Human review remains separate; assessor findings are not created by the product.",
-    "centralMachineSha256": "806c5628247f68edca1d338af950d9d4f8c6b13212cc731f5d64e3e75e89b8a0",
-    "centralHumanSha256": "f43cf73c2b5703697e420c14dc971a5dc74bacc25252b09a352482a5f350a2f2",
-    "separateDispositionSha256": "8f2d76fe05119f3e950e964686c05a6a2759c2040192e1072172afdbc55857de",
+    "centralMachineSha256": "0ef74053ba79b697b533332b81f15b239ea952d23867e1239bfe24278ef1d75e",
+    "centralHumanSha256": "9b747afa18e3d82a1e95be4b447477b434728a8f5fc448998cca296b3c727785",
+    "separateDispositionSha256": "9cca1446b2d6fb822c559a763009fbedbbfd56dd612e64ae63889d5508c58ea3",
     "mappedObjectiveCount": 287,
     "centralTechnicalDisposition": "not_tested",
     "centralHumanDisposition": "pending"
@@ -295,12 +315,12 @@
     {
       "checkId": "FDACS-DB-LIVE-MIGRATIONS",
       "state": "passed",
-      "result": "Nine forward hardening migrations are live in the isolated project; the provider ledger contains 38 total FDACS migrations and ends with provider version 20260814223854."
+      "result": "Nine forward FDACS hardening migrations are live; the provider ledger contains 38 FDACS migrations plus three governed CMMC evidence-archive migrations, ending with provider version 20260815133241."
     },
     {
       "checkId": "FDACS-DB-LIVE-ACCESS-BOUNDARY",
       "state": "passed",
-      "result": "Zero browser table privileges, zero browser execute privileges across 114 FDACS routines, zero non-FDACS tables, all 64 FDACS tables forced-RLS, and 64 explicit restrictive deny policies."
+      "result": "Zero browser table privileges, zero browser execute privileges, all 64 FDACS tables forced-RLS, and 64 explicit restrictive deny policies. The only two non-FDACS public tables are the governed RPC-only CMMC evidence archive and its append-only event chain; zero unauthorized non-FDACS tables are present."
     },
     {
       "checkId": "FDACS-DB-LIVE-FUNCTION-BOUNDARY",
@@ -391,15 +411,15 @@
   "generatedFrom": {
     "source": {
       "path": "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT-SOURCE.json",
-      "sha256": "3d12752287ef8ca5fa479b04f18883712be59bfbbe75fa97c03c436d376d3c53"
+      "sha256": "951630f02ad91af825ecfdb9bf726082ba6575bc7ffa27758d22d8a348f1e304"
     },
     "evidenceSchema": {
       "path": "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.schema.json",
-      "sha256": "25bedfad1ce177a488a83ec8ff6cf6307d2f24766b5c6961319844608da00a8f"
+      "sha256": "8ee2d32ebd9b4697e9c58283167b0cea26ef2b866839b9ba49792fa2ed28743a"
     },
     "generator": {
       "path": "scripts/fdacs-pii-database-audit-record.mjs",
-      "sha256": "340055dcf9635b51b9d76775c25798e4282ecee9afbe0fb655da099d570d37bc"
+      "sha256": "0090aa09b4deaa94f4c9c3a54a8135945f31604b40efbe8e61a9389335216a53"
     },
     "sourceGate": {
       "path": "scripts/fdacs-pii-database-audit-gate.mjs",

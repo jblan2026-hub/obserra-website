@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 import { FloridaClassDExamError } from "./florida-class-d-exam";
+import { floridaClassDSupabaseServerConfigAuthorized } from "./florida-class-d-supabase-config";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -16,7 +17,7 @@ export const FLORIDA_CLASS_D_COMPLETION_PACKET_POLICY = {
 function config() {
   const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
   const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
-  if (!key || !url.startsWith("https://")) {
+  if (!floridaClassDSupabaseServerConfigAuthorized(url, key)) {
     throw new FloridaClassDExamError("Completion packet service is not configured.", 503, "FDACS_COMPLETION_PACKET_NOT_CONFIGURED");
   }
   return { key, url };

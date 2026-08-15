@@ -1,21 +1,37 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { courseForId } from "../../../../lib/academy";
+import {
+  academyCommerceLivemode,
+  academyCourseAmountCents,
+  validateAcademyPaidSession,
+} from "../../../../lib/academy-payment";
 import { recordPaidCheckout } from "../../../../lib/academy-persistence";
 import { getStripe } from "../../../../lib/stripe";
+import { readStripeWebhookBody, StripeWebhookBodyError } from "../../../../lib/stripe-webhook-body";
 
 export const runtime = "nodejs";
+
+function modeMismatchResponse(event: Stripe.Event, session?: Stripe.Checkout.Session) {
+  console.warn("academy Stripe webhook mode mismatch rejected", {
+    eventId: event.id,
+    eventLivemode: event.livemode,
+    sessionLivemode: session?.livemode ?? null,
+  });
+  return NextResponse.json(
+    { error: "Webhook mode mismatch" },
+    { status: 409 },
+  );
+}
 
 async function fulfillPaidSession(
   session: Stripe.Checkout.Session,
   eventId: string,
   eventType: "checkout.session.completed" | "checkout.session.async_payment_succeeded",
+  expectedLivemode: boolean,
 ) {
   const courseId = session.metadata?.courseId;
   const course = courseId ? courseForId(courseId) : undefined;
-  const learnerId = session.metadata?.clerkUserId || undefined;
-  const identityMode = session.metadata?.identityMode;
-
   if (!course) {
     console.error("academy paid session rejected", {
       eventId,
@@ -26,38 +42,40 @@ async function fulfillPaidSession(
     return { state: "rejected", reason: "unknown-course" } as const;
   }
 
-  if (identityMode !== "authenticated" && identityMode !== "guest-email") {
+  const amountCents = academyCourseAmountCents(course.price);
+  const validation = amountCents === null
+    ? { valid: false as const, reason: "course-price-invalid" }
+    : validateAcademyPaidSession(session, {
+        courseId: course.id,
+        amountCents,
+        livemode: expectedLivemode,
+      });
+  if (!validation.valid) {
     console.error("academy paid session rejected", {
       eventId,
       sessionId: session.id,
       courseId: course.id,
-      reason: "invalid-identity-mode",
+      reason: validation.reason,
     });
-    return { state: "rejected", reason: "invalid-identity-mode" } as const;
+    return { state: "rejected", reason: validation.reason } as const;
   }
 
-  const paymentIntentId = typeof session.payment_intent === "string"
-    ? session.payment_intent
-    : session.payment_intent?.id;
-  const courseVersion = /^\d+\.\d+\.\d+$/.test(session.metadata?.courseVersion ?? "")
-    ? session.metadata!.courseVersion
-    : "1.0.0";
   const result = await recordPaidCheckout({
     eventId,
     eventType,
     checkoutSessionId: session.id,
-    paymentIntentId,
+    paymentIntentId: validation.paymentIntentId,
     courseId: course.id,
-    courseVersion,
-    identityMode,
-    clerkUserId: learnerId,
-    purchaserEmail: learnerId ? undefined : session.customer_details?.email ?? session.customer_email ?? undefined,
+    courseVersion: validation.courseVersion,
+    identityMode: validation.identityMode,
+    clerkUserId: validation.learnerId,
+    purchaserEmail: validation.learnerId ? undefined : session.customer_details?.email ?? session.customer_email ?? undefined,
   });
   console.info("academy paid session durably recorded", {
     eventId,
     sessionId: session.id,
     courseId: course.id,
-    identityMode,
+    identityMode: validation.identityMode,
     paymentStatus: session.payment_status,
     fulfillmentState: result.state,
     idempotentReplay: result.idempotentReplay,
@@ -76,18 +94,31 @@ export async function POST(request: Request) {
 
   let event: Stripe.Event;
   try {
-    event = getStripe().webhooks.constructEvent(await request.text(), signature, process.env.STRIPE_WEBHOOK_SECRET);
-  } catch {
+    const body = await readStripeWebhookBody(request);
+    event = getStripe().webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (error) {
+    if (error instanceof StripeWebhookBodyError) {
+      return NextResponse.json({ error: "Webhook payload too large" }, { status: error.status });
+    }
     return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 });
   }
+
+  const expectedLivemode = academyCommerceLivemode();
+  if (expectedLivemode === null) {
+    return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
+  }
+  if (event.livemode !== expectedLivemode) return modeMismatchResponse(event);
 
   let fulfillment: Awaited<ReturnType<typeof fulfillPaidSession>> | undefined;
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    if (session.payment_status === "paid") fulfillment = await fulfillPaidSession(session, event.id, event.type);
+    if (session.livemode !== event.livemode) return modeMismatchResponse(event, session);
+    if (session.payment_status === "paid") fulfillment = await fulfillPaidSession(session, event.id, event.type, expectedLivemode);
   }
   if (event.type === "checkout.session.async_payment_succeeded") {
-    fulfillment = await fulfillPaidSession(event.data.object as Stripe.Checkout.Session, event.id, event.type);
+    const session = event.data.object as Stripe.Checkout.Session;
+    if (session.livemode !== event.livemode) return modeMismatchResponse(event, session);
+    fulfillment = await fulfillPaidSession(session, event.id, event.type, expectedLivemode);
   }
 
   return NextResponse.json({

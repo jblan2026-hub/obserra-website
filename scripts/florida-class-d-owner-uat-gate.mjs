@@ -18,6 +18,7 @@ const files = {
   enrollmentAdminApi: "app/api/florida-class-d/admin/enrollments/route.ts",
   scheduleApi: "app/api/florida-class-d/admin/schedule/route.ts",
   instructorApi: "app/api/florida-class-d/admin/instructor-file/route.ts",
+  identityAdminApi: "app/api/florida-class-d/admin/identity/route.ts",
   liveApi: "app/api/florida-class-d/admin/live/route.ts",
   enrollmentUi: "app/florida-security-training/enroll/EnrollmentClient.tsx",
   enrollmentActivationUi: "app/florida-security-training/admin/enrollments/EnrollmentActivationConsole.tsx",
@@ -25,9 +26,12 @@ const files = {
   accessUi: "app/florida-security-training/access/page.tsx",
   scheduleUi: "app/florida-security-training/admin/schedule/ScheduleManager.tsx",
   identityUi: "app/florida-security-training/identity/IdentityVerificationClient.tsx",
+  identityVideoApi: "app/api/florida-class-d/identity-video/route.ts",
+  identityAttendanceMigration: "supabase/migrations/20260814172000_fdacs_class_d_instructor_identity_attendance.sql",
   migration: "supabase/migrations/20260814210337_fdacs_class_d_owner_real_identity_uat.sql",
   instructionSafety: "supabase/migrations/20260814213309_fdacs_class_d_owner_uat_instruction_safety.sql",
   liveExecution: "supabase/migrations/20260814215217_fdacs_class_d_owner_uat_live_execution_and_instructor_provisioning.sql",
+  identityLobbyAssignment: "supabase/migrations/20260815160000_fdacs_class_d_identity_video_lobby_assignment.sql",
   environment: ".env.example",
 };
 
@@ -127,10 +131,42 @@ requireText("enrollmentApi", "floridaClassDOwnerUatEvidenceSha256", "pre-enrollm
 requireText("identity", "require_matching_selfie: true", "Stripe Identity must require a matching selfie");
 requireText("identity", "owner_uat_noncredit", "live Identity sessions must be labeled with the non-credit profile");
 requireText("identity", "fdacs_enrollment_id", "Stripe metadata must use an opaque enrollment reference rather than learner PII");
+requireText("identityVideoApi", "requireFloridaClassDSignedInUser", "the protected identity video lobby must require an authenticated learner");
+requireText("identityVideoApi", "getFloridaClassDIdentityLobbyMediaAccess", "the identity video lobby must use the controlled media broker");
+requireText("identityAdminApi", "const attestedAt = new Date().toISOString();", "identity and attendance evidence timestamps must be assigned by the authenticated server route");
+if (source.identityAdminApi.includes("body.attestedAt")) {
+  throw new Error("Gate 38 failed: identity and attendance evidence must not trust a browser-supplied attestation timestamp.");
+}
 requireText("media", '"/rooms?limit=1"', "Daily readiness must authenticate without creating a room or token");
+requireText("media", "identity_lobby_noninstructional", "identity video access must be explicitly non-instructional");
+requireText("media", "tokenExpiresInSeconds = 30 * 60", "identity video access must use a short-lived scoped token");
+requireText("media", "instructionalTimeCredited: false", "identity video access must never credit instructional time");
+requireText("media", "attendanceCredited: false", "identity video access must never credit attendance");
+requireText("media", "rawIdentityImagesStoredByLms: false", "identity video access must not copy raw ID images into the LMS");
+requireText("media", "FDACS_IDENTITY_LOBBY_PROVIDER_EVIDENCE_REQUIRED", "the lobby must require verified hosted ID and matching-selfie evidence");
+requireText("media", "FDACS_IDENTITY_LOBBY_ASSIGNED_SESSION_REQUIRED", "the lobby must require an exact assigned cohort session");
+requireText("identityLobbyAssignment", "fdacs_class_d_identity_attestation_assignment_guard", "durable identity evidence must have an assigned-DI database guard");
+requireText("identityLobbyAssignment", "s.instructor_clerk_user_id = new.instructor_clerk_user_id", "the database guard must bind the attesting DI to the assigned session");
+requireText("identityLobbyAssignment", "does not store an ID image, grant attendance, credit instructional time, or authorize production", "the migration must preserve the identity-lobby claim boundary");
+requireText("identityAttendanceMigration", "'studentLegalName',i.legal_name", "the assigned DI review context must expose the learner's full legal name from the protected record");
+requireText("identityAttendanceMigration", "identity_images_copied_to_lms boolean not null default false", "the LMS must enforce that provider identity images are not copied into its database");
+requireText("identityAttendanceMigration", "biometric_template_stored_by_lms boolean not null default false", "the LMS must enforce that biometric templates are not stored");
 requireText("readiness", "fdacs_class_d_boundary_health", "provider readiness must verify the isolated database boundary");
 requireText("readiness", "verificationSessions.list({ limit: 1 })", "provider readiness must authenticate Stripe Identity read-only");
 requireText("readiness", "sk_live_", "provider readiness must independently require live Stripe Identity mode");
+requireText("readiness", "webhookEndpoints.list({ limit: 100", "provider readiness must enumerate Stripe webhook configuration read-only");
+requireText("readiness", "candidate.url === expectedUrl", "provider readiness must bind Stripe Identity callbacks to the exact Preview endpoint");
+requireText("readiness", 'candidate.status === "enabled"', "provider readiness must reject disabled Stripe Identity callbacks");
+requireText("readiness", 'candidate.livemode === true', "provider readiness must reject test-mode Stripe Identity callbacks");
+for (const event of [
+  "identity.verification_session.processing",
+  "identity.verification_session.requires_input",
+  "identity.verification_session.verified",
+  "identity.verification_session.canceled",
+  "identity.verification_session.redacted",
+]) {
+  requireText("readiness", event, `provider readiness must require the handled Stripe event ${event}`);
+}
 requireText("readiness", "getFloridaClassDOwnerUatInstructorReadiness", "provider readiness must require verified-active Class DI coverage");
 requireText("providerReadinessUi", "Run read-only provider preflight", "live provider readiness must be operable from the protected administrator UI");
 requireText("enrollmentApi", "getFloridaClassDProviderReadiness", "live providers must pass before owner learner PII is stored");
@@ -154,6 +190,8 @@ requireText("environment", "OBSERRA_FDACS_RECORD_ENCRYPTION_KEY_BASE64", "the pr
 requireText("environment", "OBSERRA_FDACS_RECORD_ENCRYPTION_KEY_REFERENCE", "the external key reference setting must be documented");
 requireText("enrollmentUi", "cannot produce completion or LIAS records", "learner UI must disclose the non-credit boundary");
 requireText("identityUi", "government ID and selfie are processed by Stripe", "learner UI must disclose hosted identity processing");
+requireText("identityUi", "assigned-instructor video verification pending", "learner UI must expose the assigned-DI video step");
+requireText("identityUi", "This lobby records no instructional time or attendance credit", "learner UI must disclose the non-instructional lobby boundary");
 
 const combined = Object.values(source).join("\n");
 if (/NEXT_PUBLIC_(?:OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY|OBSERRA_FDACS_DAILY_API_KEY|OBSERRA_FDACS_RECORD_ENCRYPTION_KEY_BASE64|STRIPE_SECRET_KEY|STRIPE_IDENTITY_WEBHOOK_SECRET)/.test(combined)) {

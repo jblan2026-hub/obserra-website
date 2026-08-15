@@ -2,6 +2,10 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 import type { FloridaClassDStaffRole } from "./florida-class-d-auth";
+import {
+  floridaClassDServiceRoleKeyAuthorized,
+  floridaClassDSupabaseOriginAuthorized,
+} from "./florida-class-d-supabase-config";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const BROWSER_INSTANCE_PATTERN = /^[A-Za-z0-9._:-]{12,180}$/;
@@ -34,8 +38,8 @@ function serviceRoleKey() {
 function config() {
   const key = serviceRoleKey();
   const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
-  if (!key) throw new FloridaClassDLivePersistenceError("Class D live persistence is not configured.", 503, "FDACS_LIVE_PERSISTENCE_NOT_CONFIGURED");
-  if (!url.startsWith("https://")) throw new FloridaClassDLivePersistenceError("Class D live persistence URL is invalid.", 503, "FDACS_LIVE_PERSISTENCE_INVALID_URL");
+  if (!floridaClassDServiceRoleKeyAuthorized(key)) throw new FloridaClassDLivePersistenceError("Class D live persistence is not configured.", 503, "FDACS_LIVE_PERSISTENCE_NOT_CONFIGURED");
+  if (!floridaClassDSupabaseOriginAuthorized(url)) throw new FloridaClassDLivePersistenceError("Class D live persistence URL is invalid.", 503, "FDACS_LIVE_PERSISTENCE_INVALID_URL");
   return { key, url };
 }
 

@@ -14,7 +14,7 @@ Production remains fail closed. Gate 29 does not apply a production database mig
 
 Gate 29 makes regulated database promotion depend on the exact ordered Class D migration lineage and a deterministic SHA-256 promotion manifest. Schema similarity alone is not sufficient production evidence.
 
-The current verified controlled lineage contains exactly 38 regulated migrations, beginning with `20260813033000_fdacs_class_d_regulated_records.sql` and ending with `20260814215217_fdacs_class_d_owner_uat_live_execution_and_instructor_provisioning.sql`.
+The current controlled source lineage contains exactly 39 regulated migrations, beginning with `20260813033000_fdacs_class_d_regulated_records.sql` and ending with `20260815160000_fdacs_class_d_identity_video_lobby_assignment.sql`. The isolated live provider remains at the prior 38-migration checkpoint until the forward-only identity-lobby assignment migration passes integrated review, controlled backup/preflight, and authorized promotion. Gate 29 does not apply it.
 
 ## Lineage reconciliation
 

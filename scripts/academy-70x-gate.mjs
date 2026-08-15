@@ -134,7 +134,12 @@ check(
     && /course\.price === baseCourse\.price/.test(checkoutRoute)
     && /course\.title === baseCourse\.title/.test(checkoutRoute),
 );
-check("checkout live fallback charges website course price", /unit_amount: Math\.round\(course\.price \* 100\)/.test(checkoutRoute));
+check(
+  "checkout live fallback charges the validated website course price",
+  /const amountCents = academyCourseAmountCents\(course\.price\)/.test(checkoutRoute)
+    && /if \(amountCents === null\)/.test(checkoutRoute)
+    && /unit_amount: amountCents/.test(checkoutRoute),
+);
 check("checkout live fallback uses website title", /name: course\.title/.test(checkoutRoute));
 check("checkout emits catalog parity evidence", /x-obserra-catalog-parity/.test(checkoutRoute));
 check(
@@ -150,7 +155,10 @@ check(
 );
 
 check("public Academy states 60 published courses", /60 published courses/.test(academyClient));
-check("public Academy markets AI native training", /AI native training/.test(academyClient));
+check(
+  "public Academy expands artificial intelligence before the AI abbreviation",
+  /artificial intelligence \(AI\) native training/.test(academyClient),
+);
 check("public Academy says AI tutor requires access", /unlocked only with authorized course access/.test(academyClient));
 check("public course page exposes published lesson count", /course\.modules\.length/.test(coursePage));
 check("public course page exposes published duration", /\{course\.duration\}/.test(coursePage));

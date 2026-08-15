@@ -3,6 +3,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import type { FloridaClassDStaffRole } from "./florida-class-d-auth";
 import { floridaClassDLiveInstructionEnabled } from "./florida-class-d-live-policy";
+import { floridaClassDSupabaseServerConfigAuthorized } from "./florida-class-d-supabase-config";
 
 const DAILY_API_BASE = "https://api.daily.co/v1";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -40,7 +41,7 @@ function dailyConfig() {
 function supabaseConfig() {
   const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
   const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
-  if (!key || !url.startsWith("https://")) {
+  if (!floridaClassDSupabaseServerConfigAuthorized(url, key)) {
     throw new FloridaClassDMediaError("Class D media authorization persistence is not configured.", 503, "FDACS_MEDIA_PERSISTENCE_NOT_CONFIGURED");
   }
   return { key, url };
@@ -115,7 +116,7 @@ function roomName(liveSessionId: string) {
 async function loadSession(liveSessionId: string) {
   requireUuid(liveSessionId, "live session id");
   const query = new URLSearchParams({
-    select: "id,cohort_id,day,lesson_id,status,execution_profile,instructor_clerk_user_id",
+    select: "id,cohort_id,day,lesson_id,status,execution_profile,instructor_clerk_user_id,scheduled_start_at,scheduled_end_at",
     id: `eq.${liveSessionId}`,
     limit: "1",
   });
@@ -125,21 +126,76 @@ async function loadSession(liveSessionId: string) {
   return session;
 }
 
-function legalName(identity: unknown) {
-  if (identity && typeof identity === "object" && !Array.isArray(identity)) {
-    const value = (identity as Record<string, unknown>).legal_name;
-    if (typeof value === "string" && value.trim()) return value.trim().slice(0, 80);
+async function loadIdentityLobbyStudent(userId: string) {
+  const enrollmentQuery = new URLSearchParams({
+    select: "id,status,cohort_id,execution_profile,training_credit_eligible",
+    clerk_user_id: `eq.${userId}`,
+    status: "in.(pending_identity,pending_entitlement)",
+    order: "created_at.desc",
+    limit: "1",
+  });
+  const enrollments = await supabaseRequest<Record<string, unknown>[]>(`fdacs_class_d_enrollments?${enrollmentQuery}`);
+  const enrollment = enrollments[0];
+  if (!enrollment || typeof enrollment.id !== "string" || typeof enrollment.cohort_id !== "string") {
+    throw new FloridaClassDMediaError("A pending regulated identity record is required.", 403, "FDACS_IDENTITY_LOBBY_ENROLLMENT_REQUIRED");
   }
-  if (Array.isArray(identity) && identity[0] && typeof identity[0] === "object") {
-    const value = (identity[0] as Record<string, unknown>).legal_name;
-    if (typeof value === "string" && value.trim()) return value.trim().slice(0, 80);
+  if (enrollment.execution_profile === "owner_uat_noncredit" && enrollment.training_credit_eligible !== false) {
+    throw new FloridaClassDMediaError("The owner-UAT identity boundary is invalid.", 409, "FDACS_IDENTITY_LOBBY_CREDIT_BOUNDARY_INVALID");
   }
-  return "Enrolled Student";
+
+  const evidenceQuery = new URLSearchParams({
+    select: "verification_session_id,provider_livemode,execution_profile",
+    enrollment_id: `eq.${enrollment.id}`,
+    status: "eq.verified",
+    document_check_status: "eq.verified",
+    selfie_check_status: "eq.verified",
+    order: "verified_at.desc",
+    limit: "1",
+  });
+  const evidence = (await supabaseRequest<Record<string, unknown>[]>(`fdacs_class_d_identity_verification_sessions?${evidenceQuery}`))[0];
+  if (!evidence) {
+    throw new FloridaClassDMediaError("Hosted government-ID and matching-selfie verification must pass first.", 409, "FDACS_IDENTITY_LOBBY_PROVIDER_EVIDENCE_REQUIRED");
+  }
+  if (
+    enrollment.execution_profile === "owner_uat_noncredit"
+    && (evidence.provider_livemode !== true || evidence.execution_profile !== "owner_uat_noncredit")
+  ) {
+    throw new FloridaClassDMediaError("Live owner-UAT identity evidence is not bound to this enrollment.", 409, "FDACS_IDENTITY_LOBBY_EVIDENCE_PROFILE_MISMATCH");
+  }
+
+  const sessionQuery = new URLSearchParams({
+    select: "id,cohort_id,day,lesson_id,status,execution_profile,instructor_clerk_user_id,scheduled_start_at,scheduled_end_at",
+    cohort_id: `eq.${enrollment.cohort_id}`,
+    status: "in.(scheduled,live,break)",
+    order: "day.asc,scheduled_start_at.asc",
+    limit: "1",
+  });
+  const session = (await supabaseRequest<Record<string, unknown>[]>(`fdacs_class_d_live_sessions?${sessionQuery}`))[0];
+  if (
+    !session ||
+    typeof session.id !== "string" ||
+    typeof session.instructor_clerk_user_id !== "string" ||
+    session.instructor_clerk_user_id.length < 3 ||
+    session.execution_profile !== enrollment.execution_profile
+  ) {
+    throw new FloridaClassDMediaError("An exact assigned-instructor identity session is not available.", 409, "FDACS_IDENTITY_LOBBY_ASSIGNED_SESSION_REQUIRED");
+  }
+
+  return {
+    enrollmentId: enrollment.id,
+    displayName: studentMediaLabel(enrollment.id),
+    session,
+  };
+}
+
+function studentMediaLabel(enrollmentId: string) {
+  requireUuid(enrollmentId, "enrollment id");
+  return `Verified Class D learner ${enrollmentId.slice(0, 8)}`;
 }
 
 async function loadStudentEnrollment(userId: string, cohortId: string) {
   const query = new URLSearchParams({
-    select: "id,status,student_identity_id,fdacs_class_d_student_identities(id,legal_name,identity_status)",
+    select: "id,status,student_identity_id",
     clerk_user_id: `eq.${userId}`,
     cohort_id: `eq.${cohortId}`,
     limit: "1",
@@ -150,7 +206,7 @@ async function loadStudentEnrollment(userId: string, cohortId: string) {
   if (!["enrolled", "active", "in_progress"].includes(String(enrollment.status))) {
     throw new FloridaClassDMediaError("Student enrollment is not eligible for live media access.", 403, "FDACS_MEDIA_ENROLLMENT_NOT_ACTIVE");
   }
-  return { enrollmentId: enrollment.id, displayName: legalName(enrollment.fdacs_class_d_student_identities) };
+  return { enrollmentId: enrollment.id, displayName: studentMediaLabel(enrollment.id) };
 }
 
 async function ensureRoom(liveSessionId: string) {
@@ -276,6 +332,51 @@ export async function getFloridaClassDStudentMediaAccess(userId: string, liveSes
     joinUrl: joinUrl(room.url, token),
     tokenExpiresAt: new Date((now + 3 * 60 * 60) * 1000).toISOString(),
     recordingEnabled: false,
+  };
+}
+
+export async function getFloridaClassDIdentityLobbyMediaAccess(userId: string) {
+  if (!floridaClassDLiveMediaEnabled()) {
+    throw new FloridaClassDMediaError("Class D live video is not enabled for the protected identity lobby.", 503, "FDACS_IDENTITY_LOBBY_MEDIA_NOT_ENABLED");
+  }
+  const student = await loadIdentityLobbyStudent(userId);
+  const liveSessionId = String(student.session.id);
+  const room = await ensureRoom(liveSessionId);
+  if (!room.name || !room.url) {
+    throw new FloridaClassDMediaError("The protected identity lobby room is incomplete.", 502, "FDACS_IDENTITY_LOBBY_ROOM_INVALID");
+  }
+  const now = Math.floor(Date.now() / 1000);
+  const tokenExpiresInSeconds = 30 * 60;
+  const token = await createToken({
+    room_name: room.name,
+    user_id: student.enrollmentId,
+    user_name: student.displayName,
+    nbf: now - 30,
+    exp: now + tokenExpiresInSeconds,
+    eject_at_token_exp: true,
+    is_owner: false,
+    enable_screenshare: false,
+    start_video_off: false,
+    start_audio_off: false,
+    enable_prejoin_ui: true,
+    enable_live_captions_ui: true,
+    enable_recording_ui: false,
+    permissions: {
+      hasPresence: true,
+      canSend: ["video", "audio"],
+      canAdmin: false,
+    },
+  });
+  return {
+    provider: "daily" as const,
+    accessMode: "identity_lobby_noninstructional" as const,
+    liveSessionId,
+    joinUrl: joinUrl(room.url, token),
+    tokenExpiresAt: new Date((now + tokenExpiresInSeconds) * 1000).toISOString(),
+    recordingEnabled: false,
+    attendanceCredited: false,
+    instructionalTimeCredited: false,
+    rawIdentityImagesStoredByLms: false,
   };
 }
 

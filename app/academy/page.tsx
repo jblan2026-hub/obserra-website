@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
 import { publicAcademyCatalog } from "../../lib/academy-control";
 import AcademyControlledClient from "./AcademyControlledClient";
+import AcademyCommerceNotice from "./AcademyCommerceNotice";
 import { courses as sourceCourses } from "./courseCatalog";
 import "./academy-commercial.css";
+import "./academy-payment.css";
 import "./academy-world-class.css";
 
 export const revalidate = 10;
 
 export const metadata: Metadata = {
-  title: "Obserra Academy | Cybersecurity, Intelligence, Protection and AI Training",
-  description: "Search and enroll in professional Obserra Academy courses covering cybersecurity, executive protection, intelligence, AI governance, and secure technology leadership.",
+  title: "Obserra Academy | Cybersecurity, Intelligence, Protection and Artificial Intelligence Training",
+  description: "Search and evaluate professional Obserra Academy courses covering cybersecurity, executive protection, intelligence, artificial intelligence governance, and secure technology leadership.",
   alternates: { canonical: "/academy" },
-  keywords: ["cybersecurity training", "executive protection training", "AI governance training", "intelligence training", "CISO education"],
+  keywords: ["cybersecurity training", "executive protection training", "artificial intelligence governance training", "intelligence training", "Chief Information Security Officer education"],
   openGraph: {
     title: "Obserra Academy | Professional Security and Executive Training",
     description: "Secure, account based professional training with assessments and Obserra Certificates of Training.",
@@ -27,8 +29,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function AcademyPage() {
+export default async function AcademyPage({ searchParams }: { searchParams: Promise<{ enrollment?: string }> }) {
   const runtime = await publicAcademyCatalog(sourceCourses);
+  const commerceState = await searchParams;
   const publicCourses = runtime.controlPlane === "operational" ? runtime.courses : [];
   const catalogSchema = {
     "@context": "https://schema.org",
@@ -71,6 +74,7 @@ export default async function AcademyPage() {
 
   return (
     <>
+      <AcademyCommerceNotice status={commerceState.enrollment} />
       <AcademyControlledClient courses={publicCourses} controlPlane={runtime.controlPlane} />
       <script
         type="application/ld+json"

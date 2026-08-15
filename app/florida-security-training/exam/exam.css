@@ -8,9 +8,11 @@
 .fdacs-exam__metrics strong { font-size: 20px; color: #fff; }
 .fdacs-exam__question h2 { line-height: 1.45; margin: 10px 0 20px; }
 .fdacs-exam__question > small { color: #d6b45d; letter-spacing: .1em; }
-.fdacs-exam__choices { display: grid; gap: 12px; }
+.fdacs-exam__choices { display: grid; gap: 12px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.fdacs-exam__choices legend { margin-bottom: 12px; color: #dbe9f6; font-weight: 800; }
 .fdacs-exam__choices label { display: block; border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 14px; cursor: pointer; background: rgba(255,255,255,.025); }
 .fdacs-exam__choices label.is-selected { border-color: rgba(214,180,93,.75); background: rgba(214,180,93,.08); }
+.fdacs-exam__choices label:focus-within { outline: 3px solid #9dc8ef; outline-offset: 3px; }
 .fdacs-exam__choices input { position: absolute; opacity: 0; pointer-events: none; }
 .fdacs-exam__choices span { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; }
 .fdacs-exam__choices b { color: #d6b45d; }

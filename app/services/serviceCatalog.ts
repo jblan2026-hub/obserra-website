@@ -66,7 +66,7 @@ export const serviceCatalog: ServiceItem[] = [
   },
   {
     id: "fractional-ciso",
-    title: "Fractional CISO",
+    title: "Fractional Chief Information Security Officer",
     category: "Executive Leadership",
     summary: "Interim security leadership for governance maturity, risk reduction, executive reporting, and prioritized execution.",
     detail: "Provides executive-level security leadership capacity for organizations needing strategic guidance, operating cadence, and accountable execution immediately.",
@@ -78,7 +78,7 @@ export const serviceCatalog: ServiceItem[] = [
   },
   {
     id: "ai-governance",
-    title: "AI Governance",
+    title: "Artificial Intelligence Governance",
     category: "AI and Governance",
     summary: "Policy-aligned AI operating controls covering model risk, approval workflow, evidence, and accountability.",
     detail: "Builds practical governance for AI use cases, including approval controls, role accountability, human oversight, data boundaries, and confidence requirements.",
