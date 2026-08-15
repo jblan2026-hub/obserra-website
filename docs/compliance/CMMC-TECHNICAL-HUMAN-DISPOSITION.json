@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "recordId": "obserra-cmmc-working-011880e2896f10eecfb895b4:technical-human-disposition",
+  "recordId": "obserra-cmmc-working-8844ba8b807a75cc7984caa5:technical-human-disposition",
   "recordState": "working_disposition_record",
   "generatedAt": "2026-08-14T18:49:07Z",
   "legalOwner": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
@@ -14,9 +14,9 @@
   },
   "sourceBundle": {
     "path": "docs/compliance/CMMC-SYSTEM-EVIDENCE.json",
-    "bundleId": "obserra-cmmc-working-011880e2896f10eecfb895b4",
+    "bundleId": "obserra-cmmc-working-8844ba8b807a75cc7984caa5",
     "bundleState": "working_evidence_inventory",
-    "sha256": "6d836921fac5c84d1960c2345cd17b29e99a03fc7ff674ba2cf711514b37c43c",
+    "sha256": "14be1d1e48a276d9daf5836ac779b6b8489793efd8ca1b597d0260bfb559a01a",
     "revisionBinding": "working_tree_digest",
     "exactReleaseCommitSha": null
   },
