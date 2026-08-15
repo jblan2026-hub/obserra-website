@@ -25,5 +25,3 @@ npm run build
 ```
 
 Before a production deployment, verify public routes, protected Academy routes, Stripe signature rejection, navigation links, robots, sitemap, and headers. Deploy only the `main` branch through the `obserra-integrated-services` project, then alias the validated production deployment to `www.obserrallc.com`.
-
-<!-- GitHub verified release provenance refresh. -->
