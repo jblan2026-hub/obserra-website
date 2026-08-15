@@ -29,6 +29,17 @@ type StatusResponse = {
   error?: string;
 };
 
+type IdentityLobbyAccess = {
+  provider?: "daily";
+  accessMode?: "identity_lobby_noninstructional";
+  joinUrl?: string;
+  tokenExpiresAt?: string;
+  recordingEnabled?: boolean;
+  attendanceCredited?: boolean;
+  instructionalTimeCredited?: boolean;
+  rawIdentityImagesStoredByLms?: boolean;
+};
+
 async function loadStatus() {
   const response = await fetch("/api/florida-class-d/identity-verification", {
     cache: "no-store",
@@ -44,6 +55,8 @@ export default function IdentityVerificationClient() {
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [identityLobby, setIdentityLobby] = useState<IdentityLobbyAccess | null>(null);
+  const [lobbyError, setLobbyError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -117,6 +130,29 @@ export default function IdentityVerificationClient() {
   const complete = Boolean(status?.instructorAttestationRecorded && status?.identityStatus === "verified");
   const ownerUat = payload?.executionProfile === "owner_uat_noncredit";
 
+  const loadIdentityLobby = useCallback(async () => {
+    setLobbyError(null);
+    const response = await fetch("/api/florida-class-d/identity-video", {
+      cache: "no-store",
+      headers: { accept: "application/json" },
+    });
+    const lobby = await response.json().catch(() => ({})) as IdentityLobbyAccess & { error?: unknown };
+    if (!response.ok || typeof lobby.joinUrl !== "string" || !lobby.joinUrl.startsWith("https://")) {
+      throw new Error(typeof lobby.error === "string" ? lobby.error : "The protected identity video lobby is unavailable.");
+    }
+    setIdentityLobby(lobby);
+  }, []);
+
+  useEffect(() => {
+    if (!providerVerified || complete || identityLobby?.joinUrl) return;
+    const timer = window.setTimeout(() => {
+      void loadIdentityLobby().catch((lobbyLoadError) => {
+        setLobbyError(lobbyLoadError instanceof Error ? lobbyLoadError.message : "The protected identity video lobby is unavailable.");
+      });
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [complete, identityLobby?.joinUrl, loadIdentityLobby, providerVerified]);
+
   if (!payload && !error) {
     return <div className="fl-classd__notice"><span>Loading controlled identity status…</span></div>;
   }
@@ -143,10 +179,32 @@ export default function IdentityVerificationClient() {
           <Link href="/florida-security-training/access">Continue to controlled course access</Link>
         </div>
       ) : providerVerified ? (
-        <div className="fl-classd__notice">
-          <strong>Automated verification complete; instructor verification pending.</strong>
-          <span>The assigned Class DI instructor must observe you and your U.S. state or federal photo ID and sign the identity attestation before instructional access can be granted.</span>
-          <button type="button" onClick={() => void refresh()}>Refresh status</button>
+        <div className="fl-classd__identity-lobby">
+          <div className="fl-classd__notice" role="status">
+            <strong>Automated verification complete; assigned-instructor video verification pending.</strong>
+            <span>Join the protected lobby with your U.S. state or federal photo ID. Only the licensed Class DI instructor assigned to your cohort may complete this verification.</span>
+          </div>
+          {lobbyError ? (
+            <div className="fl-classd__notice" role="alert">
+              <strong>Video verification remains locked.</strong>
+              <span>{lobbyError}</span>
+              <button type="button" onClick={() => void loadIdentityLobby().catch((lobbyLoadError) => setLobbyError(lobbyLoadError instanceof Error ? lobbyLoadError.message : "The protected identity video lobby is unavailable."))}>Retry protected video</button>
+            </div>
+          ) : null}
+          {identityLobby?.joinUrl ? (
+            <div className="fl-classd__identity-video">
+              <iframe
+                title="Protected Florida Class D photo-identification video lobby"
+                src={identityLobby.joinUrl}
+                allow="camera; microphone; fullscreen; autoplay"
+                referrerPolicy="no-referrer"
+              />
+              <p>
+                This lobby records no instructional time or attendance credit, and recording is disabled. Stripe retains the hosted ID and selfie images; the LMS stores only minimized provider references, signed instructor attestations, timestamps, and integrity evidence.
+              </p>
+            </div>
+          ) : !lobbyError ? <p role="status">Opening the protected identity video lobby…</p> : null}
+          <button type="button" onClick={() => void refresh()}>Refresh verification status</button>
         </div>
       ) : (
         <div className="fl-classd__automation-grid">

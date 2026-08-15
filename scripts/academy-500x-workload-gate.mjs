@@ -63,7 +63,7 @@ const requiredFiles = [
 for (const file of requiredFiles) check(`required file ${file}`, exists(file));
 
 const checkout = read("app/api/academy/checkout/route.ts");
-check("checkout fails closed without webhook", /STRIPE_WEBHOOK_SECRET/.test(checkout) && /configuration-required/.test(checkout));
+check("checkout fails closed without webhook", /academyCommerceWebhookConfigured/.test(checkout) && /configuration-required/.test(checkout));
 check("checkout fails closed without durable storage", /academyStorageHealth/.test(checkout) && /durable-storage-unavailable/.test(checkout));
 check("checkout fails closed without identity", /identity\.configured/.test(checkout) && /identity-configuration-required/.test(checkout));
 check("checkout disables public cache", /cache-control/i.test(checkout) && /no-store/i.test(checkout));

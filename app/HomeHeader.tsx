@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LEGAL_ENTITY_NAME } from "../lib/legal-identity";
 import "./site-header.css";
 
@@ -33,12 +33,24 @@ function ObserraMark() {
 export default function HomeHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      toggleRef.current?.focus();
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
   }, [open]);
 
   function closeNavigation() {
@@ -52,8 +64,8 @@ export default function HomeHeader() {
           <ObserraMark />
           <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt={LEGAL_ENTITY_NAME} />
         </Link>
-        <button className="obs-site-header__toggle" type="button" aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="primary-navigation" onClick={() => setOpen((current) => !current)}>
-          <span /><span /><span />
+        <button ref={toggleRef} className="obs-site-header__toggle" type="button" aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="primary-navigation" onClick={() => setOpen((current) => !current)}>
+          <span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" />
         </button>
       </div>
       <nav id="primary-navigation" className={`obs-site-header__nav${open ? " is-open" : ""}`} aria-label="Primary navigation">

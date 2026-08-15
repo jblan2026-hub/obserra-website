@@ -32,7 +32,6 @@ type AttestationRequest = {
   anchorLiveSessionId?: unknown;
   attendanceEntryId?: unknown;
   identityAttestationId?: unknown;
-  attestedAt?: unknown;
   correlationId?: unknown;
 };
 
@@ -100,7 +99,7 @@ export async function POST(request: Request) {
       );
     }
     const correlationId = typeof body.correlationId === "string" ? body.correlationId : crypto.randomUUID();
-    const attestedAt = typeof body.attestedAt === "string" ? body.attestedAt : new Date().toISOString();
+    const attestedAt = new Date().toISOString();
 
     if (body.action === "identity_attestation") {
       if (

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import ContactExperience from "./ContactExperience";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./contact.css";
+import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 
 export const metadata: Metadata = {
   title: `Contact | ${LEGAL_ENTITY_NAME}`,
@@ -33,39 +33,26 @@ const engagementTracks = [
     cta: "Request advisory consultation",
   },
   {
-    title: "EIOS Platform Briefing",
+    title: "Enterprise Intelligence Operating System Briefing",
     copy: "Enterprise intelligence operating model walkthrough, adoption pathway, and implementation readiness review.",
     action: "mailto:info@obserrallc.com?subject=EIOS%20Enterprise%20Briefing%20Request",
     cta: "Book EIOS enterprise briefing",
   },
   {
     title: "Academy and Workforce Training",
-    copy: "Paid course enrollment, cohort planning, and workforce upskilling tied to cybersecurity, protection, intelligence, and secure technology execution.",
+    copy: "Course evaluation, enterprise cohort planning, and workforce capability discussions tied to cybersecurity, protection, intelligence, and secure technology.",
     action: "mailto:info@obserrallc.com?subject=Academy%20Enterprise%20Training%20Inquiry",
     cta: "Discuss training options",
+  },
+  {
+    title: "University and Institutional Learning",
+    copy: "Program evaluation, curriculum fit, cohort delivery, learning evidence, accessibility, and governance discussions for higher education and institutional buyers.",
+    action: "mailto:info@obserrallc.com?subject=University%20and%20Institutional%20Learning%20Inquiry",
+    cta: "Plan an institutional review",
   },
 ];
 
 const legalEntityMailName = encodeURIComponent(LEGAL_ENTITY_NAME);
-
-const growthLinks = [
-  {
-    label: "Publish tracked LinkedIn post",
-    href: "https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dlinkedin%26utm_medium%3Dorganic_social%26utm_campaign%3Dlead_acceleration",
-  },
-  {
-    label: "Publish tracked Facebook post",
-    href: "https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dfacebook%26utm_medium%3Dorganic_social%26utm_campaign%3Dlead_acceleration",
-  },
-  {
-    label: "Publish tracked X post",
-    href: "https://x.com/intent/post?text=Explore%20Obserra%20enterprise%20intelligence%2C%20cybersecurity%2C%20and%20professional%20training.&url=https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Dx%26utm_medium%3Dorganic_social%26utm_campaign%3Dlead_acceleration",
-  },
-  {
-    label: "Send tracked referral email",
-    href: `mailto:?subject=${legalEntityMailName}%20Enterprise%20Intelligence&body=Explore%20${legalEntityMailName}%20enterprise%20intelligence%20and%20security%20solutions%3A%20https%3A%2F%2Fwww.obserrallc.com%2F%3Futm_source%3Demail%26utm_medium%3Dreferral%26utm_campaign%3Dlead_acceleration`,
-  },
-];
 
 type ContactPageProps = {
   searchParams: Promise<{ interest?: string | string[] }>;
@@ -108,35 +95,25 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
   };
 
   return (
-    <main className="contact-page">
+    <>
+      <EnterpriseHeader section="Enterprise contact" />
+      <main className="contact-page enterprise-page-main">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(contactSchema) }} />
-      <header className="contact-nav">
-        <a href="/" className="contact-brand" aria-label={`${LEGAL_ENTITY_NAME} home`}>
-          <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
-          <span>CONTACT</span>
-        </a>
-        <nav aria-label="Contact navigation">
-          <a href="/">Home</a>
-          <a href="/services">Services</a>
-          <a href="/eios">EIOS</a>
-          <a href="/apps">Applications</a>
-          <a href="/academy">Academy</a>
-          <a href="/about">About</a>
-        </nav>
-      </header>
 
       <section className="contact-hero">
         <p className="contact-eyebrow">{LEGAL_ENTITY_NAME}</p>
         <h1>Start a focused conversation on the work you need done.</h1>
         <p>
           Engage {LEGAL_ENTITY_NAME} for cybersecurity leadership, protective intelligence, executive protection advisory,
-          enterprise risk guidance, AI governance, and productized intelligence solutions including EIOS with commercial delivery discipline.
+          enterprise risk guidance, AI governance, and EIOS through a scoped, security-conscious engagement process.
         </p>
         <div className="contact-actions">
           <a className="contact-button" href={`mailto:info@obserrallc.com?subject=${legalEntityMailName}%20Confidential%20Consultation`}>Request executive consultation</a>
           <a className="contact-outline" href="/services">Review enterprise services</a>
         </div>
       </section>
+
+      <EnterpriseProofBand />
 
       <ContactExperience initialInterest={initialInterest} />
 
@@ -161,37 +138,31 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
         </div>
         <ul>
           <li>Veteran-owned organization</li>
-          <li>Fortune 500 CISO leadership background</li>
+          <li>Fortune 500 Chief Information Security Officer leadership background</li>
           <li>Enterprise cybersecurity and risk advisory</li>
           <li>Protective intelligence and executive protection alignment</li>
-          <li>Paid professional training through Obserra Academy</li>
+          <li>Professional and enterprise learning options through Obserra Academy</li>
         </ul>
       </section>
 
       <section className="contact-confidence">
         <div>
-          <p className="contact-eyebrow">TRACKED DISTRIBUTION LINKS</p>
-          <h2>Launch no-cost tracked promotion to generate qualified conversations.</h2>
+          <p className="contact-eyebrow">ENGAGEMENT GOVERNANCE</p>
+          <h2>A controlled path from initial inquiry to scoped work.</h2>
           <p>
-            Use these no-cost distribution links to publish trackable posts and referrals.
-            Each link includes campaign attribution so your team can identify channel performance.
+            Initial conversations establish the authorized participants, business objective, information boundary, delivery model, and evidence expectations before sensitive material or implementation work is introduced.
           </p>
         </div>
         <ul>
-          {growthLinks.map((item) => (
-            <li key={item.label}><a href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined} rel={item.href.startsWith("http") ? "noreferrer" : undefined}>{item.label}</a></li>
-          ))}
-          <li><a href="mailto:info@obserrallc.com?subject=Free%20Lead%20Generation%20and%20Advertising%20Strategy%20Session">Book free lead-generation strategy session</a></li>
+          <li>Scope, ownership, and decision authority confirmed before delivery</li>
+          <li>Data minimization and secure-exchange instructions established before file transfer</li>
+          <li>Commercial terms, dependencies, and acceptance evidence documented for the engagement</li>
+          <li><a href="/trust">Review security, privacy, accessibility, and procurement disclosures</a></li>
         </ul>
       </section>
 
-      <footer className="contact-footer">
-        <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={180} height={35} />
-        <p>
-          Copyright OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC. All rights reserved. Proprietary material.
-          No unauthorized reproduction, distribution, recording, or use.
-        </p>
-      </footer>
-    </main>
+      </main>
+      <EnterpriseFooter />
+    </>
   );
 }

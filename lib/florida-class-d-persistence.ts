@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { FloridaClassDStaffRole } from "./florida-class-d-auth";
+import { floridaClassDSupabaseServerConfigAuthorized } from "./florida-class-d-supabase-config";
 import {
   FLORIDA_CLASS_D_ENROLLMENT_POLICY_VERSION,
   validateFloridaClassDAcknowledgments,
@@ -86,25 +87,19 @@ function configuredServiceRoleKey() {
 function getConfig(): SupabaseConfig {
   const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   const serviceRoleKey = configuredServiceRoleKey();
-  if (!serviceRoleKey) {
+  if (!floridaClassDSupabaseServerConfigAuthorized(url, serviceRoleKey)) {
     throw new FloridaClassDPersistenceError(
-      "Florida Class D regulated persistence is not configured.",
+      "Florida Class D regulated persistence is not configured for the isolated project.",
       503,
       "FDACS_PERSISTENCE_NOT_CONFIGURED",
-    );
-  }
-  if (!url.startsWith("https://")) {
-    throw new FloridaClassDPersistenceError(
-      "Florida Class D regulated persistence URL is invalid.",
-      503,
-      "FDACS_PERSISTENCE_INVALID_URL",
     );
   }
   return { url, serviceRoleKey };
 }
 
 export function floridaClassDPersistenceConfigured() {
-  return Boolean(configuredServiceRoleKey());
+  const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
+  return floridaClassDSupabaseServerConfigAuthorized(url, configuredServiceRoleKey());
 }
 
 function requireUuid(value: string, field: string) {

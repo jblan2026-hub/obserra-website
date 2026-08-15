@@ -4,11 +4,12 @@ import { alignmentAuthorities, alignmentDisclaimer } from "../../lib/control-ali
 import { trustPolicies } from "./policies";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./trust.css";
+import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 
 export const metadata: Metadata = {
-  title: "Enterprise Trust Center | Security, Privacy, AI Governance, and Procurement",
+  title: "Enterprise Trust Center | Security, Privacy and Procurement Evidence",
   description:
-    `Review ${LEGAL_ENTITY_NAME} security architecture, privacy practices, responsible AI controls, framework alignment, procurement pathways, verified credentials, and buyer protections.`,
+    `Review ${LEGAL_ENTITY_NAME} published security and privacy information, responsible AI principles, framework alignment, procurement pathways, credentials, and current assurance boundaries.`,
   alternates: { canonical: "/trust" },
   keywords: [
     `${LEGAL_ENTITY_NAME} trust center`,
@@ -99,14 +100,16 @@ export default function TrustCenterPage() {
   };
 
   return (
-    <main className="trust-page">
+    <>
+      <EnterpriseHeader section="Trust and assurance" />
+      <main className="trust-page enterprise-page-main">
       <div className="trust-wrap">
         <header className="trust-hero">
           <div>
             <p className="trust-eyebrow">{LEGAL_ENTITY_NAME} ENTERPRISE TRUST CENTER</p>
-            <h1>Trust evidence for organizations that require security, accountability, and executive assurance.</h1>
+            <h1>Clear assurance boundaries for security, privacy, procurement, and responsible technology.</h1>
             <p className="trust-lead">
-              Review {LEGAL_ENTITY_NAME} security principles, privacy practices, responsible AI controls, framework alignment, procurement pathways, verified credentials, and published policies for services, software, applications, and professional training.
+              Review {LEGAL_ENTITY_NAME} published security and privacy information, responsible AI principles, framework mapping, procurement pathways, credentials, and current status boundaries for services, software, and professional learning.
             </p>
             <div className="trust-hero-actions">
               <a href={`mailto:info@obserrallc.com?subject=${legalEntityMailName}%20Enterprise%20Trust%20Review`}>Start a trust review</a>
@@ -115,21 +118,23 @@ export default function TrustCenterPage() {
           </div>
           <aside className="trust-status-panel" aria-label="Trust Center status summary">
             <span>TRUST CENTER STATUS</span>
-            <strong>Published and operational</strong>
+            <strong>Public disclosures available</strong>
             <dl>
-              <div><dt>Security model</dt><dd>Secure by design</dd></div>
-              <div><dt>AI posture</dt><dd>Governed use</dd></div>
-              <div><dt>Policy access</dt><dd>Public</dd></div>
-              <div><dt>Review path</dt><dd>Enterprise support</dd></div>
+              <div><dt>Cybersecurity Maturity Model Certification (CMMC) Level 2</dt><dd>Not assessed</dd></div>
+              <div><dt>Human determinations</dt><dd>Pending</dd></div>
+              <div><dt>Controlled unclassified information (CUI) authorization</dt><dd>Not granted</dd></div>
+              <div><dt>Florida Department of Agriculture and Consumer Services (FDACS) authorization</dt><dd>Not granted</dd></div>
             </dl>
           </aside>
         </header>
 
+        <EnterpriseProofBand />
+
         <section className="trust-assurance" aria-label={`${LEGAL_ENTITY_NAME} assurance principles`}>
-          <article><strong>Secure by design</strong><span>Security, least privilege, governed access, auditability, resilience, and accountable delivery are built into the operating model.</span></article>
-          <article><strong>Privacy and minimization</strong><span>Information is collected, used, retained, and disclosed only for legitimate service, security, billing, support, and legal purposes.</span></article>
-          <article><strong>Responsible AI</strong><span>AI use is risk based, governed, subject to human oversight, and constrained by data handling, permissions, and accountability requirements.</span></article>
-          <article><strong>Transparent reporting</strong><span>Customers and researchers have defined paths for incidents, vulnerabilities, privacy requests, procurement questions, and architecture review.</span></article>
+          <article><strong>Security engineering</strong><span>Design objectives include least privilege, governed access, auditability, resilience, secure release controls, and accountable delivery.</span></article>
+          <article><strong>Privacy and minimization</strong><span>Published policy limits information use to legitimate service, security, billing, support, and legal purposes, subject to the applicable service boundary.</span></article>
+          <article><strong>Responsible AI</strong><span>Published principles call for risk-based governance, human oversight, data-use constraints, permissions, accountability, and review.</span></article>
+          <article><strong>Truthful assurance</strong><span>Alignment and engineering evidence are not certification, independent attestation, regulatory approval, or authorization to process CUI.</span></article>
         </section>
 
         <section className="trust-frameworks">
@@ -152,7 +157,7 @@ export default function TrustCenterPage() {
         <section className="trust-architecture">
           <div className="trust-section-heading">
             <p className="trust-eyebrow">SECURITY ARCHITECTURE</p>
-            <h2>Core safeguards for enterprise software, advisory delivery, intelligence, and training.</h2>
+            <h2>Security objectives used to guide software, advisory delivery, intelligence, and learning systems.</h2>
           </div>
           <div className="trust-architecture-grid">
             {architecture.map(([title, description], index) => (
@@ -230,6 +235,8 @@ export default function TrustCenterPage() {
         </section>
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-    </main>
+      </main>
+      <EnterpriseFooter />
+    </>
   );
 }

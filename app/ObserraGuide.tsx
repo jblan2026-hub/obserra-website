@@ -36,21 +36,21 @@ function pageContext(pathname: string): PageContext {
     return {
       label: "Product Advisor",
       welcome: `I can help you evaluate ${LEGAL_ENTITY_NAME} applications, compare use cases, request a product briefing, or identify the right solution for your organization.`,
-      prompts: ["Recommend an application", "Show EIOS", "Request a product demo", "Discuss enterprise pricing"],
+      prompts: ["Recommend an application", "Show Obserra EIOS", "Request a product demo", "Discuss enterprise pricing"],
     };
   }
   if (pathname.startsWith("/eios")) {
     return {
-      label: "EIOS Advisor",
-      welcome: "I can explain EIOS capabilities, guide you through the product views, or help arrange an executive platform briefing.",
-      prompts: ["What is EIOS?", "Show product views", "Explain the business value", "Request an EIOS briefing"],
+      label: "Obserra EIOS Advisor",
+      welcome: "I can explain the Obserra Enterprise Intelligence Operating System (EIOS), guide you through the product views, or help arrange an executive platform briefing.",
+      prompts: ["What is Obserra EIOS?", "Show product views", "Explain the business value", "Request an Obserra EIOS briefing"],
     };
   }
   if (pathname.startsWith("/services") || pathname.startsWith("/protection-intelligence")) {
     return {
       label: "Engagement Advisor",
       welcome: "I can help identify the right cybersecurity, protection, intelligence, governance, or technology engagement for your priority.",
-      prompts: ["Cybersecurity advisory", "Executive protection", "AI governance", "Request a consultation"],
+      prompts: ["Cybersecurity advisory", "Executive protection", "Artificial intelligence governance", "Request a consultation"],
     };
   }
   if (pathname.startsWith("/about")) {
@@ -69,7 +69,7 @@ function pageContext(pathname: string): PageContext {
   }
   return {
     label: "Executive Intelligence Advisor",
-    welcome: `I can help you discover ${LEGAL_ENTITY_NAME} applications, professional services, Academy training, EIOS capabilities, and the right next step for your organization.`,
+    welcome: `I can help you discover ${LEGAL_ENTITY_NAME} applications and services, Obserra Academy training, Obserra EIOS capabilities, and the right next step for your organization.`,
     prompts: ["Explore applications", "Find professional training", "Review services", "Speak with an advisor"],
   };
 }
@@ -80,9 +80,9 @@ function response(question: string, pathname: string): Message {
   if (/\beios\b|enterprise intelligence|situation room|decision intelligence|business value|product view/.test(input)) {
     return {
       from: "guide",
-      text: "Obserra EIOS is a governed enterprise intelligence and execution environment. It connects risk context, evidence, policy, approvals, actions, and verified outcomes so leaders can make faster, defensible decisions.",
+      text: "Obserra Enterprise Intelligence Operating System (EIOS) is a governed enterprise intelligence and execution environment. It connects risk context, evidence, policy, approvals, actions, and verified outcomes to support defensible leadership decisions.",
       actions: [
-        { href: "/eios", label: "Explore EIOS" },
+        { href: "/eios", label: "Explore Obserra EIOS" },
         { href: "/contact?interest=eios", label: "Request a briefing" },
       ],
     };
@@ -91,7 +91,7 @@ function response(question: string, pathname: string): Message {
   if (/app|application|software|product|demo|pricing/.test(input)) {
     return {
       from: "guide",
-      text: `${LEGAL_ENTITY_NAME} applications support cybersecurity, AI governance, cyber risk, control evidence, vulnerability prioritization, executive exposure, and enterprise intelligence. Product availability is stated clearly on each commercial product page.`,
+      text: `${LEGAL_ENTITY_NAME} applications support cybersecurity, artificial intelligence governance, cyber risk, control evidence, vulnerability prioritization, executive exposure, and enterprise intelligence. Product availability is stated clearly on each commercial product page.`,
       actions: [
         { href: "/apps", label: "Browse applications" },
         { href: "/contact?interest=applications", label: "Request product guidance" },
@@ -102,7 +102,7 @@ function response(question: string, pathname: string): Message {
   if (/course|academy|training|learn|recommend/.test(input)) {
     return {
       from: "guide",
-      text: "Obserra Academy offers account-based, self-paced professional training across cybersecurity, protection, intelligence, leadership, AI, and secure technology. Course pages show the level, duration, outcomes, and price before enrollment.",
+      text: "Obserra Academy offers account-based, self-paced professional training across cybersecurity, protection, intelligence, leadership, artificial intelligence, and secure technology. Course pages show the level, duration, outcomes, and price before enrollment.",
       actions: [
         { href: "/academy#courses", label: "Browse courses" },
         { href: "/contact?interest=enterprise-training", label: "Discuss team training" },
@@ -140,7 +140,7 @@ function response(question: string, pathname: string): Message {
   if (/cyber|ciso|incident|risk|governance|identity|grc|ai governance/.test(input)) {
     return {
       from: "guide",
-      text: `${LEGAL_ENTITY_NAME} provides executive cybersecurity advisory, fractional CISO leadership, incident readiness, risk and governance, identity access management, GRC, AI governance, and secure technology consulting.`,
+      text: `${LEGAL_ENTITY_NAME} provides executive cybersecurity advisory, fractional Chief Information Security Officer leadership, incident readiness, governance, risk and compliance, identity and access management, artificial intelligence governance, and secure technology consulting.`,
       actions: [
         { href: "/services", label: "Review services" },
         { href: "/contact?interest=cybersecurity", label: "Discuss your priority" },
@@ -170,7 +170,7 @@ function response(question: string, pathname: string): Message {
   const context = pageContext(pathname);
   return {
     from: "guide",
-    text: `I am currently your ${context.label}. I can guide you to a ${LEGAL_ENTITY_NAME} application, service, Academy course, EIOS briefing, or confidential consultation.`,
+    text: `I am currently your ${context.label}. I can guide you to a ${LEGAL_ENTITY_NAME} application or service, an Obserra Academy course, an Obserra EIOS briefing, or a confidential consultation.`,
     actions: [
       { href: "/apps", label: "Applications" },
       { href: "/services", label: "Services" },

@@ -3,6 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 const config = fs.readFileSync("lib/clerk-runtime-config.ts", "utf8");
+const ownerUat = fs.readFileSync("lib/florida-class-d-owner-uat.ts", "utf8");
 const layout = fs.readFileSync("app/layout.tsx", "utf8");
 const proxy = fs.readFileSync("proxy.ts", "utf8");
 const envExample = fs.readFileSync(".env.example", "utf8");
@@ -13,6 +14,8 @@ test("identity runtime requires an explicit server-side activation control", () 
   assert.match(config, /"runtime_disabled"/);
   assert.match(config, /const ready = runtimeEnabled && reasonCodes\.length === 0/);
   assert.match(config, /runtimeEnabled,/);
+  assert.match(ownerUat, /trueFlag\("OBSERRA_IDENTITY_RUNTIME_ENABLED"\)/);
+  assert.doesNotMatch(ownerUat, /enabled\("OBSERRA_IDENTITY_RUNTIME_ENABLED"\)/);
   assert.match(envExample, /OBSERRA_IDENTITY_RUNTIME_ENABLED=false/);
 });
 

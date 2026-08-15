@@ -1,13 +1,37 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import {
+  academyCommerceLivemode,
+  academyCourseAmountCents,
+  validateAcademyPaidSession,
+} from "../../../../lib/academy-payment";
 import { claimCourseAccess, courseForId } from "../../../../lib/academy";
 import { safeIdentity } from "../../../../lib/identity-runtime";
 import { getStripe } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
 
+const NO_STORE = "private, no-store, max-age=0";
+
 function normalizeEmail(value: string | null | undefined) {
   return value?.trim().toLowerCase() ?? "";
+}
+
+function response(status: number, error: string) {
+  return NextResponse.json({ error }, {
+    status,
+    headers: { "cache-control": NO_STORE, "x-content-type-options": "nosniff" },
+  });
+}
+
+function isSameOrigin(request: Request, requestUrl: URL) {
+  const origin = request.headers.get("origin");
+  if (!origin) return false;
+  try {
+    return new URL(origin).origin === requestUrl.origin;
+  } catch {
+    return false;
+  }
 }
 
 async function authenticatedUserOwnsVerifiedPurchaserEmail(userId: string, purchaserEmail: string) {
@@ -15,87 +39,109 @@ async function authenticatedUserOwnsVerifiedPurchaserEmail(userId: string, purch
   const user = await client.users.getUser(userId);
   const expected = normalizeEmail(purchaserEmail);
   return expected.length > 0 && user.emailAddresses.some((item) => (
-    item.verification?.status === "verified" &&
-    normalizeEmail(item.emailAddress) === expected
+    item.verification?.status === "verified" && normalizeEmail(item.emailAddress) === expected
   ));
 }
 
-export async function GET(request: Request) {
-  const requestUrl = new URL(request.url);
-  const courseId = requestUrl.searchParams.get("course") ?? "";
-  const sessionId = requestUrl.searchParams.get("session_id") ?? "";
-  const course = courseForId(courseId);
+function retryUrl(requestUrl: URL, courseId: string, sessionId: string, enrollment: string) {
+  const target = new URL(`/academy/${courseId}`, requestUrl);
+  target.searchParams.set("enrollment", enrollment);
+  target.searchParams.set("session_id", sessionId);
+  return target;
+}
 
-  if (!course || !sessionId.startsWith("cs_")) {
-    return NextResponse.redirect(new URL("/academy?enrollment=invalid", requestUrl));
+export async function GET() {
+  const result = response(405, "Method not allowed");
+  result.headers.set("allow", "POST");
+  return result;
+}
+
+export async function POST(request: Request) {
+  const requestUrl = new URL(request.url);
+  if (!isSameOrigin(request, requestUrl)) return response(403, "Forbidden");
+
+  const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
+  if (!contentType.startsWith("application/x-www-form-urlencoded") && !contentType.startsWith("multipart/form-data")) {
+    return response(415, "Unsupported media type");
+  }
+
+  const formData = await request.formData().catch(() => null);
+  const courseId = formData?.get("course");
+  const sessionId = formData?.get("session_id");
+  const course = courseForId(typeof courseId === "string" ? courseId : "");
+  if (!course || typeof sessionId !== "string" || !/^cs_(?:live|test)_[A-Za-z0-9_]+$/.test(sessionId)) {
+    return NextResponse.redirect(new URL("/academy?enrollment=invalid", requestUrl), 303);
+  }
+
+  const identity = await safeIdentity();
+  const returnUrl = new URL("/academy/success", requestUrl);
+  returnUrl.searchParams.set("course", course.id);
+  returnUrl.searchParams.set("session_id", sessionId);
+  if (!identity.configured) {
+    return NextResponse.redirect(retryUrl(requestUrl, course.id, sessionId, "identity-configuration-required"), 303);
+  }
+  if (!identity.userId) {
+    const signInUrl = new URL("/sign-in", requestUrl);
+    signInUrl.searchParams.set("redirect_url", returnUrl.toString());
+    return NextResponse.redirect(signInUrl, 303);
+  }
+
+  const livemode = academyCommerceLivemode();
+  const amountCents = academyCourseAmountCents(course.price);
+  if (livemode === null || amountCents === null) {
+    return NextResponse.redirect(retryUrl(requestUrl, course.id, sessionId, "verification-unavailable"), 303);
   }
 
   try {
     const session = await getStripe().checkout.sessions.retrieve(sessionId);
-    const validPayment =
-      session.mode === "payment" &&
-      session.status === "complete" &&
-      session.payment_status === "paid" &&
-      session.metadata?.courseId === courseId;
-
-    if (!validPayment) {
-      return NextResponse.redirect(new URL(`/academy/${courseId}?enrollment=verification-failed`, requestUrl));
+    const validation = validateAcademyPaidSession(session, { courseId: course.id, amountCents, livemode });
+    if (!validation.valid) {
+      const status = validation.reason === "payment-expired"
+        ? "payment-expired"
+        : validation.reason === "payment-pending"
+          ? "payment-pending"
+          : "verification-failed";
+      console.warn("academy paid access validation rejected", {
+        courseId: course.id,
+        sessionId: session.id,
+        reason: validation.reason,
+      });
+      return NextResponse.redirect(retryUrl(requestUrl, course.id, session.id, status), 303);
     }
 
-    const identity = await safeIdentity();
-    if (!identity.configured) {
-      const pendingUrl = new URL(`/academy/${courseId}`, requestUrl);
-      pendingUrl.searchParams.set("enrollment", "paid-pending-account");
-      pendingUrl.searchParams.set("session_id", sessionId);
-      return NextResponse.redirect(pendingUrl);
+    let authorizedClaim = validation.learnerId === identity.userId;
+    const purchaserEmail = session.customer_details?.email ?? session.customer_email ?? undefined;
+    if (!authorizedClaim && validation.identityMode === "guest-email" && !validation.learnerId) {
+      authorizedClaim = await authenticatedUserOwnsVerifiedPurchaserEmail(identity.userId, purchaserEmail ?? "");
     }
-
-    if (!identity.userId) {
-      const signInUrl = new URL("/sign-in", requestUrl);
-      signInUrl.searchParams.set("redirect_url", requestUrl.toString());
-      return NextResponse.redirect(signInUrl);
-    }
-
-    const sessionUserId = session.metadata?.clerkUserId;
-    const identityMode = session.metadata?.identityMode;
-    let authorizedClaim = sessionUserId === identity.userId;
-
-    if (!authorizedClaim && identityMode === "guest-email" && !sessionUserId) {
-      const purchaserEmail = session.customer_details?.email ?? session.customer_email;
-      authorizedClaim = await authenticatedUserOwnsVerifiedPurchaserEmail(
-        identity.userId,
-        purchaserEmail ?? "",
-      );
-    }
-
     if (!authorizedClaim) {
       console.warn("academy deferred claim rejected", {
-        courseId,
+        courseId: course.id,
         sessionId: session.id,
-        identityMode,
+        identityMode: validation.identityMode,
         reason: "verified-authenticated-account-does-not-match-purchaser",
       });
-      return NextResponse.redirect(new URL(`/academy/${courseId}?enrollment=claim-email-mismatch`, requestUrl));
+      return NextResponse.redirect(retryUrl(requestUrl, course.id, session.id, "claim-email-mismatch"), 303);
     }
 
-    const purchaserEmail = session.customer_details?.email ?? session.customer_email ?? undefined;
     await claimCourseAccess({
       userId: identity.userId,
-      courseId,
+      courseId: course.id,
       checkoutSessionId: session.id,
-      purchaserEmail: sessionUserId ? undefined : purchaserEmail,
+      purchaserEmail: validation.learnerId ? undefined : purchaserEmail,
     });
     console.info("academy paid enrollment confirmed", {
-      courseId,
+      courseId: course.id,
       sessionId: session.id,
-      identityMode,
-      fulfillmentMode: sessionUserId ? "authenticated-checkout" : "verified-email-claim",
+      identityMode: validation.identityMode,
+      fulfillmentMode: validation.learnerId ? "authenticated-checkout" : "verified-email-claim",
     });
-    return NextResponse.redirect(new URL(`/academy/learn/${courseId}?enrollment=confirmed`, requestUrl));
+    return NextResponse.redirect(new URL(`/academy/learn/${course.id}?enrollment=confirmed`, requestUrl), 303);
   } catch (error) {
-    console.error("academy enrollment redemption failed", {
+    console.error("academy enrollment recovery deferred", {
+      courseId: course.id,
       error: error instanceof Error ? error.name : "unknown",
     });
-    return NextResponse.redirect(new URL(`/academy/${courseId}?enrollment=verification-unavailable`, requestUrl));
+    return NextResponse.redirect(retryUrl(requestUrl, course.id, sessionId, "payment-processing"), 303);
   }
 }

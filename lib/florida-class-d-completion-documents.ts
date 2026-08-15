@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
 import { FloridaClassDExamError } from "./florida-class-d-exam";
+import { floridaClassDSupabaseServerConfigAuthorized } from "./florida-class-d-supabase-config";
 
 const REQUIRED_BUCKET = "fdacs-class-d-completion-documents";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -51,7 +52,7 @@ function config() {
   const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
   const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
   const bucket = process.env.OBSERRA_FDACS_DOCUMENTS_BUCKET?.trim() || "";
-  if (!key || !url.startsWith("https://") || bucket !== REQUIRED_BUCKET) {
+  if (!floridaClassDSupabaseServerConfigAuthorized(url, key) || bucket !== REQUIRED_BUCKET) {
     throw new FloridaClassDExamError("Completion document service is not configured.", 503, "FDACS_COMPLETION_DOCUMENTS_NOT_CONFIGURED");
   }
   return { key, url, bucket };

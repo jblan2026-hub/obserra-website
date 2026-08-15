@@ -83,10 +83,10 @@ test("Academy catalog exposes discovery and secure enrollment signals", async ()
   assert.match(html, /Certificate of Training/i, "Certificate disclosure is missing");
 });
 
-test("Academy checkout rejects an invalid course without server failure", async () => {
+test("Academy checkout rejects retired GET mutations without server failure", async () => {
   const response = await fetchWithTimeout("/api/academy/checkout?course=invalid-smoke-course");
-  assert.ok(response.status >= 300 && response.status < 400, `Unexpected HTTP ${response.status}`);
-  assert.match(response.headers.get("location") || "", /\/academy\?enrollment=not-ready/, "Unexpected invalid-course redirect");
+  assert.equal(response.status, 405, `Unexpected HTTP ${response.status}`);
+  assert.equal(response.headers.get("allow"), "POST", "Checkout must advertise POST as the only supported mutation method");
 });
 
 test("unknown paths use the branded not-found experience", async () => {

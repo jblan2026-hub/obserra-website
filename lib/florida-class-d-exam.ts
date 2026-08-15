@@ -1,6 +1,7 @@
 import "server-only";
 
 import { FloridaClassDMakeupError } from "./florida-class-d-makeup";
+import { floridaClassDSupabaseServerConfigAuthorized } from "./florida-class-d-supabase-config";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -62,7 +63,7 @@ export function floridaClassDExamEnabled() {
 function config() {
   const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
   const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
-  if (!key || !url.startsWith("https://")) throw new FloridaClassDExamError("Final examination service is not configured.", 503, "FDACS_EXAM_NOT_CONFIGURED");
+  if (!floridaClassDSupabaseServerConfigAuthorized(url, key)) throw new FloridaClassDExamError("Final examination service is not configured.", 503, "FDACS_EXAM_NOT_CONFIGURED");
   return { key, url };
 }
 

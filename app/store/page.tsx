@@ -21,7 +21,7 @@ const categories = [
   {
     eyebrow: "ACADEMY",
     title: "Professional courses and certifications",
-    copy: "Enroll in cybersecurity, leadership, governance, intelligence, and executive education through the Obserra Academy.",
+    copy: "Evaluate cybersecurity, leadership, governance, intelligence, and executive education through Obserra Academy.",
     href: "/academy",
     action: "Browse courses",
     status: "Secure checkout",
@@ -29,7 +29,7 @@ const categories = [
   {
     eyebrow: "ADVISORY",
     title: "Executive and cybersecurity advisory",
-    copy: "Request fractional CISO, board advisory, cyber strategy, governance, risk, compliance, and transformation engagements.",
+    copy: "Request fractional Chief Information Security Officer leadership, board advisory, cyber strategy, governance, risk, compliance, and transformation engagements.",
     href: "/services",
     action: "Explore advisory",
     status: "Proposal-based",

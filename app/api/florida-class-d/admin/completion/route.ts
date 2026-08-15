@@ -7,6 +7,7 @@ import {
   listFloridaClassDCompletionCandidates,
   listFloridaClassDLiasQueue,
 } from "../../../../../lib/florida-class-d-completion";
+import { floridaClassDRegulatedExecutionAuthorized } from "../../../../../lib/florida-class-d-production-activation";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,13 @@ const headers = {
 
 function response(body: unknown, status = 200) {
   return NextResponse.json(body, { status, headers });
+}
+
+function executionBlocked() {
+  return response(
+    { error: "Florida Class D regulated completion execution is not authorized in this environment.", code: "FDACS_REGULATED_EXECUTION_NOT_AUTHORIZED" },
+    503,
+  );
 }
 
 function errorResponse(error: unknown) {
@@ -49,6 +57,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!floridaClassDRegulatedExecutionAuthorized()) return executionBlocked();
     const staff = await requireFloridaClassDStaff(["compliance_admin"]);
     const body = await request.json().catch(() => null) as Record<string, unknown> | null;
     if (!body || body.action !== "approve_completion") {

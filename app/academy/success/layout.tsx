@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "../academy-payment.css";
 
 export const metadata: Metadata = {
   title: "Payment Verification",

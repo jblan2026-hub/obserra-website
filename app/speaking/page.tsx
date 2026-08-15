@@ -5,13 +5,13 @@ import "./speaking.css";
 
 export const metadata: Metadata = {
   title: "Speaking | Dr. Jody Blanchard",
-  description: "Book Dr. Jody Blanchard for keynotes, board briefings, panels, podcasts, and executive sessions on cybersecurity, AI governance, enterprise risk, protection, and leadership.",
+  description: "Book Dr. Jody Blanchard for keynotes, board briefings, panels, podcasts, and executive sessions on cybersecurity, artificial intelligence governance, enterprise risk, protection, and leadership.",
   alternates: { canonical: "/speaking" },
 };
 
 const topics = [
   ["Executive Cybersecurity Leadership", "Board and executive decision making, accountability, investment discipline, and resilience."],
-  ["AI Governance and Responsible Innovation", "Secure adoption, human oversight, business value, and enterprise AI accountability."],
+  ["Artificial Intelligence Governance and Responsible Innovation", "Secure adoption, human oversight, business value, and enterprise artificial intelligence accountability."],
   ["Executive Protection and Protective Intelligence", "Cyber, physical, travel, reputational, and human risk around leaders and operations."],
   ["Board Ready Risk Communication", "Translating complex risk into clear choices, ownership, and measurable action."],
   ["Organizational Leadership and Transformation", "Building trust, alignment, and disciplined execution in high consequence environments."],
@@ -19,7 +19,7 @@ const topics = [
 ];
 
 const highlights = [
-  ["2x", "Fortune 500 CISO"], ["21", "Years U.S. Army service"], ["Ph.D.", "Organizational Leadership"],
+  ["2x", "Fortune 500 Chief Information Security Officer"], ["21", "Years U.S. Army service"], ["Ph.D.", "Organizational Leadership"],
   ["2", "Published books"], ["20+", "Credentials and licenses"], ["Global", "Leadership recognition"],
 ];
 
@@ -35,12 +35,12 @@ export default function SpeakingPage() {
         <Image src="/leadership/dr-jody-blanchard-executive.webp" width={1200} height={1500} priority sizes="(max-width: 900px) 88vw, 410px" alt="Dr. Jody Blanchard, executive keynote speaker" />
         <div><span>DR. JODY BLANCHARD, PH.D.</span><strong>EXECUTIVE SPEAKER AND ADVISOR</strong></div>
       </div>
-      <div><p className="speaker-kicker">BOOK DR. JODY BLANCHARD</p><h1>Executive insight for leaders responsible for complex decisions.</h1><p>Dr. Jody Blanchard brings the perspective of a two time Fortune 500 CISO, retired U.S. Army leader, doctoral researcher, published author, and enterprise advisor to keynotes, board sessions, leadership events, panels, podcasts, and private executive briefings.</p><p>Every engagement is tailored to the audience and designed to leave leaders with a clearer way to think, decide, communicate, and act.</p><div className="speaker-actions"><Link href="/contact?interest=speaking" className="speaker-button">Request a speaking engagement</Link><a href="#topics" className="speaker-outline">Explore speaking topics</a></div></div>
+      <div><p className="speaker-kicker">BOOK DR. JODY BLANCHARD</p><h1>Executive insight for leaders responsible for complex decisions.</h1><p>Dr. Jody Blanchard brings the perspective of a two-time Fortune 500 Chief Information Security Officer, retired U.S. Army leader, doctoral researcher, published author, and enterprise advisor to keynotes, board sessions, leadership events, panels, podcasts, and private executive briefings.</p><p>Every engagement is tailored to the audience and designed to leave leaders with a clearer way to think, decide, communicate, and act.</p><div className="speaker-actions"><Link href="/contact?interest=speaking" className="speaker-button">Request a speaking engagement</Link><a href="#topics" className="speaker-outline">Explore speaking topics</a></div></div>
     </section>
 
     <section className="speaker-metrics">{highlights.map(([value,label]) => <article key={label}><strong>{value}</strong><span>{label}</span></article>)}</section>
 
-    <section className="speaker-intro"><div><p className="speaker-kicker">EXECUTIVE SPEAKER PROFILE</p><h2>Credible experience. Business relevant content. Practical outcomes.</h2></div><div><p>Dr. Blanchard speaks to the realities leaders face when cybersecurity, AI, governance, enterprise risk, executive protection, workforce readiness, and organizational performance collide.</p><p>Audiences leave with sharper questions, clearer decision principles, and a stronger understanding of how leadership systems shape security, resilience, trust, and enterprise value.</p></div></section>
+    <section className="speaker-intro"><div><p className="speaker-kicker">EXECUTIVE SPEAKER PROFILE</p><h2>Credible experience. Business relevant content. Practical outcomes.</h2></div><div><p>Dr. Blanchard speaks to the realities leaders face when cybersecurity, artificial intelligence, governance, enterprise risk, executive protection, workforce readiness, and organizational performance collide.</p><p>Audiences leave with sharper questions, clearer decision principles, and a stronger understanding of how leadership systems shape security, resilience, trust, and enterprise value.</p></div></section>
 
     <section className="speaker-topics" id="topics"><p className="speaker-kicker">SIGNATURE TOPICS</p><h2>Built for boards, executives, technology leaders, security teams, and mission focused organizations.</h2><div className="speaker-topic-grid">{topics.map(([title,copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div></section>
 

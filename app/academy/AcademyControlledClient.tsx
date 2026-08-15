@@ -139,7 +139,7 @@ export default function AcademyControlledClient({
 
       <section className="hero">
         <p className="kicker">OBSERRA ACADEMY</p>
-        <h1>Professional, AI native training for high consequence cybersecurity, intelligence, protection, and technology decisions.</h1>
+        <h1>Professional, artificial intelligence (AI) native training for high consequence cybersecurity, intelligence, protection, and technology decisions.</h1>
         <p>
           Choose from {courses.length} currently published courses, complete secure enrollment, and gain access
           to the exact course curriculum, saved progress, assessment workflow, completion record, and the

@@ -111,6 +111,8 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   const [challengeAnswer, setChallengeAnswer] = useState("");
   const [selectedPollOption, setSelectedPollOption] = useState<number | null>(null);
   const [pollSubmitting, setPollSubmitting] = useState(false);
+  const [joinBusy, setJoinBusy] = useState(false);
+  const [mediaBusy, setMediaBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [statusText, setStatusText] = useState("Connecting to regulated live classroom…");
   const joining = useRef(false);
@@ -133,37 +135,47 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   }, [liveSessionId]);
 
   const loadMedia = useCallback(async () => {
-    const response = await fetch(`/api/florida-class-d/media?liveSessionId=${encodeURIComponent(liveSessionId)}`, { cache: "no-store" });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Secure live video is unavailable.");
-    const access = payload as MediaAccess;
-    if (!access.joinUrl) throw new Error("Secure live video did not return a join URL.");
-    setMedia(access);
+    setMediaBusy(true);
+    try {
+      const response = await fetch(`/api/florida-class-d/media?liveSessionId=${encodeURIComponent(liveSessionId)}`, { cache: "no-store" });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Secure live video is unavailable.");
+      const access = payload as MediaAccess;
+      if (!access.joinUrl || !access.tokenExpiresAt) throw new Error("Secure live video did not return complete time-bounded access.");
+      setMedia(access);
+      setError(null);
+    } finally {
+      setMediaBusy(false);
+    }
   }, [liveSessionId]);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function join() {
-      if (joining.current) return;
-      joining.current = true;
-      try {
-        const result = await api({ action: "join", liveSessionId, browserInstanceId });
-        if (cancelled) return;
-        setDeviceLeaseId(typeof result.deviceLeaseId === "string" ? result.deviceLeaseId : null);
-        setStatusText("Connected. Attendance, instructional time, and secure live media are active.");
-        await refresh();
-      } catch (joinError) {
-        if (!cancelled) {
-          setError(joinError instanceof Error ? joinError.message : "Unable to join live class.");
-          setStatusText("Live classroom access is locked.");
-        }
-      }
+  const joinClassroom = useCallback(async () => {
+    if (joining.current) return;
+    joining.current = true;
+    setJoinBusy(true);
+    setError(null);
+    setStatusText("Connecting to regulated live classroom…");
+    try {
+      const result = await api({ action: "join", liveSessionId, browserInstanceId });
+      const leaseId = typeof result.deviceLeaseId === "string" ? result.deviceLeaseId : null;
+      if (!leaseId) throw new Error("The live classroom did not return a single-device attendance lease.");
+      setDeviceLeaseId(leaseId);
+      setStatusText("Connected. Attendance, instructional time, and secure live media are active.");
+      await refresh();
+    } catch (joinError) {
+      setDeviceLeaseId(null);
+      setError(joinError instanceof Error ? joinError.message : "Unable to join live class.");
+      setStatusText("Live classroom access is locked. Review the message and retry.");
+    } finally {
+      joining.current = false;
+      setJoinBusy(false);
     }
-    void join();
-    return () => {
-      cancelled = true;
-    };
   }, [browserInstanceId, liveSessionId, refresh]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => void joinClassroom(), 0);
+    return () => window.clearTimeout(timer);
+  }, [joinClassroom]);
 
   useEffect(() => {
     if (!deviceLeaseId) return;
@@ -174,12 +186,26 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   }, [deviceLeaseId, loadMedia]);
 
   useEffect(() => {
+    if (!media?.tokenExpiresAt) return;
+    const refreshExpiringMedia = () => {
+      const expiresAt = Date.parse(media.tokenExpiresAt ?? "");
+      if (!Number.isFinite(expiresAt) || expiresAt - Date.now() > 10 * 60_000) return;
+      void loadMedia().catch((mediaError) => setError(mediaError instanceof Error ? mediaError.message : "Secure live video access could not be renewed."));
+    };
+    const timer = window.setInterval(refreshExpiringMedia, 60_000);
+    return () => window.clearInterval(timer);
+  }, [loadMedia, media?.tokenExpiresAt]);
+
+  useEffect(() => {
     if (!deviceLeaseId) return;
     let cancelled = false;
     const sendHeartbeat = async () => {
       try {
         await api({ action: "heartbeat", deviceLeaseId });
-        if (!cancelled) await refresh();
+        if (!cancelled) {
+          setStatusText("Connected. Attendance, instructional time, and secure live media are active.");
+          await refresh();
+        }
       } catch (heartbeatError) {
         if (!cancelled) setError(heartbeatError instanceof Error ? heartbeatError.message : "Presence heartbeat failed.");
       }
@@ -187,10 +213,15 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
     void sendHeartbeat();
     const heartbeat = window.setInterval(() => void sendHeartbeat(), 60_000);
     const stateRefresh = window.setInterval(() => void refresh().catch(() => undefined), 10_000);
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") void sendHeartbeat();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
       cancelled = true;
       window.clearInterval(heartbeat);
       window.clearInterval(stateRefresh);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [deviceLeaseId, refresh]);
 
@@ -300,7 +331,13 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
         </div>
       </header>
 
-      {error ? <div className="fdacs-live__alert">{error}</div> : null}
+      {error ? <div className="fdacs-live__alert" role="alert">{error}</div> : null}
+      {!deviceLeaseId ? (
+        <div className="fdacs-live__recovery" role="status">
+          <span>Instruction, attendance, and course credit remain locked until the single-device lease succeeds.</span>
+          <button type="button" disabled={joinBusy} onClick={() => void joinClassroom()}>{joinBusy ? "Connecting…" : "Retry secure classroom entry"}</button>
+        </div>
+      ) : null}
 
       <section className="fdacs-live__grid">
         <div className="fdacs-live__stage">
@@ -309,7 +346,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
               <iframe
                 title="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Florida Class D secure live video classroom"
                 src={media.joinUrl}
-                allow="camera; microphone; fullscreen; display-capture; autoplay"
+                allow="camera; microphone; fullscreen; autoplay"
                 referrerPolicy="no-referrer"
               />
             ) : (
@@ -317,6 +354,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
                 <span>SECURE LIVE INSTRUCTOR MEDIA</span>
                 <h2>{session?.lesson_id ?? "Scheduled lesson"}</h2>
                 <p>The encrypted classroom video surface opens only after authenticated enrollment, single-device attendance control, and the live-media gate succeed.</p>
+                {deviceLeaseId ? <button type="button" disabled={mediaBusy} onClick={() => void loadMedia().catch((mediaError) => setError(mediaError instanceof Error ? mediaError.message : "Secure live video failed to load."))}>{mediaBusy ? "Connecting video…" : "Reconnect secure video"}</button> : null}
               </div>
             )}
           </div>
@@ -356,7 +394,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
             {state?.pendingChallenge ? (
               <form onSubmit={submitChallenge} className="fdacs-live__form">
                 <p>{state.pendingChallenge.prompt}</p>
-                <input value={challengeAnswer} onChange={(event) => setChallengeAnswer(event.target.value)} placeholder="Your answer" autoComplete="off" />
+                <input aria-label="Presence check answer" value={challengeAnswer} onChange={(event) => setChallengeAnswer(event.target.value)} placeholder="Your answer" autoComplete="off" />
                 <button type="submit">Submit check-in</button>
                 <small>A failed challenge receives one retry opportunity within five minutes before the LMS marks the student absent for review.</small>
               </form>
@@ -393,7 +431,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
 
           <section className="fdacs-live__panel">
             <div className="fdacs-live__panel-head"><h2>Live Q&amp;A</h2><button type="button" onClick={() => void raiseHand()}>Raise hand</button></div>
-            <div className="fdacs-live__feed">
+            <div className="fdacs-live__feed" aria-live="polite" aria-relevant="additions text">
               {(state?.interactions ?? []).map((interaction, index) => (
                 <div key={interaction.id ?? `${interaction.created_at}-${index}`}>
                   <b>{interaction.actor_role === "instructor" ? "Instructor" : "Student"}</b>
@@ -403,7 +441,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
               {!state?.interactions?.length ? <p className="fdacs-live__muted">Questions and instructor responses will appear here.</p> : null}
             </div>
             <form onSubmit={submitQuestion} className="fdacs-live__form fdacs-live__question">
-              <textarea value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Ask the instructor a question" maxLength={4000} />
+              <textarea aria-label="Question for the live instructor" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Ask the instructor a question" maxLength={4000} />
               <button type="submit">Ask question</button>
             </form>
           </section>

@@ -414,8 +414,8 @@ begin
       raise exception 'CMMC evidence machine/human artifact content hash verification failed';
     end if;
     v_expected_manifest :=
-      p_evidence_contract ->> 'machineReadableArtifactSha256' || '  CMMC-SYSTEM-EVIDENCE.json' || chr(10) ||
-      p_evidence_contract ->> 'humanReadableExtractSha256' || '  CMMC-SYSTEM-EVIDENCE.md' || chr(10);
+      (p_evidence_contract ->> 'machineReadableArtifactSha256') || '  CMMC-SYSTEM-EVIDENCE.json' || chr(10) ||
+      (p_evidence_contract ->> 'humanReadableExtractSha256') || '  CMMC-SYSTEM-EVIDENCE.md' || chr(10);
     if left(
          convert_from(decode(v_manifest_file ->> 'content', 'base64'), 'UTF8'),
          char_length(v_expected_manifest)

@@ -1,29 +1,29 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import HomeHeader from "./HomeHeader";
 import { ButtonLink, KpiCard, StatusBadge } from "./components/ui/ObserraUI";
+import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "./components/enterprise/EnterpriseChrome";
 import { LEGAL_ENTITY_NAME } from "../lib/legal-identity";
 import "./executive-mission-control.css";
 import "./executive-mission-control-polish.css";
 
 export const metadata: Metadata = {
-  title: `${LEGAL_ENTITY_NAME} | Executive Intelligence for High-Consequence Organizations`,
+  title: `${LEGAL_ENTITY_NAME} | Cybersecurity, Intelligence and Secure Technology`,
   description:
-    `${LEGAL_ENTITY_NAME} unifies executive advisory, cybersecurity, protective intelligence, enterprise applications, and professional training into one decision-focused operating model.`,
+    `${LEGAL_ENTITY_NAME} provides executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning for regulated and high-consequence organizations.`,
   alternates: { canonical: "/" },
 };
 
 const pathways = [
   ["01", "Executive Advisory", "Board-ready cyber, risk, governance, resilience, and transformation leadership for material enterprise decisions.", "/services", "Explore advisory"],
   ["02", "Protection and Intelligence", "Protective intelligence, executive exposure, travel risk, and discreet support for leaders and high-consequence operations.", "/protection-intelligence", "Explore protection"],
-  ["03", "EIOS and Applications", "Enterprise intelligence, governed workflows, risk context, evidence, and executive decision support in one platform experience.", "/eios", "Explore EIOS"],
-  ["04", "Obserra Academy", "Commercial professional training with secure checkout, account-based access, progress tracking, assessment, and certificates.", "/academy", "Browse training"],
+  ["03", "EIOS and Secure Technology", "Enterprise intelligence, governed workflows, risk context, evidence, and executive decision support in one platform experience.", "/eios", "Explore EIOS"],
+  ["04", "Obserra Academy", "Professional learning pathways for executives, practitioners, teams, and regulated training use cases, subject to the controls for each offering.", "/academy", "Explore learning"],
 ];
 
 const domains = [
   ["CYBER", "Cyber Risk", "Translate technical exposure into business consequence, investment priority, and accountable action."],
-  ["AI", "AI Governance", "Establish policy, inventory, approval, control, evidence, and oversight for enterprise AI use."],
+  ["AI", "Artificial Intelligence Governance", "Establish policy, inventory, approval, control, evidence, and oversight for enterprise artificial intelligence use."],
   ["EXECUTIVE", "Executive Protection", "Connect digital exposure, travel conditions, physical threats, and protective planning."],
   ["RISK", "Organizational Risk", "Correlate operational, regulatory, financial, technology, and people risk across the enterprise."],
   ["BOARD", "Board Intelligence", "Produce concise, defensible reporting focused on material risk, ownership, movement, and decisions."],
@@ -32,9 +32,9 @@ const domains = [
 
 export default function HomePage() {
   return (
-    <main className="mission-home">
-      <HomeHeader />
-
+    <>
+      <EnterpriseHeader section="Executive intelligence" />
+      <main className="mission-home enterprise-page-main">
       <section className="mission-hero">
         <div className="mission-hero__visual">
           <Image src="/brand/visuals/obserra-eios-intelligence-hero.png" alt="Obserra EIOS visualization" fill priority sizes="100vw" />
@@ -42,21 +42,22 @@ export default function HomePage() {
         <div className="mission-hero__copy">
           <p className="obs-eyebrow">EXECUTIVE INTELLIGENCE OPERATING SYSTEM</p>
           <h1>Enterprise intelligence for organizations that cannot afford to be wrong.</h1>
-          <p>{LEGAL_ENTITY_NAME} connects executive judgment, cybersecurity, protective intelligence, governance, secure technology, and professional training so leaders can move from fragmented signals to confident, accountable action.</p>
+          <p>{LEGAL_ENTITY_NAME} connects executive judgment, cybersecurity, protective intelligence, governance, secure technology, and professional learning so leaders can move from fragmented signals to clear, accountable action.</p>
           <div className="mission-hero__actions">
             <ButtonLink href="/contact?interest=enterprise-consultation">Schedule an executive consultation</ButtonLink>
             <ButtonLink href="/eios" variant="secondary">Explore Obserra EIOS</ButtonLink>
           </div>
           <div className="mission-assurance" aria-label={`${LEGAL_ENTITY_NAME} operating assurances`}>
-            <span>Veteran owned</span><span>Executive led</span><span>Secure by design</span><span>Board ready</span>
+            <span>Veteran owned</span><span>Executive led</span><span>Evidence disciplined</span><span>Procurement ready</span>
           </div>
         </div>
 
         <aside className="mission-console" aria-label="Executive Mission Control preview">
           <div className="mission-console__top">
             <div><span>EXECUTIVE MISSION CONTROL</span><strong>Enterprise posture overview</strong></div>
-            <StatusBadge tone="success">Operational</StatusBadge>
+            <StatusBadge tone="neutral">Illustrative preview</StatusBadge>
           </div>
+          <p className="mission-console__disclosure">Sample interface and representative values. This preview is not a live customer environment.</p>
           <div className="mission-kpis">
             <KpiCard label="Enterprise Health" value="87" trend="Improving" status="Strong" statusTone="success"><div className="mission-spark" /></KpiCard>
             <KpiCard label="Cyber Risk" value="28" trend="6 points lower" status="Managed" statusTone="success"><div className="mission-spark" /></KpiCard>
@@ -65,6 +66,8 @@ export default function HomePage() {
           </div>
         </aside>
       </section>
+
+      <EnterpriseProofBand />
 
       <section className="mission-section mission-section--tight">
         <div className="mission-heading">
@@ -117,32 +120,30 @@ export default function HomePage() {
         </article>
         <article>
           <div className="mission-proof__stats">
-            <div><strong>2×</strong><span>Fortune 500 CISO experience</span></div>
+            <div><strong>2×</strong><span>Fortune 500 Chief Information Security Officer experience</span></div>
             <div><strong>21</strong><span>Years of U.S. Army service</span></div>
             <div><strong>3</strong><span>Top Global CISO recognitions</span></div>
-            <div><strong>60</strong><span>Commercial Academy courses</span></div>
+            <div><strong>60</strong><span>Reviewed nonregulated course baseline</span></div>
           </div>
         </article>
       </section>
 
       <section className="mission-section">
         <div className="mission-academy">
-          <div><p className="obs-eyebrow">OBSERRA ACADEMY</p><h2>Build workforce capability for the decisions that matter now.</h2><p>Purchase professional training through secure Stripe checkout, receive account-based course access, save progress, complete assessments, and generate an Obserra Certificate of Training after meeting the published standard.</p><div className="mission-hero__actions"><ButtonLink href="/academy">Browse Academy courses</ButtonLink><ButtonLink href="/academy/enterprise" variant="secondary">Explore enterprise training</ButtonLink></div></div>
-          <div className="mission-academy__steps"><span><b>1</b>Select the right course or learning path</span><span><b>2</b>Sign in and pay securely</span><span><b>3</b>Receive immediate account-based access</span><span><b>4</b>Complete, assess, and certify</span></div>
+          <div><p className="obs-eyebrow">OBSERRA ACADEMY</p><h2>Build workforce capability for the decisions that matter now.</h2><p>Review professional course and enterprise learning options, then confirm the enrollment, delivery, assessment, and completion controls that apply to the selected offering. Regulated programs follow separate eligibility and authorization gates.</p><div className="mission-hero__actions"><ButtonLink href="/academy">Explore Academy courses</ButtonLink><ButtonLink href="/academy/enterprise" variant="secondary">Plan enterprise learning</ButtonLink></div></div>
+          <div className="mission-academy__steps"><span><b>1</b>Define the audience and required capability</span><span><b>2</b>Select an available course or learning path</span><span><b>3</b>Confirm enrollment and delivery requirements</span><span><b>4</b>Measure learning against the published standard</span></div>
         </div>
       </section>
 
       <section className="mission-final">
         <p className="obs-eyebrow">START WITH THE DECISION IN FRONT OF YOU</p>
         <h2>Bring {LEGAL_ENTITY_NAME} into the mission before risk becomes consequence.</h2>
-        <p>Engage for executive advisory, protective intelligence, EIOS, secure applications, or professional training through one confidential enterprise conversation.</p>
-        <div className="mission-hero__actions"><ButtonLink href="/contact?interest=enterprise-consultation">Talk with {LEGAL_ENTITY_NAME}</ButtonLink><ButtonLink href="/apps" variant="secondary">Explore applications</ButtonLink></div>
+        <p>Engage for executive advisory, protective intelligence, EIOS, secure technology, or professional learning through one controlled enterprise conversation.</p>
+        <div className="mission-hero__actions"><ButtonLink href="/contact?interest=enterprise-consultation">Request executive consultation</ButtonLink><ButtonLink href="/trust" variant="secondary">Review the Trust Center</ButtonLink></div>
       </section>
 
-      <footer className="mission-footer">
-        <Link href="/" aria-label={`${LEGAL_ENTITY_NAME} home`}><Image src="/brand/obserra-logo.png" width={190} height={37} alt={LEGAL_ENTITY_NAME} /></Link>
-        <nav aria-label="Footer links"><Link href="/about">Company</Link><Link href="/speaking">Speaking</Link><Link href="/trust">Trust Center</Link><Link href="/academy">Academy</Link><Link href="/contact">Contact</Link></nav>
-      </footer>
-    </main>
+      </main>
+      <EnterpriseFooter />
+    </>
   );
 }

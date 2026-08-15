@@ -106,7 +106,7 @@ export default function AcademyClient() {
 
       <section className="hero">
         <p className="kicker">OBSERRA ACADEMY</p>
-        <h1>Professional, AI native training for high consequence cybersecurity, intelligence, protection, and technology decisions.</h1>
+        <h1>Professional, artificial intelligence (AI) native training for high consequence cybersecurity, intelligence, protection, and technology decisions.</h1>
         <p>Choose one of the 60 published courses, complete secure enrollment, and gain access to the exact course curriculum, saved progress, assessment workflow, completion record, and the Obserrian Academy Tutor. The AI tutor is unlocked only with authorized course access and is grounded in the learner&apos;s current course, lesson, authoritative references, scenarios, and business application.</p>
         <div className="certificate-promise"><strong>Completion standard</strong><span>Complete every lesson and earn 80 percent or higher on the final assessment to receive an Obserra Certificate of Training. The AI tutor supports learning and practice but is paused during the graded final assessment.</span></div>
       </section>

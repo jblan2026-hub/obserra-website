@@ -3,6 +3,7 @@ import {
   floridaClassDIdentityErrorStatus,
   recordFloridaClassDStripeIdentityWebhook,
 } from "../../../../lib/florida-class-d-identity-verification";
+import { readStripeWebhookBody, StripeWebhookBodyError } from "../../../../lib/stripe-webhook-body";
 
 const responseHeaders = {
   "cache-control": "no-store, max-age=0",
@@ -21,9 +22,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await recordFloridaClassDStripeIdentityWebhook(await request.text(), signature);
+    const result = await recordFloridaClassDStripeIdentityWebhook(await readStripeWebhookBody(request), signature);
     return NextResponse.json(result, { headers: responseHeaders });
   } catch (error) {
+    if (error instanceof StripeWebhookBodyError) {
+      return NextResponse.json(
+        { error: error.message, code: "FDACS_IDENTITY_WEBHOOK_PAYLOAD_TOO_LARGE" },
+        { status: error.status, headers: responseHeaders },
+      );
+    }
     const identityError = floridaClassDIdentityErrorStatus(error);
     if (identityError) {
       return NextResponse.json(

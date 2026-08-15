@@ -51,8 +51,9 @@ gate("provider identity is canonical", () => {
 
 gate("course remains fail-closed and coming soon", () => {
   assert.match(courseSource, /status: "coming-soon"/);
-  assert.match(publicPage, /COMING SOON · LMS IN PROGRESS/);
+  assert.match(publicPage, /COMING SOON · LEARNING MANAGEMENT SYSTEM IN PROGRESS/);
   assert.match(publicPage, /Enrollment and payment are not yet enabled/);
+  assert.match(publicPage, /This page is a development preview/);
   assert.doesNotMatch(publicPage, /Buy now|Purchase now|Enroll now|checkout/i);
 });
 
@@ -106,7 +107,8 @@ gate("certification exam is separately controlled", () => {
 
 gate("licensure and approval are not misrepresented", () => {
   assert.match(publicPage, /Completing training does not itself issue a Florida Class D Security Officer license/);
-  assert.match(publicPage, /will not represent this course as state-approved until the applicable approval process is complete/);
+  assert.match(publicPage, /does not claim FDACS approval or production authorization/);
+  assert.match(publicPage, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled until every applicable authorization gate is satisfied/);
 });
 
 gate("regulated LMS lifecycle declares live and administrative controls", () => {

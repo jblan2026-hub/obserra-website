@@ -5,16 +5,16 @@
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 - **System:** `SYS-FDACS-DATABASE` — FDACS isolated student-record PII database
 - **Live project:** `OBSERRA FDACS Student Records Production` (`ggkxgjhsbgbifiqrhavr`, `us-east-1`)
-- **Observed:** `2026-08-14T22:43:09.105533Z`
+- **Observed:** `2026-08-15T13:36:54Z`
 - **State:** `live_hardened_activation_pending`
 - **Production runtime authorized:** `false`
-- **Evidence schema:** `docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.schema.json` (SHA-256 `25bedfad1ce177a488a83ec8ff6cf6307d2f24766b5c6961319844608da00a8f`)
+- **Evidence schema:** `docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.schema.json` (SHA-256 `8ee2d32ebd9b4697e9c58283167b0cea26ef2b866839b9ba49792fa2ed28743a`)
 
 ## Live result
 
-9 forward migrations are live. The isolated project contains 64 FDACS tables, 0 non-FDACS tables, 64 explicit restrictive browser-deny policies, 0 browser table privileges, 0 browser execute privileges across 114 FDACS routines, and 0 FDACS tables without forced RLS.
+9 forward FDACS migrations are live. The isolated project contains 64 FDACS tables, 2 governed CMMC evidence tables, 0 unauthorized non-FDACS tables, 64 explicit restrictive browser-deny policies, 0 browser table privileges, 0 browser execute privileges across 114 FDACS routines, and 0 FDACS tables without forced RLS.
 
-Supabase security advisor findings: 0. Unindexed foreign-key findings: 0. Remaining performance observations are informational: 102 unused-index notices on the empty/pre-production workload and 1 Auth allocation notice.
+Supabase security advisor findings: 2, both INFO-only notices for deliberate forced-RLS, no-policy, RPC-only CMMC archive tables. Error or warning findings: 0. Unindexed foreign-key findings: 0. Remaining performance observations are informational: 107 unused-index notices on the empty/pre-production workload and 1 Auth allocation notice.
 
 ## Exact-release owner UAT boundary
 
@@ -34,8 +34,8 @@ Transactional live negative tests passed and were rolled back: expiry beyond 14 
 | Check | Technical state | Result |
 | --- | --- | --- |
 | `FDACS-DB-SOURCE-GATE` | `passed` | The isolated retention, archive, identity/attendance, investigator export, CMMC binding, and chain-verifier source contract is published at exact GitHub merge commit 2dde838ee176e6f450abeca2daad96ab377ed931 and the fail-closed source gate passed against that revision. |
-| `FDACS-DB-LIVE-MIGRATIONS` | `passed` | Nine forward hardening migrations are live in the isolated project; the provider ledger contains 38 total FDACS migrations and ends with provider version 20260814223854. |
-| `FDACS-DB-LIVE-ACCESS-BOUNDARY` | `passed` | Zero browser table privileges, zero browser execute privileges across 114 FDACS routines, zero non-FDACS tables, all 64 FDACS tables forced-RLS, and 64 explicit restrictive deny policies. |
+| `FDACS-DB-LIVE-MIGRATIONS` | `passed` | Nine forward FDACS hardening migrations are live; the provider ledger contains 38 FDACS migrations plus three governed CMMC evidence-archive migrations, ending with provider version 20260815133241. |
+| `FDACS-DB-LIVE-ACCESS-BOUNDARY` | `passed` | Zero browser table privileges, zero browser execute privileges, all 64 FDACS tables forced-RLS, and 64 explicit restrictive deny policies. The only two non-FDACS public tables are the governed RPC-only CMMC evidence archive and its append-only event chain; zero unauthorized non-FDACS tables are present. |
 | `FDACS-DB-LIVE-FUNCTION-BOUNDARY` | `passed` | Anon and authenticated have zero execute privileges across all FDACS routines. Fifty-five security-definer routines use an empty search path; the 46 legacy routines fixed to public remain protected by zero anon/authenticated CREATE privilege on that schema. |
 | `FDACS-DB-LIVE-CHAIN-VERIFIERS` | `passed` | All five chain verifiers returned valid with zero failures; record-access and investigator-export chains each contain the real preflight event. |
 | `FDACS-DB-LIVE-EXPORT-GENERATION` | `passed` | A real boundary-scoped export was generated and its payload digest independently recomputed and matched. |

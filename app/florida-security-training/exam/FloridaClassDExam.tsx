@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Question = {
   id: string;
@@ -67,6 +67,9 @@ export default function FloridaClassDExam() {
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [monitoringLabel, setMonitoringLabel] = useState("Not started");
+  const [busyAction, setBusyAction] = useState<"start" | "save" | "submit" | null>(null);
+  const errorRef = useRef<HTMLDivElement | null>(null);
+  const questionHeadingRef = useRef<HTMLHeadingElement | null>(null);
 
   const refresh = useCallback(async () => {
     const payload = await examRequest();
@@ -74,6 +77,14 @@ export default function FloridaClassDExam() {
     setSelected(payload.question?.selectedChoiceKey ?? "");
     if (payload.attempt?.monitoring?.status) setMonitoringLabel(payload.attempt.monitoring.status);
   }, []);
+
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
+
+  useEffect(() => {
+    if (state?.question?.id) questionHeadingRef.current?.focus();
+  }, [state?.question?.id]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => void refresh().catch((e) => setError(e instanceof Error ? e.message : "Unable to load examination.")), 0);
@@ -142,6 +153,8 @@ export default function FloridaClassDExam() {
   }, [attempt?.startedAt, now]);
 
   async function start() {
+    if (busyAction) return;
+    setBusyAction("start");
     setError(null);
     try {
       const payload = await examRequest({ action: "start", browserInstanceId: browserInstanceId() });
@@ -150,11 +163,14 @@ export default function FloridaClassDExam() {
       setMonitoringLabel(payload.attempt?.monitoring?.status ?? "active");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to start examination.");
+    } finally {
+      setBusyAction(null);
     }
   }
 
   async function save(direction: "next" | "previous" | "stay") {
-    if (!attempt?.id || !question?.id || !selected || monitoringBlocked) return;
+    if (!attempt?.id || !question?.id || !selected || monitoringBlocked || busyAction) return;
+    setBusyAction("save");
     setError(null);
     try {
       const payload = await examRequest({ action: "answer", attemptId: attempt.id, questionId: question.id, selectedChoiceKey: selected, direction });
@@ -163,12 +179,15 @@ export default function FloridaClassDExam() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to save answer.");
       await refresh().catch(() => undefined);
+    } finally {
+      setBusyAction(null);
     }
   }
 
   async function submit() {
-    if (!attempt?.id || remainingSeconds > 0 || monitoringBlocked) return;
+    if (!attempt?.id || remainingSeconds > 0 || monitoringBlocked || busyAction) return;
     if (!window.confirm("Submit the final examination for scoring? Answers cannot be changed after submission.")) return;
+    setBusyAction("submit");
     setError(null);
     try {
       await examRequest({ action: "submit", attemptId: attempt.id });
@@ -176,6 +195,8 @@ export default function FloridaClassDExam() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to submit examination.");
       await refresh().catch(() => undefined);
+    } finally {
+      setBusyAction(null);
     }
   }
 
@@ -186,13 +207,13 @@ export default function FloridaClassDExam() {
         <div className="fdacs-live__status"><strong>PROTECTED EXAMINATION</strong><small>170 questions · 128 required to pass · minimum 2 hours</small></div>
       </header>
 
-      {error ? <div className="fdacs-live__alert">{error}</div> : null}
+      {error ? <div ref={errorRef} className="fdacs-live__alert" role="alert" tabIndex={-1}>{error}</div> : null}
 
       {!attempt ? (
         <section className="fdacs-live__panel fdacs-exam__start">
           <h2>Final examination eligibility</h2>
           <p>The examination is separate from the 40 instructional hours. Access remains locked unless your identity, enrollment, verified instructional time, and the Division-approved examination-bank controls are satisfied.</p>
-          <button type="button" onClick={() => void start()}>Start final examination</button>
+          <button type="button" disabled={busyAction !== null} onClick={() => void start()}>{busyAction === "start" ? "Starting protected exam…" : "Start final examination"}</button>
         </section>
       ) : null}
 
@@ -205,7 +226,7 @@ export default function FloridaClassDExam() {
             <div><small>MONITORING</small><strong>{monitoringLabel.replaceAll("_", " ").toUpperCase()}</strong></div>
           </section>
           {monitoringBlocked ? (
-            <section className="fdacs-live__panel fdacs-live__alert">
+            <section className="fdacs-live__panel fdacs-live__alert" role="alert" aria-live="assertive">
               <h2>Examination paused for monitoring review</h2>
               <p>Answering and submission are locked. Keep this page open. A school administrator must review the interruption and authorize a controlled resume, or invalidate the attempt with an auditable reason.</p>
               <button type="button" onClick={() => void refresh()}>Check resume status</button>
@@ -213,19 +234,20 @@ export default function FloridaClassDExam() {
           ) : (
             <section className="fdacs-live__panel fdacs-exam__question">
               <small>{question.subjectCode.replaceAll("_", " ").toUpperCase()}</small>
-              <h2>{question.prompt}</h2>
-              <div className="fdacs-exam__choices">
+              <h2 ref={questionHeadingRef} tabIndex={-1}>{question.prompt}</h2>
+              <fieldset className="fdacs-exam__choices" disabled={busyAction !== null}>
+                <legend>Choose one answer for question {attempt.questionNumber ?? question.number}</legend>
                 {Object.entries(question.choices).map(([key, label]) => (
                   <label key={key} className={selected === key ? "is-selected" : ""}>
                     <input type="radio" name="answer" value={key} checked={selected === key} onChange={() => setSelected(key)} />
                     <span><b>{key}</b>{label}</span>
                   </label>
                 ))}
-              </div>
+              </fieldset>
               <div className="fdacs-exam__actions">
-                <button type="button" disabled={!selected || (attempt.questionNumber ?? 1) <= 1} onClick={() => void save("previous")}>Save &amp; previous</button>
-                <button type="button" disabled={!selected || (attempt.questionNumber ?? 1) >= 170} onClick={() => void save("next")}>Save &amp; next</button>
-                <button type="button" disabled={remainingSeconds > 0} onClick={() => void submit()}>Submit examination</button>
+                <button type="button" disabled={busyAction !== null || !selected || (attempt.questionNumber ?? 1) <= 1} onClick={() => void save("previous")}>{busyAction === "save" ? "Saving…" : "Save & previous"}</button>
+                <button type="button" disabled={busyAction !== null || !selected || (attempt.questionNumber ?? 1) >= 170} onClick={() => void save("next")}>{busyAction === "save" ? "Saving…" : "Save & next"}</button>
+                <button type="button" disabled={busyAction !== null || remainingSeconds > 0} onClick={() => void submit()}>{busyAction === "submit" ? "Submitting…" : "Submit examination"}</button>
               </div>
             </section>
           )}

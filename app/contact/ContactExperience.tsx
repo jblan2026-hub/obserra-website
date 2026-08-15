@@ -8,11 +8,12 @@ type InquiryCategory =
   | "Executive protection or urgent travel support"
   | "Protective intelligence"
   | "Cybersecurity advisory"
-  | "Fractional CISO leadership"
+  | "Fractional Chief Information Security Officer leadership"
   | "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC application or product demonstration"
-  | "Obserra EIOS executive briefing"
+  | "Obserra Enterprise Intelligence Operating System (EIOS) executive briefing"
   | "Academy learner support"
   | "Enterprise training"
+  | "Florida Class D training interest"
   | "Speaking or executive briefing"
   | "Strategic partnership or general inquiry";
 
@@ -25,30 +26,31 @@ const categories: InquiryCategory[] = [
   "Executive protection or urgent travel support",
   "Protective intelligence",
   "Cybersecurity advisory",
-  "Fractional CISO leadership",
+  "Fractional Chief Information Security Officer leadership",
   "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC application or product demonstration",
-  "Obserra EIOS executive briefing",
+  "Obserra Enterprise Intelligence Operating System (EIOS) executive briefing",
   "Academy learner support",
   "Enterprise training",
+  "Florida Class D training interest",
   "Speaking or executive briefing",
   "Strategic partnership or general inquiry",
 ];
 
 const interestMap: Record<string, InquiryCategory> = {
   "enterprise-consultation": "Cybersecurity advisory",
+  "enterprise-services": "Cybersecurity advisory",
   "capability-review": "Strategic partnership or general inquiry",
   "application-demo": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC application or product demonstration",
   applications: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC application or product demonstration",
-  eios: "Obserra EIOS executive briefing",
-  "eios-demo": "Obserra EIOS executive briefing",
+  eios: "Obserra Enterprise Intelligence Operating System (EIOS) executive briefing",
+  "eios-demo": "Obserra Enterprise Intelligence Operating System (EIOS) executive briefing",
   protection: "Executive protection or urgent travel support",
   cybersecurity: "Cybersecurity advisory",
   "enterprise-training": "Enterprise training",
+  "florida-class-d-training": "Florida Class D training interest",
   speaking: "Speaking or executive briefing",
   partnership: "Strategic partnership or general inquiry",
 };
-
-const schedulingUrl = "https://calendly.com/obserra/executive-consultation";
 
 function resolveInitialCategory(initialInterest?: string): InquiryCategory {
   if (!initialInterest) return defaultCategory;
@@ -120,25 +122,16 @@ export default function ContactExperience({ initialInterest }: { initialInterest
 
       <div className="contact-experience-grid">
         <article className="contact-card scheduling-card">
-          <h3>Schedule an executive consultation</h3>
-          <p>Reserve time for an initial discussion about cybersecurity, enterprise applications, EIOS, training, or a strategic engagement.</p>
+          <h3>Request an executive consultation</h3>
+          <p>Send the decision, timing, and outcome you need. {LEGAL_ENTITY_NAME} will review the request and return an appropriate scheduling path without asking you to place sensitive information in a public booking service.</p>
           <a
             className="contact-button"
-            href={schedulingUrl}
-            target="_blank"
-            rel="noreferrer"
+            href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`${LEGAL_ENTITY_NAME} Executive Consultation Request`)}`}
             onClick={() => track("contact_schedule_clicked", { source: "contact_page" })}
           >
-            View consultation availability
+            Request consultation scheduling
           </a>
-          <div className="schedule-embed-wrap" aria-label={`${LEGAL_ENTITY_NAME} consultation scheduling`}>
-            <iframe
-              title={`Schedule an ${LEGAL_ENTITY_NAME} executive consultation`}
-              src={schedulingUrl}
-              loading="lazy"
-              referrerPolicy="strict-origin-when-cross-origin"
-            />
-          </div>
+          <p className="secure-note">For urgent protective matters, include a safe callback number and the required response window. Do not send identity documents, operational plans, credentials, or other sensitive attachments by ordinary email.</p>
         </article>
 
         <article className="contact-card inquiry-card">

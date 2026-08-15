@@ -27,7 +27,7 @@ const csp = [
   `connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.credly.com https://cdn.credly.com https://vitals.vercel-insights.com ${clerkIdentitySources}`,
   "media-src 'self' https: blob:",
   "worker-src 'self' blob:",
-  "frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.credly.com https://challenges.cloudflare.com https://*.protect.clerk.com",
+  "frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.credly.com https://challenges.cloudflare.com https://*.protect.clerk.com https://*.daily.co",
   "frame-ancestors 'none'",
   "form-action 'self' https://checkout.stripe.com https://buy.stripe.com",
   "upgrade-insecure-requests"
@@ -40,7 +40,7 @@ const publicSecurityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "off" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), display-capture=(), fullscreen=(self), geolocation=(), payment=(), usb=()" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
@@ -51,6 +51,22 @@ const protectedRouteHeaders = [
   { key: "Pragma", value: "no-cache" },
   { key: "Expires", value: "0" },
   { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+];
+
+const protectedVideoParticipantHeaders = [
+  ...protectedRouteHeaders,
+  {
+    key: "Permissions-Policy",
+    value: 'camera=(self "https://*.daily.co"), microphone=(self "https://*.daily.co"), display-capture=(), fullscreen=(self "https://*.daily.co"), geolocation=(), payment=(), usb=()',
+  },
+];
+
+const protectedVideoInstructorHeaders = [
+  ...protectedRouteHeaders,
+  {
+    key: "Permissions-Policy",
+    value: 'camera=(self "https://*.daily.co"), microphone=(self "https://*.daily.co"), display-capture=(self "https://*.daily.co"), fullscreen=(self "https://*.daily.co"), geolocation=(), payment=(), usb=()',
+  },
 ];
 
 const transactionalRouteHeaders = [
@@ -129,6 +145,18 @@ const nextConfig: NextConfig = {
       {
         source: "/academy/certificate/:path*",
         headers: protectedRouteHeaders,
+      },
+      {
+        source: "/florida-security-training/identity",
+        headers: protectedVideoParticipantHeaders,
+      },
+      {
+        source: "/florida-security-training/live/:path*",
+        headers: protectedVideoParticipantHeaders,
+      },
+      {
+        source: "/florida-security-training/admin/live/:path*",
+        headers: protectedVideoInstructorHeaders,
       },
       {
         source: "/eios/app/:path*",

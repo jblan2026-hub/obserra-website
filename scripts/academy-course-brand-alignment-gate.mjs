@@ -162,8 +162,8 @@ requireTerms("app/academy/[courseId]/page.tsx", [
 ]);
 requireTerms("app/api/academy/checkout/route.ts", [
   "studioCourseForId",
-  "STRIPE_SECRET_KEY",
-  "STRIPE_WEBHOOK_SECRET",
+  "academyCommerceLivemode",
+  "academyCommerceWebhookConfigured",
   "courseId: course.id",
   "checkout.sessions.create",
 ]);

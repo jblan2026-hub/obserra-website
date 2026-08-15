@@ -19,6 +19,7 @@ const websiteHealthPath = "app/api/health/route.ts";
 const productionWorkflowPath = ".github/workflows/production-e2e-operational-gate.yml";
 const contractsPath = "lib/academy-control-contracts.ts";
 const controlPath = "lib/academy-control.ts";
+const paymentPath = "lib/academy-payment.ts";
 const checkoutPath = "app/api/academy/checkout/route.ts";
 const checkoutFormPath = "app/academy/AcademyCheckoutForm.tsx";
 const academyClientPath = "app/academy/AcademyControlledClient.tsx";
@@ -42,6 +43,7 @@ const websiteHealth = read(websiteHealthPath);
 const productionWorkflow = read(productionWorkflowPath);
 const contracts = read(contractsPath);
 const control = read(controlPath);
+const payment = read(paymentPath);
 const checkout = read(checkoutPath);
 const checkoutForm = read(checkoutFormPath);
 const academyClient = read(academyClientPath);
@@ -172,19 +174,26 @@ requireText(academyCoursePagePath, academyCoursePage, "<AcademyCheckoutForm", "c
 forbidText(academyClientPath, academyClient, "/api/academy/checkout?course=", "legacy GET checkout link");
 forbidText(academyCoursePagePath, academyCoursePage, "/api/academy/checkout?course=", "legacy GET checkout link");
 
-// Academy checkout must fail closed without current catalog authorization and Stripe webhook verification.
-requireText(checkoutPath, checkout, "STRIPE_SECRET_KEY", "Stripe secret readiness check");
-requireText(checkoutPath, checkout, "STRIPE_WEBHOOK_SECRET", "Stripe webhook readiness check");
+// Academy checkout must fail closed without a mode-appropriate Stripe secret,
+// a syntactically valid webhook secret, and current catalog authorization.
+requireText(checkoutPath, checkout, "academyCommerceLivemode()", "centralized Stripe mode/readiness check");
+requireText(checkoutPath, checkout, "academyCommerceWebhookConfigured()", "centralized webhook readiness check");
+requireText(paymentPath, payment, "process.env.STRIPE_SECRET_KEY", "server-only Stripe secret inspection");
+requireText(paymentPath, payment, "process.env.STRIPE_WEBHOOK_SECRET", "server-only webhook secret inspection");
+requireText(paymentPath, payment, 'process.env.VERCEL_ENV === "production"', "production live-mode binding");
 requireText(checkoutPath, checkout, 'runtimeCourse.controlPlane !== "operational"', "operational control-plane requirement");
 requireText(checkoutPath, checkout, "!runtimeCourse.control.purchaseEnabled", "purchase authorization requirement");
 requireText(checkoutPath, checkout, "academyStorageHealth", "durable fulfillment readiness check");
 requireText(checkoutPath, checkout, "identity.configured", "configured identity requirement");
 requireText(checkoutPath, checkout, 'response.headers.set("cache-control", NO_STORE)', "no-store commerce response");
 
-// Deferred payment claims must re-fetch the paid Stripe session and match a verified Clerk email address.
+// Deferred payment claims must be POST-only/same-origin, re-fetch and fully
+// validate the paid Stripe session, then match a verified Clerk email address.
+requireText(redeemPath, redeem, "export async function POST(request: Request)", "POST redemption handler");
+requireText(redeemPath, redeem, "export async function GET()", "non-mutating GET handler");
+requireText(redeemPath, redeem, "isSameOrigin(request, requestUrl)", "same-origin redemption check");
 requireText(redeemPath, redeem, "checkout.sessions.retrieve(sessionId)", "Stripe session re-verification");
-requireText(redeemPath, redeem, 'session.payment_status === "paid"', "paid redemption requirement");
-requireText(redeemPath, redeem, 'session.metadata?.courseId === courseId', "course-bound redemption requirement");
+requireText(redeemPath, redeem, "validateAcademyPaidSession(session", "full paid-session contract validation");
 requireText(redeemPath, redeem, 'item.verification?.status === "verified"', "verified Clerk email requirement");
 requireText(redeemPath, redeem, "authenticatedUserOwnsVerifiedPurchaserEmail", "verified purchaser-email ownership check");
 requireText(redeemPath, redeem, "claimCourseAccess", "durable paid checkout claim");
@@ -195,6 +204,7 @@ requireText(webhookPath, webhook, "webhooks.constructEvent", "Stripe signature v
 requireText(webhookPath, webhook, 'event.type === "checkout.session.completed"', "checkout completion event");
 requireText(webhookPath, webhook, 'session.payment_status === "paid"', "paid status check");
 requireText(webhookPath, webhook, 'event.type === "checkout.session.async_payment_succeeded"', "async payment success event");
+requireText(webhookPath, webhook, "validateAcademyPaidSession(session", "full paid-session contract validation");
 requireText(webhookPath, webhook, "recordPaidCheckout", "durable post-payment event recording");
 requireText(webhookPath, webhook, "event.id", "Stripe-event idempotency key");
 

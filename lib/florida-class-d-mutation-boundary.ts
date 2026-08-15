@@ -15,6 +15,18 @@ export type FloridaClassDMutationBoundaryDecision = {
   policy: "not_applicable" | "synthetic_nonproduction_only" | "regulated_execution";
 };
 
+export function floridaClassDMutationOriginAuthorized(
+  requestUrl: string,
+  originHeader: string | null,
+) {
+  if (!originHeader) return false;
+  try {
+    return new URL(originHeader).origin === new URL(requestUrl).origin;
+  } catch {
+    return false;
+  }
+}
+
 function pathMatchesPrefix(pathname: string, prefix: string) {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 }

@@ -46,7 +46,8 @@ test("checkout binds canonical course identity to Stripe session and payment int
 });
 
 test("dynamic Stripe product data uses canonical title and governed runtime price", () => {
-  assert.match(checkout, /unit_amount: Math\.round\(course\.price \* 100\)/);
+  assert.match(checkout, /const amountCents = academyCourseAmountCents\(course\.price\)/);
+  assert.match(checkout, /unit_amount: amountCents/);
   assert.match(checkout, /name: course\.title/);
   assert.match(checkout, /courseVersion,/);
 });

@@ -1,5 +1,10 @@
 import "server-only";
 
+import {
+  floridaClassDServiceRoleKeyAuthorized,
+  floridaClassDSupabaseOriginAuthorized,
+} from "./florida-class-d-supabase-config";
+
 export type FloridaClassDRuntimeReadinessItem = {
   key: string;
   label: string;
@@ -42,7 +47,6 @@ const REGULATED_FEATURE_FLAGS = [
 
 const NONPRODUCTION_ENVIRONMENTS = new Set(["development", "sandbox", "staging", "uat"]);
 const CLASS_DS_LICENSE_KEYS = new Set(["ds_status", "ds_license_number"]);
-const REQUIRED_FDACS_SUPABASE_PROJECT_REF = "ggkxgjhsbgbifiqrhavr";
 
 function value(name: string) {
   return process.env[name]?.trim() || "";
@@ -73,13 +77,12 @@ function item(
 
 function commonProtectedRuntimeItems(): FloridaClassDRuntimeReadinessItem[] {
   const explicitSupabaseUrl = value("OBSERRA_FDACS_SUPABASE_URL");
-  const serviceRolePresent = present("OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY");
+  const serviceRoleKey = value("OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY");
+  const serviceRoleReady = floridaClassDServiceRoleKeyAuthorized(serviceRoleKey);
   const mediaProvider = value("OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER").toLowerCase();
   const documentBucket = value("OBSERRA_FDACS_DOCUMENTS_BUCKET");
-  const expectedDatabaseOrigin = `https://${REQUIRED_FDACS_SUPABASE_PROJECT_REF}.supabase.co`;
   const explicitProjectRef = value("OBSERRA_FDACS_SUPABASE_PROJECT_REF");
-  const fdacsDatabaseExactlyBound = explicitSupabaseUrl === expectedDatabaseOrigin
-    && explicitProjectRef === REQUIRED_FDACS_SUPABASE_PROJECT_REF;
+  const fdacsDatabaseExactlyBound = floridaClassDSupabaseOriginAuthorized(explicitSupabaseUrl, explicitProjectRef);
   const stripeKey = value("STRIPE_SECRET_KEY");
   const stripeIdentityWebhook = value("STRIPE_IDENTITY_WEBHOOK_SECRET");
 
@@ -130,16 +133,16 @@ function commonProtectedRuntimeItems(): FloridaClassDRuntimeReadinessItem[] {
       "supabase_url",
       "Explicit Supabase HTTPS URL configured",
       "database",
-      explicitSupabaseUrl.startsWith("https://"),
-      explicitSupabaseUrl.startsWith("https://") ? "Configured; hostname suppressed." : "Explicit protected runtime URL is missing or not HTTPS.",
+      fdacsDatabaseExactlyBound,
+      fdacsDatabaseExactlyBound ? "Exact isolated project origin configured; hostname suppressed." : "Explicit protected runtime URL does not match the isolated FDACS project.",
       true,
     ),
     item(
       "supabase_service_role",
       "Supabase service-role credential configured",
       "database",
-      serviceRolePresent,
-      serviceRolePresent ? "Configured; value suppressed." : "Missing.",
+      serviceRoleReady,
+      serviceRoleReady ? "Privileged server credential class verified; value suppressed." : "Missing or not a service-role credential.",
       true,
     ),
     item(

@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Brain, Briefcase, Users, Binary, Landmark, BookOpen, Building2, LockKeyhole, Network, Scale, Crosshair, FileCheck2 } from "lucide-react";
 import "../apps/apps.css";
 import "./services.css";
 import { serviceCatalog } from "./serviceCatalog";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 
 export const metadata: Metadata = {
   title: "Enterprise Services | Cybersecurity, Protection, Intelligence, Risk and AI Governance",
   description:
-    "Executive advisory and delivery across cybersecurity, executive protection, protective intelligence, enterprise risk, AI governance, identity, GRC, incident response, forensics, and professional training.",
+    "Executive advisory and scoped delivery across cybersecurity, protection, intelligence, enterprise risk, AI governance, identity, resilience, and secure technology.",
   alternates: { canonical: "/services" },
   keywords: [
     "enterprise cybersecurity services",
@@ -104,24 +104,9 @@ export default function ServicesPage() {
   };
 
   return (
-    <main className="apps-page services-page">
-      <header className="apps-nav">
-        <a href="/" className="apps-brand" aria-label={`${LEGAL_ENTITY_NAME} home`}>
-          <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
-          <span>ENTERPRISE SERVICES</span>
-        </a>
-        <nav aria-label="Services navigation">
-          <a href="/">Home</a>
-          <a href="/protection-intelligence">Protection</a>
-          <a href="/industries">Industries</a>
-          <a href="/eios">EIOS</a>
-          <a href="/academy">Academy</a>
-          <a href="/trust">Trust</a>
-          <a href="/contact">Contact</a>
-          <a href="/contact?interest=enterprise-services" className="apps-nav-cta">Request consultation</a>
-        </nav>
-      </header>
-
+    <>
+      <EnterpriseHeader section="Enterprise services" />
+      <main className="apps-page services-page enterprise-page-main">
       <section className="apps-hero services-hero">
         <div>
           <p className="apps-eyebrow">ENTERPRISE SERVICES</p>
@@ -129,7 +114,7 @@ export default function ServicesPage() {
           <p>
             OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC helps leadership teams assess complex exposure,
             design defensible operating models, strengthen resilience, and execute high-consequence priorities.
-            Engagements are scoped around business outcomes, evidence, accountability, and measurable implementation progress.
+            Engagements are scoped around the decision, business outcome, information boundary, accountable owners, and acceptance evidence.
           </p>
           <div className="apps-actions">
             <a className="apps-button" href="/contact?interest=enterprise-services">Request executive consultation</a>
@@ -139,11 +124,13 @@ export default function ServicesPage() {
         </div>
         <aside>
           <p><ShieldCheck size={16} /> Veteran-led executive advisory and protective intelligence</p>
-          <p><Brain size={16} /> Fortune 500 cybersecurity and enterprise-risk leadership</p>
-          <p><Building2 size={16} /> Structured delivery for regulated and high-consequence environments</p>
+          <p><Brain size={16} /> Fortune 500 Chief Information Security Officer and enterprise-risk leadership</p>
+          <p><Building2 size={16} /> Structured delivery for regulated and high-consequence operating environments</p>
           <p><FileCheck2 size={16} /> Evidence, traceability, and executive-ready reporting</p>
         </aside>
       </section>
+
+      <EnterpriseProofBand />
 
       <section className="services-command-bar" aria-label="Enterprise services operating model">
         <article><strong>01</strong><span>Assess the operating context and material exposure.</span></article>
@@ -212,7 +199,8 @@ export default function ServicesPage() {
       <section className="services-case-study">
         <div className="services-section-heading">
           <p className="apps-eyebrow">CASE-STUDY FRAMEWORK</p>
-          <h2>Future customer outcomes will be documented without compromising confidentiality or inventing unsupported claims.</h2>
+          <h2>Customer work is documented through a controlled, confidentiality-aware evidence model.</h2>
+          <p>No customer relationship, outcome, scale, or performance metric is represented without permission and supporting evidence.</p>
         </div>
         <div className="services-case-grid">
           {caseStudyFramework.map(([title, description]) => (
@@ -234,6 +222,8 @@ export default function ServicesPage() {
       </section>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-    </main>
+      </main>
+      <EnterpriseFooter />
+    </>
   );
 }

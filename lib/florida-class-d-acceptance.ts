@@ -2,6 +2,7 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 import { FloridaClassDExamError } from "./florida-class-d-exam";
+import { floridaClassDSupabaseServerConfigAuthorized } from "./florida-class-d-supabase-config";
 
 export const FLORIDA_CLASS_D_ACCEPTANCE_DOMAINS = [
   "identity_enrollment",
@@ -54,7 +55,7 @@ export type FloridaClassDAcceptanceCheck = {
 function config() {
   const key = process.env.OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
   const url = (process.env.OBSERRA_FDACS_SUPABASE_URL?.trim() || "").replace(/\/$/, "");
-  if (!key || !url.startsWith("https://")) {
+  if (!floridaClassDSupabaseServerConfigAuthorized(url, key)) {
     throw new FloridaClassDExamError("Regulated Class D data service is not configured.", 503, "FDACS_REGULATED_DATA_NOT_CONFIGURED");
   }
   return { key, url };
