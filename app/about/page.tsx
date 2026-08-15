@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 };
 
 const recognition = [
+  ["EC-COUNCIL RECOGNITION", "Certified Ethical Hacker Hall of Fame, 2025", "/recognition/ceh-hall-of-fame-2025-badge.jpg"],
   ["GLOBAL CYBER LEADERSHIP", "Top Global CISO in the World, 2023", "/recognition/top-global-ciso-2023.jpg"],
   ["GLOBAL CYBER LEADERSHIP", "Top Global CISO in the World, 2024", "/recognition/top-global-ciso-2024.jpg"],
   ["GLOBAL CYBER LEADERSHIP", "Top Global CISO in the World, 2025", "/recognition/top-global-ciso-2025.jpg"],
@@ -61,6 +62,7 @@ export default function AboutPage() {
         worksFor: { "@type": "Organization", name: LEGAL_ENTITY_NAME, url: "https://www.obserrallc.com" },
         image: "https://www.obserrallc.com/leadership/dr-jody-blanchard-about.png",
         url: "https://www.obserrallc.com/about",
+        award: "EC-Council Certified Ethical Hacker Hall of Fame 2025",
         hasCredential: [
           { "@type": "EducationalOccupationalCredential", name: "Private Investigator", credentialCategory: "Florida FDACS License", identifier: "C 3600281" },
           { "@type": "EducationalOccupationalCredential", name: "Security Officer", credentialCategory: "Florida FDACS License", identifier: "D 3617216" },
@@ -114,6 +116,25 @@ export default function AboutPage() {
       <section className="recognition">
         <div className="recognition-heading"><p className="about-kicker">RECOGNITION &amp; CREDIBILITY</p><h2>Recognized for cybersecurity leadership and industry impact.</h2><p>Independent recognition reinforces the executive judgment, technical depth, and public leadership brought to {LEGAL_ENTITY_NAME} clients.</p></div>
         <div className="recognition-grid">{recognition.map(([label, award, image], index) => <article key={award}><span>0{index + 1}</span><Image src={image} alt={`${award} recognition badge`} width={420} height={260} sizes="(max-width: 700px) 90vw, 380px" /><p>{label}</p><h3>{award}</h3></article>)}</div>
+        <article className="ceh-hall-of-fame-award" aria-labelledby="ceh-hall-of-fame-title">
+          <div className="ceh-hall-of-fame-award__badge">
+            <Image src="/recognition/ceh-hall-of-fame-2025-badge.jpg" width={223} height={222} alt="Official EC-Council Certified Ethical Hacker Hall of Fame 2025 badge" sizes="(max-width: 700px) 180px, 220px" />
+          </div>
+          <div className="ceh-hall-of-fame-award__copy">
+            <p className="about-kicker">ISSUER-BACKED RECOGNITION</p>
+            <h3 id="ceh-hall-of-fame-title">EC-Council Certified Ethical Hacker Hall of Fame 2025</h3>
+            <p>Presented to Jody Blanchard for outstanding performance and contribution to the field of ethical hacking.</p>
+            <dl>
+              <div><dt>Certificate</dt><dd>HOF-2025-1500089</dd></div>
+              <div><dt>Issue date</dt><dd>July 1, 2025</dd></div>
+            </dl>
+            <a href="https://www.eccouncil.org/ceh-hall-of-fame-2025/" target="_blank" rel="noreferrer">Verify on EC-Council&apos;s official Hall of Fame page</a>
+          </div>
+          <a className="ceh-hall-of-fame-award__certificate" href="https://www.eccouncil.org/ceh-hall-of-fame-2025/" target="_blank" rel="noreferrer" aria-label="Verify Jody Blanchard's 2025 CEH Hall of Fame recognition on EC-Council">
+            <Image src="/recognition/ceh-hall-of-fame-2025-certificate.jpg" width={1750} height={1383} alt="EC-Council CEH Hall of Fame 2025 certificate presented to Jody Blanchard, certificate HOF-2025-1500089" sizes="(max-width: 900px) 92vw, 640px" />
+            <span>Open issuer verification</span>
+          </a>
+        </article>
       </section>
 
       <section className="books">
