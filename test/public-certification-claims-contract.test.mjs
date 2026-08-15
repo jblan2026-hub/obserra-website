@@ -85,10 +85,13 @@ test("public page titles rely on the root legal-name template exactly once", () 
   const rootLayout = read("app/layout.tsx");
   const floridaTraining = read("app/florida-security-training/page.tsx");
   const store = read("app/store/page.tsx");
+  const contact = read("app/contact/page.tsx");
 
   assert.match(rootLayout, /template: `%s \| \$\{LEGAL_ENTITY_NAME\}`/);
   assert.match(floridaTraining, /title: "Florida Class D Security Officer Training"/);
   assert.match(store, /title: "Store"/);
+  assert.match(contact, /title: "Contact"/);
   assert.doesNotMatch(floridaTraining, /title: [^\n]*OBSERRA EXECUTIVE PROTECTION/);
   assert.doesNotMatch(store, /title: [^\n]*LEGAL_ENTITY_NAME/);
+  assert.doesNotMatch(contact, /title: [^\n]*LEGAL_ENTITY_NAME/);
 });

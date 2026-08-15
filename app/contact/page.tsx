@@ -5,7 +5,7 @@ import "./contact.css";
 import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 
 export const metadata: Metadata = {
-  title: `Contact | ${LEGAL_ENTITY_NAME}`,
+  title: "Contact",
   description:
     `Contact ${LEGAL_ENTITY_NAME} for enterprise cybersecurity advisory, executive protection, intelligence, EIOS product briefings, Academy licensing, and scoped implementation planning.`,
   alternates: { canonical: "/contact" },
