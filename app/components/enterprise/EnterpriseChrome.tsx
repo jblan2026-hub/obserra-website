@@ -15,6 +15,7 @@ const primaryNavigation = [
   ["Academy", "/academy"],
   ["Trust Center", "/trust"],
   ["About", "/about"],
+  ["Speaking", "/speaking"],
 ] as const;
 
 export function EnterpriseHeader({ section = "Enterprise" }: { section?: string }) {

@@ -30,6 +30,30 @@ const recognition = [
   ["EXECUTIVE COMMUNITY", "A100 Accelerated Winner, 2026", "/recognition/a100-2026.jpg"],
 ];
 
+const leadershipMedia = [
+  {
+    title: "CNBC Technology Executive Council TEC Talk",
+    summary: "Completed December 12, 2024, on upskilling the workforce in the age of artificial intelligence.",
+    label: "Completed executive panel",
+    image: "/leadership/technology-talks-no-employer.png",
+    alt: "Dr. Jody Blanchard at the CNBC Technology Executive Council TEC Talk on December 12, 2024",
+  },
+  {
+    title: "Cybersecurity ROI: Transforming Security Expenditure into Business Growth in a Time of Economic Uncertainty",
+    summary: "Completed ISE East Summit and Awards fireside discussion on measurable security value.",
+    label: "Completed fireside discussion",
+    image: "/leadership/fireside-chat-neutral.png",
+    alt: "Dr. Jody Blanchard at the ISE East Summit and Awards cybersecurity return on investment fireside chat",
+  },
+  {
+    title: "HMG Strategy Global Leadership Institute Awards, 2025",
+    summary: "Named a 2025 winner for executive leadership in cybersecurity and enterprise risk governance.",
+    label: "Executive recognition",
+    image: "/leadership/global-leadership-award-2025.png",
+    alt: "Dr. Jody Blanchard HMG Strategy Global Leadership Institute Awards 2025 winner recognition",
+  },
+];
+
 const businessReasons = [
   ["Enterprise problems cross organizational boundaries", "Cybersecurity, operational risk, executive exposure, governance, and technology decisions are often managed separately even when the business impact is shared."],
   ["Boards need decision clarity, not additional noise", `${LEGAL_ENTITY_NAME} translates technical, intelligence, regulatory, and operational signals into a defensible executive decision path.`],
@@ -135,6 +159,22 @@ export default function AboutPage() {
             <span>Open issuer verification</span>
           </a>
         </article>
+      </section>
+
+      <section className="leadership-media">
+        <div className="leadership-media-heading">
+          <p className="about-kicker">LEADERSHIP IN PRACTICE</p>
+          <h2>Hall of Fame recognition. Completed engagements. Public leadership.</h2>
+          <p>Selected recognition and completed appearances demonstrate Dr. Jody Blanchard&apos;s contribution to cybersecurity, technology leadership, workforce readiness, and business-focused risk governance.</p>
+        </div>
+        <div className="leadership-media-grid">
+          <article className="hall-of-fame-feature">
+            <Image src="/leadership/ceh-hall-of-fame-2025.png" alt="Dr. Jody Blanchard CEH Hall of Fame 2025 magazine cover" width={680} height={848} sizes="(max-width: 700px) 90vw, 620px" />
+            <div><span>CEH HALL OF FAME · TOP 100</span><h3>CEH Hall of Fame 2025 magazine cover</h3><p>EC-Council recognition for outstanding performance and contribution to ethical hacking.</p></div>
+          </article>
+          {leadershipMedia.map((item) => <article key={item.title} className="leadership-media-card"><Image src={item.image} alt={item.alt} width={720} height={480} sizes="(max-width: 700px) 90vw, 360px" /><div><span>{item.label}</span><h3>{item.title}</h3><p>{item.summary}</p></div></article>)}
+        </div>
+        <div className="about-actions"><Link className="about-outline" href="/speaking">View speaking profile and completed engagements</Link></div>
       </section>
 
       <section className="books">
