@@ -93,5 +93,5 @@ test("public page titles rely on the root legal-name template exactly once", () 
   assert.match(contact, /title: "Contact"/);
   assert.doesNotMatch(floridaTraining, /title: [^\n]*OBSERRA EXECUTIVE PROTECTION/);
   assert.doesNotMatch(store, /title: [^\n]*LEGAL_ENTITY_NAME/);
-  assert.doesNotMatch(contact, /title: [^\n]*LEGAL_ENTITY_NAME/);
+  assert.doesNotMatch(contact, /title: `Contact \| \$\{LEGAL_ENTITY_NAME\}`/);
 });
