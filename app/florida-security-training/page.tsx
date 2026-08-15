@@ -20,27 +20,28 @@ export default function FloridaSecurityTrainingPage() {
     <main className="fl-classd">
       <section className="fl-classd__hero">
         <div className="fl-classd__eyebrow"><ShieldCheck size={18} /> Florida Security Training</div>
+        <span className="fl-classd__status">PREVIEW UAT ONLY · NON-CREDIT · PRODUCTION AUTHORIZATION FALSE</span>
         <span className="fl-classd__status">COMING SOON · LEARNING MANAGEMENT SYSTEM IN PROGRESS</span>
         <h1>{FLORIDA_CLASS_D_COURSE.title}</h1>
-        <p className="fl-classd__lead">A premium regulated-training environment from <strong>{FLORIDA_CLASS_D_COURSE.provider}</strong>, being engineered for live instruction, secure enrollment, verified attendance, student interaction, learning checks, examination controls, training records, and post-course administration.</p>
-        <div className="fl-classd__notice"><LockKeyhole size={20} /><div><strong>Enrollment and payment are not yet enabled.</strong><span>This page is a development preview. The regulated course will remain locked until applicable school, curriculum, examination, operational, and launch gates are satisfied.</span></div></div>
+        <p className="fl-classd__lead">A controlled Preview UAT environment from <strong>{FLORIDA_CLASS_D_COURSE.provider}</strong>, engineered to test live instruction, secure enrollment controls, verified attendance, student interaction, learning checks, examination controls, training records, and post-course administration without awarding course credit.</p>
+        <div className="fl-classd__notice"><LockKeyhole size={20} /><div><strong>Enrollment and payment are not yet enabled.</strong><span>This page is a development preview for non-credit UAT. FDACS provider and course authorization have not been granted. Production instruction, course credit, completion, certificates, and LIAS reporting are disabled. Preview UAT cannot create a student completion or licensing record.</span></div></div>
         <div className="fl-classd__actions"><Link href="/contact?interest=florida-class-d-training">Join the interest list</Link><Link className="secondary" href="/florida-security-training/access">Authorized student course sign-in</Link></div>
       </section>
 
       <section className="fl-classd__metrics" aria-label="Course structure">
-        <article><Clock3 /><strong>40</strong><span>Credited instructional hours</span></article>
-        <article><GraduationCap /><strong>5</strong><span>Eight-hour instructional days</span></article>
+        <article><Clock3 /><strong>40</strong><span>Required instructional hours after authorization</span></article>
+        <article><GraduationCap /><strong>5</strong><span>Planned eight-hour instructional days</span></article>
         <article><Sparkles /><strong>18</strong><span>Required curriculum areas</span></article>
         <article><ShieldCheck /><strong>170</strong><span>Controlled final-exam questions</span></article>
       </section>
 
       <section className="fl-classd__section">
-        <div className="fl-classd__section-heading"><span>LIVE CURRICULUM ARCHITECTURE</span><h2>Four live lessons every day</h2><p>Each day contains four 120-minute live instructional lessons. A 15-minute break follows Lessons 1, 2, and 3. The LMS tracks instructional time, break time, connection time, security-question responses, attendance, and participation separately. Break time is recorded but is never credited toward the required 40 instructional hours. The certification examination is controlled separately from the 40 instructional hours.</p></div>
+        <div className="fl-classd__section-heading"><span>CONTROLLED CURRICULUM ARCHITECTURE</span><h2>Four planned live lessons every authorized training day</h2><p>The controlled design provides four 120-minute live instructional lessons per day, with a 15-minute break after Lessons 1, 2, and 3. During non-credit Preview UAT, the LMS tests separate tracking for instruction, breaks, connection time, security-question responses, attendance, and participation, but awards no instructional credit. Break time is recorded but is never credited toward the required 40 instructional hours. The certification examination is controlled separately from the 40 instructional hours.</p></div>
         <div className="fl-classd__days">{floridaClassDDays.map(({ day, lessons }) => <article key={day}><header><span>DAY {day}</span><strong>8 instruction hours + 45 tracked break minutes</strong></header>{lessons.map((lesson) => <div className="fl-classd__module" key={lesson.id}><div><b>{lesson.id}</b><span><strong>{lesson.title}</strong><small>{lesson.moduleSegments.map((segment) => `${moduleTitle(segment.moduleId)} · ${segment.hours} hr`).join(" | ")}</small></span></div><em>2 hr{lesson.breakAfterMinutes ? " + 15 min break" : ""}</em></div>)}</article>)}</div>
       </section>
 
       <section className="fl-classd__section fl-classd__automation">
-        <div className="fl-classd__section-heading"><span>LIVE REGULATED LEARNING MANAGEMENT SYSTEM (LMS)</span><h2>Instructor-led and interaction rich</h2><p>The live classroom is being built around real-time instructor presence and auditable student participation, not passive video playback.</p></div>
+        <div className="fl-classd__section-heading"><span>PREVIEW REGULATED LEARNING MANAGEMENT SYSTEM (LMS)</span><h2>Instructor-led and interaction rich</h2><p>The non-credit Preview UAT classroom tests real-time instructor presence and auditable student participation rather than passive video playback. Test results do not establish FDACS approval or production authorization.</p></div>
         <div className="fl-classd__metrics" aria-label="Live classroom features">
           <article><UsersRound /><strong>Live</strong><span>Instructor and student presence</span></article>
           <article><MessageSquareText /><strong>Q&amp;A</strong><span>Questions, answers, polls, hand raise</span></article>
@@ -65,7 +66,7 @@ export default function FloridaSecurityTrainingPage() {
         <div className="fl-classd__actions"><Link className="secondary" href="/florida-security-training/access">Open protected student access</Link></div>
       </section>
 
-      <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied.</p></div></section>
+      <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>Preview UAT is non-credit. Completing any test activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. FDACS provider and course authorization have not been granted. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied.</p></div></section>
     </main>
   );
 }

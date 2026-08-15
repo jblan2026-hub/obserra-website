@@ -180,7 +180,7 @@ export const serviceCatalog: ServiceItem[] = [
     detail: "Supports workforce capability in cybersecurity, protection, intelligence, governance, and secure technology through structured training and enterprise programs.",
     icon: "BookOpen",
     outcomes: ["Build role-specific capability linked to operating responsibilities.", "Create measurable cohort completion and learning pathways.", "Improve leadership and workforce readiness for material risks."],
-    deliverables: ["Role-based learning path", "Enterprise cohort delivery", "Executive briefing", "Completion and certificate reporting"],
+    deliverables: ["Role-based learning path", "Enterprise cohort delivery", "Executive briefing", "Course-completion reporting"],
     engagementSteps: ["Define audience, capability gaps, outcomes, and delivery constraints.", "Select or customize curriculum, cohort model, and reporting.", "Deliver training and measure completion, feedback, and next steps."],
     industries: ["All sectors", "Government", "Healthcare", "Technology"],
   },

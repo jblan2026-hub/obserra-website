@@ -150,7 +150,7 @@ export default function AcademyControlledClient({
           <strong>Completion standard</strong>
           <span>
             Complete every lesson and earn 80 percent or higher on the final assessment to receive an Obserra
-            Certificate of Training. The AI tutor supports learning and practice but is paused during the graded
+            Academy Certificate of Course Completion. The AI tutor supports learning and practice but is paused during the graded
             final assessment.
           </span>
         </div>
@@ -166,7 +166,7 @@ export default function AcademyControlledClient({
         <article><span>01</span><h2>Select</h2><p>Compare the published outcomes, duration, level, lesson path, and price.</p></article>
         <article><span>02</span><h2>Enroll securely</h2><p>Complete the approved Stripe enrollment and associate access with your learner identity.</p></article>
         <article><span>03</span><h2>Learn with AI</h2><p>Receive course aware instruction, saved progress, applied scenarios, authoritative sources, and the Obserrian Academy Tutor.</p></article>
-        <article><span>04</span><h2>Complete</h2><p>Complete every lesson, pass the protected assessment, and generate your governed training certificate.</p></article>
+        <article><span>04</span><h2>Complete</h2><p>Complete every lesson, pass the protected assessment, and generate your governed Certificate of Course Completion.</p></article>
       </section>
 
       {featuredCourse ? (
@@ -221,7 +221,7 @@ export default function AcademyControlledClient({
           <div><p className="kicker">COURSE CATALOG</p><h2>Choose from the courses currently published by Obserra Academy.</h2></div>
           <p>
             {courses.length} purchasable courses with published descriptions, stated training hours, applied
-            practice, final assessments, certificates, and course-aware AI tutoring after access is granted.
+            practice, final assessments, course-completion records, and course-aware AI tutoring after access is granted.
           </p>
         </div>
 
@@ -327,10 +327,10 @@ export default function AcademyControlledClient({
 
       <section className="certificate">
         <div>
-          <p className="kicker">COMPLETION RECOGNITION</p><h2>Earn an Obserra Certificate of Training.</h2>
-          <p>Complete every lesson and pass the final assessment with an 80 percent score or higher. Certificates include learner name, course, completion date, training hours, and a unique certificate ID.</p>
+          <p className="kicker">COMPLETION RECOGNITION</p><h2>Earn an Obserra Academy Certificate of Course Completion.</h2>
+          <p>Complete every lesson and pass the final assessment with an 80 percent score or higher. Course-completion certificates include learner name, course, completion date, training hours, and a unique verification ID.</p>
         </div>
-        <p className="fine-print">An Obserra Certificate of Training is a proprietary course completion record. It is not a state license, occupational authorization, accredited academic credit, or third-party professional certification.</p>
+        <p className="fine-print">An Obserra Academy Certificate of Course Completion is a proprietary course-completion record issued by {LEGAL_ENTITY_NAME}. It is not a state license, occupational authorization, accredited academic credit, or third-party professional certification.</p>
       </section>
 
       <section className="academy-purchase-assurance">
@@ -338,9 +338,9 @@ export default function AcademyControlledClient({
         <div>
           <span>Secure Stripe checkout</span><span>Authorized learner access</span><span>Existing entitlement preservation</span>
           <span>Obserrian AI Tutor</span><span>Authoritative course grounding</span><span>Saved progress</span>
-          <span>Assessment-based completion</span><span>Certificate record</span>
+          <span>Assessment-based completion</span><span>Course-completion record</span>
         </div>
-        <p>Questions about enrollment, team licensing, access, or certificates can be directed to <a href="mailto:info@obserrallc.com">info@obserrallc.com</a>.</p>
+        <p>Questions about enrollment, team licensing, access, or course-completion records can be directed to <a href="mailto:info@obserrallc.com">info@obserrallc.com</a>.</p>
       </section>
 
       <footer className="site-footer">

@@ -58,8 +58,8 @@ export const customerSuccessModules: CustomerSuccessModule[] = [
   },
   {
     id: "academy",
-    title: "Learning and certification",
-    description: "Access Academy programs and prepare for future organization-level completion, certification, and continuing-education reporting.",
+    title: "Learning and course completion",
+    description: "Access Academy programs and prepare for future organization-level completion, course-completion records, and continuing-education reporting.",
     href: "/academy",
     action: "Open Academy",
     status: "available",

@@ -80,7 +80,7 @@ test("Academy catalog exposes discovery and secure enrollment signals", async ()
   assert.match(html, /Search courses/i, "Academy search is missing");
   assert.match(html, /Enterprise teams/i, "Enterprise training pathway is missing");
   assert.match(html, /Stripe/i, "Secure checkout assurance is missing");
-  assert.match(html, /Certificate of Training/i, "Certificate disclosure is missing");
+  assert.match(html, /Certificate of Course Completion/i, "Course-completion credential disclosure is missing");
 });
 
 test("Academy checkout rejects retired GET mutations without server failure", async () => {

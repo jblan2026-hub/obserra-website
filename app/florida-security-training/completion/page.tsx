@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 function documentLabel(type: string) {
   if (type === "fdacs_16103") return "FDACS-16103 Certificate of Security Officer Training";
-  if (type === "obserra_course_completion") return "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Course Completion Certificate";
+  if (type === "obserra_course_completion") return "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Supplemental Course Completion Record";
   return "Florida Class D Application Instructions";
 }
 
@@ -27,7 +27,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
       <section className="fl-classd__hero">
         <div className="fl-classd__eyebrow"><ShieldCheck size={18} /> Florida Class D Student Records</div>
         <h1>Completion Documents</h1>
-        <p className="fl-classd__lead">After successful completion and school compliance review, this portal provides the documents made available for your Florida Class D license application record.</p>
+        <p className="fl-classd__lead">Production authorization is false. No course credit, completion document, certificate, or LIAS record can be issued from Preview UAT. This protected portal remains a fail-closed future delivery surface until all required authorization gates are satisfied.</p>
         <div className="fl-classd__notice">
           <FileCheck2 size={20} />
           <div>
@@ -39,7 +39,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
           <FileCheck2 size={20} />
           <div>
             <strong>The official training certificate is FDACS-16103.</strong>
-            <span>It is generated through the school&apos;s LIAS reporting workflow only after successful completion. An OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC-branded certificate may also be provided after the passing examination and completion approval, but it is supplemental and does not replace FDACS-16103.</span>
+            <span>If production is authorized in the future, the official certificate can originate only through the authorized LIAS reporting workflow after successful course completion. A separate OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC Supplemental Course Completion Record may then document the provider&apos;s completion decision, but it can never replace FDACS-16103.</span>
           </div>
         </div>
       </section>
@@ -55,8 +55,8 @@ export default async function FloridaClassDCompletionDocumentsPage() {
       <section className="fl-classd__section">
         <div className="fl-classd__section-heading">
           <span>OFFICIAL FLORIDA TRAINING RECORD</span>
-          <h2>Certificate to include with the Class D application</h2>
-          <p>After you pass the final examination and the school approves successful completion, authorized staff report the completion through LIAS. Download the LIAS-generated Certificate of Security Officer Training when it appears below and retain a copy with your application records.</p>
+          <h2>Official certificate for a future authorized Class D application workflow</h2>
+          <p>No FDACS-16103 is available from Preview UAT. If production is authorized and a student later satisfies every controlled completion requirement, authorized personnel may report that completion through LIAS. Only the resulting LIAS-generated Certificate of Security Officer Training is the official training certificate for the application record.</p>
         </div>
         <div className="fl-classd__automation-grid">
           {official.map((document) => (
@@ -83,8 +83,8 @@ export default async function FloridaClassDCompletionDocumentsPage() {
       <section className="fl-classd__section">
         <div className="fl-classd__section-heading">
           <span>SUPPLEMENTAL RECORDS</span>
-          <h2>School completion and application support</h2>
-          <p>Supplemental OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC records may be generated only after the passing examination and successful completion approval. They may include your verified legal name, course title, 40 instructional hours, completion date, and a unique certificate identifier. These records do not substitute for the official LIAS-generated FDACS-16103.</p>
+          <h2>Provider completion record and application support</h2>
+          <p>A Supplemental Course Completion Record from OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC may be generated only after production authorization, a passing examination, and controlled completion approval. It may include the verified legal name, course title, 40 instructional hours, completion date, and a unique record identifier. It is not a professional certification, state certificate, license, FDACS approval, or substitute for the official LIAS-generated FDACS-16103.</p>
         </div>
         <div className="fl-classd__automation-grid">
           {supplemental.map((document) => (

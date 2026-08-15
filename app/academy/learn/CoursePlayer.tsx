@@ -67,7 +67,7 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
     if (!response.ok || result.score === undefined) return setNotice(result.error ?? "Unable to score the assessment");
     setScore(result.score);
     setCertificateId(result.certificateId);
-    setNotice(result.passed ? "You passed. Your Obserra Certificate of Training is ready." : "You did not reach the 80% completion standard. Review the lessons and try again.");
+    setNotice(result.passed ? "You passed. Your Obserra Academy Certificate of Course Completion is ready." : "You did not reach the 80% completion standard. Review the lessons and try again.");
   }
 
   async function askTutor(questionOverride?: string) {
@@ -292,11 +292,11 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
       </section> : <section className="assessment-stage">
         <p className="learning-kicker">Final assessment</p>
         <h2>Demonstrate your decision readiness.</h2>
-        <p>Answer all 25 questions. You need an 80% score or higher after completing every lesson to receive your Obserra Certificate of Training.</p>
+        <p>Answer all 25 questions. You need an 80% score or higher after completing every lesson to receive your Obserra Academy Certificate of Course Completion.</p>
         <div className="assessment-integrity"><strong>Assessment integrity</strong><span>The Obserrian Tutor is paused during the graded assessment. Return to any lesson for tutoring, explanations, additional examples, or ungraded practice.</span></div>
         <div className="assessment-questions">{assessment.map((question, questionIndex) => <fieldset key={question.question}><legend>{question.question}</legend>{question.options.map((option, optionIndex) => <label key={option}><input type="radio" name={`q-${questionIndex}`} checked={answers[questionIndex] === optionIndex} onChange={() => setAnswers((current) => current.map((answer, index) => index === questionIndex ? optionIndex : answer))} />{option}</label>)}</fieldset>)}</div>
         <button className="complete-lesson" disabled={answers.includes(-1)} onClick={submitAssessment}>Submit final assessment</button>
-        {score !== undefined && <div className={score >= 80 ? "result-pass" : "result-retry"}><strong>{score}%</strong><span>{score >= 80 ? "Completion standard met" : "Completion standard not yet met"}</span>{certificateId && <a href={`/academy/certificate/${course.id}`}>Open your Certificate of Training</a>}</div>}
+        {score !== undefined && <div className={score >= 80 ? "result-pass" : "result-retry"}><strong>{score}%</strong><span>{score >= 80 ? "Completion standard met" : "Completion standard not yet met"}</span>{certificateId && <a href={`/academy/certificate/${course.id}`}>Open your Certificate of Course Completion</a>}</div>}
         {notice && <p className="learning-notice">{notice}</p>}
       </section>}
     </div>

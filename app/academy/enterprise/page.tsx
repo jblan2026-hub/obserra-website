@@ -62,17 +62,17 @@ const learningPaths = [
 const capabilities = [
   ["Curated learning paths", "Courses are assembled around roles, business outcomes, and organizational priorities rather than a generic catalog."],
   ["Cohort delivery", "Launch structured programs for leadership teams, business units, security teams, or cross functional governance groups."],
-  ["Manager visibility", "Track enrollment, progression, completion, assessment results, and certificate records for authorized managers."],
+  ["Manager visibility", "Track enrollment, progression, completion, assessment results, and course-completion records for authorized managers."],
   ["Executive briefings", "Combine self paced learning with facilitated executive sessions, workshops, or decision exercises."],
   ["Custom content", "Adapt learning objectives, examples, scenarios, and implementation guidance to the organization where appropriate."],
-  ["Governed records", "Maintain account based access, completion standards, certificate identifiers, and defensible training records."],
+  ["Governed records", "Maintain account-based access, completion standards, completion-record identifiers, and defensible training records."],
 ];
 
 const editions = [
   {
     name: "Team",
     fit: "Focused teams and small cohorts",
-    includes: ["Curated course bundle", "Central enrollment support", "Completion reporting", "Certificate records"],
+    includes: ["Curated course bundle", "Central enrollment support", "Completion reporting", "Course-completion records"],
   },
   {
     name: "Enterprise",
@@ -188,7 +188,7 @@ export default function AcademyEnterprisePage() {
           <li><b>01</b><span><strong>Discover</strong> Identify roles, capability gaps, desired outcomes, and constraints.</span></li>
           <li><b>02</b><span><strong>Design</strong> Select courses, learning paths, cohorts, facilitation, and reporting.</span></li>
           <li><b>03</b><span><strong>Deliver</strong> Provide secure access, progress tracking, assessments, and support.</span></li>
-          <li><b>04</b><span><strong>Demonstrate</strong> Report completion, assessment results, certificates, and next actions.</span></li>
+          <li><b>04</b><span><strong>Demonstrate</strong> Report course completion, assessment results, completion records, and next actions.</span></li>
         </ol>
       </section>
 
@@ -226,7 +226,7 @@ export default function AcademyEnterprisePage() {
           <h2>Clear standards for access, completion, and records.</h2>
           <p>
             Learner accounts, Stripe supported purchasing where applicable, progress records, assessment thresholds,
-            and unique certificate identifiers support a consistent training experience. Enterprise programs can include
+            and unique completion-record identifiers support a consistent training experience. Enterprise programs can include
             authorized manager reporting and consolidated completion summaries.
           </p>
         </div>

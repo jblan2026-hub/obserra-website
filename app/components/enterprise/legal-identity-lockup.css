@@ -1,0 +1,42 @@
+.ent-header__brand .ent-header__identity {
+  display: grid;
+  gap: 4px;
+  align-content: center;
+  color: inherit;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.ent-header__brand .ent-header__legal-name {
+  padding: 0;
+  border: 0;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-transform: none;
+}
+
+.ent-header__identity small {
+  color: #f2c56d;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ent-footer__legal-name {
+  display: block;
+  margin-top: 14px;
+  color: #f2c56d;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .ent-header__brand .ent-header__identity {
+    display: none;
+  }
+}

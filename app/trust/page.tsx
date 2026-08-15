@@ -121,9 +121,10 @@ export default function TrustCenterPage() {
             <strong>Public disclosures available</strong>
             <dl>
               <div><dt>Cybersecurity Maturity Model Certification (CMMC) Level 2</dt><dd>Not assessed</dd></div>
-              <div><dt>Human determinations</dt><dd>Pending</dd></div>
+              <div><dt>Technical objective results</dt><dd>3,048 not tested</dd></div>
+              <div><dt>Human determinations</dt><dd>3,048 pending. Status: Pending.</dd></div>
               <div><dt>Controlled unclassified information (CUI) authorization</dt><dd>Not granted</dd></div>
-              <div><dt>Florida Department of Agriculture and Consumer Services (FDACS) authorization</dt><dd>Not granted</dd></div>
+              <div><dt>Florida Department of Agriculture and Consumer Services (FDACS) authorization</dt><dd>Not granted. Production authorization false.</dd></div>
             </dl>
           </aside>
         </header>
@@ -134,7 +135,7 @@ export default function TrustCenterPage() {
           <article><strong>Security engineering</strong><span>Design objectives include least privilege, governed access, auditability, resilience, secure release controls, and accountable delivery.</span></article>
           <article><strong>Privacy and minimization</strong><span>Published policy limits information use to legitimate service, security, billing, support, and legal purposes, subject to the applicable service boundary.</span></article>
           <article><strong>Responsible AI</strong><span>Published principles call for risk-based governance, human oversight, data-use constraints, permissions, accountability, and review.</span></article>
-          <article><strong>Truthful assurance</strong><span>Alignment and engineering evidence are not certification, independent attestation, regulatory approval, or authorization to process CUI.</span></article>
+          <article><strong>Truthful assurance</strong><span>All 3,048 human determinations remain pending, which is not itself a technical failure. Current technical objective results remain not tested. Alignment and engineering evidence are not certification, independent attestation, regulatory approval, or authorization to process CUI.</span></article>
         </section>
 
         <section className="trust-frameworks">
