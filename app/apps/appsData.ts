@@ -253,14 +253,14 @@ export const marketplaceApps: MarketplaceApp[] = [
     faq: [{ q: "What is EIOS's current release state?", a: "The reviewed maturity evidence explicitly remains NOT_READY, so Demo and Live are both not verified." }],
   }),
   reviewedProduct({
-    slug: "obserra-sap-uac",
-    name: "Obserra SAP UAC",
+    slug: "obserra-offboarding-orchestrator",
+    name: "Obserra Offboarding Orchestrator",
     status: "Coming Soon",
     category: "Identity",
     features: ["Access request workflow", "Policy and segregation-of-duties review", "Tamper-evident audit evidence"],
     integrations: ["ServiceNow", "SAP Identity Directory / SCIM", "Managed Windows configuration"],
     deployment: ["On-Premises"],
-    value: "ServiceNow-governed SAP user-account creation and access orchestration for managed Windows endpoints.",
+    value: "ServiceNow-governed SAP user-account access orchestration for managed Windows endpoints.",
     focusAreas: ["Access request workflow", "Policy and segregation-of-duties review", "Tamper-evident audit evidence"],
     integrationReview: ["ServiceNow", "SAP Identity Directory / SCIM", "Managed Windows configuration"],
     positioning: optionalEios,
@@ -279,7 +279,7 @@ export const marketplaceApps: MarketplaceApp[] = [
       mode("Outbound tenant agent", "Not verified", "The reviewed source describes outbound HTTPS/OAuth connectivity, but no clean install-to-live customer journey or exact customer connection is verified."),
     ],
     releaseEvidence: {
-      source: "Obserra-SAP-UAC@854247654621a55d5c304568874f03446f46b9b0",
+      source: "Audited product source · 854247654621a55d5c304568874f03446f46b9b0",
       sourceVersion: "Internal package 0.2.0",
       evidenceDate: "2026-08-03",
       summary: "Internal installer, checksum, SBOM, source/JSON, unit-test, and dry-run evidence is present. No approved public download is bound.",
@@ -350,7 +350,6 @@ export const marketplaceApps: MarketplaceApp[] = [
 ];
 
 export const roadmapConcepts: RoadmapConcept[] = [
-  { name: "Offboarding Orchestrator", category: "Operations", status: "Roadmap concept" },
   { name: "Asset Intelligence", category: "Cybersecurity", status: "Roadmap concept" },
   { name: "IT PMO Command Center", category: "Operations", status: "Roadmap concept" },
   { name: "Executive Exposure Monitor", category: "Intelligence", status: "Roadmap concept" },

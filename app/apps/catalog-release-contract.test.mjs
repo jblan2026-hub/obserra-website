@@ -32,7 +32,7 @@ test("the reviewed catalog contains the seven canonical Obserra products", async
     "Obserra Control Intelligence",
     "Obserra EU CRA Governance",
     "Obserra EIOS",
-    "Obserra SAP UAC",
+    "Obserra Offboarding Orchestrator",
     "Obserra Agentic AI Security",
     "Obserra Academy Production Studio",
   ];
@@ -68,10 +68,11 @@ test("roadmap concepts cannot be mistaken for released products", async () => {
   const roadmapStart = data.indexOf("export const roadmapConcepts");
   const roadmapBlock = data.slice(roadmapStart, data.indexOf("\n];", roadmapStart) + 3);
 
-  for (const concept of ["Asset Intelligence", "Cyber Risk Register", "Offboarding Orchestrator"]) {
+  for (const concept of ["Asset Intelligence", "Cyber Risk Register"]) {
     assert.doesNotMatch(productBlock, new RegExp(`name: "${concept}"`));
     assert.match(roadmapBlock, new RegExp(`name: "${concept}"`));
   }
+  assert.equal((roadmapBlock.match(/name:/g) ?? []).length, 14);
   assert.doesNotMatch(roadmapBlock, /slug:|actions:|href:/);
 });
 
@@ -100,16 +101,16 @@ test("product-specific evidence does not overstate operating verification", asyn
   const client = await readFile(join(appsRoot, "AppsMarketplaceClient.tsx"), "utf8");
   const listing = await readFile(join(appsRoot, "page.tsx"), "utf8");
   const detail = await readFile(join(appsRoot, "[slug]", "page.tsx"), "utf8");
-  const sapStart = data.indexOf('slug: "obserra-sap-uac"');
-  const sapEnd = data.indexOf("reviewedProduct({", sapStart);
-  const sap = data.slice(sapStart, sapEnd);
+  const offboardingStart = data.indexOf('slug: "obserra-offboarding-orchestrator"');
+  const offboardingEnd = data.indexOf("reviewedProduct({", offboardingStart);
+  const offboarding = data.slice(offboardingStart, offboardingEnd);
 
   assert.match(data, /Obserra--Crisis-commander-app@85556468f598a4340e59a3d3609fd016c503bcfd/);
   assert.match(data, /Obserra-EU-CRA-governace-app@6fbbc06bd450946c0af5fad51e62153deb44bdf7 · CI run 31894696092/);
-  assert.match(sap, /Demo: state\(\s*"Verified"/);
-  assert.match(sap, /mode\("Local \/ on-prem", "Not verified"/);
-  assert.match(sap, /mode\("Outbound tenant agent", "Not verified"/);
-  assert.doesNotMatch(sap, /mode\("(?:Local \/ on-prem|Outbound tenant agent)", "Verified"/);
+  assert.match(offboarding, /Demo: state\(\s*"Verified"/);
+  assert.match(offboarding, /mode\("Local \/ on-prem", "Not verified"/);
+  assert.match(offboarding, /mode\("Outbound tenant agent", "Not verified"/);
+  assert.doesNotMatch(offboarding, /mode\("(?:Local \/ on-prem|Outbound tenant agent)", "Verified"/);
   assert.match(client, /entry\.actions\.length > 0/);
   assert.match(client, /entry\.actions\.map\(\(action\)/);
   assert.doesNotMatch(`${listing}\n${detail}`, /obserra-eios-intelligence-hero/);
