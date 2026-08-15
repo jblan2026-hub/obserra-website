@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ArrowUpRight, Check, CircleDashed, LockKeyhole, ShieldCheck, Video } from "lucide-react";
 import { getFloridaClassDIdentityVerificationStatus } from "../../../lib/florida-class-d-identity-verification";
 import { listFloridaClassDStudentLiveSessions } from "../../../lib/florida-class-d-live-persistence";
+import { evaluateFloridaClassDStudentAccess } from "../../../lib/florida-class-d-student-access";
 import "../florida-security-training.css";
 
 export const metadata: Metadata = {
@@ -33,6 +34,8 @@ function sessionTime(value: string, timeZone: string) {
 export default async function FloridaClassDControlledAccessPage() {
   const { userId } = await auth();
   if (!userId) redirect(`/sign-in?redirect_url=${encodeURIComponent("/florida-security-training/access")}`);
+  const access = await evaluateFloridaClassDStudentAccess(userId);
+  if (!access.allowed) notFound();
 
   let status: Awaited<ReturnType<typeof getFloridaClassDIdentityVerificationStatus>> | null = null;
   let unavailable = false;
@@ -96,7 +99,6 @@ export default async function FloridaClassDControlledAccessPage() {
           </div>
         )}
         <div className="fl-classd__actions">
-          {!status?.enrollmentId ? <Link href="/florida-security-training/enroll">Begin controlled enrollment</Link> : null}
           {!status?.instructorAttestationRecorded && status?.enrollmentId ? <Link href="/florida-security-training/identity">Complete identity verification</Link> : null}
           <Link className="secondary" href="/florida-security-training">Return to course information</Link>
         </div>

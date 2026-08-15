@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getStripe } from "./stripe";
+import { getInternalOwnerAuthority } from "./auth/authority-repository";
 import { getFloridaClassDOwnerUatInstructorReadiness } from "./florida-class-d-instructor-provisioning";
 import { verifyFloridaClassDMediaProviderConnection } from "./florida-class-d-media";
 import { getFloridaClassDOwnerUatReport } from "./florida-class-d-owner-uat";
@@ -15,7 +16,7 @@ const REQUIRED_STRIPE_IDENTITY_WEBHOOK_EVENTS = [
 ] as const;
 
 type ProviderCheck = {
-  provider: "supabase" | "stripe_identity" | "daily" | "fdacs_instructor";
+  provider: "supabase" | "identity_provider" | "stripe_identity" | "daily" | "fdacs_instructor";
   ready: boolean;
   detail: string;
 };
@@ -45,6 +46,16 @@ async function liveStripeIdentityWebhookReady(origin: string) {
 export async function getFloridaClassDProviderReadiness() {
   const checks: ProviderCheck[] = [];
   const ownerUatReport = getFloridaClassDOwnerUatReport();
+
+  const authority = await getInternalOwnerAuthority();
+  const identityReadiness = authority.protectedReadiness;
+  checks.push({
+    provider: "identity_provider",
+    ready: identityReadiness.ready,
+    detail: identityReadiness.ready
+      ? "Supabase Auth JWT/JWKS, subject, identity link, session, role, and AAL checks are current."
+      : `Supabase Auth protected readiness is fail closed (${identityReadiness.reason}).`,
+  });
 
   try {
     const health = await floridaClassDPersistenceRequest<Record<string, unknown>>(

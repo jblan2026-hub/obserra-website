@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import { notFound, redirect } from "next/navigation";
 import { ExternalLink, FileCheck2, FileDown, ShieldCheck } from "lucide-react";
-import { requireFloridaClassDSignedInUser } from "../../../lib/florida-class-d-auth";
 import { listCompletionDocumentsForStudent } from "../../../lib/florida-class-d-completion-documents";
+import { evaluateFloridaClassDStudentAccess } from "../../../lib/florida-class-d-student-access";
 import "../florida-security-training.css";
 
 export const metadata: Metadata = {
@@ -17,8 +19,11 @@ function documentLabel(type: string) {
 }
 
 export default async function FloridaClassDCompletionDocumentsPage() {
-  const user = await requireFloridaClassDSignedInUser();
-  const documents = await listCompletionDocumentsForStudent(user.userId);
+  const { userId } = await auth();
+  if (!userId) redirect(`/sign-in?redirect_url=${encodeURIComponent("/florida-security-training/completion")}`);
+  const access = await evaluateFloridaClassDStudentAccess(userId);
+  if (!access.allowed) notFound();
+  const documents = await listCompletionDocumentsForStudent(userId);
   const official = documents.filter((document) => document.document_type === "fdacs_16103");
   const supplemental = documents.filter((document) => document.document_type !== "fdacs_16103");
 

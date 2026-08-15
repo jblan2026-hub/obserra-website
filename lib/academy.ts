@@ -122,13 +122,14 @@ async function migrateLegacyCourseState(userId: string, courseId: string, state:
 export async function claimCourseAccess(input: {
   userId: string;
   courseId: string;
+  courseVersion: string;
   checkoutSessionId: string;
   purchaserEmail?: string;
 }) {
   return claimPaidCheckout({
     checkoutSessionId: input.checkoutSessionId,
     courseId: input.courseId,
-    courseVersion: governedCourseVersion(input.courseId),
+    courseVersion: input.courseVersion,
     clerkUserId: input.userId,
     purchaserEmail: input.purchaserEmail,
   });

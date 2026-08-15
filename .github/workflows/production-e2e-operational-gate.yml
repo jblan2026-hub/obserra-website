@@ -137,7 +137,7 @@ jobs:
             .identity == "available" and
             .identityEnvironment == "live" and
             .durableStorage == "available" and
-            .storageSchema == "academy-durable-state-v1" and
+            .storageSchema == "academy-durable-state-v2" and
             .purchaserIdentityHashing == "available" and
             .fulfillment.idempotencyKey == "stripe-event-id" and
             .fulfillment.auditLedger == "durable-supabase"

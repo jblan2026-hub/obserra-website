@@ -22,6 +22,7 @@ const excludedPaths = [
   "/academy/learn",
   "/academy/certificate",
   "/academy/success",
+  "/florida-security-training",
 ];
 
 function pageContext(pathname: string): PageContext {

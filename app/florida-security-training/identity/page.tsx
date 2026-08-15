@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import IdentityVerificationClient from "./IdentityVerificationClient";
+import { evaluateFloridaClassDIdentityStageAccess } from "../../../lib/florida-class-d-student-access";
 import "../florida-security-training.css";
 
 export const metadata: Metadata = {
@@ -15,6 +16,8 @@ export default async function FloridaClassDIdentityVerificationPage() {
   if (!userId) {
     redirect(`/sign-in?redirect_url=${encodeURIComponent("/florida-security-training/identity")}`);
   }
+  const access = await evaluateFloridaClassDIdentityStageAccess(userId);
+  if (!access.allowed) notFound();
 
   return (
     <main className="fl-classd">

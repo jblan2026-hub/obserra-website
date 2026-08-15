@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SignIn } from "@clerk/nextjs";
+import { identityProviderForRequest } from "@/lib/auth/provider-routing";
+import { safeRelativeRedirect } from "@/lib/auth/redirects";
+import { prepareSupabaseAuthRuntime } from "@/lib/auth/runtime-config";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import SupabaseSignInForm from "./SupabaseSignInForm";
 
 export const metadata: Metadata = {
   title: `Sign In | ${LEGAL_ENTITY_NAME} Customer Portal`,
@@ -10,19 +14,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-function safeRedirect(value: string | string[] | undefined) {
-  const candidate = Array.isArray(value) ? value[0] : value;
-  if (!candidate || !candidate.startsWith("/") || candidate.startsWith("//")) return "/portal";
-  return candidate;
-}
-
 export default async function SignInPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
-  const redirectUrl = safeRedirect(params.redirect_url ?? params.redirectUrl);
+  const redirectUrl = safeRelativeRedirect(params.redirect_url ?? params.redirectUrl);
+  const ownership = identityProviderForRequest({ pathname: "/sign-in", redirectTarget: redirectUrl });
+  const supabaseRuntime = prepareSupabaseAuthRuntime();
+  const useSupabase = ownership.provider === "supabase" && supabaseRuntime.runtimeEnabled;
 
   return (
     <main className="auth-shell">
@@ -42,13 +43,33 @@ export default async function SignInPage({
           </div>
         </div>
         <div className="auth-panel">
-          <SignIn
-            routing="path"
-            path="/sign-in"
-            signUpUrl="/sign-up"
-            forceRedirectUrl={redirectUrl}
-            fallbackRedirectUrl={redirectUrl}
-          />
+          {useSupabase ? (
+            supabaseRuntime.ready ? (
+              <SupabaseSignInForm
+                redirectUrl={redirectUrl}
+                runtime={{
+                  ready: supabaseRuntime.ready,
+                  url: supabaseRuntime.url,
+                  projectRef: supabaseRuntime.projectRef,
+                  publishableKey: supabaseRuntime.publishableKey,
+                  production: process.env.VERCEL_ENV === "production",
+                }}
+              />
+            ) : (
+              <div role="alert">
+                <h2>Identity service unavailable</h2>
+                <p>Secure sign-in is not configured. Access remains closed.</p>
+              </div>
+            )
+          ) : (
+            <SignIn
+              routing="path"
+              path="/sign-in"
+              signUpUrl="/sign-up"
+              forceRedirectUrl={redirectUrl}
+              fallbackRedirectUrl={redirectUrl}
+            />
+          )}
         </div>
       </section>
       <p className="auth-note">Authorized access only. Authentication activity may be logged for security, fraud prevention, support, and compliance purposes.</p>

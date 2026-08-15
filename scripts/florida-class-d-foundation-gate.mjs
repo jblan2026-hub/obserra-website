@@ -5,6 +5,10 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf
 
 const courseSource = read("lib/florida-class-d.ts");
 const publicPage = read("app/florida-security-training/page.tsx");
+const governedPublicLink = read("app/florida-security-training/GovernedFloridaClassDLink.tsx");
+const productionActivation = read("lib/florida-class-d-production-activation.ts");
+const protectedCompletionPage = read("app/florida-security-training/completion/page.tsx");
+const completionDocumentService = read("lib/florida-class-d-completion-documents.ts");
 const header = read("app/HomeHeader.tsx");
 
 const failures = [];
@@ -52,9 +56,14 @@ gate("provider identity is canonical", () => {
 gate("course remains fail-closed and coming soon", () => {
   assert.match(courseSource, /status: "coming-soon"/);
   assert.match(publicPage, /COMING SOON · LEARNING MANAGEMENT SYSTEM IN PROGRESS/);
-  assert.match(publicPage, /Enrollment and payment are not yet enabled/);
-  assert.match(publicPage, /This page is a development preview/);
-  assert.doesNotMatch(publicPage, /Buy now|Purchase now|Enroll now|checkout/i);
+  assert.match(publicPage, /Enrollment, payment, and student course access are not open/);
+  assert.match(publicPage, /robots: \{ index: true, follow: true \}/);
+  assert.match(publicPage, /enabled=\{publicLearnerControlsEnabled\}/);
+  assert.match(governedPublicLink, /if \(!enabled\) return null;/);
+  assert.match(governedPublicLink, /return <Link/);
+  assert.doesNotMatch(governedPublicLink, /aria-disabled|data-governed-state|<button|disabled/);
+  assert.match(productionActivation, /floridaClassDProductionActivationAuthorized\(\)[\s\S]*enabled\("OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED"\)/);
+  assert.doesNotMatch(publicPage, /Enrollment is open|Pay now|Enroll now|Buy now|Authorized student course sign-in/i);
 });
 
 gate("Florida Training navigation is present", () => {
@@ -109,6 +118,9 @@ gate("licensure and approval are not misrepresented", () => {
   assert.match(publicPage, /Completing training does not itself issue a Florida Class D Security Officer license/);
   assert.match(publicPage, /does not claim FDACS approval or production authorization/);
   assert.match(publicPage, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled until every applicable authorization gate is satisfied/);
+  assert.match(protectedCompletionPage, /Production authorization is false/);
+  assert.match(protectedCompletionPage, /No course credit, completion document, certificate, or LIAS record can be issued from Preview UAT/);
+  assert.match(completionDocumentService, /does not establish FDACS approval, professional certification, or a Florida Class D Security Officer license/);
 });
 
 gate("regulated LMS lifecycle declares live and administrative controls", () => {

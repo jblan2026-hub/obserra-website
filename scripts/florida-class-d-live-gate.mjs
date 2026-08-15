@@ -17,6 +17,8 @@ const studentUi = read("app/florida-security-training/live/[liveSessionId]/LiveC
 const instructorUi = read("app/florida-security-training/admin/live/[liveSessionId]/InstructorLiveConsole.tsx");
 const course = read("lib/florida-class-d.ts");
 const publicPage = read("app/florida-security-training/page.tsx");
+const governedPublicLink = read("app/florida-security-training/GovernedFloridaClassDLink.tsx");
+const productionActivation = read("lib/florida-class-d-production-activation.ts");
 
 const required = (source, text, message) => {
   if (!source.includes(text)) throw new Error(message);
@@ -121,6 +123,13 @@ required(instructorUi, "Course breaks", "Instructor console must display each st
 required(course, "liveLessonsPerDay: 4", "Course model must define four live lessons per day.");
 required(course, "trackedBreakMinutesPerDay: 45", "Course model must define 45 tracked break minutes per day.");
 required(publicPage, "Break time is recorded but is never credited", "Public preview must accurately disclose tracked break treatment.");
+required(publicPage, "Enrollment, payment, and student course access are not open", "Public preview must disclose the pre-license control state.");
+required(governedPublicLink, "if (!enabled) return null", "Unavailable public learner actions must be omitted instead of rendered as disabled controls.");
+if (/aria-disabled|data-governed-state|<button|disabled/.test(governedPublicLink)) {
+  throw new Error("Unavailable public learner actions may not render disabled controls or placeholders.");
+}
+required(productionActivation, "floridaClassDPublicLearnerControlsEnabled", "Public learner controls must use a governed production authorization function.");
+required(productionActivation, "OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED", "Public learner controls must require a distinct regulated feature flag.");
 required(course, 'status: "coming-soon"', "Live source implementation must not open the course publicly.");
 
 console.log("Florida Class D live instruction gate passed: source supports live teaching, single-device presence, cumulative student time, daily attendance certification, challenges, Q&A, tracked breaks, and fail-closed DS activation.");

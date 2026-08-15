@@ -7,6 +7,15 @@ export type FloridaClassDStudentAccessDecision = {
   reason: "allowed" | "enrollment_required" | "identity_required" | "entitlement_required" | "regulated_service_unavailable";
 };
 
+const IDENTITY_STAGE_ENROLLMENT_STATUSES = new Set([
+  "pending_identity",
+  "pending_entitlement",
+  "enrolled",
+  "in_progress",
+  "instruction_complete",
+  "exam_eligible",
+]);
+
 export async function evaluateFloridaClassDStudentAccess(userId: string): Promise<FloridaClassDStudentAccessDecision> {
   try {
     const status = await getFloridaClassDIdentityVerificationStatus(userId);
@@ -18,6 +27,21 @@ export async function evaluateFloridaClassDStudentAccess(userId: string): Promis
       !status.instructionalAccessGranted ||
       !["enrolled", "in_progress", "instruction_complete", "exam_eligible"].includes(status.enrollmentStatus ?? "")
     ) {
+      return { allowed: false, reason: "entitlement_required" };
+    }
+    return { allowed: true, reason: "allowed" };
+  } catch {
+    return { allowed: false, reason: "regulated_service_unavailable" };
+  }
+}
+
+export async function evaluateFloridaClassDIdentityStageAccess(
+  userId: string,
+): Promise<FloridaClassDStudentAccessDecision> {
+  try {
+    const status = await getFloridaClassDIdentityVerificationStatus(userId);
+    if (!status.enrollmentId) return { allowed: false, reason: "enrollment_required" };
+    if (!IDENTITY_STAGE_ENROLLMENT_STATUSES.has(status.enrollmentStatus ?? "")) {
       return { allowed: false, reason: "entitlement_required" };
     }
     return { allowed: true, reason: "allowed" };

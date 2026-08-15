@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
-import { floridaClassDRequiredAcknowledgments } from "../../../lib/florida-class-d-enrollment-policy";
+import {
+  floridaClassDPreEnrollmentEnabled,
+  floridaClassDRequiredAcknowledgments,
+} from "../../../lib/florida-class-d-enrollment-policy";
 import EnrollmentClient from "./EnrollmentClient";
 import "../florida-security-training.css";
 
@@ -16,6 +19,7 @@ export default async function FloridaClassDEnrollmentPage() {
   if (!userId) {
     redirect(`/sign-in?redirect_url=${encodeURIComponent("/florida-security-training/enroll")}`);
   }
+  if (!floridaClassDPreEnrollmentEnabled()) notFound();
 
   return (
     <main className="fl-classd">

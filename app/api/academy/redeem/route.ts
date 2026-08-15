@@ -2,12 +2,11 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import {
   academyCommerceLivemode,
-  academyCourseAmountCents,
 } from "../../../../lib/academy-payment";
 import { claimCourseAccess, courseForId } from "../../../../lib/academy";
 import { safeIdentity } from "../../../../lib/identity-runtime";
 import { retrieveVerifiedAcademyPaidSession } from "../../../../lib/academy-stripe-verification";
-import { getStripe } from "../../../../lib/stripe";
+import { getAcademyStripe } from "../../../../lib/academy-stripe";
 
 export const runtime = "nodejs";
 
@@ -87,16 +86,15 @@ export async function POST(request: Request) {
   }
 
   const livemode = academyCommerceLivemode();
-  const amountCents = academyCourseAmountCents(course.price);
-  if (livemode === null || amountCents === null) {
+  if (livemode === null) {
     return NextResponse.redirect(retryUrl(requestUrl, course.id, sessionId, "verification-unavailable"), 303);
   }
 
   try {
     const verified = await retrieveVerifiedAcademyPaidSession(
-      getStripe(),
+      getAcademyStripe(),
       sessionId,
-      { courseId: course.id, amountCents, livemode },
+      { courseId: course.id, livemode },
     );
     const { session, validation } = verified;
 
@@ -118,6 +116,7 @@ export async function POST(request: Request) {
     await claimCourseAccess({
       userId: identity.userId,
       courseId: course.id,
+      courseVersion: validation.courseVersion,
       checkoutSessionId: session.id,
       purchaserEmail: validation.learnerId ? undefined : purchaserEmail,
     });

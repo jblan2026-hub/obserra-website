@@ -1,10 +1,17 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse, type NextFetchEvent, type NextMiddleware, type NextRequest } from "next/server";
+import { identityFromVerifiedClaims } from "./lib/auth/claims";
+import { getInternalOwnerAuthorityFromProxyContext } from "./lib/auth/authority-repository";
+import { evaluateInternalOwnerAuthorization } from "./lib/auth/identity-governance";
+import { identityProviderForRequest } from "./lib/auth/provider-routing";
+import { prepareSupabaseAuthRuntime } from "./lib/auth/runtime-config";
 import { prepareClerkRuntime } from "./lib/clerk-runtime-config";
 import {
   evaluateFloridaClassDMutationBoundary,
   floridaClassDMutationOriginAuthorized,
 } from "./lib/florida-class-d-mutation-boundary";
+import { floridaClassDProductionOwnerReviewExecutionAuthorized } from "./lib/florida-class-d-owner-preview";
+import { updateSupabaseAuthSession } from "./lib/supabase/proxy";
 
 const CANONICAL_HOST = "www.obserrallc.com";
 const DEFAULT_OWNER_ORIGIN = "https://owner.obserrallc.com";
@@ -30,7 +37,9 @@ const PROTECTED_PATH_PREFIXES = [
   "/florida-security-training/exam",
   "/florida-security-training/makeup",
   "/florida-security-training/completion",
+  "/florida-security-training/owner-preview",
   "/api/florida-class-d/admin",
+  "/api/florida-class-d/owner-preview",
 ] as const;
 
 let configuredClerkHandler: NextMiddleware | null = null;
@@ -127,11 +136,19 @@ function regulatedMutationBoundary(request: NextRequest) {
           ? "Florida Class D regulated mutations require an exact same-origin request."
           : decision.policy === "synthetic_nonproduction_only"
           ? "Gate 23 acceptance mutation is available only during explicitly authorized synthetic non-production execution."
+          : decision.policy === "owner_preview_provider_diagnostic"
+          ? "The isolated owner-review Daily diagnostic is not authorized for this exact release."
+          : decision.policy === "owner_preview_activation_request"
+          ? "The governed owner activation request is not authorized for this exact release."
           : "Florida Class D regulated mutation execution is not authorized.",
         code: originRejected
           ? "FDACS_REGULATED_ORIGIN_REJECTED"
           : decision.policy === "synthetic_nonproduction_only"
           ? "FDACS_ACCEPTANCE_EXECUTION_NOT_AUTHORIZED"
+          : decision.policy === "owner_preview_provider_diagnostic"
+          ? "FDACS_OWNER_PREVIEW_DAILY_NOT_AUTHORIZED"
+          : decision.policy === "owner_preview_activation_request"
+          ? "FDACS_OWNER_PREVIEW_ACTIVATION_REQUEST_NOT_AUTHORIZED"
           : "FDACS_REGULATED_EXECUTION_NOT_AUTHORIZED",
       },
       {
@@ -240,6 +257,137 @@ function identityConfigurationResponse(request: NextRequest) {
   return response;
 }
 
+function supabaseIdentityUnavailableResponse(request: NextRequest) {
+  const response = applyRouteSecurityHeaders(
+    NextResponse.json(
+      {
+        error: "Identity verification is temporarily unavailable.",
+        code: "IDENTITY_VERIFICATION_UNAVAILABLE",
+      },
+      {
+        status: 503,
+        headers: {
+          "cache-control": "private, no-store, max-age=0, must-revalidate",
+          pragma: "no-cache",
+          expires: "0",
+        },
+      },
+    ),
+    request,
+  );
+  response.headers.set("X-Obserra-Identity-Status", "unavailable");
+  response.headers.set("X-Obserra-Identity-Provider", "supabase");
+  return response;
+}
+
+function internalOwnerAccessResponse(request: NextRequest, status: 403 | 503) {
+  const response = applyRouteSecurityHeaders(
+    NextResponse.json(
+      {
+        error: status === 403
+          ? "Internal owner access is required."
+          : "Internal owner authorization is not ready.",
+        code: status === 403
+          ? "INTERNAL_OWNER_ACCESS_DENIED"
+          : "INTERNAL_OWNER_AUTHORIZATION_UNAVAILABLE",
+      },
+      {
+        status,
+        headers: {
+          "cache-control": "private, no-store, max-age=0, must-revalidate",
+          pragma: "no-cache",
+          expires: "0",
+        },
+      },
+    ),
+    request,
+  );
+  response.headers.set("X-Obserra-Identity-Status", status === 403 ? "denied" : "unavailable");
+  response.headers.set("X-Obserra-Identity-Provider", "supabase");
+  return response;
+}
+
+function internalOwnerMutationLockedResponse(request: NextRequest) {
+  const response = applyRouteSecurityHeaders(
+    NextResponse.json(
+      {
+        error: "The internal owner shell is read-only.",
+        code: "FDACS_INTERNAL_OWNER_WRITE_LOCKED",
+      },
+      {
+        status: 503,
+        headers: {
+          "cache-control": "private, no-store, max-age=0, must-revalidate",
+          pragma: "no-cache",
+          expires: "0",
+        },
+      },
+    ),
+    request,
+  );
+  response.headers.set("X-Obserra-Identity-Status", "ready");
+  response.headers.set("X-Obserra-Identity-Provider", "supabase");
+  response.headers.set("X-Obserra-FDACS-Access", "internal-owner-read-only");
+  return response;
+}
+
+async function handleSupabaseRequest(
+  request: NextRequest,
+  ownership: ReturnType<typeof identityProviderForRequest>,
+) {
+  const result = await updateSupabaseAuthSession(request);
+  if (!result.configured) return identityConfigurationResponse(request);
+  if (result.claimsUnavailable) return supabaseIdentityUnavailableResponse(request);
+
+  const identity = identityFromVerifiedClaims(result.claims);
+  if (ownership.requiresAuthentication && !identity) {
+    const response = redirectToSignIn(request);
+    response.headers.set("X-Obserra-Identity-Status", "ready");
+    response.headers.set("X-Obserra-Identity-Provider", "supabase");
+    return response;
+  }
+
+  if (ownership.accessPolicy === "internal_owner_read_only" && identity) {
+    if (!result.queryCurrentAuthority) return supabaseIdentityUnavailableResponse(request);
+    const authority = await getInternalOwnerAuthorityFromProxyContext({
+      identity,
+      jwtKeyId: result.jwtKeyId,
+      jwtAlgorithm: result.jwtAlgorithm,
+      queryCurrentAuthority: result.queryCurrentAuthority,
+    });
+    const decision = evaluateInternalOwnerAuthorization({
+      roles: identity.roles,
+      emailVerified: authority.emailVerified,
+      internalIdentityAuthorized: authority.internalIdentityAuthorized,
+      assuranceLevel: identity.assuranceLevel,
+      protectedAuthorityReady: authority.protectedReadiness.ready,
+      previewEnvironment: process.env.VERCEL_ENV === "preview",
+      productionOwnerReviewAuthorized:
+        (pathMatchesPrefix(new URL(request.url).pathname, "/florida-security-training/owner-preview")
+          || pathMatchesPrefix(new URL(request.url).pathname, "/api/florida-class-d/owner-preview"))
+        && floridaClassDProductionOwnerReviewExecutionAuthorized(),
+      productionAuthEnabled:
+        process.env.OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED?.trim().toLowerCase() === "enabled",
+    });
+    if (!decision.authorized) {
+      const identityDenied = [
+        "owner_role_required",
+        "verified_email_required",
+        "aal2_required",
+      ].includes(decision.reason);
+      return internalOwnerAccessResponse(request, identityDenied ? 403 : 503);
+    }
+    if (ownership.mutationClass !== "read" && !ownership.mutationAllowed) {
+      return internalOwnerMutationLockedResponse(request);
+    }
+  }
+
+  const response = applyRouteSecurityHeaders(result.response, request);
+  response.headers.set("X-Obserra-Identity-Status", "ready");
+  response.headers.set("X-Obserra-Identity-Provider", "supabase");
+  return response;
+}
+
 function preIdentityBoundary(request: NextRequest) {
   const ownerRoute = redirectToOwnerSite(request);
   if (ownerRoute) return ownerRoute;
@@ -281,6 +429,22 @@ function getConfiguredClerkHandler(): NextMiddleware {
 export default async function proxy(request: NextRequest, event: NextFetchEvent) {
   const preIdentityResponse = preIdentityBoundary(request);
   if (preIdentityResponse) return preIdentityResponse;
+
+  const url = new URL(request.url);
+  const ownership = identityProviderForRequest({
+    pathname: url.pathname,
+    redirectTarget: url.searchParams.get("redirect_url"),
+    method: request.method,
+  });
+  const supabaseRuntime = prepareSupabaseAuthRuntime();
+  if (ownership.provider === "supabase" && supabaseRuntime.runtimeEnabled) {
+    if (!supabaseRuntime.ready) return identityConfigurationResponse(request);
+    try {
+      return await handleSupabaseRequest(request, ownership);
+    } catch {
+      return supabaseIdentityUnavailableResponse(request);
+    }
+  }
 
   if (!authenticationReady()) {
     return identityConfigurationResponse(request);

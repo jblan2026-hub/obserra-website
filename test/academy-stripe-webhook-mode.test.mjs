@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import * as crypto from "node:crypto";
 import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
@@ -17,6 +18,7 @@ vm.runInNewContext(ts.transpileModule(paymentSource, {
   process: { env: {} },
   require(specifier) {
     if (specifier === "server-only") return {};
+    if (specifier === "node:crypto") return crypto;
     throw new Error(`Unexpected payment test import: ${specifier}`);
   },
 });
@@ -85,9 +87,9 @@ test("Academy paid-session contract accepts only the exact amount, currency, pur
 });
 
 test("Academy webhook uses the full paid-session contract before durable fulfillment", () => {
-  assert.match(webhook, /validateAcademyPaidSession\(session/);
+  assert.match(webhook, /retrieveVerifiedAcademyPaidSession\(/);
   assert.ok(
-    webhook.indexOf("validateAcademyPaidSession(session") < webhook.indexOf("recordPaidCheckout({"),
-    "full payment validation must precede durable fulfillment",
+    webhook.indexOf("retrieveVerifiedAcademyPaidSession(") < webhook.indexOf("recordPaidCheckout({"),
+    "canonical full payment verification must precede durable fulfillment",
   );
 });

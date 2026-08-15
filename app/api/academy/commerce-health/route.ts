@@ -5,7 +5,8 @@ import {
   academyStorageHealth,
 } from "../../../../lib/academy-persistence";
 import { safeIdentity } from "../../../../lib/identity-runtime";
-import { getStripe } from "../../../../lib/stripe";
+import { getAcademyStripe } from "../../../../lib/academy-stripe";
+import { academyStripeWebhookSecret } from "../../../../lib/academy-payment";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,22 +16,22 @@ const CONTRACT_VERSION = "academy-commerce-health-v1";
 
 export async function GET() {
   const identity = await safeIdentity();
-  const stripeKey = process.env.STRIPE_SECRET_KEY?.trim() ?? "";
-  const stripeEnvironment = stripeKey.startsWith("sk_live_")
+  const stripeKey = process.env.ACADEMY_STRIPE_SECRET_KEY?.trim() ?? "";
+  const stripeEnvironment = stripeKey.startsWith("rk_live_")
     ? "live"
-    : stripeKey.startsWith("sk_test_")
+    : stripeKey.startsWith("rk_test_")
       ? "test"
       : "unavailable";
   const productionModeAccepted = process.env.VERCEL_ENV === "production"
     ? stripeEnvironment === "live"
     : stripeEnvironment !== "unavailable";
-  const webhookConfigured = /^whsec_[A-Za-z0-9_]+$/.test(process.env.STRIPE_WEBHOOK_SECRET?.trim() ?? "");
+  const webhookConfigured = academyStripeWebhookSecret() !== null;
   const purchaserHashConfigured = academyPurchaserHashConfigured();
   let providerConnected = false;
   let chargesEnabled = false;
   if (productionModeAccepted) {
     try {
-      const account = await getStripe().accounts.retrieve(null);
+      const account = await getAcademyStripe().accounts.retrieve(null);
       providerConnected = true;
       chargesEnabled = account.charges_enabled;
     } catch (error) {

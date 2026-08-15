@@ -13,7 +13,7 @@ type InquiryCategory =
   | "Obserra Enterprise Intelligence Operating System (EIOS) executive briefing"
   | "Academy learner support"
   | "Enterprise training"
-  | "Florida Class D training interest"
+  | "Florida Class D program launch notice (not enrollment or payment)"
   | "Speaking or executive briefing"
   | "Strategic partnership or general inquiry";
 
@@ -31,7 +31,7 @@ const categories: InquiryCategory[] = [
   "Obserra Enterprise Intelligence Operating System (EIOS) executive briefing",
   "Academy learner support",
   "Enterprise training",
-  "Florida Class D training interest",
+  "Florida Class D program launch notice (not enrollment or payment)",
   "Speaking or executive briefing",
   "Strategic partnership or general inquiry",
 ];
@@ -47,7 +47,7 @@ const interestMap: Record<string, InquiryCategory> = {
   protection: "Executive protection or urgent travel support",
   cybersecurity: "Cybersecurity advisory",
   "enterprise-training": "Enterprise training",
-  "florida-class-d-training": "Florida Class D training interest",
+  "florida-class-d-training": "Florida Class D program launch notice (not enrollment or payment)",
   speaking: "Speaking or executive briefing",
   partnership: "Strategic partnership or general inquiry",
 };

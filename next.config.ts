@@ -1,4 +1,9 @@
 import type { NextConfig } from "next";
+import { prepareIdentityOriginContract } from "./lib/auth/identity-origin-contract";
+
+const identityOrigins = prepareIdentityOriginContract();
+const identityScriptSources = identityOrigins.scriptSources.join(" ");
+const identityConnectSources = identityOrigins.connectSources.join(" ");
 
 const clerkIdentitySources = [
   "https://*.clerk.accounts",
@@ -20,11 +25,11 @@ const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  `script-src 'self' 'unsafe-inline' https://js.stripe.com https://cdn.credly.com ${clerkIdentitySources}`,
+  `script-src 'self' 'unsafe-inline' https://js.stripe.com https://cdn.credly.com ${clerkIdentitySources} ${identityScriptSources}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https:",
   "font-src 'self' data:",
-  `connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.credly.com https://cdn.credly.com https://vitals.vercel-insights.com ${clerkIdentitySources}`,
+  `connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.credly.com https://cdn.credly.com https://vitals.vercel-insights.com ${clerkIdentitySources} ${identityConnectSources}`,
   "media-src 'self' https: blob:",
   "worker-src 'self' blob:",
   "frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.credly.com https://challenges.cloudflare.com https://*.protect.clerk.com https://*.daily.co",
@@ -156,6 +161,10 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/florida-security-training/admin/live/:path*",
+        headers: protectedVideoInstructorHeaders,
+      },
+      {
+        source: "/florida-security-training/owner-preview/:path*",
         headers: protectedVideoInstructorHeaders,
       },
       {

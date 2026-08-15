@@ -18,7 +18,11 @@ const forbidText = (file, source, text, control) => {
 const migrationFile = "supabase/migrations/20260814061110_academy_durable_learner_commerce.sql";
 const eventHardeningFile = "supabase/migrations/20260814061912_academy_payment_event_integrity_hardening.sql";
 const reversalMigrationFile = "supabase/migrations/20260815180000_academy_payment_reversal_governance.sql";
+const repurchaseMigrationFile = "supabase/migrations/20260815190000_academy_payment_repurchase_reactivation.sql";
+const checkoutReservationMigrationFile = "supabase/migrations/20260815200000_academy_checkout_attempt_reservations.sql";
 const persistenceFile = "lib/academy-persistence.ts";
+const paymentFile = "lib/academy-payment.ts";
+const academyStripeFile = "lib/academy-stripe.ts";
 const academyFile = "lib/academy.ts";
 const requestFile = "lib/academy-request.ts";
 const checkoutFile = "app/api/academy/checkout/route.ts";
@@ -33,7 +37,11 @@ const websiteCiWorkflowFile = ".github/workflows/website-ci.yml";
 const migration = read(migrationFile);
 const eventHardening = read(eventHardeningFile);
 const reversalMigration = read(reversalMigrationFile);
+const repurchaseMigration = read(repurchaseMigrationFile);
+const checkoutReservationMigration = read(checkoutReservationMigrationFile);
 const persistence = read(persistenceFile);
+const payment = read(paymentFile);
+const academyStripe = read(academyStripeFile);
 const academy = read(academyFile);
 const request = read(requestFile);
 const checkout = read(checkoutFile);
@@ -107,6 +115,49 @@ for (const text of [
 ]) requireText(reversalMigrationFile, reversalMigration, text, "durable payment reversal governance");
 requireText(reversalMigrationFile, reversalMigration, "force row level security", "payment reversal forced RLS");
 requireText(reversalMigrationFile, reversalMigration, "from public, anon, authenticated", "payment reversal browser denial");
+requireText(
+  reversalMigrationFile,
+  reversalMigration,
+  "revoke all on public.academy_payment_reversal_events from service_role",
+  "payment reversal service-role default privilege reset",
+);
+requireText(
+  reversalMigrationFile,
+  reversalMigration,
+  "grant select, insert, update on public.academy_payment_reversal_events to service_role",
+  "payment reversal service-role least privilege",
+);
+for (const text of [
+  "create or replace function public.academy_record_paid_checkout",
+  "create or replace function public.academy_claim_paid_checkout",
+  "on conflict (clerk_user_id, course_slug) do update",
+  "access_status in ('refunded', 'revoked')",
+  "payment_reference is distinct from excluded.payment_reference",
+  "not exists (",
+  "academy_payment_reversal_events",
+  "returning * into v_state",
+  "Verified payment did not activate exact Academy access",
+]) requireText(repurchaseMigrationFile, repurchaseMigration, text, "distinct verified repurchase reactivation");
+requireText(repurchaseMigrationFile, repurchaseMigration, "from public, anon, authenticated, service_role", "replacement RPC ACL normalization");
+for (const text of [
+  "create table if not exists public.academy_checkout_attempts",
+  "force row level security",
+  "pg_advisory_xact_lock",
+  "academy_reserve_checkout_attempt",
+  "academy_bind_checkout_attempt",
+  "academy_record_checkout_session",
+  "request_fingerprint",
+  "stripe_session_id",
+  "from public, anon, authenticated, service_role",
+]) requireText(checkoutReservationMigrationFile, checkoutReservationMigration, text, "durable checkout creation serialization");
+for (const text of [
+  "create or replace function public.academy_storage_health()",
+  "academy-durable-state-v2",
+  "paymentReversalRows",
+  "checkoutAttemptRows",
+  "academy_learner_state_reversal_guard",
+]) requireText(checkoutReservationMigrationFile, checkoutReservationMigration, text, "exact Academy v2 health authority");
+forbidText(repurchaseMigrationFile, repurchaseMigration.toLowerCase(), "public.fdacs_", "regulated LMS schema separation");
 forbidText(eventHardeningFile, eventHardening.toLowerCase(), "public.fdacs_", "regulated LMS schema separation");
 forbidText(migrationFile, migration.toLowerCase(), "public.fdacs_", "regulated LMS schema separation");
 
@@ -118,6 +169,9 @@ for (const variable of [
   requireText(persistenceFile, persistence, variable, `dedicated server-only configuration ${variable}`);
 }
 requireText(persistenceFile, persistence, 'import "server-only"', "server-only persistence module");
+requireText(persistenceFile, persistence, 'schemaVersion: "academy-durable-state-v2"', "exact Academy v2 runtime health contract");
+requireText(persistenceFile, persistence, "academyCommerceStorageReady(value)", "exact v2 health predicate before provider use");
+requireText(paymentFile, payment, 'health.schemaVersion === "academy-durable-state-v2"', "partial Academy schema rejection");
 requireText(persistenceFile, persistence, "createHmac", "purchaser identity HMAC");
 requireText(persistenceFile, persistence, "AbortSignal.timeout(10_000)", "bounded persistence request");
 requireText(persistenceFile, persistence, 'redirect: "error"', "persistence redirect rejection");
@@ -137,7 +191,15 @@ requireText(checkoutFile, checkout, "isSupportedFormContentType", "checkout medi
 requireText(checkoutFile, checkout, "academyStorageHealth", "pre-payment durable fulfillment health");
 requireText(checkoutFile, checkout, "identity.configured", "pre-payment identity health");
 requireText(checkoutFile, checkout, "academyCommerceWebhookConfigured", "centralized pre-payment signed webhook readiness");
+requireText(checkoutFile, checkout, 'expand: ["product"]', "governed price expanded product preflight");
+requireText(checkoutFile, checkout, "createAcademyCheckoutAfterGovernedPriceValidation", "governed price product identity preflight");
 requireText(checkoutFile, checkout, "checkout.sessions.create", "real Stripe Checkout session creation");
+requireText(checkoutFile, checkout, 'existingState?.access_status === "active"', "active-entitlement duplicate payment denial");
+requireText(checkoutFile, checkout, "reserveAcademyCheckoutAttempt", "durable checkout reservation");
+requireText(checkoutFile, checkout, "const canonicalAttempt =", "server-authoritative attempt identity");
+requireText(checkoutFile, checkout, "academyCheckoutRequestFingerprint", "exact Checkout parameter fingerprint");
+requireText(checkoutFile, checkout, "reservation.stripeSessionId", "recorded Checkout Session reuse");
+requireText("app/academy/AcademyCheckoutForm.tsx", read("app/academy/AcademyCheckoutForm.tsx"), "navigator.locks.request", "first-use cross-tab browser identity serialization");
 forbidText(checkoutFile, checkout, 'requestUrl.searchParams.get("course")', "GET payment mutation input");
 
 requireText(webhookFile, webhook, "webhooks.constructEvent", "Stripe webhook signature verification");
@@ -145,10 +207,25 @@ requireText(webhookFile, webhook, 'session.payment_status === "paid"', "paid-eve
 requireText(webhookFile, webhook, "recordPaidCheckout", "durable webhook event recording");
 requireText(webhookFile, webhook, "event.id", "Stripe event idempotency authority");
 requireText(webhookFile, webhook, "recordAcademyPaymentReversal", "durable refund and dispute processing");
+requireText(webhookFile, webhook, 'throw new AcademyStripeVerificationError("paid-session-course-unavailable")', "unknown-course paid event retryable failure");
+forbidText(webhookFile, webhook, "academyCourseAmountCents", "immutable paid-session fulfillment amount");
 requireText(persistenceFile, persistence, '"academy_record_payment_reversal"', "payment reversal service RPC client");
 requireText(redeemFile, redeem, "retrieveVerifiedAcademyPaidSession", "server-side canonical paid session revalidation");
+forbidText(redeemFile, redeem, "academyCourseAmountCents", "immutable deferred-claim payment amount");
 requireText(redeemFile, redeem, "authenticatedUserOwnsVerifiedPurchaserEmail", "verified purchaser identity claim");
 requireText(redeemFile, redeem, "claimCourseAccess", "durable entitlement claim");
+requireText(redeemFile, redeem, "courseVersion: validation.courseVersion", "immutable signed checkout claim version");
+
+for (const [file, source] of [
+  [paymentFile, payment], [academyStripeFile, academyStripe], [checkoutFile, checkout],
+  [webhookFile, webhook], [redeemFile, redeem], [commerceHealthFile, commerceHealth],
+]) {
+  forbidText(file, source, "process.env.STRIPE_SECRET_KEY", "shared Stripe secret fallback in Academy commerce");
+}
+requireText(paymentFile, payment, "ACADEMY_STRIPE_SECRET_KEY", "dedicated Academy restricted Stripe key");
+requireText(paymentFile, payment, "ACADEMY_STRIPE_WEBHOOK_SECRET", "dedicated Academy webhook secret");
+requireText(academyStripeFile, academyStripe, "rk_live_", "production restricted Stripe key");
+requireText(academyStripeFile, academyStripe, "rk_test_", "nonproduction restricted Stripe key");
 
 requireText(requestFile, request, 'request.headers.get("origin")', "Academy mutation origin validation");
 requireText(requestFile, request, 'contentType.startsWith("application/json")', "Academy mutation JSON-only boundary");
@@ -177,7 +254,7 @@ for (const text of [
   '.providerVerification.chargesEnabled == true',
   '.identityEnvironment == "live"',
   '.durableStorage == "available"',
-  '.storageSchema == "academy-durable-state-v1"',
+  '.storageSchema == "academy-durable-state-v2"',
   '.purchaserIdentityHashing == "available"',
 ]) {
   requireText(operationalWorkflowFile, operationalWorkflow, text, "production operational verification");
@@ -190,8 +267,8 @@ forbidText(websiteCiWorkflowFile, websiteCiWorkflow, "secrets.STRIPE_WEBHOOK_SEC
 
 console.log(JSON.stringify({
   gate: "academy-durable-commerce-gate-35",
-  durableTables: tables.length + 1,
-  serviceOnlyRpcs: 10,
+  durableTables: tables.length + 2,
+  serviceOnlyRpcs: 13,
   productionTransactionsCreated: 0,
   failures,
 }, null, 2));

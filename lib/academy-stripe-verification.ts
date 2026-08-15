@@ -34,16 +34,26 @@ function fail(reason: string): never {
   throw new AcademyStripeVerificationError(reason);
 }
 
+function immutableExpectedAmountCents(session: Stripe.Checkout.Session) {
+  const raw = session.metadata?.expectedAmountCents ?? "";
+  if (!/^[1-9][0-9]*$/.test(raw)) fail("expected-amount-invalid");
+  const amountCents = Number(raw);
+  if (!Number.isSafeInteger(amountCents) || amountCents <= 0) fail("expected-amount-invalid");
+  return amountCents;
+}
+
 export async function retrieveVerifiedAcademyPaidSession(
   stripe: Stripe,
   sessionId: string,
-  expected: { courseId: string; amountCents: number; livemode: boolean },
+  expected: { courseId: string; livemode: boolean },
 ) {
   if (!/^cs_(?:live|test)_[A-Za-z0-9_]+$/.test(sessionId)) fail("checkout-session-invalid");
   const session = await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ["line_items.data.price.product", "payment_intent"],
   });
-  const validation = validateAcademyPaidSession(session, expected);
+  const amountCents = immutableExpectedAmountCents(session);
+  const verificationContract = { ...expected, amountCents };
+  const validation = validateAcademyPaidSession(session, verificationContract);
   if (!validation.valid) fail(validation.reason);
 
   const productValidation = validateAcademyProductLineItem(
@@ -51,7 +61,7 @@ export async function retrieveVerifiedAcademyPaidSession(
     {
       courseId: expected.courseId,
       courseVersion: validation.courseVersion,
-      amountCents: expected.amountCents,
+      amountCents,
     },
   );
   if (!productValidation.valid) fail(productValidation.reason);
@@ -66,7 +76,7 @@ export async function retrieveVerifiedAcademyPaidSession(
   if (paymentIntent.livemode !== expected.livemode) fail("payment-intent-mode-mismatch");
   if (paymentIntent.status !== "succeeded") fail("payment-intent-not-succeeded");
   if (paymentIntent.currency !== ACADEMY_PAYMENT_CURRENCY) fail("payment-intent-currency-mismatch");
-  if (paymentIntent.amount_received !== expected.amountCents) fail("payment-intent-amount-mismatch");
+  if (paymentIntent.amount_received !== amountCents) fail("payment-intent-amount-mismatch");
   if (paymentCustomerId !== sessionCustomerId) fail("payment-customer-mismatch");
   for (const key of MATERIAL_METADATA_KEYS) {
     if ((paymentIntent.metadata?.[key] ?? "") !== (session.metadata?.[key] ?? "")) {
@@ -74,7 +84,7 @@ export async function retrieveVerifiedAcademyPaidSession(
     }
   }
 
-  return { session, paymentIntent, validation, customerId: sessionCustomerId };
+  return { session, paymentIntent, validation, customerId: sessionCustomerId, amountCents };
 }
 
 export async function retrieveVerifiedAcademyPaidSessionForPaymentIntent(
@@ -87,13 +97,11 @@ export async function retrieveVerifiedAcademyPaidSessionForPaymentIntent(
   if (sessions.has_more || sessions.data.length !== 1) fail("checkout-session-mapping-ambiguous");
   const session = sessions.data[0];
   const courseId = session.metadata?.courseId ?? "";
-  const amountCents = Number(session.metadata?.expectedAmountCents ?? "");
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(courseId)) fail("course-invalid");
-  if (!Number.isSafeInteger(amountCents) || amountCents <= 0) fail("expected-amount-invalid");
   const verified = await retrieveVerifiedAcademyPaidSession(
     stripe,
     session.id,
-    { courseId, amountCents, livemode: expectedLivemode },
+    { courseId, livemode: expectedLivemode },
   );
   if (verified.paymentIntent.id !== paymentIntentId) fail("payment-intent-session-mismatch");
   return verified;

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createHmac } from "node:crypto";
+import { academyCommerceStorageReady } from "./academy-payment";
 
 const COURSE_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
@@ -23,12 +24,16 @@ export type DurableAcademyState = {
 };
 
 export type AcademyStorageHealth = {
-  schemaVersion: "academy-durable-state-v1";
+  schemaVersion: "academy-durable-state-v2";
   operational: true;
   learnerStateRows: number;
   paymentEventRows: number;
   assessmentRecordRows: number;
   auditEventRows: number;
+  paymentReversalRows: number;
+  checkoutAttemptRows: number;
+  reversalGuard: "enabled";
+  checkoutSerialization: "purchaser-course-entitlement-revision-v1";
 };
 
 export type DurableAcademyAggregateMetrics = {
@@ -164,14 +169,7 @@ export function academyPurchaserHashConfigured() {
 
 export async function academyStorageHealth() {
   const value = await rpc<AcademyStorageHealth>("academy_storage_health", {});
-  if (
-    value?.schemaVersion !== "academy-durable-state-v1" ||
-    value.operational !== true ||
-    !Number.isSafeInteger(Number(value.learnerStateRows)) ||
-    !Number.isSafeInteger(Number(value.paymentEventRows)) ||
-    !Number.isSafeInteger(Number(value.assessmentRecordRows)) ||
-    !Number.isSafeInteger(Number(value.auditEventRows))
-  ) {
+  if (!academyCommerceStorageReady(value)) {
     throw new AcademyPersistenceError("Academy durable storage health is invalid.", "invalid-response");
   }
   return value;
@@ -187,6 +185,62 @@ export async function durableAcademyState(userId: string, courseId: string) {
     p_clerk_user_id: userId,
     p_course_slug: courseId,
   });
+}
+
+export type AcademyCheckoutAttemptReservation = {
+  attemptId: string;
+  issuedAt: number;
+  expiresAt: number;
+  requestFingerprint: string | null;
+  stripeSessionId: string | null;
+  idempotentReplay: boolean;
+  coalescedConcurrentAttempt: boolean;
+};
+
+export async function reserveAcademyCheckoutAttempt(input: {
+  attemptId: string;
+  purchaserReference: string;
+  courseId: string;
+  entitlementRevision: number;
+  issuedAt: number;
+  expiresAt: number;
+}) {
+  requireCourseVersion(input.courseId, "1.0.0");
+  const value = await rpc<AcademyCheckoutAttemptReservation>("academy_reserve_checkout_attempt", {
+    p_attempt_id: input.attemptId,
+    p_purchaser_reference: input.purchaserReference,
+    p_course_slug: input.courseId,
+    p_entitlement_revision: input.entitlementRevision,
+    p_issued_at: input.issuedAt,
+    p_expires_at: input.expiresAt,
+  });
+  if (
+    !value ||
+    !/^[0-9a-f-]{36}$/.test(value.attemptId) ||
+    !Number.isSafeInteger(Number(value.issuedAt)) ||
+    !Number.isSafeInteger(Number(value.expiresAt)) ||
+    (value.requestFingerprint !== null && !/^[0-9a-f]{64}$/.test(value.requestFingerprint)) ||
+    (value.stripeSessionId !== null && !/^cs_(?:live|test)_[A-Za-z0-9_]+$/.test(value.stripeSessionId))
+  ) throw new AcademyPersistenceError("Academy checkout reservation is invalid.", "invalid-response");
+  return {
+    ...value,
+    issuedAt: Number(value.issuedAt),
+    expiresAt: Number(value.expiresAt),
+  };
+}
+
+export async function bindAcademyCheckoutAttempt(attemptId: string, requestFingerprint: string) {
+  return rpc<{ attemptId: string; requestFingerprint: string; stripeSessionId: string | null }>(
+    "academy_bind_checkout_attempt",
+    { p_attempt_id: attemptId, p_request_fingerprint: requestFingerprint },
+  );
+}
+
+export async function recordAcademyCheckoutSession(attemptId: string, stripeSessionId: string) {
+  return rpc<{ attemptId: string; stripeSessionId: string; idempotentReplay: boolean }>(
+    "academy_record_checkout_session",
+    { p_attempt_id: attemptId, p_stripe_session_id: stripeSessionId },
+  );
 }
 
 export async function recordPaidCheckout(input: {

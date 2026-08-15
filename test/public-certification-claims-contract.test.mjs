@@ -39,13 +39,17 @@ test("Academy structured data identifies the legal entity as the course provider
   assert.match(certificate, /issued by \{LEGAL_NAME\}/);
 });
 
-test("the FDACS public program remains non-credit, unauthorized, and unable to issue records", () => {
+test("the FDACS public program remains non-credit with learner actions omitted pre-license", () => {
   const landing = read("app/florida-security-training/page.tsx");
+  const controls = read("app/florida-security-training/GovernedFloridaClassDLink.tsx");
   const completionPage = read("app/florida-security-training/completion/page.tsx");
 
   assert.match(landing, /PREVIEW UAT ONLY · NON-CREDIT · PRODUCTION AUTHORIZATION FALSE/);
+  assert.match(landing, /Enrollment, payment, and student course access are not open/);
   assert.match(landing, /FDACS provider and course authorization have not been granted/);
   assert.match(landing, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled/);
+  assert.match(controls, /if \(!enabled\) return null;/);
+  assert.doesNotMatch(controls, /aria-disabled|<button|disabled/);
   assert.match(completionPage, /Production authorization is false/);
   assert.match(completionPage, /No course credit, completion document, certificate, or LIAS record can be issued from Preview UAT/);
 });
@@ -85,10 +89,13 @@ test("public page titles rely on the root legal-name template exactly once", () 
   const rootLayout = read("app/layout.tsx");
   const floridaTraining = read("app/florida-security-training/page.tsx");
   const store = read("app/store/page.tsx");
+  const contact = read("app/contact/page.tsx");
 
   assert.match(rootLayout, /template: `%s \| \$\{LEGAL_ENTITY_NAME\}`/);
   assert.match(floridaTraining, /title: "Florida Class D Security Officer Training"/);
   assert.match(store, /title: "Store"/);
+  assert.match(contact, /title: "Contact"/);
   assert.doesNotMatch(floridaTraining, /title: [^\n]*OBSERRA EXECUTIVE PROTECTION/);
   assert.doesNotMatch(store, /title: [^\n]*LEGAL_ENTITY_NAME/);
+  assert.doesNotMatch(contact, /title: `Contact \| \$\{LEGAL_ENTITY_NAME\}`/);
 });

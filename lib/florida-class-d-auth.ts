@@ -1,6 +1,7 @@
 import "server-only";
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
+import { prepareSupabaseAuthRuntime } from "./auth/runtime-config";
 import { ownerEmailAllowed } from "./academy";
 import { floridaClassDOwnerUatProfileRequested } from "./florida-class-d-owner-uat";
 import type { FloridaClassDRecordRole } from "./florida-class-d-records";
@@ -20,14 +21,25 @@ const CLERK_USER_ID_PATTERN = /^user_[A-Za-z0-9]{3,250}$/;
 export class FloridaClassDAuthorizationError extends Error {
   constructor(
     message: string,
-    readonly status: 401 | 403,
+    readonly status: 401 | 403 | 503,
   ) {
     super(message);
     this.name = "FloridaClassDAuthorizationError";
   }
 }
 
+function requireCurrentFloridaClassDIdentityAuthority() {
+  const supabaseRuntime = prepareSupabaseAuthRuntime();
+  if (supabaseRuntime.runtimeEnabled) {
+    throw new FloridaClassDAuthorizationError(
+      "Florida Class D identity governance is not ready for Supabase Auth activation.",
+      503,
+    );
+  }
+}
+
 async function requireFloridaClassDAuthenticatedSession() {
+  requireCurrentFloridaClassDIdentityAuthority();
   const { userId, sessionId } = await auth();
   if (!userId) {
     throw new FloridaClassDAuthorizationError("Sign in is required.", 401);
@@ -55,6 +67,7 @@ export async function validateFloridaClassDInstructorPrincipal(
   targetUserId: string,
   ownerLearnerUserId: string,
 ) {
+  requireCurrentFloridaClassDIdentityAuthority();
   const normalizedTarget = targetUserId.trim();
   if (!CLERK_USER_ID_PATTERN.test(normalizedTarget) || normalizedTarget === ownerLearnerUserId) {
     throw new FloridaClassDAuthorizationError(
@@ -76,6 +89,7 @@ export async function validateFloridaClassDInstructorPrincipal(
 }
 
 export async function ensureFloridaClassDInstructorRole(targetUserId: string) {
+  requireCurrentFloridaClassDIdentityAuthority();
   const normalizedTarget = targetUserId.trim();
   if (!CLERK_USER_ID_PATTERN.test(normalizedTarget)) {
     throw new FloridaClassDAuthorizationError("A valid Clerk instructor identity is required.", 403);

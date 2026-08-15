@@ -2,10 +2,13 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 import type { FloridaClassDStaffRole } from "./florida-class-d-auth";
+import {
+  FloridaClassDDailyProviderError,
+  floridaClassDServerDailyRequest,
+} from "./florida-class-d-daily-provider";
 import { floridaClassDLiveInstructionEnabled } from "./florida-class-d-live-policy";
 import { floridaClassDSupabaseServerConfigAuthorized } from "./florida-class-d-supabase-config";
 
-const DAILY_API_BASE = "https://api.daily.co/v1";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export class FloridaClassDMediaError extends Error {
@@ -30,12 +33,6 @@ type DailyTokenResponse = {
 
 function enabled(value: string | undefined) {
   return value?.trim().toLowerCase() === "enabled";
-}
-
-function dailyConfig() {
-  const apiKey = process.env.OBSERRA_FDACS_DAILY_API_KEY?.trim() || "";
-  if (!apiKey) throw new FloridaClassDMediaError("Class D live media provider is not configured.", 503, "FDACS_MEDIA_NOT_CONFIGURED");
-  return { apiKey };
 }
 
 function supabaseConfig() {
@@ -77,35 +74,14 @@ async function supabaseRequest<T>(path: string): Promise<T> {
 }
 
 async function dailyRequest<T>(path: string, init: RequestInit = {}, allowNotFound = false): Promise<T | null> {
-  const { apiKey } = dailyConfig();
-  const response = await fetch(`${DAILY_API_BASE}${path}`, {
-    ...init,
-    cache: "no-store",
-    redirect: "error",
-    headers: {
-      accept: "application/json",
-      authorization: `Bearer ${apiKey}`,
-      "content-type": "application/json",
-      ...(init.headers ?? {}),
-    },
-    signal: init.signal ?? AbortSignal.timeout(10_000),
-  });
-  if (allowNotFound && response.status === 404) return null;
-  const raw = await response.text();
-  let payload: unknown = null;
-  if (raw) {
-    try {
-      payload = JSON.parse(raw) as unknown;
-    } catch {
-      throw new FloridaClassDMediaError("Live media provider returned an invalid response.", 502, "FDACS_MEDIA_INVALID_PROVIDER_RESPONSE");
+  try {
+    return await floridaClassDServerDailyRequest<T>(path, init, allowNotFound);
+  } catch (error) {
+    if (error instanceof FloridaClassDDailyProviderError) {
+      throw new FloridaClassDMediaError(error.message, error.status, error.code);
     }
+    throw error;
   }
-  if (!response.ok) {
-    const error = payload && typeof payload === "object" && !Array.isArray(payload) ? payload as Record<string, unknown> : null;
-    const providerMessage = typeof error?.info === "string" ? error.info : typeof error?.error === "string" ? error.error : "Live media provider request failed.";
-    throw new FloridaClassDMediaError(providerMessage, response.status >= 500 ? 502 : response.status, "FDACS_MEDIA_PROVIDER_FAILED");
-  }
-  return payload as T;
 }
 
 function roomName(liveSessionId: string) {

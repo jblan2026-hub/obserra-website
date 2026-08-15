@@ -73,7 +73,7 @@ check("checkout preserves entitlement metadata", /entitlementType/.test(checkout
 check("checkout preserves certificate metadata", /certificateIssuer/.test(checkout) && /credentialType/.test(checkout));
 
 const webhook = read("app/api/webhook/stripe/route.ts");
-check("webhook verifies Stripe signatures", /constructEvent/.test(webhook) && /STRIPE_WEBHOOK_SECRET/.test(webhook));
+check("webhook verifies Stripe signatures with the centralized Academy secret", /constructEvent/.test(webhook) && /academyStripeWebhookSecret/.test(webhook));
 check("webhook handles checkout completion", /checkout\.session\.completed/.test(webhook));
 
 const intelligence = read("app/api/obserra/intelligence/route.ts");
