@@ -48,10 +48,6 @@ function sortedUnique(values) {
   return [...new Set(values)].sort((left, right) => left.localeCompare(right, "en", { numeric: true }));
 }
 
-function requireHash(value, label) {
-  if (!/^[0-9a-f]{64}$/.test(value ?? "")) fail(`${label} must be a lowercase SHA-256`);
-}
-
 function verifyDigestManifest(raw, files) {
   const entries = new Map();
   for (const line of raw.toString("utf8").split(/\r?\n/).filter(Boolean)) {
@@ -104,7 +100,14 @@ if (bundle.systems.some((system) => system.objectiveMappings.some((mapping) => m
 if (disposition.legalOwner !== LEGAL_OWNER || disposition.sourceBundle?.sha256 !== sha256(bundleRaw) || disposition.summary?.failClosed !== true || disposition.summary?.allHumanPending !== true) {
   fail("technical/human disposition is not fail-closed, fully pending, or bound to the exact machine register");
 }
-if (disposition.humanReview?.pendingIsTechnicalFailure !== false || disposition.objectiveDispositions?.some((objective) => objective.assessmentFinding !== "not_assessed")) {
+if (disposition.humanReview?.pendingIsTechnicalFailure !== false ||
+    disposition.separationInvariant?.findingRemainsNotAssessed !== true ||
+    !Array.isArray(disposition.objectiveDispositions) ||
+    disposition.objectiveDispositions.length !== disposition.summary.objectiveDispositionCount ||
+    disposition.objectiveDispositions.some((objective) =>
+      objective.humanReviewState !== "pending" ||
+      objective.pendingHumanReviewIsFailure !== false ||
+      objective.finding !== "not_assessed")) {
   fail("technical/human disposition improperly converts human pending into failure or creates an assessor finding");
 }
 if (fdacsAudit.legalOwner !== LEGAL_OWNER || fdacsAudit.systemId !== "SYS-FDACS-DATABASE" || fdacsAudit.summary?.liveTechnicalChecksFailed !== 0 || fdacsAudit.summary?.allLiveChainsValid !== true) {
