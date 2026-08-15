@@ -9,6 +9,7 @@ import {
   type ProtectedAuthReadinessEvidence,
 } from "./protected-readiness";
 import { createSupabaseServerClient } from "../supabase/server";
+import { evaluateInternalOwnerMfaEnrollment } from "./identity-governance";
 
 type AuthorityRow = {
   provider_subject: string;
@@ -32,6 +33,7 @@ export type InternalOwnerAuthority = {
   reason: string;
   identity: SafeSupabaseIdentity["identity"];
   internalIdentityAuthorized: boolean;
+  mfaEnrollmentReady: boolean;
   emailVerified: boolean;
   protectedReadiness: ProtectedAuthReadiness;
   correlationId: string;
@@ -136,6 +138,7 @@ async function resolveInternalOwnerAuthority(
       reason: claims.status,
       identity: null,
       internalIdentityAuthorized: false,
+      mfaEnrollmentReady: false,
       emailVerified: false,
       protectedReadiness: await getProtectedSupabaseAuthReadiness(async () => unavailableEvidence),
       correlationId,
@@ -172,14 +175,28 @@ async function resolveInternalOwnerAuthority(
       requiredAssuranceLevel: "aal2",
     };
     const protectedReadiness = await getProtectedSupabaseAuthReadiness(async () => evidence);
+    const mfaProtectedReadiness = await getProtectedSupabaseAuthReadiness(async () => ({
+      ...evidence,
+      requiredAssuranceLevel: "aal1",
+    }));
     const internalIdentityAuthorized = authority.internal_identity
       && authority.authorized
       && protectedReadiness.ready;
+    const mfaEnrollmentDecision = evaluateInternalOwnerMfaEnrollment({
+      principalId: identity.principalId,
+      roles: authority.roles,
+      emailVerified: authority.email_verified,
+      internalIdentity: authority.internal_identity && authorityMatches,
+      assuranceLevel: identity.assuranceLevel,
+      protectedAuthorityReady: mfaProtectedReadiness.ready,
+      authorityReason: authorityMatches ? authority.reason : "authority_mismatch",
+    });
     return {
       status: internalIdentityAuthorized ? "ready" : "denied",
       reason: authorityMatches ? authority.reason : "authority_mismatch",
       identity,
       internalIdentityAuthorized,
+      mfaEnrollmentReady: mfaEnrollmentDecision.authorized,
       emailVerified: authority.email_verified,
       protectedReadiness,
       correlationId,
@@ -190,6 +207,7 @@ async function resolveInternalOwnerAuthority(
       reason: "authority_unavailable",
       identity,
       internalIdentityAuthorized: false,
+      mfaEnrollmentReady: false,
       emailVerified: false,
       protectedReadiness: await getProtectedSupabaseAuthReadiness(async () => ({
         ...unavailableEvidence,

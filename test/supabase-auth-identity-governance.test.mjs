@@ -176,3 +176,40 @@ test("the internal owner shell requires allowlist, owner role, AAL2, and fresh a
     { authorized: true, reason: "internal_owner_authorized" },
   );
 });
+
+test("first-time TOTP enrollment is limited to the exact durable owner at fresh AAL1", () => {
+  const {
+    INTERNAL_OWNER_PRINCIPAL_ID,
+    evaluateInternalOwnerMfaEnrollment,
+  } = governanceModule();
+  const ready = {
+    principalId: INTERNAL_OWNER_PRINCIPAL_ID,
+    roles: ["owner"],
+    emailVerified: true,
+    internalIdentity: true,
+    assuranceLevel: "aal1",
+    protectedAuthorityReady: true,
+    authorityReason: "aal2_required",
+  };
+
+  assert.equal(INTERNAL_OWNER_PRINCIPAL_ID, "obserra-owner-0001");
+  assert.deepEqual(plain(evaluateInternalOwnerMfaEnrollment(ready)), {
+    authorized: true,
+    reason: "mfa_enrollment_authorized",
+  });
+  for (const [field, value, reason] of [
+    ["principalId", "someone-else", "owner_principal_required"],
+    ["roles", [], "owner_role_required"],
+    ["emailVerified", false, "verified_email_required"],
+    ["internalIdentity", false, "internal_identity_unverified"],
+    ["assuranceLevel", "aal2", "aal1_enrollment_required"],
+    ["protectedAuthorityReady", false, "fresh_authority_unavailable"],
+    ["authorityReason", "session_revoked", "aal2_enrollment_not_required"],
+  ]) {
+    assert.deepEqual(
+      plain(evaluateInternalOwnerMfaEnrollment({ ...ready, [field]: value })),
+      { authorized: false, reason },
+      field,
+    );
+  }
+});

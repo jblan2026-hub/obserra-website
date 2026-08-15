@@ -45,14 +45,31 @@ test("callback exchanges PKCE code, preserves safe redirects, and routes AAL2 ch
   assert.match(callback, /cache-control.*no-store/is);
 });
 
-test("sign-out is same-origin POST and MFA verifies an existing factor", () => {
+test("password sign-in sends AAL1 owners to the real enrollment route without signing them out", () => {
+  const signInForm = read("app/sign-in/[[...sign-in]]/SupabaseSignInForm.tsx");
+  assert.match(signInForm, /signInWithPassword/);
+  assert.match(signInForm, /currentLevel === "aal2"/);
+  assert.match(signInForm, /router\.push\(`\/auth\/mfa\?redirect_url=/);
+  assert.doesNotMatch(signInForm, /signOut\(\{ scope: "local" \}\)/);
+});
+
+test("sign-out is same-origin POST and MFA uses real Supabase TOTP enrollment and verification", () => {
   const signOut = read("app/sign-out/route.ts");
   const mfa = read("app/auth/mfa/MfaChallenge.tsx");
+  const mfaPage = read("app/auth/mfa/page.tsx");
   assert.match(signOut, /export async function POST/);
   assert.match(signOut, /request\.headers\.get\("origin"\)/);
   assert.match(signOut, /supabase\.auth\.signOut/);
   assert.doesNotMatch(signOut, /export async function GET/);
+  assert.match(mfaPage, /getInternalOwnerAuthority/);
+  assert.match(mfaPage, /allowEnrollment=\{authority\.mfaEnrollmentReady\}/);
+  assert.match(mfa, /supabase\.auth\.mfa\.enroll\(\{/);
+  assert.match(mfa, /factorType:\s*"totp"/);
+  assert.match(mfa, /totp\.qr_code/);
   assert.match(mfa, /challengeAndVerify/);
+  assert.match(mfa, /getAuthenticatorAssuranceLevel/);
+  assert.match(mfa, /supabase\.auth\.mfa\.unenroll/);
   assert.match(mfa, /totp/);
-  assert.doesNotMatch(mfa, /\.enroll\(/);
+  assert.doesNotMatch(mfa, /placeholder=|mock|synthetic|demo/i);
+  assert.doesNotMatch(mfa, /console\.(?:log|info|debug)|localStorage|sessionStorage/);
 });

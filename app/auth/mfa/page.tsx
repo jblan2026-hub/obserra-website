@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { safeSupabaseIdentity } from "@/lib/auth/identity";
+import { getInternalOwnerAuthority } from "@/lib/auth/authority-repository";
 import { safeRelativeRedirect } from "@/lib/auth/redirects";
 import { prepareSupabaseAuthRuntime } from "@/lib/auth/runtime-config";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
@@ -20,8 +20,8 @@ export default async function MfaPage({
 }) {
   const params = await searchParams;
   const redirectUrl = safeRelativeRedirect(params.redirect_url ?? params.redirectUrl);
-  const identity = await safeSupabaseIdentity();
-  if (!identity.identity) {
+  const authority = await getInternalOwnerAuthority();
+  if (!authority.identity) {
     redirect(`/sign-in?redirect_url=${encodeURIComponent(redirectUrl)}`);
   }
   const runtime = prepareSupabaseAuthRuntime();
@@ -43,6 +43,7 @@ export default async function MfaPage({
         <div className="auth-panel">
           {runtime.ready ? (
             <MfaChallenge
+              allowEnrollment={authority.mfaEnrollmentReady}
               redirectUrl={redirectUrl}
               runtime={{
                 ready: runtime.ready,

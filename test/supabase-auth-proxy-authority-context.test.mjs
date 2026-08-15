@@ -29,6 +29,9 @@ function repositoryModule() {
           : { ready: false, reason: "not_ready" };
       },
     },
+    "./identity-governance": {
+      evaluateInternalOwnerMfaEnrollment: () => ({ authorized: false, reason: "aal1_enrollment_required" }),
+    },
     "../supabase/server": { createSupabaseServerClient: () => { throw new Error("server cookie client is forbidden in Proxy"); } },
   };
   vm.runInNewContext(output, {
