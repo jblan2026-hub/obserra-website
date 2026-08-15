@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     description: `Executive leadership, business judgment, and integrated security expertise behind ${LEGAL_ENTITY_NAME}.`,
     url: "https://www.obserrallc.com/about",
     type: "profile",
-    images: [{ url: "/leadership/dr-jody-blanchard-executive.webp", width: 1200, height: 1500, alt: "Dr. Jody Blanchard" }],
+    images: [{ url: "/leadership/dr-jody-blanchard-about.png", width: 266, height: 466, alt: "Dr. Jody Blanchard" }],
   },
 };
 
@@ -59,7 +59,7 @@ export default function AboutPage() {
         name: "Dr. Jody Blanchard",
         jobTitle: "Founder and Chief Executive Officer",
         worksFor: { "@type": "Organization", name: LEGAL_ENTITY_NAME, url: "https://www.obserrallc.com" },
-        image: "https://www.obserrallc.com/leadership/dr-jody-blanchard-executive.webp",
+        image: "https://www.obserrallc.com/leadership/dr-jody-blanchard-about.png",
         url: "https://www.obserrallc.com/about",
         hasCredential: [
           { "@type": "EducationalOccupationalCredential", name: "Private Investigator", credentialCategory: "Florida FDACS License", identifier: "C 3600281" },
@@ -92,7 +92,7 @@ export default function AboutPage() {
 
       <section className="about-profile">
         <div className="founder-profile-card">
-          <div className="profile-visual profile-photo-frame"><Image className="profile-photo" src="/leadership/dr-jody-blanchard-executive.webp" width={1200} height={1500} quality={95} sizes="(max-width: 800px) 86vw, 360px" priority alt={`Dr. Jody Blanchard, Founder and Chief Executive Officer of ${LEGAL_ENTITY_NAME}`} /></div>
+          <div className="profile-visual profile-photo-frame"><Image className="profile-photo" src="/leadership/dr-jody-blanchard-about.png" width={266} height={466} quality={95} sizes="(max-width: 800px) 86vw, 360px" priority alt={`Dr. Jody Blanchard, Founder and Chief Executive Officer of ${LEGAL_ENTITY_NAME}`} /></div>
           <div className="profile-photo-label"><span>DR. JODY BLANCHARD</span><strong>FOUNDER &amp; CHIEF EXECUTIVE OFFICER</strong><small>EXECUTIVE CYBERSECURITY · INTELLIGENCE · GOVERNANCE</small></div>
         </div>
         <div>

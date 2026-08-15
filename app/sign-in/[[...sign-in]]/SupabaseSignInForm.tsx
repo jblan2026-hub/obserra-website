@@ -43,13 +43,7 @@ export default function SupabaseSignInForm({
         router.refresh();
         return;
       }
-      if (data.nextLevel === "aal2") {
-        router.push(`/auth/mfa?redirect_url=${encodeURIComponent(redirectUrl)}`);
-        return;
-      }
-
-      await supabase.auth.signOut({ scope: "local" });
-      setMessage("Multi-factor authentication is required. Contact your administrator to complete account setup.");
+      router.push(`/auth/mfa?redirect_url=${encodeURIComponent(redirectUrl)}`);
     } catch {
       setMessage("Identity verification is temporarily unavailable. Please try again later.");
     } finally {

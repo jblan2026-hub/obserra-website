@@ -19,6 +19,8 @@ test("the server authority repository combines verified claims, JWKS, and durabl
   assert.match(repository, /sessionId === identity\.sessionId/);
   assert.match(repository, /roleVersion === identity\.roleVersion/);
   assert.match(repository, /email_verified/);
+  assert.match(repository, /evaluateInternalOwnerMfaEnrollment/);
+  assert.match(repository, /mfaEnrollmentReady/);
   assert.match(jwks, /\.well-known\/jwks\.json/);
   assert.match(jwks, /cache:\s*"no-store"/);
   assert.match(jwks, /AbortSignal\.timeout/);

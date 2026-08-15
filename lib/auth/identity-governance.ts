@@ -40,6 +40,18 @@ type InternalOwnerAuthorization = {
   productionAuthEnabled: boolean;
 };
 
+type InternalOwnerMfaEnrollmentAuthorization = {
+  principalId: string;
+  roles: readonly string[];
+  emailVerified: boolean;
+  internalIdentity: boolean;
+  assuranceLevel: "aal1" | "aal2" | null;
+  protectedAuthorityReady: boolean;
+  authorityReason: string;
+};
+
+export const INTERNAL_OWNER_PRINCIPAL_ID = "obserra-owner-0001";
+
 export type AuthorizationAuditInput = {
   provider: string;
   principalId: string;
@@ -140,6 +152,33 @@ export function evaluateInternalOwnerAuthorization(input: InternalOwnerAuthoriza
     return { authorized: false, reason: "fresh_authority_unavailable" as const };
   }
   return { authorized: true, reason: "internal_owner_authorized" as const };
+}
+
+export function evaluateInternalOwnerMfaEnrollment(
+  input: InternalOwnerMfaEnrollmentAuthorization,
+) {
+  if (input.principalId !== INTERNAL_OWNER_PRINCIPAL_ID) {
+    return { authorized: false, reason: "owner_principal_required" as const };
+  }
+  if (!input.roles.includes("owner")) {
+    return { authorized: false, reason: "owner_role_required" as const };
+  }
+  if (!input.emailVerified) {
+    return { authorized: false, reason: "verified_email_required" as const };
+  }
+  if (!input.internalIdentity) {
+    return { authorized: false, reason: "internal_identity_unverified" as const };
+  }
+  if (input.assuranceLevel !== "aal1") {
+    return { authorized: false, reason: "aal1_enrollment_required" as const };
+  }
+  if (!input.protectedAuthorityReady) {
+    return { authorized: false, reason: "fresh_authority_unavailable" as const };
+  }
+  if (input.authorityReason !== "aal2_required") {
+    return { authorized: false, reason: "aal2_enrollment_not_required" as const };
+  }
+  return { authorized: true, reason: "mfa_enrollment_authorized" as const };
 }
 
 export function authorizationAuditRecord(input: AuthorizationAuditInput) {
