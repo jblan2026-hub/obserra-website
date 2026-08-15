@@ -1,4 +1,4 @@
-import type { MarketplaceApp } from "./appsData";
+import type { DeploymentMode, MarketplaceApp } from "./appsData";
 
 export type BillingInterval = "monthly" | "annual";
 export type CommercePlan = {
@@ -6,7 +6,7 @@ export type CommercePlan = {
   name: string;
   description: string;
   billing: BillingInterval[];
-  deployment: MarketplaceApp["deployment"];
+  deployment: DeploymentMode[];
   includes: string[];
 };
 
@@ -14,7 +14,7 @@ export const commercePlans: CommercePlan[] = [
   {
     id: "professional",
     name: "Professional",
-    description: "Subscription access for a defined team, controlled onboarding, standard support, and SaaS deployment.",
+    description: "A future subscription shape that remains hidden until exact commercial approval is bound.",
     billing: ["monthly", "annual"],
     deployment: ["SaaS"],
     includes: ["Named-user access", "Standard onboarding", "Product updates", "Customer portal access", "Standard support"],
@@ -22,9 +22,9 @@ export const commercePlans: CommercePlan[] = [
   {
     id: "enterprise",
     name: "Enterprise",
-    description: "Enterprise licensing, deployment planning, integrations, governance controls, and dedicated implementation support.",
+    description: "A future enterprise agreement shape that remains hidden until exact commercial approval is bound.",
     billing: ["annual"],
-    deployment: ["SaaS", "Private Cloud", "Hybrid", "On-Premises"],
+    deployment: ["Local / on-prem", "SaaS", "Outbound tenant agent"],
     includes: ["Enterprise tenant", "Role-based administration", "Integration planning", "Security review", "Deployment assistance", "Priority support"],
   },
 ];
@@ -35,7 +35,8 @@ export function stripePriceEnvironmentKey(slug: string, plan: string, interval: 
 }
 
 export function availablePlansFor(app: MarketplaceApp) {
-  if (app.status === "Coming Soon") return [];
-  if (app.status === "Pilot") return commercePlans.filter((plan) => plan.id === "enterprise");
+  const hasApprovedSubscription = app.actions.some((action) => action.kind === "Subscribe");
+  if (!hasApprovedSubscription) return [];
+
   return commercePlans;
 }

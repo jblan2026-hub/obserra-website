@@ -7,24 +7,22 @@ import "./apps-commercial.css";
 import "./apps-responsive.css";
 
 export const metadata: Metadata = {
-  title: "Applications | Obserra Enterprise Marketplace",
+  title: "Applications | Obserra Product Release Catalog",
   description:
-    "Explore Obserra enterprise applications across cybersecurity, executive protection, intelligence, AI governance, and operational command.",
+    "Review product-specific Demo, Live, deployment, and release evidence for Obserra applications.",
   alternates: { canonical: "/apps" },
   keywords: ["enterprise applications", "cybersecurity software", "AI governance software", "obserra apps"],
   openGraph: {
-    title: "Obserra Applications Marketplace",
+    title: "Obserra Product Release Catalog",
     description:
-      "Enterprise software for intelligence, cybersecurity, executive protection, AI governance, and risk operations.",
+      "Reviewed Obserra products with explicit Demo, Live, deployment, and release-evidence states.",
     url: "https://www.obserrallc.com/apps",
     type: "website",
-    images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: "Obserra Applications Marketplace" }],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Obserra Applications Marketplace",
-    description: "Enterprise applications for cyber, intelligence, governance, and execution.",
-    images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
+    card: "summary",
+    title: "Obserra Product Release Catalog",
+    description: "Reviewed Obserra products with explicit release evidence and verification states.",
   },
 };
 
@@ -34,7 +32,7 @@ export default function AppsPage() {
     "@graph": [
       {
         "@type": "ItemList",
-        name: "Obserra Enterprise Applications Marketplace",
+        name: "Obserra Product Release Catalog",
         numberOfItems: marketplaceApps.length,
         itemListElement: marketplaceApps.map((entry, index) => ({
           "@type": "ListItem",
