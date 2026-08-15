@@ -39,13 +39,17 @@ test("Academy structured data identifies the legal entity as the course provider
   assert.match(certificate, /issued by \{LEGAL_NAME\}/);
 });
 
-test("the FDACS public program remains non-credit, unauthorized, and unable to issue records", () => {
+test("the FDACS public program remains non-credit with learner actions omitted pre-license", () => {
   const landing = read("app/florida-security-training/page.tsx");
+  const controls = read("app/florida-security-training/GovernedFloridaClassDLink.tsx");
   const completionPage = read("app/florida-security-training/completion/page.tsx");
 
   assert.match(landing, /PREVIEW UAT ONLY · NON-CREDIT · PRODUCTION AUTHORIZATION FALSE/);
+  assert.match(landing, /Enrollment, payment, and student course access are not open/);
   assert.match(landing, /FDACS provider and course authorization have not been granted/);
   assert.match(landing, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled/);
+  assert.match(controls, /if \(!enabled\) return null;/);
+  assert.doesNotMatch(controls, /aria-disabled|<button|disabled/);
   assert.match(completionPage, /Production authorization is false/);
   assert.match(completionPage, /No course credit, completion document, certificate, or LIAS record can be issued from Preview UAT/);
 });

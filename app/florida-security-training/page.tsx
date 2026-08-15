@@ -7,15 +7,20 @@ import {
   floridaClassDLmsAutomation,
   moduleTitle,
 } from "../../lib/florida-class-d";
+import { floridaClassDPublicLearnerControlsEnabled } from "../../lib/florida-class-d-production-activation";
+import GovernedFloridaClassDLink from "./GovernedFloridaClassDLink";
 import "./florida-security-training.css";
 
 export const metadata: Metadata = {
   title: "Florida Class D Security Officer Training",
   description: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC is building a premium Florida Class D Security Officer Training learning experience. Enrollment is not yet open.",
   alternates: { canonical: "/florida-security-training" },
+  robots: { index: true, follow: true },
 };
 
 export default function FloridaSecurityTrainingPage() {
+  const publicLearnerControlsEnabled = floridaClassDPublicLearnerControlsEnabled();
+
   return (
     <main className="fl-classd">
       <section className="fl-classd__hero">
@@ -24,8 +29,12 @@ export default function FloridaSecurityTrainingPage() {
         <span className="fl-classd__status">COMING SOON · LEARNING MANAGEMENT SYSTEM IN PROGRESS</span>
         <h1>{FLORIDA_CLASS_D_COURSE.title}</h1>
         <p className="fl-classd__lead">A controlled Preview UAT environment from <strong>{FLORIDA_CLASS_D_COURSE.provider}</strong>, engineered to test live instruction, secure enrollment controls, verified attendance, student interaction, learning checks, examination controls, training records, and post-course administration without awarding course credit.</p>
-        <div className="fl-classd__notice"><LockKeyhole size={20} /><div><strong>Enrollment and payment are not yet enabled.</strong><span>This page is a development preview for non-credit UAT. FDACS provider and course authorization have not been granted. Production instruction, course credit, completion, certificates, and LIAS reporting are disabled. Preview UAT cannot create a student completion or licensing record.</span></div></div>
-        <div className="fl-classd__actions"><Link href="/contact?interest=florida-class-d-training">Join the interest list</Link><Link className="secondary" href="/florida-security-training/access">Authorized student course sign-in</Link></div>
+        <div className="fl-classd__notice"><LockKeyhole size={20} /><div><strong>Coming Soon.</strong><span>Enrollment, payment, and student course access are not open. FDACS provider and course authorization have not been granted. Production instruction, course credit, completion, certificates, and LIAS reporting are disabled. Preview UAT cannot create a student completion or licensing record.</span></div></div>
+        <div className="fl-classd__actions">
+          <Link href="/contact?interest=florida-class-d-training">Request a program launch notice — not enrollment or payment</Link>
+          <GovernedFloridaClassDLink enabled={publicLearnerControlsEnabled} href="/florida-security-training/enroll">Enrollment and payment</GovernedFloridaClassDLink>
+          <GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access">Student course access</GovernedFloridaClassDLink>
+        </div>
       </section>
 
       <section className="fl-classd__metrics" aria-label="Course structure">
@@ -63,7 +72,7 @@ export default function FloridaSecurityTrainingPage() {
           <div><b>03</b><span>Meet the assigned licensed Class DI instructor for the required personal identity attestation.</span></div>
           <div><b>04</b><span>Open the assigned lesson from controlled course access after the instructor starts the secure video room.</span></div>
         </div>
-        <div className="fl-classd__actions"><Link className="secondary" href="/florida-security-training/access">Open protected student access</Link></div>
+        <div className="fl-classd__actions"><GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access">Student course access</GovernedFloridaClassDLink></div>
       </section>
 
       <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>Preview UAT is non-credit. Completing any test activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. FDACS provider and course authorization have not been granted. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied.</p></div></section>

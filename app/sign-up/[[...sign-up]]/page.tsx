@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SignUp } from "@clerk/nextjs";
+import { identityProviderForRequest } from "@/lib/auth/provider-routing";
+import { safeRelativeRedirect } from "@/lib/auth/redirects";
+import { prepareSupabaseAuthRuntime } from "@/lib/auth/runtime-config";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
@@ -10,7 +13,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function SignUpPage() {
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const redirectUrl = safeRelativeRedirect(params.redirect_url ?? params.redirectUrl);
+  const ownership = identityProviderForRequest({ pathname: "/sign-up", redirectTarget: redirectUrl });
+  const supabaseRuntime = prepareSupabaseAuthRuntime();
+  const useSupabase = ownership.provider === "supabase" && supabaseRuntime.runtimeEnabled;
+
   return (
     <main className="auth-shell">
       <header className="auth-header">
@@ -28,7 +41,25 @@ export default function SignUpPage() {
             <span>Email verification</span><span>Protected session management</span><span>Account based completion records</span><span>Enterprise federation ready</span>
           </div>
         </div>
-        <div className="auth-panel"><SignUp routing="path" path="/sign-up" signInUrl="/sign-in" fallbackRedirectUrl="/portal" /></div>
+        <div className="auth-panel">
+          {useSupabase ? (
+            <div>
+              <p className="eyebrow">INVITATION REQUIRED</p>
+              <h2>Invitation required</h2>
+              <p>{LEGAL_ENTITY_NAME} identity accounts are provisioned only for approved internal personnel. Public registration is closed.</p>
+              <Link href={`/sign-in?redirect_url=${encodeURIComponent(redirectUrl)}`}>Return to sign in</Link>
+              {!supabaseRuntime.ready ? <p role="alert">Identity configuration is unavailable. Access remains closed.</p> : null}
+            </div>
+          ) : (
+            <SignUp
+              routing="path"
+              path="/sign-up"
+              signInUrl="/sign-in"
+              forceRedirectUrl={redirectUrl}
+              fallbackRedirectUrl={redirectUrl}
+            />
+          )}
+        </div>
       </section>
       <p className="auth-note">Create an account only for yourself or for an identity you are authorized to administer. Account activity may be logged for security and support.</p>
     </main>

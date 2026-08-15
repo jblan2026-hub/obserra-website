@@ -20,6 +20,7 @@ export const EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION = "20260815170000
 export const EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256 = "2fae1d73554e3455d765b55b8df4aec25a40f29420497308a5443156cab01487";
 
 export const FLORIDA_CLASS_D_REGULATED_FEATURE_FLAGS = [
+  "OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED",
   "OBSERRA_FDACS_IDENTITY_VERIFICATION_ENABLED",
   "OBSERRA_FDACS_CLASS_D_LIVE_ENABLED",
   "OBSERRA_FDACS_CLASS_D_MEDIA_ENABLED",
@@ -417,6 +418,13 @@ function baseProductionConditionsReady() {
 
 export function floridaClassDProductionActivationAuthorized() {
   return baseProductionConditionsReady() && activationAuthorizationMarkerReady();
+}
+
+export function floridaClassDPublicLearnerControlsEnabled() {
+  return (
+    floridaClassDProductionActivationAuthorized()
+    && enabled("OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED")
+  );
 }
 
 export function floridaClassDNonProductionExecutionAuthorized() {

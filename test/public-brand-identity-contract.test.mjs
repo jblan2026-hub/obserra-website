@@ -83,6 +83,7 @@ test("non-Applications customer source rejects retired or shortened company iden
 test("public regulatory status remains fail closed and human determinations remain pending", () => {
   const trust = fs.readFileSync("app/trust/page.tsx", "utf8");
   const fdacs = fs.readFileSync("app/florida-security-training/page.tsx", "utf8");
+  const completion = fs.readFileSync("app/florida-security-training/completion/page.tsx", "utf8");
 
   assert.match(trust, /Cybersecurity Maturity Model Certification \(CMMC\) Level 2/);
   assert.match(trust, /Not assessed/);
@@ -92,4 +93,6 @@ test("public regulatory status remains fail closed and human determinations rema
   assert.match(trust, /Not granted/);
   assert.match(fdacs, /does not claim FDACS approval or production authorization/);
   assert.match(fdacs, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled/);
+  assert.match(completion, /Production authorization is false/);
+  assert.match(completion, /No course credit, completion document, certificate, or LIAS record can be issued from Preview UAT/);
 });

@@ -41,9 +41,13 @@ test("search discovery includes only the public FDACS landing surface", () => {
   }
 });
 
-test("the protected LMS explains photo-ID handling and the secure video path", () => {
+test("the public FDACS page preserves future structure while unavailable actions are omitted", () => {
+  const governedLink = fs.readFileSync("app/florida-security-training/GovernedFloridaClassDLink.tsx", "utf8");
   assert.match(publicFdacs, /Photo-ID controls before secure live video/);
   assert.match(publicFdacs, /not copied into the LMS/);
+  assert.match(publicFdacs, /enabled=\{publicLearnerControlsEnabled\}/);
+  assert.match(governedLink, /if \(!enabled\) return null;/);
+  assert.doesNotMatch(governedLink, /aria-disabled|<button|disabled/);
   assert.match(protectedAccess, /The LMS does not store copies or biometric templates/);
   assert.match(protectedAccess, /short-lived secure video/);
   assert.match(protectedAccess, /single-device controls pass/);
@@ -55,7 +59,7 @@ test("the protected LMS explains photo-ID handling and the secure video path", (
 test("public conversion paths are functional and claims stay explicit", () => {
   assert.doesNotMatch(contact, /calendly\.com/);
   assert.match(contact, /Request consultation scheduling/);
-  assert.match(contact, /"florida-class-d-training": "Florida Class D training interest"/);
+  assert.match(contact, /"florida-class-d-training": "Florida Class D program launch notice \(not enrollment or payment\)"/);
   assert.doesNotMatch(contactPage, /TRACKED DISTRIBUTION LINKS|lead-generation strategy session/);
   assert.match(contactPage, /ENGAGEMENT GOVERNANCE/);
   assert.match(home, /Illustrative preview/);
