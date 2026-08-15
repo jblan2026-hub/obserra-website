@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { Check, CircleDashed, IdCard, LockKeyhole, RefreshCw, Video } from "lucide-react";
 
 type VerificationStatus = {
   enrollmentId?: string | null;
@@ -154,38 +155,44 @@ export default function IdentityVerificationClient() {
   }, [complete, identityLobby?.joinUrl, loadIdentityLobby, providerVerified]);
 
   if (!payload && !error) {
-    return <div className="fl-classd__notice"><span>Loading controlled identity status…</span></div>;
+    return <div className="fl-classd__notice fl-classd__loading" role="status"><RefreshCw size={20} aria-hidden="true" /><span>Loading controlled identity status…</span></div>;
   }
 
   return (
-    <section className="fl-classd__section" aria-live="polite">
+    <section className="fl-classd__section fl-classd__identity-shell" aria-live="polite" aria-busy={busy}>
+      <div className="fl-classd__identity-progress" aria-label="Identity verification stages">
+        <div className={status?.enrollmentId ? "is-complete" : "is-current"}><span>{status?.enrollmentId ? <Check size={16} /> : <CircleDashed size={16} />}</span><small>01</small><strong>Enrollment</strong></div>
+        <div className={providerVerified ? "is-complete" : status?.enrollmentId ? "is-current" : ""}><span>{providerVerified ? <Check size={16} /> : <IdCard size={16} />}</span><small>02</small><strong>Hosted ID + selfie</strong></div>
+        <div className={complete ? "is-complete" : providerVerified ? "is-current" : ""}><span>{complete ? <Check size={16} /> : <Video size={16} />}</span><small>03</small><strong>Instructor video check</strong></div>
+        <div className={status?.instructionalAccessGranted ? "is-complete" : complete ? "is-current" : ""}><span>{status?.instructionalAccessGranted ? <Check size={16} /> : <LockKeyhole size={16} />}</span><small>04</small><strong>Course access</strong></div>
+      </div>
       {ownerUat ? (
-        <div className="fl-classd__notice">
+        <div className="fl-classd__notice is-warning">
           <strong>Live provider · non-credit owner UAT.</strong>
           <span>Your government ID and selfie are processed by Stripe&apos;s hosted live verification service. This acceptance record cannot grant training credit, completion, LIAS reporting, or represent FDACS approval.</span>
         </div>
       ) : null}
-      {error ? <div className="fl-classd__notice"><strong>Access remains locked.</strong><span>{error}</span></div> : null}
+      {error ? <div className="fl-classd__notice is-locked" role="alert"><LockKeyhole size={20} aria-hidden="true" /><div><strong>Access remains locked.</strong><span>{error}</span></div></div> : null}
 
       {!status?.enrollmentId ? (
-        <div className="fl-classd__notice">
+        <div className="fl-classd__notice is-locked">
           <strong>No eligible Class D enrollment was found.</strong>
           <span>Identity verification is available only after a regulated pre-enrollment record has been created.</span>
         </div>
       ) : complete ? (
-        <div className="fl-classd__notice">
+        <div className="fl-classd__notice is-success">
           <strong>Identity control complete.</strong>
           <span>The automated government-ID and matching-selfie result and the assigned Class DI instructor attestation are recorded. Daily instructor check-in is still required before each training day.</span>
           <Link href="/florida-security-training/access">Continue to controlled course access</Link>
         </div>
       ) : providerVerified ? (
         <div className="fl-classd__identity-lobby">
-          <div className="fl-classd__notice" role="status">
+          <div className="fl-classd__notice is-pending" role="status">
             <strong>Automated verification complete; assigned-instructor video verification pending.</strong>
             <span>Join the protected lobby with your U.S. state or federal photo ID. Only the licensed Class DI instructor assigned to your cohort may complete this verification.</span>
           </div>
           {lobbyError ? (
-            <div className="fl-classd__notice" role="alert">
+            <div className="fl-classd__notice is-locked" role="alert">
               <strong>Video verification remains locked.</strong>
               <span>{lobbyError}</span>
               <button type="button" onClick={() => void loadIdentityLobby().catch((lobbyLoadError) => setLobbyError(lobbyLoadError instanceof Error ? lobbyLoadError.message : "The protected identity video lobby is unavailable."))}>Retry protected video</button>
@@ -207,7 +214,7 @@ export default function IdentityVerificationClient() {
           <button type="button" onClick={() => void refresh()}>Refresh verification status</button>
         </div>
       ) : (
-        <div className="fl-classd__automation-grid">
+        <div className="fl-classd__automation-grid fl-classd__identity-steps">
           <div>
             <b>1</b>
             <span>Use Stripe&apos;s hosted verification to submit a government photo ID and matching selfie. The verification occurs on Stripe&apos;s controlled service.</span>

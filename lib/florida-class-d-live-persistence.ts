@@ -285,17 +285,26 @@ export function startFloridaClassDLiveSession(actor: StaffActor, input: {
   instructorLicenseNumber: string | null;
   schoolLicenseNumber: string | null;
   inspectionAccessReference?: string | null;
+  initialPresencePrompt: string;
+  initialPresenceAnswer: string;
   correlationId: string;
 }) {
   requireUuid(input.liveSessionId, "live session id");
   requireUuid(input.correlationId, "correlation id");
-  return rpc<null>("fdacs_class_d_start_live_session", {
+  return rpc<{
+    status?: string;
+    segmentType?: string;
+    challengeCount?: number;
+    initialPresenceVerified?: boolean;
+  }>("fdacs_class_d_start_live_session_with_initial_presence", {
     p_live_session_id: input.liveSessionId,
     p_actor_role: actor.role,
     p_actor_clerk_user_id: actor.userId,
     p_instructor_license_number: input.instructorLicenseNumber,
     p_school_license_number: input.schoolLicenseNumber,
     p_inspection_access_reference: input.inspectionAccessReference ?? null,
+    p_challenge_prompt: input.initialPresencePrompt,
+    p_answer_digest: digestAnswer(input.initialPresenceAnswer),
     p_correlation_id: input.correlationId,
   });
 }

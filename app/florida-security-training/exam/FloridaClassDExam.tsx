@@ -185,11 +185,21 @@ export default function FloridaClassDExam() {
   }
 
   async function submit() {
-    if (!attempt?.id || remainingSeconds > 0 || monitoringBlocked || busyAction) return;
+    if (!attempt?.id || !question?.id || !selected || remainingSeconds > 0 || monitoringBlocked || busyAction) return;
     if (!window.confirm("Submit the final examination for scoring? Answers cannot be changed after submission.")) return;
     setBusyAction("submit");
     setError(null);
     try {
+      const persisted = await examRequest({
+        action: "answer",
+        attemptId: attempt.id,
+        questionId: question.id,
+        selectedChoiceKey: selected,
+        direction: "stay",
+      });
+      if (persisted.question?.id !== question.id || persisted.question.selectedChoiceKey !== selected) {
+        throw new Error("The current answer was not confirmed by the examination record. Submission remains locked.");
+      }
       await examRequest({ action: "submit", attemptId: attempt.id });
       await refresh();
     } catch (e) {
@@ -202,29 +212,35 @@ export default function FloridaClassDExam() {
 
   return (
     <main className="fdacs-live fdacs-exam">
+      <a className="fdacs-live__skip" href="#protected-exam-workspace">Skip to examination workspace</a>
       <header className="fdacs-live__topbar">
-        <div><span>OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</span><h1>Florida Class D Final Examination</h1></div>
-        <div className="fdacs-live__status"><strong>PROTECTED EXAMINATION</strong><small>170 questions · 128 required to pass · minimum 2 hours</small></div>
+        <div className="fdacs-live__brandline"><span>OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</span><h1>Florida Class D Final Examination</h1><small>Controlled assessment workspace · authenticated attempt</small></div>
+        <div className="fdacs-live__status" role="status" aria-live="polite"><strong>PROTECTED EXAMINATION</strong><small>170 questions · 128 required to pass · minimum 2 hours</small></div>
       </header>
 
       {error ? <div ref={errorRef} className="fdacs-live__alert" role="alert" tabIndex={-1}>{error}</div> : null}
 
       {!attempt ? (
-        <section className="fdacs-live__panel fdacs-exam__start">
+        <section className="fdacs-live__panel fdacs-exam__start" id="protected-exam-workspace">
+          <span className="fdacs-exam__kicker">ELIGIBILITY GATE</span>
           <h2>Final examination eligibility</h2>
           <p>The examination is separate from the 40 instructional hours. Access remains locked unless your identity, enrollment, verified instructional time, and the Division-approved examination-bank controls are satisfied.</p>
+          <div className="fdacs-exam__requirements" aria-label="Examination controls">
+            <span><b>170</b> randomized questions</span><span><b>128</b> required to pass</span><span><b>2 hr</b> minimum duration</span>
+          </div>
           <button type="button" disabled={busyAction !== null} onClick={() => void start()}>{busyAction === "start" ? "Starting protected exam…" : "Start final examination"}</button>
         </section>
       ) : null}
 
       {attempt && attempt.status === "in_progress" && question ? (
         <>
-          <section className="fdacs-exam__metrics">
+          <section className="fdacs-exam__metrics" id="protected-exam-workspace" aria-label="Examination status">
             <div><small>QUESTION</small><strong>{attempt.questionNumber ?? question.number} / {attempt.totalQuestions ?? 170}</strong></div>
             <div><small>ELAPSED</small><strong>{elapsedLabel}</strong></div>
             <div><small>EARLIEST SUBMIT</small><strong>{remainingSeconds > 0 ? `${Math.ceil(remainingSeconds / 60)} min` : "Available"}</strong></div>
             <div><small>MONITORING</small><strong>{monitoringLabel.replaceAll("_", " ").toUpperCase()}</strong></div>
           </section>
+          <div className="fdacs-exam__progress" role="progressbar" aria-label="Examination progress" aria-valuemin={1} aria-valuemax={attempt.totalQuestions ?? 170} aria-valuenow={attempt.questionNumber ?? question.number}><span style={{ width: `${Math.max(0.6, ((attempt.questionNumber ?? question.number) / (attempt.totalQuestions ?? 170)) * 100)}%` }} /></div>
           {monitoringBlocked ? (
             <section className="fdacs-live__panel fdacs-live__alert" role="alert" aria-live="assertive">
               <h2>Examination paused for monitoring review</h2>
@@ -247,7 +263,7 @@ export default function FloridaClassDExam() {
               <div className="fdacs-exam__actions">
                 <button type="button" disabled={busyAction !== null || !selected || (attempt.questionNumber ?? 1) <= 1} onClick={() => void save("previous")}>{busyAction === "save" ? "Saving…" : "Save & previous"}</button>
                 <button type="button" disabled={busyAction !== null || !selected || (attempt.questionNumber ?? 1) >= 170} onClick={() => void save("next")}>{busyAction === "save" ? "Saving…" : "Save & next"}</button>
-                <button type="button" disabled={busyAction !== null || remainingSeconds > 0} onClick={() => void submit()}>{busyAction === "submit" ? "Submitting…" : "Submit examination"}</button>
+                <button type="button" disabled={busyAction !== null || !selected || remainingSeconds > 0} onClick={() => void submit()}>{busyAction === "submit" ? "Saving answer & submitting…" : "Submit examination"}</button>
               </div>
             </section>
           )}
@@ -256,7 +272,7 @@ export default function FloridaClassDExam() {
       ) : null}
 
       {attempt && attempt.status !== "in_progress" ? (
-        <section className="fdacs-live__panel fdacs-exam__result">
+        <section className="fdacs-live__panel fdacs-exam__result" id="protected-exam-workspace">
           <h2>Examination {attempt.status}</h2>
           <div className="fdacs-exam__score">{attempt.score ?? 0}<span>/ 170</span></div>
           <p>{attempt.passed ? "Passing score achieved. Completion remains subject to school review and the controlled FDACS/LIAS workflow." : "Passing score was not achieved or the attempt was invalidated. The school will apply its controlled remediation, review, and retest process."}</p>

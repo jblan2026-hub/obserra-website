@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import { NextResponse } from "next/server";
 import {
   FloridaClassDAuthorizationError,
@@ -103,6 +104,10 @@ function errorResponse(error: unknown) {
   );
 }
 
+function generateInitialPresenceCode() {
+  return String(randomInt(100000, 1_000_000));
+}
+
 export async function GET(request: Request) {
   try {
     if (!floridaClassDLiveInstructionEnabled()) return disabled();
@@ -199,14 +204,36 @@ export async function POST(request: Request) {
       const instructorLicenseNumber = ownerUat ? null : getFloridaClassDInstructorLicenseNumber();
       const schoolLicenseNumber = ownerUat ? null : getFloridaClassDSchoolLicenseNumber();
       if (!ownerUat && (!instructorLicenseNumber || !schoolLicenseNumber)) return disabled();
-      await startFloridaClassDLiveSession(actor, {
+      const presenceCode = generateInitialPresenceCode();
+      const start = await startFloridaClassDLiveSession(actor, {
         liveSessionId,
         instructorLicenseNumber,
         schoolLicenseNumber,
         inspectionAccessReference: typeof body.inspectionAccessReference === "string" ? body.inspectionAccessReference : null,
+        initialPresencePrompt: "Enter the six-digit presence code announced or displayed by your live instructor.",
+        initialPresenceAnswer: presenceCode,
         correlationId,
       });
-      return NextResponse.json({ started: true, correlationId }, { headers });
+      if (
+        start.status !== "live" ||
+        start.segmentType !== "instruction" ||
+        start.initialPresenceVerified !== true ||
+        typeof start.challengeCount !== "number" ||
+        start.challengeCount < 1
+      ) {
+        throw new FloridaClassDLivePersistenceError(
+          "Atomic live start did not return verified initial-presence evidence.",
+          502,
+          "FDACS_LIVE_ATOMIC_START_INVALID",
+        );
+      }
+      return NextResponse.json({
+        started: true,
+        presenceCode,
+        initialPresenceChallengeCount: start.challengeCount,
+        initialPresenceVerified: true,
+        correlationId,
+      }, { headers });
     }
 
     if (body.action === "segment") {

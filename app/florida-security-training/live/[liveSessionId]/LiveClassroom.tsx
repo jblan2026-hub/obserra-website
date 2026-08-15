@@ -113,9 +113,17 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   const [pollSubmitting, setPollSubmitting] = useState(false);
   const [joinBusy, setJoinBusy] = useState(false);
   const [mediaBusy, setMediaBusy] = useState(false);
+  const [mediaStale, setMediaStale] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [announcement, setAnnouncement] = useState<string | null>(null);
+  const [lastSuccessfulRefreshAt, setLastSuccessfulRefreshAt] = useState<number | null>(null);
+  const [freshnessNow, setFreshnessNow] = useState(() => Date.now());
   const [statusText, setStatusText] = useState("Connecting to regulated live classroom…");
   const joining = useRef(false);
+  const errorRef = useRef<HTMLDivElement | null>(null);
+  const announcementRef = useRef<HTMLDivElement | null>(null);
+  const announcedChallengeIds = useRef(new Set<string>());
+  const announcedPollIds = useRef(new Set<string>());
 
   const browserInstanceId = useMemo(() => {
     if (typeof window === "undefined") return "server-placeholder-instance";
@@ -132,6 +140,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Unable to load live classroom state.");
     setState(payload as LiveState);
+    setLastSuccessfulRefreshAt(Date.now());
   }, [liveSessionId]);
 
   const loadMedia = useCallback(async () => {
@@ -143,7 +152,11 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
       const access = payload as MediaAccess;
       if (!access.joinUrl || !access.tokenExpiresAt) throw new Error("Secure live video did not return complete time-bounded access.");
       setMedia(access);
-      setError(null);
+      setMediaStale(false);
+    } catch (mediaError) {
+      setMediaStale(true);
+      setMedia(null);
+      throw mediaError;
     } finally {
       setMediaBusy(false);
     }
@@ -153,7 +166,6 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
     if (joining.current) return;
     joining.current = true;
     setJoinBusy(true);
-    setError(null);
     setStatusText("Connecting to regulated live classroom…");
     try {
       const result = await api({ action: "join", liveSessionId, browserInstanceId });
@@ -176,6 +188,19 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
     const timer = window.setTimeout(() => void joinClassroom(), 0);
     return () => window.clearTimeout(timer);
   }, [joinClassroom]);
+
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
+
+  useEffect(() => {
+    if (announcement) announcementRef.current?.focus();
+  }, [announcement]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setFreshnessNow(Date.now()), 5_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (!deviceLeaseId) return;
@@ -212,7 +237,9 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
     };
     void sendHeartbeat();
     const heartbeat = window.setInterval(() => void sendHeartbeat(), 60_000);
-    const stateRefresh = window.setInterval(() => void refresh().catch(() => undefined), 10_000);
+    const stateRefresh = window.setInterval(() => void refresh().catch((refreshError) => {
+      setError((current) => current ?? (refreshError instanceof Error ? refreshError.message : "Live state is stale because classroom status could not be refreshed."));
+    }), 10_000);
     const onVisibility = () => {
       if (document.visibilityState === "visible") void sendHeartbeat();
     };
@@ -224,6 +251,21 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [deviceLeaseId, refresh]);
+
+  useEffect(() => {
+    const messages: string[] = [];
+    const challengeId = state?.pendingChallenge?.id;
+    if (challengeId && !announcedChallengeIds.current.has(challengeId)) {
+      announcedChallengeIds.current.add(challengeId);
+      messages.push("A new required presence check is available. Complete it now to protect your attendance record.");
+    }
+    const pollId = state?.activePoll?.id;
+    if (pollId && !announcedPollIds.current.has(pollId)) {
+      announcedPollIds.current.add(pollId);
+      messages.push("A new live knowledge poll is available.");
+    }
+    if (messages.length) setAnnouncement(messages.join(" "));
+  }, [state?.activePoll?.id, state?.pendingChallenge?.id]);
 
   useEffect(() => {
     const activePollId = state?.activePoll?.id;
@@ -251,9 +293,17 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
     return () => window.removeEventListener("pagehide", leave);
   }, [deviceLeaseId]);
 
+  const stateStale = Boolean(deviceLeaseId && (!lastSuccessfulRefreshAt || freshnessNow - lastSuccessfulRefreshAt > 25_000));
+
+  function requireFreshState() {
+    if (!stateStale) return true;
+    setError("Live state is stale. Refresh the regulated classroom state before taking this action.");
+    return false;
+  }
+
   async function submitQuestion(event: FormEvent) {
     event.preventDefault();
-    if (!question.trim()) return;
+    if (!question.trim() || !requireFreshState()) return;
     try {
       await api({ action: "question", liveSessionId, content: question.trim() });
       setQuestion("");
@@ -264,6 +314,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   }
 
   async function raiseHand() {
+    if (!requireFreshState()) return;
     try {
       await api({ action: "hand_raise", liveSessionId, content: "Student raised hand" });
       await refresh();
@@ -275,7 +326,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   async function submitChallenge(event: FormEvent) {
     event.preventDefault();
     const challengeId = state?.pendingChallenge?.id;
-    if (!challengeId || !challengeAnswer.trim()) return;
+    if (!challengeId || !challengeAnswer.trim() || !requireFreshState()) return;
     try {
       await api({ action: "challenge", challengeId, answer: challengeAnswer.trim() });
       setChallengeAnswer("");
@@ -288,13 +339,12 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   async function submitPoll(event: FormEvent) {
     event.preventDefault();
     const poll = state?.activePoll;
-    if (!poll?.id || selectedPollOption === null || state?.activePollResponse?.pollId === poll.id) return;
+    if (!poll?.id || selectedPollOption === null || state?.activePollResponse?.pollId === poll.id || !requireFreshState()) return;
     const openedAt = poll.opened_at ? Date.parse(poll.opened_at) : Number.NaN;
     const responseMilliseconds = Number.isFinite(openedAt)
       ? Math.max(0, Math.min(7_200_000, Date.now() - openedAt))
       : null;
     setPollSubmitting(true);
-    setError(null);
     try {
       await api({
         action: "poll_response",
@@ -320,26 +370,30 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
 
   return (
     <main className="fdacs-live">
+      <a className="fdacs-live__skip" href="#live-classroom-workspace">Skip to classroom workspace</a>
       <header className="fdacs-live__topbar">
-        <div>
+        <div className="fdacs-live__brandline">
           <span>OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</span>
           <h1>Florida Class D Live Classroom</h1>
+          <small>Controlled learner workspace · server-recorded attendance</small>
         </div>
-        <div className={`fdacs-live__status ${isBreak ? "is-break" : ""}`}>
+        <div className={`fdacs-live__status ${isBreak ? "is-break" : ""}`} role="status" aria-live="polite">
           <strong>{isBreak ? "15 MINUTE BREAK" : "LIVE INSTRUCTION"}</strong>
-          <small>{statusText}</small>
+          <small>{stateStale ? "Live state is stale. Regulated actions are locked pending refresh." : statusText}</small>
         </div>
       </header>
 
-      {error ? <div className="fdacs-live__alert" role="alert">{error}</div> : null}
+      {announcement ? <div ref={announcementRef} className="fdacs-live__announcement" role="alert" tabIndex={-1}><span>{announcement}</span><button type="button" onClick={() => setAnnouncement(null)}>Dismiss announcement</button></div> : null}
+      {error ? <div ref={errorRef} className="fdacs-live__alert" role="alert" tabIndex={-1}><strong>Classroom attention required</strong><span>{error}</span><button type="button" onClick={() => setError(null)}>Acknowledge</button></div> : null}
+      {stateStale ? <div className="fdacs-live__recovery is-stale" role="alert"><span><strong>Live state is stale</strong>Polls, presence responses, hand raises, and questions are locked until authoritative state is restored.</span><button type="button" onClick={() => void refresh().catch((refreshError) => setError(refreshError instanceof Error ? refreshError.message : "Live state is stale and could not be refreshed."))}>Refresh classroom state</button></div> : null}
       {!deviceLeaseId ? (
-        <div className="fdacs-live__recovery" role="status">
-          <span>Instruction, attendance, and course credit remain locked until the single-device lease succeeds.</span>
+        <div className="fdacs-live__recovery" role="status" aria-live="polite">
+          <span><strong>Secure entry checkpoint</strong>Instruction, attendance, and course credit remain locked until the single-device lease succeeds.</span>
           <button type="button" disabled={joinBusy} onClick={() => void joinClassroom()}>{joinBusy ? "Connecting…" : "Retry secure classroom entry"}</button>
         </div>
       ) : null}
 
-      <section className="fdacs-live__grid">
+      <section className="fdacs-live__grid" id="live-classroom-workspace" aria-busy={joinBusy || mediaBusy}>
         <div className="fdacs-live__stage">
           <div className="fdacs-live__stage-frame fdacs-live__media-frame">
             {media?.joinUrl ? (
@@ -359,10 +413,11 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
             )}
           </div>
           <p className="fdacs-live__fineprint">Video and audio are delivered through a short-lived, room-bound secure media token. OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC attendance and instructional-time evidence remain independent from the media provider. Recording is disabled by default.</p>
+          {deviceLeaseId ? <div className="fdacs-live__media-recovery"><span>{mediaStale ? "Secure media access is stale or unavailable." : "Secure media token is current and time bounded."}</span><button type="button" disabled={mediaBusy} onClick={() => void loadMedia().catch((mediaError) => setError(mediaError instanceof Error ? mediaError.message : "Secure live video access could not be renewed."))}>{mediaBusy ? "Renewing video…" : "Renew secure video"}</button></div> : null}
 
           <InstructionalTextScreen screen={state?.activeTextScreen} deviceLeaseId={deviceLeaseId} />
 
-          <h3 className="fdacs-live__time-title">Current live lesson</h3>
+          <h3 className="fdacs-live__time-title"><span>Time ledger</span>Current live lesson</h3>
           <div className="fdacs-live__timecards">
             <article><span>Total connected</span><strong>{formatDuration(seconds(time?.connected_seconds))}</strong></article>
             <article><span>Instruction present</span><strong>{formatDuration(seconds(time?.instructional_presence_seconds))}</strong></article>
@@ -370,7 +425,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
             <article><span>Uncredited connected</span><strong>{formatDuration(seconds(time?.uncredited_connected_seconds))}</strong></article>
           </div>
 
-          <h3 className="fdacs-live__time-title">Day {session?.day ?? "–"} cumulative time</h3>
+          <h3 className="fdacs-live__time-title"><span>Daily record</span>Day {session?.day ?? "–"} cumulative time</h3>
           <div className="fdacs-live__timecards">
             <article><span>Day connected</span><strong>{formatDuration(seconds(dayTime?.connectedSeconds))}</strong></article>
             <article><span>Day instruction</span><strong>{formatDuration(seconds(dayTime?.instructionalPresenceSeconds))}</strong></article>
@@ -378,7 +433,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
             <article><span>Day uncredited</span><strong>{formatDuration(seconds(dayTime?.uncreditedConnectedSeconds))}</strong></article>
           </div>
 
-          <h3 className="fdacs-live__time-title">Entire 40-hour course ledger</h3>
+          <h3 className="fdacs-live__time-title"><span>Course record</span>Entire 40-hour course ledger</h3>
           <div className="fdacs-live__timecards">
             <article><span>Course connected</span><strong>{formatDuration(seconds(courseTime?.connectedSeconds))}</strong></article>
             <article><span>Course instruction</span><strong>{formatDuration(seconds(courseTime?.instructionalPresenceSeconds))}</strong></article>
@@ -389,13 +444,13 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
         </div>
 
         <aside className="fdacs-live__side">
-          <section className="fdacs-live__panel">
+          <section className="fdacs-live__panel fdacs-live__presence-panel">
             <div className="fdacs-live__panel-head"><h2>Presence check</h2><span>{time?.presence_state ?? "waiting"}</span></div>
             {state?.pendingChallenge ? (
               <form onSubmit={submitChallenge} className="fdacs-live__form">
                 <p>{state.pendingChallenge.prompt}</p>
-                <input aria-label="Presence check answer" value={challengeAnswer} onChange={(event) => setChallengeAnswer(event.target.value)} placeholder="Your answer" autoComplete="off" />
-                <button type="submit">Submit check-in</button>
+                <input aria-label="Presence check answer" value={challengeAnswer} onChange={(event) => setChallengeAnswer(event.target.value)} placeholder="Your answer" autoComplete="off" disabled={stateStale} />
+                <button type="submit" disabled={stateStale || !challengeAnswer.trim()}>Submit check-in</button>
                 <small>A failed challenge receives one retry opportunity within five minutes before the LMS marks the student absent for review.</small>
               </form>
             ) : <p className="fdacs-live__muted">No check-in is pending. Stay connected and follow the live instructor.</p>}
@@ -406,7 +461,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
             {activePoll ? (
               <form className="fdacs-live__poll-form" onSubmit={submitPoll}>
                 <p className="fdacs-live__poll-question">{activePoll.question}</p>
-                <fieldset disabled={activePollAnswered || pollSubmitting}>
+                <fieldset disabled={activePollAnswered || pollSubmitting || stateStale}>
                   {(activePoll.options ?? []).map((option, index) => (
                     <label key={`${activePoll.id}-${index}`} className={selectedPollOption === index ? "is-selected" : ""}>
                       <input
@@ -422,15 +477,15 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
                 {activePollAnswered ? (
                   <div className="fdacs-live__poll-recorded">Response recorded in your regulated participation record.</div>
                 ) : (
-                  <button type="submit" disabled={selectedPollOption === null || pollSubmitting}>{pollSubmitting ? "Recording…" : "Submit response"}</button>
+                  <button type="submit" disabled={selectedPollOption === null || pollSubmitting || stateStale}>{pollSubmitting ? "Recording…" : "Submit response"}</button>
                 )}
                 <small>Your selection and response time are retained as participation evidence. Correct-answer data is not exposed through the student live-class API.</small>
               </form>
             ) : <p className="fdacs-live__muted">No structured poll is open. Your instructor may launch questions during live instruction.</p>}
           </section>
 
-          <section className="fdacs-live__panel">
-            <div className="fdacs-live__panel-head"><h2>Live Q&amp;A</h2><button type="button" onClick={() => void raiseHand()}>Raise hand</button></div>
+          <section className="fdacs-live__panel fdacs-live__qa-panel">
+            <div className="fdacs-live__panel-head"><h2>Live Q&amp;A</h2><button type="button" disabled={stateStale} onClick={() => void raiseHand()}>Raise hand</button></div>
             <div className="fdacs-live__feed" aria-live="polite" aria-relevant="additions text">
               {(state?.interactions ?? []).map((interaction, index) => (
                 <div key={interaction.id ?? `${interaction.created_at}-${index}`}>
@@ -441,8 +496,8 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
               {!state?.interactions?.length ? <p className="fdacs-live__muted">Questions and instructor responses will appear here.</p> : null}
             </div>
             <form onSubmit={submitQuestion} className="fdacs-live__form fdacs-live__question">
-              <textarea aria-label="Question for the live instructor" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Ask the instructor a question" maxLength={4000} />
-              <button type="submit">Ask question</button>
+              <textarea aria-label="Question for the live instructor" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Ask the instructor a question" maxLength={4000} disabled={stateStale} />
+              <div className="fdacs-live__form-actions"><small>{question.length} / 4000</small><button type="submit" disabled={stateStale || !question.trim()}>Ask question</button></div>
             </form>
           </section>
         </aside>

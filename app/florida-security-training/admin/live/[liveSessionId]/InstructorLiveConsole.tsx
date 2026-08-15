@@ -203,15 +203,20 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   const [correctOptionIndex, setCorrectOptionIndex] = useState<number | null>(null);
   const [pollBusy, setPollBusy] = useState(false);
   const [mediaBusy, setMediaBusy] = useState(false);
+  const [mediaStale, setMediaStale] = useState(false);
+  const [initialPresenceReady, setInitialPresenceReady] = useState(false);
+  const [presenceIssuanceFailures, setPresenceIssuanceFailures] = useState<string[]>([]);
+  const [lastSuccessfulRefreshAt, setLastSuccessfulRefreshAt] = useState<number | null>(null);
   const [clockMs, setClockMs] = useState(0);
   const autoCheckIssued = useRef(false);
+  const errorRef = useRef<HTMLDivElement | null>(null);
 
   const refresh = useCallback(async () => {
     const response = await fetch(`/api/florida-class-d/admin/live?liveSessionId=${encodeURIComponent(liveSessionId)}`, { cache: "no-store" });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(typeof payload?.error === "string" ? payload.error : "Unable to load instructor console.");
     setState(payload as ConsoleState);
-    setError(null);
+    setLastSuccessfulRefreshAt(Date.now());
   }, [liveSessionId]);
 
   const loadMedia = useCallback(async () => {
@@ -223,7 +228,11 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
       const access = payload as MediaAccess;
       if (!access.joinUrl || !access.tokenExpiresAt) throw new Error("Secure instructor video did not return complete time-bounded access.");
       setMedia(access);
-      setError(null);
+      setMediaStale(false);
+    } catch (mediaError) {
+      setMediaStale(true);
+      setMedia(null);
+      throw mediaError;
     } finally {
       setMediaBusy(false);
     }
@@ -233,7 +242,9 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     const initialLoad = window.setTimeout(() => {
       void Promise.all([refresh(), loadMedia()]).catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Unable to load live class."));
     }, 0);
-    const timer = window.setInterval(() => void refresh().catch(() => undefined), 5_000);
+    const timer = window.setInterval(() => void refresh().catch((refreshError) => {
+      setError((current) => current ?? (refreshError instanceof Error ? refreshError.message : "Live state is stale because the instructor console could not be refreshed."));
+    }), 5_000);
     return () => {
       window.clearTimeout(initialLoad);
       window.clearInterval(timer);
@@ -260,6 +271,10 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     };
   }, []);
 
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
+
   const startedAt = state?.session?.started_at;
   const elapsedInstructionMinutes = startedAt && state?.session?.status === "live" && clockMs > 0
     ? Math.max(0, Math.floor((clockMs - Date.parse(startedAt)) / 60_000))
@@ -270,13 +285,22 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   const questions = interactions.filter((item) => item.interaction_type === "student_question");
   const polls = state?.polls ?? [];
   const activePoll = polls.find((poll) => poll.status === "open") ?? null;
+  const stateStale = !lastSuccessfulRefreshAt || clockMs - lastSuccessfulRefreshAt > 15_000;
 
-  const issuePresenceCheck = useCallback(async () => {
-    if (!students.length) return;
+  function requireFreshState() {
+    if (!stateStale) return true;
+    setError("Live state is stale. Refresh the instructor console before taking a regulated action.");
+    return false;
+  }
+
+  const issuePresenceCheck = useCallback(async (initial = false) => {
+    if (!students.length) {
+      setInitialPresenceReady(false);
+      throw new Error("No eligible students are available. Instruction and credit remain locked.");
+    }
     const code = generatePresenceCode();
-    setPresenceCode(code);
     const eligible = students.filter((student) => typeof student.id === "string");
-    await Promise.all(eligible.map((student) => adminApi({
+    const results = await Promise.allSettled(eligible.map((student) => adminApi({
       action: "challenge",
       liveSessionId,
       enrollmentId: student.id,
@@ -284,34 +308,63 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
       prompt: "Enter the six-digit presence code announced or displayed by your live instructor.",
       answer: code,
     })));
+    const failedStudents = results.flatMap((result, index) => result.status === "rejected" ? [studentName(eligible[index])] : []);
+    setPresenceCode(code);
+    setPresenceIssuanceFailures(failedStudents);
+    if (failedStudents.length) {
+      if (initial) setInitialPresenceReady(false);
+      throw new Error(`Presence checks failed for ${failedStudents.join(", ")}. Instruction and credit remain locked on an uncredited break until every student challenge is issued.`);
+    }
+    setInitialPresenceReady(true);
     await refresh();
   }, [liveSessionId, refresh, students]);
 
   useEffect(() => {
-    if (state?.session?.status === "live" && elapsedInstructionMinutes >= 105 && !autoCheckIssued.current && students.length) {
+    if (state?.session?.status === "live" && initialPresenceReady && !stateStale && elapsedInstructionMinutes >= 105 && !autoCheckIssued.current && students.length) {
       autoCheckIssued.current = true;
       void issuePresenceCheck().catch((challengeError) => setError(challengeError instanceof Error ? challengeError.message : "Automatic presence check failed."));
     }
-  }, [elapsedInstructionMinutes, issuePresenceCheck, state?.session?.status, students.length]);
+  }, [elapsedInstructionMinutes, initialPresenceReady, issuePresenceCheck, state?.session?.status, stateStale, students.length]);
 
   async function sessionAction(action: "start" | "end") {
+    if (!requireFreshState()) return;
     if (action === "start" && !media?.joinUrl) {
       setError("Secure live video must be provisioned before regulated instruction can start.");
       return;
     }
     try {
-      await adminApi({ action, liveSessionId });
       if (action === "start") {
+        setInitialPresenceReady(false);
+        setPresenceIssuanceFailures([]);
+        const start = await adminApi({ action: "start", liveSessionId });
+        if (
+          start?.initialPresenceVerified !== true ||
+          typeof start?.initialPresenceChallengeCount !== "number" ||
+          start.initialPresenceChallengeCount < 1 ||
+          typeof start?.presenceCode !== "string" ||
+          !/^\d{6}$/.test(start.presenceCode)
+        ) {
+          throw new Error("Atomic lesson start did not return complete initial presence evidence. Instruction controls remain locked.");
+        }
+        setPresenceCode(start.presenceCode);
+        setInitialPresenceReady(true);
         autoCheckIssued.current = false;
-        window.setTimeout(() => void issuePresenceCheck().catch(() => undefined), 1500);
+      } else {
+        await adminApi({ action, liveSessionId });
       }
       await refresh();
     } catch (actionError) {
-      setError(actionError instanceof Error ? actionError.message : "Live session control failed.");
+      setError(actionError instanceof Error ? actionError.message : "Live session control failed. Instruction and credit remain locked.");
+      await refresh().catch(() => undefined);
     }
   }
 
   async function segment(segmentType: "instruction" | "break") {
+    if (!requireFreshState()) return;
+    if (segmentType === "instruction" && !initialPresenceReady) {
+      setError("Initial presence-check issuance is incomplete. Instruction and credit remain locked.");
+      return;
+    }
     try {
       await adminApi({ action: "segment", liveSessionId, segmentType });
       await refresh();
@@ -321,7 +374,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   }
 
   async function restorePresence(student: StudentRow) {
-    if (!student.id) return;
+    if (!student.id || !requireFreshState()) return;
     const note = window.prompt("Document the reason for restoring presence. Any missed instructional time still requires appropriate make-up handling.");
     if (!note?.trim()) return;
     try {
@@ -334,7 +387,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
 
   async function certifyDay(student: StudentRow) {
     const day = state?.session?.day;
-    if (!student.id || !day || day < 1 || day > 5) return;
+    if (!student.id || !day || day < 1 || day > 5 || !requireFreshState()) return;
     const attendanceStatus = suggestedAttendanceStatus(student);
     const label = attendanceStatus === "present" ? "PRESENT" : attendanceStatus === "absent" ? "ABSENT" : "MAKEUP REQUIRED";
     const approved = window.confirm(`Certify Day ${day} attendance for ${studentName(student)} as ${label}? The LMS-derived instructional and break time will be retained with the instructor attestation.`);
@@ -374,7 +427,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   }
 
   async function verifyDailyIdentity(student: StudentRow) {
-    if (!student.id || !day) return;
+    if (!student.id || !day || !requireFreshState()) return;
     try {
       let context = await identityContext(student.id, liveSessionId);
       if (
@@ -441,7 +494,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
 
   async function submitPrompt(event: FormEvent) {
     event.preventDefault();
-    if (!classPrompt.trim()) return;
+    if (!classPrompt.trim() || !requireFreshState()) return;
     try {
       await adminApi({ action: "prompt", liveSessionId, content: classPrompt.trim() });
       setClassPrompt("");
@@ -453,7 +506,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
 
   async function submitAnswer(event: FormEvent) {
     event.preventDefault();
-    if (!answerTarget?.id || !answerText.trim()) return;
+    if (!answerTarget?.id || !answerText.trim() || !requireFreshState()) return;
     try {
       await adminApi({
         action: "answer",
@@ -476,6 +529,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
 
   async function createPoll(event: FormEvent) {
     event.preventDefault();
+    if (!requireFreshState()) return;
     if (activePoll) {
       setError("Close the current live poll before opening another.");
       return;
@@ -487,7 +541,6 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
     }
     const normalizedCorrect = correctOptionIndex !== null && correctOptionIndex < normalizedOptions.length ? correctOptionIndex : null;
     setPollBusy(true);
-    setError(null);
     try {
       await adminApi({
         action: "poll_create",
@@ -508,9 +561,8 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   }
 
   async function closePoll() {
-    if (!activePoll?.id) return;
+    if (!activePoll?.id || !requireFreshState()) return;
     setPollBusy(true);
-    setError(null);
     try {
       await adminApi({ action: "poll_close", liveSessionId, pollId: activePoll.id });
       await refresh();
@@ -531,21 +583,24 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
   const canCertifyDay = Boolean(day && state?.session?.lesson_id === `D${day}-L4` && status === "ended");
 
   return (
-    <main className="fdacs-live">
+    <main className="fdacs-live fdacs-live--instructor">
+      <a className="fdacs-live__skip" href="#instructor-workspace">Skip to instructor workspace</a>
       <header className="fdacs-live__topbar">
-        <div>
+        <div className="fdacs-live__brandline">
           <span>OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</span>
           <h1>Class D Instructor Live Console</h1>
+          <small>Operational command workspace · controlled instruction</small>
         </div>
-        <div className={`fdacs-live__status ${isBreak ? "is-break" : ""}`}>
+        <div className={`fdacs-live__status ${isBreak ? "is-break" : ""}`} role="status" aria-live="polite">
           <strong>{status.toUpperCase()} · {state?.session?.lesson_id ?? "SESSION"}</strong>
-          <small>Day {day ?? "–"} · all attendance and time evidence is server recorded</small>
+          <small>{stateStale ? "Live state is stale. Regulated actions are locked pending refresh." : `Day ${day ?? "–"} · all attendance and time evidence is server recorded`}</small>
         </div>
       </header>
 
-      {error ? <div className="fdacs-live__alert" role="alert">{error}</div> : null}
+      {error ? <div ref={errorRef} className="fdacs-live__alert" role="alert" tabIndex={-1}><strong>Console attention required</strong><span>{error}</span><button type="button" onClick={() => setError(null)}>Acknowledge</button></div> : null}
+      {stateStale ? <div className="fdacs-live__recovery is-stale" role="alert"><span><strong>Live state is stale</strong>Session, attendance, identity, poll, and instructional controls are locked until authoritative state is restored.</span><button type="button" onClick={() => void refresh().catch((refreshError) => setError(refreshError instanceof Error ? refreshError.message : "Live state is stale and could not be refreshed."))}>Refresh instructor state</button></div> : null}
 
-      <section className="fdacs-live__grid">
+      <section className="fdacs-live__grid" id="instructor-workspace" aria-busy={mediaBusy || stateStale}>
         <div className="fdacs-live__stage">
           <div className="fdacs-live__stage-frame fdacs-live__media-frame">
             {media?.joinUrl ? (
@@ -565,29 +620,37 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
             )}
           </div>
           <p className="fdacs-live__fineprint">Instructor video, audio, screen sharing, and prejoin device checks are delivered through the secure media room. Recording is disabled by default. OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC remains the system of record for attendance and instructional time.</p>
+          <div className="fdacs-live__media-recovery"><span>{mediaStale ? "Secure instructor media is stale or unavailable." : "Secure instructor media token is current and time bounded."}</span><button type="button" disabled={mediaBusy} onClick={() => void loadMedia().catch((mediaError) => setError(mediaError instanceof Error ? mediaError.message : "Secure instructor video access could not be renewed."))}>{mediaBusy ? "Renewing video…" : "Renew secure video"}</button></div>
           {presenceCode ? <div className="fdacs-live__presence-code"><small>CURRENT PRESENCE CODE</small><strong>{presenceCode}</strong><span>Read or display this code to the live class. Do not post it in the student Q&amp;A feed.</span></div> : null}
+          {presenceIssuanceFailures.length ? <div className="fdacs-live__alert" role="alert"><strong>Presence issuance incomplete</strong><span>Instruction and credit remain locked for this lesson. Challenge delivery failed for: {presenceIssuanceFailures.join(", ")}.</span></div> : null}
 
-          <div className="fdacs-live__instructor-controls">
-            <button type="button" onClick={() => void sessionAction("start")} disabled={!media?.joinUrl}>Start live lesson</button>
-            <button type="button" onClick={() => void issuePresenceCheck()}>Issue presence check</button>
-            <button type="button" onClick={() => void segment("break")}>Start 15-minute break</button>
-            <button type="button" onClick={() => void segment("instruction")}>Resume instruction</button>
-            <button type="button" onClick={openObserverAdministration}>Regulatory observer access</button>
-            <button type="button" className="danger" onClick={() => void sessionAction("end")}>End lesson</button>
+          <div className="fdacs-live__instructor-controls" role="group" aria-label="Live lesson controls">
+            <fieldset className="fdacs-live__control-inline" disabled={stateStale || ["live", "break", "ended"].includes(status)}>
+              <legend className="fdacs-live__sr-only">Start lesson</legend>
+              <button type="button" onClick={() => void sessionAction("start")} disabled={!media?.joinUrl}>Start live lesson</button>
+            </fieldset>
+            <button type="button" disabled={stateStale || !students.length || !["live", "break"].includes(status)} onClick={() => void issuePresenceCheck().catch((challengeError) => setError(challengeError instanceof Error ? challengeError.message : "Presence-check issuance failed."))}>Issue presence check</button>
+            <button type="button" disabled={stateStale || status !== "live" || isBreak} onClick={() => void segment("break")}>Start 15-minute break</button>
+            <button type="button" disabled={stateStale || !initialPresenceReady || status !== "break" || !isBreak} onClick={() => void segment("instruction")}>Resume instruction</button>
+            <button type="button" disabled={stateStale} onClick={openObserverAdministration}>Regulatory observer access</button>
+            <button type="button" disabled={stateStale || !["live", "break"].includes(status)} className="danger" onClick={() => void sessionAction("end")}>End lesson</button>
           </div>
 
-          <InstructionalTextScreenControl
-            liveSessionId={liveSessionId}
-            status={status}
-            isBreak={isBreak}
-            activeTextScreen={state?.activeTextScreen ?? null}
-            textScreenViews={state?.textScreenViews ?? []}
-            students={students}
-            onChanged={refresh}
-          />
+          <fieldset className="fdacs-live__control-fieldset" disabled={stateStale || !initialPresenceReady}>
+            <legend className="fdacs-live__sr-only">Instructional text-screen controls</legend>
+            <InstructionalTextScreenControl
+              liveSessionId={liveSessionId}
+              status={status}
+              isBreak={isBreak}
+              activeTextScreen={state?.activeTextScreen ?? null}
+              textScreenViews={state?.textScreenViews ?? []}
+              students={students}
+              onChanged={refresh}
+            />
+          </fieldset>
 
-          <section className="fdacs-live__panel fdacs-live__roster-panel">
-            <div className="fdacs-live__panel-head"><h2>Live attendance and full-course time roster</h2><span>{students.length} students</span></div>
+          <section className="fdacs-live__panel fdacs-live__roster-panel" aria-labelledby="live-roster-heading">
+            <div className="fdacs-live__panel-head"><h2 id="live-roster-heading">Live attendance and full-course time roster</h2><span>{students.length} students</span></div>
             <p className="fdacs-live__muted">Before the first lesson, the assigned Class DI instructor must verify each live student and record today&apos;s identity check-in. The LMS will not issue the student&apos;s single-device instructional lease without it. After Lesson 4 ends, certify the server-derived attendance ledger and sign the separate end-of-day attendance attestation.</p>
             <div className="fdacs-live__roster">
               {students.map((student) => {
@@ -605,9 +668,9 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
                     <span><small>Course breaks</small><b>{formatDuration(student.courseTime?.breakPresenceSeconds)}</b></span>
                     <span><small>Course uncredited</small><b>{formatDuration(student.courseTime?.uncreditedConnectedSeconds)}</b></span>
                     <span className="fdacs-live__roster-actions">
-                      <button type="button" onClick={() => void verifyDailyIdentity(student)}>Verify Day {day ?? "–"} identity</button>
-                      {absent ? <button type="button" onClick={() => void restorePresence(student)}>Review absence</button> : null}
-                      {canCertifyDay ? <button type="button" onClick={() => void certifyDay(student)}>Certify {suggested.replace("_", " ")}</button> : <em>Awaiting day end</em>}
+                      <button type="button" disabled={stateStale} onClick={() => void verifyDailyIdentity(student)}>Verify Day {day ?? "–"} identity</button>
+                      {absent ? <button type="button" disabled={stateStale} onClick={() => void restorePresence(student)}>Review absence</button> : null}
+                      {canCertifyDay ? <button type="button" disabled={stateStale} onClick={() => void certifyDay(student)}>Certify {suggested.replace("_", " ")}</button> : <em>Awaiting day end</em>}
                     </span>
                   </div>
                 );
@@ -621,8 +684,8 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
           <section className="fdacs-live__panel">
             <div className="fdacs-live__panel-head"><h2>Instructor prompt</h2><span>interactive</span></div>
             <form className="fdacs-live__form" onSubmit={submitPrompt}>
-              <textarea aria-label="Instructor announcement or class prompt" value={classPrompt} onChange={(event) => setClassPrompt(event.target.value)} placeholder="Ask the class a question, launch a discussion prompt, or give an instruction" maxLength={4000} />
-              <button type="submit">Send to class</button>
+              <textarea aria-label="Instructor announcement or class prompt" value={classPrompt} onChange={(event) => setClassPrompt(event.target.value)} placeholder="Ask the class a question, launch a discussion prompt, or give an instruction" maxLength={4000} disabled={stateStale} />
+              <div className="fdacs-live__form-actions"><small>{classPrompt.length} / 4000</small><button type="submit" disabled={stateStale || !classPrompt.trim()}>Send to class</button></div>
             </form>
           </section>
 
@@ -633,21 +696,21 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
                 <strong>{activePoll.question}</strong>
                 <div>{(activePoll.options ?? []).map((option, index) => <span key={`${activePoll.id}-${index}`}>{index + 1}. {option}{activePoll.correct_option_index === index ? " · key" : ""}</span>)}</div>
                 <p className="fdacs-live__muted">Current poll responses: {activePoll.response_count ?? 0} of {students.length}. Per-student cumulative participation totals for this lesson are shown in the roster.</p>
-                <button type="button" disabled={pollBusy} onClick={() => void closePoll()}>{pollBusy ? "Closing…" : "Close current poll"}</button>
+                <button type="button" disabled={pollBusy || stateStale} onClick={() => void closePoll()}>{pollBusy ? "Closing…" : "Close current poll"}</button>
               </div>
             ) : (
               <form className="fdacs-live__form fdacs-live__poll-builder" onSubmit={createPoll}>
-                <textarea aria-label="Live poll question" value={pollQuestion} onChange={(event) => setPollQuestion(event.target.value)} placeholder="Ask a live knowledge or participation question" maxLength={1000} />
+                <textarea aria-label="Live poll question" value={pollQuestion} onChange={(event) => setPollQuestion(event.target.value)} placeholder="Ask a live knowledge or participation question" maxLength={1000} disabled={stateStale} />
                 {pollOptions.map((option, index) => (
-                  <input aria-label={`Poll option ${index + 1}`} key={index} value={option} onChange={(event) => updatePollOption(index, event.target.value)} placeholder={`Option ${index + 1}${index > 1 ? " (optional)" : ""}`} maxLength={500} />
+                  <input aria-label={`Poll option ${index + 1}`} key={index} value={option} onChange={(event) => updatePollOption(index, event.target.value)} placeholder={`Option ${index + 1}${index > 1 ? " (optional)" : ""}`} maxLength={500} disabled={stateStale} />
                 ))}
                 <label>Optional correct answer
-                  <select value={correctOptionIndex === null ? "" : String(correctOptionIndex)} onChange={(event) => setCorrectOptionIndex(event.target.value === "" ? null : Number(event.target.value))}>
+                  <select value={correctOptionIndex === null ? "" : String(correctOptionIndex)} onChange={(event) => setCorrectOptionIndex(event.target.value === "" ? null : Number(event.target.value))} disabled={stateStale}>
                     <option value="">Participation only</option>
                     {pollOptions.map((option, index) => <option key={index} value={index} disabled={!option.trim()}>Option {index + 1}</option>)}
                   </select>
                 </label>
-                <button type="submit" disabled={pollBusy || status !== "live"}>{pollBusy ? "Opening…" : "Open live poll"}</button>
+                <button type="submit" disabled={pollBusy || stateStale || status !== "live"}>{pollBusy ? "Opening…" : "Open live poll"}</button>
                 <small>Only one structured poll can be open at a time. Polls open only during live instruction and are retained as participation evidence.</small>
               </form>
             )}
@@ -657,7 +720,7 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
             <div className="fdacs-live__panel-head"><h2>Student questions</h2><span>{questions.length}</span></div>
             <div className="fdacs-live__feed" aria-live="polite" aria-relevant="additions text">
               {questions.map((question) => (
-                <button className="fdacs-live__question-card" type="button" key={question.id} onClick={() => setAnswerTarget(question)}>
+                <button className="fdacs-live__question-card" type="button" key={question.id} disabled={stateStale} onClick={() => setAnswerTarget(question)}>
                   <b>STUDENT QUESTION</b>
                   <span>{question.content || "Question submitted"}</span>
                 </button>
@@ -667,8 +730,8 @@ export default function InstructorLiveConsole({ liveSessionId }: { liveSessionId
             {answerTarget ? (
               <form className="fdacs-live__form" onSubmit={submitAnswer}>
                 <p>Answering: <strong>{answerTarget.content}</strong></p>
-                <textarea aria-label="Answer to the selected student question" value={answerText} onChange={(event) => setAnswerText(event.target.value)} placeholder="Instructor answer" maxLength={4000} />
-                <button type="submit">Send answer</button>
+                <textarea aria-label="Answer to the selected student question" value={answerText} onChange={(event) => setAnswerText(event.target.value)} placeholder="Instructor answer" maxLength={4000} disabled={stateStale} />
+                <div className="fdacs-live__form-actions"><small>{answerText.length} / 4000</small><button type="submit" disabled={stateStale || !answerText.trim()}>Send answer</button></div>
               </form>
             ) : null}
           </section>

@@ -9,6 +9,7 @@ const records = read("lib/florida-class-d-records.ts");
 const persistence = read("lib/florida-class-d-live-persistence.ts");
 const reporting = read("lib/florida-class-d-live-reporting.ts");
 const migration = read("supabase/migrations/20260813043000_fdacs_class_d_live_classroom.sql");
+const atomicStartMigration = read("supabase/migrations/20260815170000_fdacs_class_d_atomic_initial_presence_start.sql");
 const attendanceMigration = read("supabase/migrations/20260813044000_fdacs_class_d_daily_attendance_reconciliation.sql");
 const studentApi = read("app/api/florida-class-d/live/route.ts");
 const adminApi = read("app/api/florida-class-d/admin/live/route.ts");
@@ -60,6 +61,18 @@ required(migration, "break_presence_seconds", "Break presence must be stored sep
 required(migration, "instructional_presence_seconds", "Instructional presence must be stored separately.");
 required(migration, "fdacs_class_d_restore_presence_after_review", "Instructor review path is required after a failed presence challenge.");
 
+required(atomicStartMigration, "fdacs_class_d_start_live_session_with_initial_presence", "Lesson start must use one atomic initial-presence transaction.");
+required(atomicStartMigration, "begin;", "Atomic start migration must execute inside an explicit transaction.");
+required(atomicStartMigration, "commit;", "Atomic start migration must commit only after verified instruction activation.");
+required(atomicStartMigration, "from public.fdacs_class_d_cohorts c", "Atomic start must lock the cohort while freezing the eligible roster.");
+required(atomicStartMigration, "from public.fdacs_class_d_enrollments e", "Atomic start must lock enrollment eligibility for complete challenge issuance.");
+required(atomicStartMigration, "set status = 'break'", "Atomic start must enter an uncredited break state before challenge issuance.");
+required(atomicStartMigration, "insert into public.fdacs_class_d_presence_challenges", "Atomic start must issue initial challenges inside the database transaction.");
+required(atomicStartMigration, "v_issued_count <> v_eligible_count", "Atomic start must verify complete per-learner challenge issuance.");
+required(atomicStartMigration, "set status = 'live'", "Atomic start may transition to instruction only after challenge verification.");
+required(atomicStartMigration, "fdacs_atomic_start_fault_after_break", "Atomic start must retain the controlled post-break fault-injection seam.");
+required(atomicStartMigration, "revoke all on function public.fdacs_class_d_start_live_session", "The superseded non-atomic start RPC must no longer be executable.");
+
 required(attendanceMigration, "fdacs_class_d_certify_live_day", "Daily live attendance must have an instructor certification transaction.");
 required(attendanceMigration, "all four live lessons must be completed before daily attendance certification", "Daily attendance certification must wait until all four lessons end.");
 required(attendanceMigration, "v_instructional_minutes := least(480", "Daily instructional credit must cap at 480 minutes.");
@@ -71,6 +84,7 @@ required(attendanceMigration, "grant execute on function public.fdacs_class_d_ce
 required(persistence, "fdacs_class_d_acquire_device_lease", "Server persistence must acquire the single-device lease through the controlled RPC.");
 required(persistence, "fdacs_class_d_record_live_heartbeat", "Server persistence must record presence heartbeats.");
 required(persistence, "fdacs_class_d_respond_presence_challenge", "Server persistence must record challenge responses.");
+required(persistence, "fdacs_class_d_start_live_session_with_initial_presence", "Server persistence must use the atomic initial-presence start RPC.");
 required(persistence, "fdacs_class_d_live_interactions", "Server persistence must retain live Q&A and participation records.");
 required(reporting, "getFloridaClassDStudentTimeLedger", "Student reporting must aggregate daily and full-course time.");
 required(reporting, "getFloridaClassDRosterTimeLedgers", "Instructor reporting must aggregate time by student.");
@@ -83,6 +97,7 @@ required(studentApi, '["question", "hand_raise", "response"]', "Student live API
 required(studentApi, "getFloridaClassDStudentTimeLedger", "Student live API must return cumulative course time.");
 required(adminApi, "requireFloridaClassDStaff", "Instructor live API must require server-side staff authorization.");
 required(adminApi, 'body.action === "challenge"', "Instructor live API must support security challenges.");
+required(adminApi, "initialPresenceChallengeCount", "Instructor start API must return verified atomic challenge issuance evidence.");
 required(adminApi, 'body.action === "segment"', "Instructor live API must control instruction versus break segments.");
 required(adminApi, 'body.action === "certify_day"', "Instructor live API must support daily attendance certification.");
 required(adminApi, "getFloridaClassDRosterTimeLedgers", "Instructor live API must return cumulative per-student time.");
