@@ -277,6 +277,42 @@ Interpretation: the findings are consistent with the deliberate server/service-r
 
 A `PUBLIC EXECUTE` grant was observed on `fdacs_class_d_reject_lias_workflow_mutation`. Inspection confirmed it is a non-security-definer trigger function returning `trigger`, not a regulated browser data API.
 
+## 2026-08-15 controlled non-production LMS atomic-start rehearsal
+
+Candidate source revision: `e289a85b7d88bb26e4994dd6c7084799c6a5fbdc`.
+
+Controlled external objects:
+
+- temporary Supabase branch: `353b2ad4-0d2b-43e3-81e3-5f30f91767f1`;
+- temporary Supabase project reference: `iuosbfwbfdhernyquvxq`;
+- approved temporary branch rate: `$0.01344/hour`;
+- production project observed unchanged: `ggkx…` (identifier intentionally minimized in public evidence).
+
+Exact migration inputs:
+
+- `20260815160000_fdacs_class_d_identity_video_lobby_assignment.sql`, SHA-256 `c6cf9b977d4ac38c0e9d4ad55c6d2bad42f6aa42879b629519b9ea083b551dd6`;
+- `20260815170000_fdacs_class_d_atomic_initial_presence_start.sql`, SHA-256 `ccb9256168711a26de3e375edfb82d85001871e302c76dc6f35a0367a68b1765`.
+
+Result and evidence:
+
+- both exact migrations applied successfully to the temporary branch only;
+- the exact trigger, `SECURITY DEFINER` function with an empty `search_path`, and service-role-only atomic RPC were verified;
+- the superseded RPC and browser-role execution remained denied;
+- an incorrect Class DI assignment was rejected and the correct assigned Class DI was accepted;
+- an injected post-break fault rolled back the complete transaction;
+- the successful path issued exactly one security challenge before instruction began;
+- all synthetic rehearsal fixtures were rolled back to zero;
+- the security advisor reported only two pre-existing INFO-level RLS-without-policy findings on CMMC archive tables and no new warning or error;
+- the performance advisor reported only unused-index INFO findings expected on the empty temporary branch.
+
+Rollback and cost state: the temporary branch was deleted successfully after verification. No rehearsal object or fixture persisted and the temporary branch cost stopped.
+
+Security/regulatory effect: this is non-production technical rehearsal evidence only. It does not establish FDACS approval, provider or course authorization, production database promotion, real-learner acceptance, production readiness, or authorization to issue course credit, completion documents, certificates, or LIAS records.
+
+Production effect: none. The two migrations remain absent from production, production authorization remains false, Preview UAT remains non-credit, and enrollment, completion, certificate release, and LIAS execution remain disabled.
+
+Next governed action: retain this result with the exact release evidence, then complete the still-pending production migration approval, authentic licensing evidence, exact-candidate owner UAT, provider readiness, security acceptance, rollback acceptance, and explicit production authorization before any activation.
+
 ## Failed and blocked actions retained for audit
 
 ### Florida Class D LMS Gates #403
