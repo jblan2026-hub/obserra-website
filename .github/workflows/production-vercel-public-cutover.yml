@@ -1,0 +1,103 @@
+name: Production Vercel public cutover
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/production-vercel-public-cutover.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-vercel-public-cutover
+  cancel-in-progress: false
+
+jobs:
+  cutover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
+      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+      PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+      CANDIDATE_DEPLOYMENT: dpl_AFhrDBGECKNAJm4PoxnY5EQqcoMJ
+      CANDIDATE_SHA: 83b3a55c0402b9db0715c94523ecca9350cdadd5
+      ROLLBACK_DEPLOYMENT: dpl_GDJ6aJc8wr3qodS1snn8agwcG2iD
+    steps:
+      - name: Require configured Vercel credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${VERCEL_TOKEN}" ]; then
+            echo "::error::Neither VERCEL_TOKEN nor VERCEL_ACCESS_TOKEN is configured."
+            exit 1
+          fi
+
+      - name: Verify exact READY candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(curl --silent --show-error --fail-with-body             --header "Authorization: Bearer ${VERCEL_TOKEN}"             "https://api.vercel.com/v13/deployments/${CANDIDATE_DEPLOYMENT}?teamId=${TEAM_ID}")"
+          ready="$(jq -r '.readyState // .state // empty' <<<"${response}")"
+          sha="$(jq -r '.meta.githubCommitSha // empty' <<<"${response}")"
+          if [ "${ready}" != "READY" ] || [ "${sha}" != "${CANDIDATE_SHA}" ]; then
+            echo "::error::Candidate deployment identity or readiness mismatch."
+            exit 1
+          fi
+
+      - name: Make production project public
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --silent --show-error --fail-with-body             --request PATCH             --header "Authorization: Bearer ${VERCEL_TOKEN}"             --header "Content-Type: application/json"             --data '{"ssoProtection":null}'             "https://api.vercel.com/v9/projects/${PROJECT_ID}?teamId=${TEAM_ID}"             >/dev/null
+
+      - name: Attach canonical domains atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          attach() {
+            local deployment="$1"
+            local alias="$2"
+            curl --silent --show-error --fail-with-body               --request POST               --header "Authorization: Bearer ${VERCEL_TOKEN}"               --header "Content-Type: application/json"               --data "{"alias":"${alias}"}"               "https://api.vercel.com/v2/deployments/${deployment}/aliases?teamId=${TEAM_ID}"               >/dev/null
+          }
+          attach "${CANDIDATE_DEPLOYMENT}" "www.obserrallc.com"
+          attach "${CANDIDATE_DEPLOYMENT}" "obserrallc.com"
+
+      - name: Verify public website and preserve Applications
+        id: smoke
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5 6; do
+            health="$(curl --silent --show-error --fail --max-time 20 https://www.obserrallc.com/api/health || true)"
+            deployment="$(jq -r '.deploymentId // .deployment.id // empty' <<<"${health}" 2>/dev/null || true)"
+            sha="$(jq -r '.gitSha // .commitSha // .sha // empty' <<<"${health}" 2>/dev/null || true)"
+            if [ "${deployment}" = "${CANDIDATE_DEPLOYMENT}" ] && [ "${sha}" = "${CANDIDATE_SHA}" ]; then
+              break
+            fi
+            sleep 10
+          done
+          test "${deployment}" = "${CANDIDATE_DEPLOYMENT}"
+          test "${sha}" = "${CANDIDATE_SHA}"
+          curl --silent --show-error --fail --max-time 20 https://www.obserrallc.com/ >/dev/null
+          curl --silent --show-error --fail --max-time 20 https://www.obserrallc.com/florida-security-training >/dev/null
+          curl --silent --show-error --fail --max-time 20 https://www.obserrallc.com/apps >/dev/null
+          curl --silent --show-error --fail --max-time 20 https://app.obserrallc.com/api/health >/dev/null
+
+      - name: Roll back canonical domains on failed smoke
+        if: steps.smoke.outcome != 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          attach() {
+            local alias="$1"
+            curl --silent --show-error --fail-with-body               --request POST               --header "Authorization: Bearer ${VERCEL_TOKEN}"               --header "Content-Type: application/json"               --data "{"alias":"${alias}"}"               "https://api.vercel.com/v2/deployments/${ROLLBACK_DEPLOYMENT}/aliases?teamId=${TEAM_ID}"               >/dev/null
+          }
+          attach "www.obserrallc.com"
+          attach "obserrallc.com"
+          echo "::error::Candidate smoke failed; canonical domains returned to the previous deployment."
+          exit 1
