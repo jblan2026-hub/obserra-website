@@ -13,8 +13,8 @@ function requireText(source, value, message) {
 }
 
 const result = buildFloridaClassDMigrationManifest();
-const expectedCount = 39;
-const latestVersion = "20260815160000";
+const expectedCount = 40;
+const latestVersion = "20260815170000";
 
 if (result.manifest.migrationCount !== expectedCount) {
   throw new Error(`Gate 29 failed: expected ${expectedCount} regulated migrations, found ${result.manifest.migrationCount}.`);
@@ -51,7 +51,7 @@ for (const [value, message] of [
   ["databaseAppliedMigrationVersionRequired: true", "Gate 26 policy must require the applied migration version"],
 ]) requireText(activation, value, message);
 
-requireText(handoff, "exactly 39 regulated migrations", "Gate 29 handoff must preserve the controlled migration count");
+requireText(handoff, "exactly 40 regulated migrations", "Gate 29 handoff must preserve the controlled migration count");
 requireText(handoff, latestVersion, "Gate 29 handoff must preserve the latest regulated migration version");
 requireText(handoff, "deterministic SHA-256 promotion manifest", "Gate 29 handoff must document deterministic promotion evidence");
 requireText(handoff, "No production migration is executed by Gate 29 CI", "Gate 29 handoff must preserve the production fail-closed database boundary");

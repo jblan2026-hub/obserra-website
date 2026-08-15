@@ -3,6 +3,7 @@ import { publicAcademyCatalog } from "../../lib/academy-control";
 import AcademyControlledClient from "./AcademyControlledClient";
 import AcademyCommerceNotice from "./AcademyCommerceNotice";
 import { courses as sourceCourses } from "./courseCatalog";
+import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./academy-commercial.css";
 import "./academy-payment.css";
 import "./academy-world-class.css";
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   keywords: ["cybersecurity training", "executive protection training", "artificial intelligence governance training", "intelligence training", "Chief Information Security Officer education"],
   openGraph: {
     title: "Obserra Academy | Professional Security and Executive Training",
-    description: "Secure, account based professional training with assessments and Obserra Certificates of Training.",
+    description: "Secure, account-based professional training with assessments and Certificates of Course Completion.",
     url: "https://www.obserrallc.com/academy",
     type: "website",
     images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: "Obserra Academy" }],
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Obserra Academy",
-    description: "Professional training with secure enrollment, assessments, and completion certificates.",
+    description: "Professional training with secure enrollment, assessments, and clearly bounded course-completion records.",
     images: ["/brand/visuals/obserra-cybersecurity.png"],
   },
 };
@@ -50,8 +51,9 @@ export default async function AcademyPage({ searchParams }: { searchParams: Prom
             url: `https://www.obserrallc.com/academy/${course.id}`,
             provider: {
               "@type": "Organization",
-              name: "Obserra Academy",
-              url: "https://www.obserrallc.com/academy",
+              name: LEGAL_ENTITY_NAME,
+              alternateName: "Obserra Academy",
+              url: "https://www.obserrallc.com",
             },
             offers: {
               "@type": "Offer",

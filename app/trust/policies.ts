@@ -101,7 +101,7 @@ export const trustPolicies: TrustPolicy[] = [
     summary: "Academy courses are paid digital products with proprietary content and controlled learner access.",
     sections: [
       { heading: "Enrollment", points: ["Access is granted after successful payment verification.", "Learner access may be restricted to the purchased course and authorized account context."] },
-      { heading: "Completion and Certificates", points: ["Certificates require completion standards published in-course.", "Certificates are training completion records and not occupational licenses or academic credit."] },
+      { heading: "Course Completion Records", points: ["Certificates of Course Completion require the completion standards published in the applicable course.", "These proprietary course-completion records are not occupational licenses, accredited academic credit, or third-party professional certifications."] },
       { heading: "Access Controls", points: [`${LEGAL_ENTITY_NAME} may revoke access for abuse, sharing, or policy violations.`, "Automated extraction, content copying, and redistribution are prohibited."] },
     ],
   },
@@ -200,12 +200,12 @@ export const trustPolicies: TrustPolicy[] = [
   },
   {
     slug: "certificate-disclaimer",
-    title: "Certificate Disclaimer",
-    description: `Clarifies scope and legal meaning of ${LEGAL_ENTITY_NAME} training certificates.`,
-    summary: `${LEGAL_ENTITY_NAME} certificates verify course completion only.`,
+    title: "Course Completion Credential Disclaimer",
+    description: `Clarifies the scope and legal meaning of ${LEGAL_ENTITY_NAME} Certificates of Course Completion.`,
+    summary: `${LEGAL_ENTITY_NAME} Certificates of Course Completion document course completion only.`,
     sections: [
-      { heading: "Scope", points: [`Certificates document successful completion of specified ${LEGAL_ENTITY_NAME} training.`, "Certificates are not state licenses, academic credits, or third-party certifications."] },
-      { heading: "Verification", points: ["Employers or partners should treat certificates as completion evidence only.", "Certificate validity may be revoked for fraud or misuse."] },
+      { heading: "Scope", points: [`A Certificate of Course Completion documents successful completion of specified ${LEGAL_ENTITY_NAME} training.`, "It is not a state license, occupational authorization, accredited academic credit, or third-party professional certification."] },
+      { heading: "Verification", points: ["Employers or partners should treat the credential as proprietary course-completion evidence only.", "Record validity may be revoked for fraud or misuse."] },
     ],
   },
   {

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LEGAL_ENTITY_NAME } from "../../../lib/legal-identity";
 import "./enterprise-chrome.css";
+import "./legal-identity-lockup.css";
 
 const primaryNavigation = [
   ["Services", "/services"],
@@ -50,7 +51,10 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
       <div className="ent-header__main">
         <Link className="ent-header__brand" href="/" aria-label={`${LEGAL_ENTITY_NAME} home`} onClick={close}>
           <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt={LEGAL_ENTITY_NAME} />
-          <span>{section}</span>
+          <span className="ent-header__identity">
+            <span className="ent-header__legal-name">{LEGAL_ENTITY_NAME}</span>
+            <small>{section}</small>
+          </span>
         </Link>
         <button ref={toggleRef} className="ent-header__toggle" type="button" aria-label={open ? "Close enterprise navigation" : "Open enterprise navigation"} aria-expanded={open} aria-controls="enterprise-navigation" onClick={() => setOpen((value) => !value)}>
           <span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" />
@@ -86,6 +90,7 @@ export function EnterpriseFooter() {
     <footer className="ent-footer">
       <div className="ent-footer__lead">
         <Image src="/brand/obserra-logo.png" width={286} height={55} alt={LEGAL_ENTITY_NAME} />
+        <strong className="ent-footer__legal-name">{LEGAL_ENTITY_NAME}</strong>
         <p>Executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning for organizations facing consequential decisions.</p>
         <Link href="/contact?interest=enterprise-consultation">Request an executive consultation <span aria-hidden="true">→</span></Link>
       </div>

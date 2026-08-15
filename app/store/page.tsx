@@ -4,7 +4,7 @@ import Link from "next/link";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
-  title: `Store | ${LEGAL_ENTITY_NAME}`,
+  title: "Store",
   description: `Purchase ${LEGAL_ENTITY_NAME} applications, courses, subscriptions, advisory services, and enterprise offerings through one secure commercial storefront.`,
   alternates: { canonical: "/store" },
 };
@@ -20,7 +20,7 @@ const categories = [
   },
   {
     eyebrow: "ACADEMY",
-    title: "Professional courses and certifications",
+    title: "Professional courses and completion records",
     copy: "Evaluate cybersecurity, leadership, governance, intelligence, and executive education through Obserra Academy.",
     href: "/academy",
     action: "Browse courses",
@@ -99,7 +99,7 @@ export default function StorePage() {
       <section className="grid gap-3 px-4 pb-6 sm:grid-cols-2 md:px-[max(5vw,24px)] xl:grid-cols-4" aria-label="Store capabilities">
         {[
           ["APPLICATIONS", "Subscriptions", "SaaS, private cloud, hybrid, and on-premises options"],
-          ["COURSES", "Enrollment", "Professional learning and certification pathways"],
+          ["COURSES", "Enrollment", "Professional learning and course-completion pathways"],
           ["SERVICES", "Proposals", "Advisory, protection, and enterprise engagements"],
           ["FULFILLMENT", "Protected", "Portal access, licensing, downloads, and billing"],
         ].map(([label, value, copy]) => (

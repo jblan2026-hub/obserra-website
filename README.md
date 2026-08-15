@@ -12,7 +12,9 @@ Configure the following protected environment-variable names in Vercel for both 
 - `STRIPE_WEBHOOK_SECRET`
 - `OBSERRA_OWNER_EMAIL`
 
-The Stripe webhook endpoint is `https://www.obserrallc.com/api/webhook/stripe`. Subscribe it only to `checkout.session.completed` and `checkout.session.async_payment_succeeded`.
+The Stripe webhook endpoint is `https://www.obserrallc.com/api/webhook/stripe`. Subscribe it only to `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`, `charge.dispute.created`, and `charge.dispute.closed`.
+
+Full refunds set the directly linked Academy entitlement to refunded. Partial refunds and every dispute lifecycle event revoke the directly linked entitlement for operator review. A won or closed dispute never restores access automatically. Replayed events are material-field checked and idempotent, and ambiguous payment mappings never grant or revoke access.
 
 Academy access is granted solely after Stripe verifies a signed webhook. The success page is informational and does not create enrollment. The approved owner email can sign in at `/sign-in` and then access `/admin`; no public route grants owner access.
 

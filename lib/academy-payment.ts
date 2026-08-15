@@ -24,6 +24,85 @@ export function academyCourseAmountCents(price: number) {
   return Number.isSafeInteger(amount) && amount > 0 ? amount : null;
 }
 
+export type AcademyPaymentReversalEventType =
+  | "charge.refunded"
+  | "charge.dispute.created"
+  | "charge.dispute.closed";
+
+export function academyPaymentReversalPolicy(
+  eventType: AcademyPaymentReversalEventType,
+  input: { amountCaptured: number; amountReversed: number; fullyRefunded: boolean },
+) {
+  if (
+    !Number.isSafeInteger(input.amountCaptured) ||
+    !Number.isSafeInteger(input.amountReversed) ||
+    input.amountCaptured <= 0 ||
+    input.amountReversed <= 0 ||
+    input.amountReversed > input.amountCaptured
+  ) return null;
+
+  if (eventType === "charge.refunded") {
+    if (input.fullyRefunded !== (input.amountReversed === input.amountCaptured)) return null;
+    return input.fullyRefunded
+      ? { targetAccessStatus: "refunded" as const, disposition: "full-refund" as const }
+      : { targetAccessStatus: "revoked" as const, disposition: "partial-refund-review" as const };
+  }
+  return eventType === "charge.dispute.created"
+    ? { targetAccessStatus: "revoked" as const, disposition: "dispute-open" as const }
+    : { targetAccessStatus: "revoked" as const, disposition: "dispute-closed-review" as const };
+}
+
+type AcademyProductLineItem = {
+  quantity?: number | null;
+  amount_subtotal?: number | null;
+  amount_total?: number | null;
+  currency?: string | null;
+  price?: {
+    active?: boolean;
+    type?: string;
+    unit_amount?: number | null;
+    currency?: string;
+    metadata?: Record<string, string> | null;
+    product?: string | {
+      deleted?: unknown;
+      metadata?: Record<string, string> | null;
+    } | null;
+  } | null;
+};
+
+export function validateAcademyProductLineItem(
+  lineItems: AcademyProductLineItem[],
+  expected: { courseId: string; courseVersion: string; amountCents: number },
+) {
+  if (lineItems.length !== 1) return { valid: false as const, reason: "line-item-count-mismatch" };
+  const lineItem = lineItems[0];
+  const price = lineItem.price;
+  const product = price?.product;
+  if (lineItem.quantity !== 1) return { valid: false as const, reason: "line-item-quantity-mismatch" };
+  if (lineItem.currency !== ACADEMY_PAYMENT_CURRENCY || price?.currency !== ACADEMY_PAYMENT_CURRENCY) {
+    return { valid: false as const, reason: "line-item-currency-mismatch" };
+  }
+  if (
+    lineItem.amount_subtotal !== expected.amountCents ||
+    lineItem.amount_total !== expected.amountCents ||
+    price?.unit_amount !== expected.amountCents
+  ) return { valid: false as const, reason: "line-item-amount-mismatch" };
+  if (price.type !== "one_time") {
+    return { valid: false as const, reason: "line-item-price-invalid" };
+  }
+  if (!product || typeof product === "string") {
+    return { valid: false as const, reason: "line-item-product-unverified" };
+  }
+  const productMetadata = product.deleted === true ? price.metadata : product.metadata;
+  if (productMetadata?.obserraCourseId !== expected.courseId) {
+    return { valid: false as const, reason: "line-item-course-mismatch" };
+  }
+  if (productMetadata?.courseVersion && productMetadata.courseVersion !== expected.courseVersion) {
+    return { valid: false as const, reason: "line-item-course-version-mismatch" };
+  }
+  return { valid: true as const };
+}
+
 export type AcademyPaidSessionValidation =
   | {
       valid: true;

@@ -177,7 +177,7 @@ function renderCertificateHtml(payload: Record<string, unknown>) {
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC Florida Class D Course Completion Certificate</title>
+<title>OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC Florida Class D Supplemental Course Completion Record</title>
 <style>
 @page{size:landscape;margin:0.45in}*{box-sizing:border-box}body{margin:0;background:#07111f;color:#f5f1e8;font-family:Georgia,"Times New Roman",serif}.sheet{min-height:7.3in;border:2px solid #c9a54d;padding:34px 44px;background:linear-gradient(145deg,#07111f,#0d1e34);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.brand{font-family:Arial,sans-serif;letter-spacing:.18em;color:#d5b45c;font-size:13px}.rule{width:120px;border-top:1px solid #c9a54d;margin:20px auto}.title{font-size:34px;letter-spacing:.03em;margin:8px 0 12px}.subtitle{font-family:Arial,sans-serif;font-size:14px;letter-spacing:.12em;color:#c9a54d;text-transform:uppercase}.name{font-size:38px;margin:24px 0 8px;border-bottom:1px solid #c9a54d;padding:0 28px 10px}.course{font-size:23px;margin:12px 0}.facts{font-family:Arial,sans-serif;display:flex;gap:34px;justify-content:center;flex-wrap:wrap;margin:24px 0;font-size:13px}.facts b{display:block;color:#d5b45c;font-size:15px;margin-bottom:4px}.notice{max-width:800px;font-family:Arial,sans-serif;font-size:11px;line-height:1.5;color:#d5dce6;margin-top:18px}.id{font-family:monospace;font-size:11px;color:#aeb8c5;margin-top:20px}@media print{body{background:#fff}.sheet{break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
@@ -186,19 +186,19 @@ function renderCertificateHtml(payload: Record<string, unknown>) {
 <main class="sheet">
 <div class="brand">OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</div>
 <div class="rule"></div>
-<div class="subtitle">Supplemental School Record</div>
-<h1 class="title">Course Completion Certificate</h1>
-<p>This certifies that</p>
+<div class="subtitle">Supplemental Training Provider Record</div>
+<h1 class="title">Supplemental Course Completion Record</h1>
+<p>This controlled record documents that</p>
 <div class="name">${escapeHtml(studentLegalName)}</div>
-<p>successfully completed the school requirements for</p>
+<p>met the recorded course-completion requirements for</p>
 <div class="course">${escapeHtml(courseTitle)}</div>
 <div class="facts">
 <div><b>${escapeHtml(instructionalHours)}</b>Instructional Hours</div>
 <div><b>${escapeHtml(examScore)} / 170</b>Final Examination Score</div>
 <div><b>${escapeHtml(completionDate)}</b>Completion Date</div>
 </div>
-<p class="notice"><strong>Important:</strong> This is a supplemental OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC school record. It does not replace the official FDACS-16103 Certificate of Security Officer Training generated through LIAS, and course completion does not itself issue a Florida Class D Security Officer license.</p>
-<div class="id">Certificate ID: ${escapeHtml(certificateId)}</div>
+<p class="notice"><strong>Important:</strong> This is a supplemental OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC course-completion record. It is not the official FDACS-16103 Certificate of Security Officer Training, does not replace a document generated through an authorized LIAS workflow, and does not establish FDACS approval, professional certification, or a Florida Class D Security Officer license.</p>
+<div class="id">Record ID: ${escapeHtml(certificateId)}</div>
 </main>
 </body>
 </html>`;
@@ -218,7 +218,7 @@ function renderApplicationHandoffHtml(payload: Record<string, unknown>) {
 <p>Successful course completion date: <strong>${escapeHtml(completionDate)}</strong></p>
 <p class="ref">OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC completion reference: ${escapeHtml(certificateId)}</p>
 <section><h2>Official training certificate</h2><p>The official Florida training-completion record is the <strong>FDACS-16103 Certificate of Security Officer Training</strong>, generated through the school's LIAS reporting workflow after successful completion is reported. Retain that official document with your Class D application records.</p></section>
-<section><h2>License application</h2><p>Submit the required Class D license application and supporting documents through the official Florida Department of Agriculture and Consumer Services process. This handoff document and any supplemental OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC certificate do not replace FDACS-16103.</p></section>
+<section><h2>License application</h2><p>Submit the required Class D license application and supporting documents through the official Florida Department of Agriculture and Consumer Services process. This handoff document and any OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC Supplemental Course Completion Record do not replace FDACS-16103.</p></section>
 <p class="notice">Successful course completion does not itself issue a Florida Class D Security Officer license.</p>
 </body></html>`;
 }

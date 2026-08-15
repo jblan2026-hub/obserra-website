@@ -3,13 +3,13 @@
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update the controlled source records and run `npm run generate:cmmc-system-evidence`.
 
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-- **Bundle:** `obserra-cmmc-working-01e5e1c3f03ff475fd6b0286`
+- **Bundle:** `obserra-cmmc-working-011880e2896f10eecfb895b4`
 - **Bundle state:** `working_evidence_inventory`
 - **Generated at:** `2026-08-14T18:49:07Z`
 - **Git base/HEAD reference:** `0e72459a8940f23976038d85d6394409000f48c5`
 - **Revision binding:** `working_tree_digest`
 - **Exact release:** not assigned; working evidence inventory
-- **In-scope tree SHA-256:** `01e5e1c3f03ff475fd6b02867d213583d0c49cffdbad59e55a232f954d995dc1` (549 paths)
+- **In-scope tree SHA-256:** `011880e2896f10eecfb895b4026cf30349ed0efb17181c7d14bab5cecf88b82e` (556 paths)
 
 ## Paired audit views
 
@@ -976,7 +976,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | `EV-WEBSITE-BADGE-MANIFEST` — Approved credential asset and issuer-observation manifest<br>`public/badges/eccouncil/asset-manifest.json` | organization_evidence | working | test/not_run | `b3fb489e362a03bb0ec379423c86847bf73221644f8bd0957d0a5afb06165ca9` | no | Records approved local asset identities, hashes, three time-bound live ADG issuer observations, and verification destinations; external issuer pages remain authoritative for credential validity. |
 | `EV-WEBSITE-BADGE-SCHEMA` — Fail-closed credential asset evidence schema<br>`public/badges/eccouncil/asset-manifest.schema.json` | product_supplied_evidence | working | test/not_run | `b4a7ae42ee34b8c0b5d3a0970f4f021c9402f0395b459bd862934038b38342a4` | no | Defines mandatory provenance, hash, issuer-observation, and claim-boundary fields; schema presence is not a live deployment result. |
 | `EV-WEBSITE-BADGE-GATE` — Credential asset integrity and provenance gate<br>`scripts/ec-council-badge-integrity.test.mjs` | product_supplied_evidence | working | test/not_run | `93aa89a30a6f1af8ad94bff04eb57a01fde308947e6525cf82592f5c53e17d9a` | no | Fail-closed source gate for the nine authorized assets and three issuer observations; exact CI run and production HTTP evidence remain release-specific. |
-| `EV-WEBSITE-LEGAL-IDENTITY-AUDIT` — Machine-readable legal identity source audit<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.json` | organization_evidence | working | test/not_run | `af26e88062552ff49311cc031ea3b2b87845e3253d46e619c2e5854bea06e752` | no | Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence. |
+| `EV-WEBSITE-LEGAL-IDENTITY-AUDIT` — Machine-readable legal identity source audit<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.json` | organization_evidence | working | test/not_run | `e72ccbdf0e40377b4974bc422bac350a243942be058597f131deb07c97279b5f` | no | Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence. |
 | `EV-WEBSITE-LEGAL-IDENTITY-SCHEMA` — Legal identity audit machine schema<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.schema.json` | product_supplied_evidence | working | examine/not_run | `37d5bc13bed30feafb4a7c661ed867a74e432062c98ff262aecad006404d9314` | no | Defines the machine-readable audit contract and mandatory disposition fields; schema presence is not a live operating result. |
 | `EV-WEBSITE-LEGAL-IDENTITY-GATE` — Fail-closed legal identity drift gate<br>`scripts/legal-identity-audit.mjs` | product_supplied_evidence | working | test/not_run | `6323945d11fc056b0205f2f18f259779aef12a3e94ece8a69560ddc482895605` | no | Rejects malformed legal names, retired company wording, stale public origins, and unapproved short-name company claims while preserving enumerated product brands and stable technical identifiers. |
 | `EV-WEBSITE-NEXT-CONFIG` — Website response security and image-delivery configuration<br>`next.config.ts` | product_supplied_evidence | working | examine/not_run | `a89698eb0f59c46b26a0cac77035b97be7f4839d102d9a318a5d40e05bef52e1` | no | Source-level CSP, transport, browser, and image-delivery configuration only; Vercel production behavior requires exact-deployment verification. |
@@ -1186,7 +1186,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | Artifact | Origin | State | Method/result | SHA-256 | Finding eligible | Claim boundary |
 | --- | --- | --- | --- | --- | --- | --- |
 | `EV-LMS-CONTROL-CONTRACT` — Academy fail-closed control contract<br>`lib/academy-control-contracts.ts` | product_supplied_evidence | working | test/not_run | `c735bd32ff18bacfe87e1d339422dc7abb52de0dfd1c2283cc15d1177d8e1526` | no | Source-level course control enforcement candidate evidence. |
-| `EV-LMS-PERSISTENCE` — Academy durable learner persistence<br>`lib/academy-persistence.ts` | product_supplied_evidence | working | test/not_run | `3a251ae52a1139d481104bd512c8b5450a69a411cb10527419fedfcc580a3550` | no | Application persistence logic; live database state requires provider evidence. |
+| `EV-LMS-PERSISTENCE` — Academy durable learner persistence<br>`lib/academy-persistence.ts` | product_supplied_evidence | working | test/not_run | `b78cd5d6f1ef8db75c68a02de430c44395cb046e6249b8b9cb104496569c4c67` | no | Application persistence logic; live database state requires provider evidence. |
 | `EV-LMS-CLASSD-GATE` — Florida Class D mandatory CI gate<br>`.github/workflows/florida-class-d-lms-gates.yml` | product_supplied_evidence | working | examine/not_run | `4b72063a50068e2c07c4e35045aece81521fab82ab052d2a2920905d6fdef6d3` | no | Configured gate definition only; exact run result is separately required. |
 | `EV-LMS-COMPLETION-STANDARD` — Student completion and certification standard<br>`docs/florida-class-d-lms/STUDENT-COMPLETION-AND-CERTIFICATION-STANDARD.md` | organization_evidence | working | examine/not_run | `194cacca3913d0d7c9ccc2aa0374e977e9b024bf558f8035845e46d8fc42ea9d` | no | Organization procedure candidate pending final approval and operational evidence. |
 
@@ -1574,9 +1574,9 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | Artifact | Origin | State | Method/result | SHA-256 | Finding eligible | Claim boundary |
 | --- | --- | --- | --- | --- | --- | --- |
 | `EV-PAYMENT-CHECKOUT` — Authorized checkout route<br>`app/api/academy/checkout/route.ts` | product_supplied_evidence | working | test/not_run | `4f8f348744955bdc55d067e1f49ccf167e6732081dcb54e9944ac3c91d4bb174` | no | Application-side checkout controls only. |
-| `EV-PAYMENT-WEBHOOK` — Signed Stripe fulfillment webhook<br>`app/api/webhook/stripe/route.ts` | product_supplied_evidence | working | test/not_run | `bed24f7dc0eb0e018102b3821d9f72e31855b745995e2d49bd713ced23faa5a7` | no | Application signature/idempotency logic only; live webhook configuration requires Stripe evidence. |
+| `EV-PAYMENT-WEBHOOK` — Signed Stripe fulfillment webhook<br>`app/api/webhook/stripe/route.ts` | product_supplied_evidence | working | test/not_run | `6864551a0ef9599206496842d04ff6cbaf74820c5b787ba4f86a754bad3b2ebd` | no | Application signature/idempotency logic only; live webhook configuration requires Stripe evidence. |
 | `EV-PAYMENT-INTEGRITY-SQL` — Payment event integrity hardening<br>`supabase/migrations/20260814061912_academy_payment_event_integrity_hardening.sql` | product_supplied_evidence | working | examine/not_run | `4af041dd50928c66e9f0f3e8f51a8fc49c74934266c8fffa16dd3bb110630b6e` | no | Migration source only; applied production state requires a provider query result. |
-| `EV-PAYMENT-GATE` — Durable commerce verification gate<br>`scripts/academy-durable-commerce-gate.mjs` | product_supplied_evidence | working | test/not_run | `c42a9d471defca8cf51241ccc3b1512015fb20b9a2139a4b3335f6834b5c0b87` | no | Gate source only; exact run evidence remains release-specific. |
+| `EV-PAYMENT-GATE` — Durable commerce verification gate<br>`scripts/academy-durable-commerce-gate.mjs` | product_supplied_evidence | working | test/not_run | `66a3502fd9d04ed5441300628c3f3e0db29ea4efc2cc8ecff6b5d070dba263a8` | no | Gate source only; exact run evidence remains release-specific. |
 
 ### Objective-level CMMC evidence mapping
 
@@ -2115,8 +2115,8 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | `EV-FDACS-LIVE-RECEIPT` — FDACS isolated project live verification receipt<br>`docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT-SOURCE.json` | organization_evidence | working | test/not_run | `951630f02ad91af825ecfdb9bf726082ba6575bc7ffa27758d22d8a348f1e304` | no | Organization-captured live provider observations and rollback-only fail-closed negative tests at 2026-08-14T22:43:09.105533Z; not a provider attestation, assessor determination, or exact-release final evidence. |
 | `EV-FDACS-DB-GATE` — FDACS database readiness gate<br>`scripts/florida-class-d-database-readiness-gate.mjs` | product_supplied_evidence | working | test/not_run | `84b3ebf7ce1c1b83a09cb66d0bb4c9839b708ff28c5978eb5139adf15d52aa96` | no | Gate definition only until exact live and source results are retained. |
 | `EV-FDACS-RUNTIME-ISOLATION-GATE` — FDACS regulated runtime-isolation gate<br>`scripts/florida-class-d-runtime-isolation-audit.mjs` | product_supplied_evidence | working | test/not_run | `0b3e653fcaa0988cdf7aa038b0c8ff656071e0f8725ebe5bd492fbb1b429a532` | no | Fail-closed source scan for embedded Supabase origins and public secret-class configuration names; exact-release and live runtime results remain separate. |
-| `EV-FDACS-MIGRATION-MANIFEST` — FDACS deterministic migration manifest generator<br>`scripts/florida-class-d-migration-manifest.mjs` | product_supplied_evidence | working | test/not_run | `fff1954ff206656f5c9c7f0964614bd4537da13ede6b72570ccfd172a1c5aba0` | no | Binds the ordered 38-file source lineage and hashes without authorizing the production runtime. |
-| `EV-FDACS-MIGRATION-PARITY-GATE` — FDACS migration parity and activation-binding gate<br>`scripts/florida-class-d-migration-parity-gate.mjs` | product_supplied_evidence | working | test/not_run | `fde51f754b2ec4997c443876588eb1158d4f040095a3dba872a1c3ed3ab2de11` | no | Validates source lineage, latest version, manifest digest, and candidate-bound activation requirements; production runtime authorization remains false. |
+| `EV-FDACS-MIGRATION-MANIFEST` — FDACS deterministic migration manifest generator<br>`scripts/florida-class-d-migration-manifest.mjs` | product_supplied_evidence | working | test/not_run | `36a2892e6b43009b020075dc42e4524f0d2592e719caab2af7c69421a772ed26` | no | Binds the ordered 38-file source lineage and hashes without authorizing the production runtime. |
+| `EV-FDACS-MIGRATION-PARITY-GATE` — FDACS migration parity and activation-binding gate<br>`scripts/florida-class-d-migration-parity-gate.mjs` | product_supplied_evidence | working | test/not_run | `a73f38aa9e235e45f3112719fa143c3b909b3a7c363355da9f7e048962db5aab` | no | Validates source lineage, latest version, manifest digest, and candidate-bound activation requirements; production runtime authorization remains false. |
 
 ### Objective-level CMMC evidence mapping
 
@@ -2435,7 +2435,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | --- | --- | --- | --- | --- | --- | --- |
 | `EV-ACADEMY-BASELINE-SQL` — Academy publication controls<br>`supabase/migrations/20260814025522_academy_baseline_publication_controls.sql` | product_supplied_evidence | working | examine/not_run | `c402d5db0c91fc147cfec3da674fbec5532aaa513f96ca856d7d4e1e7b395934` | no | Migration source only. |
 | `EV-ACADEMY-COMMERCE-SQL` — Academy durable learner commerce schema<br>`supabase/migrations/20260814061110_academy_durable_learner_commerce.sql` | product_supplied_evidence | working | examine/not_run | `79989efa5488cd256e9eb334893d45fba005a57d2025e333d837a4b1b09134d4` | no | Migration source only. |
-| `EV-ACADEMY-PERSISTENCE` — Academy persistence service<br>`lib/academy-persistence.ts` | product_supplied_evidence | working | test/not_run | `3a251ae52a1139d481104bd512c8b5450a69a411cb10527419fedfcc580a3550` | no | Application service source only. |
+| `EV-ACADEMY-PERSISTENCE` — Academy persistence service<br>`lib/academy-persistence.ts` | product_supplied_evidence | working | test/not_run | `b78cd5d6f1ef8db75c68a02de430c44395cb046e6249b8b9cb104496569c4c67` | no | Application service source only. |
 
 ### Objective-level CMMC evidence mapping
 
@@ -3268,7 +3268,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | Artifact | Origin | State | Method/result | SHA-256 | Finding eligible | Claim boundary |
 | --- | --- | --- | --- | --- | --- | --- |
 | `EV-DAILY-MEDIA-SERVICE` — Regulated media service<br>`lib/florida-class-d-media.ts` | product_supplied_evidence | working | test/not_run | `ff544a4657d38dfda91aa69fb96c7d67d2b5ba9549fe4c9fcfe035f321632da5` | no | Application media access logic only. |
-| `EV-DAILY-LIVE-SERVICE` — Live classroom persistence<br>`lib/florida-class-d-live-persistence.ts` | product_supplied_evidence | working | test/not_run | `8f90e6d5f2df5312d7b3e1ba46655690be4ba85aa07e58ab497daf63edb543d8` | no | Application attendance persistence only. |
+| `EV-DAILY-LIVE-SERVICE` — Live classroom persistence<br>`lib/florida-class-d-live-persistence.ts` | product_supplied_evidence | working | test/not_run | `9ff7535c96a2a069d42b194d58830e6ade5bb3a51b638739fc1d99c1409d6828` | no | Application attendance persistence only. |
 | `EV-DAILY-MEDIA-GATE` — Media integration verification gate<br>`scripts/florida-class-d-media-gate.mjs` | product_supplied_evidence | working | test/not_run | `6efb9dbf83cb953203c9bc9244c874aa95b56be6477cc6dfd64d4c1306023375` | no | Gate source only until an exact-run result exists. |
 
 ### Objective-level CMMC evidence mapping

@@ -9,7 +9,7 @@ import "./portal.css";
 
 export const metadata: Metadata = {
   title: `Customer Dashboard | ${LEGAL_ENTITY_NAME}`,
-  description: `Access your protected ${LEGAL_ENTITY_NAME} customer workspace for Academy, applications, licenses, reports, billing, certificates, support, and account security.`,
+  description: `Access your protected ${LEGAL_ENTITY_NAME} customer workspace for Academy, applications, licenses, reports, billing, course-completion records, support, and account security.`,
   alternates: { canonical: "/portal" },
   robots: { index: false, follow: false },
 };
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const dashboardModules = [
   { eyebrow: "ACADEMY", title: "Learning workspace", copy: "Browse available training, resume account-based learning, and review course completion requirements.", href: "/academy", action: "Open Academy", state: "Available" },
   { eyebrow: "APPLICATIONS", title: `${LEGAL_ENTITY_NAME} applications`, copy: "Review secure enterprise applications and request deployment, licensing, or technical evaluation support.", href: "/apps", action: "View applications", state: "Available" },
-  { eyebrow: "CERTIFICATES", title: "Completion records", copy: "Request certificate assistance, verification support, or corrections to approved completion records.", href: "/contact?interest=certificate-support", action: "Certificate support", state: "Support-enabled" },
+  { eyebrow: "COURSE COMPLETION", title: "Completion records", copy: "Request Certificate of Course Completion assistance, verification support, or corrections to approved completion records.", href: "/contact?interest=certificate-support", action: "Completion-record support", state: "Support-enabled" },
   { eyebrow: "LICENSING", title: "Enterprise licensing", copy: "Coordinate renewals, procurement, user allocation, team training, and application deployment planning.", href: "/contact?interest=enterprise-licensing", action: "Contact licensing", state: "Request-based" },
   { eyebrow: "BILLING", title: "Orders and invoicing", copy: "Request receipts, invoice support, payment clarification, enrollment assistance, or procurement documentation.", href: "/contact?interest=billing-support", action: "Billing support", state: "Request-based" },
   { eyebrow: "REPORTS", title: "Executive deliverables", copy: "Request approved reports, advisory deliverables, board materials, engagement documents, and secure distribution support.", href: "/contact?interest=customer-reports", action: "Request reports", state: "Controlled release" },
@@ -96,7 +96,7 @@ export default async function PortalPage() {
         <div className="portal-roadmap">{roadmap.map(([title,state,copy]) => <article key={title}><div><span>{state}</span><h3>{title}</h3></div><p>{copy}</p></article>)}</div>
       </section>
 
-      <section className="portal-section"><div className="portal-support"><div><p className="portal-eyebrow">CUSTOMER ASSISTANCE</p><h2>Reach the correct {LEGAL_ENTITY_NAME} team through one confidential request.</h2><p>Use customer support for enrollment, certificates, billing, licensing, reports, application access, active engagements, or account assistance.</p></div><div className="portal-actions"><Link className="portal-button" href="/contact?interest=customer-support">Open support request</Link><a className="portal-outline" href="mailto:info@obserrallc.com">Email support</a></div></div></section>
+      <section className="portal-section"><div className="portal-support"><div><p className="portal-eyebrow">CUSTOMER ASSISTANCE</p><h2>Reach the correct {LEGAL_ENTITY_NAME} team through one confidential request.</h2><p>Use customer support for enrollment, course-completion records, billing, licensing, reports, application access, active engagements, or account assistance.</p></div><div className="portal-actions"><Link className="portal-button" href="/contact?interest=customer-support">Open support request</Link><a className="portal-outline" href="mailto:info@obserrallc.com">Email support</a></div></div></section>
 
       <footer className="portal-footer"><span>OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</span><nav><Link href="/trust">Trust Center</Link><Link href="/privacy">Privacy</Link><Link href="/contact">Contact</Link></nav></footer>
     </main>

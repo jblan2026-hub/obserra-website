@@ -28,7 +28,7 @@ function pageContext(pathname: string): PageContext {
   if (pathname.startsWith("/academy")) {
     return {
       label: "Academy Advisor",
-      welcome: "I can help you compare courses, understand secure enrollment, access training, or learn how Obserra Academy certificates are earned.",
+      welcome: "I can help you compare courses, understand secure enrollment, access training, or learn how Obserra Academy Certificates of Course Completion are earned.",
       prompts: ["Recommend a course", "How does enrollment work?", "How do I earn a certificate?", "Enterprise training"],
     };
   }
@@ -121,7 +121,7 @@ function response(question: string, pathname: string): Message {
   if (/certificate|certify|completion|assessment|exam/.test(input)) {
     return {
       from: "guide",
-      text: "To earn an Obserra Certificate of Training, complete every required lesson and meet the course's published passing-score requirement on the final assessment. The certificate is generated from the authenticated completion record and includes a unique certificate ID. It is a certificate of course completion, not a professional certification or evidence of regulatory compliance.",
+      text: "To earn an Obserra Academy Certificate of Course Completion, complete every required lesson and meet the course's published passing-score requirement on the final assessment. The certificate is generated from the authenticated completion record and includes a unique verification ID. It is a proprietary course-completion record issued by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC, not a professional certification, license, academic credit, or evidence of regulatory compliance.",
       actions: [{ href: "/academy", label: "Review Academy standards" }],
     };
   }

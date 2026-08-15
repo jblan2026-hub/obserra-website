@@ -14,7 +14,7 @@ Production remains fail closed. Gate 29 does not apply a production database mig
 
 Gate 29 makes regulated database promotion depend on the exact ordered Class D migration lineage and a deterministic SHA-256 promotion manifest. Schema similarity alone is not sufficient production evidence.
 
-The current controlled source lineage contains exactly 39 regulated migrations, beginning with `20260813033000_fdacs_class_d_regulated_records.sql` and ending with `20260815160000_fdacs_class_d_identity_video_lobby_assignment.sql`. The isolated live provider remains at the prior 38-migration checkpoint until the forward-only identity-lobby assignment migration passes integrated review, controlled backup/preflight, and authorized promotion. Gate 29 does not apply it.
+The current controlled source lineage contains exactly 40 regulated migrations, beginning with `20260813033000_fdacs_class_d_regulated_records.sql` and ending with `20260815170000_fdacs_class_d_atomic_initial_presence_start.sql`. The isolated live provider remains at the prior 38-migration checkpoint. Both `20260815160000_fdacs_class_d_identity_video_lobby_assignment.sql` and `20260815170000_fdacs_class_d_atomic_initial_presence_start.sql` are source-only and unapplied pending integrated review, controlled backup/preflight, and authorized promotion. Gate 29 does not apply either migration.
 
 ## Lineage reconciliation
 
@@ -45,7 +45,7 @@ The manifest lineage was corrected to that exact filename before the promotion d
 `scripts/florida-class-d-migration-manifest.mjs`:
 
 - enumerates only `fdacs_class_d` migration files;
-- requires the exact expected ordered 38-file lineage;
+- requires the exact expected ordered 40-file lineage;
 - fails on missing, extra, reordered, or renamed regulated migrations;
 - computes SHA-256 for every migration file from the exact checked-out bytes;
 - builds a deterministic canonical JSON manifest;
@@ -55,9 +55,9 @@ The manifest lineage was corrected to that exact filename before the promotion d
 
 The validated deterministic manifest values are:
 
-- migration count: `38`;
-- latest migration version: `20260814215217`;
-- migration manifest SHA-256: `e44a728ba49b26b51aab2723906e95a08eaba42c5f623a7340ce61ef7d5a1d72`.
+- migration count: `40`;
+- latest migration version: `20260815170000`;
+- migration manifest SHA-256: `2fae1d73554e3455d765b55b8df4aec25a40f29420497308a5443156cab01487`.
 
 The deterministic manifest does not contain learner PII, credentials, license values, protected exam content, or database connection details.
 
@@ -66,8 +66,8 @@ The deterministic manifest does not contain learner PII, credentials, license va
 Gate 26 production activation now verifies all of the following:
 
 - `OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA` is a valid Git SHA and exactly matches the frozen production release candidate SHA;
-- `OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION` exactly equals `20260814215217`;
-- `OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256` exactly equals `e44a728ba49b26b51aab2723906e95a08eaba42c5f623a7340ce61ef7d5a1d72`;
+- `OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION` exactly equals `20260815170000`;
+- `OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256` exactly equals `2fae1d73554e3455d765b55b8df4aec25a40f29420497308a5443156cab01487`;
 - `OBSERRA_FDACS_DB_PROMOTION_STATUS` remains `verified`;
 - all other Gate 26 production, licensing, HA, rollback, security, and owner-approval conditions remain satisfied.
 
