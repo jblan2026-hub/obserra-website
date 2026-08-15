@@ -102,7 +102,12 @@ type ReviewedProduct = Pick<
   | "deploymentModes"
   | "releaseEvidence"
   | "faq"
->;
+> & {
+  /** Source-order compatibility contract for the read-only production-worker parser. */
+  status: "Coming Soon";
+  /** Intended worker review target only; never surfaced as verified availability. */
+  deployment: "On-Premises"[];
+};
 
 function reviewedProduct(product: ReviewedProduct): MarketplaceApp {
   return {
@@ -127,7 +132,9 @@ export const marketplaceApps: MarketplaceApp[] = [
   reviewedProduct({
     slug: "obserra-crisis-commander",
     name: "Obserra Crisis Commander",
+    status: "Coming Soon",
     category: "Cybersecurity",
+    deployment: ["On-Premises"],
     value: "Cyber crisis command for executive decisions, response actions, communications, evidence, and recovery accountability.",
     focusAreas: ["Crisis command timeline", "Role-based decisions and actions", "Communications and evidence governance"],
     integrationReview: ["Security operations", "Service management", "Enterprise identity"],
@@ -152,7 +159,9 @@ export const marketplaceApps: MarketplaceApp[] = [
   reviewedProduct({
     slug: "obserra-control-intelligence",
     name: "Obserra Control Intelligence",
+    status: "Coming Soon",
     category: "GRC",
+    deployment: ["On-Premises"],
     value: "Continuous control-effectiveness, assurance, auditor workflow, and defensibility intelligence.",
     focusAreas: ["Control effectiveness", "Assurance reporting", "Auditor and owner workflow"],
     integrationReview: ["Enterprise controls", "Evidence sources", "Board reporting"],
@@ -177,7 +186,9 @@ export const marketplaceApps: MarketplaceApp[] = [
   reviewedProduct({
     slug: "obserra-eu-cra-governance",
     name: "Obserra EU CRA Governance",
+    status: "Coming Soon",
     category: "GRC",
+    deployment: ["On-Premises"],
     value: "EU Cyber Resilience Act product governance for classification, conformity, SBOM, reporting, declarations, and regulatory evidence.",
     focusAreas: ["Product classification", "Conformity and SBOM workflow", "Regulatory evidence ledger"],
     integrationReview: ["Product inventory", "Vulnerability operations", "Regulatory reporting"],
@@ -202,7 +213,9 @@ export const marketplaceApps: MarketplaceApp[] = [
   reviewedProduct({
     slug: "obserra-eios",
     name: "Obserra EIOS",
+    status: "Coming Soon",
     category: "Intelligence",
+    deployment: ["On-Premises"],
     value: "Private enterprise intelligence operating system for governed automation, typed services, security controls, and auditable evidence.",
     focusAreas: ["Enterprise intelligence kernel", "Governed automation", "Auditable platform services"],
     integrationReview: ["Identity and authorization", "Enterprise modules", "Evidence and reporting"],
@@ -230,7 +243,9 @@ export const marketplaceApps: MarketplaceApp[] = [
   reviewedProduct({
     slug: "obserra-sap-uac",
     name: "Obserra SAP UAC",
+    status: "Coming Soon",
     category: "Identity",
+    deployment: ["On-Premises"],
     value: "ServiceNow-governed SAP user-account creation and access orchestration for managed Windows endpoints.",
     focusAreas: ["Access request workflow", "Policy and segregation-of-duties review", "Tamper-evident audit evidence"],
     integrationReview: ["ServiceNow", "SAP Identity Directory / SCIM", "Managed Windows configuration"],
@@ -260,7 +275,9 @@ export const marketplaceApps: MarketplaceApp[] = [
   reviewedProduct({
     slug: "obserra-agentic-ai-security",
     name: "Obserra Agentic AI Security",
+    status: "Coming Soon",
     category: "AI Governance",
+    deployment: ["On-Premises"],
     value: "Discovery, risk review, guardrails, red-team workflow, and defensibility for enterprise AI agents.",
     focusAreas: ["AI-agent discovery", "Guardrail and authority review", "Red-team and defensibility evidence"],
     integrationReview: ["AI providers", "Enterprise collaboration", "Security and service data"],
@@ -285,7 +302,9 @@ export const marketplaceApps: MarketplaceApp[] = [
   reviewedProduct({
     slug: "obserra-academy-production-studio",
     name: "Obserra Academy Production Studio",
+    status: "Coming Soon",
     category: "Learning",
+    deployment: ["On-Premises"],
     value: "Governed authoring, validation, packaging, approval, and publication system for original Obserra Academy courses.",
     focusAreas: ["Course authoring and validation", "Review and approval workflow", "FINAL release and catalog generation"],
     integrationReview: ["Obserra Academy catalog", "LCMS dry-run loading", "Website publication contract"],

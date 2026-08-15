@@ -39,6 +39,8 @@ test("the reviewed catalog contains the seven canonical Obserra products", async
 
   for (const name of expected) assert.match(productBlock, new RegExp(`name: "${name}"`));
   assert.equal((productBlock.match(/reviewedProduct\(\{/g) ?? []).length, expected.length);
+  assert.equal((productBlock.match(/status: "Coming Soon"/g) ?? []).length, expected.length);
+  assert.equal((productBlock.match(/deployment: \["On-Premises"\]/g) ?? []).length, expected.length);
   assert.equal((productBlock.match(/Demo: state\(/g) ?? []).length, expected.length);
   assert.equal((productBlock.match(/Live: state\(/g) ?? []).length, expected.length);
   assert.equal((productBlock.match(/mode\("Local \/ on-prem"/g) ?? []).length, expected.length);
@@ -69,6 +71,8 @@ test("customer availability remains fail-closed without exact release evidence",
   assert.match(data, /status: "Coming Soon"/);
   assert.match(data, /actions: \[\]/);
   assert.match(data, /deployment: \[\]/);
+  const adapter = data.slice(data.indexOf("function reviewedProduct"), data.indexOf("const optionalEios"));
+  assert.ok(adapter.indexOf("...product") < adapter.indexOf("deployment: []"));
   assert.match(commerce, /app\.actions\.some\(\(action\) => action\.kind === "Subscribe"\)/);
   assert.doesNotMatch(storefront, /rawStoreCatalog|generatedApps|entry\.deployment|entry\.status/);
   assert.deepEqual(storeCatalog.applications, []);
@@ -105,7 +109,8 @@ test("temporary hosts, unbound delivery routes, inherited deployment claims, and
   assert.doesNotMatch(joined, /\/api\/apps\/(?:access|download|checkout|billing-portal)/i);
   assert.doesNotMatch(joined, /liveApplicationUrls|rawStoreCatalog|generatedApps/);
   assert.doesNotMatch(customerFacing, /production[- ]ready/i);
-  assert.doesNotMatch(customerFacing, /private cloud|hybrid|on-premises/i);
+  assert.doesNotMatch(customerFacing, /private cloud|hybrid/i);
+  assert.doesNotMatch(customerFacing, /deployment:\s*\[(?:[^\]]*,[^\]]*)\]/i);
 });
 
 test("legacy builder traces remain removed from the Applications tree", async () => {
