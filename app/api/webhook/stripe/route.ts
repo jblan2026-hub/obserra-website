@@ -4,8 +4,7 @@ import { courseForId } from "../../../../lib/academy";
 import {
   academyPaymentReversalPolicy,
   academyCommerceLivemode,
-  academyCourseAmountCents,
-  validateAcademyPaidSession,
+  academyStripeWebhookSecret,
 } from "../../../../lib/academy-payment";
 import { recordAcademyPaymentReversal, recordPaidCheckout } from "../../../../lib/academy-persistence";
 import {
@@ -14,7 +13,7 @@ import {
   retrieveVerifiedAcademyPaidSessionForPaymentIntent,
   stripeObjectId,
 } from "../../../../lib/academy-stripe-verification";
-import { getStripe } from "../../../../lib/stripe";
+import { getAcademyStripe } from "../../../../lib/academy-stripe";
 import { readStripeWebhookBody, StripeWebhookBodyError } from "../../../../lib/stripe-webhook-body";
 
 export const runtime = "nodejs";
@@ -46,31 +45,14 @@ async function fulfillPaidSession(
       courseId: courseId ?? "missing",
       reason: "unknown-course",
     });
-    return { state: "rejected", reason: "unknown-course" } as const;
+    throw new AcademyStripeVerificationError("paid-session-course-unavailable");
   }
 
-  const amountCents = academyCourseAmountCents(course.price);
-  if (amountCents === null) return { state: "rejected", reason: "course-price-invalid" } as const;
-  const validation = validateAcademyPaidSession(session, {
-    courseId: course.id,
-    amountCents,
-    livemode: expectedLivemode,
-  });
-  if (!validation.valid) {
-    console.error("academy paid session rejected", {
-      eventId,
-      sessionId: session.id,
-      courseId: course.id,
-      reason: validation.reason,
-    });
-    return { state: "rejected", reason: validation.reason } as const;
-  }
-
-  const stripe = getStripe();
+  const stripe = getAcademyStripe();
   const verified = await retrieveVerifiedAcademyPaidSession(
     stripe,
     session.id,
-    { courseId: course.id, amountCents, livemode: expectedLivemode },
+    { courseId: course.id, livemode: expectedLivemode },
   );
   if (
     stripeObjectId(session.payment_intent) !== verified.paymentIntent.id ||
@@ -96,7 +78,7 @@ async function fulfillPaidSession(
     eventId,
     sessionId: session.id,
     courseId: course.id,
-    identityMode: validation.identityMode,
+    identityMode: verified.validation.identityMode,
     paymentStatus: session.payment_status,
     fulfillmentState: result.state,
     idempotentReplay: result.idempotentReplay,
@@ -121,7 +103,7 @@ async function recordSignedPaymentReversal(
     event.type !== "charge.dispute.closed"
   ) reversalMismatch("reversal-event-type-invalid");
   const eventType = event.type;
-  const stripe = getStripe();
+  const stripe = getAcademyStripe();
   let charge: Stripe.Charge;
   let providerObjectId: string;
   let amountReversed: number;
@@ -212,14 +194,15 @@ async function recordSignedPaymentReversal(
 
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
-  if (!signature || !process.env.STRIPE_WEBHOOK_SECRET) {
+  const webhookSecret = academyStripeWebhookSecret();
+  if (!signature || !webhookSecret) {
     return NextResponse.json({ error: "Webhook not configured" }, { status: 400 });
   }
 
   let event: Stripe.Event;
   try {
     const body = await readStripeWebhookBody(request);
-    event = getStripe().webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
+    event = getAcademyStripe().webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error) {
     if (error instanceof StripeWebhookBodyError) {
       return NextResponse.json({ error: "Webhook payload too large" }, { status: error.status });

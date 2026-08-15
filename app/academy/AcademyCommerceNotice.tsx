@@ -4,6 +4,7 @@ const MESSAGES: Record<string, { title: string; detail: string; alert?: boolean 
   "identity-configuration-required": { title: "Sign-in service unavailable", detail: "Paid access cannot be connected to a learner identity right now. No additional charge will be created.", alert: true },
   "durable-storage-unavailable": { title: "Enrollment recording unavailable", detail: "Checkout is paused until durable entitlement storage is healthy. No charge was attempted.", alert: true },
   "purchaser-identity-storage-unavailable": { title: "Purchaser verification unavailable", detail: "Guest checkout is paused until purchaser identity protection is healthy. No charge was attempted.", alert: true },
+  "already-enrolled": { title: "Course access already active", detail: "Open the course from your learner portal. A duplicate checkout was not created." },
   "course-unavailable": { title: "New enrollment is paused", detail: "This course cannot accept a new purchase. Existing learner access is preserved." },
   "purchase-authorization-unavailable": { title: "Purchase authorization unavailable", detail: "The catalog control plane could not authorize a new purchase. No charge was attempted.", alert: true },
   "checkout-unavailable": { title: "Secure checkout did not open", detail: "No charge was created. Please wait and try again." },

@@ -86,7 +86,7 @@ create trigger academy_learner_state_reversal_guard
 before insert or update of access_status, payment_reference on public.academy_learner_state
 for each row execute function public.academy_reject_reversed_entitlement_activation();
 
-revoke all on function public.academy_reject_reversed_entitlement_activation() from public, anon, authenticated;
+revoke all on function public.academy_reject_reversed_entitlement_activation() from public, anon, authenticated, service_role;
 
 create or replace function public.academy_record_payment_reversal(
   p_event_id text,
@@ -117,6 +117,7 @@ declare
   v_access_status text;
   v_updated integer;
 begin
+  perform pg_advisory_xact_lock(hashtextextended('academy-reversal:' || p_event_id, 0));
   select * into v_existing from public.academy_payment_reversal_events
     where event_id = p_event_id for update;
   if found then
@@ -146,6 +147,14 @@ begin
     );
   end if;
 
+  if (p_event_type = 'charge.refunded' and p_disposition not in ('full-refund', 'partial-refund-review')) or
+     (p_event_type = 'charge.dispute.created' and p_disposition <> 'dispute-open') or
+     (p_event_type = 'charge.dispute.closed' and p_disposition <> 'dispute-closed-review') or
+     (p_disposition = 'full-refund' and p_target_access_status <> 'refunded') or
+     (p_disposition <> 'full-refund' and p_target_access_status <> 'revoked') then
+    raise exception 'Invalid payment reversal policy';
+  end if;
+
   select * into v_payment from public.academy_payment_events
     where payment_intent_id = p_payment_intent_id
       and checkout_session_id = p_checkout_session_id
@@ -156,7 +165,35 @@ begin
     limit 1
     for update;
   if not found then
-    raise exception 'Paid checkout mapping is unavailable';
+    if exists (
+      select 1 from public.academy_payment_events candidate
+      where (candidate.payment_intent_id = p_payment_intent_id or candidate.checkout_session_id = p_checkout_session_id)
+        and (
+          candidate.payment_intent_id is distinct from p_payment_intent_id or
+          candidate.checkout_session_id is distinct from p_checkout_session_id or
+          candidate.course_slug is distinct from p_course_slug or
+          candidate.course_version is distinct from p_course_version
+        )
+    ) then
+      raise exception 'Ambiguous paid checkout mapping';
+    end if;
+
+    insert into public.academy_payment_reversal_events (
+      event_id, event_type, provider_object_id, charge_id, payment_intent_id,
+      checkout_session_id, customer_id, course_slug, course_version,
+      amount_captured, amount_reversed, currency, livemode, disposition,
+      target_access_status, processing_state, access_status_result
+    ) values (
+      p_event_id, p_event_type, p_provider_object_id, p_charge_id, p_payment_intent_id,
+      p_checkout_session_id, p_customer_id, p_course_slug, p_course_version,
+      p_amount_captured, p_amount_reversed, p_currency, p_livemode, p_disposition,
+      p_target_access_status, 'recorded-no-entitlement', 'unchanged'
+    );
+    return jsonb_build_object(
+      'state', 'recorded-no-entitlement',
+      'accessStatus', 'unchanged',
+      'idempotentReplay', false
+    );
   end if;
   if exists (
     select 1 from public.academy_payment_events candidate
@@ -173,14 +210,6 @@ begin
   ) then
     raise exception 'Ambiguous paid checkout mapping';
   end if;
-  if (p_event_type = 'charge.refunded' and p_disposition not in ('full-refund', 'partial-refund-review')) or
-     (p_event_type = 'charge.dispute.created' and p_disposition <> 'dispute-open') or
-     (p_event_type = 'charge.dispute.closed' and p_disposition <> 'dispute-closed-review') or
-     (p_disposition = 'full-refund' and p_target_access_status <> 'refunded') or
-     (p_disposition <> 'full-refund' and p_target_access_status <> 'revoked') then
-    raise exception 'Invalid payment reversal policy';
-  end if;
-
   if p_target_access_status = 'refunded' then
     update public.academy_learner_state
       set access_status = 'refunded', record_version = record_version + 1, updated_at = now()
@@ -232,7 +261,7 @@ $$;
 
 revoke all on function public.academy_record_payment_reversal(
   text, text, text, text, text, text, text, text, text, bigint, bigint, text, boolean, text, text
-) from public, anon, authenticated;
+) from public, anon, authenticated, service_role;
 grant execute on function public.academy_record_payment_reversal(
   text, text, text, text, text, text, text, text, text, bigint, bigint, text, boolean, text, text
 ) to service_role;

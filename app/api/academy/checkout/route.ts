@@ -1,9 +1,16 @@
-import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { BASELINE_COURSE_VERSION, publicationForCourse } from "../../../academy/coursePublication";
 import { courseForId } from "../../../../lib/academy";
 import { publicAcademyCourse } from "../../../../lib/academy-control";
-import { academyPurchaserHashConfigured, academyStorageHealth } from "../../../../lib/academy-persistence";
+import {
+  academyPurchaserHashConfigured,
+  academyStorageHealth,
+  bindAcademyCheckoutAttempt,
+  durableAcademyState,
+  recordAcademyCheckoutSession,
+  reserveAcademyCheckoutAttempt,
+} from "../../../../lib/academy-persistence";
 import {
   studioCertificateMetadata,
   studioCourseForId,
@@ -16,15 +23,21 @@ import {
   ACADEMY_PAYMENT_CURRENCY,
   academyCommerceLivemode,
   academyCommerceWebhookConfigured,
+  academyCheckoutAttempt,
+  academyCheckoutIdempotencyKey,
+  academyCheckoutRequestFingerprint,
   academyCourseAmountCents,
+  createAcademyCheckoutAfterGovernedPriceValidation,
 } from "../../../../lib/academy-payment";
-import { getStripe } from "../../../../lib/stripe";
+import { getAcademyStripe } from "../../../../lib/academy-stripe";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const CLAIM_POLICY = "purchaser-email-match-v1";
 const NO_STORE = "private, no-store, max-age=0";
+const CHECKOUT_BROWSER_COOKIE = "obserra_academy_checkout_browser";
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function unavailableRedirect(requestUrl: URL, reason: string) {
   const response = NextResponse.redirect(new URL(`/academy?enrollment=${reason}`, requestUrl));
@@ -63,6 +76,16 @@ function isSupportedFormContentType(request: Request) {
     contentType.startsWith("multipart/form-data");
 }
 
+function checkoutBrowserId(request: Request) {
+  for (const item of (request.headers.get("cookie") ?? "").split(";")) {
+    const [name, ...value] = item.trim().split("=");
+    if (name !== CHECKOUT_BROWSER_COOKIE) continue;
+    const candidate = decodeURIComponent(value.join("="));
+    return UUID.test(candidate) ? candidate.toLowerCase() : null;
+  }
+  return null;
+}
+
 export async function GET() {
   const response = rejectedRequest(405, "Method not allowed");
   response.headers.set("allow", "POST");
@@ -88,6 +111,12 @@ export async function POST(request: Request) {
 
   const courseValue = formData.get("course");
   const baseCourse = courseForId(typeof courseValue === "string" ? courseValue : "");
+  const checkoutAttempt = academyCheckoutAttempt(
+    formData.get("checkoutAttemptId"),
+    formData.get("checkoutAttemptIssuedAt"),
+  );
+
+  if (!checkoutAttempt) return rejectedRequest(400, "Invalid checkout attempt");
 
   const commerceLivemode = academyCommerceLivemode();
   if (!baseCourse || commerceLivemode === null || !academyCommerceWebhookConfigured()) {
@@ -115,20 +144,28 @@ export async function POST(request: Request) {
   if (!identity.configured) {
     return unavailableRedirect(requestUrl, "identity-configuration-required");
   }
+  let existingState: Awaited<ReturnType<typeof durableAcademyState>> = null;
   try {
     await academyStorageHealth();
+    existingState = identity.userId ? await durableAcademyState(identity.userId, course.id) : null;
   } catch {
     return unavailableRedirect(requestUrl, "durable-storage-unavailable");
+  }
+  if (existingState?.access_status === "active") {
+    return unavailableRedirect(requestUrl, "already-enrolled");
   }
   if (!identity.userId && !academyPurchaserHashConfigured()) {
     return unavailableRedirect(requestUrl, "purchaser-identity-storage-unavailable");
   }
+  const browserId = identity.userId ? null : checkoutBrowserId(request);
+  if (!identity.userId && !browserId) {
+    return unavailableRedirect(requestUrl, "purchaser-identity-storage-unavailable");
+  }
 
   try {
-    const purchaserReference = identity.userId ?? `guest_${randomUUID()}`;
-    const checkoutAttemptId = randomUUID();
+    const purchaserReference = identity.userId ?? `guest_${browserId}`;
     const identityMode = identity.userId ? "authenticated" : "guest-email";
-    const stripe = getStripe();
+    const stripe = getAcademyStripe();
     const studioCourse = studioCourseIsApproved(course.id) ? studioCourseForId(course.id) : null;
     const publication = publicationForCourse(course.id);
     const license = studioLicenseMetadata(course.id);
@@ -139,6 +176,37 @@ export async function POST(request: Request) {
     const courseReleaseStatus = publication.releaseStatus ?? "published";
     const amountCents = academyCourseAmountCents(course.price);
     if (amountCents === null) throw new Error("Invalid Academy course price");
+    const entitlementRevision = existingState?.record_version ?? 0;
+    const reservation = await reserveAcademyCheckoutAttempt({
+      attemptId: checkoutAttempt.id,
+      purchaserReference,
+      courseId: course.id,
+      entitlementRevision,
+      issuedAt: checkoutAttempt.issuedAt,
+      expiresAt: checkoutAttempt.expiresAt,
+    });
+    const canonicalAttempt = {
+      id: reservation.attemptId,
+      issuedAt: reservation.issuedAt,
+      expiresAt: reservation.expiresAt,
+    };
+
+    if (reservation.stripeSessionId) {
+      const existingSession = await stripe.checkout.sessions.retrieve(reservation.stripeSessionId);
+      if (
+        existingSession.mode !== "payment" ||
+        existingSession.client_reference_id !== purchaserReference ||
+        existingSession.metadata?.courseId !== course.id ||
+        existingSession.metadata?.checkoutAttemptId !== canonicalAttempt.id ||
+        !existingSession.url
+      ) throw new Error("Reserved Academy Checkout Session identity mismatch");
+      const response = NextResponse.redirect(existingSession.url, { status: 303 });
+      response.headers.set("x-obserra-commerce-mode", identityMode);
+      response.headers.set("x-obserra-payment-contract", ACADEMY_PAYMENT_CONTRACT);
+      response.headers.set("x-obserra-checkout-replay", "durable-session");
+      response.headers.set("cache-control", NO_STORE);
+      return response;
+    }
     const successUrl = new URL("/academy/success", requestUrl);
     successUrl.searchParams.set("course", course.id);
     successUrl.searchParams.set("session_id", "{CHECKOUT_SESSION_ID}");
@@ -173,7 +241,8 @@ export async function POST(request: Request) {
       paymentContractVersion: ACADEMY_PAYMENT_CONTRACT,
       expectedAmountCents: String(amountCents),
       expectedCurrency: ACADEMY_PAYMENT_CURRENCY,
-      checkoutAttemptId,
+      checkoutAttemptId: canonicalAttempt.id,
+      checkoutAttemptIssuedAt: String(canonicalAttempt.issuedAt),
     };
 
     const useGovernedStripePrice = Boolean(
@@ -181,17 +250,13 @@ export async function POST(request: Request) {
       course.price === baseCourse.price &&
       course.title === baseCourse.title,
     );
-    let lineItem;
+    let lineItem: Stripe.Checkout.SessionCreateParams.LineItem;
+    let governedPrice: Stripe.Price | null = null;
     if (useGovernedStripePrice && studioCourse?.commerce.stripePriceId) {
-      const governedPrice = await stripe.prices.retrieve(studioCourse.commerce.stripePriceId);
-      if (
-        !governedPrice.active ||
-        governedPrice.type !== "one_time" ||
-        governedPrice.currency !== ACADEMY_PAYMENT_CURRENCY ||
-        governedPrice.unit_amount !== amountCents
-      ) {
-        throw new Error("Governed Stripe price does not match the published Academy amount");
-      }
+      governedPrice = await stripe.prices.retrieve(
+        studioCourse.commerce.stripePriceId,
+        { expand: ["product"] },
+      );
       lineItem = { price: governedPrice.id, quantity: 1 };
     } else {
       lineItem = {
@@ -217,7 +282,7 @@ export async function POST(request: Request) {
         };
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const checkoutParameters: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       payment_method_types: ["card"],
       line_items: [lineItem],
@@ -231,10 +296,28 @@ export async function POST(request: Request) {
       success_url: successUrl.toString(),
       cancel_url: cancelUrl.toString(),
       billing_address_collection: "auto",
-      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
-    }, { idempotencyKey: `academy-checkout-v2-${checkoutAttemptId}` });
+      expires_at: canonicalAttempt.expiresAt,
+    };
+    const requestFingerprint = academyCheckoutRequestFingerprint(checkoutParameters);
+    await bindAcademyCheckoutAttempt(canonicalAttempt.id, requestFingerprint);
+    const createCheckoutSession = () => stripe.checkout.sessions.create(checkoutParameters, {
+      idempotencyKey: academyCheckoutIdempotencyKey({
+        courseId: course.id,
+        purchaserReference,
+        checkoutAttemptId: canonicalAttempt.id,
+        entitlementRevision,
+      }),
+    });
+    const session = governedPrice
+      ? await createAcademyCheckoutAfterGovernedPriceValidation(
+          governedPrice,
+          { courseId: course.id, courseVersion, amountCents },
+          createCheckoutSession,
+        )
+      : await createCheckoutSession();
 
     if (!session.url) throw new Error("Stripe did not return a checkout URL");
+    await recordAcademyCheckoutSession(canonicalAttempt.id, session.id);
 
     const response = NextResponse.redirect(session.url, { status: 303 });
     response.headers.set("x-obserra-commerce-mode", identityMode);

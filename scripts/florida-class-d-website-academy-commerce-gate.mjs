@@ -21,6 +21,7 @@ const contractsPath = "lib/academy-control-contracts.ts";
 const controlPath = "lib/academy-control.ts";
 const paymentPath = "lib/academy-payment.ts";
 const paymentVerificationPath = "lib/academy-stripe-verification.ts";
+const academyStripePath = "lib/academy-stripe.ts";
 const checkoutPath = "app/api/academy/checkout/route.ts";
 const checkoutFormPath = "app/academy/AcademyCheckoutForm.tsx";
 const academyClientPath = "app/academy/AcademyControlledClient.tsx";
@@ -32,6 +33,8 @@ const webhookPath = "app/api/webhook/stripe/route.ts";
 const persistencePath = "lib/academy-persistence.ts";
 const durableMigrationPath = "supabase/migrations/20260814061110_academy_durable_learner_commerce.sql";
 const reversalMigrationPath = "supabase/migrations/20260815180000_academy_payment_reversal_governance.sql";
+const repurchaseMigrationPath = "supabase/migrations/20260815190000_academy_payment_repurchase_reactivation.sql";
+const checkoutReservationMigrationPath = "supabase/migrations/20260815200000_academy_checkout_attempt_reservations.sql";
 const supabaseConfigPath = "supabase/config.toml";
 const publicCatalogPath = "supabase/functions/academy-public-catalog/index.ts";
 const baselinePublicationPath = "supabase/migrations/20260814025522_academy_baseline_publication_controls.sql";
@@ -47,6 +50,7 @@ const contracts = read(contractsPath);
 const control = read(controlPath);
 const payment = read(paymentPath);
 const paymentVerification = read(paymentVerificationPath);
+const academyStripe = read(academyStripePath);
 const checkout = read(checkoutPath);
 const checkoutForm = read(checkoutFormPath);
 const academyClient = read(academyClientPath);
@@ -58,6 +62,8 @@ const webhook = read(webhookPath);
 const persistence = read(persistencePath);
 const durableMigration = read(durableMigrationPath);
 const reversalMigration = read(reversalMigrationPath);
+const repurchaseMigration = read(repurchaseMigrationPath);
+const checkoutReservationMigration = read(checkoutReservationMigrationPath);
 const supabaseConfig = read(supabaseConfigPath);
 const publicCatalog = read(publicCatalogPath);
 const baselinePublication = read(baselinePublicationPath);
@@ -173,6 +179,7 @@ forbidText(checkoutPath, checkout, 'requestUrl.searchParams.get("course")', "que
 requireText(checkoutFormPath, checkoutForm, 'action="/api/academy/checkout"', "checkout form action");
 requireText(checkoutFormPath, checkoutForm, 'method="post"', "checkout POST method");
 requireText(checkoutFormPath, checkoutForm, 'type="hidden" name="course"', "course form field");
+requireText(checkoutFormPath, checkoutForm, "navigator.locks.request", "first-use cross-tab checkout bootstrap serialization");
 requireText(academyClientPath, academyClient, "<AcademyCheckoutForm", "catalog POST checkout component");
 requireText(academyCoursePagePath, academyCoursePage, "<AcademyCheckoutForm", "course-page POST checkout component");
 forbidText(academyClientPath, academyClient, "/api/academy/checkout?course=", "legacy GET checkout link");
@@ -182,13 +189,29 @@ forbidText(academyCoursePagePath, academyCoursePage, "/api/academy/checkout?cour
 // a syntactically valid webhook secret, and current catalog authorization.
 requireText(checkoutPath, checkout, "academyCommerceLivemode()", "centralized Stripe mode/readiness check");
 requireText(checkoutPath, checkout, "academyCommerceWebhookConfigured()", "centralized webhook readiness check");
-requireText(paymentPath, payment, "process.env.STRIPE_SECRET_KEY", "server-only Stripe secret inspection");
-requireText(paymentPath, payment, "process.env.STRIPE_WEBHOOK_SECRET", "server-only webhook secret inspection");
+requireText(paymentPath, payment, "process.env.ACADEMY_STRIPE_SECRET_KEY", "dedicated Academy restricted Stripe secret inspection");
+requireText(paymentPath, payment, "process.env.ACADEMY_STRIPE_WEBHOOK_SECRET", "dedicated Academy webhook secret inspection");
+requireText(academyStripePath, academyStripe, "rk_live_", "production restricted-key requirement");
+requireText(academyStripePath, academyStripe, "rk_test_", "nonproduction restricted-key requirement");
+for (const [path, source] of [[checkoutPath, checkout], [redeemPath, redeem], [webhookPath, webhook], [paymentPath, payment], [academyStripePath, academyStripe]]) {
+  forbidText(path, source, "process.env.STRIPE_SECRET_KEY", "shared unrestricted Stripe key fallback");
+}
 requireText(paymentPath, payment, 'process.env.VERCEL_ENV === "production"', "production live-mode binding");
 requireText(checkoutPath, checkout, 'runtimeCourse.controlPlane !== "operational"', "operational control-plane requirement");
 requireText(checkoutPath, checkout, "!runtimeCourse.control.purchaseEnabled", "purchase authorization requirement");
 requireText(checkoutPath, checkout, "academyStorageHealth", "durable fulfillment readiness check");
 requireText(checkoutPath, checkout, "identity.configured", "configured identity requirement");
+requireText(checkoutPath, checkout, 'expand: ["product"]', "governed price expanded product preflight");
+requireText(checkoutPath, checkout, "createAcademyCheckoutAfterGovernedPriceValidation", "governed price product identity preflight");
+requireText(checkoutPath, checkout, 'existingState?.access_status === "active"', "active-entitlement duplicate payment denial");
+requireText(checkoutPath, checkout, "reserveAcademyCheckoutAttempt", "durable purchaser/course checkout reservation");
+requireText(checkoutPath, checkout, "academyCheckoutRequestFingerprint", "byte-stable Stripe parameter binding");
+requireText(checkoutPath, checkout, "reservation.stripeSessionId", "durable Checkout Session reuse");
+requireText(checkoutReservationMigrationPath, checkoutReservationMigration, "pg_advisory_xact_lock", "concurrent checkout serialization");
+requireText(checkoutReservationMigrationPath, checkoutReservationMigration, "force row level security", "checkout reservation forced RLS");
+requireText(checkoutReservationMigrationPath, checkoutReservationMigration, "academy-durable-state-v2", "exact reversal/reservation health schema");
+requireText(persistencePath, persistence, 'schemaVersion: "academy-durable-state-v2"', "runtime v2 storage health requirement");
+requireText(persistencePath, persistence, "academyCommerceStorageReady(value)", "partial migration health rejection");
 requireText(checkoutPath, checkout, 'response.headers.set("cache-control", NO_STORE)', "no-store commerce response");
 
 // Deferred payment claims must be POST-only/same-origin, re-fetch and fully
@@ -200,6 +223,7 @@ requireText(redeemPath, redeem, "retrieveVerifiedAcademyPaidSession", "canonical
 requireText(redeemPath, redeem, 'item.verification?.status === "verified"', "verified Clerk email requirement");
 requireText(redeemPath, redeem, "authenticatedUserOwnsVerifiedPurchaserEmail", "verified purchaser-email ownership check");
 requireText(redeemPath, redeem, "claimCourseAccess", "durable paid checkout claim");
+requireText(redeemPath, redeem, "courseVersion: validation.courseVersion", "immutable paid claim course version");
 
 // Fulfillment must be driven by signed Stripe webhooks and only after a paid event.
 requireText(webhookPath, webhook, 'request.headers.get("stripe-signature")', "Stripe signature header");
@@ -207,21 +231,31 @@ requireText(webhookPath, webhook, "webhooks.constructEvent", "Stripe signature v
 requireText(webhookPath, webhook, 'event.type === "checkout.session.completed"', "checkout completion event");
 requireText(webhookPath, webhook, 'session.payment_status === "paid"', "paid status check");
 requireText(webhookPath, webhook, 'event.type === "checkout.session.async_payment_succeeded"', "async payment success event");
-requireText(webhookPath, webhook, "validateAcademyPaidSession(session", "full paid-session contract validation");
+requireText(webhookPath, webhook, "retrieveVerifiedAcademyPaidSession(", "canonical full paid-session contract validation");
 requireText(webhookPath, webhook, "recordPaidCheckout", "durable post-payment event recording");
+requireText(webhookPath, webhook, 'throw new AcademyStripeVerificationError("paid-session-course-unavailable")', "paid unknown-course retryable failure");
 requireText(webhookPath, webhook, "event.id", "Stripe-event idempotency key");
 for (const eventType of ["charge.refunded", "charge.dispute.created", "charge.dispute.closed"]) {
   requireText(webhookPath, webhook, eventType, `signed ${eventType} processing`);
 }
 requireText(webhookPath, webhook, "recordAcademyPaymentReversal", "durable payment reversal recording");
+forbidText(webhookPath, webhook, "academyCourseAmountCents", "immutable paid-session fulfillment amount");
+forbidText(redeemPath, redeem, "academyCourseAmountCents", "immutable deferred-claim payment amount");
 requireText(paymentVerificationPath, paymentVerification, "line_items.data.price.product", "exact Stripe product expansion");
 requireText(paymentVerificationPath, paymentVerification, "payment-customer-mismatch", "session payment-intent customer linkage");
 requireText(reversalMigrationPath, reversalMigration, "academy_payment_reversal_events", "durable payment reversal ledger");
 requireText(reversalMigrationPath, reversalMigration, "Ambiguous paid checkout mapping", "ambiguous reversal rejection");
+requireText(reversalMigrationPath, reversalMigration, "'recorded-no-entitlement', 'unchanged'", "reversal-first durable disposition");
 requireText(reversalMigrationPath, reversalMigration, "academy_learner_state_reversal_guard", "reversed entitlement reactivation guard");
 requireText(reversalMigrationPath, reversalMigration, "force row level security", "payment reversal forced RLS");
 requireText(reversalMigrationPath, reversalMigration, "revoke all on public.academy_payment_reversal_events from service_role", "payment reversal service-role default privilege reset");
 requireText(reversalMigrationPath, reversalMigration, "grant select, insert, update on public.academy_payment_reversal_events to service_role", "payment reversal service-role least privilege");
+requireText(repurchaseMigrationPath, repurchaseMigration, "on conflict (clerk_user_id, course_slug) do update", "distinct repurchase reactivation");
+requireText(repurchaseMigrationPath, repurchaseMigration, "payment_reference is distinct from excluded.payment_reference", "old reversed payment reference denial");
+requireText(repurchaseMigrationPath, repurchaseMigration, "academy_payment_reversal_events", "new payment reversal guard");
+requireText(repurchaseMigrationPath, repurchaseMigration, "returning * into v_state", "repurchase entitlement result capture");
+requireText(repurchaseMigrationPath, repurchaseMigration, "Verified payment did not activate exact Academy access", "false fulfillment denial");
+requireText(repurchaseMigrationPath, repurchaseMigration, "from public, anon, authenticated, service_role", "replacement RPC ACL reset before service-role grant");
 
 // Academy fulfillment and learner state must be durable, service-only, auditable, and contain no fabricated rows.
 for (const table of ["academy_learner_state", "academy_payment_events", "academy_assessment_records", "academy_learner_events"]) {
