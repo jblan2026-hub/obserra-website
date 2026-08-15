@@ -93,6 +93,8 @@ test("signed webhook handles exact reversal events through a durable service-onl
   assert.match(persistence, /"academy_record_payment_reversal"/);
   assert.match(migration, /force row level security/);
   assert.match(migration, /from public, anon, authenticated/);
+  assert.match(migration, /revoke all on public\.academy_payment_reversal_events from service_role/);
+  assert.match(migration, /grant select, insert, update on public\.academy_payment_reversal_events to service_role/);
   assert.match(migration, /idempotentReplay/);
   assert.match(migration, /Ambiguous paid checkout mapping/);
   assert.match(migration, /payment_reference = p_checkout_session_id/);

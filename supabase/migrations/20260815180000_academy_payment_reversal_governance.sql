@@ -60,6 +60,7 @@ create index if not exists academy_payment_reversal_course_idx
 alter table public.academy_payment_reversal_events enable row level security;
 alter table public.academy_payment_reversal_events force row level security;
 revoke all on public.academy_payment_reversal_events from public, anon, authenticated;
+revoke all on public.academy_payment_reversal_events from service_role;
 grant select, insert, update on public.academy_payment_reversal_events to service_role;
 
 create or replace function public.academy_reject_reversed_entitlement_activation()

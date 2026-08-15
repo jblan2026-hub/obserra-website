@@ -220,6 +220,8 @@ requireText(reversalMigrationPath, reversalMigration, "academy_payment_reversal_
 requireText(reversalMigrationPath, reversalMigration, "Ambiguous paid checkout mapping", "ambiguous reversal rejection");
 requireText(reversalMigrationPath, reversalMigration, "academy_learner_state_reversal_guard", "reversed entitlement reactivation guard");
 requireText(reversalMigrationPath, reversalMigration, "force row level security", "payment reversal forced RLS");
+requireText(reversalMigrationPath, reversalMigration, "revoke all on public.academy_payment_reversal_events from service_role", "payment reversal service-role default privilege reset");
+requireText(reversalMigrationPath, reversalMigration, "grant select, insert, update on public.academy_payment_reversal_events to service_role", "payment reversal service-role least privilege");
 
 // Academy fulfillment and learner state must be durable, service-only, auditable, and contain no fabricated rows.
 for (const table of ["academy_learner_state", "academy_payment_events", "academy_assessment_records", "academy_learner_events"]) {

@@ -107,6 +107,18 @@ for (const text of [
 ]) requireText(reversalMigrationFile, reversalMigration, text, "durable payment reversal governance");
 requireText(reversalMigrationFile, reversalMigration, "force row level security", "payment reversal forced RLS");
 requireText(reversalMigrationFile, reversalMigration, "from public, anon, authenticated", "payment reversal browser denial");
+requireText(
+  reversalMigrationFile,
+  reversalMigration,
+  "revoke all on public.academy_payment_reversal_events from service_role",
+  "payment reversal service-role default privilege reset",
+);
+requireText(
+  reversalMigrationFile,
+  reversalMigration,
+  "grant select, insert, update on public.academy_payment_reversal_events to service_role",
+  "payment reversal service-role least privilege",
+);
 forbidText(eventHardeningFile, eventHardening.toLowerCase(), "public.fdacs_", "regulated LMS schema separation");
 forbidText(migrationFile, migration.toLowerCase(), "public.fdacs_", "regulated LMS schema separation");
 
