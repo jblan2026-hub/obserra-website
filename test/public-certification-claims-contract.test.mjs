@@ -80,3 +80,15 @@ test("the shared enterprise header renders the exact legal site identity visibly
   assert.match(chrome, /className="ent-header__legal-name">\{LEGAL_ENTITY_NAME\}/);
   assert.match(styles, /\.ent-header__legal-name/);
 });
+
+test("public page titles rely on the root legal-name template exactly once", () => {
+  const rootLayout = read("app/layout.tsx");
+  const floridaTraining = read("app/florida-security-training/page.tsx");
+  const store = read("app/store/page.tsx");
+
+  assert.match(rootLayout, /template: `%s \| \$\{LEGAL_ENTITY_NAME\}`/);
+  assert.match(floridaTraining, /title: "Florida Class D Security Officer Training"/);
+  assert.match(store, /title: "Store"/);
+  assert.doesNotMatch(floridaTraining, /title: [^\n]*OBSERRA EXECUTIVE PROTECTION/);
+  assert.doesNotMatch(store, /title: [^\n]*LEGAL_ENTITY_NAME/);
+});

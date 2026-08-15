@@ -10,7 +10,7 @@ import {
 import "./florida-security-training.css";
 
 export const metadata: Metadata = {
-  title: "Florida Class D Security Officer Training | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  title: "Florida Class D Security Officer Training",
   description: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC is building a premium Florida Class D Security Officer Training learning experience. Enrollment is not yet open.",
   alternates: { canonical: "/florida-security-training" },
 };

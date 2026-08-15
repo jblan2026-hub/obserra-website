@@ -4,7 +4,7 @@ import Link from "next/link";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
-  title: `Store | ${LEGAL_ENTITY_NAME}`,
+  title: "Store",
   description: `Purchase ${LEGAL_ENTITY_NAME} applications, courses, subscriptions, advisory services, and enterprise offerings through one secure commercial storefront.`,
   alternates: { canonical: "/store" },
 };
