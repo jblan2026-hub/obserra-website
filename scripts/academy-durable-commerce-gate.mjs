@@ -17,6 +17,7 @@ const forbidText = (file, source, text, control) => {
 
 const migrationFile = "supabase/migrations/20260814061110_academy_durable_learner_commerce.sql";
 const eventHardeningFile = "supabase/migrations/20260814061912_academy_payment_event_integrity_hardening.sql";
+const reversalMigrationFile = "supabase/migrations/20260815180000_academy_payment_reversal_governance.sql";
 const persistenceFile = "lib/academy-persistence.ts";
 const academyFile = "lib/academy.ts";
 const requestFile = "lib/academy-request.ts";
@@ -31,6 +32,7 @@ const websiteCiWorkflowFile = ".github/workflows/website-ci.yml";
 
 const migration = read(migrationFile);
 const eventHardening = read(eventHardeningFile);
+const reversalMigration = read(reversalMigrationFile);
 const persistence = read(persistenceFile);
 const academy = read(academyFile);
 const request = read(requestFile);
@@ -93,6 +95,18 @@ for (const text of [
 }
 requireText(eventHardeningFile, eventHardening, "v_event.course_version", "signed-webhook course version authority");
 requireText(eventHardeningFile, eventHardening, "academy_payment_events_user_id", "payment-event user identity bound");
+for (const text of [
+  "academy_payment_reversal_events",
+  "charge.refunded",
+  "charge.dispute.created",
+  "charge.dispute.closed",
+  "academy_record_payment_reversal",
+  "Ambiguous paid checkout mapping",
+  "idempotentReplay",
+  "academy_learner_state_reversal_guard",
+]) requireText(reversalMigrationFile, reversalMigration, text, "durable payment reversal governance");
+requireText(reversalMigrationFile, reversalMigration, "force row level security", "payment reversal forced RLS");
+requireText(reversalMigrationFile, reversalMigration, "from public, anon, authenticated", "payment reversal browser denial");
 forbidText(eventHardeningFile, eventHardening.toLowerCase(), "public.fdacs_", "regulated LMS schema separation");
 forbidText(migrationFile, migration.toLowerCase(), "public.fdacs_", "regulated LMS schema separation");
 
@@ -130,7 +144,9 @@ requireText(webhookFile, webhook, "webhooks.constructEvent", "Stripe webhook sig
 requireText(webhookFile, webhook, 'session.payment_status === "paid"', "paid-event fulfillment boundary");
 requireText(webhookFile, webhook, "recordPaidCheckout", "durable webhook event recording");
 requireText(webhookFile, webhook, "event.id", "Stripe event idempotency authority");
-requireText(redeemFile, redeem, "checkout.sessions.retrieve(sessionId)", "server-side paid session revalidation");
+requireText(webhookFile, webhook, "recordAcademyPaymentReversal", "durable refund and dispute processing");
+requireText(persistenceFile, persistence, '"academy_record_payment_reversal"', "payment reversal service RPC client");
+requireText(redeemFile, redeem, "retrieveVerifiedAcademyPaidSession", "server-side canonical paid session revalidation");
 requireText(redeemFile, redeem, "authenticatedUserOwnsVerifiedPurchaserEmail", "verified purchaser identity claim");
 requireText(redeemFile, redeem, "claimCourseAccess", "durable entitlement claim");
 
@@ -174,8 +190,8 @@ forbidText(websiteCiWorkflowFile, websiteCiWorkflow, "secrets.STRIPE_WEBHOOK_SEC
 
 console.log(JSON.stringify({
   gate: "academy-durable-commerce-gate-35",
-  durableTables: tables.length,
-  serviceOnlyRpcs: 9,
+  durableTables: tables.length + 1,
+  serviceOnlyRpcs: 10,
   productionTransactionsCreated: 0,
   failures,
 }, null, 2));

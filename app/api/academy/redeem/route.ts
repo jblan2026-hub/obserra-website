@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 import {
   academyCommerceLivemode,
   academyCourseAmountCents,
-  validateAcademyPaidSession,
 } from "../../../../lib/academy-payment";
 import { claimCourseAccess, courseForId } from "../../../../lib/academy";
 import { safeIdentity } from "../../../../lib/identity-runtime";
+import { retrieveVerifiedAcademyPaidSession } from "../../../../lib/academy-stripe-verification";
 import { getStripe } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
@@ -93,21 +93,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    const session = await getStripe().checkout.sessions.retrieve(sessionId);
-    const validation = validateAcademyPaidSession(session, { courseId: course.id, amountCents, livemode });
-    if (!validation.valid) {
-      const status = validation.reason === "payment-expired"
-        ? "payment-expired"
-        : validation.reason === "payment-pending"
-          ? "payment-pending"
-          : "verification-failed";
-      console.warn("academy paid access validation rejected", {
-        courseId: course.id,
-        sessionId: session.id,
-        reason: validation.reason,
-      });
-      return NextResponse.redirect(retryUrl(requestUrl, course.id, session.id, status), 303);
-    }
+    const verified = await retrieveVerifiedAcademyPaidSession(
+      getStripe(),
+      sessionId,
+      { courseId: course.id, amountCents, livemode },
+    );
+    const { session, validation } = verified;
 
     let authorizedClaim = validation.learnerId === identity.userId;
     const purchaserEmail = session.customer_details?.email ?? session.customer_email ?? undefined;

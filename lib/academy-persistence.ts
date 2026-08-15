@@ -218,6 +218,47 @@ export async function recordPaidCheckout(input: {
   );
 }
 
+export async function recordAcademyPaymentReversal(input: {
+  eventId: string;
+  eventType: "charge.refunded" | "charge.dispute.created" | "charge.dispute.closed";
+  providerObjectId: string;
+  chargeId: string;
+  paymentIntentId: string;
+  checkoutSessionId: string;
+  customerId: string;
+  courseId: string;
+  courseVersion: string;
+  amountCaptured: number;
+  amountReversed: number;
+  currency: "usd";
+  livemode: boolean;
+  disposition: "full-refund" | "partial-refund-review" | "dispute-open" | "dispute-closed-review";
+  targetAccessStatus: "refunded" | "revoked";
+}) {
+  requireCourseVersion(input.courseId, input.courseVersion);
+  return rpc<{
+    state: "applied" | "recorded-no-entitlement" | "manual-review-required";
+    accessStatus: "refunded" | "revoked" | "unchanged";
+    idempotentReplay: boolean;
+  }>("academy_record_payment_reversal", {
+    p_event_id: input.eventId,
+    p_event_type: input.eventType,
+    p_provider_object_id: input.providerObjectId,
+    p_charge_id: input.chargeId,
+    p_payment_intent_id: input.paymentIntentId,
+    p_checkout_session_id: input.checkoutSessionId,
+    p_customer_id: input.customerId,
+    p_course_slug: input.courseId,
+    p_course_version: input.courseVersion,
+    p_amount_captured: input.amountCaptured,
+    p_amount_reversed: input.amountReversed,
+    p_currency: input.currency,
+    p_livemode: input.livemode,
+    p_disposition: input.disposition,
+    p_target_access_status: input.targetAccessStatus,
+  });
+}
+
 export async function claimPaidCheckout(input: {
   checkoutSessionId: string;
   courseId: string;

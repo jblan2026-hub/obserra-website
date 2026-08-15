@@ -68,6 +68,13 @@ export async function GET() {
         chargesEnabled,
       },
       webhookVerification: webhookConfigured ? "required" : "unavailable",
+      requiredWebhookEvents: [
+        "checkout.session.completed",
+        "checkout.session.async_payment_succeeded",
+        "charge.refunded",
+        "charge.dispute.created",
+        "charge.dispute.closed",
+      ],
       checkoutModes: ["authenticated", "guest-email"],
       claimPolicy: CLAIM_POLICY,
       identity: identity.configured ? "available" : "degraded",
@@ -80,6 +87,7 @@ export async function GET() {
         guest: "paid-pending-account-claim",
         idempotencyKey: "stripe-event-id",
         auditLedger: "durable-supabase",
+        reversalPolicy: "full-refund-refunded-partial-or-dispute-revoked-no-automatic-restoration",
       },
     },
     {

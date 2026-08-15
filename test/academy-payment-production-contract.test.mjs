@@ -59,7 +59,7 @@ test("entitlement recovery is authenticated same-origin POST and never creates a
   assert.match(redeem, /export async function POST\(request: Request\)/);
   assert.match(redeem, /if \(!isSameOrigin\(request, requestUrl\)\)/);
   assert.match(redeem, /safeIdentity\(\)/);
-  assert.match(redeem, /validateAcademyPaidSession/);
+  assert.match(redeem, /retrieveVerifiedAcademyPaidSession/);
   assert.match(redeem, /claimCourseAccess/);
   assert.doesNotMatch(redeem, /checkout\.sessions\.create/);
   assert.match(success, /action="\/api\/academy\/redeem" method="post"/);
