@@ -40,12 +40,26 @@ test("the reviewed catalog contains the seven canonical Obserra products", async
   for (const name of expected) assert.match(productBlock, new RegExp(`name: "${name}"`));
   assert.equal((productBlock.match(/reviewedProduct\(\{/g) ?? []).length, expected.length);
   assert.equal((productBlock.match(/status: "Coming Soon"/g) ?? []).length, expected.length);
+  assert.equal((productBlock.match(/features: \[[^\]]+\]/g) ?? []).length, expected.length);
+  assert.equal((productBlock.match(/integrations: \[[^\]]+\]/g) ?? []).length, expected.length);
   assert.equal((productBlock.match(/deployment: \["On-Premises"\]/g) ?? []).length, expected.length);
   assert.equal((productBlock.match(/Demo: state\(/g) ?? []).length, expected.length);
   assert.equal((productBlock.match(/Live: state\(/g) ?? []).length, expected.length);
   assert.equal((productBlock.match(/mode\("Local \/ on-prem"/g) ?? []).length, expected.length);
   assert.equal((productBlock.match(/mode\("SaaS"/g) ?? []).length, expected.length);
   assert.equal((productBlock.match(/mode\("Outbound tenant agent"/g) ?? []).length, expected.length);
+
+  const marketPattern = /slug:\s*"([^"]+)"[\s\S]*?name:\s*"([^"]+)"[\s\S]*?status:\s*"([^"]+)"[\s\S]*?category:\s*"([^"]+)"[\s\S]*?features:\s*\[([^\]]*)\][\s\S]*?integrations:\s*\[([^\]]*)\][\s\S]*?deployment:\s*\[([^\]]*)\]/g;
+  const marketRecords = [...productBlock.matchAll(marketPattern)];
+  assert.equal(marketRecords.length, expected.length);
+  assert.deepEqual(marketRecords.map((record) => record[2]), expected);
+  assert.equal(marketRecords.find((record) => record[1] === "obserra-academy-production-studio")?.[4], "Operations");
+  for (const record of marketRecords) {
+    assert.equal(record[3], "Coming Soon");
+    assert.match(record[5], /"[^"]+"/);
+    assert.match(record[6], /"[^"]+"/);
+    assert.equal(record[7].trim(), '"On-Premises"');
+  }
 });
 
 test("roadmap concepts cannot be mistaken for released products", async () => {
@@ -72,7 +86,9 @@ test("customer availability remains fail-closed without exact release evidence",
   assert.match(data, /actions: \[\]/);
   assert.match(data, /deployment: \[\]/);
   const adapter = data.slice(data.indexOf("function reviewedProduct"), data.indexOf("const optionalEios"));
-  assert.ok(adapter.indexOf("...product") < adapter.indexOf("deployment: []"));
+  for (const runtimeOverride of ["features: product.focusAreas", "integrations: product.integrationReview", "deployment: []"]) {
+    assert.ok(adapter.indexOf("...product") < adapter.indexOf(runtimeOverride));
+  }
   assert.match(commerce, /app\.actions\.some\(\(action\) => action\.kind === "Subscribe"\)/);
   assert.doesNotMatch(storefront, /rawStoreCatalog|generatedApps|entry\.deployment|entry\.status/);
   assert.deepEqual(storeCatalog.applications, []);
