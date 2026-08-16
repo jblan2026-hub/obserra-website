@@ -124,6 +124,36 @@ function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest)
   return response;
 }
 
+function temporarilyDisableOwnerReviewRoute(request: NextRequest) {
+  const source = new URL(request.url);
+
+  if (pathMatchesPrefix(source.pathname, "/api/florida-class-d/owner-preview")) {
+    return NextResponse.json(
+      {
+        error: "Owner LMS review is temporarily unavailable.",
+        code: "FDACS_OWNER_REVIEW_TEMPORARILY_UNAVAILABLE",
+      },
+      {
+        status: 404,
+        headers: {
+          "cache-control": "private, no-store, max-age=0, must-revalidate",
+          pragma: "no-cache",
+          expires: "0",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY",
+          "referrer-policy": "no-referrer",
+        },
+      },
+    );
+  }
+
+  if (!pathMatchesPrefix(source.pathname, "/florida-security-training/owner-preview")) return null;
+
+  const destination = new URL("/florida-security-training", source);
+  destination.searchParams.set("owner_review", "temporarily_unavailable");
+  return NextResponse.redirect(destination, 307);
+}
+
 function regulatedMutationBoundary(request: NextRequest) {
   const url = new URL(request.url);
   const decision = evaluateFloridaClassDMutationBoundary(url.pathname, request.method);
@@ -399,6 +429,9 @@ async function handleSupabaseRequest(
 }
 
 function preIdentityBoundary(request: NextRequest) {
+  const temporaryOwnerReviewShutdown = temporarilyDisableOwnerReviewRoute(request);
+  if (temporaryOwnerReviewShutdown) return temporaryOwnerReviewShutdown;
+
   const ownerRoute = redirectToOwnerSite(request);
   if (ownerRoute) return ownerRoute;
 
