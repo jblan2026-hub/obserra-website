@@ -26,6 +26,8 @@ test("About restores completed speaking engagements and recognition media", () =
 });
 
 test("Speaking presents the engagements as completed work and shows the Hall of Fame cover", () => {
+  assert.match(speaking, /DR\. JODY BLANCHARD<\/span>/);
+  assert.doesNotMatch(speaking, /DR\. JODY BLANCHARD, PH\.D\./);
   assert.match(speaking, /SELECTED COMPLETED ENGAGEMENTS/);
   assert.match(speaking, /CNBC Technology Executive Council TEC Talk/);
   assert.match(speaking, /December 12, 2024/);
