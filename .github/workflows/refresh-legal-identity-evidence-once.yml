@@ -1,0 +1,33 @@
+name: Refresh legal identity evidence once
+
+on:
+  push:
+    branches:
+      - codex/refresh-legal-identity-evidence-20260816
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/refresh-legal-identity-evidence-20260816
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Regenerate legal identity evidence
+        run: |
+          npm run generate:legal-identity-audit
+          rm .github/workflows/refresh-legal-identity-evidence-once.yml
+          git config user.name "obserra-evidence-bot"
+          git config user.email "obserra-evidence-bot@users.noreply.github.com"
+          git add docs/compliance/LEGAL-IDENTITY-AUDIT.json docs/compliance/LEGAL-IDENTITY-AUDIT.md docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 .github/workflows/refresh-legal-identity-evidence-once.yml
+          git diff --cached --quiet && exit 0
+          git commit -m "docs(compliance): refresh legal identity evidence"
+          git push origin HEAD:codex/refresh-legal-identity-evidence-20260816
