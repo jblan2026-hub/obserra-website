@@ -382,3 +382,13 @@ test("owner provider mutations stay release-bound, same-origin, noindex, and iso
   assert.match(nextConfig, /source:\s*"\/florida-security-training\/owner-preview\/:path\*"[\s\S]*headers:\s*protectedVideoInstructorHeaders/);
   assert.match(nextConfig, /value:\s*"camera=\(\), microphone=\(\), display-capture=\(\)/);
 });
+
+
+test("owner-review outage switch prevents middleware 503 responses", async () => {
+  const proxy = await source("proxy");
+  assert.match(proxy, /temporarilyDisableOwnerReviewRoute/);
+  assert.match(proxy, /FDACS_OWNER_REVIEW_TEMPORARILY_UNAVAILABLE/);
+  assert.match(proxy, /owner_review", "temporarily_unavailable/);
+  assert.match(proxy, /status: 404/);
+  assert.match(proxy, /NextResponse\.redirect\(destination, 307\)/);
+});
