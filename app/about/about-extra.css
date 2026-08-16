@@ -35,8 +35,9 @@
 .about-profile .profile-photo-frame { position: relative; display: block; width: 100%; min-height: 0; aspect-ratio: 1 / 1.16; overflow: hidden; border: 0; border-radius: 0; background: #061524; }
 .about-profile .profile-photo { display: block; width: 100% !important; height: 100% !important; object-fit: cover !important; object-position: center top !important; }
 .profile-photo-label { display: grid; gap: 6px; padding: 18px 20px 20px; border-top: 1px solid #7ecfeb38; background: linear-gradient(145deg, #092e4d, #061626); }
-.profile-photo-label span, .profile-photo-label small { color: #c5e8f6; font-size: 9px; font-weight: 900; letter-spacing: .14em; }
-.profile-photo-label strong { color: #f7c45e; font-size: 20px; letter-spacing: .02em; }
+.profile-photo-name { color: #fff; font-family: "Avenir Next", "Segoe UI", Arial, sans-serif; font-size: clamp(22px, 2.2vw, 27px); font-weight: 800; letter-spacing: -.025em; line-height: 1.05; }
+.profile-photo-title { color: #f7c45e; font-family: "Avenir Next", "Segoe UI", Arial, sans-serif; font-size: 13px; font-weight: 800; letter-spacing: .08em; line-height: 1.38; text-transform: uppercase; }
+.profile-photo-specialty { color: #c5e8f6; font-family: "Avenir Next", "Segoe UI", Arial, sans-serif; font-size: 9px; font-weight: 800; letter-spacing: .12em; line-height: 1.45; text-transform: uppercase; }
 .about-profile > div:last-child { max-width: 770px; }
 .about-profile h2, .books h2, .credentials h2, .recognition h2, .leadership-media h2, .interview-feature h2, .expertise h2, .speaking h2, .about-cta h2 { margin: 0; color: #fff; font-size: clamp(37px, 4.2vw, 62px); letter-spacing: -.06em; line-height: .98; }
 .about-profile > div:last-child > p:not(.about-kicker) { color: #c5e0ed; font-size: 16px; line-height: 1.75; }
