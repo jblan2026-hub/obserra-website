@@ -33,7 +33,7 @@ export default function SpeakingPage() {
     <section className="speaker-hero">
       <div className="speaker-portrait">
         <Image src="/leadership/dr-jody-blanchard-speaking.png" width={273} height={422} quality={95} priority sizes="(max-width: 900px) 88vw, 410px" alt="Dr. Jody Blanchard, executive keynote speaker" />
-        <div><span>DR. JODY BLANCHARD, PH.D.</span><strong>EXECUTIVE SPEAKER AND ADVISOR</strong></div>
+        <div><span>DR. JODY BLANCHARD</span><strong>EXECUTIVE SPEAKER AND ADVISOR</strong></div>
       </div>
       <div><p className="speaker-kicker">BOOK DR. JODY BLANCHARD</p><h1>Executive insight for leaders responsible for complex decisions.</h1><p>Dr. Jody Blanchard brings the perspective of a two-time Fortune 500 Chief Information Security Officer, retired U.S. Army leader, doctoral researcher, published author, and enterprise advisor to keynotes, board sessions, leadership events, panels, podcasts, and private executive briefings.</p><p>Every engagement is tailored to the audience and designed to leave leaders with a clearer way to think, decide, communicate, and act.</p><div className="speaker-actions"><Link href="/contact?interest=speaking" className="speaker-button">Request a speaking engagement</Link><a href="#topics" className="speaker-outline">Explore speaking topics</a></div></div>
     </section>
