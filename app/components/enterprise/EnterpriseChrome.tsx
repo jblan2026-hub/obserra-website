@@ -6,13 +6,15 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LEGAL_ENTITY_NAME } from "../../../lib/legal-identity";
 import "./enterprise-chrome.css";
+import "./enterprise-sales-navigation.css";
 import "./legal-identity-lockup.css";
 
 const primaryNavigation = [
+  ["Applications", "/apps", "sales"],
+  ["Academy", "/academy", "sales"],
   ["Services", "/services"],
   ["Industries", "/industries"],
   ["EIOS", "/eios"],
-  ["Academy", "/academy"],
   ["Trust Center", "/trust"],
   ["About", "/about"],
   ["Speaking", "/speaking"],
@@ -61,8 +63,16 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
           <span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true" />
         </button>
         <nav id="enterprise-navigation" className={`ent-header__nav${open ? " is-open" : ""}`} aria-label="Enterprise navigation">
-          {primaryNavigation.map(([label, href]) => (
-            <Link key={href} href={href} onClick={close} aria-current={pathname === href || pathname.startsWith(`${href}/`) ? "page" : undefined}>{label}</Link>
+          {primaryNavigation.map(([label, href, prominence]) => (
+            <Link
+              key={href}
+              href={href}
+              className={prominence === "sales" ? "ent-header__sales-link" : undefined}
+              onClick={close}
+              aria-current={pathname === href || pathname.startsWith(`${href}/`) ? "page" : undefined}
+            >
+              {label}
+            </Link>
           ))}
           <Link href="/contact?interest=enterprise-consultation" className="ent-header__cta" onClick={close}>Request consultation</Link>
         </nav>
@@ -95,7 +105,7 @@ export function EnterpriseFooter() {
         <p>Executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning for organizations facing consequential decisions.</p>
         <Link href="/contact?interest=enterprise-consultation">Request an executive consultation <span aria-hidden="true">→</span></Link>
       </div>
-      <nav aria-label="Enterprise capabilities"><strong>Capabilities</strong><Link href="/services">Enterprise services</Link><Link href="/protection-intelligence">Protection and intelligence</Link><Link href="/eios">EIOS platform</Link><Link href="/academy">Obserra Academy</Link></nav>
+      <nav aria-label="Enterprise capabilities"><strong>Capabilities</strong><Link href="/apps">Applications Marketplace</Link><Link href="/academy">Obserra Academy</Link><Link href="/services">Enterprise services</Link><Link href="/protection-intelligence">Protection and intelligence</Link><Link href="/eios">EIOS platform</Link></nav>
       <nav aria-label="Enterprise company links"><strong>Company</strong><Link href="/about">Leadership and credentials</Link><Link href="/speaking">Speaking and briefings</Link><Link href="/industries">Industries</Link><Link href="/resources">Resources</Link></nav>
       <nav aria-label="Enterprise assurance links"><strong>Assurance</strong><Link href="/trust">Trust Center</Link><Link href="/trust/privacy-policy">Privacy</Link><Link href="/trust/security-and-responsible-disclosure">Security</Link><Link href="/trust/accessibility-statement">Accessibility</Link></nav>
       <div className="ent-footer__legal"><span>© {new Date().getFullYear()} {LEGAL_ENTITY_NAME}. All rights reserved.</span><span>{LEGAL_ENTITY_NAME} product, Obserra EIOS, and Obserra Academy materials are proprietary.</span></div>

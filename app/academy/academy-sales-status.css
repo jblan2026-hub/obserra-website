@@ -1,0 +1,17 @@
+.academy-feature-actions .academy-enrollment-pending,
+.course-card-actions .academy-enrollment-pending {
+  display: inline-flex;
+  flex: 1;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 11px;
+  border: 1px solid rgba(126, 204, 232, .28);
+  border-radius: 8px;
+  background: rgba(4, 24, 41, .88);
+  color: #b8cfdd;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.25;
+  text-align: center;
+}
