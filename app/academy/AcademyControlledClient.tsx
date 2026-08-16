@@ -53,9 +53,11 @@ function levelTag(level: CourseLevel) {
 
 export default function AcademyControlledClient({
   courses,
+  purchaseAvailability,
   controlPlane,
 }: {
   courses: Course[];
+  purchaseAvailability: Record<string, boolean>;
   controlPlane: "operational" | "degraded";
 }) {
   const [department, setDepartment] = useState<Department | "All">("All");
@@ -108,6 +110,9 @@ export default function AcademyControlledClient({
   }, [courses, department, query, selectedCollection, sort]);
 
   const visibleCourses = filteredCourses.slice(0, visibleCount);
+  const purchaseAvailable = (courseId: string) =>
+    controlPlane === "operational" && purchaseAvailability[courseId] === true;
+  const purchasableCourseCount = courses.filter((course) => purchaseAvailable(course.id)).length;
 
   function resetCatalog() {
     setQuery("");
@@ -141,10 +146,9 @@ export default function AcademyControlledClient({
         <p className="kicker">OBSERRA ACADEMY</p>
         <h1>Professional, artificial intelligence (AI) native training for high consequence cybersecurity, intelligence, protection, and technology decisions.</h1>
         <p>
-          Choose from {courses.length} currently published courses, complete secure enrollment, and gain access
-          to the exact course curriculum, saved progress, assessment workflow, completion record, and the
-          Obserrian Academy Tutor. Courses removed from publication cannot be purchased, while previously
-          entitled learners retain their committed access.
+          Review {courses.length} courses in the Obserra Academy catalog. New enrollment opens only after a
+          course's learner edition is loaded, reviewed, and explicitly approved for sale. Previously entitled
+          learners retain their committed access when new sales are paused.
         </p>
         <div className="certificate-promise">
           <strong>Completion standard</strong>
@@ -163,8 +167,8 @@ export default function AcademyControlledClient({
       </section>
 
       <section className="purchase-journey" aria-label="Academy purchase and completion journey">
-        <article><span>01</span><h2>Select</h2><p>Compare the published outcomes, duration, level, lesson path, and price.</p></article>
-        <article><span>02</span><h2>Enroll securely</h2><p>Complete the approved Stripe enrollment and associate access with your learner identity.</p></article>
+        <article><span>01</span><h2>Review</h2><p>Compare the stated outcomes, duration, level, and planned lesson path.</p></article>
+        <article><span>02</span><h2>Enroll when activated</h2><p>After course approval, complete secure enrollment and associate access with your learner identity.</p></article>
         <article><span>03</span><h2>Learn with AI</h2><p>Receive course aware instruction, saved progress, applied scenarios, authoritative sources, and the Obserrian Academy Tutor.</p></article>
         <article><span>04</span><h2>Complete</h2><p>Complete every lesson, pass the protected assessment, and generate your governed Certificate of Course Completion.</p></article>
       </section>
@@ -175,8 +179,8 @@ export default function AcademyControlledClient({
             <p className="kicker">FEATURED COURSES</p>
             <h2>Start with training built for decisions leaders face now.</h2>
             <p>
-              Premium learning across cybersecurity, executive protection, incident leadership, AI governance,
-              and enterprise technology. Every paid course includes an entitlement-gated AI learning assistant.
+              Preview planned learning across cybersecurity, executive protection, incident leadership, AI governance,
+              and enterprise technology. Activated paid courses include an entitlement-gated AI learning assistant.
             </p>
             <div className="academy-spotlight-tabs">
               {flagshipCourses.map((course, index) => (
@@ -197,19 +201,23 @@ export default function AcademyControlledClient({
               <h3>{featuredCourse.title}</h3>
               <p>{featuredCourse.description}</p>
               <div className="academy-feature-meta">
-                <b>{money.format(featuredCourse.price)}</b><em>· {featuredCourse.duration}</em>
+                <b>{purchaseAvailable(featuredCourse.id) ? money.format(featuredCourse.price) : "Enrollment pending"}</b><em>· {featuredCourse.duration}</em>
               </div>
               <div className="academy-feature-highlights">
                 {featuredCourse.outcomes.slice(0, 3).map((item) => <span key={item}>{item}</span>)}
               </div>
               <div className="academy-feature-actions">
                 <a href={`/academy/${featuredCourse.id}`}>Preview course</a>
-                <AcademyCheckoutForm
-                  courseId={featuredCourse.id}
-                  label="Enroll securely"
-                  source="featured"
-                  className="academy-checkout-button"
-                />
+                {purchaseAvailable(featuredCourse.id) ? (
+                  <AcademyCheckoutForm
+                    courseId={featuredCourse.id}
+                    label="Enroll securely"
+                    source="featured"
+                    className="academy-checkout-button"
+                  />
+                ) : (
+                  <span className="academy-enrollment-pending" aria-disabled="true">Not yet available for purchase</span>
+                )}
               </div>
             </article>
           </div>
@@ -218,10 +226,10 @@ export default function AcademyControlledClient({
 
       <section className="catalog" id="courses">
         <div className="catalog-heading">
-          <div><p className="kicker">COURSE CATALOG</p><h2>Choose from the courses currently published by Obserra Academy.</h2></div>
+          <div><p className="kicker">COURSE CATALOG</p><h2>Review the courses being prepared by Obserra Academy.</h2></div>
           <p>
-            {courses.length} purchasable courses with published descriptions, stated training hours, applied
-            practice, final assessments, course-completion records, and course-aware AI tutoring after access is granted.
+            {courses.length} courses are available to review. {purchasableCourseCount} are currently open for purchase.
+            Enrollment activates separately for each course only after the learner edition and commercial controls are approved.
           </p>
         </div>
 
@@ -276,25 +284,32 @@ export default function AcademyControlledClient({
 
         {visibleCourses.length ? (
           <div className="course-grid">
-            {visibleCourses.map((course) => (
+            {visibleCourses.map((course) => {
+              const canPurchase = purchaseAvailable(course.id);
+              return (
               <article key={course.id} className="course-card">
                 <span>{course.department}: {course.track}</span>
                 <h3>{course.title}</h3>
                 <p>{course.description}</p>
                 <div className="course-retail-meta"><i>{levelTag(course.level)}</i><i>{course.level}</i><i>AI native</i></div>
                 <div className="course-highlights">{course.outcomes.slice(0, 2).map((item) => <span key={item}>{item}</span>)}</div>
-                <footer><b>{money.format(course.price)}</b><em>· {course.duration}</em></footer>
+                <footer><b>{canPurchase ? money.format(course.price) : "Enrollment pending"}</b><em>· {course.duration}</em></footer>
                 <div className="course-card-actions">
                   <a href={`/academy/${course.id}`}>View details</a>
-                  <AcademyCheckoutForm
-                    courseId={course.id}
-                    label="Enroll securely"
-                    source="catalog"
-                    className="academy-checkout-button"
-                  />
+                  {canPurchase ? (
+                    <AcademyCheckoutForm
+                      courseId={course.id}
+                      label="Enroll securely"
+                      source="catalog"
+                      className="academy-checkout-button"
+                    />
+                  ) : (
+                    <span className="academy-enrollment-pending" aria-disabled="true">Not yet for sale</span>
+                  )}
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="academy-empty-state">
@@ -315,7 +330,7 @@ export default function AcademyControlledClient({
       <section className="academy-buyer-paths">
         <article>
           <p className="kicker">INDIVIDUAL LEARNERS</p><h2>Build practical capability at your own pace.</h2>
-          <p>Secure enrollment, course-aware AI tutoring, authoritative sources, realistic scenarios, saved progress, assessments, and a verifiable completion record.</p>
+          <p>Browse planned courses now. Secure enrollment, course-aware AI tutoring, saved progress, assessments, and completion records activate only for approved learner editions.</p>
           <a href="#courses">Browse courses</a>
         </article>
         <article>
@@ -334,9 +349,9 @@ export default function AcademyControlledClient({
       </section>
 
       <section className="academy-purchase-assurance">
-        <h2>Commercial purchase assurance</h2>
+        <h2>Commercial activation assurance</h2>
         <div>
-          <span>Secure Stripe checkout</span><span>Authorized learner access</span><span>Existing entitlement preservation</span>
+          <span>Course-by-course sales approval</span><span>Secure Stripe checkout after activation</span><span>Authorized learner access</span><span>Existing entitlement preservation</span>
           <span>Obserrian AI Tutor</span><span>Authoritative course grounding</span><span>Saved progress</span>
           <span>Assessment-based completion</span><span>Course-completion record</span>
         </div>

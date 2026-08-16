@@ -6,6 +6,7 @@ import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "./compo
 import { LEGAL_ENTITY_NAME } from "../lib/legal-identity";
 import "./executive-mission-control.css";
 import "./executive-mission-control-polish.css";
+import "./homepage-direct-sales.css";
 
 export const metadata: Metadata = {
   title: `${LEGAL_ENTITY_NAME} | Cybersecurity, Intelligence and Secure Technology`,
@@ -44,8 +45,8 @@ export default function HomePage() {
           <h1>Enterprise intelligence for organizations that cannot afford to be wrong.</h1>
           <p>{LEGAL_ENTITY_NAME} connects executive judgment, cybersecurity, protective intelligence, governance, secure technology, and professional learning so leaders can move from fragmented signals to clear, accountable action.</p>
           <div className="mission-hero__actions">
-            <ButtonLink href="/contact?interest=enterprise-consultation">Schedule an executive consultation</ButtonLink>
-            <ButtonLink href="/eios" variant="secondary">Explore Obserra EIOS</ButtonLink>
+            <ButtonLink href="/apps">Shop Applications</ButtonLink>
+            <ButtonLink href="/academy" variant="secondary">Browse Academy</ButtonLink>
           </div>
           <div className="mission-assurance" aria-label={`${LEGAL_ENTITY_NAME} operating assurances`}>
             <span>Veteran owned</span><span>Executive led</span><span>Evidence disciplined</span><span>Procurement ready</span>
@@ -65,6 +66,28 @@ export default function HomePage() {
             <KpiCard label="Executive Exposure" value="Low" trend="No critical change" status="Monitored" statusTone="neutral"><div className="mission-spark" /></KpiCard>
           </div>
         </aside>
+      </section>
+
+      <section className="mission-direct-sales" aria-labelledby="direct-sales-heading">
+        <div className="mission-direct-sales__heading">
+          <p className="obs-eyebrow">DIRECT FROM OBSERRA</p>
+          <h2 id="direct-sales-heading">Applications and Academy are direct website destinations.</h2>
+          <p>Explore products and learning without entering EIOS. Each destination keeps its own purchase, access, and approval controls.</p>
+        </div>
+        <div className="mission-direct-sales__grid">
+          <Link href="/apps" className="mission-direct-sales__card">
+            <span>APPLICATIONS MARKETPLACE</span>
+            <h3>Find secure applications built for executive operations.</h3>
+            <p>Review product capabilities and commercial options directly from the public marketplace.</p>
+            <strong>Shop Applications <span aria-hidden="true">→</span></strong>
+          </Link>
+          <Link href="/academy" className="mission-direct-sales__card">
+            <span>OBSERRA ACADEMY</span>
+            <h3>Browse self-paced professional learning.</h3>
+            <p>Review the course catalog now. Enrollment opens course by course only after the learner edition is loaded, reviewed, and approved for sale.</p>
+            <strong>Browse Academy <span aria-hidden="true">→</span></strong>
+          </Link>
+        </div>
       </section>
 
       <EnterpriseProofBand />

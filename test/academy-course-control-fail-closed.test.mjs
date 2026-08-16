@@ -9,7 +9,8 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), "u
 test("public Academy hides the catalog when control authority is unavailable", () => {
   const page = read("app/academy/page.tsx");
   assert.match(page, /runtime\.controlPlane === "operational" \? runtime\.courses : \[\]/);
-  assert.match(page, /AcademyControlledClient courses=\{publicCourses\}/);
+  assert.match(page, /courses=\{publicCourses\}/);
+  assert.match(page, /purchaseAvailability=\{purchaseAvailability\}/);
   assert.match(page, /numberOfItems: publicCourses\.length/);
 });
 

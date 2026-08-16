@@ -6,6 +6,7 @@ import { courses as sourceCourses } from "./courseCatalog";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./academy-commercial.css";
 import "./academy-payment.css";
+import "./academy-sales-status.css";
 import "./academy-world-class.css";
 
 export const revalidate = 10;
@@ -34,6 +35,13 @@ export default async function AcademyPage({ searchParams }: { searchParams: Prom
   const runtime = await publicAcademyCatalog(sourceCourses);
   const commerceState = await searchParams;
   const publicCourses = runtime.controlPlane === "operational" ? runtime.courses : [];
+  const courseIsPurchasable = (courseId: string) => {
+    const control = runtime.controls[courseId];
+    return control?.lifecycle === "published" && control.purchaseEnabled === true;
+  };
+  const purchaseAvailability = Object.fromEntries(
+    publicCourses.map((course) => [course.id, courseIsPurchasable(course.id)]),
+  );
   const catalogSchema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -59,7 +67,9 @@ export default async function AcademyPage({ searchParams }: { searchParams: Prom
               "@type": "Offer",
               price: course.price,
               priceCurrency: "USD",
-              availability: "https://schema.org/InStock",
+              availability: courseIsPurchasable(course.id)
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
             },
           },
         })),
@@ -77,7 +87,11 @@ export default async function AcademyPage({ searchParams }: { searchParams: Prom
   return (
     <>
       <AcademyCommerceNotice status={commerceState.enrollment} />
-      <AcademyControlledClient courses={publicCourses} controlPlane={runtime.controlPlane} />
+      <AcademyControlledClient
+        courses={publicCourses}
+        purchaseAvailability={purchaseAvailability}
+        controlPlane={runtime.controlPlane}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(catalogSchema) }}
