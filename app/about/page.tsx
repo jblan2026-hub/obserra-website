@@ -119,7 +119,7 @@ export default function AboutPage() {
       <section className="about-profile">
         <div className="founder-profile-card">
           <div className="profile-visual profile-photo-frame"><Image className="profile-photo" src="/leadership/dr-jody-blanchard-about.png" width={266} height={466} quality={95} sizes="(max-width: 800px) 86vw, 360px" priority alt={`Dr. Jody Blanchard, Founder and Chief Executive Officer of ${LEGAL_ENTITY_NAME}`} /></div>
-          <div className="profile-photo-label"><span>DR. JODY BLANCHARD</span><strong>FOUNDER &amp; CHIEF EXECUTIVE OFFICER</strong><small>EXECUTIVE CYBERSECURITY · INTELLIGENCE · GOVERNANCE</small></div>
+          <div className="profile-photo-label"><strong className="profile-photo-name">Dr. Jody Blanchard</strong><span className="profile-photo-title">Founder &amp; Chief Executive Officer</span><small className="profile-photo-specialty">Executive Cybersecurity · Intelligence · Governance</small></div>
         </div>
         <div>
           <p className="about-kicker">FOUNDER &amp; BUSINESS EXECUTIVE</p>

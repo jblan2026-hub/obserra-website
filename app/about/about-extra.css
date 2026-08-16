@@ -35,8 +35,9 @@
 .about-profile .profile-photo-frame { position: relative; display: block; width: 100%; min-height: 0; aspect-ratio: 1 / 1.16; overflow: hidden; border: 0; border-radius: 0; background: #061524; }
 .about-profile .profile-photo { display: block; width: 100% !important; height: 100% !important; object-fit: cover !important; object-position: center top !important; }
 .profile-photo-label { display: grid; gap: 6px; padding: 18px 20px 20px; border-top: 1px solid #7ecfeb38; background: linear-gradient(145deg, #092e4d, #061626); }
-.profile-photo-label span, .profile-photo-label small { color: #c5e8f6; font-size: 9px; font-weight: 900; letter-spacing: .14em; }
-.profile-photo-label strong { color: #f7c45e; font-size: 20px; letter-spacing: .02em; }
+.profile-photo-name { color: #fff; font-family: "Avenir Next", "Segoe UI", Arial, sans-serif; font-size: clamp(22px, 2.2vw, 27px); font-weight: 800; letter-spacing: -.025em; line-height: 1.05; }
+.profile-photo-title { color: #f7c45e; font-family: "Avenir Next", "Segoe UI", Arial, sans-serif; font-size: 13px; font-weight: 800; letter-spacing: .08em; line-height: 1.38; text-transform: uppercase; }
+.profile-photo-specialty { color: #c5e8f6; font-family: "Avenir Next", "Segoe UI", Arial, sans-serif; font-size: 9px; font-weight: 800; letter-spacing: .12em; line-height: 1.45; text-transform: uppercase; }
 .about-profile > div:last-child { max-width: 770px; }
 .about-profile h2, .books h2, .credentials h2, .recognition h2, .leadership-media h2, .interview-feature h2, .expertise h2, .speaking h2, .about-cta h2 { margin: 0; color: #fff; font-size: clamp(37px, 4.2vw, 62px); letter-spacing: -.06em; line-height: .98; }
 .about-profile > div:last-child > p:not(.about-kicker) { color: #c5e0ed; font-size: 16px; line-height: 1.75; }
@@ -87,9 +88,9 @@
 .ceh-hall-of-fame-award__certificate img { display: block; width: 100%; height: auto; }
 .ceh-hall-of-fame-award__certificate span { position: absolute; right: 12px; bottom: 12px; padding: 8px 10px; border: 1px solid #f5bc587a; border-radius: 999px; background: #04111ee8; color: #ffd892; font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 
-.leadership-media-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; max-width: 1440px; margin: 46px auto 0; }
-.leadership-media-grid article { display: flex; min-width: 0; min-height: 0; flex-direction: column; overflow: hidden; border: 1px solid #78c8e554; border-radius: 14px; background: #082944; box-shadow: 0 18px 32px #0004; }
-.leadership-media-grid article img { display: block; width: 100%; aspect-ratio: 4 / 3; padding: 8px; background: linear-gradient(160deg, #061a2d, #03101d); object-fit: contain; object-position: center; }
+.leadership-media-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: start; max-width: 1440px; margin: 46px auto 0; }
+.leadership-media-grid article { display: flex; min-width: 0; min-height: 0; height: fit-content; align-self: start; flex-direction: column; overflow: hidden; border: 1px solid #78c8e554; border-radius: 14px; background: #082944; box-shadow: 0 18px 32px #0004; }
+.leadership-media-grid article img { display: block; width: 100%; height: auto; aspect-ratio: auto; padding: 8px; background: linear-gradient(160deg, #061a2d, #03101d); object-fit: contain; object-position: center; }
 .leadership-media-grid .leadership-media-card > div { display: grid; gap: 8px; padding: 16px 18px 18px; }
 .leadership-media-grid .leadership-media-card span { color: #f5bc58; font-size: 9px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
 .leadership-media-grid .leadership-media-card h3 { min-height: 0; margin: 0; padding: 0; color: #f6fbff; font-size: 18px; line-height: 1.22; }
@@ -179,7 +180,7 @@
   .ceh-hall-of-fame-award { grid-template-columns: 1fr; }
   .ceh-hall-of-fame-award__badge { width: 156px; }
   .ceh-hall-of-fame-award__certificate { grid-column: auto; }
-  .leadership-media-grid article img { aspect-ratio: 16 / 10; }
+  .leadership-media-grid article img { height: auto; aspect-ratio: auto; }
   .speaking-visual, .speaking-visual > img { min-height: 320px; }
   .speaking-visual-label { max-width: 86%; }
   .speaking-visual-label strong { font-size: 37px; }
