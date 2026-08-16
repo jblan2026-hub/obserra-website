@@ -3,6 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 const about = fs.readFileSync("app/about/page.tsx", "utf8");
+const aboutExtraCss = fs.readFileSync("app/about/about-extra.css", "utf8");
 const speaking = fs.readFileSync("app/speaking/page.tsx", "utf8");
 const enterpriseChrome = fs.readFileSync("app/components/enterprise/EnterpriseChrome.tsx", "utf8");
 
@@ -36,4 +37,12 @@ test("Speaking presents the engagements as completed work and shows the Hall of 
 
 test("Speaking is discoverable from the enterprise primary navigation", () => {
   assert.match(enterpriseChrome, /\["Speaking", "\/speaking"\]/);
+});
+
+test("About leadership media cards wrap their own image and content height", () => {
+  assert.match(aboutExtraCss, /\.leadership-media-grid \{[^}]*align-items: start;/);
+  assert.match(aboutExtraCss, /\.leadership-media-grid article \{[^}]*height: fit-content;[^}]*align-self: start;/);
+  assert.match(aboutExtraCss, /\.leadership-media-grid article img \{[^}]*height: auto;[^}]*aspect-ratio: auto;/);
+  assert.doesNotMatch(aboutExtraCss, /\.leadership-media-grid article img \{[^}]*aspect-ratio: 4 \/ 3;/);
+  assert.doesNotMatch(aboutExtraCss, /\.leadership-media-grid article img \{[^}]*aspect-ratio: 16 \/ 10;/);
 });
