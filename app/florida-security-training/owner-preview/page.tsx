@@ -6,6 +6,7 @@ import { readFloridaClassDOwnerPreviewState } from "../../../lib/florida-class-d
 import OwnerPreviewConsole from "./OwnerPreviewConsole";
 import "./owner-preview.css";
 
+// Classroom media permissions are intentionally scoped in proxy.ts to this owner-only route.
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
