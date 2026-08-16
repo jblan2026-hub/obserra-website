@@ -46,3 +46,10 @@ test("About leadership media cards wrap their own image and content height", () 
   assert.doesNotMatch(aboutExtraCss, /\.leadership-media-grid article img \{[^}]*aspect-ratio: 4 \/ 3;/);
   assert.doesNotMatch(aboutExtraCss, /\.leadership-media-grid article img \{[^}]*aspect-ratio: 16 \/ 10;/);
 });
+
+test("Founder portrait gives Dr. Jody Blanchard stronger type hierarchy than the title", () => {
+  assert.match(about, /<strong className="profile-photo-name">Dr\. Jody Blanchard<\/strong>/);
+  assert.match(about, /<span className="profile-photo-title">Founder &amp; Chief Executive Officer<\/span>/);
+  assert.match(aboutExtraCss, /\.profile-photo-name \{[^}]*font-size: clamp\(22px, 2\.2vw, 27px\);/);
+  assert.match(aboutExtraCss, /\.profile-photo-title \{[^}]*font-size: 13px;/);
+});
