@@ -15,6 +15,9 @@ const files = {
   page: new URL("../app/florida-security-training/owner-preview/page.tsx", import.meta.url),
   console: new URL("../app/florida-security-training/owner-preview/OwnerPreviewConsole.tsx", import.meta.url),
   dailyApi: new URL("../app/api/florida-class-d/owner-preview/daily/route.ts", import.meta.url),
+  courseware: new URL("../lib/florida-class-d-owner-preview-courseware.ts", import.meta.url),
+  coursewareApi: new URL("../app/api/florida-class-d/owner-preview/courseware/route.ts", import.meta.url),
+  coursewareMigration: new URL("../supabase/migrations/20260816010000_fdacs_owner_review_courseware_storage.sql", import.meta.url),
   activationApi: new URL("../app/api/florida-class-d/owner-preview/activation-request/route.ts", import.meta.url),
   mutationBoundary: new URL("../lib/florida-class-d-mutation-boundary.ts", import.meta.url),
   providerRouting: new URL("../lib/auth/provider-routing.ts", import.meta.url),
@@ -180,7 +183,7 @@ test("production owner review evaluator authorizes only the exact bounded real-o
 });
 
 test("every owner-preview module is provider-neutral and contains no Clerk fallback", async () => {
-  const names = ["policy", "auth", "state", "daily", "dailyServer", "page", "console", "dailyApi", "activationApi"];
+  const names = ["policy", "auth", "state", "daily", "dailyServer", "courseware", "page", "console", "dailyApi", "coursewareApi", "activationApi"];
   for (const name of names) {
     const text = await source(name);
     assert.doesNotMatch(text, /@clerk|CLERK_|OBSERRA_IDENTITY_RUNTIME_ENABLED|ownerEmailAllowed|factorVerificationAge/, `${name} must not depend on Clerk`);
@@ -219,8 +222,42 @@ test("rendered owner experience uses real services, real empty states, and no fa
   assert.match(dailyApi, /trainingCreditEligible:\s*false/);
   assert.match(dailyApi, /attendanceCredited:\s*false/);
   assert.match(dailyApi, /instructionalTimeCredited:\s*false/);
+  assert.match(consoleSource, /Upload courseware/);
+  assert.match(consoleSource, /Mute or remove participants/);
+  assert.match(consoleSource, /Camera and microphone available/);
+  assert.match(consoleSource, /PowerPoint/);
   assert.match(activationApi, /requestOwnerActivationAudit/);
   assert.match(activationApi, /activationPerformed:\s*false/);
+});
+
+test("owner courseware is private, exact-release bound, media restricted, and non-credit", async () => {
+  const [courseware, coursewareApi, migration, consoleSource, nextConfig] = await Promise.all([
+    source("courseware"),
+    source("coursewareApi"),
+    source("coursewareMigration"),
+    source("console"),
+    source("nextConfig"),
+  ]);
+  assert.match(courseware, /fdacs-owner-review-courseware/);
+  assert.match(courseware, /createSignedUploadUrl/);
+  assert.match(courseware, /createSignedUrl/);
+  assert.match(courseware, /owner-review\/\$\{normalized\}/);
+  assert.match(courseware, /100 \* 1024 \* 1024/);
+  assert.match(courseware, /\.pptx/);
+  assert.match(courseware, /application\/pdf/);
+  assert.match(courseware, /video\/mp4/);
+  assert.match(courseware, /trainingCreditEligible:\s*false/);
+  assert.match(courseware, /regulatedDatabaseWritesAuthorized:\s*false/);
+  assert.match(coursewareApi, /requireFloridaClassDOwnerPreviewPrincipal/);
+  assert.match(coursewareApi, /cache-control.*private, no-store/i);
+  assert.match(coursewareApi, /trainingCreditEligible:\s*false/g);
+  assert.match(coursewareApi, /regulatedDatabaseWritesAuthorized:\s*false/g);
+  assert.match(migration, /insert into storage\.buckets/);
+  assert.match(migration, /public,[\s\S]*false/);
+  assert.doesNotMatch(migration, /fdacs_class_d_(?:student|enrollment|attendance|completion|lias)/i);
+  assert.match(consoleSource, /\.pptx,\.pdf,\.png,\.jpg,\.jpeg,\.webp,\.mp4,\.webm/);
+  assert.match(consoleSource, /screen-share control/);
+  assert.match(nextConfig, /ggkxgjhsbgbifiqrhavr\.storage\.supabase\.co/);
 });
 
 test("real FDACS state reads exact counts and never fabricates zero on failure", async () => {
@@ -251,18 +288,19 @@ test("real FDACS state reads exact counts and never fabricates zero on failure",
   assert.match(unavailable.blockingReason, /no zero-row assumption/i);
 });
 
-test("Daily diagnostic creates one exact private owner room and one owner token", async () => {
+test("Daily diagnostic creates one exact private classroom with instructor moderation and three learner views", async () => {
   const { createFloridaClassDOwnerPreviewDailySession, deleteFloridaClassDOwnerPreviewDailyRoom } = await import("../lib/florida-class-d-owner-preview-daily.ts");
   const releaseSha = "c1bcbf308e73b398cfcfc72519e41c9b68408f82";
   const nowMs = Date.parse("2026-08-15T20:00:00.000Z");
   const calls = [];
+  let tokenIndex = 0;
   const request = async (path, init = {}, allowNotFound = false) => {
     calls.push({ path, init, allowNotFound });
     if (path === "/rooms") {
       const body = JSON.parse(init.body);
       return { name: body.name, url: `https://obserra.daily.co/${body.name}` };
     }
-    if (path === "/meeting-tokens") return { token: "owner-token" };
+    if (path === "/meeting-tokens") return { token: `owner-token-${tokenIndex += 1}` };
     if (path.startsWith("/rooms/") && init.method === "DELETE") return {};
     throw new Error(`Unexpected test request ${init.method ?? "GET"} ${path}`);
   };
@@ -273,20 +311,27 @@ test("Daily diagnostic creates one exact private owner room and one owner token"
   assert.equal(access.trainingCreditEligible, false);
   assert.equal(access.attendanceCredited, false);
   assert.equal(access.instructionalTimeCredited, false);
-  assert.match(access.instructorJoinUrl, /^https:\/\/obserra\.daily\.co\/[^?]+\?t=owner-token$/);
+  assert.match(access.instructorJoinUrl, /^https:\/\/obserra\.daily\.co\/[^?]+\?t=owner-token-1$/);
+  assert.equal(access.participantJoinUrls.length, 3);
+  assert.equal(access.maximumParticipants, 4);
   assert.doesNotMatch(JSON.stringify(access), /api[_-]?key|authorization|bearer/i);
   const roomBody = JSON.parse(calls[0].init.body);
   assert.equal(roomBody.privacy, "private");
-  assert.equal(roomBody.properties.max_participants, 1);
+  assert.equal(roomBody.properties.max_participants, 4);
   assert.equal(roomBody.properties.eject_at_room_exp, true);
   assert.equal(roomBody.properties.enable_screenshare, true);
   assert.equal(roomBody.properties.enable_chat, true);
   assert.equal(roomBody.properties.enable_recording_ui, false);
   assert.equal(roomBody.properties.exp, Math.floor(nowMs / 1000) + 60 * 60);
   const tokenBodies = calls.filter((call) => call.path === "/meeting-tokens").map((call) => JSON.parse(call.init.body).properties);
-  assert.equal(tokenBodies.length, 1);
+  assert.equal(tokenBodies.length, 4);
   assert.equal(tokenBodies[0].eject_at_token_exp, true);
   assert.equal(tokenBodies[0].is_owner, true);
+  assert.equal(tokenBodies[0].permissions.canAdmin, true);
+  assert.equal(tokenBodies.slice(1).every((token) => token.is_owner === false), true);
+  assert.equal(tokenBodies.slice(1).every((token) => token.start_audio_off === true), true);
+  assert.equal(tokenBodies.slice(1).every((token) => token.start_video_off === true), true);
+  assert.equal(tokenBodies.slice(1).every((token) => token.permissions.canSend === true && token.permissions.canAdmin === false), true);
   await deleteFloridaClassDOwnerPreviewDailyRoom({ request, roomName: access.roomName, releaseSha });
   assert.ok(calls.some((call) => call.path === `/rooms/${encodeURIComponent(access.roomName)}` && call.init.method === "DELETE"));
 });
@@ -310,13 +355,13 @@ test("Daily room is cleaned up if owner-token provisioning fails", async () => {
 
 test("only exact audited owner provider actions bypass the read-only mutation lock", async () => {
   const { identityProviderForRequest } = await import("../lib/auth/provider-routing.ts");
-  for (const [pathname, method] of [["/api/florida-class-d/owner-preview/daily", "POST"], ["/api/florida-class-d/owner-preview/daily", "DELETE"], ["/api/florida-class-d/owner-preview/activation-request", "POST"]]) {
+  for (const [pathname, method] of [["/api/florida-class-d/owner-preview/daily", "POST"], ["/api/florida-class-d/owner-preview/daily", "DELETE"], ["/api/florida-class-d/owner-preview/courseware", "POST"], ["/api/florida-class-d/owner-preview/courseware", "DELETE"], ["/api/florida-class-d/owner-preview/activation-request", "POST"]]) {
     const decision = identityProviderForRequest({ pathname, method });
     assert.equal(decision.provider, "supabase");
     assert.equal(decision.accessPolicy, "internal_owner_read_only");
     assert.equal(decision.mutationAllowed, true);
   }
-  for (const [pathname, method] of [["/api/florida-class-d/owner-preview/daily", "PUT"], ["/api/florida-class-d/owner-preview/activation-request", "DELETE"], ["/api/florida-class-d/live", "POST"], ["/api/florida-class-d/enrollments", "POST"], ["/api/florida-class-d/completion", "POST"]]) {
+  for (const [pathname, method] of [["/api/florida-class-d/owner-preview/daily", "PUT"], ["/api/florida-class-d/owner-preview/courseware", "PUT"], ["/api/florida-class-d/owner-preview/activation-request", "DELETE"], ["/api/florida-class-d/live", "POST"], ["/api/florida-class-d/enrollments", "POST"], ["/api/florida-class-d/completion", "POST"]]) {
     assert.equal(identityProviderForRequest({ pathname, method }).mutationAllowed, false);
   }
 });
@@ -324,6 +369,7 @@ test("only exact audited owner provider actions bypass the read-only mutation lo
 test("owner provider mutations stay release-bound, same-origin, noindex, and isolated from regulated execution", async () => {
   const [boundary, activation, proxy, nextConfig] = await Promise.all([source("mutationBoundary"), source("productionActivation"), source("proxy"), source("nextConfig")]);
   assert.match(boundary, /OWNER_PREVIEW_DAILY_PATH/);
+  assert.match(boundary, /OWNER_PREVIEW_COURSEWARE_PATH/);
   assert.match(boundary, /OWNER_PREVIEW_ACTIVATION_REQUEST_PATH/);
   assert.match(boundary, /floridaClassDOwnerPreviewExecutionAuthorized/);
   const regulated = activation.slice(activation.indexOf("export function floridaClassDRegulatedExecutionAuthorized"), activation.indexOf("export function getFloridaClassDProductionActivationReport"));

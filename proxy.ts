@@ -138,6 +138,8 @@ function regulatedMutationBoundary(request: NextRequest) {
           ? "Gate 23 acceptance mutation is available only during explicitly authorized synthetic non-production execution."
           : decision.policy === "owner_preview_provider_diagnostic"
           ? "The isolated owner-review Daily diagnostic is not authorized for this exact release."
+          : decision.policy === "owner_preview_courseware"
+          ? "The isolated owner-review courseware workspace is not authorized for this exact release."
           : decision.policy === "owner_preview_activation_request"
           ? "The governed owner activation request is not authorized for this exact release."
           : "Florida Class D regulated mutation execution is not authorized.",
@@ -147,6 +149,8 @@ function regulatedMutationBoundary(request: NextRequest) {
           ? "FDACS_ACCEPTANCE_EXECUTION_NOT_AUTHORIZED"
           : decision.policy === "owner_preview_provider_diagnostic"
           ? "FDACS_OWNER_PREVIEW_DAILY_NOT_AUTHORIZED"
+          : decision.policy === "owner_preview_courseware"
+          ? "FDACS_OWNER_PREVIEW_COURSEWARE_NOT_AUTHORIZED"
           : decision.policy === "owner_preview_activation_request"
           ? "FDACS_OWNER_PREVIEW_ACTIVATION_REQUEST_NOT_AUTHORIZED"
           : "FDACS_REGULATED_EXECUTION_NOT_AUTHORIZED",

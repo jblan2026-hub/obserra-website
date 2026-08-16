@@ -18,8 +18,11 @@ export type FloridaClassDOwnerPreviewDailyAccess = {
   provider: "daily";
   roomName: string;
   instructorJoinUrl: string;
+  participantJoinUrl: string;
+  participantJoinUrls: string[];
   roomExpiresAt: string;
   tokenExpiresAt: string;
+  maximumParticipants: 4;
   recordingEnabled: false;
   trainingCreditEligible: false;
   attendanceCredited: false;
@@ -112,7 +115,7 @@ export async function createFloridaClassDOwnerPreviewDailySession(input: {
         properties: {
           exp: roomExp,
           eject_at_room_exp: true,
-          max_participants: 1,
+          max_participants: 4,
           enable_people_ui: true,
           enable_prejoin_ui: true,
           enable_network_ui: true,
@@ -147,12 +150,32 @@ export async function createFloridaClassDOwnerPreviewDailySession(input: {
       enable_recording_ui: false,
       permissions: { hasPresence: true, canSend: true, canAdmin: true },
     });
+    const participantTokens = await Promise.all([1, 2, 3].map((index) => createToken(input.request, {
+      room_name: roomName,
+      user_id: `internal_owner_participant_uat_${index}`,
+      user_name: `Internal Owner Learner View ${index}`,
+      nbf: now - 30,
+      exp: tokenExp,
+      eject_at_token_exp: true,
+      is_owner: false,
+      enable_screenshare: false,
+      start_video_off: true,
+      start_audio_off: true,
+      enable_prejoin_ui: true,
+      enable_live_captions_ui: true,
+      enable_recording_ui: false,
+      permissions: { hasPresence: true, canSend: true, canAdmin: false },
+    })));
+    const participantJoinUrls = participantTokens.map((token) => joinUrl(roomUrl, token?.token));
     return {
       provider: "daily",
       roomName,
       instructorJoinUrl: joinUrl(roomUrl, instructorToken?.token),
+      participantJoinUrl: participantJoinUrls[0],
+      participantJoinUrls,
       roomExpiresAt: new Date(roomExp * 1000).toISOString(),
       tokenExpiresAt: new Date(tokenExp * 1000).toISOString(),
+      maximumParticipants: 4,
       recordingEnabled: false,
       trainingCreditEligible: false,
       attendanceCredited: false,

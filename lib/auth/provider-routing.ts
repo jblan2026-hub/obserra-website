@@ -51,6 +51,7 @@ const FDACS_HEALTH_PREFIXES = [
 ] as const;
 const FDACS_OWNER_PROVIDER_ACTIONS = new Map<string, ReadonlySet<string>>([
   ["/api/florida-class-d/owner-preview/daily", new Set(["POST", "DELETE"])],
+  ["/api/florida-class-d/owner-preview/courseware", new Set(["POST", "DELETE"])],
   ["/api/florida-class-d/owner-preview/activation-request", new Set(["POST"])],
 ]);
 

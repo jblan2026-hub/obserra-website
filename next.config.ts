@@ -4,6 +4,10 @@ import { prepareIdentityOriginContract } from "./lib/auth/identity-origin-contra
 const identityOrigins = prepareIdentityOriginContract();
 const identityScriptSources = identityOrigins.scriptSources.join(" ");
 const identityConnectSources = identityOrigins.connectSources.join(" ");
+const fdacsOwnerCoursewareSources = [
+  "https://ggkxgjhsbgbifiqrhavr.supabase.co",
+  "https://ggkxgjhsbgbifiqrhavr.storage.supabase.co",
+].join(" ");
 
 const clerkIdentitySources = [
   "https://*.clerk.accounts",
@@ -29,10 +33,10 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https:",
   "font-src 'self' data:",
-  `connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.credly.com https://cdn.credly.com https://vitals.vercel-insights.com ${clerkIdentitySources} ${identityConnectSources}`,
+  `connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.credly.com https://cdn.credly.com https://vitals.vercel-insights.com ${clerkIdentitySources} ${identityConnectSources} ${fdacsOwnerCoursewareSources}`,
   "media-src 'self' https: blob:",
   "worker-src 'self' blob:",
-  "frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.credly.com https://challenges.cloudflare.com https://*.protect.clerk.com https://*.daily.co",
+  `frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.credly.com https://challenges.cloudflare.com https://*.protect.clerk.com https://*.daily.co ${fdacsOwnerCoursewareSources}`,
   "frame-ancestors 'none'",
   "form-action 'self' https://checkout.stripe.com https://buy.stripe.com",
   "upgrade-insecure-requests"
