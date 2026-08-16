@@ -3,13 +3,13 @@
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update the controlled source records and run `npm run generate:cmmc-system-evidence`.
 
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-- **Bundle:** `obserra-cmmc-working-64efa7095d8783f7ce6edc72`
+- **Bundle:** `obserra-cmmc-working-fa204de789debcfe27e601ed`
 - **Bundle state:** `working_evidence_inventory`
 - **Generated at:** `2026-08-14T18:49:07Z`
 - **Git base/HEAD reference:** `0e72459a8940f23976038d85d6394409000f48c5`
 - **Revision binding:** `working_tree_digest`
 - **Exact release:** not assigned; working evidence inventory
-- **In-scope tree SHA-256:** `64efa7095d8783f7ce6edc7233d4150b1172e90aa1c9f8c64fb6469bec81cbb4` (629 paths)
+- **In-scope tree SHA-256:** `fa204de789debcfe27e601ed57d0c53b6e65911772bc87e4b4a065373cf518bb` (633 paths)
 
 ## Paired audit views
 
@@ -976,7 +976,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | `EV-WEBSITE-BADGE-MANIFEST` — Approved credential asset and issuer-observation manifest<br>`public/badges/eccouncil/asset-manifest.json` | organization_evidence | working | test/not_run | `b3fb489e362a03bb0ec379423c86847bf73221644f8bd0957d0a5afb06165ca9` | no | Records approved local asset identities, hashes, three time-bound live ADG issuer observations, and verification destinations; external issuer pages remain authoritative for credential validity. |
 | `EV-WEBSITE-BADGE-SCHEMA` — Fail-closed credential asset evidence schema<br>`public/badges/eccouncil/asset-manifest.schema.json` | product_supplied_evidence | working | test/not_run | `b4a7ae42ee34b8c0b5d3a0970f4f021c9402f0395b459bd862934038b38342a4` | no | Defines mandatory provenance, hash, issuer-observation, and claim-boundary fields; schema presence is not a live deployment result. |
 | `EV-WEBSITE-BADGE-GATE` — Credential asset integrity and provenance gate<br>`scripts/ec-council-badge-integrity.test.mjs` | product_supplied_evidence | working | test/not_run | `93aa89a30a6f1af8ad94bff04eb57a01fde308947e6525cf82592f5c53e17d9a` | no | Fail-closed source gate for the nine authorized assets and three issuer observations; exact CI run and production HTTP evidence remain release-specific. |
-| `EV-WEBSITE-LEGAL-IDENTITY-AUDIT` — Machine-readable legal identity source audit<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.json` | organization_evidence | working | test/not_run | `22fa2f739665094aaa5fba29f2ae679dcfff6aabf0e7a0781b026d9718e3268b` | no | Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence. |
+| `EV-WEBSITE-LEGAL-IDENTITY-AUDIT` — Machine-readable legal identity source audit<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.json` | organization_evidence | working | test/not_run | `a4b81da4276ffc337eeb69dac2d794230d4a7844a1ee87862ef89ce303c8b6f7` | no | Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence. |
 | `EV-WEBSITE-LEGAL-IDENTITY-SCHEMA` — Legal identity audit machine schema<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.schema.json` | product_supplied_evidence | working | examine/not_run | `37d5bc13bed30feafb4a7c661ed867a74e432062c98ff262aecad006404d9314` | no | Defines the machine-readable audit contract and mandatory disposition fields; schema presence is not a live operating result. |
 | `EV-WEBSITE-LEGAL-IDENTITY-GATE` — Fail-closed legal identity drift gate<br>`scripts/legal-identity-audit.mjs` | product_supplied_evidence | working | test/not_run | `6323945d11fc056b0205f2f18f259779aef12a3e94ece8a69560ddc482895605` | no | Rejects malformed legal names, retired company wording, stale public origins, and unapproved short-name company claims while preserving enumerated product brands and stable technical identifiers. |
 | `EV-WEBSITE-NEXT-CONFIG` — Website response security and image-delivery configuration<br>`next.config.ts` | product_supplied_evidence | working | examine/not_run | `9919c0e58d7347f1003414e979b6c6dd2cf344bd2c55e9adf41fb9a3272abe96` | no | Source-level CSP, transport, browser, and image-delivery configuration only; Vercel production behavior requires exact-deployment verification. |
