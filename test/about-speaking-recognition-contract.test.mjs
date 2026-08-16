@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import test from "node:test";
 
@@ -37,6 +38,12 @@ test("Speaking presents the engagements as completed work and shows the Hall of 
 
 test("Speaking is discoverable from the enterprise primary navigation", () => {
   assert.match(enterpriseChrome, /\["Speaking", "\/speaking"\]/);
+});
+
+test("Speaking uses the supplied executive portrait without modifying its bytes", () => {
+  const portraitPath = "public/leadership/dr-jody-blanchard-speaking.png";
+  assert.match(speaking, /src="\/leadership\/dr-jody-blanchard-speaking\.png"/);
+  assert.equal(createHash("sha256").update(fs.readFileSync(portraitPath)).digest("hex"), "774e819b386b5953b5e58fea61aa8b5c64ebfe1e1215a3b2e93db89c001651b6");
 });
 
 test("About leadership media cards wrap their own image and content height", () => {
