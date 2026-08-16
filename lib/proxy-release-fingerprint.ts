@@ -11,5 +11,5 @@
 export const PROXY_RELEASE_FINGERPRINT = {
   schemaVersion: "1.0",
   sourcePath: "proxy.ts",
-  gitBlobSha1: "1c567cf2335d159ffbf595106976f1238a83c814",
+  gitBlobSha1: "e1fe62026988a0212ef5565dc6f7f1c3c37c591e",
 } as const;

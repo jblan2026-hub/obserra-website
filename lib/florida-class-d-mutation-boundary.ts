@@ -9,13 +9,14 @@ import { floridaClassDOwnerPreviewExecutionAuthorized } from "./florida-class-d-
 const REGULATED_API_PREFIX = "/api/florida-class-d";
 const ACCEPTANCE_MUTATION_PATH = "/api/florida-class-d/admin/acceptance";
 const OWNER_PREVIEW_DAILY_PATH = "/api/florida-class-d/owner-preview/daily";
+const OWNER_PREVIEW_COURSEWARE_PATH = "/api/florida-class-d/owner-preview/courseware";
 const OWNER_PREVIEW_ACTIVATION_REQUEST_PATH = "/api/florida-class-d/owner-preview/activation-request";
 const MUTATION_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 export type FloridaClassDMutationBoundaryDecision = {
   regulatedMutation: boolean;
   authorized: boolean;
-  policy: "not_applicable" | "synthetic_nonproduction_only" | "owner_preview_provider_diagnostic" | "owner_preview_activation_request" | "regulated_execution";
+  policy: "not_applicable" | "synthetic_nonproduction_only" | "owner_preview_provider_diagnostic" | "owner_preview_courseware" | "owner_preview_activation_request" | "regulated_execution";
 };
 
 export function floridaClassDMutationOriginAuthorized(
@@ -58,6 +59,14 @@ export function evaluateFloridaClassDMutationBoundary(
       regulatedMutation: true,
       authorized: floridaClassDOwnerPreviewExecutionAuthorized(),
       policy: "owner_preview_provider_diagnostic",
+    };
+  }
+
+  if (pathname === OWNER_PREVIEW_COURSEWARE_PATH) {
+    return {
+      regulatedMutation: true,
+      authorized: floridaClassDOwnerPreviewExecutionAuthorized(),
+      policy: "owner_preview_courseware",
     };
   }
 

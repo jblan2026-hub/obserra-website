@@ -133,6 +133,42 @@
 .owner-preview__daily-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; padding-top: .8rem; }
 .owner-preview__daily-actions > span { display: inline-flex; align-items: center; gap: .4rem; margin-right: auto; color: #91a7ba; font-size: .7rem; }
 .owner-preview__daily-actions button { color: #ffd7ca; background: rgba(137, 51, 32, .4); border-color: rgba(230, 115, 86, .3); }
+.owner-preview__participant-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .55rem; margin-top: .7rem; }
+.owner-preview__participant-links a { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .65rem; color: #dffefd; background: rgba(21, 97, 104, .45); border: 1px solid rgba(90, 211, 207, .23); border-radius: .55rem; font-size: .72rem; font-weight: 800; text-decoration: none; }
+.owner-preview__participant-links a:hover { background: rgba(32, 133, 138, .65); }
+.owner-preview__courseware > p { max-width: 72rem; margin-top: -.15rem; }
+.owner-preview__upload-button { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; padding: .68rem .82rem; color: #ebffff; background: #176b70; border: 1px solid rgba(96, 222, 218, .28); border-radius: .55rem; font-size: .75rem; font-weight: 800; cursor: pointer; }
+.owner-preview__upload-button:hover { background: #20858a; }
+.owner-preview__upload-button input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.owner-preview__courseware-layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(17rem, .65fr); gap: .85rem; margin-top: 1rem; }
+.owner-preview__courseware-stage { overflow: hidden; min-height: 31rem; background: #02070c; border: 1px solid rgba(155, 185, 210, .16); border-radius: .75rem; }
+.owner-preview__courseware-stage-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 3rem; padding: .65rem .8rem; color: #eef7fb; background: rgba(18, 42, 58, .96); border-bottom: 1px solid rgba(155, 185, 210, .14); }
+.owner-preview__courseware-stage-head span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; font-weight: 800; }
+.owner-preview__courseware-stage-head small { flex: 0 0 auto; color: #88a1b5; font-size: .65rem; }
+.owner-preview__courseware-stage iframe,
+.owner-preview__courseware-stage video { display: block; width: 100%; height: 25rem; background: #000; border: 0; object-fit: contain; }
+.owner-preview__powerpoint-stage,
+.owner-preview__courseware-empty { display: grid; place-items: center; align-content: center; gap: .65rem; min-height: 25rem; padding: 2rem; color: #9fb3c4; text-align: center; }
+.owner-preview__powerpoint-stage > svg,
+.owner-preview__courseware-empty > svg { color: #55d4cd; }
+.owner-preview__powerpoint-stage strong,
+.owner-preview__courseware-empty strong { color: #f3f9fc; font-size: 1rem; }
+.owner-preview__powerpoint-stage p,
+.owner-preview__courseware-empty p { max-width: 35rem; margin: 0; }
+.owner-preview__powerpoint-stage a { display: inline-flex; align-items: center; gap: .45rem; margin-top: .35rem; padding: .68rem .82rem; color: #ebffff; background: #176b70; border: 1px solid rgba(96, 222, 218, .28); border-radius: .55rem; font-size: .75rem; font-weight: 800; text-decoration: none; }
+.owner-preview__slide-controls { display: flex; align-items: center; justify-content: center; gap: .65rem; min-height: 3rem; padding: .5rem; background: rgba(11, 28, 42, .96); border-top: 1px solid rgba(155, 185, 210, .12); }
+.owner-preview__slide-controls button { padding: .48rem .65rem; background: rgba(28, 80, 94, .66); }
+.owner-preview__slide-controls span { color: #91a7b9; font-size: .7rem; }
+.owner-preview__courseware-list { display: grid; align-content: start; gap: .5rem; max-height: 31rem; overflow-y: auto; padding-right: .2rem; }
+.owner-preview__courseware-list article { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; overflow: hidden; background: rgba(6, 20, 31, .72); border: 1px solid rgba(144, 175, 201, .14); border-radius: .65rem; }
+.owner-preview__courseware-list article.is-active { border-color: rgba(77, 214, 207, .56); box-shadow: inset 3px 0 #4dd6cf; }
+.owner-preview__courseware-list .owner-preview__courseware-select { justify-content: flex-start; min-width: 0; padding: .72rem; color: #d9e7ef; background: transparent; border: 0; border-radius: 0; text-align: left; }
+.owner-preview__courseware-select > svg { flex: 0 0 auto; color: #57d6cf; }
+.owner-preview__courseware-select span { display: grid; min-width: 0; gap: .18rem; }
+.owner-preview__courseware-select strong { overflow: hidden; color: #f4f8fb; font-size: .73rem; text-overflow: ellipsis; white-space: nowrap; }
+.owner-preview__courseware-select small { color: #7f96a9; font-size: .63rem; }
+.owner-preview__courseware-list .owner-preview__courseware-delete { align-self: stretch; padding: .65rem; color: #f4aa95; background: rgba(120, 42, 29, .22); border: 0; border-left: 1px solid rgba(211, 105, 78, .16); border-radius: 0; }
+.owner-preview__courseware-list > .owner-preview__courseware-empty { min-height: 14rem; border: 1px dashed rgba(144, 175, 201, .22); border-radius: .65rem; }
 .owner-preview__empty-state { display: flex; align-items: center; gap: .85rem; min-height: 9rem; padding: 1.2rem; color: #a9bdcd; background: rgba(6, 19, 30, .58); border: 1px dashed rgba(134, 171, 198, .27); border-radius: .7rem; }
 .owner-preview__empty-state > svg { flex: 0 0 auto; color: #54d2cb; }
 .owner-preview__empty-state span { display: grid; gap: .3rem; }
@@ -188,6 +224,8 @@
   .owner-preview__sidebar nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .owner-preview__sidebar-boundary { margin-top: 0; }
   .owner-preview__live-grid, .owner-preview__cohort-card, .owner-preview__activation-grid { grid-template-columns: 1fr; }
+  .owner-preview__courseware-layout { grid-template-columns: 1fr; }
+  .owner-preview__courseware-list { max-height: 20rem; }
 }
 
 @media (max-width: 760px) {
@@ -197,6 +235,7 @@
   .owner-preview__release { width: 100%; }
   .owner-preview__section-head { align-items: flex-start; flex-direction: column; }
   .owner-preview__button-grid { grid-template-columns: 1fr; }
+  .owner-preview__participant-links { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
