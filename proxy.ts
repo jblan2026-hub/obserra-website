@@ -111,7 +111,13 @@ function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest)
     response.headers.set("Referrer-Policy", "no-referrer");
     response.headers.set("X-Frame-Options", "DENY");
     response.headers.set("X-Content-Type-Options", "nosniff");
-    response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+    const isRestrictedOwnerClassroom = pathMatchesPrefix(pathname, "/florida-security-training/owner-preview");
+    response.headers.set(
+      "Permissions-Policy",
+      isRestrictedOwnerClassroom
+        ? 'camera=(self "https://*.daily.co"), microphone=(self "https://*.daily.co"), display-capture=(self "https://*.daily.co"), fullscreen=(self "https://*.daily.co"), geolocation=(), payment=(), usb=()'
+        : "camera=(), microphone=(), display-capture=(), fullscreen=(self), geolocation=(), payment=(), usb=()",
+    );
     response.headers.set("X-Obserra-Owner-Site", "private");
   }
 

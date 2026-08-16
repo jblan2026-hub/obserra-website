@@ -377,6 +377,8 @@ test("owner provider mutations stay release-bound, same-origin, noindex, and iso
   assert.match(proxy, /floridaClassDMutationOriginAuthorized/);
   assert.match(proxy, /\/florida-security-training\/owner-preview/);
   assert.match(proxy, /\/api\/florida-class-d\/owner-preview/);
+  assert.match(proxy, /const isRestrictedOwnerClassroom = pathMatchesPrefix\(pathname, "\/florida-security-training\/owner-preview"\);/);
+  assert.match(proxy, /display-capture=\(self "https:\/\/\*\.daily\.co"\)/);
   assert.match(nextConfig, /source:\s*"\/florida-security-training\/owner-preview\/:path\*"[\s\S]*headers:\s*protectedVideoInstructorHeaders/);
   assert.match(nextConfig, /value:\s*"camera=\(\), microphone=\(\), display-capture=\(\)/);
 });
