@@ -88,7 +88,7 @@ export default function FloridaSecurityTrainingPage() {
             <div>
               <strong>Enrollment is not open.</strong>
               <span>
-                FDACS provider and course authorization have not been granted. Production instruction, course credit,
+                Enrollment, payment, and student course access are not open. FDACS provider and course authorization have not been granted. Production instruction, course credit,
                 completion, certificates, and LIAS reporting are disabled. Production validation cannot create an authorized student completion or licensing record.
               </span>
             </div>
