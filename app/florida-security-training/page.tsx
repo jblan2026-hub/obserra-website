@@ -36,6 +36,7 @@ export default function FloridaSecurityTrainingPage() {
                 <div className="fl-classd__status-row" aria-label="Current program status">
                   <span className="fl-classd__status is-verified">PRODUCTION SOFTWARE VERIFIED</span>
                   <span className="fl-classd__status is-locked">REGULATED CREDIT LOCKED</span>
+                  <span className="fl-classd__status">COMING SOON · LEARNING MANAGEMENT SYSTEM IN PROGRESS</span>
                 </div>
                 <h1 id="class-d-title">{FLORIDA_CLASS_D_COURSE.title}</h1>
                 <p className="fl-classd__lead">A production learning environment from <strong>{FLORIDA_CLASS_D_COURSE.provider}</strong>, engineered for live instruction, secure enrollment, verified attendance, student interaction, learning checks, examination controls, training records, and post-course administration.</p>
@@ -57,7 +58,7 @@ export default function FloridaSecurityTrainingPage() {
 
             <div className="fl-classd__notice is-warning">
               <span className="fl-classd__notice-mark" aria-hidden="true">LOCK</span>
-              <div><strong>Coming soon for regulated enrollment.</strong><span>The live system can validate software and operational controls, but validation activity cannot create authorized course credit, a completion record, a certificate, or a Florida licensing record.</span></div>
+              <div><strong>Coming soon for regulated enrollment.</strong><span>Enrollment, payment, and student course access are not open. The live system can validate software and operational controls, but validation activity cannot create authorized course credit, a completion record, a certificate, or a Florida licensing record.</span></div>
             </div>
           </section>
         </div>
@@ -71,7 +72,7 @@ export default function FloridaSecurityTrainingPage() {
         <section className="fl-classd__section" aria-labelledby="curriculum-heading">
           <div className="fl-classd__section-heading">
             <div><span>CONTROLLED CURRICULUM ARCHITECTURE</span><h2 id="curriculum-heading">Four planned live lessons every authorized training day.</h2></div>
-            <p>The controlled design provides four 120-minute live instructional lessons per day, with a 15-minute break after Lessons 1, 2, and 3. Production validation tracks instruction, breaks, connection time, security-question responses, attendance, and participation separately. Breaks are never counted toward the required 40 instructional hours.</p>
+            <p>The controlled design provides four 120-minute live instructional lessons per day, with a 15-minute break after Lessons 1, 2, and 3. Production validation tracks instruction, breaks, connection time, security-question responses, attendance, and participation separately. Break time is recorded but is never credited toward the required 40 instructional hours. The certification examination is controlled separately from the 40 instructional hours.</p>
           </div>
           <div className="fl-classd__days">{floridaClassDDays.map(({ day, lessons }) => <article key={day}><header><span>DAY {day}</span><strong>8 instruction hours + 45 tracked break minutes</strong></header>{lessons.map((lesson) => <div className="fl-classd__module" key={lesson.id}><div><b>{lesson.id}</b><span><strong>{lesson.title}</strong><small>{lesson.moduleSegments.map((segment) => `${moduleTitle(segment.moduleId)} · ${segment.hours} hr`).join(" | ")}</small></span></div><em>2 hr{lesson.breakAfterMinutes ? " + 15 min break" : ""}</em></div>)}</article>)}</div>
         </section>
@@ -100,7 +101,7 @@ export default function FloridaSecurityTrainingPage() {
 
         <section className="fl-classd__legal" aria-label="Florida licensing and authorization notice">
           <span className="fl-classd__legal-mark" aria-hidden="true">FL</span>
-          <div><strong>Licensing and authorization distinction</strong><p>Production software validation is non-credit until the regulated activation gates are satisfied. Completing validation activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services. {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System reporting remain disabled until every applicable authorization gate is satisfied.</p></div>
+          <div><strong>Licensing and authorization distinction</strong><p>Production software validation is non-credit until the regulated activation gates are satisfied. Completing validation activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services. {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied.</p></div>
         </section>
       </main>
       <EnterpriseFooter />
