@@ -1,4 +1,4 @@
-name: Legal Identity Evidence Refresh
+name: Governed Source Evidence Refresh
 
 on:
   push:
@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   refresh:
+    name: Regenerate governed source evidence
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -24,23 +25,42 @@ jobs:
           node-version: 22
       - name: Regenerate legal identity evidence
         run: node scripts/legal-identity-audit.mjs --write
+      - name: Regenerate CMMC system evidence
+        run: node scripts/cmmc-system-evidence.mjs --write
+      - name: Verify regenerated evidence before persistence
+        shell: bash
+        run: |
+          node scripts/legal-identity-audit.mjs --check
+          node scripts/cmmc-system-evidence.mjs --check
       - name: Upload regenerated evidence
         uses: actions/upload-artifact@v4
         with:
-          name: legal-identity-evidence-${{ github.sha }}
+          name: governed-source-evidence-${{ github.sha }}
           if-no-files-found: error
           path: |
             docs/compliance/LEGAL-IDENTITY-AUDIT.json
             docs/compliance/LEGAL-IDENTITY-AUDIT.md
             docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
       - name: Commit regenerated evidence when changed
         shell: bash
         run: |
-          if git diff --quiet -- docs/compliance/LEGAL-IDENTITY-AUDIT.json docs/compliance/LEGAL-IDENTITY-AUDIT.md docs/compliance/LEGAL-IDENTITY-AUDIT.sha256; then
+          paths=(
+            docs/compliance/LEGAL-IDENTITY-AUDIT.json
+            docs/compliance/LEGAL-IDENTITY-AUDIT.md
+            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          )
+          if git diff --quiet -- "${paths[@]}"; then
+            echo "Governed source evidence is already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/compliance/LEGAL-IDENTITY-AUDIT.json docs/compliance/LEGAL-IDENTITY-AUDIT.md docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
-          git commit -m "Refresh generated legal identity evidence"
+          git add -- "${paths[@]}"
+          git commit -m "Refresh generated governed source evidence"
           git push origin "HEAD:${GITHUB_REF_NAME}"
