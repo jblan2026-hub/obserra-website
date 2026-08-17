@@ -297,6 +297,17 @@ function identityConfigurationResponse(request: NextRequest) {
   return response;
 }
 
+function publicIdentityResponse(request: NextRequest) {
+  const response = applyRouteSecurityHeaders(NextResponse.next(), request);
+  response.headers.set("X-Obserra-Identity-Status", "ready");
+  response.headers.set("X-Obserra-Identity-Provider", "public");
+  response.headers.set(
+    "X-Obserra-Identity-Environment",
+    process.env.VERCEL_ENV === "production" ? "live" : process.env.VERCEL_ENV || "local",
+  );
+  return response;
+}
+
 function supabaseIdentityUnavailableResponse(request: NextRequest) {
   const response = applyRouteSecurityHeaders(
     NextResponse.json(
@@ -479,9 +490,12 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
     redirectTarget: url.searchParams.get("redirect_url"),
     method: request.method,
   });
-  const supabaseRuntime = prepareSupabaseAuthRuntime();
-  if (ownership.provider === "supabase" && supabaseRuntime.runtimeEnabled) {
-    if (!supabaseRuntime.ready) return identityConfigurationResponse(request);
+
+  if (ownership.provider === "public") return publicIdentityResponse(request);
+
+  if (ownership.provider === "supabase") {
+    const supabaseRuntime = prepareSupabaseAuthRuntime();
+    if (!supabaseRuntime.runtimeEnabled || !supabaseRuntime.ready) return identityConfigurationResponse(request);
     try {
       return await handleSupabaseRequest(request, ownership);
     } catch {
