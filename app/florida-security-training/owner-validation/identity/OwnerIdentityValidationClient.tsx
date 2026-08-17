@@ -1,23 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { CheckCircle2, IdCard, LoaderCircle, LockKeyhole, ShieldCheck } from "lucide-react";
-
-type Props = {
-  authorized: boolean;
-  blockingKeys: string[];
-};
+import { CheckCircle2, IdCard, LoaderCircle, ShieldCheck } from "lucide-react";
 
 type StatusPayload = {
   status?: string;
   verified?: boolean;
+  providerLivemode?: boolean;
   providerErrorCode?: string | null;
   error?: string;
 };
 
 const API_PATH = "/api/florida-class-d/owner-validation/identity";
 
-export default function OwnerIdentityValidationClient({ authorized, blockingKeys }: Props) {
+export default function OwnerIdentityValidationClient() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<StatusPayload | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -48,17 +44,13 @@ export default function OwnerIdentityValidationClient({ authorized, blockingKeys
 
   useEffect(() => {
     const returnedFromProvider = new URLSearchParams(window.location.search).get("provider_return") === "1";
-    if (!returnedFromProvider || !authorized) return;
-
-    const timer = window.setTimeout(() => {
-      void refreshStatus();
-    }, 0);
-
+    if (!returnedFromProvider) return;
+    const timer = window.setTimeout(() => void refreshStatus(), 0);
     return () => window.clearTimeout(timer);
-  }, [authorized, refreshStatus]);
+  }, [refreshStatus]);
 
   async function startValidation() {
-    if (!authorized || busy) return;
+    if (busy) return;
     setBusy(true);
     setMessage(null);
     try {
@@ -83,27 +75,17 @@ export default function OwnerIdentityValidationClient({ authorized, blockingKeys
   return (
     <section className="fl-classd__section" aria-labelledby="owner-idv-heading">
       <div className="fl-classd__section-heading">
-        <span>HOSTED IDENTITY DIAGNOSTIC</span>
+        <span>LIVE OWNER ID TEST</span>
         <h2 id="owner-idv-heading">Government ID and matching selfie</h2>
-        <p>Provider execution remains exact-release gated. The diagnostic never creates learner enrollment, instructional time, course entitlement, completion, certificate, or LIAS state.</p>
+        <p>Launch the configured Stripe Identity provider from this authenticated AAL2 owner session. Test mode and live mode are both reported accurately by the provider response.</p>
       </div>
-
-      {!authorized ? (
-        <div className="fl-classd__notice is-locked" role="status">
-          <LockKeyhole size={20} />
-          <div>
-            <strong>Provider validation remains locked.</strong>
-            <span>Blocking controls: {blockingKeys.join(", ") || "unknown"}. Satisfy the governed production owner-validation controls before starting Stripe Identity.</span>
-          </div>
-        </div>
-      ) : null}
 
       {status ? (
         <div className={`fl-classd__notice ${status.verified ? "is-success" : ""}`} role="status">
           {status.verified ? <CheckCircle2 size={20} /> : <ShieldCheck size={20} />}
           <div>
             <strong>{status.verified ? "Hosted identity validation verified." : `Provider status: ${status.status ?? "unknown"}`}</strong>
-            <span>{status.providerErrorCode ? `Provider error code: ${status.providerErrorCode}. ` : ""}No identity document, selfie image, biometric template, or verified personal details are rendered here.</span>
+            <span>{status.providerLivemode ? "Stripe live mode. " : "Stripe test mode. "}{status.providerErrorCode ? `Provider error code: ${status.providerErrorCode}. ` : ""}No identity document or selfie image is rendered by this LMS page.</span>
           </div>
         </div>
       ) : null}
@@ -111,16 +93,16 @@ export default function OwnerIdentityValidationClient({ authorized, blockingKeys
       {message ? (
         <div className="fl-classd__notice is-locked" role="alert">
           <ShieldCheck size={20} />
-          <div><strong>Identity diagnostic unavailable.</strong><span>{message}</span></div>
+          <div><strong>Identity test unavailable.</strong><span>{message}</span></div>
         </div>
       ) : null}
 
       <div className="fl-classd__actions">
-        <button type="button" onClick={startValidation} disabled={!authorized || busy}>
+        <button type="button" onClick={startValidation} disabled={busy}>
           {busy ? <LoaderCircle size={18} aria-hidden="true" /> : <IdCard size={18} aria-hidden="true" />}
           {busy ? "Working…" : "Start hosted ID verification"}
         </button>
-        {authorized ? <button type="button" className="secondary" onClick={refreshStatus} disabled={busy}>Refresh provider status</button> : null}
+        <button type="button" className="secondary" onClick={refreshStatus} disabled={busy}>Refresh provider status</button>
       </div>
     </section>
   );
