@@ -4,7 +4,6 @@ export type IdentityAccessPolicy =
   | "standard_authenticated"
   | "standard_public"
   | "internal_owner_read_only"
-  | "internal_owner_production_validation"
   | "public";
 export type IdentityMutationClass =
   | "read"
@@ -55,13 +54,6 @@ const FDACS_OWNER_PROVIDER_ACTIONS = new Map<string, ReadonlySet<string>>([
   ["/api/florida-class-d/owner-preview/courseware", new Set(["POST", "DELETE"])],
   ["/api/florida-class-d/owner-preview/activation-request", new Set(["POST"])],
 ]);
-const FDACS_PRODUCTION_VALIDATION_ACTIONS = new Map<string, ReadonlySet<string>>([
-  ["/api/florida-class-d/owner-validation/bootstrap", new Set(["POST"])],
-  ["/api/florida-class-d/owner-validation/enrollment", new Set(["POST"])],
-  ["/api/florida-class-d/owner-validation/schedule", new Set(["POST"])],
-  ["/api/florida-class-d/owner-validation/daily", new Set(["POST", "DELETE"])],
-  ["/api/florida-class-d/owner-validation/courseware", new Set(["POST", "DELETE"])],
-]);
 
 function pathMatchesPrefix(pathname: string, prefix: string) {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
@@ -83,9 +75,7 @@ function mutationClass(pathname: string, method: string | null | undefined): Ide
   if (normalizedMethod === "GET" || normalizedMethod === "HEAD") return "read";
   if (/\/(?:enrollment|enrollments)(?:\/|$)/.test(pathname)) return "enrollment";
   if (/\/(?:payment|payments|checkout)(?:\/|$)/.test(pathname)) return "payment";
-  if (/\/(?:completion|completion-documents|completion-packet|certificate|lias)(?:\/|$)/.test(pathname)) {
-    return "completion_certificate_lias";
-  }
+  if (/\/(?:completion|completion-documents|completion-packet|certificate|lias)(?:\/|$)/.test(pathname)) return "completion_certificate_lias";
   return "training_operation";
 }
 
@@ -94,13 +84,7 @@ function readMethod(method: string | null | undefined) {
   return normalizedMethod === "GET" || normalizedMethod === "HEAD";
 }
 
-function route(
-  provider: IdentityProvider,
-  requiresAuthentication: boolean,
-  accessPolicy: IdentityAccessPolicy,
-  mutationClass: IdentityMutationClass = "read",
-  mutationAllowed = true,
-): IdentityRouteOwnership {
+function route(provider: IdentityProvider, requiresAuthentication: boolean, accessPolicy: IdentityAccessPolicy, mutationClass: IdentityMutationClass = "read", mutationAllowed = true): IdentityRouteOwnership {
   return { provider, requiresAuthentication, accessPolicy, mutationAllowed, mutationClass };
 }
 
@@ -110,21 +94,8 @@ function ownedRoute(pathname: string, method?: string | null): IdentityRouteOwne
   if (FDACS_HEALTH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("public", false, "public");
   if ((pathname === "/florida-security-training" || pathname === "/florida-security-training/") && readMethod(method)) return route("public", false, "public");
 
-  if (
-    pathMatchesPrefix(pathname, "/florida-security-training/owner-validation") ||
-    pathMatchesPrefix(pathname, "/api/florida-class-d/owner-validation")
-  ) {
-    const normalizedMethod = method?.trim().toUpperCase() || "GET";
-    const classification = mutationClass(pathname, method);
-    const explicitlyAllowed = readMethod(method) || FDACS_PRODUCTION_VALIDATION_ACTIONS.get(pathname)?.has(normalizedMethod) === true;
-    const completionMutation = classification === "completion_certificate_lias";
-    return route(
-      "supabase",
-      true,
-      "internal_owner_production_validation",
-      classification,
-      explicitlyAllowed && !completionMutation,
-    );
+  if (pathMatchesPrefix(pathname, "/florida-security-training/owner-validation") || pathMatchesPrefix(pathname, "/api/florida-class-d/owner-validation")) {
+    return route("supabase", true, "standard_authenticated", mutationClass(pathname, method), true);
   }
 
   if (pathMatchesPrefix(pathname, "/florida-security-training") || pathMatchesPrefix(pathname, "/api/florida-class-d")) {
