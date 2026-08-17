@@ -5,18 +5,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { LEGAL_ENTITY_NAME } from "../lib/legal-identity";
+import type { LocalizedMessageKey } from "../lib/regional-localization";
+import { LanguageSelector, useObserraLocale } from "./RegionalLocalization";
 import "./site-header.css";
 
 const navigation = [
-  { label: "Services", href: "/services" },
-  { label: "Applications", href: "/apps" },
-  { label: "Industries", href: "/industries" },
-  { label: "Academy", href: "/academy" },
-  { label: "Florida Training", href: "/florida-security-training" },
-  { label: "Resources", href: "/resources" },
-  { label: "Trust", href: "/trust" },
-  { label: "About", href: "/about" },
-];
+  { label: "EIOS", href: "/eios", key: "nav.eios" },
+  { label: "Services", href: "/services", key: "nav.services" },
+  { label: "Applications", href: "/apps", key: "nav.applications" },
+  { label: "Academy", href: "/academy", key: "nav.academy" },
+  { label: "Industries", href: "/industries", key: "nav.industries" },
+  { label: "Trust", href: "/trust", key: "nav.trust" },
+  { label: "About", href: "/about", key: "nav.about" },
+  { label: "Speaking", href: "/speaking", key: "nav.speaking" },
+] satisfies Array<{ label: string; href: string; key: LocalizedMessageKey }>;
 
 function ObserraMark() {
   return (
@@ -32,6 +34,7 @@ function ObserraMark() {
 
 export default function HomeHeader() {
   const pathname = usePathname();
+  const { t } = useObserraLocale();
   const [open, setOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
@@ -58,7 +61,7 @@ export default function HomeHeader() {
   }
 
   return (
-    <header className="obs-site-header">
+    <header className="obs-site-header" data-obserra-localized>
       <div className="obs-site-header__brand-row">
         <Link className="obs-site-header__brand" href="/" aria-label={`${LEGAL_ENTITY_NAME} home`} onClick={closeNavigation}>
           <ObserraMark />
@@ -70,10 +73,11 @@ export default function HomeHeader() {
       </div>
       <nav id="primary-navigation" className={`obs-site-header__nav${open ? " is-open" : ""}`} aria-label="Primary navigation">
         {navigation.map((item) => (
-          <Link key={item.href} href={item.href} onClick={closeNavigation} aria-current={pathname === item.href || pathname.startsWith(`${item.href}/`) ? "page" : undefined}>{item.label}</Link>
+          <Link key={item.href} href={item.href} onClick={closeNavigation} aria-current={pathname === item.href || pathname.startsWith(`${item.href}/`) ? "page" : undefined}>{t(item.key)}</Link>
         ))}
-        <Link href="/contact" onClick={closeNavigation}>Contact</Link>
-        <Link className="obs-site-header__cta" href="/contact?interest=enterprise-consultation" onClick={closeNavigation}>Get in touch <span aria-hidden="true">→</span></Link>
+        <Link href="/contact" onClick={closeNavigation}>{t("nav.contact")}</Link>
+        <LanguageSelector className="obs-site-header__locale" />
+        <Link className="obs-site-header__cta" href="/contact?interest=enterprise-consultation" onClick={closeNavigation}>{t("nav.talk")} <span aria-hidden="true">→</span></Link>
       </nav>
     </header>
   );
