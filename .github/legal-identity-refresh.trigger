@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T16:30:00Z
-reason: regenerate complete governed legal identity, CMMC, disposition, continuous-audit, and FDACS PII audit evidence after full dependency-chain correction
+refresh-request: 2026-08-17T16:37:00Z
+reason: regenerate complete governed evidence after request-time Supabase authentication hotfix for protected Florida Class D learner pages

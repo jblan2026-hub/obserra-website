@@ -1,6 +1,7 @@
 import "server-only";
 
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import {
   FloridaClassDAuthorizationError,
   requireFloridaClassDSignedInUser,
@@ -14,6 +15,11 @@ function safeReturnPath(value: string) {
 }
 
 export async function requireFloridaClassDPageUser(returnPath: string) {
+  // Authentication is request-scoped. Explicitly defer everything below this
+  // boundary until an incoming request exists so Next.js never calls the
+  // Supabase identity authority while prerendering protected learner pages.
+  await connection();
+
   try {
     return await requireFloridaClassDSignedInUser();
   } catch (error) {
