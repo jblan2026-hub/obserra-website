@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ShieldCheck } from "lucide-react";
 import IdentityPreflightForm from "./IdentityPreflightForm";
 import "../florida-security-training.css";
+import "./preflight.css";
 
 export const metadata: Metadata = {
   title: "Class D Identity Readiness Check | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
