@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T18:38:00Z
-reason: regenerate complete governed evidence after aligning Florida Class D runtime readiness with the canonical Supabase protected identity boundary while preserving Clerk for broader site surfaces
+refresh-request: 2026-08-17T20:42:00Z
+reason: regenerate governed source evidence after restoring premium SaaS direct-sales, preview-disclosure, and regulated Academy truth contracts
