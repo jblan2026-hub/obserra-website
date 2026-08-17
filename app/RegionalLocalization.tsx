@@ -294,11 +294,12 @@ function PublicPageTranslator() {
       });
       if (!response.ok) throw new Error(`translation_${response.status}`);
       const payload = (await response.json()) as { translations?: unknown; translated?: unknown };
-      if (payload.translated !== true || !Array.isArray(payload.translations) || payload.translations.length !== batch.length) {
+      const translatedBatch = payload.translations;
+      if (payload.translated !== true || !Array.isArray(translatedBatch) || translatedBatch.length !== batch.length) {
         throw new Error("translation_unavailable");
       }
       batch.forEach((source, index) => {
-        const translated = payload.translations?.[index];
+        const translated = translatedBatch[index];
         if (typeof translated !== "string" || !translated.trim()) return;
         translations.set(source, translated.trim());
         cacheRef.current.set(`${locale}\u0000${source}`, translated.trim());
