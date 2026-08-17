@@ -5,7 +5,6 @@ import {
   floridaClassDRegulatedExecutionAuthorized,
 } from "./florida-class-d-production-activation";
 import { floridaClassDOwnerPreviewExecutionAuthorized } from "./florida-class-d-owner-preview";
-import { getFloridaClassDProductionOwnerValidationConfiguration } from "./florida-class-d-production-owner-validation";
 
 const REGULATED_API_PREFIX = "/api/florida-class-d";
 const ACCEPTANCE_MUTATION_PATH = "/api/florida-class-d/admin/acceptance";
@@ -13,7 +12,16 @@ const OWNER_PREVIEW_DAILY_PATH = "/api/florida-class-d/owner-preview/daily";
 const OWNER_PREVIEW_COURSEWARE_PATH = "/api/florida-class-d/owner-preview/courseware";
 const OWNER_PREVIEW_ACTIVATION_REQUEST_PATH = "/api/florida-class-d/owner-preview/activation-request";
 const OWNER_VALIDATION_PREFIX = "/api/florida-class-d/owner-validation";
+const OWNER_VALIDATION_IDENTITY_PATH = `${OWNER_VALIDATION_PREFIX}/identity`;
+const OWNER_VALIDATION_DAILY_PATH = `${OWNER_VALIDATION_PREFIX}/daily`;
+const OWNER_VALIDATION_COURSEWARE_PATH = `${OWNER_VALIDATION_PREFIX}/courseware`;
 const MUTATION_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+const OWNER_TEST_MUTATIONS = new Map<string, ReadonlySet<string>>([
+  [OWNER_VALIDATION_IDENTITY_PATH, new Set(["POST"])],
+  [OWNER_VALIDATION_DAILY_PATH, new Set(["POST", "DELETE"])],
+  [OWNER_VALIDATION_COURSEWARE_PATH, new Set(["POST", "DELETE"])],
+]);
 
 export type FloridaClassDMutationBoundaryDecision = {
   regulatedMutation: boolean;
@@ -59,8 +67,12 @@ export function evaluateFloridaClassDMutationBoundary(pathname: string, method: 
     return { regulatedMutation: true, authorized: floridaClassDOwnerPreviewExecutionAuthorized(), policy: "owner_preview_activation_request" };
   }
   if (pathMatchesPrefix(pathname, OWNER_VALIDATION_PREFIX)) {
-    const configuration = getFloridaClassDProductionOwnerValidationConfiguration();
-    return { regulatedMutation: true, authorized: configuration.authorized, policy: "production_owner_validation" };
+    const allowedMethods = OWNER_TEST_MUTATIONS.get(pathname);
+    return {
+      regulatedMutation: true,
+      authorized: allowedMethods?.has(normalizedMethod) === true,
+      policy: "production_owner_validation",
+    };
   }
   return { regulatedMutation: true, authorized: floridaClassDRegulatedExecutionAuthorized(), policy: "regulated_execution" };
 }
