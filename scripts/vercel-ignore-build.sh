@@ -8,10 +8,9 @@ if [ "${VERCEL_PROJECT_ID:-}" != "$CANONICAL_PROJECT_ID" ]; then
   exit 0
 fi
 
-case "${VERCEL_ENV:-}" in
-  production|preview) ;;
-  *) exit 0 ;;
-esac
+if [ "${VERCEL_ENV:-}" != "production" ] && [ "${VERCEL_ENV:-}" != "preview" ]; then
+  exit 0
+fi
 
 BASE_SHA="${VERCEL_GIT_PREVIOUS_SHA:-}"
 
