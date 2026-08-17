@@ -10,6 +10,8 @@ const files = {
   exam: new URL("../app/florida-security-training/exam/page.tsx", import.meta.url),
   makeup: new URL("../app/florida-security-training/makeup/page.tsx", import.meta.url),
   completion: new URL("../app/florida-security-training/completion/page.tsx", import.meta.url),
+  pageAuth: new URL("../lib/florida-class-d-page-auth.ts", import.meta.url),
+  auth: new URL("../lib/florida-class-d-auth.ts", import.meta.url),
   studentAccess: new URL("../lib/florida-class-d-student-access.ts", import.meta.url),
   env: new URL("../.env.example", import.meta.url),
 };
@@ -18,16 +20,23 @@ async function source(name) {
   return readFile(files[name], "utf8");
 }
 
-test("every student training and record surface requires authenticated eligible enrollment", async () => {
-  const [access, live, exam, makeup, completion, policy] = await Promise.all([
+test("every student training and record surface requires shared authenticated eligible enrollment", async () => {
+  const [access, live, exam, makeup, completion, pageAuth, auth, policy] = await Promise.all([
     source("access"),
     source("live"),
     source("exam"),
     source("makeup"),
     source("completion"),
+    source("pageAuth"),
+    source("auth"),
     source("studentAccess"),
   ]);
 
+  assert.match(pageAuth, /requireFloridaClassDSignedInUser/);
+  assert.match(pageAuth, /redirect\(`\/sign-in\?redirect_url=/);
+  assert.match(auth, /prepareSupabaseAuthRuntime\(\)\.runtimeEnabled/);
+  assert.match(auth, /requireSupabaseIdentity\(\)/);
+  assert.match(auth, /const \{ userId, sessionId \} = await auth\(\)/);
   assert.match(policy, /getFloridaClassDIdentityVerificationStatus/);
   assert.match(policy, /enrollmentId/);
   assert.match(policy, /instructionalAccessGranted/);
@@ -35,16 +44,17 @@ test("every student training and record surface requires authenticated eligible 
   assert.match(policy, /in_progress/);
 
   for (const route of [access, live, exam, makeup, completion]) {
-    assert.match(route, /auth\(\)/);
+    assert.match(route, /requireFloridaClassDPageUser\(/);
     assert.match(route, /evaluateFloridaClassDStudentAccess/);
     assert.match(route, /notFound\(\)/);
   }
   assert.doesNotMatch(access, /Begin controlled enrollment/);
 });
 
-test("identity requires an existing eligible pre-course enrollment", async () => {
-  const identity = await source("identity");
-  assert.match(identity, /auth\(\)/);
+test("identity requires shared authentication and an existing eligible pre-course enrollment", async () => {
+  const [identity, pageAuth] = await Promise.all([source("identity"), source("pageAuth")]);
+  assert.match(identity, /requireFloridaClassDPageUser\(/);
+  assert.match(pageAuth, /requireFloridaClassDSignedInUser/);
   assert.match(identity, /evaluateFloridaClassDIdentityStageAccess/);
   assert.match(identity, /notFound\(\)/);
 });

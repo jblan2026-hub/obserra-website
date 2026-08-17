@@ -119,7 +119,8 @@ gate("licensure and approval are not misrepresented", () => {
   assert.match(publicPage, /does not claim FDACS approval or production authorization/);
   assert.match(publicPage, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled until every applicable authorization gate is satisfied/);
   assert.match(protectedCompletionPage, /Production authorization is false/);
-  assert.match(protectedCompletionPage, /No course credit, completion document, certificate, or LIAS record can be issued from Preview UAT/);
+  assert.match(protectedCompletionPage, /no course credit, completion document, certificate, or LIAS record can be issued until the separate FDACS activation gates are satisfied/i);
+  assert.doesNotMatch(protectedCompletionPage, /Preview UAT/);
   assert.match(completionDocumentService, /does not establish FDACS approval, professional certification, or a Florida Class D Security Officer license/);
 });
 

@@ -5,8 +5,8 @@
   "canonicalPublicOrigin": "https://www.obserrallc.com",
   "sourceRevision": {
     "kind": "working_tree_content_digest",
-    "sourceTreeSha256": "90c4e17d5b5161fc641daef0702c9dbb9a5398f762c2ebc093ab5f1450a7d474",
-    "checkedFileCount": 356
+    "sourceTreeSha256": "2dd1a492e7ddee8b4c3b8426164a50f2ba7ca76f9d6db3e7392ca00674b056ca",
+    "checkedFileCount": 362
   },
   "scope": {
     "includedRoots": [

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 import { ArrowUpRight, Check, CircleDashed, LockKeyhole, ShieldCheck, Video } from "lucide-react";
 import { getFloridaClassDIdentityVerificationStatus } from "../../../lib/florida-class-d-identity-verification";
 import { listFloridaClassDStudentLiveSessions } from "../../../lib/florida-class-d-live-persistence";
+import { requireFloridaClassDPageUser } from "../../../lib/florida-class-d-page-auth";
 import { evaluateFloridaClassDStudentAccess } from "../../../lib/florida-class-d-student-access";
 import "../florida-security-training.css";
 
@@ -32,8 +32,7 @@ function sessionTime(value: string, timeZone: string) {
 }
 
 export default async function FloridaClassDControlledAccessPage() {
-  const { userId } = await auth();
-  if (!userId) redirect(`/sign-in?redirect_url=${encodeURIComponent("/florida-security-training/access")}`);
+  const { userId } = await requireFloridaClassDPageUser("/florida-security-training/access");
   const access = await evaluateFloridaClassDStudentAccess(userId);
   if (!access.allowed) notFound();
 

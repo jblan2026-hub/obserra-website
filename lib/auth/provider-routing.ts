@@ -61,7 +61,6 @@ function pathMatchesPrefix(pathname: string, prefix: string) {
 
 function normalizedPathname(pathname: string) {
   if (!pathname.startsWith("/") || pathname.startsWith("//")) return null;
-
   try {
     const segments = pathname.split("/").map((segment) => decodeURIComponent(segment));
     if (segments.some((segment) => /[\\/\u0000-\u001f\u007f]/.test(segment))) return null;
@@ -76,9 +75,7 @@ function mutationClass(pathname: string, method: string | null | undefined): Ide
   if (normalizedMethod === "GET" || normalizedMethod === "HEAD") return "read";
   if (/\/(?:enrollment|enrollments)(?:\/|$)/.test(pathname)) return "enrollment";
   if (/\/(?:payment|payments|checkout)(?:\/|$)/.test(pathname)) return "payment";
-  if (/\/(?:completion|completion-documents|completion-packet|certificate|lias)(?:\/|$)/.test(pathname)) {
-    return "completion_certificate_lias";
-  }
+  if (/\/(?:completion|completion-documents|completion-packet|certificate|lias)(?:\/|$)/.test(pathname)) return "completion_certificate_lias";
   return "training_operation";
 }
 
@@ -87,79 +84,43 @@ function readMethod(method: string | null | undefined) {
   return normalizedMethod === "GET" || normalizedMethod === "HEAD";
 }
 
-function route(
-  provider: IdentityProvider,
-  requiresAuthentication: boolean,
-  accessPolicy: IdentityAccessPolicy,
-  mutationClass: IdentityMutationClass = "read",
-  mutationAllowed = true,
-): IdentityRouteOwnership {
+function route(provider: IdentityProvider, requiresAuthentication: boolean, accessPolicy: IdentityAccessPolicy, mutationClass: IdentityMutationClass = "read", mutationAllowed = true): IdentityRouteOwnership {
   return { provider, requiresAuthentication, accessPolicy, mutationAllowed, mutationClass };
 }
 
-function ownedRoute(
-  pathname: string,
-  method?: string | null,
-): IdentityRouteOwnership {
-  if (CLERK_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
-    return route("clerk", true, "applications_clerk");
+function ownedRoute(pathname: string, method?: string | null): IdentityRouteOwnership {
+  if (CLERK_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("clerk", true, "applications_clerk");
+  if (CLERK_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("clerk", false, "applications_clerk");
+  if (FDACS_HEALTH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("public", false, "public");
+  if ((pathname === "/florida-security-training" || pathname === "/florida-security-training/") && readMethod(method)) return route("public", false, "public");
+
+  if (pathMatchesPrefix(pathname, "/florida-security-training/owner-validation") || pathMatchesPrefix(pathname, "/api/florida-class-d/owner-validation")) {
+    return route("supabase", true, "standard_authenticated", mutationClass(pathname, method), true);
   }
-  if (CLERK_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
-    return route("clerk", false, "applications_clerk");
-  }
-  if (FDACS_HEALTH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
-    return route("public", false, "public");
-  }
-  if (
-    (pathname === "/florida-security-training" || pathname === "/florida-security-training/")
-    && readMethod(method)
-  ) {
-    return route("public", false, "public");
-  }
-  if (
-    pathMatchesPrefix(pathname, "/florida-security-training") ||
-    pathMatchesPrefix(pathname, "/api/florida-class-d")
-  ) {
+
+  if (pathMatchesPrefix(pathname, "/florida-security-training") || pathMatchesPrefix(pathname, "/api/florida-class-d")) {
     const normalizedMethod = method?.trim().toUpperCase() || "GET";
     const ownerActionAllowed = FDACS_OWNER_PROVIDER_ACTIONS.get(pathname)?.has(normalizedMethod) === true;
-    return route(
-      "supabase",
-      true,
-      "internal_owner_read_only",
-      mutationClass(pathname, method),
-      ownerActionAllowed,
-    );
+    return route("supabase", true, "internal_owner_read_only", mutationClass(pathname, method), ownerActionAllowed);
   }
-  if (SUPABASE_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
-    return route("supabase", true, "standard_authenticated");
-  }
-  if (SUPABASE_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
-    return route("supabase", false, "standard_public");
-  }
+  if (SUPABASE_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("supabase", true, "standard_authenticated");
+  if (SUPABASE_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("supabase", false, "standard_public");
   return route("public", false, "public");
 }
 
 function safeRedirectPath(redirectTarget: string | null | undefined) {
-  if (!redirectTarget || !redirectTarget.startsWith("/") || redirectTarget.startsWith("//")) {
-    return null;
-  }
+  if (!redirectTarget || !redirectTarget.startsWith("/") || redirectTarget.startsWith("//")) return null;
   const queryIndex = redirectTarget.indexOf("?");
   return normalizedPathname(queryIndex === -1 ? redirectTarget : redirectTarget.slice(0, queryIndex));
 }
 
-export function identityProviderForRequest(
-  request: IdentityProviderRequest,
-): IdentityRouteOwnership {
+export function identityProviderForRequest(request: IdentityProviderRequest): IdentityRouteOwnership {
   const pathname = normalizedPathname(request.pathname);
   if (!pathname) return route("supabase", true, "standard_authenticated", "training_operation", false);
-
   if (pathMatchesPrefix(pathname, "/sign-in") || pathMatchesPrefix(pathname, "/sign-up")) {
     const returnPath = safeRedirectPath(request.redirectTarget);
-    if (returnPath && ownedRoute(returnPath).provider === "clerk") {
-      return route("clerk", false, "applications_clerk");
-    }
+    if (returnPath && ownedRoute(returnPath).provider === "clerk") return route("clerk", false, "applications_clerk");
     return route("supabase", false, "standard_public");
   }
-
   return ownedRoute(pathname, request.method);
 }

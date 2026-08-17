@@ -17,9 +17,11 @@ test("the public Florida training route remains discoverable with its complete f
   assert.match(enterpriseChrome, /href="\/florida-security-training"/);
   assert.match(sitemap, /\$\{siteUrl\}\/florida-security-training/);
   assert.match(page, /COMING SOON · LEARNING MANAGEMENT SYSTEM IN PROGRESS/);
+  assert.match(page, /PRODUCTION SOFTWARE VALIDATION · NON-CREDIT · PRODUCTION AUTHORIZATION FALSE/);
   assert.match(page, /CONTROLLED CURRICULUM ARCHITECTURE/);
-  assert.match(page, /PREVIEW REGULATED LEARNING MANAGEMENT SYSTEM \(LMS\)/);
+  assert.match(page, /REGULATED LMS PRODUCTION VALIDATION/);
   assert.match(page, /PROTECTED STUDENT JOURNEY/);
+  assert.match(page, /Photo-ID controls before secure live video/);
   assert.match(page, /robots: \{ index: true, follow: true \}/);
   assert.match(page, /floridaClassDPublicLearnerControlsEnabled\(\)/);
   assert.match(controls, /if \(!enabled\) return null;/);

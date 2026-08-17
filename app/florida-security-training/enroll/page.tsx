@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { auth } from "@clerk/nextjs/server";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import {
   floridaClassDPreEnrollmentEnabled,
   floridaClassDRequiredAcknowledgments,
 } from "../../../lib/florida-class-d-enrollment-policy";
+import { requireFloridaClassDPageUser } from "../../../lib/florida-class-d-page-auth";
 import EnrollmentClient from "./EnrollmentClient";
 import "../florida-security-training.css";
 
@@ -15,10 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function FloridaClassDEnrollmentPage() {
-  const { userId } = await auth();
-  if (!userId) {
-    redirect(`/sign-in?redirect_url=${encodeURIComponent("/florida-security-training/enroll")}`);
-  }
+  await requireFloridaClassDPageUser("/florida-security-training/enroll");
   if (!floridaClassDPreEnrollmentEnabled()) notFound();
 
   return (

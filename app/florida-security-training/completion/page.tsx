@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ExternalLink, FileCheck2, FileDown, ShieldCheck } from "lucide-react";
 import { listCompletionDocumentsForStudent } from "../../../lib/florida-class-d-completion-documents";
+import { requireFloridaClassDPageUser } from "../../../lib/florida-class-d-page-auth";
 import { evaluateFloridaClassDStudentAccess } from "../../../lib/florida-class-d-student-access";
 import "../florida-security-training.css";
 
@@ -19,8 +19,7 @@ function documentLabel(type: string) {
 }
 
 export default async function FloridaClassDCompletionDocumentsPage() {
-  const { userId } = await auth();
-  if (!userId) redirect(`/sign-in?redirect_url=${encodeURIComponent("/florida-security-training/completion")}`);
+  const { userId } = await requireFloridaClassDPageUser("/florida-security-training/completion");
   const access = await evaluateFloridaClassDStudentAccess(userId);
   if (!access.allowed) notFound();
   const documents = await listCompletionDocumentsForStudent(userId);
@@ -32,7 +31,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
       <section className="fl-classd__hero">
         <div className="fl-classd__eyebrow"><ShieldCheck size={18} /> Florida Class D Student Records</div>
         <h1>Completion Documents</h1>
-        <p className="fl-classd__lead">Production authorization is false. No course credit, completion document, certificate, or LIAS record can be issued from Preview UAT. This protected portal remains a fail-closed future delivery surface until all required authorization gates are satisfied.</p>
+        <p className="fl-classd__lead">Production authorization is false for regulated student training outcomes until the separate FDACS activation gates are satisfied. The production LMS record portal is live for authorized operational validation, but no course credit, completion document, certificate, or LIAS record can be issued until the separate FDACS activation gates are satisfied.</p>
         <div className="fl-classd__notice">
           <FileCheck2 size={20} />
           <div>
@@ -44,7 +43,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
           <FileCheck2 size={20} />
           <div>
             <strong>The official training certificate is FDACS-16103.</strong>
-            <span>If production is authorized in the future, the official certificate can originate only through the authorized LIAS reporting workflow after successful course completion. A separate OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC Supplemental Course Completion Record may then document the provider&apos;s completion decision, but it can never replace FDACS-16103.</span>
+            <span>After regulated production activation and successful completion, the official certificate can originate only through the authorized LIAS reporting workflow. A separate OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC Supplemental Course Completion Record may document the provider&apos;s completion decision, but it can never replace FDACS-16103.</span>
           </div>
         </div>
       </section>
@@ -60,8 +59,8 @@ export default async function FloridaClassDCompletionDocumentsPage() {
       <section className="fl-classd__section">
         <div className="fl-classd__section-heading">
           <span>OFFICIAL FLORIDA TRAINING RECORD</span>
-          <h2>Official certificate for a future authorized Class D application workflow</h2>
-          <p>No FDACS-16103 is available from Preview UAT. If production is authorized and a student later satisfies every controlled completion requirement, authorized personnel may report that completion through LIAS. Only the resulting LIAS-generated Certificate of Security Officer Training is the official training certificate for the application record.</p>
+          <h2>Official certificate for an activated Class D application workflow</h2>
+          <p>No FDACS-16103 is released until regulated production activation and every controlled completion requirement are satisfied. Authorized personnel then report successful completion through LIAS, and only the resulting LIAS-generated Certificate of Security Officer Training is treated as the official training certificate.</p>
         </div>
         <div className="fl-classd__automation-grid">
           {official.map((document) => (
@@ -89,7 +88,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
         <div className="fl-classd__section-heading">
           <span>SUPPLEMENTAL RECORDS</span>
           <h2>Provider completion record and application support</h2>
-          <p>A Supplemental Course Completion Record from OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC may be generated only after production authorization, a passing examination, and controlled completion approval. It may include the verified legal name, course title, 40 instructional hours, completion date, and a unique record identifier. It is not a professional certification, state certificate, license, FDACS approval, or substitute for the official LIAS-generated FDACS-16103.</p>
+          <p>A Supplemental Course Completion Record from OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC may be generated only after regulated production activation, a passing examination, and controlled completion approval. It may include the verified legal name, course title, 40 instructional hours, completion date, and a unique record identifier. It is not a professional certification, state certificate, license, FDACS approval, or substitute for the official LIAS-generated FDACS-16103.</p>
         </div>
         <div className="fl-classd__automation-grid">
           {supplemental.map((document) => (

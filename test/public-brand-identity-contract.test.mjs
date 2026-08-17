@@ -94,5 +94,5 @@ test("public regulatory status remains fail closed and human determinations rema
   assert.match(fdacs, /does not claim FDACS approval or production authorization/);
   assert.match(fdacs, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled/);
   assert.match(completion, /Production authorization is false/);
-  assert.match(completion, /No course credit, completion document, certificate, or LIAS record can be issued from Preview UAT/);
+  assert.match(completion, /no course credit, completion document, certificate, or LIAS record can be issued until the separate FDACS activation gates are satisfied/i);
 });
