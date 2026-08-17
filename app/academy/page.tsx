@@ -13,6 +13,11 @@ import "./academy-world-class.css";
 
 export const revalidate = 10;
 
+const courseListDescription = (description: string) => {
+  const normalized = description.replace(/\s+/g, " ").trim();
+  return normalized.length <= 60 ? normalized : `${normalized.slice(0, 57).trimEnd()}...`;
+};
+
 export const metadata: Metadata = {
   title: "Obserra Academy | Cybersecurity, AI Governance, Intelligence and Executive Training",
   description:
@@ -77,10 +82,11 @@ export default async function AcademyPage({ searchParams }: { searchParams: Prom
         itemListElement: publicCourses.map((course, index) => ({
           "@type": "ListItem",
           position: index + 1,
+          url: `https://www.obserrallc.com/academy/${course.id}`,
           item: {
             "@type": "Course",
             name: course.title,
-            description: course.description,
+            description: courseListDescription(course.description),
             url: `https://www.obserrallc.com/academy/${course.id}`,
             provider: {
               "@type": "Organization",
