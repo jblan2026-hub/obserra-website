@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T22:20:00Z
-reason: regenerate governed source evidence after correcting Florida Class D public preflight routing while preserving authenticated student, owner, MFA, and regulated mutation boundaries
+refresh-request: 2026-08-17T22:30:00Z
+reason: regenerate governed source evidence after final Florida Class D learner routing, owner authorization separation, and governed Vercel preview validation corrections
