@@ -9,6 +9,12 @@ import {
   OBSERRIAN_SYSTEM_PROMPT,
   type ObserrianConversationMessage,
 } from "../../../lib/obserrian-advisor";
+import {
+  DEFAULT_LOCALE,
+  isSupportedLocale,
+  LOCALE_OPTIONS,
+  type ObserraLocale,
+} from "../../../lib/regional-localization";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -32,6 +38,7 @@ type AdvisorPayload = {
   question?: unknown;
   pathname?: unknown;
   conversation?: unknown;
+  locale?: unknown;
 };
 
 type GatewayResponse = {
@@ -102,11 +109,16 @@ function gatewayToken() {
   return process.env.AI_GATEWAY_API_KEY?.trim() || process.env.VERCEL_OIDC_TOKEN?.trim() || null;
 }
 
+function localeLabel(locale: ObserraLocale) {
+  return LOCALE_OPTIONS.find((option) => option.locale === locale)?.label || locale;
+}
+
 async function generateAdvisorAnswer(
   token: string,
   question: string,
   pathname: string,
   conversation: ObserrianConversationMessage[],
+  locale: ObserraLocale,
 ) {
   const grounding = buildAdvisorGrounding(question, pathname);
   const messages = [
@@ -114,7 +126,7 @@ async function generateAdvisorAnswer(
     ...conversation,
     {
       role: "user",
-      content: `CURRENT PAGE: ${pathname}\n\nGROUNDING:\n${grounding}\n\nVISITOR QUESTION:\n${question}`,
+      content: `RESPONSE LANGUAGE: ${localeLabel(locale)} (${locale}). Answer in this language unless the visitor explicitly asks for another language. Preserve Obserra, Obserra LLC, Obserra EIOS, Obserrian, NIST, CMMC, FDACS, product names, URLs, acronyms, numbers, and exact commercial status words such as Available, Pilot, and Coming Soon.\n\nCURRENT PAGE: ${pathname}\n\nGROUNDING:\n${grounding}\n\nVISITOR QUESTION:\n${question}`,
     },
   ];
 
@@ -176,6 +188,7 @@ export async function POST(request: NextRequest) {
 
   const pathname = normalizeAdvisorPath(typeof payload.pathname === "string" ? payload.pathname : "/");
   const conversation = normalizedConversation(payload.conversation);
+  const locale = isSupportedLocale(payload.locale) ? payload.locale : DEFAULT_LOCALE;
   const actions = advisorActions(question, pathname);
   const token = gatewayToken();
 
@@ -185,20 +198,22 @@ export async function POST(request: NextRequest) {
         text: fallbackAdvisorAnswer(question, pathname),
         actions,
         mode: "grounded-fallback",
+        locale,
       },
       { status: 200, headers: responseHeaders },
     );
   }
 
   try {
-    const text = await generateAdvisorAnswer(token, question, pathname, conversation);
-    return NextResponse.json({ text, actions, mode: "ai" }, { status: 200, headers: responseHeaders });
+    const text = await generateAdvisorAnswer(token, question, pathname, conversation, locale);
+    return NextResponse.json({ text, actions, mode: "ai", locale }, { status: 200, headers: responseHeaders });
   } catch {
     return NextResponse.json(
       {
         text: fallbackAdvisorAnswer(question, pathname),
         actions,
         mode: "grounded-fallback",
+        locale,
       },
       { status: 200, headers: responseHeaders },
     );
