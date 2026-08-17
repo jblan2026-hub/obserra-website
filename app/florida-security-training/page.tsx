@@ -8,9 +8,9 @@ import { EnterpriseFooter, EnterpriseHeader } from "../components/enterprise/Ent
 import "./florida-security-training.css";
 
 export const metadata: Metadata = {
-  title: "Florida Class D Security Officer Training | Obserra",
+  title: "Florida Class D Security Officer Training",
   description:
-    "Review Obserra's planned Florida Class D Security Officer Training LMS, including 40 instructional hours, live instructor controls, identity verification, attendance, examinations, and regulated authorization safeguards. Enrollment is not yet open.",
+    `${FLORIDA_CLASS_D_COURSE.provider} is building a planned Florida Class D Security Officer Training LMS with 40 instructional hours, live instructor controls, identity verification, attendance, examinations, and regulated authorization safeguards. Enrollment is not yet open.`,
   alternates: { canonical: "/florida-security-training" },
   keywords: [
     "Florida Class D security officer training",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   ],
   robots: { index: true, follow: true },
   openGraph: {
-    title: "Florida Class D Security Officer Training | Obserra",
+    title: `Florida Class D Security Officer Training | ${FLORIDA_CLASS_D_COURSE.provider}`,
     description:
       "A purpose-built live-instruction LMS for planned Florida Class D Security Officer Training. Enrollment and regulated course credit remain disabled pending applicable authorization.",
     url: "https://www.obserrallc.com/florida-security-training",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Florida Class D Security Officer Training | Obserra",
+    title: `Florida Class D Security Officer Training | ${FLORIDA_CLASS_D_COURSE.provider}`,
     description:
       "Review the planned 40-hour live-instruction Florida Class D Security Officer Training experience and student readiness controls.",
   },
