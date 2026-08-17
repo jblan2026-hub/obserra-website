@@ -9,33 +9,43 @@ import { productIntelligence } from "../lib/product-intelligence";
 
 const siteUrl = "https://www.obserrallc.com";
 
+const canonical = (path: string): MetadataRoute.Sitemap[number] => ({
+  url: `${siteUrl}${path}`,
+});
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
   const corePages: MetadataRoute.Sitemap = [
-    { url: siteUrl, lastModified, changeFrequency: "weekly", priority: 1 },
-    { url: `${siteUrl}/about`, lastModified, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${siteUrl}/speaking`, lastModified, changeFrequency: "monthly", priority: 0.82 },
-    { url: `${siteUrl}/contact`, lastModified, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${siteUrl}/services`, lastModified, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${siteUrl}/protection-intelligence`, lastModified, changeFrequency: "weekly", priority: 0.88 },
-    { url: `${siteUrl}/eios`, lastModified, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${siteUrl}/apps`, lastModified, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${siteUrl}/catalog`, lastModified, changeFrequency: "weekly", priority: 0.85 },
-    { url: `${siteUrl}/academy`, lastModified, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${siteUrl}/academy/enterprise`, lastModified, changeFrequency: "weekly", priority: 0.86 },
-    { url: `${siteUrl}/florida-security-training`, lastModified, changeFrequency: "monthly", priority: 0.78 },
-    { url: `${siteUrl}/industries`, lastModified, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${siteUrl}/resources`, lastModified, changeFrequency: "monthly", priority: 0.82 },
-    { url: `${siteUrl}/trust`, lastModified, changeFrequency: "monthly", priority: 0.8 },
+    canonical(""),
+    canonical("/about"),
+    canonical("/speaking"),
+    canonical("/contact"),
+    canonical("/services"),
+    canonical("/protection-intelligence"),
+    canonical("/eios"),
+    canonical("/apps"),
+    canonical("/catalog"),
+    canonical("/academy"),
+    canonical("/academy/enterprise"),
+    canonical("/florida-security-training"),
+    canonical("/florida-security-training/preflight"),
+    canonical("/industries"),
+    canonical("/resources"),
+    canonical("/trust"),
   ];
+
+  const productPages = productIntelligence.map((entry) => ({
+    url: `${siteUrl}/products/${entry.slug}`,
+    ...(entry.publishedAt ? { lastModified: new Date(entry.publishedAt) } : {}),
+  }));
+
   return [
     ...corePages,
-    ...industrySolutions.map((industry) => ({ url: `${siteUrl}/industries/${industry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.82 })),
-    ...serviceCatalog.map((service) => ({ url: `${siteUrl}/services/${service.id}`, lastModified, changeFrequency: "monthly" as const, priority: 0.8 })),
-    ...eiosCapabilities.map((entry) => ({ url: `${siteUrl}/eios/${entry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.82 })),
-    ...marketplaceApps.map((entry) => ({ url: `${siteUrl}/apps/${entry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.75 })),
-    ...productIntelligence.map((entry) => ({ url: `${siteUrl}/products/${entry.slug}`, lastModified: entry.publishedAt ? new Date(entry.publishedAt) : lastModified, changeFrequency: "weekly" as const, priority: 0.82 })),
-    ...courses.map((course) => ({ url: `${siteUrl}/academy/${course.id}`, lastModified, changeFrequency: "monthly" as const, priority: 0.7 })),
-    ...trustPolicies.map((policy) => ({ url: `${siteUrl}/trust/${policy.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.65 })),
+    ...industrySolutions.map((industry) => canonical(`/industries/${industry.slug}`)),
+    ...serviceCatalog.map((service) => canonical(`/services/${service.id}`)),
+    ...eiosCapabilities.map((entry) => canonical(`/eios/${entry.slug}`)),
+    ...marketplaceApps.map((entry) => canonical(`/apps/${entry.slug}`)),
+    ...productPages,
+    ...courses.map((course) => canonical(`/academy/${course.id}`)),
+    ...trustPolicies.map((policy) => canonical(`/trust/${policy.slug}`)),
   ];
 }
