@@ -27,7 +27,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     canonical("/academy"),
     canonical("/academy/enterprise"),
     canonical("/florida-security-training"),
-    canonical("/florida-security-training/preflight"),
     canonical("/industries"),
     canonical("/resources"),
     canonical("/trust"),
