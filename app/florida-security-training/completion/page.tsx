@@ -31,7 +31,7 @@ export default async function FloridaClassDCompletionDocumentsPage() {
       <section className="fl-classd__hero">
         <div className="fl-classd__eyebrow"><ShieldCheck size={18} /> Florida Class D Student Records</div>
         <h1>Completion Documents</h1>
-        <p className="fl-classd__lead">The production LMS record portal is live. Training credit, completion approval, certificate release, and LIAS production reporting remain fail-closed until the separate FDACS activation gates are satisfied.</p>
+        <p className="fl-classd__lead">Production authorization is false for regulated student training outcomes until the separate FDACS activation gates are satisfied. The production LMS record portal is live for authorized operational validation, but no course credit, completion document, certificate, or LIAS record can be issued until the separate FDACS activation gates are satisfied.</p>
         <div className="fl-classd__notice">
           <FileCheck2 size={20} />
           <div>
