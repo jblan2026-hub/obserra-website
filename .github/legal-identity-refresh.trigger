@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T15:36:00Z
-reason: synchronize generated legal identity and CMMC source evidence after Class D production-validation terminology and authentication-contract updates
+refresh-request: 2026-08-17T15:43:00Z
+reason: regenerate and verify both legal identity and CMMC system-evidence artifacts after production LMS, TypeUI design-system, and governed evidence-workflow changes
