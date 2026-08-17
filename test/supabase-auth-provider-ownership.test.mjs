@@ -100,6 +100,26 @@ test("the exact Florida Coming Soon landing stays public without opening child r
   );
 });
 
+test("Florida preflight remains public for safe reads while mutations stay fail-closed", () => {
+  const { identityProviderForRequest } = routingModule();
+
+  for (const method of ["GET", "HEAD"]) {
+    const preflight = identityProviderForRequest({ pathname: "/florida-security-training/preflight", method });
+    assert.equal(preflight.provider, "public", method);
+    assert.equal(preflight.requiresAuthentication, false, method);
+    assert.equal(preflight.accessPolicy, "public", method);
+    assert.equal(preflight.mutationAllowed, true, method);
+    assert.equal(preflight.mutationClass, "read", method);
+  }
+
+  const mutation = identityProviderForRequest({ pathname: "/florida-security-training/preflight", method: "POST" });
+  assert.equal(mutation.provider, "supabase");
+  assert.equal(mutation.requiresAuthentication, true);
+  assert.equal(mutation.accessPolicy, "internal_owner_read_only");
+  assert.equal(mutation.mutationAllowed, false);
+  assert.equal(mutation.mutationClass, "training_operation");
+});
+
 test("every non-health FDACS protected route is an internal owner read surface", () => {
   const { identityProviderForRequest } = routingModule();
 
