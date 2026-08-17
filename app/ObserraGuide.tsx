@@ -4,6 +4,7 @@ import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { useObserraLocale } from "./RegionalLocalization";
 import styles from "./ObserraGuide.module.css";
 
 type MessageAction = { href: string; label: string };
@@ -13,192 +14,142 @@ type PageContext = {
   welcome: string;
   prompts: string[];
 };
+type AdvisorApiResponse = {
+  text?: unknown;
+  actions?: unknown;
+};
 
 const excludedPaths = [
   "/admin",
   "/api",
   "/sign-in",
   "/sign-up",
+  "/portal",
   "/academy/learn",
   "/academy/certificate",
   "/academy/success",
-  "/florida-security-training",
+  "/florida-security-training/access",
+  "/florida-security-training/admin",
+  "/florida-security-training/completion",
+  "/florida-security-training/enroll",
+  "/florida-security-training/exam",
+  "/florida-security-training/identity",
+  "/florida-security-training/live",
+  "/florida-security-training/makeup",
+  "/florida-security-training/observer",
 ];
 
 function pageContext(pathname: string): PageContext {
+  if (pathname.startsWith("/florida-security-training")) {
+    return {
+      label: "Florida Training Advisor",
+      welcome:
+        "I can explain the planned Florida Class D training experience, public readiness requirements, current authorization status, and what is or is not open today. I will keep regulated status boundaries explicit.",
+      prompts: [
+        "Is enrollment open?",
+        "What are the ID requirements?",
+        "How is the 40 hour course structured?",
+        "Notify me when training opens",
+      ],
+    };
+  }
   if (pathname.startsWith("/academy")) {
     return {
       label: "Academy Advisor",
-      welcome: "I can help you compare courses, understand secure enrollment, access training, or learn how Obserra Academy Certificates of Course Completion are earned.",
-      prompts: ["Recommend a course", "How does enrollment work?", "How do I earn a certificate?", "Enterprise training"],
+      welcome:
+        "Tell me what you want to learn or the role you are preparing for. I can compare the actual Academy catalog, recommend relevant courses, explain secure enrollment, or clarify completion requirements.",
+      prompts: ["Recommend a course for me", "Compare courses", "How does enrollment work?", "Enterprise training"],
     };
   }
   if (pathname.startsWith("/apps")) {
     return {
       label: "Product Advisor",
-      welcome: `I can help you evaluate ${LEGAL_ENTITY_NAME} applications, compare use cases, request a product briefing, or identify the right solution for your organization.`,
-      prompts: ["Recommend an application", "Show Obserra EIOS", "Request a product demo", "Discuss enterprise pricing"],
+      welcome:
+        `Tell me the business problem you are trying to solve. I can compare actual ${LEGAL_ENTITY_NAME} applications, explain availability and deployment options, and direct you to the strongest product fit.`,
+      prompts: ["Recommend an application", "Compare available products", "Show Obserra EIOS", "Discuss enterprise pricing"],
     };
   }
   if (pathname.startsWith("/eios")) {
     return {
       label: "Obserra EIOS Advisor",
-      welcome: "I can explain the Obserra Enterprise Intelligence Operating System (EIOS), guide you through the product views, or help arrange an executive platform briefing.",
-      prompts: ["What is Obserra EIOS?", "Show product views", "Explain the business value", "Request an Obserra EIOS briefing"],
+      welcome:
+        "I can explain how Obserra EIOS connects enterprise context, evidence, controls, decisions, approvals, execution, and verified outcomes, or help you determine whether an EIOS briefing makes sense for your organization.",
+      prompts: ["What problem does EIOS solve?", "Explain the business value", "How does EIOS fit existing systems?", "Request an EIOS briefing"],
     };
   }
   if (pathname.startsWith("/services") || pathname.startsWith("/protection-intelligence")) {
     return {
       label: "Engagement Advisor",
-      welcome: "I can help identify the right cybersecurity, protection, intelligence, governance, or technology engagement for your priority.",
-      prompts: ["Cybersecurity advisory", "Executive protection", "Artificial intelligence governance", "Request a consultation"],
+      welcome:
+        "Describe the risk, decision, deadline, or capability gap in front of you. I can map it to the most relevant Obserra advisory, cybersecurity, AI governance, protection, intelligence, or secure technology path.",
+      prompts: ["Cybersecurity advisory", "AI governance", "Executive protection", "Help me scope an engagement"],
     };
   }
-  if (pathname.startsWith("/about")) {
+  if (pathname.startsWith("/trust")) {
+    return {
+      label: "Trust Advisor",
+      welcome:
+        "I can help buyers and reviewers navigate Obserra security, privacy, responsible AI, accessibility, procurement assurance, and governance information without overstating certification or compliance status.",
+      prompts: ["Review security assurance", "Privacy and data handling", "Responsible AI", "Procurement review"],
+    };
+  }
+  if (pathname.startsWith("/about") || pathname.startsWith("/speaking")) {
     return {
       label: "Executive Concierge",
-      welcome: `I can help you understand ${LEGAL_ENTITY_NAME} leadership, credentials, speaking capabilities, and the best path to begin an engagement.`,
-      prompts: [`About ${LEGAL_ENTITY_NAME}`, "Leadership credentials", "Book a speaker", "Start a conversation"],
+      welcome:
+        `I can help you understand ${LEGAL_ENTITY_NAME} leadership, credentials, operating experience, speaking capabilities, and the right next step for an executive conversation.`,
+      prompts: ["Leadership credentials", "Cybersecurity experience", "Book a speaker", "Start a conversation"],
     };
   }
   if (pathname.startsWith("/contact")) {
     return {
       label: "Engagement Concierge",
-      welcome: `Tell me what you are trying to accomplish and I will direct you to the most relevant ${LEGAL_ENTITY_NAME} service, application, training, or briefing.`,
-      prompts: ["I need cybersecurity help", "I need executive protection", "I want a product demo", "I need team training"],
+      welcome:
+        `Tell me what you are trying to accomplish and I will narrow it to the most relevant ${LEGAL_ENTITY_NAME} service, product, Academy path, or executive briefing.`,
+      prompts: ["I need cybersecurity help", "I need AI governance", "I want a product briefing", "I need team training"],
     };
   }
   return {
     label: "Executive Intelligence Advisor",
-    welcome: `I can help you discover ${LEGAL_ENTITY_NAME} applications and services, Obserra Academy training, Obserra EIOS capabilities, and the right next step for your organization.`,
-    prompts: ["Explore applications", "Find professional training", "Review services", "Speak with an advisor"],
+    welcome:
+      `Tell me the decision, risk, capability gap, or outcome you are working through. I can connect it to ${LEGAL_ENTITY_NAME} services, EIOS, applications, Academy learning, trust resources, or a confidential executive conversation.`,
+    prompts: ["What can Obserra help with?", "Explore EIOS", "Recommend an application", "Find professional training"],
   };
 }
 
-function response(question: string, pathname: string): Message {
-  const input = question.toLowerCase();
-
-  if (/\beios\b|enterprise intelligence|situation room|decision intelligence|business value|product view/.test(input)) {
-    return {
-      from: "guide",
-      text: "Obserra Enterprise Intelligence Operating System (EIOS) is a governed enterprise intelligence and execution environment. It connects risk context, evidence, policy, approvals, actions, and verified outcomes to support defensible leadership decisions.",
-      actions: [
-        { href: "/eios", label: "Explore Obserra EIOS" },
-        { href: "/contact?interest=eios", label: "Request a briefing" },
-      ],
-    };
-  }
-
-  if (/app|application|software|product|demo|pricing/.test(input)) {
-    return {
-      from: "guide",
-      text: `${LEGAL_ENTITY_NAME} applications support cybersecurity, artificial intelligence governance, cyber risk, control evidence, vulnerability prioritization, executive exposure, and enterprise intelligence. Product availability is stated clearly on each commercial product page.`,
-      actions: [
-        { href: "/apps", label: "Browse applications" },
-        { href: "/contact?interest=applications", label: "Request product guidance" },
-      ],
-    };
-  }
-
-  if (/course|academy|training|learn|recommend/.test(input)) {
-    return {
-      from: "guide",
-      text: "Obserra Academy offers account-based, self-paced professional training across cybersecurity, protection, intelligence, leadership, artificial intelligence, and secure technology. Course pages show the level, duration, outcomes, and price before enrollment.",
-      actions: [
-        { href: "/academy#courses", label: "Browse courses" },
-        { href: "/contact?interest=enterprise-training", label: "Discuss team training" },
-      ],
-    };
-  }
-
-  if (/pay|price|buy|checkout|enroll|stripe|access/.test(input)) {
-    return {
-      from: "guide",
-      text: `Choose an available course and select Enroll securely. Checkout is hosted by Stripe. An authenticated learner can receive direct account-based fulfillment; a guest purchase remains pending until the purchaser claims it using the verified payer email. Access is granted only after ${LEGAL_ENTITY_NAME} verifies Stripe's signed payment webhook.`,
-      actions: [{ href: "/academy#courses", label: "Choose a course" }],
-    };
-  }
-
-  if (/certificate|certify|completion|assessment|exam/.test(input)) {
-    return {
-      from: "guide",
-      text: "To earn an Obserra Academy Certificate of Course Completion, complete every required lesson and meet the course's published passing-score requirement on the final assessment. The certificate is generated from the authenticated completion record and includes a unique verification ID. It is a proprietary course-completion record issued by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC, not a professional certification, license, academic credit, or evidence of regulatory compliance.",
-      actions: [{ href: "/academy", label: "Review Academy standards" }],
-    };
-  }
-
-  if (/protect|executive protection|travel|threat|physical security/.test(input)) {
-    return {
-      from: "guide",
-      text: `${LEGAL_ENTITY_NAME} supports executive protection planning, protective intelligence, travel risk, digital exposure, and threat-informed security decisions for leaders and organizations.`,
-      actions: [
-        { href: "/protection-intelligence", label: "Explore protection" },
-        { href: "/contact?interest=protection", label: "Request consultation" },
-      ],
-    };
-  }
-
-  if (/cyber|ciso|incident|risk|governance|identity|grc|ai governance/.test(input)) {
-    return {
-      from: "guide",
-      text: `${LEGAL_ENTITY_NAME} provides executive cybersecurity advisory, fractional Chief Information Security Officer leadership, incident readiness, governance, risk and compliance, identity and access management, artificial intelligence governance, and secure technology consulting.`,
-      actions: [
-        { href: "/services", label: "Review services" },
-        { href: "/contact?interest=cybersecurity", label: "Discuss your priority" },
-      ],
-    };
-  }
-
-  if (/about|leadership|credential|speaker|speaking|jody|blanchard/.test(input)) {
-    return {
-      from: "guide",
-      text: `${LEGAL_ENTITY_NAME} is veteran-owned and executive-led by Dr. Jody Blanchard, combining Fortune 500 cybersecurity leadership, military intelligence, protection, governance, technology, and professional education experience.`,
-      actions: [
-        { href: "/about", label: "Meet the leadership" },
-        { href: "/contact?interest=speaking", label: "Request a briefing or speaker" },
-      ],
-    };
-  }
-
-  if (/contact|consult|advisor|quote|speak|help|enterprise/.test(input)) {
-    return {
-      from: "guide",
-      text: `${LEGAL_ENTITY_NAME} can help scope a confidential advisory engagement, product briefing, enterprise training program, or protection and intelligence requirement.`,
-      actions: [{ href: "/contact", label: `Contact ${LEGAL_ENTITY_NAME}` }],
-    };
-  }
-
-  const context = pageContext(pathname);
-  return {
-    from: "guide",
-    text: `I am currently your ${context.label}. I can guide you to a ${LEGAL_ENTITY_NAME} application or service, an Obserra Academy course, an Obserra EIOS briefing, or a confidential consultation.`,
-    actions: [
-      { href: "/apps", label: "Applications" },
-      { href: "/services", label: "Services" },
-      { href: "/academy", label: "Academy" },
-      { href: "/contact", label: "Contact" },
-    ],
-  };
+function validatedActions(value: unknown): MessageAction[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const actions = value
+    .filter((candidate): candidate is { href: unknown; label: unknown } => Boolean(candidate && typeof candidate === "object"))
+    .map((candidate) => ({
+      href: typeof candidate.href === "string" ? candidate.href.trim() : "",
+      label: typeof candidate.label === "string" ? candidate.label.trim() : "",
+    }))
+    .filter((action) => action.href.startsWith("/") && action.href.length <= 240 && action.label.length > 0 && action.label.length <= 90)
+    .slice(0, 3);
+  return actions.length ? actions : undefined;
 }
 
 export default function ObserraGuide() {
   const pathname = usePathname();
+  const { locale, t } = useObserraLocale();
   const context = useMemo(() => pageContext(pathname), [pathname]);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [pending, setPending] = useState(false);
   const [messagesByPath, setMessagesByPath] = useState<Record<string, Message[]>>({});
   const messages = useMemo(
     () => messagesByPath[pathname] ?? [{ from: "guide", text: context.welcome } satisfies Message],
     [context.welcome, messagesByPath, pathname],
   );
   const messagesRef = useRef<HTMLDivElement | null>(null);
-  const excluded = excludedPaths.some((path) => pathname.startsWith(path));
+  const excluded = excludedPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
   useEffect(() => {
     if (pathname !== "/" || excluded) return;
     const dismissed = window.sessionStorage.getItem("obserrian-auto-open-dismissed") === "1";
     if (dismissed) return;
-    const timer = window.setTimeout(() => setOpen(true), 1100);
+    const timer = window.setTimeout(() => setOpen(true), 1_100);
     return () => window.clearTimeout(timer);
   }, [excluded, pathname]);
 
@@ -206,32 +157,67 @@ export default function ObserraGuide() {
     if (!open) return;
     const container = messagesRef.current;
     if (container) container.scrollTop = container.scrollHeight;
-  }, [messages, open]);
+  }, [messages, open, pending]);
 
   if (excluded) return null;
 
-  function appendExchange(question: string) {
+  function appendMessage(path: string, message: Message) {
     setMessagesByPath((byPath) => ({
       ...byPath,
-      [pathname]: [
-        ...(byPath[pathname] ?? [{ from: "guide", text: context.welcome } satisfies Message]),
-        { from: "visitor", text: question },
-        response(question, pathname),
-      ],
+      [path]: [...(byPath[path] ?? [{ from: "guide", text: pageContext(path).welcome } satisfies Message]), message],
     }));
+  }
+
+  async function ask(questionValue: string) {
+    const question = questionValue.replace(/\s+/g, " ").trim().slice(0, 1_000);
+    if (!question || pending) return;
+
+    const requestPath = pathname;
+    const history = messages.slice(-6).map((message) => ({
+      role: message.from === "visitor" ? "user" : "assistant",
+      content: message.text,
+    }));
+
+    appendMessage(requestPath, { from: "visitor", text: question });
+    setInput("");
+    setPending(true);
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 22_000);
+
+    try {
+      const response = await fetch("/api/obserrian", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ question, pathname: requestPath, conversation: history, locale }),
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`advisor_request_${response.status}`);
+      const payload = (await response.json()) as AdvisorApiResponse;
+      const text = typeof payload.text === "string" ? payload.text.trim().slice(0, 2_800) : "";
+      if (!text) throw new Error("advisor_empty_response");
+      appendMessage(requestPath, { from: "guide", text, actions: validatedActions(payload.actions) });
+    } catch {
+      appendMessage(requestPath, {
+        from: "guide",
+        text:
+          "I could not complete that analysis just now. Your question has not changed any account, purchase, enrollment, or regulated training state. You can try again or continue with a direct Obserra conversation.",
+        actions: [{ href: "/contact?interest=enterprise-consultation", label: "Talk to Obserra" }],
+      });
+    } finally {
+      window.clearTimeout(timeout);
+      setPending(false);
+    }
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const question = input.trim();
-    if (!question) return;
-    appendExchange(question);
-    setInput("");
+    void ask(input);
   }
 
   function quickAsk(question: string) {
-    appendExchange(question);
     setOpen(true);
+    void ask(question);
   }
 
   function closeGuide() {
@@ -240,9 +226,9 @@ export default function ObserraGuide() {
   }
 
   return (
-    <aside className={styles.guide} aria-label="Obserrian Executive Intelligence Advisor">
+    <aside className={styles.guide} aria-label="Obserrian Executive Intelligence Advisor" data-obserra-localized>
       {open && (
-        <section className={styles.panel}>
+        <section className={styles.panel} aria-busy={pending}>
           <header className={styles.header}>
             <div className={styles.brand}>
               <Image
@@ -273,25 +259,38 @@ export default function ObserraGuide() {
                 )}
               </div>
             ))}
+            {pending ? (
+              <div className={`${styles.message} ${styles.thinking}`} role="status">
+                <span className={styles.thinkingDot} aria-hidden="true" />
+                <span className={styles.thinkingDot} aria-hidden="true" />
+                <span className={styles.thinkingDot} aria-hidden="true" />
+                <span className={styles.srOnly}>Obserrian is analyzing your question.</span>
+              </div>
+            ) : null}
           </div>
 
           <div className={styles.quick} aria-label="Suggested Obserrian actions">
             {context.prompts.map((item) => (
-              <button type="button" key={item} onClick={() => quickAsk(item)}>{item}</button>
+              <button type="button" key={item} disabled={pending} onClick={() => quickAsk(item)}>{item}</button>
             ))}
           </div>
 
           <form className={styles.form} onSubmit={submit}>
-            <label className={styles.srOnly} htmlFor="obserrian-question">Ask Obserrian</label>
+            <label className={styles.srOnly} htmlFor="obserrian-question">{t("advisor.ask")}</label>
             <input
               id="obserrian-question"
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder={`Ask about ${LEGAL_ENTITY_NAME}`}
+              placeholder="Ask about a decision, risk, product, service, or course"
               autoComplete="off"
+              maxLength={1_000}
+              disabled={pending}
             />
-            <button type="submit" aria-label="Send question to Obserrian">Send</button>
+            <button type="submit" aria-label={t("advisor.send")} disabled={pending || !input.trim()}>
+              {pending ? t("advisor.working") : t("advisor.send")}
+            </button>
           </form>
+          <p className={styles.grounding}>Grounded in current public Obserra product, service, Academy, and governance information.</p>
         </section>
       )}
 
@@ -303,7 +302,7 @@ export default function ObserraGuide() {
         aria-label={open ? "Minimize Obserrian" : "Open Obserrian Executive Intelligence Advisor"}
       >
         <Image src="/brand/obserra-mark.svg" alt="" aria-hidden="true" width={46} height={46} className={styles.launcherMark} />
-        {!open && <span>Ask Obserrian</span>}
+        {!open && <span>{t("advisor.ask")}</span>}
       </button>
     </aside>
   );
