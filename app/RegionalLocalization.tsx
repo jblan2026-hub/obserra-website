@@ -132,30 +132,31 @@ export function RegionalLocalizationProvider({ children }: { children: ReactNode
 
   useEffect(() => {
     let cancelled = false;
-    const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-    if (isSupportedLocale(stored)) {
-      setLocaleState(stored);
-      setReady(true);
-      return;
-    }
 
-    const immediate = browserLocale();
-    if (immediate) setLocaleState(immediate);
+    void Promise.resolve().then(async () => {
+      if (cancelled) return;
 
-    void fetch("/api/locale", { cache: "no-store", credentials: "same-origin" })
-      .then(async (response) => {
+      const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+      if (isSupportedLocale(stored)) {
+        setLocaleState(stored);
+        setReady(true);
+        return;
+      }
+
+      const immediate = browserLocale();
+      if (immediate && !cancelled) setLocaleState(immediate);
+
+      try {
+        const response = await fetch("/api/locale", { cache: "no-store", credentials: "same-origin" });
         if (!response.ok) throw new Error("locale_resolution_failed");
-        return (await response.json()) as { locale?: unknown };
-      })
-      .then((payload) => {
+        const payload = (await response.json()) as { locale?: unknown };
         if (!cancelled && isSupportedLocale(payload.locale)) setLocaleState(payload.locale);
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled && immediate) setLocaleState(immediate);
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setReady(true);
-      });
+      }
+    });
 
     return () => {
       cancelled = true;
