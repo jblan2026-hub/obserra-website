@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T16:37:00Z
-reason: regenerate complete governed evidence after request-time Supabase authentication hotfix for protected Florida Class D learner pages
+refresh-request: 2026-08-17T17:10:00Z
+reason: regenerate complete governed evidence after canonical Vercel ownership correction, alias propagation removal, and production E2E routing authority update

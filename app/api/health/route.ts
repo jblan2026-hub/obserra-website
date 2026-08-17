@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
+import { CANONICAL_PUBLIC_VERCEL_PROJECT_ID } from "../../../lib/auth/runtime-config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const INTENDED_VERCEL_PROJECT_ID = "prj_lxTKKDa9sbhht7FaigiaF1PONMiC";
 
 const baseHeaders = {
   "cache-control": "no-store",
@@ -22,7 +21,7 @@ export async function GET() {
   const routingAuthority =
     observedProjectId === null
       ? "unavailable"
-      : observedProjectId === INTENDED_VERCEL_PROJECT_ID
+      : observedProjectId === CANONICAL_PUBLIC_VERCEL_PROJECT_ID
         ? "verified"
         : "mismatch";
   const headers: Record<string, string> = {
@@ -40,7 +39,7 @@ export async function GET() {
       status: "live",
       contract: "website-liveness-v1",
       routing: {
-        expectedProjectId: INTENDED_VERCEL_PROJECT_ID,
+        expectedProjectId: CANONICAL_PUBLIC_VERCEL_PROJECT_ID,
         observedProjectId,
         deploymentId,
         gitCommitSha,

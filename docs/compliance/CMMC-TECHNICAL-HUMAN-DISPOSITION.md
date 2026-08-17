@@ -3,11 +3,11 @@
 > GENERATED FROM THE CANONICAL MACHINE-READABLE SYSTEM EVIDENCE RECORD. DO NOT EDIT MANUALLY.
 
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-- **Record:** `obserra-cmmc-working-40efbdc088b8a19c0efafe4e:technical-human-disposition`
+- **Record:** `obserra-cmmc-working-99c9c885610d48f0985e2660:technical-human-disposition`
 - **State:** `working_disposition_record`
 - **Generated:** `2026-08-14T18:49:07Z`
-- **Source bundle:** `obserra-cmmc-working-40efbdc088b8a19c0efafe4e`
-- **Source bundle SHA-256:** `289243e7e93f9e4f3379e57d73e4f975c5464c122646ca97b909371c83e9229b`
+- **Source bundle:** `obserra-cmmc-working-99c9c885610d48f0985e2660`
+- **Source bundle SHA-256:** `3a1eb3bd64a996f2df869da981e0d76b7f6ad317bf3004fb71381382971b5487`
 - **Revision binding:** `working_tree_digest`
 
 ## Independent pass criteria

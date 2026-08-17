@@ -15,6 +15,7 @@ function forbidText(path, source, text, label = text) {
 
 const proxyPath = "proxy.ts";
 const nextConfigPath = "next.config.ts";
+const authRuntimePath = "lib/auth/runtime-config.ts";
 const websiteHealthPath = "app/api/health/route.ts";
 const productionWorkflowPath = ".github/workflows/production-e2e-operational-gate.yml";
 const contractsPath = "lib/academy-control-contracts.ts";
@@ -44,6 +45,7 @@ const tsconfigPath = "tsconfig.json";
 
 const proxy = read(proxyPath);
 const nextConfig = read(nextConfigPath);
+const authRuntime = read(authRuntimePath);
 const websiteHealth = read(websiteHealthPath);
 const productionWorkflow = read(productionWorkflowPath);
 const contracts = read(contractsPath);
@@ -90,8 +92,11 @@ forbidText(proxyPath, proxy, "export default clerkMiddleware(", "unconditional C
 
 // Canonical liveness must identify the nonsecret Vercel project, deployment, and
 // release SHA so routing ownership can be verified from a live response rather
-// than inferred from identical source deployed to multiple projects.
-requireText(websiteHealthPath, websiteHealth, 'const INTENDED_VERCEL_PROJECT_ID = "prj_lxTKKDa9sbhht7FaigiaF1PONMiC"', "intended Vercel project authority");
+// than inferred from identical source deployed to multiple projects. Project
+// ownership is single-sourced with the canonical production identity runtime.
+requireText(authRuntimePath, authRuntime, 'export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme"', "canonical Vercel project authority");
+requireText(websiteHealthPath, websiteHealth, 'import { CANONICAL_PUBLIC_VERCEL_PROJECT_ID } from "../../../lib/auth/runtime-config";', "single-source Vercel project authority import");
+requireText(websiteHealthPath, websiteHealth, "observedProjectId === CANONICAL_PUBLIC_VERCEL_PROJECT_ID", "canonical Vercel routing comparison");
 requireText(websiteHealthPath, websiteHealth, 'systemValue("VERCEL_PROJECT_ID")', "observed Vercel project identity");
 requireText(websiteHealthPath, websiteHealth, 'systemValue("VERCEL_DEPLOYMENT_ID")', "observed Vercel deployment identity");
 requireText(websiteHealthPath, websiteHealth, 'systemValue("VERCEL_GIT_COMMIT_SHA")', "observed release commit identity");

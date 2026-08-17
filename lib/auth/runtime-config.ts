@@ -20,12 +20,24 @@ export type SupabaseAuthRuntimeStatus = {
 
 type RuntimeEnvironment = Readonly<Record<string, string | undefined>>;
 
+export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";
+
+const CANONICAL_IDENTITY_PROJECT_REF = "ftkjhmtfyfkartfsnkjb";
+const CANONICAL_IDENTITY_URL = `https://${CANONICAL_IDENTITY_PROJECT_REF}.supabase.co`;
+const CANONICAL_IDENTITY_PUBLISHABLE_KEY = "sb_publishable_mRE63bML7dsVY_YqaervqA_TUEWsxVB";
 const PROJECT_REF_PATTERN = /^[a-z0-9]{20}$/;
 const PUBLISHABLE_KEY_PATTERN = /^sb_publishable_[A-Za-z0-9_-]{20,}$/;
 
 function normalized(value: string | undefined) {
   const trimmed = value?.trim();
   return trimmed || undefined;
+}
+
+function canonicalProductionBootstrap(environment: RuntimeEnvironment) {
+  return (
+    normalized(environment.VERCEL_ENV)?.toLowerCase() === "production" &&
+    normalized(environment.VERCEL_PROJECT_ID) === CANONICAL_PUBLIC_VERCEL_PROJECT_ID
+  );
 }
 
 function exactSupabaseOrigin(value: string | undefined) {
@@ -50,10 +62,22 @@ export function prepareSupabaseAuthRuntime(
   environment: RuntimeEnvironment = process.env,
 ): SupabaseAuthRuntimeStatus {
   const runtimeFlag = environment.OBSERRA_SUPABASE_AUTH_RUNTIME_ENABLED;
-  const rawUrl = environment.NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_URL;
-  const rawPublishableKey = environment.NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_PUBLISHABLE_KEY;
-  const rawProjectRef = environment.OBSERRA_AUTH_SUPABASE_PROJECT_REF;
-  const runtimeEnabled = normalized(runtimeFlag)?.toLowerCase() === "true";
+  const canonicalBootstrap = canonicalProductionBootstrap(environment);
+  const explicitRuntimeFlag = normalized(runtimeFlag);
+  const runtimeEnabled = explicitRuntimeFlag === undefined
+    ? canonicalBootstrap
+    : explicitRuntimeFlag.toLowerCase() === "true";
+
+  const rawUrl =
+    environment.NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_URL ??
+    (canonicalBootstrap ? CANONICAL_IDENTITY_URL : undefined);
+  const rawPublishableKey =
+    environment.NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_PUBLISHABLE_KEY ??
+    (canonicalBootstrap ? CANONICAL_IDENTITY_PUBLISHABLE_KEY : undefined);
+  const rawProjectRef =
+    environment.OBSERRA_AUTH_SUPABASE_PROJECT_REF ??
+    (canonicalBootstrap ? CANONICAL_IDENTITY_PROJECT_REF : undefined);
+
   const configuredUrl = normalized(rawUrl);
   const publishableKey = normalized(rawPublishableKey);
   const projectRef = normalized(rawProjectRef)?.toLowerCase();
@@ -78,10 +102,13 @@ export function prepareSupabaseAuthRuntime(
   }
 
   const normalizationApplied = Boolean(
-    (rawUrl && rawUrl !== configuredUrl) ||
-      (rawPublishableKey && rawPublishableKey !== publishableKey) ||
-      (rawProjectRef && rawProjectRef !== projectRef) ||
-      (runtimeFlag && runtimeFlag !== normalized(runtimeFlag)),
+    (environment.NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_URL &&
+      environment.NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_URL !== configuredUrl) ||
+      (environment.NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_PUBLISHABLE_KEY &&
+        environment.NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_PUBLISHABLE_KEY !== publishableKey) ||
+      (environment.OBSERRA_AUTH_SUPABASE_PROJECT_REF &&
+        environment.OBSERRA_AUTH_SUPABASE_PROJECT_REF !== projectRef) ||
+      (runtimeFlag && runtimeFlag !== explicitRuntimeFlag),
   );
   const ready = runtimeEnabled && reasonCodes.length === 0;
 
