@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Clock3, GraduationCap, LockKeyhole, MessageSquareText, ShieldCheck, Sparkles, UsersRound } from "lucide-react";
-import {
-  FLORIDA_CLASS_D_COURSE,
-  floridaClassDDays,
-  floridaClassDLmsAutomation,
-  moduleTitle,
-} from "../../lib/florida-class-d";
+import { FLORIDA_CLASS_D_COURSE, floridaClassDDays, floridaClassDLmsAutomation, moduleTitle } from "../../lib/florida-class-d";
 import { floridaClassDPublicLearnerControlsEnabled } from "../../lib/florida-class-d-production-activation";
 import GovernedFloridaClassDLink from "./GovernedFloridaClassDLink";
 import "./florida-security-training.css";
@@ -20,7 +15,6 @@ export const metadata: Metadata = {
 
 export default function FloridaSecurityTrainingPage() {
   const publicLearnerControlsEnabled = floridaClassDPublicLearnerControlsEnabled();
-
   return (
     <main className="fl-classd">
       <section className="fl-classd__hero">
@@ -31,7 +25,8 @@ export default function FloridaSecurityTrainingPage() {
         <p className="fl-classd__lead">A controlled Preview UAT environment from <strong>{FLORIDA_CLASS_D_COURSE.provider}</strong>, engineered to test live instruction, secure enrollment controls, verified attendance, student interaction, learning checks, examination controls, training records, and post-course administration without awarding course credit.</p>
         <div className="fl-classd__notice"><LockKeyhole size={20} /><div><strong>Coming Soon.</strong><span>Enrollment, payment, and student course access are not open. FDACS provider and course authorization have not been granted. Production instruction, course credit, completion, certificates, and LIAS reporting are disabled. Preview UAT cannot create a student completion or licensing record.</span></div></div>
         <div className="fl-classd__actions">
-          <Link href="/contact?interest=florida-class-d-training">Request a program launch notice — not enrollment or payment</Link>
+          <Link href="/florida-security-training/preflight">Check student ID requirements before sign-in</Link>
+          <Link className="secondary" href="/contact?interest=florida-class-d-training">Request a program launch notice</Link>
           <GovernedFloridaClassDLink enabled={publicLearnerControlsEnabled} href="/florida-security-training/enroll">Enrollment and payment</GovernedFloridaClassDLink>
           <GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access">Student course access</GovernedFloridaClassDLink>
         </div>
@@ -63,16 +58,16 @@ export default function FloridaSecurityTrainingPage() {
       <section className="fl-classd__section">
         <div className="fl-classd__section-heading">
           <span>PROTECTED STUDENT JOURNEY</span>
-          <h2>Photo-ID controls before secure live video</h2>
-          <p>When authorized testing or regulated enrollment is available, the protected LMS guides the student through each controlled step. Identity images remain with the hosted verification provider and are not copied into the LMS.</p>
+          <h2>Identity requirements are checked before student sign-in</h2>
+          <p>The student starts with a public no-PII readiness gate, then enters the protected account, enrollment, hosted identity, instructor-attestation, and one-device course-access sequence. Identity images remain with the hosted verification provider and are not copied into the LMS.</p>
         </div>
         <div className="fl-classd__automation-grid" aria-label="Protected Class D student access sequence">
-          <div><b>01</b><span>Sign in to the protected student account and select the assigned release-bound cohort.</span></div>
-          <div><b>02</b><span>Complete government photo-ID and matching-selfie verification on Stripe&apos;s hosted service.</span></div>
-          <div><b>03</b><span>Meet the assigned licensed Class DI instructor for the required personal identity attestation.</span></div>
-          <div><b>04</b><span>Open the assigned lesson from controlled course access after the instructor starts the secure video room.</span></div>
+          <div><b>01</b><span>Before login, confirm government photo-ID readiness, secure browser/camera capability, one-device use, hosted ID/selfie verification, and live instructor-attestation requirements.</span></div>
+          <div><b>02</b><span>Create or sign in to the protected student account and complete the release-bound enrollment record.</span></div>
+          <div><b>03</b><span>Complete hosted government photo-ID and matching-selfie verification, then meet the assigned licensed Class DI instructor for independent identity attestation.</span></div>
+          <div><b>04</b><span>Open only the assigned secure live lesson after enrollment, identity, instructor, schedule, and single-device controls all pass.</span></div>
         </div>
-        <div className="fl-classd__actions"><GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access">Student course access</GovernedFloridaClassDLink></div>
+        <div className="fl-classd__actions"><Link href="/florida-security-training/preflight">Run pre-login ID readiness check</Link><GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access">Student course access</GovernedFloridaClassDLink></div>
       </section>
 
       <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>Preview UAT is non-credit. Completing any test activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. FDACS provider and course authorization have not been granted. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied.</p></div></section>
