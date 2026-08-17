@@ -110,7 +110,7 @@ export default function HomePage() {
             <span>BUY AND ENGAGE DIRECTLY</span>
             <h2 id="direct-sales-heading">Start with the capability you need now.</h2>
             <p>
-              Purchase applications from {LEGAL_ENTITY_NAME} and approved Obserra Academy courses directly, or engage executive services for scoped enterprise work.
+              Applications and Academy are direct website destinations. Purchase applications from {LEGAL_ENTITY_NAME} and approved Obserra Academy courses directly, or engage executive services for scoped enterprise work.
               Each destination keeps its own commercial, access, approval, and release controls.
             </p>
             <div className="saas-actions">
