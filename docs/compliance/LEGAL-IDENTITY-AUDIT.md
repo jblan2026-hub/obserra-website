@@ -4,7 +4,7 @@
 
 - **Legal entity:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 - **Canonical public origin:** https://www.obserrallc.com
-- **Source-tree SHA-256:** `cfd205efe92db8f541473caaeddad7a06ea00e4474883a5f3281524ecb5e55fd`
+- **Source-tree SHA-256:** `dd49114e57cb08f61593cb7309c1d8b2192a20d1d3cf6ffdf3621e9ea099b1df`
 - **Files inspected:** 362
 - **Authoritative technical result:** `not_tested` — unpublished candidate; not green
 - **Candidate validation:** `satisfied_locally_non_authoritative` (0 findings)
