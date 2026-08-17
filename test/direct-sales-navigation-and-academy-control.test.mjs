@@ -24,12 +24,15 @@ test("Applications and Academy are prominent direct website destinations", () =>
 test("enterprise primary navigation retains validated strategic destinations", () => {
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
   const header = read("app/HomeHeader.tsx");
+  const primaryNavigationSource = header.match(/const navigation = \[([\s\S]*?)\] satisfies Array/)?.[1] ?? "";
 
   for (const destination of ["/eios", "/services", "/apps", "/academy", "/industries", "/trust", "/about", "/speaking"]) {
     assert.match(chrome, new RegExp(`"${destination.replaceAll("/", "\\/")}"`));
-    assert.match(header, new RegExp(`href: "${destination.replaceAll("/", "\\/")}"`));
+    assert.match(primaryNavigationSource, new RegExp(`href: "${destination.replaceAll("/", "\\/")}"`));
   }
-  assert.doesNotMatch(header, /href: "\/florida-security-training"/);
+  assert.doesNotMatch(primaryNavigationSource, /href: "\/florida-security-training"/);
+  assert.match(header, /label: "Florida Training", href: "\/florida-security-training"/);
+  assert.match(header, /className="obs-site-header__regulated-link"/);
   assert.match(chrome, /<Link href="\/florida-security-training">\{t\("nav\.florida"\)\}<\/Link>/);
 });
 
