@@ -26,7 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     canonical("/catalog"),
     canonical("/academy"),
     canonical("/academy/enterprise"),
-    canonical("/florida-security-training"),
+    { url: `${siteUrl}/florida-security-training` },
     canonical("/industries"),
     canonical("/resources"),
     canonical("/trust"),
