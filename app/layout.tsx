@@ -13,6 +13,7 @@ import "./credly-profile-link.css";
 import "./global-symbols.css";
 import "./auth.css";
 import "./premium-site.css";
+import "./premium-routes.css";
 
 const SITE_URL = "https://www.obserrallc.com";
 const GLOBAL_DESCRIPTION =
