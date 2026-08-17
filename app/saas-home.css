@@ -68,12 +68,19 @@
   font-size: .88rem;
 }
 
-.saas-hero__visual {
+.saas-hero__visual-shell {
   position: relative;
   min-height: 720px;
   overflow: hidden;
   border-left: 1px solid var(--saas-border);
   background: #03080d;
+}
+
+.saas-hero__visual {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
 }
 
 .saas-hero__visual img { object-fit: cover; object-position: center; opacity: .93; }
@@ -83,7 +90,120 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  background: linear-gradient(180deg, rgba(3,8,13,.03) 45%, rgba(3,8,13,.82) 100%);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+}
+
+.saas-hero__disclosure {
+  position: absolute;
+  z-index: 2;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(3,8,13,.84);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.saas-hero__disclosure strong {
+  color: var(--saas-gold-soft);
+  font-size: .78rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.saas-hero__disclosure span {
+  color: #c4cfd5;
+  font-size: .8rem;
+  line-height: 1.45;
+}
+
+.saas-direct-sales {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(280px, .7fr) minmax(0, 1.3fr);
+  gap: clamp(36px, 6vw, 88px);
+  padding: clamp(64px, 7vw, 96px) clamp(24px, 5vw, 72px);
+  border-bottom: 1px solid var(--saas-border);
+}
+
+.saas-direct-sales__intro > span {
+  color: var(--saas-gold);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.saas-direct-sales__intro h2 {
+  margin: 14px 0 0;
+  font-size: clamp(2rem, 3.4vw, 3.55rem);
+  line-height: 1.02;
+  letter-spacing: -.04em;
+}
+
+.saas-direct-sales__intro p {
+  margin: 20px 0 0;
+  color: var(--saas-muted);
+  line-height: 1.7;
+}
+
+.saas-direct-sales__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--saas-border);
+  border-left: 1px solid var(--saas-border);
+}
+
+.mission-direct-sales__card {
+  min-height: 290px;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(26px, 3vw, 38px);
+  border-right: 1px solid var(--saas-border);
+  border-bottom: 1px solid var(--saas-border);
+  text-decoration: none;
+  background: linear-gradient(145deg, rgba(255,255,255,.02), transparent 52%);
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.mission-direct-sales__card:hover,
+.mission-direct-sales__card:focus-visible {
+  background: linear-gradient(145deg, rgba(224,181,92,.08), rgba(255,255,255,.025));
+  border-color: rgba(224,181,92,.36);
+  transform: translateY(-2px);
+}
+
+.mission-direct-sales__card > span {
+  color: var(--saas-gold);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.mission-direct-sales__card h3 {
+  margin: 28px 0 0;
+  font-size: clamp(1.5rem, 2.25vw, 2.3rem);
+  line-height: 1.05;
+  letter-spacing: -.03em;
+}
+
+.mission-direct-sales__card p {
+  margin: 16px 0 26px;
+  color: var(--saas-muted);
+  line-height: 1.6;
+}
+
+.mission-direct-sales__card > strong {
+  margin-top: auto;
+  color: var(--saas-gold-soft);
+  font-size: .92rem;
 }
 
 .saas-product-nav {
@@ -130,9 +250,7 @@
 
 .saas-section__intro p { margin: 0; color: var(--saas-muted); line-height: 1.7; font-size: 1.02rem; }
 
-.saas-capability-list {
-  border-top: 1px solid var(--saas-border);
-}
+.saas-capability-list { border-top: 1px solid var(--saas-border); }
 
 .saas-capability-row {
   display: grid;
@@ -246,7 +364,8 @@
 
 @media (max-width: 1040px) {
   .saas-hero { grid-template-columns: 1fr; min-height: auto; }
-  .saas-hero__visual { min-height: 520px; border-left: 0; border-top: 1px solid var(--saas-border); }
+  .saas-hero__visual-shell { min-height: 520px; border-left: 0; border-top: 1px solid var(--saas-border); }
+  .saas-direct-sales { grid-template-columns: 1fr; }
   .saas-product-nav { grid-template-columns: repeat(2, 1fr); }
   .saas-product-nav a { border-bottom: 1px solid var(--saas-border); }
   .saas-section__intro,
@@ -262,6 +381,9 @@
   .saas-hero__copy h1 { font-size: clamp(2.7rem, 14vw, 4.6rem); }
   .saas-hero__proof { grid-template-columns: 1fr 1fr; }
   .saas-hero__proof span { border-bottom: 1px solid var(--saas-border); }
+  .saas-hero__disclosure { left: 14px; right: 14px; bottom: 14px; grid-template-columns: 1fr; gap: 4px; }
+  .saas-direct-sales__grid { grid-template-columns: 1fr; }
+  .mission-direct-sales__card { min-height: 240px; }
   .saas-product-nav { grid-template-columns: 1fr; }
   .saas-product-nav a { min-height: 96px; border-right: 0; }
   .saas-capability-row { grid-template-columns: 48px 1fr; gap: 12px 18px; padding: 22px 0; }
@@ -273,5 +395,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .saas-product-nav a { transition: none; }
+  .saas-product-nav a,
+  .mission-direct-sales__card { transition: none; }
+  .mission-direct-sales__card:hover,
+  .mission-direct-sales__card:focus-visible { transform: none; }
 }
