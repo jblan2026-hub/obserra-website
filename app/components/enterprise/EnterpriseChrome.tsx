@@ -117,7 +117,7 @@ export function EnterpriseFooter() {
         <Image src="/brand/obserra-logo.png" width={286} height={55} alt={LEGAL_ENTITY_NAME} />
         <strong className="ent-footer__legal-name">{LEGAL_ENTITY_NAME}</strong>
         <p>
-          Obserra helps executives connect risk, intelligence, governance, secure technology, and execution so the enterprise can move with greater clarity and accountability.
+          {LEGAL_ENTITY_NAME} helps executives connect risk, intelligence, governance, secure technology, and execution so the enterprise can move with greater clarity and accountability.
         </p>
         <Link href="/contact?interest=enterprise-consultation">Start an executive conversation <span aria-hidden="true">→</span></Link>
       </div>
