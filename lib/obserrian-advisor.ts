@@ -107,7 +107,7 @@ function routeFacts(pathname: string) {
   }
   if (pathname.startsWith("/services") || pathname.startsWith("/protection-intelligence")) {
     return [
-      "Obserra services span executive cybersecurity advisory, AI governance, cyber risk, resilience, secure technology, protective intelligence, executive exposure, and related enterprise work.",
+      `${LEGAL_ENTITY_NAME} services span executive cybersecurity advisory, AI governance, cyber risk, resilience, secure technology, protective intelligence, executive exposure, and related enterprise work.`,
       "Do not promise a scope, outcome, timeline, or price that is not supplied in the site context. Direct qualified visitors to a confidential consultation.",
     ];
   }
@@ -119,7 +119,7 @@ function routeFacts(pathname: string) {
   }
   if (pathname.startsWith("/about") || pathname.startsWith("/speaking")) {
     return [
-      "Obserra is veteran owned and executive led by Dr. Jody Blanchard.",
+      `${LEGAL_ENTITY_NAME} is veteran owned and executive led by Dr. Jody Blanchard.`,
       "The site presents Fortune 500 CISO leadership, 21 years of U.S. Army service, doctoral research, cybersecurity, governance, intelligence, and speaking experience.",
     ];
   }
@@ -129,7 +129,7 @@ function routeFacts(pathname: string) {
     ];
   }
   return [
-    "Obserra helps executive teams connect enterprise intelligence, cybersecurity, AI governance, protective intelligence, secure technology, professional learning, and accountable execution.",
+    `${LEGAL_ENTITY_NAME} helps executive teams connect enterprise intelligence, cybersecurity, AI governance, protective intelligence, secure technology, professional learning, and accountable execution.`,
     "The website presents EIOS, enterprise services, applications, Academy learning, trust and procurement assurance, protection and intelligence, resources, leadership, and speaking capabilities.",
   ];
 }
@@ -245,7 +245,7 @@ export function fallbackAdvisorAnswer(question: string, pathname: string) {
   return `${LEGAL_ENTITY_NAME} can help with enterprise intelligence, cybersecurity, AI governance, protective intelligence, secure technology, applications, and professional learning. Tell me the decision, risk, capability gap, or outcome you are trying to address and I will route you to the most relevant Obserra path.`;
 }
 
-export const OBSERRIAN_SYSTEM_PROMPT = `You are Obserrian, the Executive Intelligence Advisor for the public Obserra website owned by ${LEGAL_ENTITY_NAME}.
+export const OBSERRIAN_SYSTEM_PROMPT = `You are Obserrian, the Executive Intelligence Advisor for the public website of ${LEGAL_ENTITY_NAME}, operating under the Obserra brand.
 
 Your job is to help a visitor make a useful next decision. Answer the question first, then explain the most relevant Obserra capability or next step.
 
