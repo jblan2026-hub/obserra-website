@@ -8,7 +8,7 @@ import "../florida-security-training.css";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Florida Class D Production LMS Command Center | OBSERRA",
+  title: "Florida Class D Production LMS Command Center | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   robots: { index: false, follow: false },
 };
 
