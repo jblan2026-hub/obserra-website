@@ -42,7 +42,7 @@ export default async function FloridaClassDProductionOwnerValidationPage() {
 
       <section className="fl-classd__metrics" aria-label="Production control status">
         <article><BookOpenCheck /><strong>{configuration.authorized ? "LIVE" : "BLOCKED"}</strong><span>Production owner validation</span></article>
-        <article><Database /><strong>{state.available ? "LIVE" : "BLOCKED"}</strong><span>FDACS records database</span></article>
+        <article><Database /><strong>{state.status === "ready" ? "LIVE" : "BLOCKED"}</strong><span>FDACS records database</span></article>
         <article><CreditCard /><strong>REAL</strong><span>Provider/payment integrations required</span></article>
         <article><ShieldCheck /><strong>NON-CREDIT</strong><span>Until FDACS activation</span></article>
       </section>
