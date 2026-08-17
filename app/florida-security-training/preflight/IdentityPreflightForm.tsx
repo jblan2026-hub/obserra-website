@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Camera, CheckCircle2, IdCard, LockKeyhole, MonitorSmartphone, ShieldCheck } from "lucide-react";
 
 const items = [
@@ -14,24 +14,26 @@ const items = [
 
 type Key = typeof items[number][0];
 
+const subscribeToStaticBrowserCapability = () => () => {};
+
 export default function IdentityPreflightForm() {
   const [checks, setChecks] = useState<Record<Key, boolean>>({ photoId: false, legalName: false, hosted: false, instructor: false, singleDevice: false });
-  const [secure, setSecure] = useState<boolean | null>(null);
-  const [media, setMedia] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    setSecure(window.isSecureContext);
-    setMedia(Boolean(navigator.mediaDevices?.getUserMedia));
-  }, []);
+  const capabilitiesKnown = useSyncExternalStore(subscribeToStaticBrowserCapability, () => true, () => false);
+  const secure = useSyncExternalStore(subscribeToStaticBrowserCapability, () => window.isSecureContext, () => false);
+  const media = useSyncExternalStore(
+    subscribeToStaticBrowserCapability,
+    () => Boolean(navigator.mediaDevices?.getUserMedia),
+    () => false,
+  );
 
   const acknowledged = Object.values(checks).every(Boolean);
-  const ready = acknowledged && secure === true && media === true;
+  const ready = capabilitiesKnown && acknowledged && secure && media;
 
   return (
     <section className="fl-classd__section fl-classd__identity-shell">
       <div className="fl-classd__automation-grid">
-        <div><b>{secure ? <CheckCircle2 size={16} /> : <LockKeyhole size={16} />}</b><span><strong>Secure browser</strong>{secure === null ? "Checking…" : secure ? "HTTPS secure context detected." : "HTTPS is required."}</span></div>
-        <div><b>{media ? <CheckCircle2 size={16} /> : <Camera size={16} />}</b><span><strong>Camera-capable browser</strong>{media === null ? "Checking…" : media ? "Camera and microphone APIs are available." : "Camera/microphone browser support is required."}</span></div>
+        <div><b>{secure ? <CheckCircle2 size={16} /> : <LockKeyhole size={16} />}</b><span><strong>Secure browser</strong>{!capabilitiesKnown ? "Checking…" : secure ? "HTTPS secure context detected." : "HTTPS is required."}</span></div>
+        <div><b>{media ? <CheckCircle2 size={16} /> : <Camera size={16} />}</b><span><strong>Camera-capable browser</strong>{!capabilitiesKnown ? "Checking…" : media ? "Camera and microphone APIs are available." : "Camera/microphone browser support is required."}</span></div>
       </div>
 
       <div className="fl-classd__identity-preflight-list">
@@ -45,7 +47,7 @@ export default function IdentityPreflightForm() {
       </div>
 
       <div className="fl-classd__notice"><ShieldCheck size={20} /><div><strong>This is a readiness gate, not identity verification.</strong><span>No PII, ID image, biometric template, enrollment, payment, attendance, instructional time, exam result, completion, certificate, or LIAS record is created here.</span></div></div>
-      {!ready && secure !== null && media !== null ? <div className="fl-classd__notice is-locked"><LockKeyhole size={20} /><div><strong>Student sign-in remains locked from this flow.</strong><span>Complete every requirement on a secure camera-capable device.</span></div></div> : null}
+      {!ready && capabilitiesKnown ? <div className="fl-classd__notice is-locked"><LockKeyhole size={20} /><div><strong>Student sign-in remains locked from this flow.</strong><span>Complete every requirement on a secure camera-capable device.</span></div></div> : null}
       <div className="fl-classd__actions">
         {ready ? <Link href={`/sign-in?redirect_url=${encodeURIComponent("/florida-security-training/enroll")}`}>Continue to protected student account</Link> : <span aria-disabled="true">Complete all ID checks to continue</span>}
         <Link className="secondary" href="/florida-security-training">Return to course information</Link>
