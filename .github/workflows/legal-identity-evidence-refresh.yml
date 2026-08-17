@@ -61,12 +61,15 @@ jobs:
         run: npm run generate:cmmc-disposition
       - name: Regenerate CMMC continuous-audit handoff views
         run: npm run generate:cmmc-handoff
-      - name: Verify complete derived CMMC evidence before persistence
+      - name: Regenerate FDACS PII database audit record
+        run: npm run generate:fdacs-pii-audit
+      - name: Verify complete derived evidence before persistence
         shell: bash
         run: |
           node scripts/cmmc-system-evidence.mjs --check
           npm run verify:cmmc-disposition
           npm run verify:cmmc-handoff
+          npm run verify:fdacs-pii-audit
 
       - name: Upload regenerated evidence
         uses: actions/upload-artifact@v4
@@ -86,8 +89,11 @@ jobs:
             docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json
             docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md
             docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
 
-      - name: Commit complete derived CMMC evidence when changed
+      - name: Commit complete derived evidence when changed
         shell: bash
         run: |
           paths=(
@@ -100,15 +106,18 @@ jobs:
             docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json
             docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md
             docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
           )
           if git diff --quiet -- "${paths[@]}"; then
-            echo "Derived CMMC evidence is already current."
+            echo "Derived evidence is already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- "${paths[@]}"
-          git commit -m "Refresh complete derived CMMC evidence"
+          git commit -m "Refresh complete derived governed evidence"
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Verify final governed evidence state
