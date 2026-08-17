@@ -29,10 +29,37 @@ const SKIPPED_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "CODE", "PRE", "INP
 const DO_NOT_TRANSLATE_SELECTOR = "[data-obserra-no-translate], [data-obserra-localized], [translate='no'], [contenteditable='true']";
 const MAX_BATCH_STRINGS = 70;
 const MAX_BATCH_CHARS = 17_500;
+const LOCALIZATION_UI_BLOCKED_PREFIXES = [
+  "/admin",
+  "/api",
+  "/auth",
+  "/checkout",
+  "/command-center",
+  "/owner-access",
+  "/portal",
+  "/sign-in",
+  "/sign-up",
+  "/academy/admin",
+  "/academy/certificate",
+  "/academy/learn",
+  "/academy/success",
+  "/apps/subscribe",
+  "/florida-security-training/access",
+  "/florida-security-training/admin",
+  "/florida-security-training/completion",
+  "/florida-security-training/enroll",
+  "/florida-security-training/exam",
+  "/florida-security-training/identity",
+  "/florida-security-training/live",
+  "/florida-security-training/makeup",
+  "/florida-security-training/observer",
+  "/florida-security-training/owner-preview",
+] as const;
 
 type LocaleContextValue = {
   locale: ObserraLocale;
   ready: boolean;
+  localizationUiAllowed: boolean;
   translationAllowed: boolean;
   setLocale: (locale: ObserraLocale) => void;
   t: (key: LocalizedMessageKey) => string;
@@ -47,6 +74,11 @@ function browserLocale() {
     if (matched) return matched;
   }
   return null;
+}
+
+function localizationUiAllowed(pathname: string) {
+  const clean = pathname.split("?")[0]?.split("#")[0] || "/";
+  return !LOCALIZATION_UI_BLOCKED_PREFIXES.some((prefix) => clean === prefix || clean.startsWith(`${prefix}/`));
 }
 
 function publicTextNode(node: Text, root: HTMLElement) {
@@ -92,9 +124,11 @@ export function useObserraLocale() {
 
 export function RegionalLocalizationProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const [locale, setLocaleState] = useState<ObserraLocale>(DEFAULT_LOCALE);
+  const [selectedLocale, setLocaleState] = useState<ObserraLocale>(DEFAULT_LOCALE);
   const [ready, setReady] = useState(false);
-  const translationAllowed = isFullPageTranslationAllowed(pathname);
+  const allowLocalizationUi = localizationUiAllowed(pathname);
+  const locale = allowLocalizationUi ? selectedLocale : DEFAULT_LOCALE;
+  const translationAllowed = allowLocalizationUi && isFullPageTranslationAllowed(pathname);
 
   useEffect(() => {
     let cancelled = false;
@@ -148,8 +182,8 @@ export function RegionalLocalizationProvider({ children }: { children: ReactNode
 
   const t = useCallback((key: LocalizedMessageKey) => message(locale, key), [locale]);
   const contextValue = useMemo(
-    () => ({ locale, ready, translationAllowed, setLocale, t }),
-    [locale, ready, setLocale, t, translationAllowed],
+    () => ({ locale, ready, localizationUiAllowed: allowLocalizationUi, translationAllowed, setLocale, t }),
+    [allowLocalizationUi, locale, ready, setLocale, t, translationAllowed],
   );
 
   return (
@@ -161,7 +195,9 @@ export function RegionalLocalizationProvider({ children }: { children: ReactNode
 }
 
 export function LanguageSelector({ className = "" }: { className?: string }) {
-  const { locale, ready, setLocale, t, translationAllowed } = useObserraLocale();
+  const { locale, ready, localizationUiAllowed: allowLocalizationUi, setLocale, t, translationAllowed } = useObserraLocale();
+  if (!allowLocalizationUi) return null;
+
   const status = !isEnglishLocale(locale)
     ? translationAllowed
       ? t("locale.translated")
@@ -192,8 +228,8 @@ export function LanguageSelector({ className = "" }: { className?: string }) {
 }
 
 export function RegionalTranslationNotice() {
-  const { locale, ready, translationAllowed, t } = useObserraLocale();
-  if (!ready || isEnglishLocale(locale)) return null;
+  const { locale, ready, localizationUiAllowed: allowLocalizationUi, translationAllowed, t } = useObserraLocale();
+  if (!allowLocalizationUi || !ready || isEnglishLocale(locale)) return null;
   return (
     <div className="obs-translation-notice" data-obserra-localized role="status">
       <span>{translationAllowed ? t("locale.translated") : t("locale.restricted")}</span>
