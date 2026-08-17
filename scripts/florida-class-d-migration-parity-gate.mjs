@@ -13,8 +13,8 @@ function requireText(source, value, message) {
 }
 
 const result = buildFloridaClassDMigrationManifest();
-const expectedCount = 40;
-const latestVersion = "20260815170000";
+const expectedCount = 41;
+const latestVersion = "20260817104500";
 
 if (result.manifest.migrationCount !== expectedCount) {
   throw new Error(`Gate 29 failed: expected ${expectedCount} regulated migrations, found ${result.manifest.migrationCount}.`);
@@ -39,7 +39,7 @@ if (expectedDigestMatch[1].toLowerCase() !== result.sha256) {
 
 for (const [value, message] of [
   ["EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION", "Gate 26 must define the exact latest regulated migration version"],
-  [latestVersion, "Gate 26 must bind to the Gate 28 applied migration version"],
+  [latestVersion, "Gate 26 must bind to the exact latest regulated migration version"],
   ["OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA", "Gate 26 must require production database promotion evidence bound to a Git SHA"],
   ["OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION", "Gate 26 must require the exact applied migration version"],
   ["OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256", "Gate 26 must require the exact migration manifest digest"],
@@ -51,7 +51,7 @@ for (const [value, message] of [
   ["databaseAppliedMigrationVersionRequired: true", "Gate 26 policy must require the applied migration version"],
 ]) requireText(activation, value, message);
 
-requireText(handoff, "exactly 40 regulated migrations", "Gate 29 handoff must preserve the controlled migration count");
+requireText(handoff, "exactly 41 regulated migrations", "Gate 29 handoff must preserve the controlled migration count");
 requireText(handoff, latestVersion, "Gate 29 handoff must preserve the latest regulated migration version");
 requireText(handoff, "deterministic SHA-256 promotion manifest", "Gate 29 handoff must document deterministic promotion evidence");
 requireText(handoff, "No production migration is executed by Gate 29 CI", "Gate 29 handoff must preserve the production fail-closed database boundary");
