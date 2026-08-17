@@ -17,6 +17,7 @@ const primaryNavigation = [
   ["Industries", "/industries"],
   ["Trust", "/trust"],
   ["About", "/about"],
+  ["Speaking", "/speaking"],
 ] as const;
 
 export function EnterpriseHeader({ section = "Enterprise" }: { section?: string }) {
@@ -101,7 +102,7 @@ export function EnterpriseProofBand({ children }: { children?: ReactNode }) {
       {children ?? (
         <>
           <div><span>01</span><strong>Executive-led</strong><small>Senior judgment for material enterprise decisions</small></div>
-          <div><span>02</span><strong>Evidence-driven</strong><small>Traceable analysis, controls, recommendations, and outcomes</small></div>
+          <div><span>02</span><strong>Evidence-backed</strong><small>Traceable analysis, controls, recommendations, and outcomes</small></div>
           <div><span>03</span><strong>Secure by design</strong><small>Identity, access, data, and release boundaries built into delivery</small></div>
           <div><span>04</span><strong>Built to execute</strong><small>Clear ownership, implementation, measurement, and verification</small></div>
         </>
@@ -125,8 +126,7 @@ export function EnterpriseFooter() {
         <strong>Obserra</strong>
         <Link href="/eios">EIOS platform</Link>
         <Link href="/services">Enterprise services</Link>
-        <Link href="/apps">Applications</Link>
-        <Link href="/academy">Academy</Link>
+        <Link href="/apps">Applications Marketplace</Link><Link href="/academy">Obserra Academy</Link>
         <Link href="/protection-intelligence">Protection and intelligence</Link>
       </nav>
       <nav aria-label="Company links">
