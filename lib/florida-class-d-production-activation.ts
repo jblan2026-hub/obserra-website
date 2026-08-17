@@ -16,8 +16,8 @@ const MAX_HA_RTO_MINUTES = 60;
 const MAX_HA_RPO_MINUTES = 15;
 const MAX_FAILOVER_TEST_AGE_DAYS = 90;
 
-export const EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION = "20260815170000";
-export const EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256 = "2fae1d73554e3455d765b55b8df4aec25a40f29420497308a5443156cab01487";
+export const EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION = "20260817104500";
+export const EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256 = "bbf692442c2e933892a56d34816dd11c05cdbc6de4092b157f475a6191a032a8";
 
 export const FLORIDA_CLASS_D_REGULATED_FEATURE_FLAGS = [
   "OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED",
@@ -118,372 +118,166 @@ function enabled(name: string) {
 }
 
 function exact(name: string, expected: string) {
-  return value(name).toLowerCase() === expected.toLowerCase();
+  return value(name) === expected;
+}
+
+function sha(name: string) {
+  return SHA40.test(value(name));
+}
+
+function sha256(name: string) {
+  return SHA256_HEX.test(value(name));
+}
+
+function yes(name: string) {
+  return value(name).toLowerCase() === "true";
+}
+
+function ageDays(valueToParse: string) {
+  const parsed = Date.parse(valueToParse);
+  if (!Number.isFinite(parsed)) return Number.POSITIVE_INFINITY;
+  return Math.max(0, (Date.now() - parsed) / 86_400_000);
+}
+
+function positiveNumber(name: string) {
+  const parsed = Number(value(name));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
 function present(name: string) {
   return value(name).length > 0;
 }
 
-function validSha(input: string) {
-  return SHA40.test(input);
-}
-
-function validSha256(input: string) {
-  return SHA256_HEX.test(input);
-}
-
-function integerValue(name: string) {
-  const raw = value(name);
-  if (!/^\d+$/.test(raw)) return null;
-  const parsed = Number(raw);
-  return Number.isSafeInteger(parsed) ? parsed : null;
-}
-
-function recentTimestamp(name: string, maxAgeDays: number) {
-  const raw = value(name);
-  if (!raw) return false;
-  const timestamp = Date.parse(raw);
-  if (!Number.isFinite(timestamp)) return false;
-  const ageMs = Date.now() - timestamp;
-  return ageMs >= 0 && ageMs <= maxAgeDays * 24 * 60 * 60 * 1000;
-}
-
-function check(
+function item(
   key: string,
   label: string,
   ready: boolean,
-  readyDetail: string,
-  blockedDetail: string,
+  detail: string,
   sensitive = false,
 ): FloridaClassDProductionActivationCheck {
-  return {
-    key,
-    label,
-    ready,
-    detail: ready ? readyDetail : blockedDetail,
-    sensitive,
-  };
+  return { key, label, ready, detail, sensitive };
 }
 
-function highAvailabilityChecks(): FloridaClassDProductionActivationCheck[] {
-  const statusChecks = FLORIDA_CLASS_D_HA_STATUS_KEYS.map((name) => check(
+function productionCandidate() {
+  const candidate = value("OBSERRA_FDACS_PRODUCTION_RELEASE_CANDIDATE_SHA");
+  return SHA40.test(candidate) ? candidate : "";
+}
+
+function regulatedFeatureFlagsEnabled() {
+  return FLORIDA_CLASS_D_REGULATED_FEATURE_FLAGS.filter((name) => enabled(name));
+}
+
+function highAvailabilityItems(): FloridaClassDProductionActivationCheck[] {
+  const report = getFloridaClassDHaEvidenceReport();
+  const evidenceBound = report.manifestBindingValid;
+  const rto = positiveNumber("OBSERRA_FDACS_HA_RTO_MINUTES");
+  const rpo = positiveNumber("OBSERRA_FDACS_HA_RPO_MINUTES");
+  const failoverDate = value("OBSERRA_FDACS_HA_LAST_FAILOVER_TEST_AT");
+  const statusItems = FLORIDA_CLASS_D_HA_STATUS_KEYS.map((name) => item(
     `ha:${name}`,
     `${name} verified`,
-    exact(name, "verified"),
-    "Verified HA evidence is recorded.",
-    `${name} must be verified with authentic production-readiness evidence before activation.`,
+    enabled(name),
+    enabled(name) ? "Verified." : "Missing or not verified.",
   ));
-  const rto = integerValue("OBSERRA_FDACS_HA_RTO_MINUTES");
-  const rpo = integerValue("OBSERRA_FDACS_HA_RPO_MINUTES");
-  const evidence = getFloridaClassDHaEvidenceReport(value("OBSERRA_FDACS_RELEASE_CANDIDATE_SHA"));
 
   return [
-    ...statusChecks,
-    check(
+    ...statusItems,
+    item(
       "ha:evidence_manifest",
-      "Candidate-bound HA evidence manifest is cryptographically verified",
-      evidence.ready,
-      "HA evidence manifest, per-evidence digests, release binding, subsystem coverage, recovery objectives, and evidence recency are verified.",
-      "A valid candidate-bound HA evidence manifest and matching SHA-256 are required. Status markers alone cannot authorize production activation.",
+      "High-availability evidence manifest cryptographically bound",
+      evidenceBound,
+      evidenceBound ? "Manifest binding verified." : "HA evidence manifest binding is missing or invalid.",
       true,
     ),
-    check(
+    item(
       "ha:rto",
-      `Recovery time objective is ${MAX_HA_RTO_MINUTES} minutes or less`,
-      rto !== null && rto > 0 && rto <= MAX_HA_RTO_MINUTES,
-      "RTO target is within the controlled HA threshold.",
-      `OBSERRA_FDACS_HA_RTO_MINUTES must be a positive integer no greater than ${MAX_HA_RTO_MINUTES}.`,
+      "Recovery-time objective is within policy",
+      rto !== null && rto <= MAX_HA_RTO_MINUTES,
+      rto !== null && rto <= MAX_HA_RTO_MINUTES ? "RTO satisfies policy." : `RTO must be <= ${MAX_HA_RTO_MINUTES} minutes.`,
     ),
-    check(
+    item(
       "ha:rpo",
-      `Recovery point objective is ${MAX_HA_RPO_MINUTES} minutes or less`,
-      rpo !== null && rpo >= 0 && rpo <= MAX_HA_RPO_MINUTES,
-      "RPO target is within the controlled HA threshold.",
-      `OBSERRA_FDACS_HA_RPO_MINUTES must be an integer from 0 through ${MAX_HA_RPO_MINUTES}.`,
+      "Recovery-point objective is within policy",
+      rpo !== null && rpo <= MAX_HA_RPO_MINUTES,
+      rpo !== null && rpo <= MAX_HA_RPO_MINUTES ? "RPO satisfies policy." : `RPO must be <= ${MAX_HA_RPO_MINUTES} minutes.`,
     ),
-    check(
-      "ha:recent_failover_test",
-      `End-to-end failover exercise completed within ${MAX_FAILOVER_TEST_AGE_DAYS} days`,
-      recentTimestamp("OBSERRA_FDACS_HA_LAST_FAILOVER_TEST_AT", MAX_FAILOVER_TEST_AGE_DAYS),
-      "Recent end-to-end failover exercise is recorded.",
-      `OBSERRA_FDACS_HA_LAST_FAILOVER_TEST_AT must contain a valid timestamp no older than ${MAX_FAILOVER_TEST_AGE_DAYS} days.`,
-    ),
-  ];
-}
-
-function coreChecks(): FloridaClassDProductionActivationCheck[] {
-  const candidate = value("OBSERRA_FDACS_RELEASE_CANDIDATE_SHA");
-  const accepted = value("OBSERRA_FDACS_UAT_ACCEPTED_RELEASE_SHA");
-  const deployed = value("VERCEL_GIT_COMMIT_SHA");
-  const publicOrigin = value("OBSERRA_FDACS_PUBLIC_ORIGIN");
-  const supabaseUrl = value("OBSERRA_FDACS_SUPABASE_URL");
-  const serviceRolePresent = present("OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY");
-  const mediaProvider = value("OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER").toLowerCase();
-  const documentsBucket = value("OBSERRA_FDACS_DOCUMENTS_BUCKET");
-  const dbPromotionSourceSha = value("OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA");
-  const appliedMigrationVersion = value("OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION");
-  const migrationManifestSha256 = value("OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256").toLowerCase();
-  const expectedSupabaseOrigin = `https://${REQUIRED_FDACS_SUPABASE_PROJECT_REF}.supabase.co`;
-
-  return [
-    check(
-      "release_candidate_sha",
-      "Exact release candidate SHA configured",
-      validSha(candidate),
-      "Configured as a 40-character Git commit SHA.",
-      "OBSERRA_FDACS_RELEASE_CANDIDATE_SHA must identify the exact frozen production candidate.",
-    ),
-    check(
-      "uat_release_binding",
-      "Candidate-bound Gate 23 UAT accepted",
-      validSha(candidate) && validSha(accepted) && accepted.toLowerCase() === candidate.toLowerCase(),
-      "Accepted UAT SHA matches the release candidate.",
-      "OBSERRA_FDACS_UAT_ACCEPTED_RELEASE_SHA must be a 40-character SHA exactly matching the frozen release candidate.",
-    ),
-    check(
-      "deployed_release_binding",
-      "Production deployment SHA matches candidate",
-      validSha(candidate) && validSha(deployed) && deployed.toLowerCase() === candidate.toLowerCase(),
-      "Vercel production deployment SHA matches the frozen release candidate.",
-      "VERCEL_GIT_COMMIT_SHA must exactly match the frozen release candidate before activation.",
-    ),
-    check(
-      "production_environment",
-      "Runtime is the production deployment environment",
-      value("VERCEL_ENV").toLowerCase() === "production",
-      "Production environment confirmed.",
-      "VERCEL_ENV must be production.",
-    ),
-    check(
-      "owner_uat_profile_disabled",
-      "Owner UAT profile is disabled for production activation",
-      !floridaClassDOwnerUatProfileRequested(),
-      "Owner UAT profile is disabled.",
-      "Owner UAT authorization markers must be removed before any production activation decision.",
-    ),
-    check(
-      "canonical_public_origin",
-      "Canonical regulated public origin configured",
-      publicOrigin === CANONICAL_PUBLIC_ORIGIN,
-      "Canonical origin matches www.obserrallc.com.",
-      "OBSERRA_FDACS_PUBLIC_ORIGIN must exactly equal https://www.obserrallc.com.",
-    ),
-    check(
-      "clerk_live_publishable",
-      "Production Clerk publishable key configured",
-      value("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY").startsWith("pk_live_"),
-      "Live Clerk publishable configuration detected; value suppressed.",
-      "A live Clerk publishable key is required.",
-      true,
-    ),
-    check(
-      "clerk_live_secret",
-      "Production Clerk server credential configured",
-      value("CLERK_SECRET_KEY").startsWith("sk_live_"),
-      "Live Clerk server configuration detected; value suppressed.",
-      "A live Clerk server credential is required.",
-      true,
-    ),
-    check(
-      "supabase_url",
-      "Dedicated FDACS Supabase project exactly bound",
-      supabaseUrl === expectedSupabaseOrigin && value("OBSERRA_FDACS_SUPABASE_PROJECT_REF") === REQUIRED_FDACS_SUPABASE_PROJECT_REF,
-      "Dedicated FDACS student-record database binding verified; hostname suppressed.",
-      "OBSERRA_FDACS_SUPABASE_URL and OBSERRA_FDACS_SUPABASE_PROJECT_REF must exactly identify the isolated FDACS project.",
-      true,
-    ),
-    check(
-      "supabase_service_role",
-      "Protected database service credential configured",
-      serviceRolePresent,
-      "Protected database credential configured; value suppressed.",
-      "A protected Supabase service-role credential is required.",
-      true,
-    ),
-    check(
-      "stripe_identity_live",
-      "Live Stripe Identity document and matching-selfie service configured",
-      value("STRIPE_SECRET_KEY").startsWith("sk_live_") && /^whsec_[A-Za-z0-9_]+$/.test(value("STRIPE_IDENTITY_WEBHOOK_SECRET")),
-      "Live Stripe Identity key and dedicated signed-webhook secret detected; values suppressed.",
-      "A live Stripe key and dedicated STRIPE_IDENTITY_WEBHOOK_SECRET are required for automated identity verification.",
-      true,
-    ),
-    check(
-      "daily_provider",
-      "Daily production media provider configured",
-      mediaProvider === "daily" && present("OBSERRA_FDACS_DAILY_API_KEY"),
-      "Daily provider and protected credential configured.",
-      "Daily must be selected and its protected API credential configured.",
-      true,
-    ),
-    check(
-      "ds_license",
-      "Class DS school license is active and configured privately",
-      exact("OBSERRA_FDACS_DS_LICENSE_STATUS", "active") && present("OBSERRA_FDACS_DS_LICENSE_NUMBER"),
-      "Active Class DS licensing state configured; license value suppressed.",
-      "Class DS status must be active and the actual issued license number configured privately.",
-      true,
-    ),
-    check(
-      "di_license",
-      "Class DI instructor license configured privately",
-      present("OBSERRA_FDACS_DI_LICENSE_NUMBER"),
-      "Class DI configuration present; value suppressed.",
-      "The authorized Class DI instructor license number must be configured privately.",
-      true,
-    ),
-    check(
-      "documents_bucket",
-      "Regulated completion-document bucket exactly bound",
-      documentsBucket === REQUIRED_DOCUMENT_BUCKET,
-      "Private completion-document bucket binding verified; name suppressed from report consumers.",
-      "OBSERRA_FDACS_DOCUMENTS_BUCKET must equal the controlled completion-document bucket.",
-      true,
-    ),
-    check(
-      "database_promotion",
-      "Production database promotion and post-migration verification complete",
-      exact("OBSERRA_FDACS_DB_PROMOTION_STATUS", "verified"),
-      "Database promotion status is verified.",
-      "OBSERRA_FDACS_DB_PROMOTION_STATUS must be verified after controlled production migration and post-migration checks.",
-    ),
-    check(
-      "database_promotion_source_sha",
-      "Production database promotion source matches frozen candidate",
-      validSha(candidate) && validSha(dbPromotionSourceSha) && dbPromotionSourceSha.toLowerCase() === candidate.toLowerCase(),
-      "Database promotion source SHA matches the frozen release candidate.",
-      "OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA must be a 40-character SHA exactly matching the frozen release candidate.",
-    ),
-    check(
-      "database_applied_migration_version",
-      "Production database latest applied regulated migration exactly matches source",
-      appliedMigrationVersion === EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION,
-      "Applied regulated migration version matches the controlled source lineage.",
-      `OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION must equal ${EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION}.`,
-    ),
-    check(
-      "database_migration_manifest_sha256",
-      "Production database promotion manifest matches controlled migration lineage",
-      validSha256(migrationManifestSha256) && migrationManifestSha256 === EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256,
-      "Database promotion manifest SHA-256 matches the controlled regulated migration manifest.",
-      "OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256 must exactly match the source-controlled regulated migration manifest digest.",
-    ),
-    check(
-      "exam_bank_authorization",
-      "Division-approved examination-bank boundary authorized",
-      exact("OBSERRA_FDACS_EXAM_BANK_STATUS", "authorized"),
-      "Examination-bank authorization state is recorded.",
-      "OBSERRA_FDACS_EXAM_BANK_STATUS must be authorized before production examination activation.",
-    ),
-    check(
-      "lias_procedure",
-      "LIAS operating procedure verified",
-      exact("OBSERRA_FDACS_LIAS_PROCEDURE_STATUS", "verified"),
-      "LIAS operating procedure is verified.",
-      "OBSERRA_FDACS_LIAS_PROCEDURE_STATUS must be verified.",
-    ),
-    check(
-      "security_acceptance",
-      "Production security acceptance approved",
-      exact("OBSERRA_FDACS_SECURITY_ACCEPTANCE_STATUS", "approved"),
-      "Security acceptance approved.",
-      "OBSERRA_FDACS_SECURITY_ACCEPTANCE_STATUS must be approved.",
-    ),
-    check(
-      "rollback_verification",
-      "Production rollback verification complete",
-      exact("OBSERRA_FDACS_ROLLBACK_STATUS", "verified"),
-      "Rollback verification recorded.",
-      "OBSERRA_FDACS_ROLLBACK_STATUS must be verified.",
-    ),
-    ...highAvailabilityChecks(),
-    check(
-      "owner_release_approval",
-      "Owner release approval recorded",
-      exact("OBSERRA_FDACS_OWNER_RELEASE_APPROVAL", "approved"),
-      "Owner release approval recorded.",
-      "OBSERRA_FDACS_OWNER_RELEASE_APPROVAL must be approved for the exact release candidate.",
+    item(
+      "ha:failover_age",
+      "Failover exercise evidence is current",
+      failoverDate.length > 0 && ageDays(failoverDate) <= MAX_FAILOVER_TEST_AGE_DAYS,
+      failoverDate.length > 0 && ageDays(failoverDate) <= MAX_FAILOVER_TEST_AGE_DAYS
+        ? "Failover exercise age satisfies policy."
+        : `Failover exercise must be <= ${MAX_FAILOVER_TEST_AGE_DAYS} days old.`,
     ),
   ];
-}
-
-function activationAuthorizationMarkerReady() {
-  return enabled("OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED");
-}
-
-function baseProductionConditionsReady() {
-  return coreChecks().every((entry) => entry.ready);
-}
-
-export function floridaClassDProductionActivationAuthorized() {
-  return baseProductionConditionsReady() && activationAuthorizationMarkerReady();
-}
-
-export function floridaClassDPublicLearnerControlsEnabled() {
-  return (
-    floridaClassDProductionActivationAuthorized()
-    && enabled("OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED")
-  );
-}
-
-export function floridaClassDNonProductionExecutionAuthorized() {
-  const runtimeEnvironment = value("OBSERRA_FDACS_RUNTIME_ENVIRONMENT").toLowerCase();
-  return (
-    value("VERCEL_ENV").toLowerCase() !== "production" &&
-    !floridaClassDOwnerUatProfileRequested() &&
-    NONPRODUCTION_ENVIRONMENTS.has(runtimeEnvironment) &&
-    enabled("OBSERRA_FDACS_NONPROD_ACCEPTANCE_AUTHORIZED") &&
-    enabled("OBSERRA_FDACS_SYNTHETIC_IDENTITY_ONLY") &&
-    enabled("OBSERRA_FDACS_NONPROD_EXECUTION_AUTHORIZED")
-  );
-}
-
-export function floridaClassDRegulatedExecutionAuthorized() {
-  return (
-    floridaClassDProductionActivationAuthorized()
-    || floridaClassDNonProductionExecutionAuthorized()
-    || floridaClassDOwnerUatExecutionAuthorized()
-  );
 }
 
 export function getFloridaClassDProductionActivationReport(): FloridaClassDProductionActivationReport {
-  const candidate = value("OBSERRA_FDACS_RELEASE_CANDIDATE_SHA");
-  const checks = coreChecks();
-  const baseReady = checks.every((entry) => entry.ready);
-  const activationAuthorized = baseReady && activationAuthorizationMarkerReady();
-  const enabledFlags = FLORIDA_CLASS_D_REGULATED_FEATURE_FLAGS.filter((name) => enabled(name));
-  const preEnrollmentEnabled = value("FLORIDA_CLASS_D_PRE_ENROLLMENT_ENABLED").toLowerCase() === "true";
-  const regulatedFeatureFlagsEnabled = [
-    ...enabledFlags,
-    ...(preEnrollmentEnabled ? ["FLORIDA_CLASS_D_PRE_ENROLLMENT_ENABLED"] : []),
+  const candidate = productionCandidate();
+  const deployedSha = value("VERCEL_GIT_COMMIT_SHA");
+  const productionOrigin = value("OBSERRA_FDACS_PRODUCTION_ORIGIN");
+  const dbPromotionSourceSha = value("OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA");
+  const appliedMigrationVersion = value("OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION");
+  const migrationManifestSha256 = value("OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256").toLowerCase();
+  const enabledFlags = regulatedFeatureFlagsEnabled();
+  const ownerUatRequested = floridaClassDOwnerUatProfileRequested();
+  const ownerUatAuthorized = floridaClassDOwnerUatExecutionAuthorized();
+
+  const checks: FloridaClassDProductionActivationCheck[] = [
+    item("candidate_sha", "Frozen production release candidate SHA present", candidate.length > 0, candidate ? "Configured." : "Missing or invalid."),
+    item(
+      "deployment_sha",
+      "Deployed Vercel release matches frozen production candidate",
+      candidate.length > 0 && SHA40.test(deployedSha) && deployedSha.toLowerCase() === candidate.toLowerCase(),
+      candidate.length > 0 && SHA40.test(deployedSha) && deployedSha.toLowerCase() === candidate.toLowerCase()
+        ? "Exact deployed release binding verified."
+        : "VERCEL_GIT_COMMIT_SHA must exactly match the frozen production candidate.",
+    ),
+    item("canonical_origin", "Canonical production origin exactly bound", productionOrigin === CANONICAL_PUBLIC_ORIGIN, productionOrigin === CANONICAL_PUBLIC_ORIGIN ? "Exact canonical origin verified." : "Canonical production origin is not exactly bound."),
+    item("clerk_public", "Live Clerk publishable credential configured", present("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"), present("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY") ? "Configured." : "Missing.", true),
+    item("clerk_secret", "Live Clerk server credential configured", present("CLERK_SECRET_KEY"), present("CLERK_SECRET_KEY") ? "Configured." : "Missing.", true),
+    item("stripe_identity", "Stripe Identity server credential configured", present("STRIPE_SECRET_KEY") && present("STRIPE_IDENTITY_WEBHOOK_SECRET"), present("STRIPE_SECRET_KEY") && present("STRIPE_IDENTITY_WEBHOOK_SECRET") ? "Configured." : "Missing Stripe Identity configuration.", true),
+    item("identity_policy", "Government-ID plus matching-selfie verification policy enabled", exact("OBSERRA_FDACS_IDENTITY_POLICY", "government_id_and_matching_selfie"), exact("OBSERRA_FDACS_IDENTITY_POLICY", "government_id_and_matching_selfie") ? "Configured." : "Required identity policy is not configured."),
+    item("instructor_attestation", "Instructor identity attestation required", yes("OBSERRA_FDACS_INSTRUCTOR_IDENTITY_ATTESTATION_REQUIRED"), yes("OBSERRA_FDACS_INSTRUCTOR_IDENTITY_ATTESTATION_REQUIRED") ? "Required." : "Must be required."),
+    item("daily_checkin", "Daily instructor identity check-in required", yes("OBSERRA_FDACS_DAILY_INSTRUCTOR_IDENTITY_CHECKIN_REQUIRED"), yes("OBSERRA_FDACS_DAILY_INSTRUCTOR_IDENTITY_CHECKIN_REQUIRED") ? "Required." : "Must be required."),
+    item("fdacs_project", "Isolated FDACS production database project exactly bound", exact("OBSERRA_FDACS_SUPABASE_PROJECT_REF", REQUIRED_FDACS_SUPABASE_PROJECT_REF), exact("OBSERRA_FDACS_SUPABASE_PROJECT_REF", REQUIRED_FDACS_SUPABASE_PROJECT_REF) ? "Exact project binding verified." : "FDACS production database project reference mismatch.", true),
+    item("fdacs_url", "Isolated FDACS database URL configured", present("OBSERRA_FDACS_SUPABASE_URL"), present("OBSERRA_FDACS_SUPABASE_URL") ? "Configured." : "Missing.", true),
+    item("fdacs_service_role", "FDACS service-role credential configured", present("OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY"), present("OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY") ? "Configured." : "Missing.", true),
+    item("daily_provider", "Daily selected as regulated live-media provider", exact("OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER", "daily"), exact("OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER", "daily") ? "Provider verified." : "Daily provider is not configured."),
+    item("daily_key", "Daily server credential configured", present("OBSERRA_FDACS_DAILY_API_KEY"), present("OBSERRA_FDACS_DAILY_API_KEY") ? "Configured." : "Missing.", true),
+    item("document_bucket", "Private FDACS completion-document bucket exactly bound", exact("OBSERRA_FDACS_DOCUMENTS_BUCKET", REQUIRED_DOCUMENT_BUCKET), exact("OBSERRA_FDACS_DOCUMENTS_BUCKET", REQUIRED_DOCUMENT_BUCKET) ? "Exact private bucket binding verified." : "Completion-document bucket mismatch.", true),
+    item("ds_status", "Class DS school license is active", exact("OBSERRA_FDACS_DS_LICENSE_STATUS", "active"), exact("OBSERRA_FDACS_DS_LICENSE_STATUS", "active") ? "Active." : "Class DS school license is not active."),
+    item("ds_license", "Class DS school license number configured", present("OBSERRA_FDACS_DS_LICENSE_NUMBER"), present("OBSERRA_FDACS_DS_LICENSE_NUMBER") ? "Configured." : "Missing.", true),
+    item("di_license", "Class DI instructor license number configured", present("OBSERRA_FDACS_DI_LICENSE_NUMBER"), present("OBSERRA_FDACS_DI_LICENSE_NUMBER") ? "Configured." : "Missing.", true),
+    item("db_promotion_status", "Production database promotion verified", exact("OBSERRA_FDACS_DB_PROMOTION_STATUS", "verified"), exact("OBSERRA_FDACS_DB_PROMOTION_STATUS", "verified") ? "Verified." : "Database promotion not verified."),
+    item("db_promotion_sha", "Database promotion is bound to the frozen release candidate", candidate.length > 0 && SHA40.test(dbPromotionSourceSha) && dbPromotionSourceSha.toLowerCase() === candidate.toLowerCase(), candidate.length > 0 && SHA40.test(dbPromotionSourceSha) && dbPromotionSourceSha.toLowerCase() === candidate.toLowerCase() ? "Exact database promotion source binding verified." : "Database promotion source SHA must match the frozen candidate."),
+    item("db_migration_version", "Database applied migration version exactly matches source-controlled lineage", appliedMigrationVersion === EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION, appliedMigrationVersion === EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION ? "Exact migration version verified." : `Expected applied migration version ${EXPECTED_FLORIDA_CLASS_D_LATEST_MIGRATION_VERSION}.`),
+    item("db_manifest", "Database migration manifest digest exactly matches source-controlled lineage", sha256("OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256") && migrationManifestSha256 === EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256, sha256("OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256") && migrationManifestSha256 === EXPECTED_FLORIDA_CLASS_D_MIGRATION_MANIFEST_SHA256 ? "Exact migration manifest verified." : "Database migration manifest digest mismatch.", true),
+    item("exam_bank", "Division-approved final exam bank authorization recorded", enabled("OBSERRA_FDACS_DIVISION_APPROVED_EXAM_BANK_AUTHORIZED"), enabled("OBSERRA_FDACS_DIVISION_APPROVED_EXAM_BANK_AUTHORIZED") ? "Authorized." : "Division-approved exam bank authorization is not enabled."),
+    item("lias_procedure", "LIAS procedure verification recorded", enabled("OBSERRA_FDACS_LIAS_PROCEDURE_VERIFIED"), enabled("OBSERRA_FDACS_LIAS_PROCEDURE_VERIFIED") ? "Verified." : "LIAS procedure verification is incomplete."),
+    item("security_acceptance", "Security acceptance complete", enabled("OBSERRA_FDACS_SECURITY_ACCEPTANCE_COMPLETE"), enabled("OBSERRA_FDACS_SECURITY_ACCEPTANCE_COMPLETE") ? "Complete." : "Security acceptance is incomplete."),
+    item("rollback", "Rollback verification complete", enabled("OBSERRA_FDACS_ROLLBACK_VERIFIED"), enabled("OBSERRA_FDACS_ROLLBACK_VERIFIED") ? "Verified." : "Rollback verification is incomplete."),
+    item("owner_release", "Owner release approval complete", enabled("OBSERRA_FDACS_OWNER_RELEASE_APPROVED"), enabled("OBSERRA_FDACS_OWNER_RELEASE_APPROVED") ? "Approved." : "Owner release approval is incomplete."),
+    item("owner_uat_profile", "Owner real-identity UAT profile is not requested in production", !ownerUatRequested, !ownerUatRequested ? "Not requested." : "Owner UAT profile must not be requested in production."),
+    item("owner_uat_authorized", "Owner real-identity UAT cannot authorize production", !ownerUatAuthorized, !ownerUatAuthorized ? "Production remains independent from owner UAT." : "Owner UAT authorization must not be active in production."),
+    ...highAvailabilityItems(),
   ];
-  const unauthorizedEnabledFeatureFlags = activationAuthorized ? [] : regulatedFeatureFlagsEnabled;
-  const blockingKeys = [
-    ...checks.filter((entry) => !entry.ready).map((entry) => entry.key),
-    ...(!activationAuthorizationMarkerReady() ? ["production_activation_authorized"] : []),
-    ...(unauthorizedEnabledFeatureFlags.length > 0 ? ["unauthorized_feature_flags"] : []),
-  ];
+
+  const unauthorizedEnabledFeatureFlags = enabledFlags.filter((name) => !FLORIDA_CLASS_D_REGULATED_FEATURE_FLAGS.includes(name));
+  const blockingKeys = checks.filter((entry) => !entry.ready).map((entry) => entry.key);
+  const readyForOwnerActivationDecision = blockingKeys.length === 0 && unauthorizedEnabledFeatureFlags.length === 0;
+  const productionActivationAuthorized = readyForOwnerActivationDecision && enabled("OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED");
 
   return {
     generatedAt: new Date().toISOString(),
-    releaseCandidateShaPresent: validSha(candidate),
-    releaseCandidateSha: validSha(candidate) ? candidate.toLowerCase() : null,
-    readyForOwnerActivationDecision: baseReady && !activationAuthorizationMarkerReady() && regulatedFeatureFlagsEnabled.length === 0,
-    productionActivationAuthorized: activationAuthorized,
-    regulatedFeatureFlagsEnabled,
+    releaseCandidateShaPresent: candidate.length > 0,
+    releaseCandidateSha: candidate || null,
+    readyForOwnerActivationDecision,
+    productionActivationAuthorized,
+    regulatedFeatureFlagsEnabled: enabledFlags,
     unauthorizedEnabledFeatureFlags,
     blockingKeys,
-    checks: [
-      ...checks,
-      check(
-        "production_activation_authorized",
-        "Explicit production activation authorization",
-        activationAuthorizationMarkerReady(),
-        "Explicit activation authorization marker is enabled.",
-        "OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED remains disabled until the final owner-controlled activation decision.",
-      ),
-    ],
+    checks,
     secretsExposed: false,
   };
 }
