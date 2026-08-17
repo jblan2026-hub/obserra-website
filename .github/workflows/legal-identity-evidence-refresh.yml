@@ -57,8 +57,16 @@ jobs:
 
       - name: Regenerate CMMC system evidence from clean governed tree
         run: node scripts/cmmc-system-evidence.mjs --write
-      - name: Verify CMMC system evidence before persistence
-        run: node scripts/cmmc-system-evidence.mjs --check
+      - name: Regenerate CMMC technical and human disposition
+        run: npm run generate:cmmc-disposition
+      - name: Regenerate CMMC continuous-audit handoff views
+        run: npm run generate:cmmc-handoff
+      - name: Verify complete derived CMMC evidence before persistence
+        shell: bash
+        run: |
+          node scripts/cmmc-system-evidence.mjs --check
+          npm run verify:cmmc-disposition
+          npm run verify:cmmc-handoff
 
       - name: Upload regenerated evidence
         uses: actions/upload-artifact@v4
@@ -72,28 +80,39 @@ jobs:
             docs/compliance/CMMC-SYSTEM-EVIDENCE.json
             docs/compliance/CMMC-SYSTEM-EVIDENCE.md
             docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256
 
-      - name: Commit CMMC system evidence when changed
+      - name: Commit complete derived CMMC evidence when changed
         shell: bash
         run: |
           paths=(
             docs/compliance/CMMC-SYSTEM-EVIDENCE.json
             docs/compliance/CMMC-SYSTEM-EVIDENCE.md
             docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256
           )
           if git diff --quiet -- "${paths[@]}"; then
-            echo "CMMC system evidence is already current."
+            echo "Derived CMMC evidence is already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- "${paths[@]}"
-          git commit -m "Refresh generated CMMC system evidence"
+          git commit -m "Refresh complete derived CMMC evidence"
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Verify final governed evidence state
         shell: bash
         run: |
-          node scripts/legal-identity-audit.mjs --check
-          node scripts/cmmc-system-evidence.mjs --check
+          npm run verify:cmmc-evidence
           git diff --exit-code
