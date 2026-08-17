@@ -1,9 +1,16 @@
 import type { NextConfig } from "next";
 import { prepareIdentityOriginContract } from "./lib/auth/identity-origin-contract";
+import { prepareSupabaseAuthRuntime } from "./lib/auth/runtime-config";
 
 const identityOrigins = prepareIdentityOriginContract();
+const supabaseAuthRuntime = prepareSupabaseAuthRuntime();
 const identityScriptSources = identityOrigins.scriptSources.join(" ");
-const identityConnectSources = identityOrigins.connectSources.join(" ");
+const identityConnectSources = [
+  ...new Set([
+    ...identityOrigins.connectSources,
+    ...(supabaseAuthRuntime.ready && supabaseAuthRuntime.url ? [supabaseAuthRuntime.url] : []),
+  ]),
+].join(" ");
 const fdacsOwnerCoursewareSources = [
   "https://ggkxgjhsbgbifiqrhavr.supabase.co",
   "https://ggkxgjhsbgbifiqrhavr.storage.supabase.co",
