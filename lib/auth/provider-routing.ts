@@ -4,6 +4,7 @@ export type IdentityAccessPolicy =
   | "standard_authenticated"
   | "standard_public"
   | "internal_owner_read_only"
+  | "internal_owner_production_validation"
   | "public";
 export type IdentityMutationClass =
   | "read"
@@ -54,6 +55,13 @@ const FDACS_OWNER_PROVIDER_ACTIONS = new Map<string, ReadonlySet<string>>([
   ["/api/florida-class-d/owner-preview/courseware", new Set(["POST", "DELETE"])],
   ["/api/florida-class-d/owner-preview/activation-request", new Set(["POST"])],
 ]);
+const FDACS_PRODUCTION_VALIDATION_ACTIONS = new Map<string, ReadonlySet<string>>([
+  ["/api/florida-class-d/owner-validation/bootstrap", new Set(["POST"])],
+  ["/api/florida-class-d/owner-validation/enrollment", new Set(["POST"])],
+  ["/api/florida-class-d/owner-validation/schedule", new Set(["POST"])],
+  ["/api/florida-class-d/owner-validation/daily", new Set(["POST", "DELETE"])],
+  ["/api/florida-class-d/owner-validation/courseware", new Set(["POST", "DELETE"])],
+]);
 
 function pathMatchesPrefix(pathname: string, prefix: string) {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
@@ -61,7 +69,6 @@ function pathMatchesPrefix(pathname: string, prefix: string) {
 
 function normalizedPathname(pathname: string) {
   if (!pathname.startsWith("/") || pathname.startsWith("//")) return null;
-
   try {
     const segments = pathname.split("/").map((segment) => decodeURIComponent(segment));
     if (segments.some((segment) => /[\\/\u0000-\u001f\u007f]/.test(segment))) return null;
@@ -97,69 +104,52 @@ function route(
   return { provider, requiresAuthentication, accessPolicy, mutationAllowed, mutationClass };
 }
 
-function ownedRoute(
-  pathname: string,
-  method?: string | null,
-): IdentityRouteOwnership {
-  if (CLERK_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
-    return route("clerk", true, "applications_clerk");
-  }
-  if (CLERK_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
-    return route("clerk", false, "applications_clerk");
-  }
-  if (FDACS_HEALTH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
-    return route("public", false, "public");
-  }
+function ownedRoute(pathname: string, method?: string | null): IdentityRouteOwnership {
+  if (CLERK_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("clerk", true, "applications_clerk");
+  if (CLERK_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("clerk", false, "applications_clerk");
+  if (FDACS_HEALTH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("public", false, "public");
+  if ((pathname === "/florida-security-training" || pathname === "/florida-security-training/") && readMethod(method)) return route("public", false, "public");
+
   if (
-    (pathname === "/florida-security-training" || pathname === "/florida-security-training/")
-    && readMethod(method)
-  ) {
-    return route("public", false, "public");
-  }
-  if (
-    pathMatchesPrefix(pathname, "/florida-security-training") ||
-    pathMatchesPrefix(pathname, "/api/florida-class-d")
+    pathMatchesPrefix(pathname, "/florida-security-training/owner-validation") ||
+    pathMatchesPrefix(pathname, "/api/florida-class-d/owner-validation")
   ) {
     const normalizedMethod = method?.trim().toUpperCase() || "GET";
-    const ownerActionAllowed = FDACS_OWNER_PROVIDER_ACTIONS.get(pathname)?.has(normalizedMethod) === true;
+    const classification = mutationClass(pathname, method);
+    const explicitlyAllowed = readMethod(method) || FDACS_PRODUCTION_VALIDATION_ACTIONS.get(pathname)?.has(normalizedMethod) === true;
+    const completionMutation = classification === "completion_certificate_lias";
     return route(
       "supabase",
       true,
-      "internal_owner_read_only",
-      mutationClass(pathname, method),
-      ownerActionAllowed,
+      "internal_owner_production_validation",
+      classification,
+      explicitlyAllowed && !completionMutation,
     );
   }
-  if (SUPABASE_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
-    return route("supabase", true, "standard_authenticated");
+
+  if (pathMatchesPrefix(pathname, "/florida-security-training") || pathMatchesPrefix(pathname, "/api/florida-class-d")) {
+    const normalizedMethod = method?.trim().toUpperCase() || "GET";
+    const ownerActionAllowed = FDACS_OWNER_PROVIDER_ACTIONS.get(pathname)?.has(normalizedMethod) === true;
+    return route("supabase", true, "internal_owner_read_only", mutationClass(pathname, method), ownerActionAllowed);
   }
-  if (SUPABASE_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
-    return route("supabase", false, "standard_public");
-  }
+  if (SUPABASE_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("supabase", true, "standard_authenticated");
+  if (SUPABASE_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("supabase", false, "standard_public");
   return route("public", false, "public");
 }
 
 function safeRedirectPath(redirectTarget: string | null | undefined) {
-  if (!redirectTarget || !redirectTarget.startsWith("/") || redirectTarget.startsWith("//")) {
-    return null;
-  }
+  if (!redirectTarget || !redirectTarget.startsWith("/") || redirectTarget.startsWith("//")) return null;
   const queryIndex = redirectTarget.indexOf("?");
   return normalizedPathname(queryIndex === -1 ? redirectTarget : redirectTarget.slice(0, queryIndex));
 }
 
-export function identityProviderForRequest(
-  request: IdentityProviderRequest,
-): IdentityRouteOwnership {
+export function identityProviderForRequest(request: IdentityProviderRequest): IdentityRouteOwnership {
   const pathname = normalizedPathname(request.pathname);
   if (!pathname) return route("supabase", true, "standard_authenticated", "training_operation", false);
-
   if (pathMatchesPrefix(pathname, "/sign-in") || pathMatchesPrefix(pathname, "/sign-up")) {
     const returnPath = safeRedirectPath(request.redirectTarget);
-    if (returnPath && ownedRoute(returnPath).provider === "clerk") {
-      return route("clerk", false, "applications_clerk");
-    }
+    if (returnPath && ownedRoute(returnPath).provider === "clerk") return route("clerk", false, "applications_clerk");
     return route("supabase", false, "standard_public");
   }
-
   return ownedRoute(pathname, request.method);
 }
