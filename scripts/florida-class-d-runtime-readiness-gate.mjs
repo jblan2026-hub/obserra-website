@@ -20,7 +20,8 @@ assert(service.includes("getFloridaClassDProductionRuntimeReadiness") && service
 assert(service.includes("readyExceptForClassDSLicense") && service.includes("technicalReadinessComplete"), "production readiness must distinguish technical readiness from Class DS licensing blockers");
 assert(service.includes('const CLASS_DS_LICENSE_KEYS = new Set(["ds_status", "ds_license_number"])'), "Class DS license blockers must be explicitly identified");
 assert(service.includes("OBSERRA_FDACS_SUPABASE_URL") && service.includes("OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY"), "readiness must check explicit protected database configuration");
-assert(service.includes("CLERK_SECRET_KEY") && service.includes("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"), "readiness must check identity configuration");
+assert(service.includes("prepareSupabaseAuthRuntime") && service.includes("supabase_identity_runtime"), "Class D readiness must consume the canonical Supabase identity runtime contract");
+assert(!service.includes("CLERK_SECRET_KEY") && !service.includes("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"), "Class D readiness must not require Clerk credentials after the regulated identity migration to Supabase");
 assert(service.includes("OBSERRA_FDACS_DAILY_API_KEY") && service.includes("OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER"), "readiness must check live-media configuration");
 assert(service.includes("OBSERRA_FDACS_DS_LICENSE_STATUS") && service.includes("OBSERRA_FDACS_DS_LICENSE_NUMBER") && service.includes("OBSERRA_FDACS_DI_LICENSE_NUMBER"), "production readiness must check private regulated license configuration without returning values");
 assert(service.includes("OBSERRA_FDACS_DOCUMENTS_BUCKET"), "readiness must check private completion-document storage configuration");
@@ -75,4 +76,4 @@ assert(proxy.includes('"/florida-security-training/admin"') && proxy.includes('"
 assert(handoff.includes("does not activate regulated functions") && handoff.includes("never written into the public repository"), "Gate 22 handoff must preserve the non-activating and secret-suppression boundary");
 assert(handoff.includes("passing 170-question final examination at 128/170 or better"), "Gate 22 handoff must preserve the exam-before-certificate rule");
 
-console.log("Florida Class D Gate 22 passed: separated production/non-production readiness profiles, availability-safe protected identity routing, regulated fail-closed mutation ordering, secret suppression, feature-flag fail-closed status, licensing boundaries, and completion controls are validated in source.");
+console.log("Florida Class D Gate 22 passed: Supabase-native regulated identity readiness, separated production/non-production profiles, availability-safe site identity routing, regulated fail-closed mutation ordering, secret suppression, feature-flag fail-closed status, licensing boundaries, and completion controls are validated in source.");

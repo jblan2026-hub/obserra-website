@@ -1,5 +1,6 @@
 import "server-only";
 
+import { prepareSupabaseAuthRuntime } from "./auth/runtime-config";
 import {
   floridaClassDServiceRoleKeyAuthorized,
   floridaClassDSupabaseOriginAuthorized,
@@ -76,6 +77,7 @@ function item(
 }
 
 function commonProtectedRuntimeItems(): FloridaClassDRuntimeReadinessItem[] {
+  const identityRuntime = prepareSupabaseAuthRuntime();
   const explicitSupabaseUrl = value("OBSERRA_FDACS_SUPABASE_URL");
   const serviceRoleKey = value("OBSERRA_FDACS_SUPABASE_SERVICE_ROLE_KEY");
   const serviceRoleReady = floridaClassDServiceRoleKeyAuthorized(serviceRoleKey);
@@ -88,11 +90,13 @@ function commonProtectedRuntimeItems(): FloridaClassDRuntimeReadinessItem[] {
 
   return [
     item(
-      "clerk_publishable",
-      "Clerk publishable key configured",
+      "supabase_identity_runtime",
+      "Supabase regulated identity runtime configured",
       "identity",
-      present("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"),
-      present("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY") ? "Configured." : "Missing.",
+      identityRuntime.ready,
+      identityRuntime.ready
+        ? "Canonical Supabase Auth runtime is configured; project, URL, and publishable key are suppressed from report consumers."
+        : `Supabase Auth runtime is fail closed (${identityRuntime.reasonCodes.join(", ") || "unavailable"}).`,
       true,
     ),
     item(
@@ -103,14 +107,6 @@ function commonProtectedRuntimeItems(): FloridaClassDRuntimeReadinessItem[] {
       fdacsDatabaseExactlyBound
         ? "Dedicated isolated project binding verified; credential and hostname suppressed from report consumers."
         : "OBSERRA_FDACS_SUPABASE_URL and OBSERRA_FDACS_SUPABASE_PROJECT_REF must exactly identify the isolated FDACS student-record project.",
-      true,
-    ),
-    item(
-      "clerk_secret",
-      "Clerk server credential configured",
-      "identity",
-      present("CLERK_SECRET_KEY"),
-      present("CLERK_SECRET_KEY") ? "Configured; value suppressed." : "Missing.",
       true,
     ),
     item(
@@ -254,7 +250,7 @@ export const FLORIDA_CLASS_D_RUNTIME_READINESS_POLICY = {
   reportExposesSecretValues: false,
   explicitProductionSupabaseUrlRequired: true,
   serviceRoleRequired: true,
-  clerkServerCredentialRequired: true,
+  supabaseProtectedIdentityRuntimeRequired: true,
   dedicatedFdacsDatabaseBoundaryRequired: true,
   stripeDocumentAndMatchingSelfieRequired: true,
   stripeIdentityWebhookSignatureRequired: true,

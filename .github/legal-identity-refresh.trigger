@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T18:00:00Z
-reason: regenerate complete governed evidence after moving canonical Vercel project guard into a bounded ignored-build script that satisfies the 256-character schema limit
+refresh-request: 2026-08-17T18:38:00Z
+reason: regenerate complete governed evidence after aligning Florida Class D runtime readiness with the canonical Supabase protected identity boundary while preserving Clerk for broader site surfaces
