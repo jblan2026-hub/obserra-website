@@ -5,6 +5,7 @@ import { prepareClerkRuntime } from "../lib/clerk-runtime-config";
 import { LEGAL_ENTITY_NAME } from "../lib/legal-identity";
 import ObserraGuide from "./ObserraGuide";
 import CredlyProfileLink from "./CredlyProfileLink";
+import { RegionalLocalizationProvider, RegionalTranslationNotice } from "./RegionalLocalization";
 import "./globals.css";
 import "./design-system.css";
 import "./brand-consistency.css";
@@ -14,6 +15,7 @@ import "./global-symbols.css";
 import "./auth.css";
 import "./premium-site.css";
 import "./premium-routes.css";
+import "./regional-localization.css";
 
 const SITE_URL = "https://www.obserrallc.com";
 const GLOBAL_DESCRIPTION =
@@ -140,13 +142,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   };
 
   const application = (
-    <html lang="en-US">
+    <html lang="en-US" dir="ltr" suppressHydrationWarning>
       <body>
-        <a className="obs-skip-link" href="#main-content">Skip to main content</a>
-        <div id="main-content" tabIndex={-1}>{children}</div>
-        <CredlyProfileLink />
-        <ObserraGuide />
-        <Analytics />
+        <RegionalLocalizationProvider>
+          <a className="obs-skip-link" href="#main-content">Skip to main content</a>
+          <RegionalTranslationNotice />
+          <div id="main-content" tabIndex={-1}>{children}</div>
+          <CredlyProfileLink />
+          <ObserraGuide />
+          <Analytics />
+        </RegionalLocalizationProvider>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </body>
     </html>
