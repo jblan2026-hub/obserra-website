@@ -73,6 +73,7 @@ export default function FloridaSecurityTrainingPage() {
       <main className="fl-classd enterprise-page-main">
         <section className="fl-classd__hero">
           <div className="fl-classd__eyebrow"><ShieldCheck size={18} /> Florida Class D Security Officer Training</div>
+          <span className="fl-classd__status">COMING SOON · LEARNING MANAGEMENT SYSTEM IN PROGRESS</span>
           <span className="fl-classd__status">COMING SOON · REGULATED TRAINING AUTHORIZATION PENDING</span>
           <span className="fl-classd__status">PRODUCTION SOFTWARE VALIDATION · NON-CREDIT · PRODUCTION AUTHORIZATION FALSE</span>
           <h1>{FLORIDA_CLASS_D_COURSE.title}</h1>
@@ -114,8 +115,7 @@ export default function FloridaSecurityTrainingPage() {
             <p>
               The controlled design provides four 120-minute live instructional lessons per day, with a 15-minute break after Lessons 1, 2, and 3.
               During production software validation, the LMS verifies separate tracking for instruction, breaks, connection time, security-question responses,
-              attendance, and participation without awarding regulated instructional credit. Break time is recorded but is never credited toward the required
-              40 instructional hours. The certification examination is controlled separately from the 40 instructional hours.
+              attendance, and participation without awarding regulated instructional credit. Break time is recorded but is never credited toward the required 40 instructional hours. The certification examination is controlled separately from the 40 instructional hours.
             </p>
           </div>
           <div className="fl-classd__days">
