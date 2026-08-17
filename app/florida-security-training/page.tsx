@@ -86,7 +86,7 @@ export default function FloridaSecurityTrainingPage() {
           <div className="fl-classd__notice">
             <LockKeyhole size={20} />
             <div>
-              <strong>Enrollment is not open.</strong>
+              <strong>Coming Soon.</strong>
               <span>
                 Enrollment, payment, and student course access are not open. FDACS provider and course authorization have not been granted. Production instruction, course credit,
                 completion, certificates, and LIAS reporting are disabled. Production validation cannot create an authorized student completion or licensing record.
@@ -110,7 +110,7 @@ export default function FloridaSecurityTrainingPage() {
 
         <section className="fl-classd__section">
           <div className="fl-classd__section-heading">
-            <span>LIVE INSTRUCTION ARCHITECTURE</span>
+            <span>CONTROLLED CURRICULUM ARCHITECTURE</span>
             <h2>Forty hours built around accountable instructor-led learning.</h2>
             <p>
               The controlled design provides four 120-minute live instructional lessons per day, with a 15-minute break after Lessons 1, 2, and 3.
@@ -141,7 +141,7 @@ export default function FloridaSecurityTrainingPage() {
 
         <section className="fl-classd__section fl-classd__automation">
           <div className="fl-classd__section-heading">
-            <span>REGULATED LMS CONTROLS</span>
+            <span>REGULATED LMS PRODUCTION VALIDATION</span>
             <h2>Designed for live presence, interaction, identity, and evidence.</h2>
             <p>
               The production-stack classroom validates real-time instructor presence and auditable student participation rather than passive video playback.
@@ -162,7 +162,7 @@ export default function FloridaSecurityTrainingPage() {
         <section className="fl-classd__section">
           <div className="fl-classd__section-heading">
             <span>PROTECTED STUDENT JOURNEY</span>
-            <h2>Identity and access controls before the live classroom opens.</h2>
+            <h2>Photo-ID controls before secure live video.</h2>
             <p>
               Identity requirements are checked before student sign-in. The student starts with a public no-PII readiness gate,
               then enters the protected account, enrollment, hosted identity, instructor-attestation, and one-device course-access sequence.
