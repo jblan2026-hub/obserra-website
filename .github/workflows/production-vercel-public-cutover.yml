@@ -23,9 +23,9 @@ jobs:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
       TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
       PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
-      CANDIDATE_DEPLOYMENT: dpl_AFhrDBGECKNAJm4PoxnY5EQqcoMJ
-      CANDIDATE_SHA: 83b3a55c0402b9db0715c94523ecca9350cdadd5
-      ROLLBACK_DEPLOYMENT: dpl_GDJ6aJc8wr3qodS1snn8agwcG2iD
+      CANDIDATE_DEPLOYMENT: dpl_2SaaLYJ4q48BBvn4DGmqx1Ty3PFy
+      CANDIDATE_SHA: 6e3ef7e8f424b822ef277784c2b72c1bffb3b823
+      ROLLBACK_DEPLOYMENT: dpl_3ywMEDW2j87uwuRrXbFdeFG21pXj
     steps:
       - name: Require configured Vercel credential
         shell: bash
@@ -40,7 +40,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          response="$(curl --silent --show-error --fail-with-body             --header "Authorization: Bearer ${VERCEL_TOKEN}"             "https://api.vercel.com/v13/deployments/${CANDIDATE_DEPLOYMENT}?teamId=${TEAM_ID}")"
+          response="$(curl --silent --show-error --fail-with-body \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v13/deployments/${CANDIDATE_DEPLOYMENT}?teamId=${TEAM_ID}")"
           ready="$(jq -r '.readyState // .state // empty' <<<"${response}")"
           sha="$(jq -r '.meta.githubCommitSha // empty' <<<"${response}")"
           if [ "${ready}" != "READY" ] || [ "${sha}" != "${CANDIDATE_SHA}" ]; then
@@ -52,7 +54,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl --silent --show-error --fail-with-body             --request PATCH             --header "Authorization: Bearer ${VERCEL_TOKEN}"             --header "Content-Type: application/json"             --data '{"ssoProtection":null}'             "https://api.vercel.com/v9/projects/${PROJECT_ID}?teamId=${TEAM_ID}"             >/dev/null
+          curl --silent --show-error --fail-with-body \
+            --request PATCH \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data '{"ssoProtection":null}' \
+            "https://api.vercel.com/v9/projects/${PROJECT_ID}?teamId=${TEAM_ID}" \
+            >/dev/null
 
       - name: Attach canonical domains atomically
         shell: bash
@@ -61,7 +69,13 @@ jobs:
           attach() {
             local deployment="$1"
             local alias="$2"
-            curl --silent --show-error --fail-with-body               --request POST               --header "Authorization: Bearer ${VERCEL_TOKEN}"               --header "Content-Type: application/json"               --data "{"alias":"${alias}"}"               "https://api.vercel.com/v2/deployments/${deployment}/aliases?teamId=${TEAM_ID}"               >/dev/null
+            curl --silent --show-error --fail-with-body \
+              --request POST \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "{\"alias\":\"${alias}\"}" \
+              "https://api.vercel.com/v2/deployments/${deployment}/aliases?teamId=${TEAM_ID}" \
+              >/dev/null
           }
           attach "${CANDIDATE_DEPLOYMENT}" "www.obserrallc.com"
           attach "${CANDIDATE_DEPLOYMENT}" "obserrallc.com"
@@ -95,7 +109,13 @@ jobs:
           set -euo pipefail
           attach() {
             local alias="$1"
-            curl --silent --show-error --fail-with-body               --request POST               --header "Authorization: Bearer ${VERCEL_TOKEN}"               --header "Content-Type: application/json"               --data "{"alias":"${alias}"}"               "https://api.vercel.com/v2/deployments/${ROLLBACK_DEPLOYMENT}/aliases?teamId=${TEAM_ID}"               >/dev/null
+            curl --silent --show-error --fail-with-body \
+              --request POST \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "{\"alias\":\"${alias}\"}" \
+              "https://api.vercel.com/v2/deployments/${ROLLBACK_DEPLOYMENT}/aliases?teamId=${TEAM_ID}" \
+              >/dev/null
           }
           attach "www.obserrallc.com"
           attach "obserrallc.com"
