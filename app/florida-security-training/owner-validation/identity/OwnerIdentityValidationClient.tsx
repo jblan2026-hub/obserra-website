@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CheckCircle2, IdCard, LoaderCircle, LockKeyhole, ShieldCheck } from "lucide-react";
 
 type Props = {
@@ -22,7 +22,7 @@ export default function OwnerIdentityValidationClient({ authorized, blockingKeys
   const [status, setStatus] = useState<StatusPayload | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  async function refreshStatus() {
+  const refreshStatus = useCallback(async () => {
     setBusy(true);
     setMessage(null);
     try {
@@ -44,12 +44,18 @@ export default function OwnerIdentityValidationClient({ authorized, blockingKeys
     } finally {
       setBusy(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     const returnedFromProvider = new URLSearchParams(window.location.search).get("provider_return") === "1";
-    if (returnedFromProvider && authorized) void refreshStatus();
-  }, [authorized]);
+    if (!returnedFromProvider || !authorized) return;
+
+    const timer = window.setTimeout(() => {
+      void refreshStatus();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [authorized, refreshStatus]);
 
   async function startValidation() {
     if (!authorized || busy) return;
