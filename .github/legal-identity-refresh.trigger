@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T22:30:00Z
-reason: regenerate governed source evidence after final Florida Class D learner routing, owner authorization separation, and governed Vercel preview validation corrections
+refresh-request: 2026-08-17T22:52:44Z
+reason: regenerate governed source evidence after production AAL2 owner inspection separation and governed live Stripe Identity matching-selfie validation implementation
