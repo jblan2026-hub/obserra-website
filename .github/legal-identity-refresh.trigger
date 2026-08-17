@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T20:42:00Z
-reason: regenerate governed source evidence after restoring premium SaaS direct-sales, preview-disclosure, and regulated Academy truth contracts
+refresh-request: 2026-08-17T16:05:00-04:00
+reason: regenerate governed source evidence for world-class premium design, Academy LMS, SEO, and legal-identity corrections
