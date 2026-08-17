@@ -4,6 +4,7 @@ import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { useObserraLocale } from "./RegionalLocalization";
 import styles from "./ObserraGuide.module.css";
 
 type MessageAction = { href: string; label: string };
@@ -131,6 +132,7 @@ function validatedActions(value: unknown): MessageAction[] | undefined {
 
 export default function ObserraGuide() {
   const pathname = usePathname();
+  const { locale, t } = useObserraLocale();
   const context = useMemo(() => pageContext(pathname), [pathname]);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -187,7 +189,7 @@ export default function ObserraGuide() {
       const response = await fetch("/api/obserrian", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ question, pathname: requestPath, conversation: history }),
+        body: JSON.stringify({ question, pathname: requestPath, conversation: history, locale }),
         signal: controller.signal,
       });
       if (!response.ok) throw new Error(`advisor_request_${response.status}`);
@@ -224,7 +226,7 @@ export default function ObserraGuide() {
   }
 
   return (
-    <aside className={styles.guide} aria-label="Obserrian Executive Intelligence Advisor">
+    <aside className={styles.guide} aria-label="Obserrian Executive Intelligence Advisor" data-obserra-localized>
       {open && (
         <section className={styles.panel} aria-busy={pending}>
           <header className={styles.header}>
@@ -274,7 +276,7 @@ export default function ObserraGuide() {
           </div>
 
           <form className={styles.form} onSubmit={submit}>
-            <label className={styles.srOnly} htmlFor="obserrian-question">Ask Obserrian</label>
+            <label className={styles.srOnly} htmlFor="obserrian-question">{t("advisor.ask")}</label>
             <input
               id="obserrian-question"
               value={input}
@@ -284,8 +286,8 @@ export default function ObserraGuide() {
               maxLength={1_000}
               disabled={pending}
             />
-            <button type="submit" aria-label="Send question to Obserrian" disabled={pending || !input.trim()}>
-              {pending ? "Working" : "Send"}
+            <button type="submit" aria-label={t("advisor.send")} disabled={pending || !input.trim()}>
+              {pending ? t("advisor.working") : t("advisor.send")}
             </button>
           </form>
           <p className={styles.grounding}>Grounded in current public Obserra product, service, Academy, and governance information.</p>
@@ -300,7 +302,7 @@ export default function ObserraGuide() {
         aria-label={open ? "Minimize Obserrian" : "Open Obserrian Executive Intelligence Advisor"}
       >
         <Image src="/brand/obserra-mark.svg" alt="" aria-hidden="true" width={46} height={46} className={styles.launcherMark} />
-        {!open && <span>Ask Obserrian</span>}
+        {!open && <span>{t("advisor.ask")}</span>}
       </button>
     </aside>
   );
