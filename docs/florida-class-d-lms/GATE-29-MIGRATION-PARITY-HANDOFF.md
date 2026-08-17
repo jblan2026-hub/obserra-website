@@ -1,115 +1,63 @@
 # Gate 29 Regulated Migration Parity and Promotion Manifest Handoff
 
-Snapshot: 2026-08-13
+Snapshot: 2026-08-17
 
 ## Status
 
-Gate 29 is implemented and validated at exact five-green source checkpoint:
+Gate 29 remains the fail-closed database-promotion integrity control for the Florida Class D LMS. It validates source lineage and deterministic promotion evidence; it does not execute a production migration and does not authorize regulated training delivery.
 
-`a84c754db81ae805de634dbd74c8745ee8d29714`
+The current controlled source lineage contains exactly 41 regulated migrations, beginning with `20260813033000_fdacs_class_d_regulated_records.sql` and ending with `20260817104500_fdacs_class_d_completion_document_storage.sql`.
 
-Production remains fail closed. Gate 29 does not apply a production database migration and does not authorize production activation.
-
-## Purpose
-
-Gate 29 makes regulated database promotion depend on the exact ordered Class D migration lineage and a deterministic SHA-256 promotion manifest. Schema similarity alone is not sufficient production evidence.
-
-The current controlled source lineage contains exactly 40 regulated migrations, beginning with `20260813033000_fdacs_class_d_regulated_records.sql` and ending with `20260815170000_fdacs_class_d_atomic_initial_presence_start.sql`. The isolated live provider remains at the prior 38-migration checkpoint. Both `20260815160000_fdacs_class_d_identity_video_lobby_assignment.sql` and `20260815170000_fdacs_class_d_atomic_initial_presence_start.sql` are source-only and unapplied pending integrated review, controlled backup/preflight, and authorized promotion. Gate 29 does not apply either migration.
-
-## Lineage reconciliation
-
-The first Gate 29 manifest attempt did not reach lineage validation because the `.mjs` generator contained a TypeScript-only `as const` token. Florida Class D LMS Gates run #453 failed at manifest generation with a JavaScript syntax error. That failed run remains audit evidence.
-
-After the parser fix, the manifest generator correctly reported that source contained 30 regulated migration files while the regulated non-production database recorded 29 applied regulated migrations.
-
-Direct source and Supabase history comparison identified exactly one source-only migration:
-
-`20260813112000_fdacs_class_d_security_hardening.sql`
-
-Its executable SQL was semantically identical to the later applied migration:
-
-`20260813204215_fdacs_class_d_security_hardening.sql`
-
-Both pin the same three internal functions to `search_path = public`, revoke execute from `public`, `anon`, and `authenticated`, grant execute to `service_role`, and commit. The earlier file differed only by explanatory comments. It was not referenced by a source gate and was not present in the applied regulated non-production migration history.
-
-The unapplied duplicate was removed from source at commit `bd83c77a9a69a6454a0b03c58da0e1a802ef767e` so a fresh production promotion will follow the same 29-version lineage already verified in non-production rather than executing equivalent hardening twice under different versions.
-
-A later manifest diagnostic identified one expected-filename defect for the make-up certification security migration. The canonical source and regulated non-production history both use:
-
-`20260813052500_fdacs_class_d_makeup_certification_security.sql`
-
-The manifest lineage was corrected to that exact filename before the promotion digest was accepted.
+The latest migration adds the exact private storage boundary required by the completion-document service for retained official LIAS-generated FDACS-16103 PDF artifacts. It creates no student, enrollment, attendance credit, instructional credit, examination result, completion authorization, FDACS submission, certificate issuance, or LIAS action.
 
 ## Deterministic manifest
 
 `scripts/florida-class-d-migration-manifest.mjs`:
 
-- enumerates only `fdacs_class_d` migration files;
-- requires the exact expected ordered 40-file lineage;
+- enumerates only regulated `fdacs_class_d` migration files;
+- requires the exact expected ordered 41-file lineage;
 - fails on missing, extra, reordered, or renamed regulated migrations;
 - computes SHA-256 for every migration file from the exact checked-out bytes;
-- builds a deterministic canonical JSON manifest;
+- builds deterministic canonical JSON;
 - computes a SHA-256 digest for the canonical manifest;
 - can write the evidence manifest to a workflow artifact;
-- prints the migration count, latest version, and manifest digest without exposing credentials or runtime secrets.
+- prints migration count, latest version, and manifest digest without exposing credentials or runtime secrets.
 
-The validated deterministic manifest values are:
+The current deterministic manifest values are:
 
-- migration count: `40`;
-- latest migration version: `20260815170000`;
-- migration manifest SHA-256: `2fae1d73554e3455d765b55b8df4aec25a40f29420497308a5443156cab01487`.
+- migration count: `41`;
+- latest migration version: `20260817104500`;
+- migration manifest SHA-256: `bbf692442c2e933892a56d34816dd11c05cdbc6de4092b157f475a6191a032a8`.
 
-The deterministic manifest does not contain learner PII, credentials, license values, protected exam content, or database connection details.
+The manifest contains no learner PII, credentials, license values, protected exam content, or database connection details.
 
 ## Production activation binding
 
-Gate 26 production activation now verifies all of the following:
+Gate 26 binds production database evidence to the exact source-controlled migration state. Before production database promotion can be marked verified:
 
-- `OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA` is a valid Git SHA and exactly matches the frozen production release candidate SHA;
-- `OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION` exactly equals `20260815170000`;
-- `OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256` exactly equals `2fae1d73554e3455d765b55b8df4aec25a40f29420497308a5443156cab01487`;
-- `OBSERRA_FDACS_DB_PROMOTION_STATUS` remains `verified`;
-- all other Gate 26 production, licensing, HA, rollback, security, and owner-approval conditions remain satisfied.
+- `OBSERRA_FDACS_DB_PROMOTION_SOURCE_SHA` must be a valid Git SHA and exactly match the frozen production release candidate SHA;
+- `OBSERRA_FDACS_DB_APPLIED_MIGRATION_VERSION` must exactly equal `20260817104500`;
+- `OBSERRA_FDACS_DB_MIGRATION_MANIFEST_SHA256` must exactly equal `bbf692442c2e933892a56d34816dd11c05cdbc6de4092b157f475a6191a032a8`;
+- `OBSERRA_FDACS_DB_PROMOTION_STATUS` must be `verified`;
+- all other production, licensing, HA, rollback, security, LIAS, and owner-approval conditions remain independently enforced.
 
-This binds production database evidence to the exact validated migration bytes rather than to an operator-entered generic success state.
+This prevents a generic operator-entered success state from substituting for exact migration evidence.
 
-## Non-production evidence baseline
+## FDACS record-control relationship
 
-The regulated non-production branch is:
+The new storage migration exists to support the record-retention and certificate-control requirements already enforced by the LMS data model:
 
-- branch: `obserra-fdacs-lms-nonprod`;
-- project ref: `jeklrsratrijrsamdauv`;
-- parent project: `nwxnyqlyzyufgoadtqxs`.
+- Rule 5N-1.140, F.A.C. requires Class D school records to remain retained and reproducible/transmittable for investigator inspection and requires the FDACS-16103 certificate to be generated through the school's LIAS reporting account.
+- Rule 5N-1.142(4), F.A.C. requires successful Class D completion to be electronically reported through LIAS within 3 business days.
+- FDACS-P-02188 establishes the LIAS submission/certificate workflow, including the unique Certificate Audit Control Number (ACN), correction history, current certificate, and school retention of LIAS-generated records.
 
-Its applied regulated migration history contains exactly 29 Class D versions, including the recovered security migration `20260813204215` and Gate 28 migration `20260814011203`.
+The `fdacs-class-d-completion-documents` bucket is therefore private, limited to PDF, capped at 10 MB per object, and intended only for the school's retained official LIAS-generated certificate artifact. It is not a certificate generator and is not evidence by itself that a LIAS submission occurred.
 
-Gate 37 extended the controlled lineage by six forward-only isolated FDACS audit, archival, identity/attendance, investigator-access, performance/explicit-deny, and trigger-function execute-hardening migrations through `20260814175000`. Gate 38 adds the exact-release owner real-identity UAT migration `20260814210337`; independent verification added the instructor-assignment/non-credit scheduling migration `20260814213309` and the assigned-instructor live-execution/encrypted-provisioning migration `20260814215217`. Their provider observations are recorded separately in `FDACS-PII-DATABASE-AUDIT-SOURCE.json`; production runtime authorization remains false. The earlier 29-version non-production snapshot is retained as historical evidence and is not misrepresented as parity with the current 38-file candidate.
-
-Gate 28 post-migration verification found zero Class D foreign-key constraints without a covering index and zero Class D `unindexed_foreign_keys` advisor findings.
-
-The main connected Supabase project remains without any `public.fdacs_class_d_*` objects. Production promotion has not occurred.
-
-## CI evidence
-
-Exact validated source checkpoint:
-
-`a84c754db81ae805de634dbd74c8745ee8d29714`
-
-All five primary workflows are green on that exact SHA:
-
-- Florida Class D LMS Gates #461;
-- Website CI #2067;
-- Academy 70x Production Gate #1179;
-- Application Release Validation #868;
-- Application Production Pipeline #887.
-
-Florida Class D LMS Gates #461 passed Gates 1-29, generated and uploaded the retained migration manifest evidence, passed repository contract tests and static quality validation, and completed the production Next.js build successfully.
-
-The manifest artifact is evidence for a specific Git checkout. It is not FDACS approval and is not permission to promote production.
+See `docs/florida-class-d-lms/FDACS-CONTROL-MAPPING.md` for the control-to-schema mapping.
 
 ## Promotion evidence requirements
 
-Before any future authorized production database promotion can be marked verified, the controlled evidence must retain:
+Before any authorized production database promotion can be marked verified, evidence must retain:
 
 - exact frozen candidate SHA;
 - exact GitHub workflow/run that generated the migration manifest;
@@ -120,26 +68,25 @@ Before any future authorized production database promotion can be marked verifie
 - migration execution result;
 - applied migration-history verification;
 - post-migration schema/control verification;
+- post-migration storage-boundary verification;
 - post-migration Class D foreign-key coverage verification;
 - rollback or forward-compensating-change status;
 - owner/compliance approval state.
 
 ## Security boundary
 
-Gate 29 does not expose database credentials or make migration endpoints public. It does not add browser database privileges and does not weaken RLS/service-role isolation.
+Gate 29 does not expose database credentials, make migration endpoints public, add browser database privileges, or weaken RLS/service-role isolation.
 
 No production migration is executed by Gate 29 CI.
 
-## Primary artifacts
+## CI requirement
 
-- `scripts/florida-class-d-migration-manifest.mjs`
-- `scripts/florida-class-d-migration-parity-gate.mjs`
-- `lib/florida-class-d-production-activation.ts`
-- `.github/workflows/florida-class-d-lms-gates.yml`
-- `docs/florida-class-d-lms/ACTION-LEDGER.md`
+The dedicated Florida Class D LMS workflow must run Gates 1-35 and production deployment-integrity checks on relevant pull requests and relevant pushes to `main`, ensuring that the SHA eligible for Vercel production deployment also receives the regulated release checks.
+
+A failed Gate 29 run remains audit evidence and must not be reclassified as success. A new exact-head run must pass after any lineage change.
 
 ## Production and regulatory boundary
 
 Gate 29 is a software-supply-chain and database-promotion integrity control. It is not FDACS approval.
 
-Production regulated enrollment, learner access, scheduling, instruction, examination, LIAS execution, certificate release, database promotion, and runtime activation remain fail closed until actual Class DS authorization and every final production condition passes.
+Production regulated enrollment, learner access, scheduling, instruction, examination, LIAS execution, certificate release, database promotion, and runtime activation remain fail closed until the actual Class DS authorization and every final production condition are satisfied.
