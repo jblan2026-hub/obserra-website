@@ -20,6 +20,10 @@ const navigation = [
   { label: "Speaking", href: "/speaking", key: "nav.speaking" },
 ] satisfies Array<{ label: string; href: string; key: LocalizedMessageKey }>;
 
+const regulatedNavigation = {
+  label: "Florida Training", href: "/florida-security-training", key: "nav.florida",
+} satisfies { label: string; href: string; key: LocalizedMessageKey };
+
 function ObserraMark() {
   return (
     <span className="obs-site-mark" aria-hidden="true">
@@ -75,6 +79,7 @@ export default function HomeHeader() {
         {navigation.map((item) => (
           <Link key={item.href} href={item.href} onClick={closeNavigation} aria-current={pathname === item.href || pathname.startsWith(`${item.href}/`) ? "page" : undefined}>{t(item.key)}</Link>
         ))}
+        <Link className="obs-site-header__regulated-link" href={regulatedNavigation.href} onClick={closeNavigation} aria-current={pathname === regulatedNavigation.href || pathname.startsWith(`${regulatedNavigation.href}/`) ? "page" : undefined}>{t(regulatedNavigation.key)}</Link>
         <Link href="/contact" onClick={closeNavigation}>{t("nav.contact")}</Link>
         <LanguageSelector className="obs-site-header__locale" />
         <Link className="obs-site-header__cta" href="/contact?interest=enterprise-consultation" onClick={closeNavigation}>{t("nav.talk")} <span aria-hidden="true">→</span></Link>
