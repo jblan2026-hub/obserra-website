@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - release/fdacs-lms-production-20260817
-      - hotfix/fdacs-request-time-auth-20260817
+      - hotfix/fdacs-*
     paths:
       - .github/legal-identity-refresh.trigger
 
