@@ -1,4 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "ignoreCommand": "git diff --name-only HEAD^ HEAD | grep -Eq '^(app/|components/|lib/|public/|styles/|package.json$|package-lock.json$|next.config\\.|middleware\\.|proxy\\.ts$|tsconfig.json$|vercel.json$)' && exit 1 || exit 0"
+  "alias": [
+    "www.obserrallc.com",
+    "obserrallc.com"
+  ],
+  "ignoreCommand": "if [ \"${VERCEL_PROJECT_ID:-}\" != \"prj_FfAnssVJU8pcJydGNJHmCliP6Yme\" ] || [ \"${VERCEL_ENV:-}\" != \"production\" ]; then exit 0; fi; git diff --name-only HEAD^ HEAD | grep -Eq '^(app/|components/|lib/|public/|styles/|package.json$|package-lock.json$|next.config\\.|middleware\\.|proxy\\.ts$|tsconfig.json$|vercel.json$)' && exit 1 || exit 0"
 }
