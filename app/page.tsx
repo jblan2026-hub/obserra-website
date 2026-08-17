@@ -44,15 +44,47 @@ export default function HomePage() {
               <span>Procurement ready</span>
             </div>
           </div>
-          <Link href="/eios" className="saas-hero__visual" aria-label="Explore Obserra EIOS">
-            <Image
-              src="/brand/visuals/obserra-eios-intelligence-hero.png"
-              alt="Obserra EIOS enterprise intelligence visualization"
-              fill
-              priority
-              sizes="(max-width: 1040px) 100vw, 50vw"
-            />
-          </Link>
+          <div className="saas-hero__visual-shell">
+            <Link href="/eios" className="saas-hero__visual" aria-label="Explore Obserra EIOS">
+              <Image
+                src="/brand/visuals/obserra-eios-intelligence-hero.png"
+                alt="Obserra EIOS enterprise intelligence visualization"
+                fill
+                priority
+                sizes="(max-width: 1040px) 100vw, 50vw"
+              />
+            </Link>
+            <div className="saas-hero__disclosure" aria-label="Preview disclosure">
+              <strong>Illustrative preview</strong>
+              <span>Representative interface only; this is not a live customer environment.</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="saas-direct-sales" aria-labelledby="direct-sales-heading">
+          <div className="saas-direct-sales__intro">
+            <span>DIRECT FROM OBSERRA</span>
+            <h2 id="direct-sales-heading">Applications and Academy are direct website destinations.</h2>
+            <p>Move directly to secure applications or governed learning. Each destination preserves its own purchase, access, approval, and release controls.</p>
+            <div className="saas-actions">
+              <ButtonLink href="/apps">Shop Applications</ButtonLink>
+              <ButtonLink href="/academy" variant="secondary">Browse Academy</ButtonLink>
+            </div>
+          </div>
+          <div className="saas-direct-sales__grid">
+            <Link href="/apps" className="mission-direct-sales__card">
+              <span>APPLICATIONS MARKETPLACE</span>
+              <h3>Secure software for executive and operational use.</h3>
+              <p>Review product capabilities and commercial options directly from the public marketplace.</p>
+              <strong>Shop Applications <span aria-hidden="true">→</span></strong>
+            </Link>
+            <Link href="/academy" className="mission-direct-sales__card">
+              <span>OBSERRA ACADEMY</span>
+              <h3>Professional learning with governed access and completion.</h3>
+              <p>Browse the reviewed nonregulated catalog and enterprise learning options. Purchases open only when a course is explicitly activated.</p>
+              <strong>Browse Academy <span aria-hidden="true">→</span></strong>
+            </Link>
+          </div>
         </section>
 
         <nav className="saas-product-nav" aria-label="Primary Obserra product destinations">
@@ -129,8 +161,8 @@ export default function HomePage() {
             <h2>Learning built as a product, not a content library.</h2>
             <p>
               Obserra Academy combines professional learning with controlled enrollment, protected access,
-              assessment, completion records, and enterprise learning options. Regulated programs use
-              separate authorization, identity, attendance, and reporting controls.
+              assessment, completion records, and enterprise learning options. Regulated programs follow separate eligibility and authorization gates.
+              Identity, attendance, reporting, and completion controls remain offering-specific.
             </p>
             <div className="saas-actions">
               <ButtonLink href="/academy">Browse Academy</ButtonLink>
@@ -161,7 +193,7 @@ export default function HomePage() {
             <div><strong>2×</strong><span>Fortune 500 Chief Information Security Officer experience</span></div>
             <div><strong>21</strong><span>Years of U.S. Army service</span></div>
             <div><strong>3</strong><span>Top Global CISO recognitions</span></div>
-            <div><strong>60</strong><span>Reviewed nonregulated Academy course baseline</span></div>
+            <div><strong>60</strong><span>Reviewed nonregulated course baseline</span></div>
           </div>
         </section>
 
