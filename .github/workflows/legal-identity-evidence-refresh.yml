@@ -23,15 +23,43 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - name: Regenerate legal identity evidence
         run: node scripts/legal-identity-audit.mjs --write
-      - name: Regenerate CMMC system evidence
-        run: node scripts/cmmc-system-evidence.mjs --write
-      - name: Verify regenerated evidence before persistence
+      - name: Verify legal identity evidence before persistence
+        run: node scripts/legal-identity-audit.mjs --check
+      - name: Commit legal identity evidence when changed
         shell: bash
         run: |
-          node scripts/legal-identity-audit.mjs --check
-          node scripts/cmmc-system-evidence.mjs --check
+          paths=(
+            docs/compliance/LEGAL-IDENTITY-AUDIT.json
+            docs/compliance/LEGAL-IDENTITY-AUDIT.md
+            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
+          )
+          if git diff --quiet -- "${paths[@]}"; then
+            echo "Legal identity evidence is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "${paths[@]}"
+          git commit -m "Refresh generated legal identity evidence"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Require clean governed source tree before CMMC generation
+        shell: bash
+        run: |
+          if ! git diff --quiet || ! git diff --cached --quiet; then
+            echo "Governed source tree is not clean before CMMC generation."
+            git status --short
+            exit 1
+          fi
+
+      - name: Regenerate CMMC system evidence from clean governed tree
+        run: node scripts/cmmc-system-evidence.mjs --write
+      - name: Verify CMMC system evidence before persistence
+        run: node scripts/cmmc-system-evidence.mjs --check
+
       - name: Upload regenerated evidence
         uses: actions/upload-artifact@v4
         with:
@@ -44,23 +72,28 @@ jobs:
             docs/compliance/CMMC-SYSTEM-EVIDENCE.json
             docs/compliance/CMMC-SYSTEM-EVIDENCE.md
             docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
-      - name: Commit regenerated evidence when changed
+
+      - name: Commit CMMC system evidence when changed
         shell: bash
         run: |
           paths=(
-            docs/compliance/LEGAL-IDENTITY-AUDIT.json
-            docs/compliance/LEGAL-IDENTITY-AUDIT.md
-            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
             docs/compliance/CMMC-SYSTEM-EVIDENCE.json
             docs/compliance/CMMC-SYSTEM-EVIDENCE.md
             docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
           )
           if git diff --quiet -- "${paths[@]}"; then
-            echo "Governed source evidence is already current."
+            echo "CMMC system evidence is already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- "${paths[@]}"
-          git commit -m "Refresh generated governed source evidence"
+          git commit -m "Refresh generated CMMC system evidence"
           git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Verify final governed evidence state
+        shell: bash
+        run: |
+          node scripts/legal-identity-audit.mjs --check
+          node scripts/cmmc-system-evidence.mjs --check
+          git diff --exit-code
