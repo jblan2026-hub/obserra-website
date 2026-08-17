@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T15:31:00Z
-reason: re-run exact-head PR validation after generated legal identity evidence was committed by the controlled refresh workflow
+refresh-request: 2026-08-17T15:36:00Z
+reason: synchronize generated legal identity and CMMC source evidence after Class D production-validation terminology and authentication-contract updates
