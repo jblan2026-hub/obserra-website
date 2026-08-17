@@ -353,7 +353,7 @@ test("Daily room is cleaned up if owner-token provisioning fails", async () => {
   assert.ok(calls.some((call) => call.path.startsWith("/rooms/") && call.init.method === "DELETE"));
 });
 
-test("only exact audited owner provider actions bypass the read-only mutation lock", async () => {
+test("only exact audited owner provider actions bypass the owner read-only mutation lock", async () => {
   const { identityProviderForRequest } = await import("../lib/auth/provider-routing.ts");
   for (const [pathname, method] of [["/api/florida-class-d/owner-preview/daily", "POST"], ["/api/florida-class-d/owner-preview/daily", "DELETE"], ["/api/florida-class-d/owner-preview/courseware", "POST"], ["/api/florida-class-d/owner-preview/courseware", "DELETE"], ["/api/florida-class-d/owner-preview/activation-request", "POST"]]) {
     const decision = identityProviderForRequest({ pathname, method });
@@ -361,9 +361,19 @@ test("only exact audited owner provider actions bypass the read-only mutation lo
     assert.equal(decision.accessPolicy, "internal_owner_read_only");
     assert.equal(decision.mutationAllowed, true);
   }
-  for (const [pathname, method] of [["/api/florida-class-d/owner-preview/daily", "PUT"], ["/api/florida-class-d/owner-preview/courseware", "PUT"], ["/api/florida-class-d/owner-preview/activation-request", "DELETE"], ["/api/florida-class-d/live", "POST"], ["/api/florida-class-d/enrollments", "POST"], ["/api/florida-class-d/completion", "POST"]]) {
-    assert.equal(identityProviderForRequest({ pathname, method }).mutationAllowed, false);
+  for (const [pathname, method] of [["/api/florida-class-d/owner-preview/daily", "PUT"], ["/api/florida-class-d/owner-preview/courseware", "PUT"], ["/api/florida-class-d/owner-preview/activation-request", "DELETE"]]) {
+    const decision = identityProviderForRequest({ pathname, method });
+    assert.equal(decision.accessPolicy, "internal_owner_read_only");
+    assert.equal(decision.mutationAllowed, false);
   }
+  for (const [pathname, method] of [["/api/florida-class-d/admin/live", "POST"], ["/api/florida-class-d/admin/enrollments", "POST"], ["/api/florida-class-d/admin/completion", "POST"]]) {
+    const decision = identityProviderForRequest({ pathname, method });
+    assert.equal(decision.accessPolicy, "internal_owner_read_only");
+    assert.equal(decision.mutationAllowed, false);
+  }
+  const learner = identityProviderForRequest({ pathname: "/api/florida-class-d/live", method: "POST" });
+  assert.equal(learner.accessPolicy, "standard_authenticated");
+  assert.equal(learner.mutationAllowed, true);
 });
 
 test("owner provider mutations stay release-bound, same-origin, noindex, and isolated from regulated execution", async () => {
