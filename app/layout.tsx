@@ -17,7 +17,7 @@ import "./premium-routes.css";
 
 const SITE_URL = "https://www.obserrallc.com";
 const GLOBAL_DESCRIPTION =
-  "Obserra helps executives govern cyber risk, AI, intelligence, resilience, and secure technology through advisory services, EIOS software, and professional training.";
+  `${LEGAL_ENTITY_NAME} helps executives govern cyber risk, AI, intelligence, resilience, and secure technology through advisory services, EIOS software, and professional training.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
