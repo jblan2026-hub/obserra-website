@@ -38,8 +38,8 @@ type GatewayPayload = {
 
 function clientKey(request: NextRequest) {
   return (
-    request.headers.get("x-real-ip")?.trim() ||
     request.headers.get("x-vercel-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip")?.trim() ||
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     "anonymous"
   );
@@ -69,10 +69,12 @@ function withinRateLimit(request: NextRequest) {
 function sameOriginRequest(request: NextRequest) {
   const origin = request.headers.get("origin");
   const referer = request.headers.get("referer");
+  if (!origin && !referer) return false;
+
   try {
-    const originAllowed = Boolean(origin && new URL(origin).host === request.nextUrl.host);
-    const refererAllowed = Boolean(referer && new URL(referer).host === request.nextUrl.host);
-    return originAllowed && refererAllowed;
+    if (origin && new URL(origin).origin !== request.nextUrl.origin) return false;
+    if (referer && new URL(referer).origin !== request.nextUrl.origin) return false;
+    return true;
   } catch {
     return false;
   }
