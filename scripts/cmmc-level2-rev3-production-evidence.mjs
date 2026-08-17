@@ -5,6 +5,7 @@ const sourcePath = "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDEN
 const humanPath = "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.md";
 const digestPath = "docs/florida-class-d-lms/CMMC-LEVEL-2-REV3-PRODUCTION-EVIDENCE.sha256";
 const vercelPath = "vercel.json";
+const vercelIgnorePath = "scripts/vercel-ignore-build.sh";
 const clerkConfigPath = "lib/clerk-runtime-config.ts";
 const identityPath = "lib/identity-runtime.ts";
 const layoutPath = "app/layout.tsx";
@@ -132,12 +133,20 @@ const expectedCanonicalAliases = ["www.obserrallc.com", "obserrallc.com"];
 if (JSON.stringify(vercelConfig.alias) !== JSON.stringify(expectedCanonicalAliases)) {
   fail("canonical aliases must remain exactly scoped to www.obserrallc.com and obserrallc.com");
 }
-const ignoreCommand = typeof vercelConfig.ignoreCommand === "string" ? vercelConfig.ignoreCommand : "";
-requireText(vercelPath, ignoreCommand, "${VERCEL_PROJECT_ID:-}", "project-aware ignored-build guard");
-requireText(vercelPath, ignoreCommand, "prj_FfAnssVJU8pcJydGNJHmCliP6Yme", "canonical Vercel project guard");
-requireText(vercelPath, ignoreCommand, "${VERCEL_ENV:-}", "environment-aware ignored-build guard");
-requireText(vercelPath, ignoreCommand, '!= \"production\"', "production-only alias deployment guard");
-requireText(vercelPath, ignoreCommand, "then exit 0; fi;", "fail-closed noncanonical deployment suppression");
+if (vercelConfig.ignoreCommand !== "sh scripts/vercel-ignore-build.sh") {
+  fail("ignoreCommand must delegate to the bounded canonical-project guard script");
+}
+if (vercelConfig.ignoreCommand.length > 256) {
+  fail("ignoreCommand exceeds Vercel's 256-character schema limit");
+}
+const vercelIgnore = read(vercelIgnorePath);
+requireText(vercelIgnorePath, vercelIgnore, "${VERCEL_PROJECT_ID:-}", "project-aware ignored-build guard");
+requireText(vercelIgnorePath, vercelIgnore, "prj_FfAnssVJU8pcJydGNJHmCliP6Yme", "canonical Vercel project guard");
+requireText(vercelIgnorePath, vercelIgnore, "${VERCEL_ENV:-}", "environment-aware ignored-build guard");
+requireText(vercelIgnorePath, vercelIgnore, '!= "production"', "production-only alias deployment guard");
+requireText(vercelIgnorePath, vercelIgnore, "exit 0", "fail-closed noncanonical deployment suppression");
+requireText(vercelIgnorePath, vercelIgnore, "exit 1", "canonical changed-source deployment continuation");
+requireText(vercelIgnorePath, vercelIgnore, "scripts/vercel-ignore-build\\.sh$", "guard self-change deployment trigger");
 
 const clerkConfig = read(clerkConfigPath);
 requireText(clerkConfigPath, clerkConfig, "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "Next.js Clerk publishable-key support");
@@ -190,4 +199,4 @@ if (mode === "write") {
   if (read(digestPath) !== expectedDigest) fail(`${digestPath} drifted from machine-readable source`);
 }
 
-console.log(`Gate 34 passed: production identity availability isolation, canonical routing, project-scoped production aliases, Rev. 3/CMMC evidence mapping, generated audit view, and SHA-256 no-drift controls verified (${digest}).`);
+console.log(`Gate 34 passed: production identity availability isolation, canonical routing, bounded project-scoped production aliases, Rev. 3/CMMC evidence mapping, generated audit view, and SHA-256 no-drift controls verified (${digest}).`);
