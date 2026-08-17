@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T16:04:00Z
-reason: regenerate governed legal and CMMC evidence after production Class D identity preflight lint remediation
+refresh-request: 2026-08-17T16:08:00Z
+reason: human-authored exact-head production LMS validation after governed legal and CMMC evidence refresh
