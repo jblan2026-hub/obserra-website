@@ -1,2 +1,2 @@
-refresh-request: 2026-08-17T15:45:00Z
-reason: exact-head PR validation after governed legal identity and CMMC system evidence regeneration completed successfully
+refresh-request: 2026-08-17T15:50:00Z
+reason: exact-head production LMS validation after governed evidence refresh before continuing staff authority, Class D entitlement, and end-to-end lifecycle build
