@@ -8,7 +8,7 @@ import "./saas-home.css";
 export const metadata: Metadata = {
   title: "Enterprise Intelligence, Cybersecurity and AI Governance",
   description:
-    "Obserra helps executive teams govern cyber risk, AI, intelligence, resilience, and secure technology through executive advisory, EIOS software, applications, and professional training.",
+    `${LEGAL_ENTITY_NAME} helps executive teams govern cyber risk, AI, intelligence, resilience, and secure technology through executive advisory, EIOS software, applications, and professional training.`,
   alternates: { canonical: "/" },
   keywords: [
     "enterprise intelligence",
@@ -44,7 +44,7 @@ export default function HomePage() {
       },
       {
         "@type": "Service",
-        name: "Obserra Enterprise Intelligence and Cybersecurity Services",
+        name: `${LEGAL_ENTITY_NAME} Enterprise Intelligence and Cybersecurity Services`,
         provider: { "@id": "https://www.obserrallc.com/#organization" },
         areaServed: "US",
         serviceType: [
@@ -66,14 +66,14 @@ export default function HomePage() {
           <div className="saas-hero__copy">
             <h1>See the enterprise clearly. Act with confidence.</h1>
             <p>
-              Obserra brings executive judgment, cyber risk, AI governance, intelligence, secure technology,
+              {LEGAL_ENTITY_NAME} brings executive judgment, cyber risk, AI governance, intelligence, secure technology,
               and execution into one operating model for organizations where the cost of a bad decision is material.
             </p>
             <div className="saas-hero__actions">
               <ButtonLink href="/eios">Explore Obserra EIOS</ButtonLink>
               <ButtonLink href="/contact?interest=enterprise-consultation" variant="secondary">Talk to Obserra</ButtonLink>
             </div>
-            <div className="saas-hero__proof" aria-label="Obserra operating assurances">
+            <div className="saas-hero__proof" aria-label={`${LEGAL_ENTITY_NAME} operating assurances`}>
               <span>Executive-led</span>
               <span>Secure by design</span>
               <span>Evidence-driven</span>
@@ -81,7 +81,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="saas-hero__command-shell" aria-label="Obserra enterprise intelligence model">
+          <div className="saas-hero__command-shell" aria-label="Obserra EIOS enterprise intelligence model">
             <div className="saas-hero__command">
               <div className="saas-hero__command-head">
                 <span>OBSERRA EIOS · EXECUTIVE INTELLIGENCE</span>
@@ -110,7 +110,7 @@ export default function HomePage() {
             <span>BUY AND ENGAGE DIRECTLY</span>
             <h2 id="direct-sales-heading">Start with the capability you need now.</h2>
             <p>
-              Purchase Obserra applications and approved Academy courses directly, or engage executive services for scoped enterprise work.
+              Purchase applications from {LEGAL_ENTITY_NAME} and approved Obserra Academy courses directly, or engage executive services for scoped enterprise work.
               Each destination keeps its own commercial, access, approval, and release controls.
             </p>
             <div className="saas-actions">
@@ -120,9 +120,9 @@ export default function HomePage() {
           </div>
           <div className="saas-direct-sales__grid">
             <Link href="/apps" className="mission-direct-sales__card">
-              <span>OBSERRA APPLICATIONS</span>
+              <span>APPLICATIONS</span>
               <h3>Purpose-built software for high-consequence work.</h3>
-              <p>Review product capabilities, release status, and commercial options across the Obserra application portfolio.</p>
+              <p>Review product capabilities, release status, and commercial options across the application portfolio from {LEGAL_ENTITY_NAME}.</p>
               <strong>Shop Applications <span aria-hidden="true">→</span></strong>
             </Link>
             <Link href="/academy" className="mission-direct-sales__card">
@@ -148,7 +148,7 @@ export default function HomePage() {
           <div className="saas-section__intro">
             <h2>One partner across intelligence, cyber risk, protection, technology, and learning.</h2>
             <p>
-              Engage one capability or connect them. Obserra is designed to help leadership teams see material risk,
+              Engage one capability or connect them. The {LEGAL_ENTITY_NAME} operating model is designed to help leadership teams see material risk,
               make defensible decisions, assign ownership, and verify that action produced the intended result.
             </p>
           </div>
@@ -232,7 +232,7 @@ export default function HomePage() {
           <div className="saas-proof__copy">
             <h2>Built from operating experience, not generic consulting theory.</h2>
             <p>
-              Obserra combines Fortune 500 CISO leadership, military intelligence and operational experience,
+              {LEGAL_ENTITY_NAME} combines Fortune 500 CISO leadership, military intelligence and operational experience,
               governance discipline, doctoral research, and secure technology engineering for work where consequence, accountability, and trust matter.
             </p>
             <div className="saas-actions">
@@ -250,7 +250,7 @@ export default function HomePage() {
 
         <section className="saas-final">
           <div>
-            <h2>Bring Obserra into the decision while there is still time to shape the outcome.</h2>
+            <h2>Bring {LEGAL_ENTITY_NAME} into the decision while there is still time to shape the outcome.</h2>
             <p>
               Engage for executive advisory, EIOS, cybersecurity, protective intelligence, secure applications,
               or professional learning through one enterprise conversation.
