@@ -91,10 +91,9 @@ export function getFloridaClassDProductionOwnerValidationConfiguration() {
   } as const;
 }
 
-export async function requireFloridaClassDProductionOwnerValidationPrincipal() {
-  const configuration = getFloridaClassDProductionOwnerValidationConfiguration();
-  if (!configuration.authorized || !configuration.releaseCommitSha || !configuration.expiresAt) {
-    throw new Error(`Production owner validation is not authorized: ${configuration.blockingKeys.join(",") || "unknown"}`);
+export async function requireFloridaClassDProductionOwnerPrincipal() {
+  if (value("VERCEL_ENV").toLowerCase() !== "production") {
+    throw new Error("Production owner inspection is available only in the production environment.");
   }
 
   const authority = await getInternalOwnerAuthority();
@@ -114,6 +113,18 @@ export async function requireFloridaClassDProductionOwnerValidationPrincipal() {
     principalId: authority.identity.principalId,
     sessionId: authority.identity.sessionId,
     correlationId: authority.correlationId,
+  };
+}
+
+export async function requireFloridaClassDProductionOwnerValidationPrincipal() {
+  const configuration = getFloridaClassDProductionOwnerValidationConfiguration();
+  if (!configuration.authorized || !configuration.releaseCommitSha || !configuration.expiresAt) {
+    throw new Error(`Production owner validation is not authorized: ${configuration.blockingKeys.join(",") || "unknown"}`);
+  }
+
+  const principal = await requireFloridaClassDProductionOwnerPrincipal();
+  return {
+    ...principal,
     releaseCommitSha: configuration.releaseCommitSha,
     expiresAt: configuration.expiresAt,
     watermark: configuration.watermark,
