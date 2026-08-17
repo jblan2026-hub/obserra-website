@@ -12,38 +12,134 @@ import "./credential-issuer-marks.css";
 import "./credly-profile-link.css";
 import "./global-symbols.css";
 import "./auth.css";
+import "./premium-site.css";
+
+const SITE_URL = "https://www.obserrallc.com";
+const GLOBAL_DESCRIPTION =
+  "Obserra helps executives govern cyber risk, AI, intelligence, resilience, and secure technology through advisory services, EIOS software, and professional training.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.obserrallc.com"),
-  title: { default: `${LEGAL_ENTITY_NAME} | Cybersecurity, Intelligence and Secure Technology`, template: `%s | ${LEGAL_ENTITY_NAME}` },
-  description: `${LEGAL_ENTITY_NAME} provides executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning for regulated and high-consequence organizations.`,
-  alternates: { canonical: "/", languages: { "en-US": "https://www.obserrallc.com", "x-default": "https://www.obserrallc.com" } },
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${LEGAL_ENTITY_NAME} | Enterprise Intelligence, Cybersecurity and AI Governance`,
+    template: `%s | ${LEGAL_ENTITY_NAME}`,
+  },
+  description: GLOBAL_DESCRIPTION,
+  alternates: {
+    canonical: "/",
+    languages: {
+      "en-US": SITE_URL,
+      "x-default": SITE_URL,
+    },
+  },
   applicationName: LEGAL_ENTITY_NAME,
-  authors: [{ name: LEGAL_ENTITY_NAME }],
+  authors: [{ name: LEGAL_ENTITY_NAME, url: SITE_URL }],
   creator: LEGAL_ENTITY_NAME,
   publisher: LEGAL_ENTITY_NAME,
-  category: "Executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning",
+  category: "Enterprise intelligence, cybersecurity, AI governance, protective intelligence, and professional learning",
   formatDetection: { email: false, address: false, telephone: false },
   manifest: "/manifest.webmanifest",
-  icons: { icon: [{ url: "/brand/obserra-mark.svg", type: "image/svg+xml" }], shortcut: ["/brand/obserra-mark.svg"], apple: [{ url: "/brand/obserra-logo.png" }] },
-  keywords: ["cybersecurity consulting", "executive protection", "protective intelligence", "enterprise intelligence", "AI governance", "enterprise learning", "university cybersecurity training", "Obserra EIOS"],
+  icons: {
+    icon: [{ url: "/brand/obserra-mark.svg", type: "image/svg+xml" }],
+    shortcut: ["/brand/obserra-mark.svg"],
+    apple: [{ url: "/brand/obserra-logo.png" }],
+  },
+  keywords: [
+    "enterprise intelligence",
+    "cybersecurity consulting",
+    "AI governance consulting",
+    "executive cyber risk",
+    "protective intelligence",
+    "executive protection",
+    "enterprise risk intelligence",
+    "fractional CISO",
+    "CMMC readiness",
+    "NIST cybersecurity",
+    "cybersecurity training",
+    "Obserra EIOS",
+  ],
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION },
-  openGraph: { siteName: LEGAL_ENTITY_NAME, type: "website", url: "https://www.obserrallc.com", title: `${LEGAL_ENTITY_NAME} | Cybersecurity, Intelligence and Secure Technology`, description: "Executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning.", locale: "en_US", images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: `${LEGAL_ENTITY_NAME} enterprise intelligence and cybersecurity` }] },
-  twitter: { card: "summary_large_image", title: `${LEGAL_ENTITY_NAME} | Cybersecurity, Intelligence and Secure Technology`, description: "Executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning.", images: ["/brand/visuals/obserra-eios-intelligence-hero.png"] },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
+  openGraph: {
+    siteName: LEGAL_ENTITY_NAME,
+    type: "website",
+    url: SITE_URL,
+    title: `${LEGAL_ENTITY_NAME} | Enterprise Intelligence, Cybersecurity and AI Governance`,
+    description: GLOBAL_DESCRIPTION,
+    locale: "en_US",
+    images: [
+      {
+        url: "/brand/visuals/obserra-eios-intelligence-hero.png",
+        width: 1672,
+        height: 941,
+        alt: `${LEGAL_ENTITY_NAME} enterprise intelligence operating environment`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${LEGAL_ENTITY_NAME} | Enterprise Intelligence, Cybersecurity and AI Governance`,
+    description: GLOBAL_DESCRIPTION,
+    images: ["/brand/visuals/obserra-eios-intelligence-hero.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "Organization", "@id": "https://www.obserrallc.com/#organization", name: LEGAL_ENTITY_NAME, url: "https://www.obserrallc.com", logo: "https://www.obserrallc.com/brand/obserra-logo.png", description: "Executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning.", email: "info@obserrallc.com", contactPoint: [{ "@type": "ContactPoint", contactType: "sales", email: "info@obserrallc.com", availableLanguage: ["en"], areaServed: "US" }] },
-      { "@type": "WebSite", "@id": "https://www.obserrallc.com/#website", name: LEGAL_ENTITY_NAME, url: "https://www.obserrallc.com", publisher: { "@id": "https://www.obserrallc.com/#organization" }, inLanguage: "en-US" },
+      {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        name: LEGAL_ENTITY_NAME,
+        url: SITE_URL,
+        logo: `${SITE_URL}/brand/obserra-logo.png`,
+        description: GLOBAL_DESCRIPTION,
+        email: "info@obserrallc.com",
+        knowsAbout: [
+          "Enterprise cybersecurity",
+          "AI governance",
+          "Executive cyber risk",
+          "Protective intelligence",
+          "Executive protection",
+          "Enterprise resilience",
+          "Secure technology",
+          "Professional cybersecurity training",
+        ],
+        contactPoint: [
+          {
+            "@type": "ContactPoint",
+            contactType: "sales",
+            email: "info@obserrallc.com",
+            availableLanguage: ["en"],
+            areaServed: "US",
+          },
+        ],
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        name: LEGAL_ENTITY_NAME,
+        url: SITE_URL,
+        description: GLOBAL_DESCRIPTION,
+        publisher: { "@id": `${SITE_URL}/#organization` },
+        inLanguage: "en-US",
+      },
     ],
   };
 
   const application = (
-    <html lang="en">
+    <html lang="en-US">
       <body>
         <a className="obs-skip-link" href="#main-content">Skip to main content</a>
         <div id="main-content" tabIndex={-1}>{children}</div>
