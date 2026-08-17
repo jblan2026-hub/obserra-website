@@ -65,7 +65,7 @@ test("customer portal, Academy, and FDACS protected paths are Supabase-owned", (
   }
 });
 
-test("the exact Florida Coming Soon landing stays public without opening child routes", () => {
+test("the exact Florida Coming Soon landing stays public without opening protected child routes", () => {
   const { identityProviderForRequest } = routingModule();
 
   for (const pathname of ["/florida-security-training", "/florida-security-training/"]) {
@@ -85,32 +85,98 @@ test("the exact Florida Coming Soon landing stays public without opening child r
     assert.equal(landingMutation.mutationClass, "training_operation", pathname);
   }
 
-  for (const pathname of [
-    "/florida-security-training/access",
-    "/florida-security-training/owner-preview",
-  ]) {
-    const child = identityProviderForRequest({ pathname, method: "GET" });
-    assert.equal(child.provider, "supabase", pathname);
-    assert.equal(child.requiresAuthentication, true, pathname);
-    assert.equal(child.accessPolicy, "internal_owner_read_only", pathname);
-  }
+  const learnerChild = identityProviderForRequest({ pathname: "/florida-security-training/access", method: "GET" });
+  assert.equal(learnerChild.provider, "supabase");
+  assert.equal(learnerChild.requiresAuthentication, true);
+  assert.equal(learnerChild.accessPolicy, "standard_authenticated");
+
+  const ownerChild = identityProviderForRequest({ pathname: "/florida-security-training/owner-preview", method: "GET" });
+  assert.equal(ownerChild.provider, "supabase");
+  assert.equal(ownerChild.requiresAuthentication, true);
+  assert.equal(ownerChild.accessPolicy, "internal_owner_read_only");
+
   assert.equal(
     identityProviderForRequest({ pathname: "/florida-security-trainingish", method: "GET" }).provider,
     "public",
   );
 });
 
-test("every non-health FDACS protected route is an internal owner read surface", () => {
+test("Florida preflight remains public for safe reads while mutations stay fail-closed", () => {
+  const { identityProviderForRequest } = routingModule();
+
+  for (const method of ["GET", "HEAD"]) {
+    const preflight = identityProviderForRequest({ pathname: "/florida-security-training/preflight", method });
+    assert.equal(preflight.provider, "public", method);
+    assert.equal(preflight.requiresAuthentication, false, method);
+    assert.equal(preflight.accessPolicy, "public", method);
+    assert.equal(preflight.mutationAllowed, true, method);
+    assert.equal(preflight.mutationClass, "read", method);
+  }
+
+  const mutation = identityProviderForRequest({ pathname: "/florida-security-training/preflight", method: "POST" });
+  assert.equal(mutation.provider, "supabase");
+  assert.equal(mutation.requiresAuthentication, true);
+  assert.equal(mutation.accessPolicy, "internal_owner_read_only");
+  assert.equal(mutation.mutationAllowed, false);
+  assert.equal(mutation.mutationClass, "training_operation");
+});
+
+test("Florida learner journey uses authenticated Supabase without owner-only interception", () => {
   const { identityProviderForRequest } = routingModule();
 
   for (const pathname of [
+    "/florida-security-training/enroll",
+    "/florida-security-training/identity",
     "/florida-security-training/access",
-    "/florida-security-training/admin/enrollments",
+    "/florida-security-training/live/session-1",
+    "/florida-security-training/exam",
+    "/florida-security-training/makeup/session-1",
     "/florida-security-training/completion",
     "/api/florida-class-d/enrollment",
     "/api/florida-class-d/identity-verification",
-    "/api/florida-class-d/live",
+    "/api/florida-class-d/identity-video",
+    "/api/florida-class-d/live/session-1",
+    "/api/florida-class-d/media/session-1",
+    "/api/florida-class-d/exam",
+    "/api/florida-class-d/makeup/session-1",
+    "/api/florida-class-d/recorded-makeup/session-1",
+  ]) {
+    const ownership = identityProviderForRequest({ pathname, method: "GET" });
+    assert.equal(ownership.provider, "supabase", pathname);
+    assert.equal(ownership.requiresAuthentication, true, pathname);
+    assert.equal(ownership.accessPolicy, "standard_authenticated", pathname);
+    assert.equal(ownership.mutationAllowed, true, pathname);
+    assert.equal(ownership.mutationClass, "read", pathname);
+  }
+
+  for (const pathname of [
+    "/api/florida-class-d/enrollment",
+    "/api/florida-class-d/identity-verification",
+    "/api/florida-class-d/live/session-1",
+    "/api/florida-class-d/media/session-1",
+    "/api/florida-class-d/exam",
+    "/api/florida-class-d/makeup/session-1",
+    "/api/florida-class-d/recorded-makeup/session-1",
+  ]) {
+    const ownership = identityProviderForRequest({ pathname, method: "POST" });
+    assert.equal(ownership.provider, "supabase", pathname);
+    assert.equal(ownership.requiresAuthentication, true, pathname);
+    assert.equal(ownership.accessPolicy, "standard_authenticated", pathname);
+    assert.equal(ownership.mutationAllowed, true, pathname);
+    assert.notEqual(ownership.mutationClass, "read", pathname);
+  }
+});
+
+test("Florida owner and administrative surfaces remain owner-authorized and mutation-locked by default", () => {
+  const { identityProviderForRequest } = routingModule();
+
+  for (const pathname of [
+    "/florida-security-training/admin/enrollments",
+    "/florida-security-training/owner-preview",
+    "/florida-security-training/observer",
     "/api/florida-class-d/admin/lias",
+    "/api/florida-class-d/owner-preview",
+    "/api/florida-class-d/observer",
   ]) {
     const ownership = identityProviderForRequest({ pathname, method: "GET" });
     assert.equal(ownership.provider, "supabase", pathname);
@@ -121,13 +187,10 @@ test("every non-health FDACS protected route is an internal owner read surface",
   }
 
   for (const pathname of [
-    "/api/florida-class-d/enrollment",
-    "/api/florida-class-d/identity-verification",
     "/api/florida-class-d/admin/schedule",
-    "/api/florida-class-d/live",
-    "/api/florida-class-d/exam",
     "/api/florida-class-d/admin/completion",
     "/api/florida-class-d/admin/lias",
+    "/api/florida-class-d/observer",
   ]) {
     const ownership = identityProviderForRequest({ pathname, method: "POST" });
     assert.equal(ownership.accessPolicy, "internal_owner_read_only", pathname);
@@ -146,6 +209,7 @@ test("provider ownership is segment-safe and shared sign-in follows only a safe 
 
   assert.equal(identityProviderForRequest({ pathname: "/api/appshell" }).provider, "public");
   assert.equal(identityProviderForRequest({ pathname: "/florida-security-training-malicious" }).provider, "public");
+  assert.equal(identityProviderForRequest({ pathname: "/florida-security-training/enroll-malicious" }).accessPolicy, "internal_owner_read_only");
   assert.equal(identityProviderForRequest({ pathname: "/portal/applications-malicious" }).provider, "supabase");
   assert.equal(identityProviderForRequest({ pathname: "/portal/%61pplications" }).provider, "clerk");
   assert.equal(

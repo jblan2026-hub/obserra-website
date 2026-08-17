@@ -49,6 +49,31 @@ const FDACS_HEALTH_PREFIXES = [
   "/api/florida-class-d/health/live",
   "/api/florida-class-d/health/ready",
 ] as const;
+const FDACS_PUBLIC_READ_PATHS = new Set([
+  "/florida-security-training",
+  "/florida-security-training/",
+  "/florida-security-training/preflight",
+  "/florida-security-training/preflight/",
+]);
+const FDACS_LEARNER_PAGE_PREFIXES = [
+  "/florida-security-training/enroll",
+  "/florida-security-training/identity",
+  "/florida-security-training/access",
+  "/florida-security-training/live",
+  "/florida-security-training/exam",
+  "/florida-security-training/makeup",
+  "/florida-security-training/completion",
+] as const;
+const FDACS_LEARNER_API_PREFIXES = [
+  "/api/florida-class-d/enrollment",
+  "/api/florida-class-d/identity-verification",
+  "/api/florida-class-d/identity-video",
+  "/api/florida-class-d/live",
+  "/api/florida-class-d/media",
+  "/api/florida-class-d/exam",
+  "/api/florida-class-d/makeup",
+  "/api/florida-class-d/recorded-makeup",
+] as const;
 const FDACS_OWNER_PROVIDER_ACTIONS = new Map<string, ReadonlySet<string>>([
   ["/api/florida-class-d/owner-preview/daily", new Set(["POST", "DELETE"])],
   ["/api/florida-class-d/owner-preview/courseware", new Set(["POST", "DELETE"])],
@@ -92,9 +117,16 @@ function ownedRoute(pathname: string, method?: string | null): IdentityRouteOwne
   if (CLERK_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("clerk", true, "applications_clerk");
   if (CLERK_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("clerk", false, "applications_clerk");
   if (FDACS_HEALTH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("public", false, "public");
-  if ((pathname === "/florida-security-training" || pathname === "/florida-security-training/") && readMethod(method)) return route("public", false, "public");
+  if (FDACS_PUBLIC_READ_PATHS.has(pathname) && readMethod(method)) return route("public", false, "public");
 
   if (pathMatchesPrefix(pathname, "/florida-security-training/owner-validation") || pathMatchesPrefix(pathname, "/api/florida-class-d/owner-validation")) {
+    return route("supabase", true, "standard_authenticated", mutationClass(pathname, method), true);
+  }
+
+  if (
+    FDACS_LEARNER_PAGE_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))
+    || FDACS_LEARNER_API_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))
+  ) {
     return route("supabase", true, "standard_authenticated", mutationClass(pathname, method), true);
   }
 
