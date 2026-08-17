@@ -4,5 +4,5 @@
     "www.obserrallc.com",
     "obserrallc.com"
   ],
-  "ignoreCommand": "git diff --name-only HEAD^ HEAD | grep -Eq '^(app/|components/|lib/|public/|styles/|package.json$|package-lock.json$|next.config\\.|middleware\\.|tsconfig.json$|vercel.json$)' && exit 1 || exit 0"
+  "ignoreCommand": "git diff --name-only HEAD^ HEAD | grep -Eq '^(app/|components/|lib/|public/|styles/|package.json$|package-lock.json$|next.config\\.|middleware\\.|proxy\\.ts$|tsconfig.json$|vercel.json$)' && exit 1 || exit 0"
 }
