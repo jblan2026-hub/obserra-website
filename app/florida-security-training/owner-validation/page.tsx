@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Activity, BadgeCheck, BookOpenCheck, CreditCard, Database, FileCheck2, GraduationCap, IdCard, MonitorCheck, RadioTower, ShieldCheck, UsersRound } from "lucide-react";
+import { getInternalOwnerAuthority } from "../../../lib/auth/authority-repository";
 import { getFloridaClassDProductionOwnerValidationConfiguration, requireFloridaClassDProductionOwnerPrincipal } from "../../../lib/florida-class-d-production-owner-validation";
 import { readFloridaClassDOwnerPreviewState } from "../../../lib/florida-class-d-owner-preview-state";
 import "../florida-security-training.css";
@@ -11,6 +13,8 @@ export const metadata: Metadata = {
   title: "Florida Class D Production LMS Command Center | OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
   robots: { index: false, follow: false },
 };
+
+const OWNER_VALIDATION_PATH = "/florida-security-training/owner-validation";
 
 const modules = [
   ["Student identity", "/florida-security-training/owner-validation/identity", IdCard, "Live hosted government ID and matching selfie validation for the authenticated owner. No learner record or training credit is created."],
@@ -27,6 +31,14 @@ const modules = [
 ] as const;
 
 export default async function FloridaClassDProductionOwnerValidationPage() {
+  const authority = await getInternalOwnerAuthority();
+  if (!authority.identity || authority.status === "signed_out") {
+    redirect(`/sign-in?redirect_url=${encodeURIComponent(OWNER_VALIDATION_PATH)}`);
+  }
+  if (authority.identity.assuranceLevel !== "aal2") {
+    redirect(`/auth/mfa?redirect_url=${encodeURIComponent(OWNER_VALIDATION_PATH)}`);
+  }
+
   const principal = await requireFloridaClassDProductionOwnerPrincipal();
   const configuration = getFloridaClassDProductionOwnerValidationConfiguration();
   const state = await readFloridaClassDOwnerPreviewState();
