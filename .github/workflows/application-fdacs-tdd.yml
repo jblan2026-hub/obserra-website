@@ -1,6 +1,7 @@
 name: FDACS Focused TDD
 
 on:
+  pull_request:
   push:
     branches:
       - hotfix/owner-lms-test-access-20260817
