@@ -6,6 +6,7 @@ type GovernedFloridaClassDLinkProps = {
   className?: string;
   enabled: boolean;
   href: string;
+  lockedLabel?: string;
 };
 
 export default function GovernedFloridaClassDLink({
@@ -13,7 +14,21 @@ export default function GovernedFloridaClassDLink({
   className,
   enabled,
   href,
+  lockedLabel = "Enrollment and payment unavailable pending license activation",
 }: GovernedFloridaClassDLinkProps) {
-  if (!enabled) return null;
+  if (!enabled) {
+    return (
+      <button
+        aria-disabled="true"
+        className={className}
+        disabled
+        title={lockedLabel}
+        type="button"
+      >
+        {children}
+      </button>
+    );
+  }
+
   return <Link className={className} href={href}>{children}</Link>;
 }
