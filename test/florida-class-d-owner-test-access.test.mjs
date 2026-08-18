@@ -99,6 +99,7 @@ test("owner command center exposes a validated real LMS test workspace with Dail
   assert.match(lmsPage, /\/api\/florida-class-d\/owner-validation\/courseware/);
   assert.match(ownerLmsConsole, /function isHttpsUrlArray/);
   assert.match(ownerLmsConsole, /!isHttpsUrlArray\(result\.participantJoinUrls\)/);
+  assert.match(ownerLmsConsole, /result\.participantJoinUrls\.length === 0/);
   assert.match(ownerLmsConsole, /result\.trainingCreditEligible !== false/);
   assert.match(ownerLmsConsole, /function isCourseware\(/);
   assert.match(ownerLmsConsole, /function isCoursewareArray\(/);
@@ -107,6 +108,8 @@ test("owner command center exposes a validated real LMS test workspace with Dail
   assert.doesNotMatch(ownerLmsConsole, /courseware as Courseware\[\]|finalized\.courseware as Courseware/);
   assert.match(ownerLmsConsole, /async function createCoursewareView/);
   assert.match(ownerLmsConsole, /setCoursewareView\(await createCoursewareView\(item\)\)/);
+  assert.match(ownerLmsConsole, /const cleanup = \(event\?: PageTransitionEvent\)/);
+  assert.match(ownerLmsConsole, /if \(event\?\.persisted\) return;/);
   assert.match(ownerLmsConsole, /roomNameRef\.current = null;\s*setDaily\(null\);\s*void deleteDailyRoom\(roomName, true\)/s);
   assert.match(ownerLmsConsole, /<nav className="owner-preview__participant-links" aria-labelledby="owner-learner-views-heading">/);
   assert.match(ownerLmsConsole, /<section className="owner-preview__courseware-list" aria-labelledby="owner-protected-courseware-heading">/);
