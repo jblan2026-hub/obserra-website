@@ -27,11 +27,19 @@ test("rollback alias capture fails closed and distinguishes missing aliases from
   assert.match(workflow, /Vercel returned no deployment ID for required rollback alias/);
 });
 
-test("partial alias attachment or smoke failure always triggers fail-closed rollback", () => {
+test("auxiliary Vercel project is configured to ignore duplicate builds", () => {
+  assert.match(workflow, /commandForIgnoringBuildStep\":\"exit 0\"/);
+  assert.doesNotMatch(workflow, /commandForIgnoringBuildStep\":\"exit 1\"/);
+});
+
+test("partial alias attachment or smoke failure triggers rollback only after rollback state is captured", () => {
   assert.match(workflow, /id:\s*attach/);
   assert.match(workflow, /continue-on-error:\s*true/);
   assert.match(workflow, /if:\s*steps\.attach\.outcome == 'success'/);
-  assert.match(workflow, /always\(\) && \(steps\.attach\.outcome != 'success' \|\| steps\.smoke\.outcome != 'success'\)/);
+  assert.match(
+    workflow,
+    /always\(\) && steps\.rollback\.outcome == 'success' && steps\.rollback\.outputs\.primary != '' && steps\.rollback\.outputs\.apex != '' && \(steps\.attach\.outcome == 'failure' \|\| steps\.smoke\.outcome == 'failure'\)/,
+  );
   assert.match(workflow, /if \[ -z "\$\{ROLLBACK_PRIMARY\}" \] \|\| \[ -z "\$\{ROLLBACK_APEX\}" \]/);
   assert.match(workflow, /Rollback deployment IDs were not captured/);
 });
