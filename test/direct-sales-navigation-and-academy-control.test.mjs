@@ -35,3 +35,24 @@ test("Academy catalog exposes checkout only for explicitly activated courses", (
   assert.match(client, /Not yet for sale/);
   assert.match(client, /0 are currently open for purchase|purchasableCourseCount/);
 });
+
+test("Academy LMS stays live while new enrollment and payment remain licensing-gated", () => {
+  const licensing = read("lib/academy-licensing.ts");
+  const catalogPage = read("app/academy/page.tsx");
+  const coursePage = read("app/academy/[courseId]/page.tsx");
+  const checkout = read("app/api/academy/checkout/route.ts");
+  const notice = read("app/academy/AcademyCommerceNotice.tsx");
+  const homeHeader = read("app/HomeHeader.tsx");
+  const learnPage = read("app/academy/learn/[courseId]/page.tsx");
+
+  assert.match(licensing, /OBSERRA_ACADEMY_LICENSED_SALES_ENABLED/);
+  assert.match(licensing, /===\s*["']enabled["']/);
+  assert.match(catalogPage, /academyLicensedSalesEnabled/);
+  assert.match(coursePage, /academyLicensedSalesEnabled/);
+  assert.match(checkout, /academyLicensedSalesEnabled/);
+  assert.match(checkout, /licensing-pending/);
+  assert.match(notice, /licensing-pending/);
+  assert.match(homeHeader, /Academy LMS/);
+  assert.match(learnPage, /academyStateWithOwnerAccess/);
+  assert.doesNotMatch(learnPage, /academyLicensedSalesEnabled/);
+});
