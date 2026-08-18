@@ -20,9 +20,9 @@ export default function FloridaSecurityTrainingPage() {
       <section className="fl-classd__hero">
         <div className="fl-classd__eyebrow"><ShieldCheck size={18} /> Florida Security Training</div>
         <span className="fl-classd__status">LMS PLATFORM LIVE · PRODUCTION SOFTWARE</span>
-        <span className="fl-classd__status">ENROLLMENT &amp; PAYMENT LOCKED · LICENSE ACTIVATION PENDING</span>
+        <span className="fl-classd__status">ENROLLMENT & PAYMENT LOCKED · LICENSE ACTIVATION PENDING</span>
         <h1>{FLORIDA_CLASS_D_COURSE.title}</h1>
-        <p className="fl-classd__lead">The LMS platform is live on the OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC production website and is engineered for instructor-led delivery, identity controls, attendance evidence, student interaction, learning checks, examination controls, training records, and post-course administration. Enrollment and payment remain unavailable until licensing and production activation are complete, and regulated training credit remains disabled until every applicable FDACS activation requirement is satisfied.</p>
+        <p className="fl-classd__lead">The LMS platform is live on the OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC production website and is engineered for instructor-led delivery, identity controls, attendance evidence, student interaction, learning checks, examination controls, training records, and post-course administration. Enrollment and payment remain unavailable until licensing and production activation are complete, and regulated training credit remains disabled until every applicable FDACS activation requirement is satisfied.</p>
         <div className="fl-classd__notice is-warning"><LockKeyhole size={20} /><div><strong>Platform live. Learner commerce locked pending licensure.</strong><span>You may review the LMS, curriculum, readiness requirements, and delivery model now. Enrollment, payment, production student access, course credit, completion, certificates, and LIAS reporting remain fail closed until licensing and production activation are complete.</span></div></div>
         <div className="fl-classd__actions">
           <Link href="/florida-security-training/preflight">Check student ID requirements</Link>
