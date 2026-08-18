@@ -264,9 +264,33 @@ export default function OwnerValidationLmsConsole({
   }
 
   useEffect(() => {
-    void refreshCourseware().catch((error: unknown) => {
-      setCoursewareError(error instanceof Error ? error.message : "Protected courseware inventory is unavailable.");
-    });
+    let active = true;
+
+    void fetch(COURSEWARE_API, { cache: "no-store" })
+      .then(async (response) => {
+        const result = await payload(response);
+        if (!response.ok || !Array.isArray(result.courseware)) {
+          throw new Error(
+            typeof result.error === "string"
+              ? result.error
+              : "Protected courseware inventory is unavailable.",
+          );
+        }
+        if (active) setCourseware(result.courseware as Courseware[]);
+      })
+      .catch((error: unknown) => {
+        if (active) {
+          setCoursewareError(
+            error instanceof Error
+              ? error.message
+              : "Protected courseware inventory is unavailable.",
+          );
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
