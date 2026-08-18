@@ -102,23 +102,40 @@ jobs:
           retention-days: 180
 
   cmmc-evidence-remediation:
-    name: Emit CMMC evidence remediation artifact
+    name: Commit CMMC evidence remediation
     if: github.event_name == 'pull_request' && github.head_ref == 'hotfix/owner-lms-test-access-20260817'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    permissions:
+      contents: write
     steps:
-      - name: Check out exact pull request revision
+      - name: Check out controlled owner branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: hotfix/owner-lms-test-access-20260817
       - name: Configure Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Regenerate controlled CMMC system evidence
-        run: node scripts/cmmc-system-evidence.mjs --write
-      - name: Verify regenerated evidence
-        run: node scripts/cmmc-system-evidence.mjs --check
+      - name: Pin generator source before execution
+        run: |
+          test "$(git hash-object scripts/cmmc-system-evidence.mjs)" = "8fd7ea51f34ab9a02c19cf34e48c33ac4f5757f3"
+      - name: Regenerate and verify controlled CMMC system evidence
+        run: |
+          node scripts/cmmc-system-evidence.mjs --write
+          node scripts/cmmc-system-evidence.mjs --check
+      - name: Commit generated evidence only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- docs/compliance/CMMC-SYSTEM-EVIDENCE.json docs/compliance/CMMC-SYSTEM-EVIDENCE.md docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          if git diff --cached --quiet; then
+            echo "CMMC evidence is already synchronized."
+            exit 0
+          fi
+          git commit -m "chore(cmmc): refresh generated system evidence"
+          git push origin HEAD:hotfix/owner-lms-test-access-20260817
       - name: Upload CMMC evidence remediation
         uses: actions/upload-artifact@v4
         with:
