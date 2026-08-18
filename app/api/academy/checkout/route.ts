@@ -3,6 +3,7 @@ import type Stripe from "stripe";
 import { BASELINE_COURSE_VERSION, publicationForCourse } from "../../../academy/coursePublication";
 import { courseForId } from "../../../../lib/academy";
 import { publicAcademyCourse } from "../../../../lib/academy-control";
+import { academyLicensedSalesEnabled } from "../../../../lib/academy-licensing";
 import {
   academyPurchaserHashConfigured,
   academyStorageHealth,
@@ -117,6 +118,13 @@ export async function POST(request: Request) {
   );
 
   if (!checkoutAttempt) return rejectedRequest(400, "Invalid checkout attempt");
+
+  if (!academyLicensedSalesEnabled()) {
+    const response = unavailableRedirect(requestUrl, "licensing-pending");
+    response.headers.set("x-obserra-sales-license", "pending");
+    response.headers.set("x-obserra-existing-entitlements", "preserved");
+    return response;
+  }
 
   const commerceLivemode = academyCommerceLivemode();
   if (!baseCourse || commerceLivemode === null || !academyCommerceWebhookConfigured()) {
@@ -260,26 +268,26 @@ export async function POST(request: Request) {
       lineItem = { price: governedPrice.id, quantity: 1 };
     } else {
       lineItem = {
-          quantity: 1,
-          price_data: {
-            currency: "usd",
-            unit_amount: amountCents,
-            product_data: {
-              name: course.title,
-              description: course.description,
-              metadata: {
-                obserraCourseId: course.id,
-                courseVersion,
-                courseReleaseStatus,
-                department: course.department,
-                level: course.level,
-                entitlementCode: license.entitlementCode,
-                credentialType: metadata.credentialType,
-                courseControlRevision: metadata.courseControlRevision,
-              },
+        quantity: 1,
+        price_data: {
+          currency: "usd",
+          unit_amount: amountCents,
+          product_data: {
+            name: course.title,
+            description: course.description,
+            metadata: {
+              obserraCourseId: course.id,
+              courseVersion,
+              courseReleaseStatus,
+              department: course.department,
+              level: course.level,
+              entitlementCode: license.entitlementCode,
+              credentialType: metadata.credentialType,
+              courseControlRevision: metadata.courseControlRevision,
             },
           },
-        };
+        },
+      };
     }
 
     const checkoutParameters: Stripe.Checkout.SessionCreateParams = {
