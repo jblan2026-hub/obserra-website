@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { IdCard, ShieldCheck } from "lucide-react";
+import { getInternalOwnerAuthority } from "../../../../lib/auth/authority-repository";
 import { requireFloridaClassDProductionOwnerPrincipal } from "../../../../lib/florida-class-d-production-owner-validation";
 import OwnerIdentityValidationClient from "./OwnerIdentityValidationClient";
 import "../../florida-security-training.css";
@@ -12,7 +14,17 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+const OWNER_IDENTITY_PATH = "/florida-security-training/owner-validation/identity";
+
 export default async function FloridaClassDProductionOwnerIdentityPage() {
+  const authority = await getInternalOwnerAuthority();
+  if (!authority.identity || authority.status === "signed_out") {
+    redirect(`/sign-in?redirect_url=${encodeURIComponent(OWNER_IDENTITY_PATH)}`);
+  }
+  if (authority.identity.assuranceLevel !== "aal2") {
+    redirect(`/auth/mfa?redirect_url=${encodeURIComponent(OWNER_IDENTITY_PATH)}`);
+  }
+
   const principal = await requireFloridaClassDProductionOwnerPrincipal();
 
   return (
