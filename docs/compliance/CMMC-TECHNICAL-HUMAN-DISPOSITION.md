@@ -7,7 +7,7 @@
 - **State:** `working_disposition_record`
 - **Generated:** `2026-08-14T18:49:07Z`
 - **Source bundle:** `obserra-cmmc-working-2896e17ce678ae0aea486ad5`
-- **Source bundle SHA-256:** `de38ef16a201c0a26e82be7882ad4d6d4824d67d92a338a5531c0c55e16f9f44`
+- **Source bundle SHA-256:** `15fb5b692170ef48457f57bcf56252d572ab928f8e2849a24e1a2ad66e6f472e`
 - **Revision binding:** `working_tree_digest`
 
 ## Independent pass criteria
