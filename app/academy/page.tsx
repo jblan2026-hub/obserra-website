@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { publicAcademyCatalog } from "../../lib/academy-control";
 import { academyLicensedSalesEnabled } from "../../lib/academy-licensing";
 import AcademyControlledClient from "./AcademyControlledClient";
@@ -89,6 +90,11 @@ export default async function AcademyPage({ searchParams }: { searchParams: Prom
   return (
     <>
       <AcademyCommerceNotice status={licensedSalesEnabled ? commerceState.enrollment : "licensing-pending"} />
+      <section className="academy-commerce-notice" role="status">
+        <strong>Florida Class D LMS platform is live</strong>
+        <p>The regulated LMS can be reviewed now. Florida Class D enrollment and payment remain locked until licensing and production activation are complete.</p>
+        <Link href="/florida-security-training">Open Florida Class D LMS</Link>
+      </section>
       <AcademyControlledClient
         courses={publicCourses}
         purchaseAvailability={purchaseAvailability}
