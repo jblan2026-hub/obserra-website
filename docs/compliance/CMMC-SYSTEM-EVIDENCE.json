@@ -60,7 +60,7 @@
     "branch": "codex/gate37-public-production-hardening",
     "headCommitSha": "0e72459a8940f23976038d85d6394409000f48c5",
     "revisionBinding": "working_tree_digest",
-    "workingTreeState": "dirty",
+    "workingTreeState": "clean",
     "workingTreeSha256": "5851b4ea53d4a09756575a36d31a0e81812b26a6ba07ff2c445cf1dc5cccd835",
     "workingTreePathCount": 658,
     "digestPolicy": {
