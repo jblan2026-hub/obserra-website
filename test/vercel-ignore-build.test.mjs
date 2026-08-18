@@ -53,14 +53,14 @@ test("preview build continues when relevant source changed before an evidence-on
   }
 });
 
-test("noncanonical projects remain ignored", () => {
+test("unrecognized Vercel project IDs fail open so a release cannot be silently skipped", () => {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "obserra-vercel-ignore-"));
   try {
     git(cwd, "init");
     fs.writeFileSync(path.join(cwd, "README.md"), "baseline\n");
     commit(cwd, "baseline");
     const result = runIgnore(cwd, { VERCEL_PROJECT_ID: "prj_noncanonical" });
-    assert.equal(result.status, 0);
+    assert.equal(result.status, 1, `expected Vercel to build on an unrecognized project ID, stderr: ${result.stderr}`);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }
