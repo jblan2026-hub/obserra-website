@@ -100,3 +100,60 @@ jobs:
             release/application-market-intelligence/**
           if-no-files-found: error
           retention-days: 180
+
+  compliance-evidence-sync:
+    name: Synchronize post-CodeRabbit evidence
+    if: github.event_name == 'pull_request' && github.head_ref == 'hotfix/owner-lms-test-access-20260817'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Check out controlled owner branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: hotfix/owner-lms-test-access-20260817
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Restore final workflow before evidence generation
+        run: git show 3890e2814193c4729f6ca7fab588c08f291b6bd9:.github/workflows/application-release-validation.yml > .github/workflows/application-release-validation.yml
+      - name: Regenerate generated evidence in dependency order
+        run: |
+          npm run generate:legal-identity-audit
+          node scripts/cmmc-system-evidence.mjs --write
+          npm run generate:cmmc-disposition
+          npm run generate:fdacs-pii-audit
+          npm run generate:cmmc-handoff
+      - name: Verify complete generated evidence chain
+        run: |
+          npm run verify:legal-identity-audit
+          npm run verify:cmmc-system-evidence
+          npm run verify:cmmc-disposition
+          npm run verify:fdacs-pii-audit
+          npm run verify:cmmc-handoff
+      - name: Commit synchronized evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.json \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.md \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256 \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256 \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
+          git diff --cached --stat
+          git commit -m "chore(compliance): synchronize post-CodeRabbit evidence"
+          git push origin HEAD:hotfix/owner-lms-test-access-20260817
