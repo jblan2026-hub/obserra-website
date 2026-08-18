@@ -27,8 +27,8 @@ export default function FloridaSecurityTrainingPage() {
         <div className="fl-classd__actions">
           <Link href="/florida-security-training/preflight">Check student ID requirements</Link>
           <Link className="secondary" href="/contact?interest=florida-class-d-training">Request a program launch notice</Link>
-          <GovernedFloridaClassDLink enabled={publicLearnerControlsEnabled} href="/florida-security-training/enroll">Enrollment and payment</GovernedFloridaClassDLink>
-          <GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access" lockedLabel="Student access unavailable pending license activation">Student course access</GovernedFloridaClassDLink>
+          <GovernedFloridaClassDLink enabled={publicLearnerControlsEnabled} href="/florida-security-training/enroll" lockedDescriptionId="fdacs-enrollment-payment-locked">Enrollment and payment</GovernedFloridaClassDLink>
+          <GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access" lockedDescriptionId="fdacs-hero-student-access-locked" lockedLabel="Student access unavailable pending license activation">Student course access</GovernedFloridaClassDLink>
         </div>
       </section>
 
@@ -67,7 +67,7 @@ export default function FloridaSecurityTrainingPage() {
           <div><b>03</b><span>Complete hosted government photo-ID and matching-selfie verification, then meet the assigned licensed Class DI instructor for independent identity attestation.</span></div>
           <div><b>04</b><span>Open only the assigned secure live lesson after enrollment, identity, instructor, schedule, and single-device controls all pass.</span></div>
         </div>
-        <div className="fl-classd__actions"><Link href="/florida-security-training/preflight">Run pre-login ID readiness check</Link><GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access" lockedLabel="Student access unavailable pending license activation">Student course access</GovernedFloridaClassDLink></div>
+        <div className="fl-classd__actions"><Link href="/florida-security-training/preflight">Run pre-login ID readiness check</Link><GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access" lockedDescriptionId="fdacs-journey-student-access-locked" lockedLabel="Student access unavailable pending license activation">Student course access</GovernedFloridaClassDLink></div>
       </section>
 
       <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>The LMS software may be live while regulated learner operations remain disabled. Completing prelicense validation activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied. Payment and production student access also remain disabled until licensing and production activation are complete.</p></div></section>

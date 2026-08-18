@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-const read = (relativePath) => fs.readFileSync(relativePath, "utf8");
+const read = (path) => fs.readFileSync(path, "utf8");
 
 test("Applications and Academy are prominent direct website destinations", () => {
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
@@ -48,7 +48,9 @@ test("Academy LMS stays live while new enrollment and payment remain licensing-g
   assert.match(licensing, /OBSERRA_ACADEMY_LICENSED_SALES_ENABLED/);
   assert.match(licensing, /===\s*["']enabled["']/);
   assert.match(catalogPage, /academyLicensedSalesEnabled/);
+  assert.match(catalogPage, /commerceState\.enrollment \?\? \(!licensedSalesEnabled \? "licensing-pending" : undefined\)/);
   assert.match(coursePage, /academyLicensedSalesEnabled/);
+  assert.match(coursePage, /commerceState\.enrollment \?\? commerceState\.checkout \?\? \(!licensedSalesEnabled \? "licensing-pending" : undefined\)/);
   assert.match(checkout, /academyLicensedSalesEnabled/);
   assert.match(checkout, /licensing-pending/);
   assert.match(notice, /licensing-pending/);

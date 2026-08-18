@@ -13,6 +13,12 @@ type StatusPayload = {
 
 const API_PATH = "/api/florida-class-d/owner-validation/identity";
 
+function providerModeLabel(providerLivemode: boolean | undefined) {
+  if (providerLivemode === true) return "Stripe live mode. ";
+  if (providerLivemode === false) return "Stripe test mode. ";
+  return "Stripe provider mode unavailable. ";
+}
+
 export default function OwnerIdentityValidationClient() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<StatusPayload | null>(null);
@@ -85,7 +91,7 @@ export default function OwnerIdentityValidationClient() {
           {status.verified ? <CheckCircle2 size={20} /> : <ShieldCheck size={20} />}
           <div>
             <strong>{status.verified ? "Hosted identity validation verified." : `Provider status: ${status.status ?? "unknown"}`}</strong>
-            <span>{status.providerLivemode ? "Stripe live mode. " : "Stripe test mode. "}{status.providerErrorCode ? `Provider error code: ${status.providerErrorCode}. ` : ""}No identity document or selfie image is rendered by this LMS page.</span>
+            <span>{providerModeLabel(status.providerLivemode)}{status.providerErrorCode ? `Provider error code: ${status.providerErrorCode}. ` : ""}No identity document or selfie image is rendered by this LMS page.</span>
           </div>
         </div>
       ) : null}

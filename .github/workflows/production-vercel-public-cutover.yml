@@ -16,7 +16,7 @@ concurrency:
 jobs:
   cutover:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
       TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
@@ -79,17 +79,43 @@ jobs:
           set -euo pipefail
           alias_deployment() {
             local alias="$1"
-            curl --silent --show-error --fail-with-body \
+            local body
+            local status
+            local code
+            local message
+            local deployment
+            body="$(mktemp)"
+            if ! status="$(curl --silent --show-error \
+              --output "${body}" \
+              --write-out '%{http_code}' \
               --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-              "https://api.vercel.com/v4/aliases/${alias}?teamId=${TEAM_ID}" \
-              | jq -r '.deploymentId // .deployment.id // empty'
+              "https://api.vercel.com/v4/aliases/${alias}?teamId=${TEAM_ID}")"; then
+              rm -f "${body}"
+              echo "::error::Vercel rollback-alias lookup failed before an HTTP response was received for ${alias}." >&2
+              return 1
+            fi
+            code="$(jq -r '.error.code // empty' "${body}" 2>/dev/null || true)"
+            message="$(jq -r '.error.message // empty' "${body}" 2>/dev/null || true)"
+            if [ "${status}" = "404" ]; then
+              rm -f "${body}"
+              echo "::error::Required rollback alias ${alias} is not configured (HTTP 404${code:+, ${code}})." >&2
+              return 1
+            fi
+            if [ "${status}" != "200" ]; then
+              rm -f "${body}"
+              echo "::error::Vercel rollback-alias lookup failed for ${alias}: HTTP ${status}${code:+, ${code}}${message:+ - ${message}}" >&2
+              return 1
+            fi
+            deployment="$(jq -r '.deploymentId // .deployment.id // empty' "${body}")"
+            rm -f "${body}"
+            if [ -z "${deployment}" ]; then
+              echo "::error::Vercel returned no deployment ID for required rollback alias ${alias}." >&2
+              return 1
+            fi
+            printf '%s\n' "${deployment}"
           }
           primary="$(alias_deployment "${PRIMARY_DOMAIN}")"
           apex="$(alias_deployment "${APEX_DOMAIN}")"
-          if [ -z "${primary}" ] || [ -z "${apex}" ]; then
-            echo "::error::Could not capture the current canonical rollback deployments."
-            exit 1
-          fi
           echo "primary=${primary}" >> "${GITHUB_OUTPUT}"
           echo "apex=${apex}" >> "${GITHUB_OUTPUT}"
 

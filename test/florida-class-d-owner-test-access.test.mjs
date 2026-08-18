@@ -11,6 +11,7 @@ const files = {
   identityClient: new URL("../app/florida-security-training/owner-validation/identity/OwnerIdentityValidationClient.tsx", import.meta.url),
   commandCenter: new URL("../app/florida-security-training/owner-validation/page.tsx", import.meta.url),
   lmsPage: new URL("../app/florida-security-training/owner-validation/lms/page.tsx", import.meta.url),
+  ownerLmsConsole: new URL("../app/florida-security-training/owner-validation/lms/OwnerValidationLmsConsole.tsx", import.meta.url),
   ownerPreview: new URL("../app/florida-security-training/owner-preview/OwnerPreviewConsole.tsx", import.meta.url),
   dailyApi: new URL("../app/api/florida-class-d/owner-validation/daily/route.ts", import.meta.url),
   coursewareApi: new URL("../app/api/florida-class-d/owner-validation/courseware/route.ts", import.meta.url),
@@ -53,6 +54,9 @@ test("owner Stripe Identity test is bound to the authenticated AAL2 owner sessio
   assert.doesNotMatch(page, /authorized=\{configuration\.authorized\}/);
   assert.doesNotMatch(client, /disabled=\{!authorized \|\| busy\}/);
   assert.match(client, /Start hosted ID verification/);
+  assert.match(client, /providerLivemode === true/);
+  assert.match(client, /providerLivemode === false/);
+  assert.match(client, /Stripe provider mode unavailable/);
 });
 
 test("owner validation pages elevate signed-in AAL1 sessions through MFA instead of the global error boundary", async () => {
@@ -74,14 +78,19 @@ test("owner command center exposes a real LMS test workspace with Daily instruct
   assert.equal(existsSync(files.lmsPage), true, "owner LMS test page must exist");
   assert.equal(existsSync(files.dailyApi), true, "owner Daily test API must exist");
   assert.equal(existsSync(files.coursewareApi), true, "owner courseware test API must exist");
-  const [commandCenter, lmsPage, ownerPreview, dailyApi, coursewareApi, nextConfig] = await Promise.all([
-    source("commandCenter"), source("lmsPage"), source("ownerPreview"), source("dailyApi"), source("coursewareApi"), source("nextConfig"),
+  const [commandCenter, lmsPage, ownerLmsConsole, ownerPreview, dailyApi, coursewareApi, nextConfig] = await Promise.all([
+    source("commandCenter"), source("lmsPage"), source("ownerLmsConsole"), source("ownerPreview"), source("dailyApi"), source("coursewareApi"), source("nextConfig"),
   ]);
   assert.match(commandCenter, /\/florida-security-training\/owner-validation\/lms/);
   assert.match(lmsPage, /OwnerPreviewConsole/);
   assert.match(lmsPage, /initialView="live"/);
   assert.match(lmsPage, /\/api\/florida-class-d\/owner-validation\/daily/);
   assert.match(lmsPage, /\/api\/florida-class-d\/owner-validation\/courseware/);
+  assert.match(ownerLmsConsole, /function isHttpsUrlArray/);
+  assert.match(ownerLmsConsole, /!isHttpsUrlArray\(result\.participantJoinUrls\)/);
+  assert.match(ownerLmsConsole, /result\.trainingCreditEligible !== false/);
+  assert.match(ownerLmsConsole, /async function createCoursewareView/);
+  assert.match(ownerLmsConsole, /setCoursewareView\(await createCoursewareView\(item\)\)/);
   assert.match(ownerPreview, /Create live classroom/);
   assert.match(ownerPreview, /instructorJoinUrl/);
   assert.match(ownerPreview, /<iframe[\s\S]*instructorJoinUrl/);

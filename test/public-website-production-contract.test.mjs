@@ -50,8 +50,10 @@ test("the public FDACS LMS preserves learner structure while prelicense actions 
   assert.match(publicFdacs, /enabled=\{publicLearnerControlsEnabled\}/);
   assert.match(governedLink, /if \(!enabled\) \{/);
   assert.match(governedLink, /aria-disabled="true"/);
+  assert.match(governedLink, /aria-describedby=\{lockedDescriptionId\}/);
+  assert.match(governedLink, /className="obs-sr-only"/);
   assert.match(governedLink, /<button/);
-  assert.match(governedLink, /disabled/);
+  assert.doesNotMatch(governedLink, /\n\s*disabled\s*(?:\n|=|>)/);
   assert.match(governedLink, /title=\{lockedLabel\}/);
   assert.match(protectedAccess, /The LMS does not store copies or biometric templates/);
   assert.match(protectedAccess, /short-lived secure video/);

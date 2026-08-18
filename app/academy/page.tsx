@@ -89,7 +89,7 @@ export default async function AcademyPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <AcademyCommerceNotice status={licensedSalesEnabled ? commerceState.enrollment : "licensing-pending"} />
+      <AcademyCommerceNotice status={commerceState.enrollment ?? (!licensedSalesEnabled ? "licensing-pending" : undefined)} />
       <section className="academy-commerce-notice" role="status">
         <strong>Florida Class D LMS platform is live</strong>
         <p>The regulated LMS can be reviewed now. Florida Class D enrollment and payment remain locked until licensing and production activation are complete.</p>

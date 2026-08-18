@@ -45,6 +45,11 @@ async function payload(response: Response) {
   return response.json().catch(() => ({})) as Promise<Record<string, unknown>>;
 }
 
+function isHttpsUrlArray(value: unknown): value is string[] {
+  return Array.isArray(value)
+    && value.every((item) => typeof item === "string" && item.startsWith("https://"));
+}
+
 function formatDateTime(value: string) {
   const parsed = new Date(value);
   if (!Number.isFinite(parsed.getTime())) return "Unavailable";
@@ -97,6 +102,20 @@ async function deleteDailyRoom(roomName: string, keepalive = false) {
   }
 }
 
+async function createCoursewareView(item: Courseware): Promise<CoursewareView> {
+  const response = await fetch(COURSEWARE_API, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ action: "create-view", objectPath: item.objectPath }),
+    cache: "no-store",
+  });
+  const result = await payload(response);
+  if (!response.ok || typeof result.signedViewUrl !== "string") {
+    throw new Error(typeof result.error === "string" ? result.error : "Protected courseware view is unavailable.");
+  }
+  return { ...item, signedViewUrl: result.signedViewUrl };
+}
+
 export default function OwnerValidationLmsConsole({
   initialView,
   releaseCommitSha,
@@ -138,10 +157,28 @@ export default function OwnerValidationLmsConsole({
       });
       const result = await payload(response);
       if (!response.ok) throw new Error(typeof result.error === "string" ? result.error : "Daily classroom could not be created.");
-      const access = result as unknown as DailyAccess;
-      if (access.provider !== "daily" || !access.roomName || !access.instructorJoinUrl || access.ownerOnly !== true) {
+      if (
+        result.provider !== "daily"
+        || typeof result.roomName !== "string"
+        || !result.roomName
+        || typeof result.instructorJoinUrl !== "string"
+        || !result.instructorJoinUrl.startsWith("https://")
+        || !isHttpsUrlArray(result.participantJoinUrls)
+        || typeof result.roomExpiresAt !== "string"
+        || result.ownerOnly !== true
+        || result.trainingCreditEligible !== false
+      ) {
         throw new Error("Daily returned incomplete owner access.");
       }
+      const access: DailyAccess = {
+        provider: "daily",
+        roomName: result.roomName,
+        instructorJoinUrl: result.instructorJoinUrl,
+        participantJoinUrls: result.participantJoinUrls,
+        roomExpiresAt: result.roomExpiresAt,
+        ownerOnly: true,
+        trainingCreditEligible: false,
+      };
       roomNameRef.current = access.roomName;
       setDaily(access);
     } catch (error) {
@@ -171,17 +208,7 @@ export default function OwnerValidationLmsConsole({
     setCoursewareBusy(true);
     setCoursewareError(null);
     try {
-      const response = await fetch(COURSEWARE_API, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action: "create-view", objectPath: item.objectPath }),
-        cache: "no-store",
-      });
-      const result = await payload(response);
-      if (!response.ok || typeof result.signedViewUrl !== "string") {
-        throw new Error(typeof result.error === "string" ? result.error : "Protected courseware view is unavailable.");
-      }
-      setCoursewareView({ ...item, signedViewUrl: result.signedViewUrl });
+      setCoursewareView(await createCoursewareView(item));
     } catch (error) {
       setCoursewareError(error instanceof Error ? error.message : "Protected courseware view is unavailable.");
     } finally {
@@ -234,7 +261,7 @@ export default function OwnerValidationLmsConsole({
       }
       const item = finalized.courseware as Courseware;
       await refreshCourseware();
-      await presentCourseware(item);
+      setCoursewareView(await createCoursewareView(item));
     } catch (error) {
       setCoursewareError(error instanceof Error ? error.message : "Protected courseware upload failed.");
     } finally {
