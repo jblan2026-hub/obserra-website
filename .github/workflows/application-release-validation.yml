@@ -112,14 +112,14 @@ jobs:
       - name: Check out controlled owner branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
           ref: hotfix/owner-lms-test-access-20260817
       - name: Configure Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Restore final workflow before evidence generation
-        run: git show HEAD^:.github/workflows/application-release-validation.yml > .github/workflows/application-release-validation.yml
+        run: git show d9f33359617dd3103dd29c4d7af05b09c482e59b:.github/workflows/application-release-validation.yml > .github/workflows/application-release-validation.yml
       - name: Regenerate generated evidence in dependency order
         run: |
           npm run generate:legal-identity-audit
