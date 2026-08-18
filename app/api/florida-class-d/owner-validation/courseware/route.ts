@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import {
   FloridaClassDOwnerTestAuthorizationError,
   requireFloridaClassDOwnerTestPrincipal,
-} from "../../../../../../lib/florida-class-d-owner-test-session";
+} from "../../../../../lib/florida-class-d-owner-test-session";
 import {
   createFloridaClassDOwnerCoursewareUpload,
   createFloridaClassDOwnerCoursewareView,
@@ -10,7 +10,7 @@ import {
   finalizeFloridaClassDOwnerCourseware,
   FloridaClassDOwnerCoursewareError,
   listFloridaClassDOwnerCourseware,
-} from "../../../../../../lib/florida-class-d-owner-preview-courseware";
+} from "../../../../../lib/florida-class-d-owner-preview-courseware";
 
 export const dynamic = "force-dynamic";
 
