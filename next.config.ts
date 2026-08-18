@@ -179,6 +179,10 @@ const nextConfig: NextConfig = {
         headers: protectedVideoInstructorHeaders,
       },
       {
+        source: "/florida-security-training/owner-validation/lms",
+        headers: protectedVideoInstructorHeaders,
+      },
+      {
         source: "/eios/app/:path*",
         headers: protectedRouteHeaders,
       },
