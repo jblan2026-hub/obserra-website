@@ -100,38 +100,3 @@ jobs:
             release/application-market-intelligence/**
           if-no-files-found: error
           retention-days: 180
-
-  vercel-live-project-repair:
-    name: Repair live Vercel ignored-build policy
-    if: github.event_name == 'pull_request' && github.head_ref == 'hotfix/owner-lms-test-access-20260817'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
-      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
-      LIVE_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
-    steps:
-      - name: Require configured Vercel credential
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "${VERCEL_TOKEN}"
-      - name: Disable project-level ignored builds on live project
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl --silent --show-error --fail-with-body \
-            --request PATCH \
-            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-            --header "Content-Type: application/json" \
-            --data '{"commandForIgnoringBuildStep":"exit 1"}' \
-            "https://api.vercel.com/v9/projects/${LIVE_PROJECT_ID}?teamId=${TEAM_ID}" \
-            >/dev/null
-      - name: Verify live project policy
-        shell: bash
-        run: |
-          set -euo pipefail
-          response="$(curl --silent --show-error --fail-with-body \
-            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-            "https://api.vercel.com/v9/projects/${LIVE_PROJECT_ID}?teamId=${TEAM_ID}")"
-          test "$(jq -r '.commandForIgnoringBuildStep // empty' <<<"${response}")" = "exit 1"
