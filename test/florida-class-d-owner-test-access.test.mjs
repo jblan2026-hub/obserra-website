@@ -55,6 +55,21 @@ test("owner Stripe Identity test is bound to the authenticated AAL2 owner sessio
   assert.match(client, /Start hosted ID verification/);
 });
 
+test("owner validation pages elevate signed-in AAL1 sessions through MFA instead of the global error boundary", async () => {
+  const [commandCenter, identityPage, lmsPage] = await Promise.all([
+    source("commandCenter"),
+    source("identityPage"),
+    source("lmsPage"),
+  ]);
+  for (const page of [commandCenter, identityPage, lmsPage]) {
+    assert.match(page, /getInternalOwnerAuthority/);
+    assert.match(page, /redirect/);
+    assert.match(page, /assuranceLevel\s*!==\s*["']aal2["']/);
+    assert.match(page, /\/auth\/mfa\?redirect_url=/);
+    assert.match(page, /\/sign-in\?redirect_url=/);
+  }
+});
+
 test("owner command center exposes a real LMS test workspace with Daily instructor video and courseware", async () => {
   assert.equal(existsSync(files.lmsPage), true, "owner LMS test page must exist");
   assert.equal(existsSync(files.dailyApi), true, "owner Daily test API must exist");
