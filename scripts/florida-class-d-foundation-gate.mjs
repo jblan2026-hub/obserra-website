@@ -109,20 +109,20 @@ gate("daily breaks are fifteen minutes after lessons one through three", () => {
     assert.deepEqual(daily.map((lesson) => lesson.breakMinutes), [15, 15, 15, 0]);
   }
   assert.match(courseSource, /trackedBreakMinutesPerDay: 45/);
-  assert.match(publicPage, /Break time, connection time, security-question responses, attendance, and participation remain distinct evidence classes/);
-  assert.match(publicPage, /40 instructional hours/);
+  assert.match(publicPage, /Break time is recorded but is never credited toward the required 40 instructional hours/);
 });
 
 gate("certification exam is separately controlled", () => {
   assert.match(courseSource, /examQuestions: 170/);
   assert.match(courseSource, /passingCorrectAnswers: 128/);
-  assert.match(publicPage, /certification examination remains separately controlled from the 40 instructional hours/i);
+  assert.match(publicPage, /certification examination is controlled separately from the 40 instructional hours/i);
 });
 
 gate("licensure and approval are not misrepresented", () => {
   assert.match(publicPage, /Completing training does not itself issue a Florida Class D Security Officer license/);
   assert.match(publicPage, /does not claim FDACS approval or production authorization/);
-  assert.match(publicPage, /Until the applicable licensing and activation gates are satisfied, enrollment, payment, production student access, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled/);
+  assert.match(publicPage, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled until every applicable authorization gate is satisfied/);
+  assert.match(publicPage, /Payment and production student access also remain disabled until licensing and production activation are complete/);
   assert.match(protectedCompletionPage, /Production authorization is false/);
   assert.match(protectedCompletionPage, /no course credit, completion document, certificate, or LIAS record can be issued until the separate FDACS activation gates are satisfied/i);
   assert.doesNotMatch(protectedCompletionPage, /Preview UAT/);
