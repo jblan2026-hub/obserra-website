@@ -1,5 +1,6 @@
 const MESSAGES: Record<string, { title: string; detail: string; alert?: boolean }> = {
   cancelled: { title: "Checkout canceled", detail: "No new charge was created. You can restart secure checkout when ready." },
+  "licensing-pending": { title: "Academy LMS is live; new enrollment is not yet open", detail: "Course previews and existing learner access remain available. New enrollment and payment stay disabled until the required licensing is complete and the sales gate is explicitly enabled." },
   "configuration-required": { title: "Checkout is temporarily unavailable", detail: "The payment boundary is not fully configured. No charge was attempted.", alert: true },
   "identity-configuration-required": { title: "Sign-in service unavailable", detail: "Paid access cannot be connected to a learner identity right now. No additional charge will be created.", alert: true },
   "durable-storage-unavailable": { title: "Enrollment recording unavailable", detail: "Checkout is paused until durable entitlement storage is healthy. No charge was attempted.", alert: true },
