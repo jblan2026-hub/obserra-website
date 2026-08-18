@@ -101,11 +101,13 @@ jobs:
           if-no-files-found: error
           retention-days: 180
 
-  capture-pr-merge-compliance-evidence:
-    name: Capture exact PR merge compliance evidence
+  apply-pr-merge-compliance-evidence:
+    name: Apply exact PR merge compliance evidence
     if: github.event_name == 'pull_request' && github.head_ref == 'hotfix/owner-lms-test-access-20260817'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    permissions:
+      contents: write
     steps:
       - name: Check out exact pull request merge revision
         uses: actions/checkout@v4
@@ -127,25 +129,51 @@ jobs:
           npm run verify:cmmc-disposition
           npm run verify:fdacs-pii-audit
           npm run verify:cmmc-handoff
-      - name: Upload exact merge-tree evidence
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr134-exact-merge-compliance-evidence
-          path: |
-            docs/compliance/LEGAL-IDENTITY-AUDIT.json
-            docs/compliance/LEGAL-IDENTITY-AUDIT.md
-            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.json
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.md
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256
-            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json
-            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md
-            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md
+      - name: Preserve generated evidence
+        run: |
+          mkdir -p /tmp/pr134-evidence/compliance /tmp/pr134-evidence/florida-class-d-lms
+          cp docs/compliance/LEGAL-IDENTITY-AUDIT.json /tmp/pr134-evidence/compliance/
+          cp docs/compliance/LEGAL-IDENTITY-AUDIT.md /tmp/pr134-evidence/compliance/
+          cp docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 /tmp/pr134-evidence/compliance/
+          cp docs/compliance/CMMC-SYSTEM-EVIDENCE.json /tmp/pr134-evidence/compliance/
+          cp docs/compliance/CMMC-SYSTEM-EVIDENCE.md /tmp/pr134-evidence/compliance/
+          cp docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256 /tmp/pr134-evidence/compliance/
+          cp docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json /tmp/pr134-evidence/compliance/
+          cp docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md /tmp/pr134-evidence/compliance/
+          cp docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 /tmp/pr134-evidence/compliance/
+          cp docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json /tmp/pr134-evidence/compliance/
+          cp docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md /tmp/pr134-evidence/compliance/
+          cp docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256 /tmp/pr134-evidence/compliance/
+          cp docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json /tmp/pr134-evidence/florida-class-d-lms/
+          cp docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md /tmp/pr134-evidence/florida-class-d-lms/
+          cp docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256 /tmp/pr134-evidence/florida-class-d-lms/
+      - name: Commit exact merge-tree evidence to controlled branch
+        run: |
+          git fetch origin hotfix/owner-lms-test-access-20260817
+          git checkout -B evidence-sync origin/hotfix/owner-lms-test-access-20260817
+          cp /tmp/pr134-evidence/compliance/* docs/compliance/
+          cp /tmp/pr134-evidence/florida-class-d-lms/* docs/florida-class-d-lms/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.json \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.md \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256 \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256 \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
             docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
-          if-no-files-found: error
-          retention-days: 3
+          if git diff --cached --quiet; then
+            echo "Exact merge-tree compliance evidence is already synchronized."
+            exit 0
+          fi
+          git commit -m "chore(compliance): bind evidence to exact PR merge tree"
+          git push origin HEAD:hotfix/owner-lms-test-access-20260817
