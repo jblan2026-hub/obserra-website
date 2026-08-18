@@ -191,6 +191,7 @@ export default function OwnerValidationLmsConsole({
         || !result.roomName
         || !isHttpsUrl(result.instructorJoinUrl)
         || !isHttpsUrlArray(result.participantJoinUrls)
+        || result.participantJoinUrls.length === 0
         || typeof result.roomExpiresAt !== "string"
         || result.ownerOnly !== true
         || result.trainingCreditEligible !== false
@@ -348,7 +349,8 @@ export default function OwnerValidationLmsConsole({
   }, []);
 
   useEffect(() => {
-    const cleanup = () => {
+    const cleanup = (event?: PageTransitionEvent) => {
+      if (event?.persisted) return;
       const roomName = roomNameRef.current;
       if (!roomName) return;
       roomNameRef.current = null;
