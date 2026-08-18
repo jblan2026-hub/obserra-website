@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { publicAcademyCatalog } from "../../lib/academy-control";
+import { academyLicensedSalesEnabled } from "../../lib/academy-licensing";
 import AcademyControlledClient from "./AcademyControlledClient";
 import AcademyCommerceNotice from "./AcademyCommerceNotice";
 import { courses as sourceCourses } from "./courseCatalog";
@@ -34,10 +35,11 @@ export const metadata: Metadata = {
 export default async function AcademyPage({ searchParams }: { searchParams: Promise<{ enrollment?: string }> }) {
   const runtime = await publicAcademyCatalog(sourceCourses);
   const commerceState = await searchParams;
+  const licensedSalesEnabled = academyLicensedSalesEnabled();
   const publicCourses = runtime.controlPlane === "operational" ? runtime.courses : [];
   const courseIsPurchasable = (courseId: string) => {
     const control = runtime.controls[courseId];
-    return control?.lifecycle === "published" && control.purchaseEnabled === true;
+    return licensedSalesEnabled && control?.lifecycle === "published" && control.purchaseEnabled === true;
   };
   const purchaseAvailability = Object.fromEntries(
     publicCourses.map((course) => [course.id, courseIsPurchasable(course.id)]),
@@ -86,7 +88,7 @@ export default async function AcademyPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <AcademyCommerceNotice status={commerceState.enrollment} />
+      <AcademyCommerceNotice status={licensedSalesEnabled ? commerceState.enrollment : "licensing-pending"} />
       <AcademyControlledClient
         courses={publicCourses}
         purchaseAvailability={purchaseAvailability}
