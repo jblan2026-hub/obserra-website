@@ -8,7 +8,7 @@ test("the public Florida training route is a live LMS surface linked from the we
   const home = read("app/page.tsx");
   const header = read("app/HomeHeader.tsx");
   const enterpriseChrome = read("app/components/enterprise/EnterpriseChrome.tsx");
-  const academy = read("app/academy/AcademyControlledClient.tsx");
+  const academy = read("app/academy/page.tsx");
   const sitemap = read("app/sitemap.ts");
   const page = read("app/florida-security-training/page.tsx");
   const controls = read("app/florida-security-training/GovernedFloridaClassDLink.tsx");
