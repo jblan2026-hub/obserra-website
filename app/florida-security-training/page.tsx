@@ -7,7 +7,7 @@ import GovernedFloridaClassDLink from "./GovernedFloridaClassDLink";
 import "./florida-security-training.css";
 
 export const metadata: Metadata = {
-  title: "Florida Class D Security Officer Training LMS",
+  title: "Florida Class D Security Officer Training",
   description: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC operates a live Florida Class D Security Officer Training LMS platform. Enrollment and payment remain unavailable until licensing and production activation are complete.",
   alternates: { canonical: "/florida-security-training" },
   robots: { index: true, follow: true },
@@ -40,7 +40,7 @@ export default function FloridaSecurityTrainingPage() {
       </section>
 
       <section className="fl-classd__section">
-        <div className="fl-classd__section-heading"><span>CONTROLLED CURRICULUM ARCHITECTURE</span><h2>Four planned live lessons every authorized training day</h2><p>The controlled design provides four 120-minute live instructional lessons per day, with a 15-minute break after Lessons 1, 2, and 3. Before production activation, the live LMS can be inspected and validated without awarding regulated instructional credit. Break time, connection time, security-question responses, attendance, and participation remain distinct evidence classes, and the certification examination remains separately controlled from the 40 instructional hours.</p></div>
+        <div className="fl-classd__section-heading"><span>CONTROLLED CURRICULUM ARCHITECTURE</span><h2>Four planned live lessons every authorized training day</h2><p>The controlled design provides four 120-minute live instructional lessons per day, with a 15-minute break after Lessons 1, 2, and 3. Before production activation, the live LMS can be inspected and validated without awarding regulated instructional credit. Break time is recorded but is never credited toward the required 40 instructional hours. Connection time, security-question responses, attendance, and participation remain distinct evidence classes. The certification examination is controlled separately from the 40 instructional hours.</p></div>
         <div className="fl-classd__days">{floridaClassDDays.map(({ day, lessons }) => <article key={day}><header><span>DAY {day}</span><strong>8 instruction hours + 45 tracked break minutes</strong></header>{lessons.map((lesson) => <div className="fl-classd__module" key={lesson.id}><div><b>{lesson.id}</b><span><strong>{lesson.title}</strong><small>{lesson.moduleSegments.map((segment) => `${moduleTitle(segment.moduleId)} · ${segment.hours} hr`).join(" | ")}</small></span></div><em>2 hr{lesson.breakAfterMinutes ? " + 15 min break" : ""}</em></div>)}</article>)}</div>
       </section>
 
@@ -70,7 +70,7 @@ export default function FloridaSecurityTrainingPage() {
         <div className="fl-classd__actions"><Link href="/florida-security-training/preflight">Run pre-login ID readiness check</Link><GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access" lockedLabel="Student access unavailable pending license activation">Student course access</GovernedFloridaClassDLink></div>
       </section>
 
-      <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>The LMS software may be live while regulated learner operations remain disabled. Completing prelicense validation activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. Until the applicable licensing and activation gates are satisfied, enrollment, payment, production student access, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled.</p></div></section>
+      <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>The LMS software may be live while regulated learner operations remain disabled. Completing prelicense validation activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied. Payment and production student access also remain disabled until licensing and production activation are complete.</p></div></section>
     </main>
   );
 }
