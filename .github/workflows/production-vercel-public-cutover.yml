@@ -143,7 +143,7 @@ jobs:
             --request PATCH \
             --header "Authorization: Bearer ${VERCEL_TOKEN}" \
             --header "Content-Type: application/json" \
-            --data '{"commandForIgnoringBuildStep":"exit 1","ssoProtection":null}' \
+            --data '{"commandForIgnoringBuildStep":"exit 0","ssoProtection":null}' \
             "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}" \
             >/dev/null
 
@@ -225,7 +225,7 @@ jobs:
           grep -i '^x-obserra-sales-license: pending' "${checkout_headers}" >/dev/null
 
       - name: Roll back canonical domains on failed cutover
-        if: ${{ always() && (steps.attach.outcome != 'success' || steps.smoke.outcome != 'success') }}
+        if: ${{ always() && steps.rollback.outcome == 'success' && steps.rollback.outputs.primary != '' && steps.rollback.outputs.apex != '' && (steps.attach.outcome == 'failure' || steps.smoke.outcome == 'failure') }}
         shell: bash
         env:
           ROLLBACK_PRIMARY: ${{ steps.rollback.outputs.primary }}
