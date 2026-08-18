@@ -100,3 +100,32 @@ jobs:
             release/application-market-intelligence/**
           if-no-files-found: error
           retention-days: 180
+
+  cmmc-evidence-remediation:
+    name: Emit CMMC evidence remediation artifact
+    if: github.event_name == 'pull_request' && github.head_ref == 'hotfix/owner-lms-test-access-20260817'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact pull request revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Regenerate controlled CMMC system evidence
+        run: node scripts/cmmc-system-evidence.mjs --write
+      - name: Verify regenerated evidence
+        run: node scripts/cmmc-system-evidence.mjs --check
+      - name: Upload CMMC evidence remediation
+        uses: actions/upload-artifact@v4
+        with:
+          name: cmmc-system-evidence-remediation
+          path: |
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          if-no-files-found: error
+          retention-days: 3
