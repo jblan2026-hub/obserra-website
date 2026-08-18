@@ -60,9 +60,12 @@ gate("LMS is live while regulated learner commerce remains fail closed", () => {
   assert.match(publicPage, /Enrollment and payment remain unavailable until licensing and production activation are complete/);
   assert.match(publicPage, /robots: \{ index: true, follow: true \}/);
   assert.match(publicPage, /enabled=\{publicLearnerControlsEnabled\}/);
-  assert.match(governedPublicLink, /if \(!enabled\) return null;/);
+  assert.match(governedPublicLink, /if \(!enabled\) \{/);
+  assert.match(governedPublicLink, /<button/);
+  assert.match(governedPublicLink, /aria-disabled="true"/);
+  assert.match(governedPublicLink, /disabled/);
+  assert.match(governedPublicLink, /title=\{lockedLabel\}/);
   assert.match(governedPublicLink, /return <Link/);
-  assert.doesNotMatch(governedPublicLink, /aria-disabled|data-governed-state|<button|disabled/);
   assert.match(productionActivation, /floridaClassDProductionActivationAuthorized\(\)[\s\S]*enabled\("OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED"\)/);
   assert.doesNotMatch(publicPage, /Enrollment is open|Pay now|Enroll now|Buy now|Authorized student course sign-in/i);
 });
