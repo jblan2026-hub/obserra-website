@@ -169,7 +169,7 @@ export default async function AcademyCoursePage({
                 <div>
                   <strong>Existing learner access is preserved</strong>
                   <span>
-                    The Academy LMS remains available while new enrollment and payment are held. Existing learner entitlements,
+                    The Academy LMS remains available while new enrollment and payment are held. The licensing hold does not revoke a learner entitlement. Existing learner entitlements,
                     progress records, assessment history, and committed certificates remain available.
                   </span>
                 </div>
