@@ -5,6 +5,7 @@ import test from "node:test";
 
 const files = {
   ownerSession: new URL("../lib/florida-class-d-owner-test-session.ts", import.meta.url),
+  productionValidation: new URL("../lib/florida-class-d-production-owner-validation.ts", import.meta.url),
   mutationBoundary: new URL("../lib/florida-class-d-mutation-boundary.ts", import.meta.url),
   ownerIdentity: new URL("../lib/florida-class-d-production-owner-identity.ts", import.meta.url),
   identityPage: new URL("../app/florida-security-training/owner-validation/identity/page.tsx", import.meta.url),
@@ -22,13 +23,23 @@ async function source(name) {
   return readFile(files[name], "utf8");
 }
 
-test("AAL2 owner test session is authenticated and bound to the deployed commit", async () => {
+test("AAL2 owner test session is authenticated, release-bound, and preserves dependency outages as retriable", async () => {
   assert.equal(existsSync(files.ownerSession), true, "owner test session boundary must exist");
-  const ownerSession = await source("ownerSession");
+  const [ownerSession, productionValidation] = await Promise.all([
+    source("ownerSession"),
+    source("productionValidation"),
+  ]);
   assert.match(ownerSession, /requireFloridaClassDProductionOwnerPrincipal/);
+  assert.match(ownerSession, /FloridaClassDProductionOwnerAuthorizationError/);
+  assert.match(ownerSession, /error\.status === 503/);
+  assert.match(ownerSession, /FDACS_OWNER_TEST_AUTHORITY_UNAVAILABLE/);
+  assert.match(ownerSession, /FDACS_OWNER_TEST_AAL2_REQUIRED/);
   assert.match(ownerSession, /VERCEL_GIT_COMMIT_SHA/);
   assert.match(ownerSession, /releaseCommitSha/);
   assert.doesNotMatch(ownerSession, /PRODUCTION_OWNER_VALIDATION_AUTHORIZED|OWNER_PREVIEW_ENABLED/);
+  assert.match(productionValidation, /class FloridaClassDProductionOwnerAuthorizationError/);
+  assert.match(productionValidation, /authority\.status === "unavailable"/);
+  assert.match(productionValidation, /FDACS_PRODUCTION_OWNER_AUTHORITY_UNAVAILABLE/);
 });
 
 test("owner provider test mutations are same-origin admitted and authenticated inside their routes", async () => {
@@ -74,7 +85,7 @@ test("owner validation pages elevate signed-in AAL1 sessions through MFA instead
   }
 });
 
-test("owner command center exposes a real LMS test workspace with Daily instructor video and courseware", async () => {
+test("owner command center exposes a validated real LMS test workspace with Daily instructor video and courseware", async () => {
   assert.equal(existsSync(files.lmsPage), true, "owner LMS test page must exist");
   assert.equal(existsSync(files.dailyApi), true, "owner Daily test API must exist");
   assert.equal(existsSync(files.coursewareApi), true, "owner courseware test API must exist");
@@ -89,8 +100,16 @@ test("owner command center exposes a real LMS test workspace with Daily instruct
   assert.match(ownerLmsConsole, /function isHttpsUrlArray/);
   assert.match(ownerLmsConsole, /!isHttpsUrlArray\(result\.participantJoinUrls\)/);
   assert.match(ownerLmsConsole, /result\.trainingCreditEligible !== false/);
+  assert.match(ownerLmsConsole, /function isCourseware\(/);
+  assert.match(ownerLmsConsole, /function isCoursewareArray\(/);
+  assert.match(ownerLmsConsole, /!isCoursewareArray\(result\.courseware\)/);
+  assert.match(ownerLmsConsole, /!isCourseware\(finalized\.courseware\)/);
+  assert.doesNotMatch(ownerLmsConsole, /courseware as Courseware\[\]|finalized\.courseware as Courseware/);
   assert.match(ownerLmsConsole, /async function createCoursewareView/);
   assert.match(ownerLmsConsole, /setCoursewareView\(await createCoursewareView\(item\)\)/);
+  assert.match(ownerLmsConsole, /roomNameRef\.current = null;\s*setDaily\(null\);\s*void deleteDailyRoom\(roomName, true\)/s);
+  assert.match(ownerLmsConsole, /<nav className="owner-preview__participant-links" aria-labelledby="owner-learner-views-heading">/);
+  assert.match(ownerLmsConsole, /<section className="owner-preview__courseware-list" aria-labelledby="owner-protected-courseware-heading">/);
   assert.match(ownerPreview, /Create live classroom/);
   assert.match(ownerPreview, /instructorJoinUrl/);
   assert.match(ownerPreview, /<iframe[\s\S]*instructorJoinUrl/);

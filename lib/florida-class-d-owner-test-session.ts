@@ -1,6 +1,9 @@
 import "server-only";
 
-import { requireFloridaClassDProductionOwnerPrincipal } from "./florida-class-d-production-owner-validation";
+import {
+  FloridaClassDProductionOwnerAuthorizationError,
+  requireFloridaClassDProductionOwnerPrincipal,
+} from "./florida-class-d-production-owner-validation";
 
 const SHA40 = /^[0-9a-f]{40}$/i;
 
@@ -36,10 +39,24 @@ export async function requireFloridaClassDOwnerTestPrincipal() {
     } as const;
   } catch (error) {
     if (error instanceof FloridaClassDOwnerTestAuthorizationError) throw error;
+    if (error instanceof FloridaClassDProductionOwnerAuthorizationError) {
+      if (error.status === 503) {
+        throw new FloridaClassDOwnerTestAuthorizationError(
+          "Protected owner authority is temporarily unavailable.",
+          503,
+          "FDACS_OWNER_TEST_AUTHORITY_UNAVAILABLE",
+        );
+      }
+      throw new FloridaClassDOwnerTestAuthorizationError(
+        "Verified internal owner authority with AAL2 is required for the owner LMS test.",
+        403,
+        "FDACS_OWNER_TEST_AAL2_REQUIRED",
+      );
+    }
     throw new FloridaClassDOwnerTestAuthorizationError(
-      "Verified internal owner authority with AAL2 is required for the owner LMS test.",
-      403,
-      "FDACS_OWNER_TEST_AAL2_REQUIRED",
+      "Owner LMS test authorization service is temporarily unavailable.",
+      503,
+      "FDACS_OWNER_TEST_AUTHORITY_UNAVAILABLE",
     );
   }
 }

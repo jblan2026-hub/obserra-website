@@ -45,9 +45,37 @@ async function payload(response: Response) {
   return response.json().catch(() => ({})) as Promise<Record<string, unknown>>;
 }
 
+function isHttpsUrl(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function isHttpsUrlArray(value: unknown): value is string[] {
-  return Array.isArray(value)
-    && value.every((item) => typeof item === "string" && item.startsWith("https://"));
+  return Array.isArray(value) && value.every(isHttpsUrl);
+}
+
+function isCourseware(value: unknown): value is Courseware {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const item = value as Record<string, unknown>;
+  return typeof item.objectPath === "string"
+    && item.objectPath.length > 0
+    && typeof item.fileName === "string"
+    && item.fileName.length > 0
+    && typeof item.contentType === "string"
+    && item.contentType.length > 0
+    && typeof item.sizeBytes === "number"
+    && Number.isSafeInteger(item.sizeBytes)
+    && item.sizeBytes >= 0
+    && (item.mediaKind === "powerpoint" || item.mediaKind === "slides" || item.mediaKind === "image" || item.mediaKind === "video")
+    && (item.createdAt === null || typeof item.createdAt === "string");
+}
+
+function isCoursewareArray(value: unknown): value is Courseware[] {
+  return Array.isArray(value) && value.every(isCourseware);
 }
 
 function formatDateTime(value: string) {
@@ -110,7 +138,7 @@ async function createCoursewareView(item: Courseware): Promise<CoursewareView> {
     cache: "no-store",
   });
   const result = await payload(response);
-  if (!response.ok || typeof result.signedViewUrl !== "string") {
+  if (!response.ok || !isHttpsUrl(result.signedViewUrl)) {
     throw new Error(typeof result.error === "string" ? result.error : "Protected courseware view is unavailable.");
   }
   return { ...item, signedViewUrl: result.signedViewUrl };
@@ -137,10 +165,10 @@ export default function OwnerValidationLmsConsole({
   async function refreshCourseware() {
     const response = await fetch(COURSEWARE_API, { cache: "no-store" });
     const result = await payload(response);
-    if (!response.ok || !Array.isArray(result.courseware)) {
+    if (!response.ok || !isCoursewareArray(result.courseware)) {
       throw new Error(typeof result.error === "string" ? result.error : "Protected courseware inventory is unavailable.");
     }
-    setCourseware(result.courseware as Courseware[]);
+    setCourseware(result.courseware);
   }
 
   async function createDailyRoom() {
@@ -161,8 +189,7 @@ export default function OwnerValidationLmsConsole({
         result.provider !== "daily"
         || typeof result.roomName !== "string"
         || !result.roomName
-        || typeof result.instructorJoinUrl !== "string"
-        || !result.instructorJoinUrl.startsWith("https://")
+        || !isHttpsUrl(result.instructorJoinUrl)
         || !isHttpsUrlArray(result.participantJoinUrls)
         || typeof result.roomExpiresAt !== "string"
         || result.ownerOnly !== true
@@ -235,7 +262,7 @@ export default function OwnerValidationLmsConsole({
         cache: "no-store",
       });
       const ticket = await payload(ticketResponse);
-      if (!ticketResponse.ok || typeof ticket.objectPath !== "string" || typeof ticket.signedUploadUrl !== "string") {
+      if (!ticketResponse.ok || typeof ticket.objectPath !== "string" || !ticket.objectPath || !isHttpsUrl(ticket.signedUploadUrl)) {
         throw new Error(typeof ticket.error === "string" ? ticket.error : "Courseware upload authorization failed.");
       }
 
@@ -256,10 +283,10 @@ export default function OwnerValidationLmsConsole({
         cache: "no-store",
       });
       const finalized = await payload(finalizeResponse);
-      if (!finalizeResponse.ok || !finalized.courseware) {
+      if (!finalizeResponse.ok || !isCourseware(finalized.courseware)) {
         throw new Error(typeof finalized.error === "string" ? finalized.error : "Uploaded courseware verification failed.");
       }
-      const item = finalized.courseware as Courseware;
+      const item = finalized.courseware;
       await refreshCourseware();
       setCoursewareView(await createCoursewareView(item));
     } catch (error) {
@@ -296,14 +323,14 @@ export default function OwnerValidationLmsConsole({
     void fetch(COURSEWARE_API, { cache: "no-store" })
       .then(async (response) => {
         const result = await payload(response);
-        if (!response.ok || !Array.isArray(result.courseware)) {
+        if (!response.ok || !isCoursewareArray(result.courseware)) {
           throw new Error(
             typeof result.error === "string"
               ? result.error
               : "Protected courseware inventory is unavailable.",
           );
         }
-        if (active) setCourseware(result.courseware as Courseware[]);
+        if (active) setCourseware(result.courseware);
       })
       .catch((error: unknown) => {
         if (active) {
@@ -325,6 +352,7 @@ export default function OwnerValidationLmsConsole({
       const roomName = roomNameRef.current;
       if (!roomName) return;
       roomNameRef.current = null;
+      setDaily(null);
       void deleteDailyRoom(roomName, true).catch(() => undefined);
     };
     window.addEventListener("pagehide", cleanup);
@@ -383,11 +411,12 @@ export default function OwnerValidationLmsConsole({
                       <span><ShieldCheck size={16} /> Expires {formatDateTime(daily.roomExpiresAt)} · recording off · owner only</span>
                       <button type="button" onClick={() => void closeDailyRoom()} disabled={dailyBusy}><Square size={15} /> End and delete room</button>
                     </div>
-                    <div className="owner-preview__participant-links" aria-label="Owner controlled learner test views">
+                    <nav className="owner-preview__participant-links" aria-labelledby="owner-learner-views-heading">
+                      <h3 className="obs-sr-only" id="owner-learner-views-heading">Owner controlled learner test views</h3>
                       {daily.participantJoinUrls.map((url, index) => (
                         <a key={url} href={url} target="_blank" rel="noreferrer"><UsersRound size={16} /> Open learner view {index + 1}</a>
                       ))}
-                    </div>
+                    </nav>
                   </>
                 ) : null}
               </section>
@@ -427,7 +456,8 @@ export default function OwnerValidationLmsConsole({
                   )}
                 </div>
 
-                <div className="owner-preview__courseware-list" aria-label="Protected owner courseware">
+                <section className="owner-preview__courseware-list" aria-labelledby="owner-protected-courseware-heading">
+                  <h3 className="obs-sr-only" id="owner-protected-courseware-heading">Protected owner courseware</h3>
                   {courseware.length ? courseware.map((item) => (
                     <article key={item.objectPath} className={coursewareView?.objectPath === item.objectPath ? "is-active" : ""}>
                       <button type="button" className="owner-preview__courseware-select" disabled={coursewareBusy} onClick={() => void presentCourseware(item)}>
@@ -439,7 +469,7 @@ export default function OwnerValidationLmsConsole({
                   )) : (
                     <div className="owner-preview__courseware-empty"><FileUp size={32} /><strong>No protected media uploaded</strong><p>PPTX, PDF, images, MP4, and WEBM are supported up to 100 MB.</p></div>
                   )}
-                </div>
+                </section>
               </div>
 
               <div className="owner-preview__notice"><FileLock2 size={20} /><span><strong>Owner rehearsal only.</strong>Provider actions do not create enrollment, attendance, instructional time, training credit, completion, certificate, or LIAS records.</span></div>

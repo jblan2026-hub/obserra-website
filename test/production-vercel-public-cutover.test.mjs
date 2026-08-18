@@ -7,7 +7,15 @@ const workflow = fs.readFileSync(".github/workflows/production-vercel-public-cut
 test("production Vercel cutover reserves enough time for readiness polling, smoke verification, and rollback", () => {
   assert.match(workflow, /timeout-minutes:\s*30/);
   assert.match(workflow, /for attempt in \$\(seq 1 60\)/);
-  assert.match(workflow, /Roll back canonical domains on failed smoke/);
+  assert.match(workflow, /Roll back canonical domains on failed cutover/);
+});
+
+test("deployment polling retries bounded transport and response failures", () => {
+  assert.match(workflow, /--connect-timeout 10/);
+  assert.match(workflow, /--max-time 20/);
+  assert.match(workflow, /Vercel deployment lookup failed on attempt \$\{attempt\}\/60; retrying/);
+  assert.match(workflow, /Vercel deployment lookup returned an unreadable response on attempt \$\{attempt\}\/60; retrying/);
+  assert.match(workflow, /No exact READY canonical deployment appeared/);
 });
 
 test("rollback alias capture fails closed and distinguishes missing aliases from other API failures", () => {
@@ -17,4 +25,13 @@ test("rollback alias capture fails closed and distinguishes missing aliases from
   assert.match(workflow, /if \[ "\$\{status\}" != "200" \]/);
   assert.match(workflow, /Vercel rollback-alias lookup failed for \$\{alias\}/);
   assert.match(workflow, /Vercel returned no deployment ID for required rollback alias/);
+});
+
+test("partial alias attachment or smoke failure always triggers fail-closed rollback", () => {
+  assert.match(workflow, /id:\s*attach/);
+  assert.match(workflow, /continue-on-error:\s*true/);
+  assert.match(workflow, /if:\s*steps\.attach\.outcome == 'success'/);
+  assert.match(workflow, /always\(\) && \(steps\.attach\.outcome != 'success' \|\| steps\.smoke\.outcome != 'success'\)/);
+  assert.match(workflow, /if \[ -z "\$\{ROLLBACK_PRIMARY\}" \] \|\| \[ -z "\$\{ROLLBACK_APEX\}" \]/);
+  assert.match(workflow, /Rollback deployment IDs were not captured/);
 });
