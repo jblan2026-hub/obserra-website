@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import {
   FloridaClassDOwnerTestAuthorizationError,
   requireFloridaClassDOwnerTestPrincipal,
-} from "../../../../../../lib/florida-class-d-owner-test-session";
+} from "../../../../../lib/florida-class-d-owner-test-session";
 import {
   cleanupFloridaClassDOwnerPreviewDailyRoom,
   provisionFloridaClassDOwnerPreviewDailySession,
-} from "../../../../../../lib/florida-class-d-owner-preview-daily-server";
+} from "../../../../../lib/florida-class-d-owner-preview-daily-server";
 
 export const dynamic = "force-dynamic";
 
