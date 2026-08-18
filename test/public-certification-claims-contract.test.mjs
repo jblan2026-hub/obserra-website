@@ -39,17 +39,20 @@ test("Academy structured data identifies the legal entity as the course provider
   assert.match(certificate, /issued by \{LEGAL_NAME\}/);
 });
 
-test("the FDACS public program remains non-credit with learner actions omitted before activation", () => {
+test("the FDACS LMS is live while regulated learner commerce and credit remain disabled", () => {
   const landing = read("app/florida-security-training/page.tsx");
   const controls = read("app/florida-security-training/GovernedFloridaClassDLink.tsx");
   const completionPage = read("app/florida-security-training/completion/page.tsx");
 
-  assert.match(landing, /PRODUCTION SOFTWARE VALIDATION · NON-CREDIT · PRODUCTION AUTHORIZATION FALSE/);
-  assert.match(landing, /Enrollment, payment, and student course access are not open/);
-  assert.match(landing, /FDACS provider and course authorization have not been granted/);
-  assert.match(landing, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled/);
-  assert.match(controls, /if \(!enabled\) return null;/);
-  assert.doesNotMatch(controls, /aria-disabled|<button|disabled/);
+  assert.match(landing, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
+  assert.match(landing, /ENROLLMENT & PAYMENT LOCKED · LICENSE ACTIVATION PENDING/);
+  assert.match(landing, /Enrollment and payment remain unavailable until licensing and production activation are complete/);
+  assert.match(landing, /does not claim FDACS approval or production authorization/);
+  assert.match(landing, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled until every applicable authorization gate is satisfied/);
+  assert.match(controls, /if \(!enabled\) \{/);
+  assert.match(controls, /aria-disabled="true"/);
+  assert.match(controls, /<button/);
+  assert.match(controls, /disabled/);
   assert.match(completionPage, /Production authorization is false/);
   assert.match(completionPage, /no course credit, completion document, certificate, or LIAS record can be issued until the separate FDACS activation gates are satisfied/i);
 });
