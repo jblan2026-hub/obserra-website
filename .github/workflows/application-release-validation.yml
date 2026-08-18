@@ -134,12 +134,11 @@ jobs:
           npm run verify:cmmc-disposition
           npm run verify:fdacs-pii-audit
           npm run verify:cmmc-handoff
-      - name: Commit final synchronized evidence and remove helper
+      - name: Commit synchronized evidence
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -- \
-            .github/workflows/application-release-validation.yml \
             docs/compliance/LEGAL-IDENTITY-AUDIT.json \
             docs/compliance/LEGAL-IDENTITY-AUDIT.md \
             docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 \
