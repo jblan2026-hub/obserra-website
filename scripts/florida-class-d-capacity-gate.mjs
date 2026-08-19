@@ -3,6 +3,7 @@ import fs from "node:fs";
 const read = (path) => fs.readFileSync(path, "utf8");
 const policy = read("lib/florida-class-d-live-policy.ts");
 const media = read("lib/florida-class-d-media.ts");
+const classroom = read("app/florida-security-training/live/[liveSessionId]/LiveClassroom.tsx");
 const liveClassroomMigration = read("supabase/migrations/20260813043000_fdacs_class_d_live_classroom.sql");
 const loadTest = read("load/florida-class-d-200-students.k6.js");
 const workflow = read(".github/workflows/florida-class-d-lms-gates.yml");
@@ -24,7 +25,8 @@ const studentSeatsPerRoom = numericProperty(policy, "studentSeatsPerRoom");
 const minimumParallelRooms = numericProperty(policy, "minimumParallelRoomsForTarget");
 const heartbeatSeconds = numericProperty(policy, "heartbeatSeconds");
 const heartbeatWritesPerMinute = numericProperty(policy, "capacityHeartbeatWritesPerMinute");
-const heartbeatWritesPerSecondCeiling = numericProperty(policy, "capacityHeartbeatWritesPerSecondCeiling");
+const heartbeatSteadyStateWritesPerSecondTarget = numericProperty(policy, "capacityHeartbeatSteadyStateWritesPerSecondTarget");
+const heartbeatPhaseWindowSeconds = numericProperty(policy, "capacityHeartbeatPhaseWindowSeconds");
 
 if (target !== 200) throw new Error(`Gate 36 failed: concurrent student target must be exactly 200, found ${target}`);
 if (roomLimit !== 75) throw new Error(`Gate 36 failed: governed Daily room limit must remain 75, found ${roomLimit}`);
@@ -44,8 +46,11 @@ if (heartbeatSeconds !== 60) {
 if (heartbeatWritesPerMinute !== target) {
   throw new Error("Gate 36 failed: expected heartbeat writes per minute must equal the 200-student target");
 }
-if (heartbeatWritesPerSecondCeiling !== Math.ceil(target / heartbeatSeconds)) {
-  throw new Error("Gate 36 failed: heartbeat write ceiling must cover the steady-state 200-student cadence");
+if (heartbeatPhaseWindowSeconds !== 55 || heartbeatPhaseWindowSeconds >= heartbeatSeconds) {
+  throw new Error("Gate 36 failed: heartbeat phase window must remain 55 seconds and below the 60-second attendance cadence");
+}
+if (heartbeatSteadyStateWritesPerSecondTarget !== Math.ceil(target / heartbeatPhaseWindowSeconds)) {
+  throw new Error("Gate 36 failed: heartbeat steady-state target must cover 200 learners across the governed phase window");
 }
 
 requireText(policy, "capacityTargetRequiresParallelRooms: true", "capacity must be achieved through parallel regulated rooms rather than overloading one room");
@@ -54,6 +59,15 @@ requireText(media, "roomName(liveSessionId)", "media rooms must remain isolated 
 if (media.includes("max_participants: 200")) {
   throw new Error("Gate 36 failed: a single Daily room may not be configured for all 200 learners");
 }
+
+requireText(classroom, "const STATE_REFRESH_INTERVAL_MS = 15_000", "learner state polling must remain bounded at the optimized 15-second interval");
+requireText(classroom, "const HEARTBEAT_INTERVAL_MS = 60_000", "learner attendance heartbeat cadence must remain 60 seconds");
+requireText(classroom, "function deterministicPhaseOffset", "learner recurring traffic must use deterministic phase staggering");
+requireText(classroom, "HEARTBEAT_MINIMUM_PHASE_MS = 5_000", "heartbeat phase staggering must avoid an immediate synchronized burst");
+requireText(classroom, "STATE_REFRESH_MINIMUM_PHASE_MS = 1_000", "state refresh phase staggering must avoid synchronized polling");
+requireText(classroom, "heartbeatPhaseDelay", "heartbeat timers must derive a per-browser phase delay");
+requireText(classroom, "stateRefreshPhaseDelay", "state refresh timers must derive a per-browser phase delay");
+requireText(classroom, "window.setTimeout", "recurring learner traffic must be phase-started with bounded timeouts");
 
 requireText(liveClassroomMigration, "fdacs_class_d_device_session_idx", "heartbeat lookups must retain the live-session and enrollment device index");
 requireText(liveClassroomMigration, "unique (enrollment_id, live_session_id)", "per-learner live-time totals must remain one row per session");
@@ -76,7 +90,7 @@ requireText(workflow, "Run Gate 36 concurrent learner capacity verification", "r
 requireText(workflow, "node scripts/florida-class-d-capacity-gate.mjs", "regulated CI must execute the capacity verifier");
 
 console.log(JSON.stringify({
-  gate: "florida-class-d-capacity-v3",
+  gate: "florida-class-d-capacity-v4",
   targetConcurrentStudents: target,
   dailyRoomParticipantLimit: roomLimit,
   reservedInstructorSeatsPerRoom: reservedInstructorSeats,
@@ -85,7 +99,10 @@ console.log(JSON.stringify({
   availableStudentSeats: minimumParallelRooms * studentSeatsPerRoom,
   heartbeatSeconds,
   expectedHeartbeatWritesPerMinute: heartbeatWritesPerMinute,
-  expectedHeartbeatWritesPerSecondCeiling: heartbeatWritesPerSecondCeiling,
+  heartbeatSteadyStateWritesPerSecondTarget,
+  heartbeatPhaseWindowSeconds,
+  deterministicHeartbeatStaggeringRequired: true,
+  deterministicStatePollingStaggeringRequired: true,
   databaseHeartbeatPathIndexed: true,
   databaseHeartbeatCreditBounded: true,
   executableAuthenticatedLoadHarness: "load/florida-class-d-200-students.k6.js",
