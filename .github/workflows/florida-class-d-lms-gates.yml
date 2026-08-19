@@ -26,6 +26,7 @@ on:
       - "scripts/cmmc-level2-rev3-production-evidence.mjs"
       - "scripts/cmmc-level2-dual-baseline.mjs"
       - "scripts/academy-durable-commerce-gate.mjs"
+      - "test/florida-class-d-capacity-contract.test.mjs"
       - "test/vercel-deployment-integrity.test.mjs"
       - "supabase/functions/academy-public-catalog/**"
       - "supabase/config.toml"
@@ -54,7 +55,7 @@ env:
 
 jobs:
   regulated-source-gates:
-    name: Gates 1-35 and production deployment integrity
+    name: Gates 1-36 and production deployment integrity
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -135,6 +136,9 @@ jobs:
 
       - name: Run Gate 35 complete CMMC Level 2 dual-baseline verification
         run: npm run verify:cmmc-dual-baseline
+
+      - name: Run Gate 36 concurrent learner capacity verification
+        run: node scripts/florida-class-d-capacity-gate.mjs
 
       - name: Run production deployment integrity verification
         run: node --test test/vercel-deployment-integrity.test.mjs
