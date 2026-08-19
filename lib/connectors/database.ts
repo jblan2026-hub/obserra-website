@@ -30,6 +30,8 @@ export type ConnectorRow = {
   updated_at: string;
 };
 
+export type ConnectorConfigurationRow = Omit<ConnectorRow, "provenance">;
+
 export type ConnectorInsert = {
   id?: string;
   owner_user_id: string;
