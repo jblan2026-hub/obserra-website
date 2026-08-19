@@ -1,6 +1,12 @@
 name: Vercel Auxiliary Project Policy
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/vercel-auxiliary-project-policy.yml"
+      - ".github/legal-identity-refresh.trigger"
   push:
     branches:
       - main
@@ -14,7 +20,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: vercel-auxiliary-project-policy
+  group: vercel-auxiliary-project-policy-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
 env:
