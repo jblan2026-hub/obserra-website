@@ -4,6 +4,7 @@ export type IdentityAccessPolicy =
   | "standard_authenticated"
   | "standard_public"
   | "internal_owner_read_only"
+  | "internal_owner_aal2"
   | "public";
 export type IdentityMutationClass =
   | "read"
@@ -120,7 +121,7 @@ function ownedRoute(pathname: string, method?: string | null): IdentityRouteOwne
   if (FDACS_PUBLIC_READ_PATHS.has(pathname) && readMethod(method)) return route("public", false, "public");
 
   if (pathMatchesPrefix(pathname, "/florida-security-training/owner-validation") || pathMatchesPrefix(pathname, "/api/florida-class-d/owner-validation")) {
-    return route("supabase", true, "standard_authenticated", mutationClass(pathname, method), true);
+    return route("supabase", true, "internal_owner_aal2", mutationClass(pathname, method), true);
   }
 
   if (
