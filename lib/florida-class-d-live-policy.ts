@@ -4,7 +4,7 @@ import { floridaClassDOwnerUatExecutionAuthorized } from "./florida-class-d-owne
 import { floridaClassDProductionActivationAuthorized } from "./florida-class-d-production-activation";
 
 export const FLORIDA_CLASS_D_LIVE_POLICY = {
-  policyVersion: "2026-08-19-live-v3",
+  policyVersion: "2026-08-19-live-v4",
   physicalInstructionLocationState: "FL",
   tlsRequired: true,
   singleDeviceRequired: true,
@@ -34,6 +34,8 @@ export const FLORIDA_CLASS_D_LIVE_POLICY = {
   studentSeatsPerRoom: 74,
   minimumParallelRoomsForTarget: 3,
   capacityTargetRequiresParallelRooms: true,
+  capacityHeartbeatWritesPerMinute: 200,
+  capacityHeartbeatWritesPerSecondCeiling: 4,
 } as const;
 
 function enabled(value: string | undefined) {
