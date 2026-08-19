@@ -106,7 +106,7 @@ jobs:
         run: node scripts/florida-class-d-migration-manifest.mjs --write .regulated-evidence/florida-class-d-migration-manifest.json
 
       - name: Upload Gate 29 migration manifest evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: florida-class-d-migration-manifest-${{ github.sha }}
           path: .regulated-evidence/florida-class-d-migration-manifest.json
