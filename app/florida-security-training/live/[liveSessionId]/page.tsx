@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireFloridaClassDPageUser } from "../../../../lib/florida-class-d-page-auth";
 import { evaluateFloridaClassDStudentAccess } from "../../../../lib/florida-class-d-student-access";
+import AiAdvisorPanel from "./AiAdvisorPanel";
 import LiveClassroom from "./LiveClassroom";
 import "../../live-classroom.css";
 
@@ -9,5 +10,10 @@ export default async function FloridaClassDLivePage({ params }: { params: Promis
   const { userId } = await requireFloridaClassDPageUser(`/florida-security-training/live/${liveSessionId}`);
   const access = await evaluateFloridaClassDStudentAccess(userId);
   if (!access.allowed) notFound();
-  return <LiveClassroom liveSessionId={liveSessionId} />;
+  return (
+    <>
+      <LiveClassroom liveSessionId={liveSessionId} />
+      <AiAdvisorPanel liveSessionId={liveSessionId} />
+    </>
+  );
 }
