@@ -8,6 +8,7 @@ on:
     paths:
       - ".github/workflows/vercel-auxiliary-project-policy.yml"
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
