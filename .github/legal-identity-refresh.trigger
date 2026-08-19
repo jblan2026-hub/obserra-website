@@ -1,3 +1,3 @@
-refresh-request: 2026-08-19-vercel-policy-reusable-governance
-reason: regenerate governed evidence and execute the reusable provider-level Vercel policy through the established governed source refresh workflow so duplicate Git deployments and canonical-domain ownership are removed from the auxiliary project with fail-closed verification
-validation-request: 2026-08-19-post-vercel-policy-reusable-governance
+refresh-request: 2026-08-19-vercel-auxiliary-documented-policy
+reason: regenerate governed evidence and rerun the reusable Vercel reconciliation with only documented update-project fields after verifying canonical ownership, detaching duplicate auxiliary domains, disabling auxiliary preview deployments, and retaining the ignored-build guard
+validation-request: 2026-08-19-post-vercel-auxiliary-documented-policy

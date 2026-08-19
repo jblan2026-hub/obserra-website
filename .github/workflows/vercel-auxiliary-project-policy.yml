@@ -56,20 +56,6 @@ jobs:
             fi
           done
 
-      - name: Disable duplicate Git deployments and statuses on auxiliary project
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl --silent --show-error --fail-with-body \
-            --connect-timeout 10 \
-            --max-time 20 \
-            --request PATCH \
-            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-            --header "Content-Type: application/json" \
-            --data '{"commandForIgnoringBuildStep":"exit 0","ssoProtection":null,"gitProviderOptions":{"createDeployments":"disabled","disableRepositoryDispatchEvents":true,"requireVerifiedCommits":false,"gitCommitStatus":false,"consolidatedGitCommitStatus":{"enabled":false,"propagateFailures":false}}}' \
-            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}" \
-            >/dev/null
-
       - name: Detach canonical production domains from auxiliary project
         shell: bash
         run: |
@@ -94,6 +80,20 @@ jobs:
             rm -f "${body}"
           done
 
+      - name: Disable auxiliary preview deployments and duplicate builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --request PATCH \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data '{"commandForIgnoringBuildStep":"exit 0","previewDeploymentsDisabled":true,"ssoProtection":null}' \
+            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}" \
+            >/dev/null
+
       - name: Verify auxiliary project policy and domain separation
         shell: bash
         run: |
@@ -104,10 +104,8 @@ jobs:
             --header "Authorization: Bearer ${VERCEL_TOKEN}" \
             "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}")"
           jq -e '
-            .gitProviderOptions.createDeployments == "disabled"
-            and .gitProviderOptions.requireVerifiedCommits == false
-            and .gitProviderOptions.gitCommitStatus == false
-            and .gitProviderOptions.consolidatedGitCommitStatus.enabled == false
+            .previewDeploymentsDisabled == true
+            and .commandForIgnoringBuildStep == "exit 0"
           ' <<<"${project}" >/dev/null
 
           auxiliary_domains="$(curl --silent --show-error --fail-with-body \
