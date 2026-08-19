@@ -8,7 +8,8 @@ test("Florida Class D AI advisor is authenticated, grounded, reasoning-enabled, 
   const advisor = read("lib/florida-class-d-ai-advisor.ts");
   const route = read("app/api/florida-class-d/live/advisor/route.ts");
   const panel = read("app/florida-security-training/live/[liveSessionId]/AiAdvisorPanel.tsx");
-  const classroom = read("app/florida-security-training/live/[liveSessionId]/LiveClassroom.tsx");
+  const page = read("app/florida-security-training/live/[liveSessionId]/page.tsx");
+  const styles = read("app/florida-security-training/live/[liveSessionId]/AiAdvisorPanel.module.css");
 
   assert.match(route, /requireFloridaClassDSignedInUser/);
   assert.match(route, /getFloridaClassDLiveStudentState/);
@@ -42,5 +43,7 @@ test("Florida Class D AI advisor is authenticated, grounded, reasoning-enabled, 
   assert.match(panel, /AbortController/);
   assert.match(panel, /URL\.revokeObjectURL/);
   assert.match(panel, /maxLength/);
-  assert.match(classroom, /AiAdvisorPanel/);
+  assert.match(page, /AiAdvisorPanel/);
+  assert.match(styles, /prefers-reduced-motion/);
+  assert.match(styles, /@media\s*\(max-width:/);
 });
