@@ -5,6 +5,7 @@ import { prepareSupabaseAuthRuntime } from "../../../../../../lib/auth/runtime-c
 import { requireFloridaClassDOwnerTestPrincipal } from "../../../../../../lib/florida-class-d-owner-test-session";
 import OwnerLearnerWorkspace from "./OwnerLearnerWorkspace";
 import "../../../../owner-preview/owner-preview.css";
+import "../../owner-lms.css";
 
 export const dynamic = "force-dynamic";
 
