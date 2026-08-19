@@ -74,4 +74,3 @@ if (githubOutput) {
 }
 
 console.log(`[Application Production] planned ${desired} worker(s) for ${applicationCount} application(s).`);
-// Transient no-op used only to establish a user-authored PR head after governed evidence automation.
