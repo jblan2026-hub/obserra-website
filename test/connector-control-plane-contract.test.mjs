@@ -8,6 +8,7 @@ test("connector control plane is encrypted, tenant scoped, SSRF safe, fail close
   const contracts = read("lib/connectors/contracts.ts");
   const urls = read("lib/connectors/url-policy.ts");
   const secrets = read("lib/connectors/secret-envelope.ts");
+  const keyProvider = read("lib/connectors/key-provider.ts");
   const resilience = read("lib/connectors/resilience.ts");
   const repository = read("lib/connectors/repository.ts");
   const migration = read("supabase/identity/migrations/20260819030000_connector_control_plane.sql");
@@ -36,12 +37,22 @@ test("connector control plane is encrypted, tenant scoped, SSRF safe, fail close
   assert.match(urls, /OBSERRA_CONNECTOR_URL_REJECTED/);
 
   assert.match(secrets, /aes-256-gcm/);
-  assert.match(secrets, /OBSERRA_CONNECTOR_ENCRYPTION_KEY/);
   assert.match(secrets, /additionalAuthenticatedData/);
   assert.match(secrets, /tenantKey/);
   assert.match(secrets, /connectorId/);
   assert.match(secrets, /secretName/);
+  assert.match(secrets, /resolveActiveConnectorEncryptionKey/);
+  assert.match(secrets, /resolveConnectorEncryptionKey/);
+  assert.doesNotMatch(secrets, /process\.env\.OBSERRA_CONNECTOR_ENCRYPTION_KEY/);
   assert.doesNotMatch(secrets, /NEXT_PUBLIC_/);
+
+  assert.match(keyProvider, /OBSERRA_CONNECTOR_ENCRYPTION_KEY/);
+  assert.match(keyProvider, /OBSERRA_CONNECTOR_KEY_PROVIDER/);
+  assert.match(keyProvider, /azure-key-vault/);
+  assert.match(keyProvider, /OBSERRA_CONNECTOR_AZURE_KEY_MAP_JSON/);
+  assert.match(keyProvider, /VERCEL_ENV === "production"/);
+  assert.match(keyProvider, /OBSERRA_CONNECTOR_ENVIRONMENT_KEY_PROVIDER_FORBIDDEN/);
+  assert.doesNotMatch(keyProvider, /NEXT_PUBLIC_/);
 
   assert.match(resilience, /exponentialBackoff/);
   assert.match(resilience, /jitter/);
