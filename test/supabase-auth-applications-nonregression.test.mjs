@@ -45,8 +45,8 @@ function routingModule() {
   return module.exports;
 }
 
-test("the Phase 2A Applications implementation surface is byte-for-byte unchanged", () => {
-  assert.equal(APPLICATION_ROOTS.flatMap(walk).length, 28);
+test("the Phase 2A Applications implementation surface is byte-for-byte unchanged except the retired route removal", () => {
+  assert.equal(APPLICATION_ROOTS.flatMap(walk).length, 27);
   assert.equal(applicationSourceDigest(), APPLICATION_SOURCE_DIGEST);
 });
 
