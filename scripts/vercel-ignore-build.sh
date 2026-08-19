@@ -24,6 +24,16 @@ if [ "${VERCEL_ENV:-}" != "production" ] && [ "${VERCEL_ENV:-}" != "preview" ]; 
   exit 1
 fi
 
+# Hotfix and release branches are release-control surfaces. Their promotion
+# workflow requires an exact READY deployment for the current Git SHA, so every
+# commit on these branches must build even when the last commit only refreshes
+# governed evidence.
+case "${VERCEL_GIT_COMMIT_REF:-}" in
+  hotfix/*|release/*)
+    exit 1
+    ;;
+esac
+
 BASE_SHA="${VERCEL_GIT_PREVIOUS_SHA:-}"
 
 if [ -n "$BASE_SHA" ] && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
