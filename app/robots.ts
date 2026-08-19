@@ -25,9 +25,6 @@ export default function robots(): MetadataRoute.Robots {
           "/portal/",
           "/sign-in",
           "/sign-up",
-          "/axionis",
-          "/apps/axionis",
-          "/apps/axionis/",
           "/*?checkout=*",
           "/*?session_id=*",
           "/*?enrollment=*"
