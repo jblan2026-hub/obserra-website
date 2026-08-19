@@ -3,6 +3,10 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import InstructionalTextScreen from "./InstructionalTextScreen";
 
+const STATE_REFRESH_INTERVAL_MS = 15_000;
+const HEARTBEAT_INTERVAL_MS = 60_000;
+const STATE_STALE_AFTER_MS = 35_000;
+
 type Interaction = {
   id?: string;
   actor_role?: string;
@@ -126,7 +130,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   const announcedPollIds = useRef(new Set<string>());
 
   const browserInstanceId = useMemo(() => {
-    if (typeof window === "undefined") return "server-placeholder-instance";
+    if (typeof window === "undefined") return "ssr-browser-instance-unavailable";
     const key = "obserra-fdacs-browser-instance";
     const existing = window.sessionStorage.getItem(key);
     if (existing) return existing;
@@ -229,17 +233,16 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
         await api({ action: "heartbeat", deviceLeaseId });
         if (!cancelled) {
           setStatusText("Connected. Attendance, instructional time, and secure live media are active.");
-          await refresh();
         }
       } catch (heartbeatError) {
         if (!cancelled) setError(heartbeatError instanceof Error ? heartbeatError.message : "Presence heartbeat failed.");
       }
     };
     void sendHeartbeat();
-    const heartbeat = window.setInterval(() => void sendHeartbeat(), 60_000);
+    const heartbeat = window.setInterval(() => void sendHeartbeat(), HEARTBEAT_INTERVAL_MS);
     const stateRefresh = window.setInterval(() => void refresh().catch((refreshError) => {
       setError((current) => current ?? (refreshError instanceof Error ? refreshError.message : "Live state is stale because classroom status could not be refreshed."));
-    }), 10_000);
+    }), STATE_REFRESH_INTERVAL_MS);
     const onVisibility = () => {
       if (document.visibilityState === "visible") void sendHeartbeat();
     };
@@ -293,7 +296,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
     return () => window.removeEventListener("pagehide", leave);
   }, [deviceLeaseId]);
 
-  const stateStale = Boolean(deviceLeaseId && (!lastSuccessfulRefreshAt || freshnessNow - lastSuccessfulRefreshAt > 25_000));
+  const stateStale = Boolean(deviceLeaseId && (!lastSuccessfulRefreshAt || freshnessNow - lastSuccessfulRefreshAt > STATE_STALE_AFTER_MS));
 
   function requireFreshState() {
     if (!stateStale) return true;
@@ -398,7 +401,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
           <div className="fdacs-live__stage-frame fdacs-live__media-frame">
             {media?.joinUrl ? (
               <iframe
-                title="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Florida Class D secure live video classroom"
+                title="OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC Florida Class D secure live video classroom"
                 src={media.joinUrl}
                 allow="camera; microphone; fullscreen; autoplay"
                 referrerPolicy="no-referrer"
