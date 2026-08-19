@@ -116,9 +116,10 @@ test("owner LMS is a functional persistent instructor workspace with real media,
   assert.match(consoleSource, /CLASS CHAT/);
   assert.match(consoleSource, /INSTRUCTOR NOTES/);
   assert.match(consoleSource, /Start 15 minute break/);
-  assert.match(consoleSource, /Open learner 1/);
-  assert.match(consoleSource, /Open learner 2/);
-  assert.match(consoleSource, /Open learner 3/);
+  assert.match(consoleSource, /const LEARNER_SURFACES:\s*LearnerSurface\[\]\s*=\s*\["learner_1",\s*"learner_2",\s*"learner_3"\]/);
+  assert.match(consoleSource, /LEARNER_SURFACES\.map\(\(surface,\s*index\)\s*=>/);
+  assert.match(consoleSource, /\/florida-security-training\/owner-validation\/lms\/learner\/\$\{surface\}\?session=/);
+  assert.match(consoleSource, /Open learner \{index \+ 1\}/);
   assert.match(consoleSource, /Upload courseware/);
   assert.match(consoleSource, /createSignedUrl/);
   assert.match(consoleSource, /active_course_asset_id/);
