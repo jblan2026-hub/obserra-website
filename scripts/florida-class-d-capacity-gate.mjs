@@ -4,6 +4,7 @@ const read = (path) => fs.readFileSync(path, "utf8");
 const policy = read("lib/florida-class-d-live-policy.ts");
 const media = read("lib/florida-class-d-media.ts");
 const liveClassroomMigration = read("supabase/migrations/20260813043000_fdacs_class_d_live_classroom.sql");
+const loadTest = read("load/florida-class-d-200-students.k6.js");
 const workflow = read(".github/workflows/florida-class-d-lms-gates.yml");
 
 function requireText(source, value, message) {
@@ -60,11 +61,22 @@ requireText(liveClassroomMigration, "fdacs_class_d_record_live_heartbeat", "the 
 requireText(liveClassroomMigration, "least(90, extract(epoch from (now() - v_lease.last_heartbeat_at))::integer)", "heartbeat credit must remain bounded against delayed or bursty requests");
 requireText(liveClassroomMigration, "for update", "heartbeat and device-lease mutation paths must retain row-level serialization");
 
+requireText(loadTest, "TARGET_CONCURRENT_STUDENTS = 200", "the executable load harness must target exactly 200 authenticated learners");
+requireText(loadTest, 'executor: "constant-vus"', "the load harness must maintain concurrent learners rather than send a one-shot burst");
+requireText(loadTest, "vus: TARGET_CONCURRENT_STUDENTS", "the load harness must bind VUs to the governed capacity target");
+requireText(loadTest, "FDACS_LOAD_TEST_IDENTITIES_JSON", "the load harness must require real authenticated learner identities");
+requireText(loadTest, "ALLOW_PRODUCTION_LOAD_TEST", "the load harness must block accidental production load by default");
+requireText(loadTest, 'http_req_failed: ["rate<0.01"]', "the load harness must enforce a sub-one-percent HTTP failure threshold");
+requireText(loadTest, 'http_req_duration: ["p(95)<2000", "p(99)<4000"]', "the load harness must enforce latency thresholds");
+requireText(loadTest, 'operation: "heartbeat"', "the workload must exercise regulated attendance heartbeat writes");
+requireText(loadTest, 'operation: "state"', "the workload must exercise learner state reads");
+requireText(loadTest, 'operation: "media"', "the workload must exercise real Daily media access issuance");
+
 requireText(workflow, "Run Gate 36 concurrent learner capacity verification", "regulated CI must make capacity verification mandatory");
 requireText(workflow, "node scripts/florida-class-d-capacity-gate.mjs", "regulated CI must execute the capacity verifier");
 
 console.log(JSON.stringify({
-  gate: "florida-class-d-capacity-v2",
+  gate: "florida-class-d-capacity-v3",
   targetConcurrentStudents: target,
   dailyRoomParticipantLimit: roomLimit,
   reservedInstructorSeatsPerRoom: reservedInstructorSeats,
@@ -76,6 +88,9 @@ console.log(JSON.stringify({
   expectedHeartbeatWritesPerSecondCeiling: heartbeatWritesPerSecondCeiling,
   databaseHeartbeatPathIndexed: true,
   databaseHeartbeatCreditBounded: true,
+  executableAuthenticatedLoadHarness: "load/florida-class-d-200-students.k6.js",
+  loadHarnessRequiresRealLearnerSessions: true,
+  accidentalProductionLoadBlocked: true,
   singleRoomOverloadProhibited: true,
   productionLoadTestStillRequired: true,
 }, null, 2));
