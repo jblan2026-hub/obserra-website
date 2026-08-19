@@ -6,6 +6,7 @@ const read = (path) => fs.readFileSync(path, "utf8");
 
 test("connector HTTP adapter composes tenant scope, encrypted credentials, SSRF policy, resilience, and telemetry", () => {
   const adapter = read("lib/connectors/http-adapter.ts");
+  const resilience = read("lib/connectors/resilience.ts");
 
   assert.match(adapter, /import "server-only"/);
   assert.match(adapter, /getConnectorConfiguration/);
@@ -22,9 +23,13 @@ test("connector HTTP adapter composes tenant scope, encrypted credentials, SSRF 
   assert.match(adapter, /redirect:\s*"error"/);
   assert.match(adapter, /cache:\s*"no-store"/);
   assert.match(adapter, /idempotency/i);
-  assert.match(adapter, /retry-after/i);
   assert.match(adapter, /correlationId/);
   assert.match(adapter, /authorization/i);
+
+  assert.match(resilience, /retry-after/i);
+  assert.match(resilience, /exponentialBackoff/);
+  assert.match(resilience, /circuitIsOpen/);
+
   assert.doesNotMatch(adapter, /console\.(log|debug|info)\([^\n]*(secret|authorization|token)/i);
   assert.doesNotMatch(adapter, /NEXT_PUBLIC_/);
 });
