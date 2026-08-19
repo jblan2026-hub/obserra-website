@@ -133,20 +133,6 @@ jobs:
           echo "primary=${primary}" >> "${GITHUB_OUTPUT}"
           echo "apex=${apex}" >> "${GITHUB_OUTPUT}"
 
-      - name: Repair auxiliary Vercel project build policy
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl --silent --show-error --fail-with-body \
-            --connect-timeout 10 \
-            --max-time 20 \
-            --request PATCH \
-            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-            --header "Content-Type: application/json" \
-            --data '{"commandForIgnoringBuildStep":"exit 0","ssoProtection":null}' \
-            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}" \
-            >/dev/null
-
       - name: Attach canonical domains atomically
         id: attach
         continue-on-error: true
@@ -223,6 +209,61 @@ jobs:
           test "${status}" = "307"
           grep -i '^location: .*enrollment=licensing-pending' "${checkout_headers}" >/dev/null
           grep -i '^x-obserra-sales-license: pending' "${checkout_headers}" >/dev/null
+
+      - name: Retire obsolete auxiliary Vercel project
+        if: steps.smoke.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          delete_domain_if_present() {
+            local domain="$1"
+            local body
+            local status
+            body="$(mktemp)"
+            status="$(curl --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${body}" \
+              --write-out '%{http_code}' \
+              --request DELETE \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"
+            if [ "${status}" != "200" ] && [ "${status}" != "204" ] && [ "${status}" != "404" ]; then
+              cat "${body}" >&2 || true
+              rm -f "${body}"
+              echo "::error::Failed to remove ${domain} from obsolete Vercel project: HTTP ${status}."
+              return 1
+            fi
+            rm -f "${body}"
+          }
+
+          delete_domain_if_present "${PRIMARY_DOMAIN}"
+          delete_domain_if_present "${APEX_DOMAIN}"
+
+          body="$(mktemp)"
+          status="$(curl --silent --show-error \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --output "${body}" \
+            --write-out '%{http_code}' \
+            --request DELETE \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}")"
+          if [ "${status}" != "204" ] && [ "${status}" != "404" ]; then
+            cat "${body}" >&2 || true
+            rm -f "${body}"
+            echo "::error::Failed to retire obsolete Vercel project ${AUXILIARY_PROJECT_ID}: HTTP ${status}."
+            exit 1
+          fi
+          rm -f "${body}"
+
+          health="$(curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/api/health")"
+          observed_project="$(jq -r '.routing.observedProjectId // empty' <<<"${health}")"
+          if [ "${observed_project}" != "${CANONICAL_PROJECT_ID}" ]; then
+            echo "::error::Canonical production route changed after auxiliary project retirement."
+            exit 1
+          fi
 
       - name: Roll back canonical domains on failed cutover
         if: ${{ always() && steps.rollback.outcome == 'success' && steps.rollback.outputs.primary != '' && steps.rollback.outputs.apex != '' && (steps.attach.outcome == 'failure' || steps.smoke.outcome == 'failure') }}
