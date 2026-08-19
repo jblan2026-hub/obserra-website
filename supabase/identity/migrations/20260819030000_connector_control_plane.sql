@@ -93,7 +93,7 @@ revoke all on table public.integration_connector_health_events from public, anon
 grant select, insert on table public.integration_connector_health_events to service_role;
 
 comment on table public.integration_connector_health_events is
-  'Append-only connector health telemetry; update and delete are intentionally not granted.';
+  'append-only connector health telemetry; update and delete are intentionally not granted.';
 
 create table public.integration_connector_failures (
   id bigint generated always as identity primary key,
