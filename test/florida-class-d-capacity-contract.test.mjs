@@ -21,7 +21,8 @@ test("Florida Class D production capacity is explicitly engineered for 200 concu
   assert.match(policy, /capacityTargetRequiresParallelRooms:\s*true/);
   assert.match(policy, /heartbeatSeconds:\s*60/);
   assert.match(policy, /capacityHeartbeatWritesPerMinute:\s*200/);
-  assert.match(policy, /capacityHeartbeatWritesPerSecondCeiling:\s*4/);
+  assert.match(policy, /capacityHeartbeatSteadyStateWritesPerSecondTarget:\s*4/);
+  assert.match(policy, /capacityHeartbeatPhaseWindowSeconds:\s*55/);
 
   assert.match(media, /max_participants:\s*75/);
   assert.match(media, /roomName\(liveSessionId\)/);
@@ -29,6 +30,13 @@ test("Florida Class D production capacity is explicitly engineered for 200 concu
 
   assert.match(classroom, /const STATE_REFRESH_INTERVAL_MS = 15_000/);
   assert.match(classroom, /const HEARTBEAT_INTERVAL_MS = 60_000/);
+  assert.match(classroom, /function deterministicPhaseOffset/);
+  assert.match(classroom, /HEARTBEAT_MINIMUM_PHASE_MS = 5_000/);
+  assert.match(classroom, /STATE_REFRESH_MINIMUM_PHASE_MS = 1_000/);
+  assert.match(classroom, /heartbeatPhaseDelay/);
+  assert.match(classroom, /stateRefreshPhaseDelay/);
+  assert.match(classroom, /window\.setTimeout\([^]*heartbeatPhaseDelay/);
+  assert.match(classroom, /window\.setTimeout\([^]*stateRefreshPhaseDelay/);
   assert.match(classroom, /setInterval\(\(\) => void sendHeartbeat\(\), HEARTBEAT_INTERVAL_MS\)/);
   assert.match(classroom, /setInterval\(\(\) => void refresh\(\)/);
   assert.match(classroom, /STATE_REFRESH_INTERVAL_MS/);
@@ -36,7 +44,7 @@ test("Florida Class D production capacity is explicitly engineered for 200 concu
 
   const heartbeatBody = classroom.slice(
     classroom.indexOf("const sendHeartbeat = async () =>"),
-    classroom.indexOf("const heartbeat = window.setInterval"),
+    classroom.indexOf("const heartbeatPhaseDelay"),
   );
   assert.doesNotMatch(heartbeatBody, /await refresh\(\)/);
 
@@ -58,7 +66,8 @@ test("Florida Class D production capacity is explicitly engineered for 200 concu
   assert.match(loadTest, /operation: "media"/);
 
   assert.match(capacityGate, /capacityHeartbeatWritesPerMinute/);
-  assert.match(capacityGate, /capacityHeartbeatWritesPerSecondCeiling/);
+  assert.match(capacityGate, /capacityHeartbeatSteadyStateWritesPerSecondTarget/);
+  assert.match(capacityGate, /capacityHeartbeatPhaseWindowSeconds/);
   assert.match(capacityGate, /florida-class-d-200-students\.k6\.js/);
   assert.match(capacityGate, /productionLoadTestStillRequired:\s*true/);
 
