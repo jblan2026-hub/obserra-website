@@ -3,13 +3,13 @@
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update the controlled source records and run `npm run generate:cmmc-system-evidence`.
 
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-- **Bundle:** `obserra-cmmc-working-f0b14ca80ec15efcd02ad0eb`
+- **Bundle:** `obserra-cmmc-working-167d55870eac0e5937e6d2d6`
 - **Bundle state:** `working_evidence_inventory`
 - **Generated at:** `2026-08-14T18:49:07Z`
 - **Git base/HEAD reference:** `0e72459a8940f23976038d85d6394409000f48c5`
 - **Revision binding:** `working_tree_digest`
 - **Exact release:** not assigned; working evidence inventory
-- **In-scope tree SHA-256:** `f0b14ca80ec15efcd02ad0ebe92c3d1b15d024cdea004ca32ebe92911ce381d5` (681 paths)
+- **In-scope tree SHA-256:** `167d55870eac0e5937e6d2d66eac45182fd685f214f12f113e6011521d92db06` (681 paths)
 
 ## Paired audit views
 
