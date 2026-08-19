@@ -4,13 +4,14 @@ import { notFound } from "next/navigation";
 import { courseForId } from "../../../lib/academy";
 import { publicAcademyCourse } from "../../../lib/academy-control";
 import { academyLicensedSalesEnabled } from "../../../lib/academy-licensing";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "../../../lib/legal-identity";
 import AcademyCheckoutForm from "../AcademyCheckoutForm";
 import AcademyCommerceNotice from "../AcademyCommerceNotice";
 import { publicationForCourse } from "../coursePublication";
 import "./course-page.css";
 import "../academy-payment.css";
 
-const LEGAL_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
+const LEGAL_NAME = LEGAL_ENTITY_NAME;
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -30,17 +31,17 @@ export async function generateMetadata({
   const runtime = await publicAcademyCourse(baseCourse);
   if (!runtime.course) {
     return {
-      title: "Course Unavailable | Obserra Academy",
+      title: `Course Unavailable | ${ACADEMY_BRAND_NAME}`,
       robots: { index: false, follow: false, noarchive: true, nosnippet: true },
     };
   }
   const course = runtime.course;
   return {
-    title: `${course.title} | Obserra Academy`,
+    title: `${course.title} | ${ACADEMY_BRAND_NAME}`,
     description: course.description,
     alternates: { canonical: `/academy/${course.id}` },
     openGraph: {
-      title: `${course.title} | Obserra Academy`,
+      title: `${course.title} | ${ACADEMY_BRAND_NAME}`,
       description: course.description,
       url: `https://www.obserrallc.com/academy/${course.id}`,
       type: "article",
@@ -48,7 +49,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${course.title} | Obserra Academy`,
+      title: `${course.title} | ${ACADEMY_BRAND_NAME}`,
       description: course.description,
       images: [OFFICIAL_LOGO],
     },
