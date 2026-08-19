@@ -172,9 +172,11 @@ export default function OwnerLearnerWorkspace({
 
   useEffect(() => {
     let cancelled = false;
-    void Promise.all([refresh(), heartbeat()]).catch((error: unknown) => {
-      if (!cancelled) setMessage(error instanceof Error ? error.message : "Learner workspace could not be loaded.");
-    });
+    const initialTimer = window.setTimeout(() => {
+      void Promise.all([refresh(), heartbeat()]).catch((error: unknown) => {
+        if (!cancelled) setMessage(error instanceof Error ? error.message : "Learner workspace could not be loaded.");
+      });
+    }, 0);
     const timer = window.setInterval(() => {
       void Promise.all([refresh(), heartbeat()]).catch((error: unknown) => setMessage(error instanceof Error ? error.message : "Learner workspace refresh failed."));
     }, 5_000);
@@ -182,6 +184,7 @@ export default function OwnerLearnerWorkspace({
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       cancelled = true;
+      window.clearTimeout(initialTimer);
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisibility);
       void supabase.from("owner_lms_participants").update({ status: "disconnected", last_seen_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("session_id", sessionId).eq("surface", surface);
