@@ -28,7 +28,9 @@ test("connector control plane is encrypted, tenant scoped, SSRF safe, fail close
   assert.match(urls, /127\./);
   assert.match(urls, /169\.254\./);
   assert.match(urls, /10\./);
-  assert.match(urls, /172\./);
+  assert.match(urls, /octets\[0\] === 172/);
+  assert.match(urls, /octets\[1\] >= 16/);
+  assert.match(urls, /octets\[1\] <= 31/);
   assert.match(urls, /192\.168\./);
   assert.match(urls, /\[::1\]/);
   assert.match(urls, /OBSERRA_CONNECTOR_URL_REJECTED/);
