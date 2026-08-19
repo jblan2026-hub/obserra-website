@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./enterprise.css";
 
+const ENTERPRISE_ACADEMY_NAME = `${ACADEMY_BRAND_NAME} Enterprise`;
+
 export const metadata: Metadata = {
-  title: "Obserra Academy Enterprise | Team Training and Learning Paths",
+  title: `${ENTERPRISE_ACADEMY_NAME} | Team Training and Learning Paths`,
   description:
     "Build enterprise cybersecurity, intelligence, executive protection, and AI governance capability through curated learning paths, cohort delivery, manager reporting, and team licensing.",
   alternates: { canonical: "/academy/enterprise" },
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
     "CISO team development",
   ],
   openGraph: {
-    title: "Obserra Academy Enterprise",
+    title: ENTERPRISE_ACADEMY_NAME,
     description: "Curated learning paths, cohort delivery, manager visibility, and enterprise training support.",
     url: "https://www.obserrallc.com/academy/enterprise",
     type: "website",
@@ -26,7 +28,7 @@ export const metadata: Metadata = {
         url: "/brand/visuals/obserra-cybersecurity.png",
         width: 1344,
         height: 768,
-        alt: "Obserra Academy Enterprise",
+        alt: ENTERPRISE_ACADEMY_NAME,
       },
     ],
   },
@@ -92,7 +94,7 @@ export default function AcademyEnterprisePage() {
     "@graph": [
       {
         "@type": "Service",
-        name: "Obserra Academy Enterprise",
+        name: ENTERPRISE_ACADEMY_NAME,
         description:
           "Enterprise training programs with curated learning paths, cohort delivery, manager reporting, executive briefings, and team licensing.",
         provider: {
@@ -107,11 +109,11 @@ export default function AcademyEnterprisePage() {
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: "https://www.obserrallc.com" },
-          { "@type": "ListItem", position: 2, name: "Academy", item: "https://www.obserrallc.com/academy" },
+          { "@type": "ListItem", position: 2, name: ACADEMY_BRAND_NAME, item: "https://www.obserrallc.com/academy" },
           {
             "@type": "ListItem",
             position: 3,
-            name: "Academy Enterprise",
+            name: ENTERPRISE_ACADEMY_NAME,
             item: "https://www.obserrallc.com/academy/enterprise",
           },
         ],
@@ -129,9 +131,9 @@ export default function AcademyEnterprisePage() {
             width={286}
             height={55}
           />
-          <span>ACADEMY ENTERPRISE</span>
+          <span>{ENTERPRISE_ACADEMY_NAME.toUpperCase()}</span>
         </Link>
-        <nav aria-label="Academy Enterprise navigation">
+        <nav aria-label={`${ENTERPRISE_ACADEMY_NAME} navigation`}>
           <Link href="/academy">Course catalog</Link>
           <Link href="/about">Instructor</Link>
           <Link href="/trust">Trust Center</Link>
@@ -141,7 +143,7 @@ export default function AcademyEnterprisePage() {
 
       <section className="ae-hero">
         <div>
-          <p className="ae-eyebrow">OBSERRA ACADEMY ENTERPRISE</p>
+          <p className="ae-eyebrow">{ENTERPRISE_ACADEMY_NAME.toUpperCase()}</p>
           <h1>Build shared capability across the people responsible for high consequence decisions.</h1>
           <p>
             Create role based learning paths for executives, cybersecurity teams, AI governance groups, intelligence
@@ -153,7 +155,7 @@ export default function AcademyEnterprisePage() {
             <Link href="/academy" className="ae-secondary">Review individual courses</Link>
           </div>
         </div>
-        <aside aria-label="Enterprise Academy assurances">
+        <aside aria-label={`${ENTERPRISE_ACADEMY_NAME} assurances`}>
           <span><strong>Role aligned</strong> Learning paths tied to real responsibilities</span>
           <span><strong>Account based</strong> Secure learner access and saved progress</span>
           <span><strong>Measurable</strong> Assessments, completion records, and reporting</span>
@@ -244,7 +246,7 @@ export default function AcademyEnterprisePage() {
         <p>Tell {LEGAL_ENTITY_NAME} which roles, teams, and outcomes matter. We will recommend a practical learning path and delivery model.</p>
         <div className="ae-actions">
           <Link href="/contact?interest=enterprise-training" className="ae-primary">Request enterprise training plan</Link>
-          <a href="mailto:info@obserrallc.com" className="ae-secondary">Email Academy Enterprise</a>
+          <a href="mailto:info@obserrallc.com" className="ae-secondary">Email {ENTERPRISE_ACADEMY_NAME}</a>
         </div>
       </section>
 
