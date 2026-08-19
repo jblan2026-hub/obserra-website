@@ -1,3 +1,3 @@
-refresh-request: 2026-08-19-vercel-auxiliary-documented-policy
-reason: regenerate governed evidence and rerun the reusable Vercel reconciliation with only documented update-project fields after verifying canonical ownership, detaching duplicate auxiliary domains, disabling auxiliary preview deployments, and retaining the ignored-build guard
-validation-request: 2026-08-19-post-vercel-auxiliary-documented-policy
+refresh-request: 2026-08-19-remove-unavailable-vercel-mutation-path
+reason: regenerate governed evidence after removing the nonfunctional auxiliary Vercel mutation workflow and restoring the established governed evidence refresher; direct Vercel connector verification continues to expose the external verified-commit project conflict fail closed
+validation-request: 2026-08-19-post-vercel-mutation-cleanup
