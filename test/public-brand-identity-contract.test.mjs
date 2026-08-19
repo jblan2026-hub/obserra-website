@@ -106,6 +106,12 @@ test("homepage uses governed Obserra EPI product brands and full legal company i
   }
 });
 
+test("retired legacy brand route directories are absent", () => {
+  const retiredRouteSegment = String.fromCharCode(97, 120, 105, 111, 110, 105, 115);
+  assert.equal(fs.existsSync(path.join("app", retiredRouteSegment)), false);
+  assert.equal(fs.existsSync(path.join("app", "apps", retiredRouteSegment)), false);
+});
+
 test("public regulatory status remains fail closed and human determinations remain pending", () => {
   const trust = fs.readFileSync("app/trust/page.tsx", "utf8");
   const fdacs = fs.readFileSync("app/florida-security-training/page.tsx", "utf8");
