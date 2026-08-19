@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import { prepareIdentityOriginContract } from "./lib/auth/identity-origin-contract";
 import { prepareSupabaseAuthRuntime } from "./lib/auth/runtime-config";
+import { CANONICAL_PUBLIC_ORIGIN } from "./lib/legal-identity";
 
 const identityOrigins = prepareIdentityOriginContract();
 const supabaseAuthRuntime = prepareSupabaseAuthRuntime();
@@ -59,6 +60,7 @@ const publicSecurityHeaders = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), display-capture=(), fullscreen=(self), geolocation=(), payment=(), usb=()" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+  { key: "Access-Control-Allow-Origin", value: CANONICAL_PUBLIC_ORIGIN },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
@@ -179,7 +181,7 @@ const nextConfig: NextConfig = {
         headers: protectedVideoInstructorHeaders,
       },
       {
-        source: "/florida-security-training/owner-validation/lms",
+        source: "/florida-security-training/owner-validation/:path*",
         headers: protectedVideoInstructorHeaders,
       },
       {
