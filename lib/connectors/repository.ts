@@ -7,6 +7,11 @@ import {
   type ConnectorHealthEvent,
   type ConnectorHealthState,
 } from "./contracts";
+import {
+  type ConnectorDatabase,
+  type ConnectorRow,
+  type ConnectorUpdate,
+} from "./database";
 
 const CANONICAL_CONNECTOR_PROJECT_REF = "ftkjhmtfyfkartfsnkjb";
 const CANONICAL_CONNECTOR_ORIGIN = `https://${CANONICAL_CONNECTOR_PROJECT_REF}.supabase.co`;
@@ -18,28 +23,7 @@ const TENANT_KEY_PATTERN = /^[a-z0-9][a-z0-9_.:-]{1,127}$/;
 const CONNECTOR_KEY_PATTERN = /^[a-z0-9][a-z0-9_.:-]{1,127}$/;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-type ConnectorRow = {
-  id: string;
-  owner_user_id: string;
-  tenant_key: string;
-  connector_key: string;
-  provider: string;
-  display_name: string;
-  base_url: string;
-  allowed_hostname: string;
-  activated: boolean;
-  health_state: ConnectorHealthState;
-  failure_count: number;
-  circuit_open_until: string | null;
-  last_success_at: string | null;
-  last_failure_at: string | null;
-  last_error_code: string | null;
-  config_version: number;
-  created_at: string;
-  updated_at: string;
-};
-
-type ConnectorStorageClient = SupabaseClient<Record<string, unknown>, "public", Record<string, unknown>>;
+type ConnectorStorageClient = SupabaseClient<ConnectorDatabase>;
 
 function storageError(message: string, code = "OBSERRA_CONNECTOR_STORAGE_UNAVAILABLE", status = 503): never {
   throw new ConnectorRuntimeError(message, code, "configuration", status, false);
@@ -83,7 +67,7 @@ function connectorStorageConfig() {
 
 function connectorStorageClient(): ConnectorStorageClient {
   const config = connectorStorageConfig();
-  return createClient(config.url, config.serviceRoleKey, {
+  return createClient<ConnectorDatabase>(config.url, config.serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -94,7 +78,7 @@ function connectorStorageClient(): ConnectorStorageClient {
         "x-obserra-runtime": "connector-control-plane/service_role",
       },
     },
-  }) as ConnectorStorageClient;
+  });
 }
 
 function requireTenantKey(value: string) {
@@ -157,7 +141,7 @@ async function singleConnector(
     .eq("connector_key", requireConnectorKey(connectorKey))
     .maybeSingle();
   if (result.error) storageError("Connector configuration lookup failed.");
-  return result.data ? mapConnector(result.data as unknown as ConnectorRow) : null;
+  return result.data ? mapConnector(result.data) : null;
 }
 
 export async function getConnectorConfiguration(input: {
@@ -205,7 +189,7 @@ export async function upsertConnectorConfiguration(input: {
     .select("id,owner_user_id,tenant_key,connector_key,provider,display_name,base_url,allowed_hostname,activated,health_state,failure_count,circuit_open_until,last_success_at,last_failure_at,last_error_code,config_version,created_at,updated_at")
     .single();
   if (result.error || !result.data) storageError("Connector configuration persistence failed.");
-  return mapConnector(result.data as unknown as ConnectorRow);
+  return mapConnector(result.data);
 }
 
 export async function setConnectorActivation(input: {
@@ -228,7 +212,7 @@ export async function setConnectorActivation(input: {
     .select("id,owner_user_id,tenant_key,connector_key,provider,display_name,base_url,allowed_hostname,activated,health_state,failure_count,circuit_open_until,last_success_at,last_failure_at,last_error_code,config_version,created_at,updated_at")
     .single();
   if (result.error || !result.data) storageError("Connector activation persistence failed.");
-  return mapConnector(result.data as unknown as ConnectorRow);
+  return mapConnector(result.data);
 }
 
 export async function persistConnectorSecret(input: {
@@ -267,15 +251,14 @@ export async function loadConnectorSecretEnvelope(input: {
     p_secret_name: requireConnectorKey(input.secretName),
   });
   if (result.error) storageError(`Connector secret lookup failed for ${PRIVATE_SECRETS_TABLE}.`);
-  const row = Array.isArray(result.data) ? result.data[0] : result.data;
-  if (!row || typeof row !== "object") return null;
-  const record = row as Record<string, unknown>;
-  if (typeof record.secret_envelope !== "string" || typeof record.encryption_key_id !== "string") {
+  const row = result.data?.[0];
+  if (!row) return null;
+  if (typeof row.secret_envelope !== "string" || typeof row.encryption_key_id !== "string") {
     storageError("Connector secret lookup returned an invalid response.", "OBSERRA_CONNECTOR_STORAGE_INVALID_RESPONSE", 500);
   }
   return {
-    secretEnvelope: record.secret_envelope,
-    encryptionKeyId: record.encryption_key_id,
+    secretEnvelope: row.secret_envelope,
+    encryptionKeyId: row.encryption_key_id,
   };
 }
 
@@ -290,7 +273,7 @@ export async function persistConnectorHealth(input: {
   success: boolean;
 }) {
   const now = new Date().toISOString();
-  const patch: Record<string, unknown> = {
+  const patch: ConnectorUpdate = {
     health_state: input.state,
     failure_count: Math.max(0, Math.floor(input.failureCount)),
     circuit_open_until: input.circuitOpenUntil,
