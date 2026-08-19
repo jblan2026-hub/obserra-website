@@ -74,6 +74,29 @@ test("preview build skips governed evidence-only updates when runtime source did
   }
 });
 
+test("hotfix and release branches always build so exact release SHAs can be promoted", () => {
+  for (const ref of ["hotfix/owner-lms-test-access-20260817", "release/fdacs-lms-production-20260817"]) {
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "obserra-vercel-ignore-"));
+    try {
+      git(cwd, "init");
+      fs.mkdirSync(path.join(cwd, "docs", "compliance"), { recursive: true });
+      fs.writeFileSync(path.join(cwd, "README.md"), "baseline\n");
+      const baseline = commit(cwd, "baseline");
+
+      fs.writeFileSync(path.join(cwd, "docs", "compliance", "evidence.json"), "{}\n");
+      commit(cwd, "evidence-only release update");
+
+      const result = runIgnore(cwd, {
+        VERCEL_GIT_PREVIOUS_SHA: baseline,
+        VERCEL_GIT_COMMIT_REF: ref,
+      });
+      assert.equal(result.status, 1, `expected Vercel to build ${ref}, stderr: ${result.stderr}`);
+    } finally {
+      fs.rmSync(cwd, { recursive: true, force: true });
+    }
+  }
+});
+
 test("unrecognized Vercel project IDs fail open so a release cannot be silently skipped", () => {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "obserra-vercel-ignore-"));
   try {
