@@ -2,19 +2,26 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-const read = (relativePath) => fs.readFileSync(relativePath, "utf8");
+const read = (path) => fs.readFileSync(path, "utf8");
 
-test("Applications and Academy are prominent direct website destinations", () => {
+test("Obserra EPI Applications and Obserra EPI Academy are prominent direct website destinations", () => {
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
   const home = read("app/page.tsx");
+  const identity = read("lib/legal-identity.ts");
   const styles = read("app/components/enterprise/enterprise-sales-navigation.css");
 
-  assert.ok(chrome.indexOf('["Applications", "/apps", "sales"]') < chrome.indexOf('["Academy", "/academy", "sales"]'));
+  assert.match(identity, /APPLICATIONS_BRAND_NAME = `\$\{BRAND_PREFIX\} Applications`/);
+  assert.match(identity, /ACADEMY_BRAND_NAME = `\$\{BRAND_PREFIX\} Academy`/);
+  assert.ok(
+    chrome.indexOf('[APPLICATIONS_BRAND_NAME, "/apps", "sales"]') <
+      chrome.indexOf('[ACADEMY_BRAND_NAME, "/academy", "sales"]'),
+    "Applications must remain ahead of Academy in primary sales navigation",
+  );
   assert.match(chrome, /className=\{prominence === "sales" \? "ent-header__sales-link"/);
-  assert.match(chrome, /Applications Marketplace<\/Link><Link href="\/academy">Obserra Academy/);
+  assert.match(chrome, /<Link href="\/apps">\{APPLICATIONS_BRAND_NAME\}<\/Link><Link href="\/academy">\{ACADEMY_BRAND_NAME\}<\/Link>/);
   assert.match(styles, /> a\.ent-header__sales-link/);
-  assert.match(home, /<ButtonLink href="\/apps">Shop Applications<\/ButtonLink>/);
-  assert.match(home, /<ButtonLink href="\/academy" variant="secondary">Browse Academy<\/ButtonLink>/);
+  assert.match(home, /<ButtonLink href="\/apps">Shop \{APPLICATIONS_BRAND_NAME\}<\/ButtonLink>/);
+  assert.match(home, /<ButtonLink href="\/academy" variant="secondary">Browse \{ACADEMY_BRAND_NAME\}<\/ButtonLink>/);
   assert.match(home, /Applications and Academy are direct website destinations/);
   assert.match(home, /href="\/apps" className="mission-direct-sales__card"/);
   assert.match(home, /href="\/academy" className="mission-direct-sales__card"/);
@@ -34,4 +41,27 @@ test("Academy catalog exposes checkout only for explicitly activated courses", (
   assert.match(client, /Not yet available for purchase/);
   assert.match(client, /Not yet for sale/);
   assert.match(client, /0 are currently open for purchase|purchasableCourseCount/);
+});
+
+test("Academy LMS stays live while new enrollment and payment remain licensing-gated", () => {
+  const licensing = read("lib/academy-licensing.ts");
+  const catalogPage = read("app/academy/page.tsx");
+  const coursePage = read("app/academy/[courseId]/page.tsx");
+  const checkout = read("app/api/academy/checkout/route.ts");
+  const notice = read("app/academy/AcademyCommerceNotice.tsx");
+  const homeHeader = read("app/HomeHeader.tsx");
+  const learnPage = read("app/academy/learn/[courseId]/page.tsx");
+
+  assert.match(licensing, /OBSERRA_ACADEMY_LICENSED_SALES_ENABLED/);
+  assert.match(licensing, /===\s*["']enabled["']/);
+  assert.match(catalogPage, /academyLicensedSalesEnabled/);
+  assert.match(catalogPage, /commerceState\.enrollment \?\? \(!licensedSalesEnabled \? "licensing-pending" : undefined\)/);
+  assert.match(coursePage, /academyLicensedSalesEnabled/);
+  assert.match(coursePage, /commerceState\.enrollment \?\? commerceState\.checkout \?\? \(!licensedSalesEnabled \? "licensing-pending" : undefined\)/);
+  assert.match(checkout, /academyLicensedSalesEnabled/);
+  assert.match(checkout, /licensing-pending/);
+  assert.match(notice, /licensing-pending/);
+  assert.match(homeHeader, /Academy LMS/);
+  assert.match(learnPage, /academyStateWithOwnerAccess/);
+  assert.doesNotMatch(learnPage, /academyLicensedSalesEnabled/);
 });

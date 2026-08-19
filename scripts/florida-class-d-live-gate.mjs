@@ -122,14 +122,15 @@ required(instructorUi, "Course breaks", "Instructor console must display each st
 
 required(course, "liveLessonsPerDay: 4", "Course model must define four live lessons per day.");
 required(course, "trackedBreakMinutesPerDay: 45", "Course model must define 45 tracked break minutes per day.");
-required(publicPage, "Break time is recorded but is never credited", "Public preview must accurately disclose tracked break treatment.");
-required(publicPage, "Enrollment, payment, and student course access are not open", "Public preview must disclose the pre-license control state.");
-required(governedPublicLink, "if (!enabled) return null", "Unavailable public learner actions must be omitted instead of rendered as disabled controls.");
-if (/aria-disabled|data-governed-state|<button|disabled/.test(governedPublicLink)) {
-  throw new Error("Unavailable public learner actions may not render disabled controls or placeholders.");
-}
+required(publicPage, "LMS PLATFORM LIVE · PRODUCTION SOFTWARE", "Public Florida LMS must disclose that the platform software is live.");
+required(publicPage, "Break time is recorded but is never credited", "Public LMS must accurately disclose tracked break treatment.");
+required(publicPage, "Enrollment and payment remain unavailable until licensing and production activation are complete", "Public LMS must disclose the prelicense enrollment and payment control state.");
+required(governedPublicLink, "if (!enabled) {", "Unavailable public learner actions must enter the fail-closed visible-control branch.");
+required(governedPublicLink, 'aria-disabled="true"', "Unavailable public learner actions must be visibly marked disabled.");
+required(governedPublicLink, "<button", "Unavailable public learner actions must render a non-navigating button.");
+required(governedPublicLink, "disabled", "Unavailable public learner actions must not be interactive before activation.");
 required(productionActivation, "floridaClassDPublicLearnerControlsEnabled", "Public learner controls must use a governed production authorization function.");
 required(productionActivation, "OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED", "Public learner controls must require a distinct regulated feature flag.");
-required(course, 'status: "coming-soon"', "Live source implementation must not open the course publicly.");
+required(course, 'status: "coming-soon"', "The regulated course must remain unavailable for learner enrollment before activation even while the LMS platform is live.");
 
-console.log("Florida Class D live instruction gate passed: source supports live teaching, single-device presence, cumulative student time, daily attendance certification, challenges, Q&A, tracked breaks, and fail-closed DS activation.");
+console.log("Florida Class D live instruction gate passed: LMS platform is live; source supports live teaching, single-device presence, cumulative student time, daily attendance certification, challenges, Q&A, tracked breaks, and fail-closed learner commerce and DS activation.");

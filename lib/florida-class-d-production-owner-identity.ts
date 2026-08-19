@@ -1,13 +1,15 @@
 import "server-only";
 
 import { getStripe } from "./stripe";
-import { requireFloridaClassDProductionOwnerValidationPrincipal } from "./florida-class-d-production-owner-validation";
+import { requireFloridaClassDOwnerTestPrincipal } from "./florida-class-d-owner-test-session";
 
 const CANONICAL_PUBLIC_ORIGIN = "https://www.obserrallc.com";
 const VERIFICATION_SESSION_PATTERN = /^vs_[A-Za-z0-9_]{8,255}$/;
 const SURFACE = "fdacs_production_owner_validation";
 
-function metadataFor(principal: Awaited<ReturnType<typeof requireFloridaClassDProductionOwnerValidationPrincipal>>) {
+type OwnerTestPrincipal = Awaited<ReturnType<typeof requireFloridaClassDOwnerTestPrincipal>>;
+
+function metadataFor(principal: OwnerTestPrincipal) {
   return {
     obserra_surface: SURFACE,
     obserra_principal_id: principal.principalId,
@@ -17,19 +19,18 @@ function metadataFor(principal: Awaited<ReturnType<typeof requireFloridaClassDPr
 }
 
 function sessionMatchesPrincipal(
-  session: { livemode?: boolean; metadata?: Record<string, string> | null },
-  principal: Awaited<ReturnType<typeof requireFloridaClassDProductionOwnerValidationPrincipal>>,
+  session: { metadata?: Record<string, string> | null },
+  principal: OwnerTestPrincipal,
 ) {
   const metadata = session.metadata ?? {};
-  return session.livemode === true
-    && metadata.obserra_surface === SURFACE
+  return metadata.obserra_surface === SURFACE
     && metadata.obserra_principal_id === principal.principalId
     && metadata.obserra_auth_session_id === principal.sessionId
     && metadata.obserra_release_sha === principal.releaseCommitSha;
 }
 
 export async function createFloridaClassDProductionOwnerIdentityVerification() {
-  const principal = await requireFloridaClassDProductionOwnerValidationPrincipal();
+  const principal = await requireFloridaClassDOwnerTestPrincipal();
   const stripe = getStripe();
   const metadata = metadataFor(principal);
   const verification = await stripe.identity.verificationSessions.create(
@@ -51,19 +52,18 @@ export async function createFloridaClassDProductionOwnerIdentityVerification() {
 
   if (
     !VERIFICATION_SESSION_PATTERN.test(verification.id)
-    || verification.livemode !== true
     || typeof verification.url !== "string"
     || !verification.url.startsWith("https://")
     || !sessionMatchesPrincipal(verification, principal)
   ) {
-    throw new Error("Stripe Identity returned an invalid production owner validation session.");
+    throw new Error("Stripe Identity returned an invalid owner validation session.");
   }
 
   return {
     verificationSessionId: verification.id,
     verificationUrl: verification.url,
     status: verification.status,
-    providerLivemode: true,
+    providerLivemode: verification.livemode === true,
     trainingCreditEligible: false,
     enrollmentCreated: false,
     fdacsApprovalClaimed: false,
@@ -76,7 +76,7 @@ export async function getFloridaClassDProductionOwnerIdentityVerificationStatus(
     throw new Error("A valid Stripe Identity verification session is required.");
   }
 
-  const principal = await requireFloridaClassDProductionOwnerValidationPrincipal();
+  const principal = await requireFloridaClassDOwnerTestPrincipal();
   const stripe = getStripe();
   const verification = await stripe.identity.verificationSessions.retrieve(normalized);
   if (!sessionMatchesPrincipal(verification, principal)) {
@@ -90,7 +90,7 @@ export async function getFloridaClassDProductionOwnerIdentityVerificationStatus(
   return {
     status: verification.status,
     verified: verification.status === "verified",
-    providerLivemode: true,
+    providerLivemode: verification.livemode === true,
     providerErrorCode,
     trainingCreditEligible: false,
     enrollmentCreated: false,

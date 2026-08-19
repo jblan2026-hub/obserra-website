@@ -21,6 +21,7 @@ export type SupabaseAuthRuntimeStatus = {
 type RuntimeEnvironment = Readonly<Record<string, string | undefined>>;
 
 export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";
+export const CONTROLLED_OWNER_VALIDATION_PREVIEW_REF = "hotfix/owner-lms-test-access-20260817";
 
 const CANONICAL_IDENTITY_PROJECT_REF = "ftkjhmtfyfkartfsnkjb";
 const CANONICAL_IDENTITY_URL = `https://${CANONICAL_IDENTITY_PROJECT_REF}.supabase.co`;
@@ -33,11 +34,13 @@ function normalized(value: string | undefined) {
   return trimmed || undefined;
 }
 
-function canonicalProductionBootstrap(environment: RuntimeEnvironment) {
-  return (
-    normalized(environment.VERCEL_ENV)?.toLowerCase() === "production" &&
-    normalized(environment.VERCEL_PROJECT_ID) === CANONICAL_PUBLIC_VERCEL_PROJECT_ID
-  );
+function canonicalIdentityBootstrap(environment: RuntimeEnvironment) {
+  const vercelEnvironment = normalized(environment.VERCEL_ENV)?.toLowerCase();
+  const canonicalProject = normalized(environment.VERCEL_PROJECT_ID) === CANONICAL_PUBLIC_VERCEL_PROJECT_ID;
+  if (!canonicalProject) return false;
+  if (vercelEnvironment === "production") return true;
+  return vercelEnvironment === "preview"
+    && normalized(environment.VERCEL_GIT_COMMIT_REF) === CONTROLLED_OWNER_VALIDATION_PREVIEW_REF;
 }
 
 function exactSupabaseOrigin(value: string | undefined) {
@@ -62,7 +65,7 @@ export function prepareSupabaseAuthRuntime(
   environment: RuntimeEnvironment = process.env,
 ): SupabaseAuthRuntimeStatus {
   const runtimeFlag = environment.OBSERRA_SUPABASE_AUTH_RUNTIME_ENABLED;
-  const canonicalBootstrap = canonicalProductionBootstrap(environment);
+  const canonicalBootstrap = canonicalIdentityBootstrap(environment);
   const explicitRuntimeFlag = normalized(runtimeFlag);
   const runtimeEnabled = explicitRuntimeFlag === undefined
     ? canonicalBootstrap

@@ -33,9 +33,9 @@ function identityModule({ principal, stripe }) {
     require: (specifier) => {
       if (specifier === "server-only") return {};
       if (specifier === "./stripe") return { getStripe: () => stripe };
-      if (specifier === "./florida-class-d-production-owner-validation") {
+      if (specifier === "./florida-class-d-owner-test-session") {
         return {
-          requireFloridaClassDProductionOwnerValidationPrincipal: async () => principal,
+          requireFloridaClassDOwnerTestPrincipal: async () => principal,
         };
       }
       throw new Error(`Unexpected import ${specifier}`);

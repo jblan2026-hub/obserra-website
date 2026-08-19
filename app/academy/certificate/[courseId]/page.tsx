@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import CertificateView from "./CertificateView";
 import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
 import { verifyCertificateClaim } from "../../../../lib/certificate-signing";
+import { ACADEMY_BRAND_NAME } from "../../../../lib/legal-identity";
 import { BASELINE_COURSE_VERSION, publicationForCourse } from "../../coursePublication";
 
 export default async function CertificatePage({ params }: { params: Promise<{ courseId: string }> }) {
@@ -40,7 +41,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
 
   const user = await (await clerkClient()).users.getUser(userId);
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
-  const learnerName = fullName || user.emailAddresses[0]?.emailAddress || "Obserra Academy Learner";
+  const learnerName = fullName || user.emailAddresses[0]?.emailAddress || `${ACADEMY_BRAND_NAME} Learner`;
 
   return (
     <CertificateView

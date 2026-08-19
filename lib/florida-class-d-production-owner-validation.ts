@@ -13,6 +13,17 @@ const MAX_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 export const FLORIDA_CLASS_D_PRODUCTION_OWNER_VALIDATION_WATERMARK =
   "PRODUCTION OWNER VALIDATION — REAL SERVICES — NON-CREDIT UNTIL FDACS ACTIVATION";
 
+export class FloridaClassDProductionOwnerAuthorizationError extends Error {
+  constructor(
+    message: string,
+    readonly status: 403 | 503,
+    readonly code: string,
+  ) {
+    super(message);
+    this.name = "FloridaClassDProductionOwnerAuthorizationError";
+  }
+}
+
 function value(name: string) {
   return process.env[name]?.trim() ?? "";
 }
@@ -93,10 +104,32 @@ export function getFloridaClassDProductionOwnerValidationConfiguration() {
 
 export async function requireFloridaClassDProductionOwnerPrincipal() {
   if (value("VERCEL_ENV").toLowerCase() !== "production") {
-    throw new Error("Production owner inspection is available only in the production environment.");
+    throw new FloridaClassDProductionOwnerAuthorizationError(
+      "Production owner inspection is available only in the production environment.",
+      503,
+      "FDACS_PRODUCTION_OWNER_ENVIRONMENT_UNAVAILABLE",
+    );
   }
 
-  const authority = await getInternalOwnerAuthority();
+  let authority;
+  try {
+    authority = await getInternalOwnerAuthority();
+  } catch {
+    throw new FloridaClassDProductionOwnerAuthorizationError(
+      "Protected owner authority is unavailable.",
+      503,
+      "FDACS_PRODUCTION_OWNER_AUTHORITY_UNAVAILABLE",
+    );
+  }
+
+  if (authority.status === "unavailable") {
+    throw new FloridaClassDProductionOwnerAuthorizationError(
+      "Protected owner authority is unavailable.",
+      503,
+      "FDACS_PRODUCTION_OWNER_AUTHORITY_UNAVAILABLE",
+    );
+  }
+
   if (
     authority.status !== "ready" ||
     !authority.identity ||
@@ -106,7 +139,11 @@ export async function requireFloridaClassDProductionOwnerPrincipal() {
     !authority.identity.roles.includes("owner") ||
     authority.identity.assuranceLevel !== "aal2"
   ) {
-    throw new Error("Verified internal owner authority with AAL2 is required for production owner validation.");
+    throw new FloridaClassDProductionOwnerAuthorizationError(
+      "Verified internal owner authority with AAL2 is required for production owner validation.",
+      403,
+      "FDACS_PRODUCTION_OWNER_AUTHORITY_REQUIRED",
+    );
   }
 
   return {

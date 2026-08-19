@@ -3,13 +3,15 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { courseForId } from "../../../lib/academy";
 import { publicAcademyCourse } from "../../../lib/academy-control";
+import { academyLicensedSalesEnabled } from "../../../lib/academy-licensing";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "../../../lib/legal-identity";
 import AcademyCheckoutForm from "../AcademyCheckoutForm";
 import AcademyCommerceNotice from "../AcademyCommerceNotice";
 import { publicationForCourse } from "../coursePublication";
 import "./course-page.css";
 import "../academy-payment.css";
 
-const LEGAL_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
+const LEGAL_NAME = LEGAL_ENTITY_NAME;
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -29,17 +31,17 @@ export async function generateMetadata({
   const runtime = await publicAcademyCourse(baseCourse);
   if (!runtime.course) {
     return {
-      title: "Course Unavailable | Obserra Academy",
+      title: `Course Unavailable | ${ACADEMY_BRAND_NAME}`,
       robots: { index: false, follow: false, noarchive: true, nosnippet: true },
     };
   }
   const course = runtime.course;
   return {
-    title: `${course.title} | Obserra Academy`,
+    title: `${course.title} | ${ACADEMY_BRAND_NAME}`,
     description: course.description,
     alternates: { canonical: `/academy/${course.id}` },
     openGraph: {
-      title: `${course.title} | Obserra Academy`,
+      title: `${course.title} | ${ACADEMY_BRAND_NAME}`,
       description: course.description,
       url: `https://www.obserrallc.com/academy/${course.id}`,
       type: "article",
@@ -47,7 +49,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${course.title} | Obserra Academy`,
+      title: `${course.title} | ${ACADEMY_BRAND_NAME}`,
       description: course.description,
       images: [OFFICIAL_LOGO],
     },
@@ -69,7 +71,8 @@ export default async function AcademyCoursePage({
   const course = runtime.course;
   const commerceState = await searchParams;
   const publication = publicationForCourse(course.id);
-  const purchaseAvailable = runtime.controlPlane === "operational" && runtime.control.purchaseEnabled;
+  const licensedSalesEnabled = academyLicensedSalesEnabled();
+  const purchaseAvailable = licensedSalesEnabled && runtime.controlPlane === "operational" && runtime.control.purchaseEnabled;
   const passingScoreLabel = `${publication.passingScore} percent completion standard`;
   const assessmentLabel = publication.assessmentRequired
     ? publication.assessmentDuration
@@ -120,7 +123,7 @@ export default async function AcademyCoursePage({
 
       <section className="academy-course-hero">
         <AcademyCommerceNotice
-          status={commerceState.enrollment ?? commerceState.checkout}
+          status={commerceState.enrollment ?? commerceState.checkout ?? (!licensedSalesEnabled ? "licensing-pending" : undefined)}
           courseId={course.id}
           sessionId={commerceState.session_id}
         />
@@ -155,7 +158,7 @@ export default async function AcademyCoursePage({
                 />
               ) : (
                 <span className="academy-course-checkout" aria-disabled="true">
-                  New enrollment is temporarily unavailable
+                  Enrollment opens after licensing is complete
                 </span>
               )}
               <a className="academy-course-secondary" href="#curriculum">See curriculum</a>
@@ -167,15 +170,15 @@ export default async function AcademyCoursePage({
                 <div>
                   <strong>Existing learner access is preserved</strong>
                   <span>
-                    Pausing or unpublishing a course blocks new purchases but does not revoke a learner entitlement,
-                    progress record, assessment history, or certificate already committed.
+                    The Academy LMS remains available while new enrollment and payment are held. The licensing hold does not revoke a learner entitlement. Existing learner entitlements,
+                    progress records, assessment history, and committed certificates remain available.
                   </span>
                 </div>
               </div>
             ) : null}
 
             <div className="academy-course-assurance">
-              <div><strong>Secure Stripe Checkout</strong><span>Buy once and return directly to authorized paid course access.</span></div>
+              <div><strong>Secure Stripe Checkout</strong><span>Checkout activates only after the licensing hold is explicitly released.</span></div>
               <div><strong>Substantive professional instruction</strong><span>Every lesson teaches the published course subject, why it matters, how it is applied, and how decisions are documented.</span></div>
               <div><strong>Authoritative grounding</strong><span>Relevant laws, regulations, standards, government guidance, and professional frameworks are connected directly to the lesson where applicable.</span></div>
               <div><strong>Obserrian Academy Tutor</strong><span>The course-aware AI tutor unlocks with authorized access and can explain concepts, create ungraded practice, and translate the lesson into business use.</span></div>
@@ -205,7 +208,7 @@ export default async function AcademyCoursePage({
               />
             ) : (
               <span className="academy-course-checkout academy-course-card-cta" aria-disabled="true">
-                New purchases paused
+                New purchases paused pending licensing
               </span>
             )}
             <small>Enterprise-ready training with authoritative grounding, applied scenarios, governed assessment controls where required, and a completion record issued by {LEGAL_NAME}.</small>

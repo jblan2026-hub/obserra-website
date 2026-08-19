@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { Course } from "../courseData";
 import type { AssessmentQuestion, LessonBrief } from "../courseExperience";
 import type { CourseProgress } from "../../../lib/academy";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./learning.css";
 import "./brand-overrides.css";
 
@@ -67,7 +67,7 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
     if (!response.ok || result.score === undefined) return setNotice(result.error ?? "Unable to score the assessment");
     setScore(result.score);
     setCertificateId(result.certificateId);
-    setNotice(result.passed ? "You passed. Your Obserra Academy Certificate of Course Completion is ready." : "You did not reach the 80% completion standard. Review the lessons and try again.");
+    setNotice(result.passed ? `You passed. Your ${ACADEMY_BRAND_NAME} Certificate of Course Completion is ready.` : "You did not reach the 80% completion standard. Review the lessons and try again.");
   }
 
   async function askTutor(questionOverride?: string) {
@@ -148,10 +148,10 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
 
       {!assessmentActive && lesson ? <section className="lesson-stage">
         <div className="video-frame">
-          <div className="video-top"><span>OBSERRA ACADEMY</span><span>PROPRIETARY TRAINING</span></div>
+          <div className="video-top"><span>{ACADEMY_BRAND_NAME.toUpperCase()}</span><span>PROPRIETARY TRAINING</span></div>
           <div className="video-orb" />
           <div className="video-copy"><p>{lesson.format}</p><h2>{lesson.title}</h2><span>{lesson.videoDuration} guided professional learning session</span></div>
-          <div className="video-controls"><i /><span>Original Obserra Academy instruction grounded in authoritative sources</span><b>AI NATIVE</b></div>
+          <div className="video-controls"><i /><span>Original {ACADEMY_BRAND_NAME} instruction grounded in authoritative sources</span><b>AI NATIVE</b></div>
         </div>
 
         <div className="lesson-content">
@@ -208,7 +208,7 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
           </section>
 
           <section className="authority-section" aria-label="Authoritative grounding">
-            <div className="section-heading"><p className="learning-kicker">Why Obserra Academy teaches it</p><h3>Authoritative grounding</h3></div>
+            <div className="section-heading"><p className="learning-kicker">Why {ACADEMY_BRAND_NAME} teaches it</p><h3>Authoritative grounding</h3></div>
             <div className="authority-grid">
               {lesson.authorities.map((authority) => <article key={authority.reference}>
                 <span>{authority.publisher}</span>
@@ -292,7 +292,7 @@ export default function CoursePlayer({ course, initialProgress, lessons, assessm
       </section> : <section className="assessment-stage">
         <p className="learning-kicker">Final assessment</p>
         <h2>Demonstrate your decision readiness.</h2>
-        <p>Answer all 25 questions. You need an 80% score or higher after completing every lesson to receive your Obserra Academy Certificate of Course Completion.</p>
+        <p>Answer all 25 questions. You need an 80% score or higher after completing every lesson to receive your {ACADEMY_BRAND_NAME} Certificate of Course Completion.</p>
         <div className="assessment-integrity"><strong>Assessment integrity</strong><span>The Obserrian Tutor is paused during the graded assessment. Return to any lesson for tutoring, explanations, additional examples, or ungraded practice.</span></div>
         <div className="assessment-questions">{assessment.map((question, questionIndex) => <fieldset key={question.question}><legend>{question.question}</legend>{question.options.map((option, optionIndex) => <label key={option}><input type="radio" name={`q-${questionIndex}`} checked={answers[questionIndex] === optionIndex} onChange={() => setAnswers((current) => current.map((answer, index) => index === questionIndex ? optionIndex : answer))} />{option}</label>)}</fieldset>)}</div>
         <button className="complete-lesson" disabled={answers.includes(-1)} onClick={submitAssessment}>Submit final assessment</button>

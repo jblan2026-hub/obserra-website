@@ -4,17 +4,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { LEGAL_ENTITY_NAME } from "../../../lib/legal-identity";
+import {
+  ACADEMY_BRAND_NAME,
+  APPLICATIONS_BRAND_NAME,
+  EIOS_BRAND_NAME,
+  LEGAL_ENTITY_NAME,
+} from "../../../lib/legal-identity";
 import "./enterprise-chrome.css";
 import "./enterprise-sales-navigation.css";
 import "./legal-identity-lockup.css";
 
 const primaryNavigation = [
-  ["Applications", "/apps", "sales"],
-  ["Academy", "/academy", "sales"],
+  [APPLICATIONS_BRAND_NAME, "/apps", "sales"],
+  [ACADEMY_BRAND_NAME, "/academy", "sales"],
   ["Services", "/services"],
   ["Industries", "/industries"],
-  ["EIOS", "/eios"],
+  [EIOS_BRAND_NAME, "/eios"],
   ["Trust Center", "/trust"],
   ["About", "/about"],
   ["Speaking", "/speaking"],
@@ -105,10 +110,10 @@ export function EnterpriseFooter() {
         <p>Executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning for organizations facing consequential decisions.</p>
         <Link href="/contact?interest=enterprise-consultation">Request an executive consultation <span aria-hidden="true">→</span></Link>
       </div>
-      <nav aria-label="Enterprise capabilities"><strong>Capabilities</strong><Link href="/apps">Applications Marketplace</Link><Link href="/academy">Obserra Academy</Link><Link href="/services">Enterprise services</Link><Link href="/protection-intelligence">Protection and intelligence</Link><Link href="/eios">EIOS platform</Link></nav>
+      <nav aria-label="Enterprise capabilities"><strong>Capabilities</strong><Link href="/apps">{APPLICATIONS_BRAND_NAME}</Link><Link href="/academy">{ACADEMY_BRAND_NAME}</Link><Link href="/services">Enterprise services</Link><Link href="/protection-intelligence">Protection and intelligence</Link><Link href="/eios">{EIOS_BRAND_NAME}</Link></nav>
       <nav aria-label="Enterprise company links"><strong>Company</strong><Link href="/about">Leadership and credentials</Link><Link href="/speaking">Speaking and briefings</Link><Link href="/industries">Industries</Link><Link href="/resources">Resources</Link></nav>
       <nav aria-label="Enterprise assurance links"><strong>Assurance</strong><Link href="/trust">Trust Center</Link><Link href="/trust/privacy-policy">Privacy</Link><Link href="/trust/security-and-responsible-disclosure">Security</Link><Link href="/trust/accessibility-statement">Accessibility</Link></nav>
-      <div className="ent-footer__legal"><span>© {new Date().getFullYear()} {LEGAL_ENTITY_NAME}. All rights reserved.</span><span>{LEGAL_ENTITY_NAME} product, Obserra EIOS, and Obserra Academy materials are proprietary.</span></div>
+      <div className="ent-footer__legal"><span>© {new Date().getFullYear()} {LEGAL_ENTITY_NAME}. All rights reserved.</span><span>{APPLICATIONS_BRAND_NAME}, {EIOS_BRAND_NAME}, and {ACADEMY_BRAND_NAME} materials are proprietary products of {LEGAL_ENTITY_NAME}.</span></div>
     </footer>
   );
 }

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import AcademyCheckoutForm from "./AcademyCheckoutForm";
 import { courses, type CourseLevel, type Department } from "./courseData";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const departments: (Department | "All")[] = ["All", "Cyber", "Protection", "Intelligence", "Technologies"];
@@ -105,10 +105,10 @@ export default function AcademyClient() {
       </header>
 
       <section className="hero">
-        <p className="kicker">OBSERRA ACADEMY</p>
+        <p className="kicker">{ACADEMY_BRAND_NAME.toUpperCase()}</p>
         <h1>Professional, artificial intelligence (AI) native training for high consequence cybersecurity, intelligence, protection, and technology decisions.</h1>
         <p>Choose one of the 60 published courses, complete secure enrollment, and gain access to the exact course curriculum, saved progress, assessment workflow, completion record, and the Obserrian Academy Tutor. The AI tutor is unlocked only with authorized course access and is grounded in the learner&apos;s current course, lesson, authoritative references, scenarios, and business application.</p>
-        <div className="certificate-promise"><strong>Completion standard</strong><span>Complete every lesson and earn 80 percent or higher on the final assessment to receive an Obserra Academy Certificate of Course Completion. The AI tutor supports learning and practice but is paused during the graded final assessment.</span></div>
+        <div className="certificate-promise"><strong>Completion standard</strong><span>Complete every lesson and earn 80 percent or higher on the final assessment to receive an {ACADEMY_BRAND_NAME} Certificate of Course Completion. The AI tutor supports learning and practice but is paused during the graded final assessment.</span></div>
       </section>
 
       <section className="purchase-journey" aria-label="Academy purchase and completion journey">
@@ -124,7 +124,7 @@ export default function AcademyClient() {
       </section>
 
       <section className="catalog" id="courses">
-        <div className="catalog-heading"><div><p className="kicker">COURSE CATALOG</p><h2>Choose from the 60 courses published by Obserra Academy.</h2></div><p>{courses.length} paid courses with the published course descriptions, stated training hours, five lesson learning paths, applied practice, final assessments, course-completion records, and course aware AI tutoring after access is granted.</p></div>
+        <div className="catalog-heading"><div><p className="kicker">COURSE CATALOG</p><h2>Choose from the 60 courses published by {ACADEMY_BRAND_NAME}.</h2></div><p>{courses.length} paid courses with the published course descriptions, stated training hours, five lesson learning paths, applied practice, final assessments, course-completion records, and course aware AI tutoring after access is granted.</p></div>
 
         <div className="academy-commerce-controls">
           <label className="academy-search"><span>Search courses</span><input value={query} onChange={(event) => updateQuery(event.target.value)} placeholder="Search AI governance, CISO, incident response..." type="search" /></label>
@@ -145,11 +145,11 @@ export default function AcademyClient() {
         <article><p className="kicker">ENTERPRISE TEAMS</p><h2>Train teams against a shared operating standard.</h2><p>Request curated learning paths, cohort delivery, executive briefings, organizational reporting, and AI native learner support aligned to the purchased curriculum.</p><a href="/contact?interest=enterprise-training">Request enterprise training</a></article>
       </section>
 
-      <section className="certificate"><div><p className="kicker">COMPLETION RECOGNITION</p><h2>Earn an Obserra Academy Certificate of Course Completion.</h2><p>Complete every lesson and pass the final assessment with an 80 percent score or higher. Course-completion certificates include learner name, course, completion date, training hours, and a unique verification ID.</p></div><p className="fine-print">An Obserra Academy Certificate of Course Completion is a proprietary course-completion record issued by {LEGAL_ENTITY_NAME}. It is not a state license, occupational authorization, accredited academic credit, or third-party professional certification.</p></section>
+      <section className="certificate"><div><p className="kicker">COMPLETION RECOGNITION</p><h2>Earn an {ACADEMY_BRAND_NAME} Certificate of Course Completion.</h2><p>Complete every lesson and pass the final assessment with an 80 percent score or higher. Course-completion certificates include learner name, course, completion date, training hours, and a unique verification ID.</p></div><p className="fine-print">An {ACADEMY_BRAND_NAME} Certificate of Course Completion is a proprietary course-completion record issued by {LEGAL_ENTITY_NAME}. It is not a state license, occupational authorization, accredited academic credit, or third-party professional certification.</p></section>
 
       <section className="academy-purchase-assurance"><h2>Commercial purchase assurance</h2><div><span>Secure Stripe checkout</span><span>Authorized learner access</span><span>Obserrian AI Tutor</span><span>Authoritative course grounding</span><span>Saved progress</span><span>Assessment based completion</span><span>Course-completion record</span><span>Enterprise support available</span></div><p>Questions about enrollment, team licensing, access, or course-completion records can be directed to <a href="mailto:info@obserrallc.com">info@obserrallc.com</a>.</p></section>
 
-      <footer className="site-footer"><Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={180} height={35} /><p>Obserra Academy learning product. Proprietary to {LEGAL_ENTITY_NAME}. Unauthorized downloading, recording, copying, sharing, distribution, or classroom use is prohibited.</p></footer>
+      <footer className="site-footer"><Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={180} height={35} /><p>{ACADEMY_BRAND_NAME} learning product. Proprietary to {LEGAL_ENTITY_NAME}. Unauthorized downloading, recording, copying, sharing, distribution, or classroom use is prohibited.</p></footer>
     </main>
   );
 }

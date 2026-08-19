@@ -1,16 +1,38 @@
 #!/bin/sh
 set -eu
 
-CANONICAL_PROJECT_ID="prj_FfAnssVJU8pcJydGNJHmCliP6Yme"
-RELEVANT_PATHS='^(app/|components/|lib/|public/|styles/|package.json$|package-lock.json$|next.config\.|middleware\.|proxy\.ts$|tsconfig.json$|vercel.json$|scripts/vercel-ignore-build\.sh$)'
+INTEGRATION_PROJECT_ID="prj_FfAnssVJU8pcJydGNJHmCliP6Yme"
+PRODUCTION_PROJECT_ID="prj_lxTKKDa9sbhht7FaigiaF1PONMiC"
+RELEVANT_PATHS='^(app/|components/|lib/|public/|styles/|test/|package.json$|package-lock.json$|next.config\.|middleware\.|proxy\.ts$|tsconfig.json$|vercel.json$|scripts/vercel-ignore-build\.sh$)'
 
-if [ "${VERCEL_PROJECT_ID:-}" != "$CANONICAL_PROJECT_ID" ]; then
-  exit 0
-fi
+# The production project is the canonical public deployment target. Never let an
+# optimization cancel its build. If Vercel does not expose a recognized project
+# ID during the ignored-build phase, fail open and build rather than silently
+# suppressing a release.
+case "${VERCEL_PROJECT_ID:-}" in
+  "$PRODUCTION_PROJECT_ID")
+    exit 1
+    ;;
+  "$INTEGRATION_PROJECT_ID")
+    ;;
+  *)
+    exit 1
+    ;;
+esac
 
 if [ "${VERCEL_ENV:-}" != "production" ] && [ "${VERCEL_ENV:-}" != "preview" ]; then
-  exit 0
+  exit 1
 fi
+
+# Hotfix and release branches are release-control surfaces. Their promotion
+# workflow requires an exact READY deployment for the current Git SHA, so every
+# commit on these branches must build even when the last commit only refreshes
+# governed evidence.
+case "${VERCEL_GIT_COMMIT_REF:-}" in
+  hotfix/*|release/*)
+    exit 1
+    ;;
+esac
 
 BASE_SHA="${VERCEL_GIT_PREVIOUS_SHA:-}"
 

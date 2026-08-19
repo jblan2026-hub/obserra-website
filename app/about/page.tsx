@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import VerifiedCredentials from "./VerifiedCredentials";
-import { LEGAL_ENTITY_NAME } from "../../lib/legal-identity";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "../../lib/legal-identity";
 import "./about.css";
 import "./about-extra.css";
 import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
@@ -190,7 +190,7 @@ export default function AboutPage() {
         <div><p className="about-kicker">SPEAKING &amp; EXECUTIVE BRIEFINGS</p><h2>Bring an experienced executive voice into the room.</h2><p>Dr. Blanchard provides board briefings, leadership offsites, conference keynotes, panels, podcasts, and private learning sessions focused on practical decisions, accountable leadership, and enterprise outcomes.</p><div className="speaking-topics"><span>Enterprise cyber leadership</span><span>AI governance and responsible innovation</span><span>Protective intelligence and executive risk</span><span>Board-ready risk communication</span><span>Security culture and decision accountability</span><span>Veteran leadership and mission-focused teams</span></div><Link className="about-button" href="/contact?interest=speaking">Request a speaking engagement</Link></div>
       </section>
 
-      <section className="about-cta"><p className="about-kicker">ENGAGE {LEGAL_ENTITY_NAME}</p><h2>Bring integrated executive leadership to the risk, decision, or transformation in front of you.</h2><p>Begin with a confidential consultation, evaluate an application, strengthen the workforce through Obserra Academy, or engage {LEGAL_ENTITY_NAME} for focused cybersecurity, intelligence, governance, protection, and enterprise-risk support.</p><div><Link className="about-button" href="/contact?interest=enterprise-consultation">Talk with {LEGAL_ENTITY_NAME}</Link><Link className="about-outline" href="/academy">View Academy courses</Link></div></section>
+      <section className="about-cta"><p className="about-kicker">ENGAGE {LEGAL_ENTITY_NAME}</p><h2>Bring integrated executive leadership to the risk, decision, or transformation in front of you.</h2><p>Begin with a confidential consultation, evaluate an application, strengthen the workforce through {ACADEMY_BRAND_NAME}, or engage {LEGAL_ENTITY_NAME} for focused cybersecurity, intelligence, governance, protection, and enterprise-risk support.</p><div><Link className="about-button" href="/contact?interest=enterprise-consultation">Talk with {LEGAL_ENTITY_NAME}</Link><Link className="about-outline" href="/academy">View Academy courses</Link></div></section>
 
       </main>
       <EnterpriseFooter />

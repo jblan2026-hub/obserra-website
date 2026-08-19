@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - .github/workflows/production-vercel-public-cutover.yml
   workflow_dispatch:
 
 permissions:
@@ -18,14 +16,14 @@ concurrency:
 jobs:
   cutover:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
       TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
-      PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
-      CANDIDATE_DEPLOYMENT: dpl_2SaaLYJ4q48BBvn4DGmqx1Ty3PFy
-      CANDIDATE_SHA: 6e3ef7e8f424b822ef277784c2b72c1bffb3b823
-      ROLLBACK_DEPLOYMENT: dpl_3ywMEDW2j87uwuRrXbFdeFG21pXj
+      CANONICAL_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme
+      AUXILIARY_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+      PRIMARY_DOMAIN: www.obserrallc.com
+      APEX_DOMAIN: obserrallc.com
     steps:
       - name: Require configured Vercel credential
         shell: bash
@@ -36,40 +34,214 @@ jobs:
             exit 1
           fi
 
-      - name: Verify exact READY candidate
+      - name: Wait for exact canonical READY deployment
+        id: candidate
         shell: bash
         run: |
           set -euo pipefail
-          response="$(curl --silent --show-error --fail-with-body \
-            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-            "https://api.vercel.com/v13/deployments/${CANDIDATE_DEPLOYMENT}?teamId=${TEAM_ID}")"
-          ready="$(jq -r '.readyState // .state // empty' <<<"${response}")"
-          sha="$(jq -r '.meta.githubCommitSha // empty' <<<"${response}")"
-          if [ "${ready}" != "READY" ] || [ "${sha}" != "${CANDIDATE_SHA}" ]; then
-            echo "::error::Candidate deployment identity or readiness mismatch."
+          candidate=""
+          for attempt in $(seq 1 60); do
+            response=""
+            if ! response="$(curl --silent --show-error --fail-with-body \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v6/deployments?projectId=${CANONICAL_PROJECT_ID}&teamId=${TEAM_ID}&limit=100")"; then
+              echo "::warning::Vercel deployment lookup failed on attempt ${attempt}/60; retrying."
+              sleep 10
+              continue
+            fi
+            if ! candidate="$(jq -r --arg sha "${GITHUB_SHA}" '
+              [.deployments[]
+                | select((.meta.githubCommitSha // "") == $sha)
+                | select((.readyState // .state // "") == "READY")
+                | (.uid // .id // empty)][0] // empty
+            ' <<<"${response}" 2>/dev/null)"; then
+              candidate=""
+              echo "::warning::Vercel deployment lookup returned an unreadable response on attempt ${attempt}/60; retrying."
+            fi
+            if [ -n "${candidate}" ]; then
+              break
+            fi
+            echo "Waiting for canonical Vercel deployment for ${GITHUB_SHA} (${attempt}/60)."
+            sleep 10
+          done
+          if [ -z "${candidate}" ]; then
+            echo "::error::No exact READY canonical deployment appeared for ${GITHUB_SHA}."
             exit 1
           fi
+          details="$(curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v13/deployments/${candidate}?teamId=${TEAM_ID}")"
+          project="$(jq -r '.projectId // .project.id // empty' <<<"${details}")"
+          sha="$(jq -r '.meta.githubCommitSha // empty' <<<"${details}")"
+          ready="$(jq -r '.readyState // .state // empty' <<<"${details}")"
+          if [ "${project}" != "${CANONICAL_PROJECT_ID}" ] || [ "${sha}" != "${GITHUB_SHA}" ] || [ "${ready}" != "READY" ]; then
+            echo "::error::Canonical deployment identity verification failed."
+            exit 1
+          fi
+          echo "deployment_id=${candidate}" >> "${GITHUB_OUTPUT}"
 
-      - name: Make production project public
+      - name: Capture rollback aliases
+        id: rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          alias_deployment() {
+            local alias="$1"
+            local body
+            local status
+            local code
+            local message
+            local deployment
+            body="$(mktemp)"
+            if ! status="$(curl --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${body}" \
+              --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v4/aliases/${alias}?teamId=${TEAM_ID}")"; then
+              rm -f "${body}"
+              echo "::error::Vercel rollback-alias lookup failed before an HTTP response was received for ${alias}." >&2
+              return 1
+            fi
+            code="$(jq -r '.error.code // empty' "${body}" 2>/dev/null || true)"
+            message="$(jq -r '.error.message // empty' "${body}" 2>/dev/null || true)"
+            if [ "${status}" = "404" ]; then
+              rm -f "${body}"
+              echo "::error::Required rollback alias ${alias} is not configured (HTTP 404${code:+, ${code}})." >&2
+              return 1
+            fi
+            if [ "${status}" != "200" ]; then
+              rm -f "${body}"
+              echo "::error::Vercel rollback-alias lookup failed for ${alias}: HTTP ${status}${code:+, ${code}}${message:+ - ${message}}" >&2
+              return 1
+            fi
+            deployment="$(jq -r '.deploymentId // .deployment.id // empty' "${body}")"
+            rm -f "${body}"
+            if [ -z "${deployment}" ]; then
+              echo "::error::Vercel returned no deployment ID for required rollback alias ${alias}." >&2
+              return 1
+            fi
+            printf '%s\n' "${deployment}"
+          }
+          primary="$(alias_deployment "${PRIMARY_DOMAIN}")"
+          apex="$(alias_deployment "${APEX_DOMAIN}")"
+          echo "primary=${primary}" >> "${GITHUB_OUTPUT}"
+          echo "apex=${apex}" >> "${GITHUB_OUTPUT}"
+
+      - name: Repair auxiliary Vercel project build policy
         shell: bash
         run: |
           set -euo pipefail
           curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
             --request PATCH \
             --header "Authorization: Bearer ${VERCEL_TOKEN}" \
             --header "Content-Type: application/json" \
-            --data '{"ssoProtection":null}' \
-            "https://api.vercel.com/v9/projects/${PROJECT_ID}?teamId=${TEAM_ID}" \
+            --data '{"commandForIgnoringBuildStep":"exit 0","ssoProtection":null}' \
+            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}" \
             >/dev/null
 
       - name: Attach canonical domains atomically
+        id: attach
+        continue-on-error: true
         shell: bash
+        env:
+          CANDIDATE_DEPLOYMENT: ${{ steps.candidate.outputs.deployment_id }}
         run: |
           set -euo pipefail
+          attach() {
+            local alias="$1"
+            curl --silent --show-error --fail-with-body \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --request POST \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "{\"alias\":\"${alias}\"}" \
+              "https://api.vercel.com/v2/deployments/${CANDIDATE_DEPLOYMENT}/aliases?teamId=${TEAM_ID}" \
+              >/dev/null
+          }
+          attach "${PRIMARY_DOMAIN}"
+          attach "${APEX_DOMAIN}"
+
+      - name: Verify canonical LMS and prelicense commerce lock
+        id: smoke
+        if: steps.attach.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        env:
+          CANDIDATE_DEPLOYMENT: ${{ steps.candidate.outputs.deployment_id }}
+        run: |
+          set -euo pipefail
+          observed_deployment=""
+          observed_sha=""
+          observed_project=""
+          for attempt in $(seq 1 12); do
+            health="$(curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/api/health" || true)"
+            observed_deployment="$(jq -r '.routing.deploymentId // empty' <<<"${health}" 2>/dev/null || true)"
+            observed_sha="$(jq -r '.routing.gitCommitSha // empty' <<<"${health}" 2>/dev/null || true)"
+            observed_project="$(jq -r '.routing.observedProjectId // empty' <<<"${health}" 2>/dev/null || true)"
+            if [ "${observed_deployment}" = "${CANDIDATE_DEPLOYMENT}" ] \
+              && [ "${observed_sha}" = "${GITHUB_SHA}" ] \
+              && [ "${observed_project}" = "${CANONICAL_PROJECT_ID}" ]; then
+              break
+            fi
+            sleep 10
+          done
+          test "${observed_deployment}" = "${CANDIDATE_DEPLOYMENT}"
+          test "${observed_sha}" = "${GITHUB_SHA}"
+          test "${observed_project}" = "${CANONICAL_PROJECT_ID}"
+
+          curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/" >/dev/null
+          academy="$(curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/academy")"
+          printf '%s' "${academy}" | grep -F "Academy LMS is live; new enrollment is not yet open" >/dev/null
+          curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/florida-security-training" >/dev/null
+          curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/apps" >/dev/null
+          curl --silent --show-error --fail --max-time 20 https://app.obserrallc.com/api/health >/dev/null
+
+          attempt_id="$(cat /proc/sys/kernel/random/uuid)"
+          issued_at="$(date +%s)"
+          checkout_headers="$(mktemp)"
+          checkout_body="$(mktemp)"
+          status="$(curl --silent --show-error --max-time 20 \
+            --output "${checkout_body}" \
+            --dump-header "${checkout_headers}" \
+            --write-out '%{http_code}' \
+            --request POST \
+            --header "Origin: https://${PRIMARY_DOMAIN}" \
+            --header "Content-Type: application/x-www-form-urlencoded" \
+            --data-urlencode "course=zero-trust-strategy" \
+            --data-urlencode "checkoutAttemptId=${attempt_id}" \
+            --data-urlencode "checkoutAttemptIssuedAt=${issued_at}" \
+            "https://${PRIMARY_DOMAIN}/api/academy/checkout")"
+          test "${status}" = "307"
+          grep -i '^location: .*enrollment=licensing-pending' "${checkout_headers}" >/dev/null
+          grep -i '^x-obserra-sales-license: pending' "${checkout_headers}" >/dev/null
+
+      - name: Roll back canonical domains on failed cutover
+        if: ${{ always() && steps.rollback.outcome == 'success' && steps.rollback.outputs.primary != '' && steps.rollback.outputs.apex != '' && (steps.attach.outcome == 'failure' || steps.smoke.outcome == 'failure') }}
+        shell: bash
+        env:
+          ROLLBACK_PRIMARY: ${{ steps.rollback.outputs.primary }}
+          ROLLBACK_APEX: ${{ steps.rollback.outputs.apex }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ROLLBACK_PRIMARY}" ] || [ -z "${ROLLBACK_APEX}" ]; then
+            echo "::error::Rollback deployment IDs were not captured; canonical domains cannot be safely restored."
+            exit 1
+          fi
           attach() {
             local deployment="$1"
             local alias="$2"
             curl --silent --show-error --fail-with-body \
+              --connect-timeout 10 \
+              --max-time 20 \
               --request POST \
               --header "Authorization: Bearer ${VERCEL_TOKEN}" \
               --header "Content-Type: application/json" \
@@ -77,47 +249,7 @@ jobs:
               "https://api.vercel.com/v2/deployments/${deployment}/aliases?teamId=${TEAM_ID}" \
               >/dev/null
           }
-          attach "${CANDIDATE_DEPLOYMENT}" "www.obserrallc.com"
-          attach "${CANDIDATE_DEPLOYMENT}" "obserrallc.com"
-
-      - name: Verify public website and preserve Applications
-        id: smoke
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -euo pipefail
-          for attempt in 1 2 3 4 5 6; do
-            health="$(curl --silent --show-error --fail --max-time 20 https://www.obserrallc.com/api/health || true)"
-            deployment="$(jq -r '.deploymentId // .deployment.id // empty' <<<"${health}" 2>/dev/null || true)"
-            sha="$(jq -r '.gitSha // .commitSha // .sha // empty' <<<"${health}" 2>/dev/null || true)"
-            if [ "${deployment}" = "${CANDIDATE_DEPLOYMENT}" ] && [ "${sha}" = "${CANDIDATE_SHA}" ]; then
-              break
-            fi
-            sleep 10
-          done
-          test "${deployment}" = "${CANDIDATE_DEPLOYMENT}"
-          test "${sha}" = "${CANDIDATE_SHA}"
-          curl --silent --show-error --fail --max-time 20 https://www.obserrallc.com/ >/dev/null
-          curl --silent --show-error --fail --max-time 20 https://www.obserrallc.com/florida-security-training >/dev/null
-          curl --silent --show-error --fail --max-time 20 https://www.obserrallc.com/apps >/dev/null
-          curl --silent --show-error --fail --max-time 20 https://app.obserrallc.com/api/health >/dev/null
-
-      - name: Roll back canonical domains on failed smoke
-        if: steps.smoke.outcome != 'success'
-        shell: bash
-        run: |
-          set -euo pipefail
-          attach() {
-            local alias="$1"
-            curl --silent --show-error --fail-with-body \
-              --request POST \
-              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-              --header "Content-Type: application/json" \
-              --data "{\"alias\":\"${alias}\"}" \
-              "https://api.vercel.com/v2/deployments/${ROLLBACK_DEPLOYMENT}/aliases?teamId=${TEAM_ID}" \
-              >/dev/null
-          }
-          attach "www.obserrallc.com"
-          attach "obserrallc.com"
-          echo "::error::Candidate smoke failed; canonical domains returned to the previous deployment."
+          attach "${ROLLBACK_PRIMARY}" "${PRIMARY_DOMAIN}"
+          attach "${ROLLBACK_APEX}" "${APEX_DOMAIN}"
+          echo "::error::Production cutover failed; canonical domains were returned to their prior deployments."
           exit 1

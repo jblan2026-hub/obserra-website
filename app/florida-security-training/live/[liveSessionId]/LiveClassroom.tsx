@@ -3,6 +3,14 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import InstructionalTextScreen from "./InstructionalTextScreen";
 
+const STATE_REFRESH_INTERVAL_MS = 15_000;
+const HEARTBEAT_INTERVAL_MS = 60_000;
+const STATE_STALE_AFTER_MS = 35_000;
+const HEARTBEAT_MINIMUM_PHASE_MS = 5_000;
+const HEARTBEAT_PHASE_WINDOW_MS = 55_000;
+const STATE_REFRESH_MINIMUM_PHASE_MS = 1_000;
+const STATE_REFRESH_PHASE_WINDOW_MS = 14_000;
+
 type Interaction = {
   id?: string;
   actor_role?: string;
@@ -91,6 +99,17 @@ function formatDuration(totalSeconds: number) {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
+function deterministicPhaseOffset(seed: string, minimumMs: number, windowMs: number) {
+  let hash = 2166136261;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash ^= seed.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  const safeMinimum = Math.max(0, Math.floor(minimumMs));
+  const safeWindow = Math.max(safeMinimum + 1, Math.floor(windowMs));
+  return safeMinimum + ((hash >>> 0) % (safeWindow - safeMinimum));
+}
+
 async function api(body: Record<string, unknown>) {
   const response = await fetch("/api/florida-class-d/live", {
     method: "POST",
@@ -126,7 +145,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   const announcedPollIds = useRef(new Set<string>());
 
   const browserInstanceId = useMemo(() => {
-    if (typeof window === "undefined") return "server-placeholder-instance";
+    if (typeof window === "undefined") return "ssr-browser-instance-unavailable";
     const key = "obserra-fdacs-browser-instance";
     const existing = window.sessionStorage.getItem(key);
     if (existing) return existing;
@@ -224,33 +243,60 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
   useEffect(() => {
     if (!deviceLeaseId) return;
     let cancelled = false;
+    let heartbeatInterval: number | null = null;
+    let stateRefreshInterval: number | null = null;
+
     const sendHeartbeat = async () => {
       try {
         await api({ action: "heartbeat", deviceLeaseId });
         if (!cancelled) {
           setStatusText("Connected. Attendance, instructional time, and secure live media are active.");
-          await refresh();
         }
       } catch (heartbeatError) {
         if (!cancelled) setError(heartbeatError instanceof Error ? heartbeatError.message : "Presence heartbeat failed.");
       }
     };
-    void sendHeartbeat();
-    const heartbeat = window.setInterval(() => void sendHeartbeat(), 60_000);
-    const stateRefresh = window.setInterval(() => void refresh().catch((refreshError) => {
-      setError((current) => current ?? (refreshError instanceof Error ? refreshError.message : "Live state is stale because classroom status could not be refreshed."));
-    }), 10_000);
+
+    const heartbeatPhaseDelay = deterministicPhaseOffset(
+      `${browserInstanceId}:${deviceLeaseId}:heartbeat`,
+      HEARTBEAT_MINIMUM_PHASE_MS,
+      HEARTBEAT_PHASE_WINDOW_MS,
+    );
+    const stateRefreshPhaseDelay = deterministicPhaseOffset(
+      `${browserInstanceId}:${deviceLeaseId}:state`,
+      STATE_REFRESH_MINIMUM_PHASE_MS,
+      STATE_REFRESH_PHASE_WINDOW_MS,
+    );
+
+    const heartbeatPhase = window.setTimeout(() => {
+      if (cancelled) return;
+      void sendHeartbeat();
+      heartbeatInterval = window.setInterval(() => void sendHeartbeat(), HEARTBEAT_INTERVAL_MS);
+    }, heartbeatPhaseDelay);
+
+    const stateRefreshPhase = window.setTimeout(() => {
+      if (cancelled) return;
+      void refresh().catch((refreshError) => {
+        setError((current) => current ?? (refreshError instanceof Error ? refreshError.message : "Live state is stale because classroom status could not be refreshed."));
+      });
+      stateRefreshInterval = window.setInterval(() => void refresh().catch((refreshError) => {
+        setError((current) => current ?? (refreshError instanceof Error ? refreshError.message : "Live state is stale because classroom status could not be refreshed."));
+      }), STATE_REFRESH_INTERVAL_MS);
+    }, stateRefreshPhaseDelay);
+
     const onVisibility = () => {
       if (document.visibilityState === "visible") void sendHeartbeat();
     };
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       cancelled = true;
-      window.clearInterval(heartbeat);
-      window.clearInterval(stateRefresh);
+      window.clearTimeout(heartbeatPhase);
+      window.clearTimeout(stateRefreshPhase);
+      if (heartbeatInterval !== null) window.clearInterval(heartbeatInterval);
+      if (stateRefreshInterval !== null) window.clearInterval(stateRefreshInterval);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [deviceLeaseId, refresh]);
+  }, [browserInstanceId, deviceLeaseId, refresh]);
 
   useEffect(() => {
     const messages: string[] = [];
@@ -293,7 +339,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
     return () => window.removeEventListener("pagehide", leave);
   }, [deviceLeaseId]);
 
-  const stateStale = Boolean(deviceLeaseId && (!lastSuccessfulRefreshAt || freshnessNow - lastSuccessfulRefreshAt > 25_000));
+  const stateStale = Boolean(deviceLeaseId && (!lastSuccessfulRefreshAt || freshnessNow - lastSuccessfulRefreshAt > STATE_STALE_AFTER_MS));
 
   function requireFreshState() {
     if (!stateStale) return true;
@@ -398,7 +444,7 @@ export default function LiveClassroom({ liveSessionId }: { liveSessionId: string
           <div className="fdacs-live__stage-frame fdacs-live__media-frame">
             {media?.joinUrl ? (
               <iframe
-                title="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC Florida Class D secure live video classroom"
+                title="OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC Florida Class D secure live video classroom"
                 src={media.joinUrl}
                 allow="camera; microphone; fullscreen; autoplay"
                 referrerPolicy="no-referrer"

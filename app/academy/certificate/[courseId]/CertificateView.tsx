@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./certificate.css";
 import "./brand-certificate.css";
 
-const LEGAL_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
+const LEGAL_NAME = LEGAL_ENTITY_NAME;
 const OFFICIAL_LOGO = "/brand/obserra-logo.png";
 const CREDENTIAL_NAME = "Certificate of Course Completion";
 
@@ -42,7 +43,7 @@ export default function CertificateView({
   return (
     <main className="certificate-page">
       <nav>
-        <a href="/academy">Obserra Academy</a>
+        <a href="/academy">{ACADEMY_BRAND_NAME}</a>
         <a href={verificationUrl} target="_blank" rel="noreferrer">Verify signature</a>
         <button onClick={() => window.print()}>Print certificate</button>
       </nav>
@@ -52,10 +53,10 @@ export default function CertificateView({
         <div className="certificate-corner certificate-corner-right" />
         <div className="certificate-brands">
           <Image src={OFFICIAL_LOGO} alt={LEGAL_NAME} width={220} height={42} priority />
-          <div className="academy-seal" aria-label={`Obserra Academy, a training division of ${LEGAL_NAME}`}>
-            <span>OA</span>
-            <b>OBSERRA ACADEMY</b>
-            <small>A TRAINING DIVISION OF OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC</small>
+          <div className="academy-seal" aria-label={`${ACADEMY_BRAND_NAME}, a learning product of ${LEGAL_NAME}`}>
+            <span>EPI</span>
+            <b>{ACADEMY_BRAND_NAME.toUpperCase()}</b>
+            <small>A LEARNING PRODUCT OF {LEGAL_NAME}</small>
           </div>
         </div>
 
@@ -64,7 +65,7 @@ export default function CertificateView({
         <p className="certificate-kicker">Cryptographically signed professional development record of {LEGAL_NAME}</p>
         <h1>This certifies that</h1>
         <h2>{learnerName}</h2>
-        <p className="certificate-copy">has successfully completed the following Obserra Academy course:</p>
+        <p className="certificate-copy">has successfully completed the following {ACADEMY_BRAND_NAME} course:</p>
         <h3>{courseTitle}</h3>
         <p className="certificate-copy certificate-copy-strong">Completion included every required learning experience and the required final assessment.</p>
 
@@ -99,8 +100,8 @@ export default function CertificateView({
         </div>
 
         <footer>
-          <b>Issued by Obserra Academy, a training division of {LEGAL_NAME}</b>
-          <small>This signed record confirms completion of an Obserra Academy course. It is not a government license, occupational authorization, accredited academic credit, or third-party professional certification.</small>
+          <b>Issued through {ACADEMY_BRAND_NAME}, a learning product of {LEGAL_NAME}</b>
+          <small>This signed record confirms completion of an {ACADEMY_BRAND_NAME} course. It is not a government license, occupational authorization, accredited academic credit, or third-party professional certification.</small>
         </footer>
       </section>
     </main>

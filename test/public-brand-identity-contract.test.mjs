@@ -4,6 +4,13 @@ import path from "node:path";
 import test from "node:test";
 
 const LEGAL_ENTITY_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC";
+const BRAND_PREFIX = "Obserra EPI";
+const PRODUCT_BRANDS = [
+  `${BRAND_PREFIX} Academy`,
+  `${BRAND_PREFIX} EIOS`,
+  `${BRAND_PREFIX} Applications`,
+  `${BRAND_PREFIX} Products`,
+];
 
 const publicRouteSources = new Map([
   ["/", "app/page.tsx"],
@@ -50,6 +57,15 @@ function collectTsx(directory, output = []) {
   return output.sort();
 }
 
+test("governed legal and product brand constants are centralized", () => {
+  const identity = fs.readFileSync("lib/legal-identity.ts", "utf8");
+  assert.match(identity, /LEGAL_ENTITY_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC"/);
+  assert.match(identity, /BRAND_PREFIX = "Obserra EPI"/);
+  for (const productBrand of ["Academy", "EIOS", "Applications", "Products"]) {
+    assert.match(identity, new RegExp(`${productBrand.toUpperCase()}_BRAND_NAME|${productBrand === "EIOS" ? "EIOS" : productBrand.toUpperCase()}_BRAND_NAME`));
+  }
+});
+
 test("the customer-facing route inventory is explicit and excludes Applications", () => {
   assert.ok(publicRouteSources.size >= 25, "public route inventory unexpectedly contracted");
   for (const [route, sourcePath] of publicRouteSources) {
@@ -58,14 +74,14 @@ test("the customer-facing route inventory is explicit and excludes Applications"
   }
 });
 
-test("non-Applications customer source rejects retired or shortened company identity", () => {
+test("non-Applications customer source rejects retired, shortened, or ungoverned company identity", () => {
   const prohibited = [
     [/(?:https?:\/\/)(?:www\.)?obserra\.com\b/i, "retired obserra.com origin"],
     [/\bObserra Executive Protection (?:and|&) Intelligence LLC\b/, "mixed-case or noncanonical legal name"],
     [/aria-label=["']Obserra(?: home| operating principles)["']/i, "short company aria label"],
     [/alt=["']Obserra["']/i, "short company image alternative"],
     [/\bObserra, EIOS\b/i, "short company ownership statement"],
-    [/\bObserra Applications\b/i, "unapproved short company product family"],
+    [/\bObserra (?:Academy|EIOS|Applications|Products)\b/, "ungoverned bare product brand"],
     [/\bObserra\s+(?:is|provides|supports|helps|connects|delivers|serves|company|website|merchant|provider|owner|team)\b/i, "short company subject"],
   ];
 
@@ -77,6 +93,16 @@ test("non-Applications customer source rejects retired or shortened company iden
     if (source.includes('/brand/obserra-logo.png')) {
       assert.ok(source.includes("LEGAL_ENTITY_NAME") || source.includes(LEGAL_ENTITY_NAME), `${sourcePath} logo lacks the legal company identity`);
     }
+  }
+});
+
+test("homepage uses governed Obserra EPI product brands and full legal company identity", () => {
+  const home = fs.readFileSync("app/page.tsx", "utf8");
+  for (const token of ["ACADEMY_BRAND_NAME", "EIOS_BRAND_NAME", "APPLICATIONS_BRAND_NAME", "LEGAL_ENTITY_NAME"]) {
+    assert.ok(home.includes(token), `homepage must consume ${token}`);
+  }
+  for (const productBrand of PRODUCT_BRANDS.slice(0, 3)) {
+    assert.ok(productBrand.startsWith(BRAND_PREFIX));
   }
 });
 

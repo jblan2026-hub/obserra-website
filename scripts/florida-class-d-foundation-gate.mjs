@@ -53,15 +53,19 @@ gate("provider identity is canonical", () => {
   assert.match(courseSource, /provider: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC"/);
 });
 
-gate("course remains fail-closed and coming soon", () => {
+gate("LMS is live while regulated learner commerce remains fail closed", () => {
   assert.match(courseSource, /status: "coming-soon"/);
-  assert.match(publicPage, /COMING SOON · LEARNING MANAGEMENT SYSTEM IN PROGRESS/);
-  assert.match(publicPage, /Enrollment, payment, and student course access are not open/);
+  assert.match(publicPage, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
+  assert.match(publicPage, /ENROLLMENT & PAYMENT LOCKED · LICENSE ACTIVATION PENDING/);
+  assert.match(publicPage, /Enrollment and payment remain unavailable until licensing and production activation are complete/);
   assert.match(publicPage, /robots: \{ index: true, follow: true \}/);
   assert.match(publicPage, /enabled=\{publicLearnerControlsEnabled\}/);
-  assert.match(governedPublicLink, /if \(!enabled\) return null;/);
+  assert.match(governedPublicLink, /if \(!enabled\) \{/);
+  assert.match(governedPublicLink, /<button/);
+  assert.match(governedPublicLink, /aria-disabled="true"/);
+  assert.match(governedPublicLink, /disabled/);
+  assert.match(governedPublicLink, /title=\{lockedLabel\}/);
   assert.match(governedPublicLink, /return <Link/);
-  assert.doesNotMatch(governedPublicLink, /aria-disabled|data-governed-state|<button|disabled/);
   assert.match(productionActivation, /floridaClassDProductionActivationAuthorized\(\)[\s\S]*enabled\("OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED"\)/);
   assert.doesNotMatch(publicPage, /Enrollment is open|Pay now|Enroll now|Buy now|Authorized student course sign-in/i);
 });
@@ -118,6 +122,7 @@ gate("licensure and approval are not misrepresented", () => {
   assert.match(publicPage, /Completing training does not itself issue a Florida Class D Security Officer license/);
   assert.match(publicPage, /does not claim FDACS approval or production authorization/);
   assert.match(publicPage, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled until every applicable authorization gate is satisfied/);
+  assert.match(publicPage, /Payment and production student access also remain disabled until licensing and production activation are complete/);
   assert.match(protectedCompletionPage, /Production authorization is false/);
   assert.match(protectedCompletionPage, /no course credit, completion document, certificate, or LIAS record can be issued until the separate FDACS activation gates are satisfied/i);
   assert.doesNotMatch(protectedCompletionPage, /Preview UAT/);
@@ -146,5 +151,5 @@ if (failures.length) {
   console.error(`\nFlorida Class D foundation gate failed: ${failures.length} control(s) failed.`);
   process.exitCode = 1;
 } else {
-  console.log("\nFlorida Class D foundation gate PASSED. Public release remains intentionally locked.");
+  console.log("\nFlorida Class D foundation gate PASSED. LMS software is live; regulated learner commerce and credit remain intentionally locked pending authorization.");
 }

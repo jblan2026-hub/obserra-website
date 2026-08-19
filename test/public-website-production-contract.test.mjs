@@ -41,13 +41,20 @@ test("search discovery includes only the public FDACS landing surface", () => {
   }
 });
 
-test("the public FDACS page preserves future structure while unavailable actions are omitted", () => {
+test("the public FDACS LMS preserves learner structure while prelicense actions are visibly locked", () => {
   const governedLink = fs.readFileSync("app/florida-security-training/GovernedFloridaClassDLink.tsx", "utf8");
+  assert.match(publicFdacs, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
+  assert.match(publicFdacs, /ENROLLMENT & PAYMENT LOCKED · LICENSE ACTIVATION PENDING/);
   assert.match(publicFdacs, /Photo-ID controls before secure live video/);
   assert.match(publicFdacs, /not copied into the LMS/);
   assert.match(publicFdacs, /enabled=\{publicLearnerControlsEnabled\}/);
-  assert.match(governedLink, /if \(!enabled\) return null;/);
-  assert.doesNotMatch(governedLink, /aria-disabled|<button|disabled/);
+  assert.match(governedLink, /if \(!enabled\) \{/);
+  assert.match(governedLink, /aria-disabled="true"/);
+  assert.match(governedLink, /aria-describedby=\{lockedDescriptionId\}/);
+  assert.match(governedLink, /className="obs-sr-only"/);
+  assert.match(governedLink, /<button/);
+  assert.doesNotMatch(governedLink, /\n\s*disabled\s*(?:\n|=|>)/);
+  assert.match(governedLink, /title=\{lockedLabel\}/);
   assert.match(protectedAccess, /The LMS does not store copies or biometric templates/);
   assert.match(protectedAccess, /short-lived secure video/);
   assert.match(protectedAccess, /single-device controls pass/);
