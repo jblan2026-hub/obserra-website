@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import AcademyCheckoutForm from "./AcademyCheckoutForm";
 import type { Course, CourseLevel, Department } from "./courseData";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -143,18 +143,18 @@ export default function AcademyControlledClient({
       </header>
 
       <section className="hero">
-        <p className="kicker">OBSERRA ACADEMY</p>
+        <p className="kicker">{ACADEMY_BRAND_NAME.toUpperCase()}</p>
         <h1>Professional, artificial intelligence (AI) native training for high consequence cybersecurity, intelligence, protection, and technology decisions.</h1>
         <p>
-          Review {courses.length} courses in the Obserra Academy catalog. New enrollment opens only after a
-          course's learner edition is loaded, reviewed, and explicitly approved for sale. Previously entitled
+          Review {courses.length} courses in the {ACADEMY_BRAND_NAME} catalog. New enrollment opens only after a
+          course&apos;s learner edition is loaded, reviewed, and explicitly approved for sale. Previously entitled
           learners retain their committed access when new sales are paused.
         </p>
         <div className="certificate-promise">
           <strong>Completion standard</strong>
           <span>
-            Complete every lesson and earn 80 percent or higher on the final assessment to receive an Obserra
-            Academy Certificate of Course Completion. The AI tutor supports learning and practice but is paused during the graded
+            Complete every lesson and earn 80 percent or higher on the final assessment to receive an {ACADEMY_BRAND_NAME}
+            {" "}Certificate of Course Completion. The AI tutor supports learning and practice but is paused during the graded
             final assessment.
           </span>
         </div>
@@ -226,7 +226,7 @@ export default function AcademyControlledClient({
 
       <section className="catalog" id="courses">
         <div className="catalog-heading">
-          <div><p className="kicker">COURSE CATALOG</p><h2>Review the courses being prepared by Obserra Academy.</h2></div>
+          <div><p className="kicker">COURSE CATALOG</p><h2>Review the courses being prepared by {ACADEMY_BRAND_NAME}.</h2></div>
           <p>
             {courses.length} courses are available to review. {purchasableCourseCount} are currently open for purchase.
             Enrollment activates separately for each course only after the learner edition and commercial controls are approved.
@@ -287,27 +287,27 @@ export default function AcademyControlledClient({
             {visibleCourses.map((course) => {
               const canPurchase = purchaseAvailable(course.id);
               return (
-              <article key={course.id} className="course-card">
-                <span>{course.department}: {course.track}</span>
-                <h3>{course.title}</h3>
-                <p>{course.description}</p>
-                <div className="course-retail-meta"><i>{levelTag(course.level)}</i><i>{course.level}</i><i>AI native</i></div>
-                <div className="course-highlights">{course.outcomes.slice(0, 2).map((item) => <span key={item}>{item}</span>)}</div>
-                <footer><b>{canPurchase ? money.format(course.price) : "Enrollment pending"}</b><em>· {course.duration}</em></footer>
-                <div className="course-card-actions">
-                  <a href={`/academy/${course.id}`}>View details</a>
-                  {canPurchase ? (
-                    <AcademyCheckoutForm
-                      courseId={course.id}
-                      label="Enroll securely"
-                      source="catalog"
-                      className="academy-checkout-button"
-                    />
-                  ) : (
-                    <span className="academy-enrollment-pending" aria-disabled="true">Not yet for sale</span>
-                  )}
-                </div>
-              </article>
+                <article key={course.id} className="course-card">
+                  <span>{course.department}: {course.track}</span>
+                  <h3>{course.title}</h3>
+                  <p>{course.description}</p>
+                  <div className="course-retail-meta"><i>{levelTag(course.level)}</i><i>{course.level}</i><i>AI native</i></div>
+                  <div className="course-highlights">{course.outcomes.slice(0, 2).map((item) => <span key={item}>{item}</span>)}</div>
+                  <footer><b>{canPurchase ? money.format(course.price) : "Enrollment pending"}</b><em>· {course.duration}</em></footer>
+                  <div className="course-card-actions">
+                    <a href={`/academy/${course.id}`}>View details</a>
+                    {canPurchase ? (
+                      <AcademyCheckoutForm
+                        courseId={course.id}
+                        label="Enroll securely"
+                        source="catalog"
+                        className="academy-checkout-button"
+                      />
+                    ) : (
+                      <span className="academy-enrollment-pending" aria-disabled="true">Not yet for sale</span>
+                    )}
+                  </div>
+                </article>
               );
             })}
           </div>
@@ -342,10 +342,10 @@ export default function AcademyControlledClient({
 
       <section className="certificate">
         <div>
-          <p className="kicker">COMPLETION RECOGNITION</p><h2>Earn an Obserra Academy Certificate of Course Completion.</h2>
+          <p className="kicker">COMPLETION RECOGNITION</p><h2>Earn an {ACADEMY_BRAND_NAME} Certificate of Course Completion.</h2>
           <p>Complete every lesson and pass the final assessment with an 80 percent score or higher. Course-completion certificates include learner name, course, completion date, training hours, and a unique verification ID.</p>
         </div>
-        <p className="fine-print">An Obserra Academy Certificate of Course Completion is a proprietary course-completion record issued by {LEGAL_ENTITY_NAME}. It is not a state license, occupational authorization, accredited academic credit, or third-party professional certification.</p>
+        <p className="fine-print">An {ACADEMY_BRAND_NAME} Certificate of Course Completion is a proprietary course-completion record issued by {LEGAL_ENTITY_NAME}. It is not a state license, occupational authorization, accredited academic credit, or third-party professional certification.</p>
       </section>
 
       <section className="academy-purchase-assurance">
@@ -360,7 +360,7 @@ export default function AcademyControlledClient({
 
       <footer className="site-footer">
         <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={180} height={35} />
-        <p>Obserra Academy learning product. Proprietary to {LEGAL_ENTITY_NAME}. Unauthorized downloading, recording, copying, sharing, distribution, or classroom use is prohibited.</p>
+        <p>{ACADEMY_BRAND_NAME} learning product. Proprietary to {LEGAL_ENTITY_NAME}. Unauthorized downloading, recording, copying, sharing, distribution, or classroom use is prohibited.</p>
       </footer>
     </main>
   );
