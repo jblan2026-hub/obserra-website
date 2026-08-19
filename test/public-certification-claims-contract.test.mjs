@@ -34,7 +34,10 @@ test("Academy structured data identifies the legal entity as the course provider
   const certificate = read("app/academy/certificate/[courseId]/CertificateView.tsx");
 
   assert.match(academyPage, /name: LEGAL_ENTITY_NAME/);
-  assert.match(coursePage, new RegExp(`const LEGAL_NAME = "${LEGAL_ENTITY_NAME.replaceAll("&", "\\&")}"`));
+  assert.match(coursePage, /const LEGAL_NAME = LEGAL_ENTITY_NAME/);
+  assert.match(coursePage, /provider:\s*\{[\s\S]*name: LEGAL_NAME/);
+  assert.match(certificate, /const LEGAL_NAME = LEGAL_ENTITY_NAME/);
+  assert.match(certificate, /ACADEMY_BRAND_NAME/);
   assert.match(certificate, /Certificate of Course Completion/);
   assert.match(certificate, /issued by \{LEGAL_NAME\}/);
 });
