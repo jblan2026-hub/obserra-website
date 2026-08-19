@@ -4,17 +4,24 @@ import test from "node:test";
 
 const read = (path) => fs.readFileSync(path, "utf8");
 
-test("Applications and Academy are prominent direct website destinations", () => {
+test("Obserra EPI Applications and Obserra EPI Academy are prominent direct website destinations", () => {
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
   const home = read("app/page.tsx");
+  const identity = read("lib/legal-identity.ts");
   const styles = read("app/components/enterprise/enterprise-sales-navigation.css");
 
-  assert.ok(chrome.indexOf('["Applications", "/apps", "sales"]') < chrome.indexOf('["Academy", "/academy", "sales"]'));
+  assert.match(identity, /APPLICATIONS_BRAND_NAME = `\$\{BRAND_PREFIX\} Applications`/);
+  assert.match(identity, /ACADEMY_BRAND_NAME = `\$\{BRAND_PREFIX\} Academy`/);
+  assert.ok(
+    chrome.indexOf('[APPLICATIONS_BRAND_NAME, "/apps", "sales"]') <
+      chrome.indexOf('[ACADEMY_BRAND_NAME, "/academy", "sales"]'),
+    "Applications must remain ahead of Academy in primary sales navigation",
+  );
   assert.match(chrome, /className=\{prominence === "sales" \? "ent-header__sales-link"/);
-  assert.match(chrome, /Applications Marketplace<\/Link><Link href="\/academy">Obserra Academy/);
+  assert.match(chrome, /<Link href="\/apps">\{APPLICATIONS_BRAND_NAME\}<\/Link><Link href="\/academy">\{ACADEMY_BRAND_NAME\}<\/Link>/);
   assert.match(styles, /> a\.ent-header__sales-link/);
-  assert.match(home, /<ButtonLink href="\/apps">Shop Applications<\/ButtonLink>/);
-  assert.match(home, /<ButtonLink href="\/academy" variant="secondary">Browse Academy<\/ButtonLink>/);
+  assert.match(home, /<ButtonLink href="\/apps">Shop \{APPLICATIONS_BRAND_NAME\}<\/ButtonLink>/);
+  assert.match(home, /<ButtonLink href="\/academy" variant="secondary">Browse \{ACADEMY_BRAND_NAME\}<\/ButtonLink>/);
   assert.match(home, /Applications and Academy are direct website destinations/);
   assert.match(home, /href="\/apps" className="mission-direct-sales__card"/);
   assert.match(home, /href="\/academy" className="mission-direct-sales__card"/);
