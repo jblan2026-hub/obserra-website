@@ -5,12 +5,12 @@ import { SignIn } from "@clerk/nextjs";
 import { identityProviderForRequest } from "@/lib/auth/provider-routing";
 import { safeRelativeRedirect } from "@/lib/auth/redirects";
 import { prepareSupabaseAuthRuntime } from "@/lib/auth/runtime-config";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import SupabaseSignInForm from "./SupabaseSignInForm";
 
 export const metadata: Metadata = {
   title: `Sign In | ${LEGAL_ENTITY_NAME} Customer Portal`,
-  description: "Sign in securely to access Obserra Academy, customer services, licensing, reports, and support.",
+  description: `Sign in securely to access ${ACADEMY_BRAND_NAME}, customer services, licensing, reports, and support.`,
   robots: { index: false, follow: false },
 };
 
@@ -29,7 +29,7 @@ export default async function SignInPage({
     <main className="auth-shell">
       <header className="auth-header">
         <Link href="/" aria-label={`${LEGAL_ENTITY_NAME} home`}>
-          <Image src="/brand/obserra-logo.png" alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" width={286} height={55} priority />
+          <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} priority />
         </Link>
         <Link href="/trust">Trust Center</Link>
       </header>
@@ -39,7 +39,7 @@ export default async function SignInPage({
           <h1>Sign in to your {LEGAL_ENTITY_NAME} account.</h1>
           <p>Access customer services through a governed identity boundary designed for account integrity, least privilege, protected transactions, and auditable access.</p>
           <div className="auth-assurance">
-            <span>Protected customer portal</span><span>Account based Academy access</span><span>Secure purchase workflows</span><span>Enterprise identity ready</span>
+            <span>Protected customer portal</span><span>Account based {ACADEMY_BRAND_NAME} access</span><span>Secure purchase workflows</span><span>Enterprise identity ready</span>
           </div>
         </div>
         <div className="auth-panel">
