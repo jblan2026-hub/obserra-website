@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getInternalOwnerAuthority } from "../../../../lib/auth/authority-repository";
+import { prepareSupabaseAuthRuntime } from "../../../../lib/auth/runtime-config";
 import { requireFloridaClassDOwnerTestPrincipal } from "../../../../lib/florida-class-d-owner-test-session";
-import OwnerPreviewConsole from "./OwnerValidationLmsConsole";
+import OwnerValidationLmsConsole from "./OwnerValidationLmsConsole";
 import "../../owner-preview/owner-preview.css";
 
 export const dynamic = "force-dynamic";
@@ -24,16 +25,22 @@ export default async function FloridaClassDOwnerValidationLmsPage() {
   }
 
   const actor = await requireFloridaClassDOwnerTestPrincipal();
+  const runtime = prepareSupabaseAuthRuntime();
+  if (!runtime.ready || !runtime.url || !runtime.projectRef || !runtime.publishableKey) {
+    throw new Error("Owner LMS persistence runtime is unavailable.");
+  }
 
   return (
-    <main
-      className="owner-preview"
-      data-daily-api="/api/florida-class-d/owner-validation/daily"
-      data-courseware-api="/api/florida-class-d/owner-validation/courseware"
-    >
-      <OwnerPreviewConsole
-        initialView="live"
+    <main className="owner-preview">
+      <OwnerValidationLmsConsole
         releaseCommitSha={actor.releaseCommitSha}
+        runtime={{
+          ready: runtime.ready,
+          url: runtime.url,
+          projectRef: runtime.projectRef,
+          publishableKey: runtime.publishableKey,
+          production: process.env.VERCEL_ENV === "production",
+        }}
       />
     </main>
   );
