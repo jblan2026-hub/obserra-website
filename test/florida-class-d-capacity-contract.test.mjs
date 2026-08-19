@@ -10,6 +10,7 @@ test("Florida Class D production capacity is explicitly engineered for 200 concu
   const classroom = read("app/florida-security-training/live/[liveSessionId]/LiveClassroom.tsx");
   const liveClassroomMigration = read("supabase/migrations/20260813043000_fdacs_class_d_live_classroom.sql");
   const capacityGate = read("scripts/florida-class-d-capacity-gate.mjs");
+  const loadTest = read("load/florida-class-d-200-students.k6.js");
   const workflow = read(".github/workflows/florida-class-d-lms-gates.yml");
 
   assert.match(policy, /platformConcurrentStudentTarget:\s*200/);
@@ -44,8 +45,21 @@ test("Florida Class D production capacity is explicitly engineered for 200 concu
   assert.match(liveClassroomMigration, /fdacs_class_d_record_live_heartbeat/);
   assert.match(liveClassroomMigration, /least\(90, extract\(epoch from \(now\(\) - v_lease\.last_heartbeat_at\)\)::integer\)/);
 
+  assert.match(loadTest, /TARGET_CONCURRENT_STUDENTS = 200/);
+  assert.match(loadTest, /executor: "constant-vus"/);
+  assert.match(loadTest, /vus: TARGET_CONCURRENT_STUDENTS/);
+  assert.match(loadTest, /FDACS_LOAD_TEST_IDENTITIES_JSON/);
+  assert.match(loadTest, /exactly \$\{TARGET_CONCURRENT_STUDENTS\} real authenticated learner identities/);
+  assert.match(loadTest, /ALLOW_PRODUCTION_LOAD_TEST/);
+  assert.match(loadTest, /http_req_failed: \["rate<0\.01"\]/);
+  assert.match(loadTest, /http_req_duration: \["p\(95\)<2000", "p\(99\)<4000"\]/);
+  assert.match(loadTest, /operation: "heartbeat"/);
+  assert.match(loadTest, /operation: "state"/);
+  assert.match(loadTest, /operation: "media"/);
+
   assert.match(capacityGate, /capacityHeartbeatWritesPerMinute/);
   assert.match(capacityGate, /capacityHeartbeatWritesPerSecondCeiling/);
+  assert.match(capacityGate, /florida-class-d-200-students\.k6\.js/);
   assert.match(capacityGate, /productionLoadTestStillRequired:\s*true/);
 
   assert.match(workflow, /Run Gate 36 concurrent learner capacity verification/);
