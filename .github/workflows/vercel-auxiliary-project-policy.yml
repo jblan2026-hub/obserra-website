@@ -1,0 +1,132 @@
+name: Vercel Auxiliary Project Policy
+
+on:
+  push:
+    branches:
+      - main
+      - hotfix/owner-lms-test-access-20260817
+    paths:
+      - ".github/workflows/vercel-auxiliary-project-policy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vercel-auxiliary-project-policy
+  cancel-in-progress: false
+
+env:
+  TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+  CANONICAL_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme
+  AUXILIARY_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+  PRIMARY_DOMAIN: www.obserrallc.com
+  APEX_DOMAIN: obserrallc.com
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
+    steps:
+      - name: Require configured Vercel credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${VERCEL_TOKEN:-}" ]; then
+            echo "::error::VERCEL_TOKEN or VERCEL_ACCESS_TOKEN is required."
+            exit 1
+          fi
+
+      - name: Verify canonical project owns both production domains
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v9/projects/${CANONICAL_PROJECT_ID}/domains?teamId=${TEAM_ID}&limit=100")"
+          for domain in "${PRIMARY_DOMAIN}" "${APEX_DOMAIN}"; do
+            if ! jq -e --arg domain "${domain}" '.domains | any(.name == $domain)' <<<"${response}" >/dev/null; then
+              echo "::error::Canonical project does not own required domain ${domain}; refusing auxiliary detachment."
+              exit 1
+            fi
+          done
+
+      - name: Disable duplicate Git deployments and statuses on auxiliary project
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --request PATCH \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data '{"commandForIgnoringBuildStep":"exit 0","ssoProtection":null,"gitProviderOptions":{"createDeployments":"disabled","disableRepositoryDispatchEvents":true,"requireVerifiedCommits":false,"gitCommitStatus":false,"consolidatedGitCommitStatus":{"enabled":false,"propagateFailures":false}}}' \
+            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}" \
+            >/dev/null
+
+      - name: Detach canonical production domains from auxiliary project
+        shell: bash
+        run: |
+          set -euo pipefail
+          for domain in "${PRIMARY_DOMAIN}" "${APEX_DOMAIN}"; do
+            body="$(mktemp)"
+            status="$(curl --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${body}" \
+              --write-out '%{http_code}' \
+              --request DELETE \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"
+            if [ "${status}" != "200" ] && [ "${status}" != "404" ]; then
+              code="$(jq -r '.error.code // empty' "${body}" 2>/dev/null || true)"
+              message="$(jq -r '.error.message // empty' "${body}" 2>/dev/null || true)"
+              rm -f "${body}"
+              echo "::error::Unable to detach ${domain} from auxiliary project: HTTP ${status}${code:+, ${code}}${message:+ - ${message}}"
+              exit 1
+            fi
+            rm -f "${body}"
+          done
+
+      - name: Verify auxiliary project policy and domain separation
+        shell: bash
+        run: |
+          set -euo pipefail
+          project="$(curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}")"
+          jq -e '
+            .gitProviderOptions.createDeployments == "disabled"
+            and .gitProviderOptions.requireVerifiedCommits == false
+            and .gitProviderOptions.gitCommitStatus == false
+            and .gitProviderOptions.consolidatedGitCommitStatus.enabled == false
+          ' <<<"${project}" >/dev/null
+
+          auxiliary_domains="$(curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}/domains?teamId=${TEAM_ID}&limit=100")"
+          canonical_domains="$(curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v9/projects/${CANONICAL_PROJECT_ID}/domains?teamId=${TEAM_ID}&limit=100")"
+
+          for domain in "${PRIMARY_DOMAIN}" "${APEX_DOMAIN}"; do
+            if jq -e --arg domain "${domain}" '.domains | any(.name == $domain)' <<<"${auxiliary_domains}" >/dev/null; then
+              echo "::error::Auxiliary project still owns ${domain}."
+              exit 1
+            fi
+            if ! jq -e --arg domain "${domain}" '.domains | any(.name == $domain)' <<<"${canonical_domains}" >/dev/null; then
+              echo "::error::Canonical project lost required domain ${domain}."
+              exit 1
+            fi
+          done

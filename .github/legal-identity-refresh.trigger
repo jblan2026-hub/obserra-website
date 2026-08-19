@@ -1,3 +1,3 @@
-refresh-request: 2026-08-19-connector-key-vault-contract-repair
-reason: regenerate governed legal identity and CMMC evidence after the connector control-plane contract was updated to validate the production key-provider boundary, Key Vault rotation policy, and fail-closed environment fallback rather than the retired direct key read in the encryption envelope module
-validation-request: 2026-08-19-post-key-vault-contract-repair
+refresh-request: 2026-08-19-vercel-auxiliary-project-policy
+reason: regenerate governed evidence after adding provider-level Vercel duplicate-project remediation that disables auxiliary Git deployments and commit statuses, removes duplicate canonical-domain ownership only after canonical ownership verification, and verifies the resulting separation fail closed
+validation-request: 2026-08-19-post-vercel-auxiliary-project-policy
