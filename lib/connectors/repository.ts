@@ -8,9 +8,10 @@ import {
   type ConnectorHealthState,
 } from "./contracts";
 import {
+  type ConnectorConfigurationRow,
   type ConnectorDatabase,
-  type ConnectorRow,
   type ConnectorUpdate,
+  type Json,
 } from "./database";
 
 const CANONICAL_CONNECTOR_PROJECT_REF = "ftkjhmtfyfkartfsnkjb";
@@ -104,7 +105,7 @@ function requireUuid(value: string, field: string) {
   return value;
 }
 
-function mapConnector(row: ConnectorRow): ConnectorConfiguration {
+function mapConnector(row: ConnectorConfigurationRow): ConnectorConfiguration {
   return {
     connectorId: row.id,
     ownerUserId: row.owner_user_id,
@@ -160,7 +161,7 @@ export async function upsertConnectorConfiguration(input: {
   displayName: string;
   baseUrl: string;
   allowedHostname: string;
-  provenance?: Record<string, unknown>;
+  provenance?: Json;
 }) {
   const client = connectorStorageClient();
   const ownerUserId = requireUuid(input.ownerUserId, "Owner user ID");
