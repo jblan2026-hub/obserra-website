@@ -134,7 +134,7 @@ export default function AiAdvisorPanel({ liveSessionId }: { liveSessionId: strin
               {busy ? <button type="button" className={styles.secondary} onClick={cancelRequest}>Cancel</button> : null}
               <button type="submit" className={styles.primary} disabled={busy || question.trim().length < 2}>{busy ? "Reasoning…" : "Ask advisor"}</button>
             </div>
-            <small className={styles.voiceDisclosure}>Voice playback is AI-generated. It is an instructional aid and not the live instructor.</small>
+            <small className={styles.voiceDisclosure}>AI-generated voice playback is an instructional aid and is not the live instructor.</small>
           </form>
 
           <div className={styles.response} aria-live="polite" aria-busy={busy}>
