@@ -127,9 +127,3 @@ jobs:
         run: |
           npm run verify:cmmc-evidence
           git diff --exit-code
-
-  reconcile-vercel-auxiliary:
-    name: Reconcile auxiliary Vercel project policy
-    needs: refresh
-    uses: ./.github/workflows/vercel-auxiliary-project-policy.yml
-    secrets: inherit
