@@ -7,6 +7,7 @@ const read = (path) => fs.readFileSync(path, "utf8");
 test("Florida Class D production capacity is explicitly engineered for 200 concurrent students", () => {
   const policy = read("lib/florida-class-d-live-policy.ts");
   const media = read("lib/florida-class-d-media.ts");
+  const classroom = read("app/florida-security-training/live/[liveSessionId]/LiveClassroom.tsx");
   const liveClassroomMigration = read("supabase/migrations/20260813043000_fdacs_class_d_live_classroom.sql");
   const capacityGate = read("scripts/florida-class-d-capacity-gate.mjs");
   const workflow = read(".github/workflows/florida-class-d-lms-gates.yml");
@@ -24,6 +25,19 @@ test("Florida Class D production capacity is explicitly engineered for 200 concu
   assert.match(media, /max_participants:\s*75/);
   assert.match(media, /roomName\(liveSessionId\)/);
   assert.doesNotMatch(media, /max_participants:\s*200/);
+
+  assert.match(classroom, /const STATE_REFRESH_INTERVAL_MS = 15_000/);
+  assert.match(classroom, /const HEARTBEAT_INTERVAL_MS = 60_000/);
+  assert.match(classroom, /setInterval\(\(\) => void sendHeartbeat\(\), HEARTBEAT_INTERVAL_MS\)/);
+  assert.match(classroom, /setInterval\(\(\) => void refresh\(\)/);
+  assert.match(classroom, /STATE_REFRESH_INTERVAL_MS/);
+  assert.doesNotMatch(classroom, /setInterval\(\(\) => void refresh\([^)]*\), 10_000\)/);
+
+  const heartbeatBody = classroom.slice(
+    classroom.indexOf("const sendHeartbeat = async () =>"),
+    classroom.indexOf("const heartbeat = window.setInterval"),
+  );
+  assert.doesNotMatch(heartbeatBody, /await refresh\(\)/);
 
   assert.match(liveClassroomMigration, /fdacs_class_d_device_session_idx/);
   assert.match(liveClassroomMigration, /unique \(enrollment_id, live_session_id\)/);
