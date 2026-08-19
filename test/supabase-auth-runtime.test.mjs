@@ -29,6 +29,7 @@ test("Supabase Auth runtime is explicit, project-bound, and disabled by default"
   assert.match(runtime, /OBSERRA_AUTH_SUPABASE_PROJECT_REF/);
   assert.match(runtime, /url_project_mismatch/);
   assert.match(runtime, /runtimeEnabled && reasonCodes\.length === 0/);
+  assert.match(runtime, /CONTROLLED_OWNER_VALIDATION_PREVIEW_REF/);
   assert.doesNotMatch(runtime, /SERVICE_ROLE|SECRET_KEY/);
 
   assert.match(environment, /OBSERRA_SUPABASE_AUTH_RUNTIME_ENABLED=false/);
@@ -62,6 +63,49 @@ test("live Clerk configuration cannot activate the Supabase runtime", () => {
     OBSERRA_SUPABASE_AUTH_RUNTIME_ENABLED: "true",
   });
   assert.equal(explicitlyEnabled.ready, true);
+});
+
+test("the exact owner-validation Vercel preview bootstraps the canonical Supabase public runtime", () => {
+  const {
+    CANONICAL_PUBLIC_VERCEL_PROJECT_ID,
+    CONTROLLED_OWNER_VALIDATION_PREVIEW_REF,
+    prepareSupabaseAuthRuntime,
+  } = runtimeModule();
+
+  const runtime = prepareSupabaseAuthRuntime({
+    VERCEL_ENV: "preview",
+    VERCEL_PROJECT_ID: CANONICAL_PUBLIC_VERCEL_PROJECT_ID,
+    VERCEL_GIT_COMMIT_REF: CONTROLLED_OWNER_VALIDATION_PREVIEW_REF,
+  });
+
+  assert.equal(runtime.ready, true);
+  assert.equal(runtime.runtimeEnabled, true);
+  assert.equal(runtime.projectRef, "ftkjhmtfyfkartfsnkjb");
+  assert.equal(runtime.url, "https://ftkjhmtfyfkartfsnkjb.supabase.co");
+  assert.match(runtime.publishableKey, /^sb_publishable_/);
+  assert.deepEqual([...runtime.reasonCodes], []);
+});
+
+test("unrelated Vercel previews remain fail closed without an explicit Supabase runtime flag", () => {
+  const {
+    CANONICAL_PUBLIC_VERCEL_PROJECT_ID,
+    prepareSupabaseAuthRuntime,
+  } = runtimeModule();
+
+  const runtime = prepareSupabaseAuthRuntime({
+    VERCEL_ENV: "preview",
+    VERCEL_PROJECT_ID: CANONICAL_PUBLIC_VERCEL_PROJECT_ID,
+    VERCEL_GIT_COMMIT_REF: "feature/unrelated-preview",
+  });
+
+  assert.equal(runtime.ready, false);
+  assert.equal(runtime.runtimeEnabled, false);
+  assert.deepEqual([...runtime.reasonCodes], [
+    "runtime_disabled",
+    "url_missing",
+    "project_ref_missing",
+    "publishable_key_missing",
+  ]);
 });
 
 test("Supabase packages are pinned to the reviewed versions", () => {
