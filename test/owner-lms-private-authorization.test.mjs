@@ -52,5 +52,11 @@ test("every owner LMS table and storage policy is rewired to the private authori
 
   const privateCalls = sql.match(/owner_lms_private\.obserra_owner_lms_authorized\(\)/g) ?? [];
   assert.ok(privateCalls.length >= 10, "All USING and WITH CHECK paths must call the private helper");
-  assert.doesNotMatch(sql, /\bpublic\.obserra_owner_lms_authorized\(\)/);
+
+  const policyStart = sql.indexOf("drop policy if exists owner_lms_course_assets_owner_all");
+  const publicHelperDrop = sql.indexOf("drop function public.obserra_owner_lms_authorized()");
+  assert.ok(policyStart >= 0 && publicHelperDrop > policyStart, "Policy rewiring must complete before the public helper is dropped");
+
+  const policySql = sql.slice(policyStart, publicHelperDrop);
+  assert.doesNotMatch(policySql, /\bpublic\.obserra_owner_lms_authorized\(\)/);
 });
