@@ -74,3 +74,4 @@ if (githubOutput) {
 }
 
 console.log(`[Application Production] planned ${desired} worker(s) for ${applicationCount} application(s).`);
+// CI-only no-op to make the PR head user-authored after governed evidence automation.
