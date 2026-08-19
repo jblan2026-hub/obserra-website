@@ -66,6 +66,16 @@ test("governed legal and product brand constants are centralized", () => {
   }
 });
 
+test("legal identity audit permits only governed EPI product names", () => {
+  const auditGenerator = fs.readFileSync("scripts/legal-identity-audit.mjs", "utf8");
+  for (const product of ["Academy", "EIOS"]) {
+    const governed = `${BRAND_PREFIX} ${product}`;
+    const bare = ["Obserra", product].join(" ");
+    assert.ok(auditGenerator.includes(`\"${governed}\"`), `${governed} must be permitted by the audit generator`);
+    assert.equal(auditGenerator.includes(`\"${bare}\"`), false, `${bare} must not be permitted by the audit generator`);
+  }
+});
+
 test("the customer-facing route inventory is explicit and excludes Applications", () => {
   assert.ok(publicRouteSources.size >= 25, "public route inventory unexpectedly contracted");
   for (const [route, sourcePath] of publicRouteSources) {
