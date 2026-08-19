@@ -14,7 +14,7 @@ test("Florida Class D AI advisor is authenticated, grounded, reasoning-enabled, 
   assert.match(route, /requireFloridaClassDSignedInUser/);
   assert.match(route, /getFloridaClassDLiveStudentState/);
   assert.match(route, /getFloridaClassDActiveTextScreen/);
-  assert.match(route, /same-origin/i);
+  assert.match(route, /isSameOrigin/);
   assert.match(route, /application\/json/);
   assert.match(route, /cache-control/);
   assert.match(route, /private, no-store/);
@@ -39,6 +39,7 @@ test("Florida Class D AI advisor is authenticated, grounded, reasoning-enabled, 
 
   assert.match(panel, /AI Advisor/);
   assert.match(panel, /aria-live/);
+  assert.match(panel, /AI-generated voice/);
   assert.match(panel, /Voice/);
   assert.match(panel, /AbortController/);
   assert.match(panel, /URL\.revokeObjectURL/);
