@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 import { prepareClerkRuntime } from "../lib/clerk-runtime-config";
-import { LEGAL_ENTITY_NAME } from "../lib/legal-identity";
+import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "../lib/legal-identity";
 import ObserraGuide from "./ObserraGuide";
 import CredlyProfileLink from "./CredlyProfileLink";
 import "./globals.css";
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   formatDetection: { email: false, address: false, telephone: false },
   manifest: "/manifest.webmanifest",
   icons: { icon: [{ url: "/brand/obserra-mark.svg", type: "image/svg+xml" }], shortcut: ["/brand/obserra-mark.svg"], apple: [{ url: "/brand/obserra-logo.png" }] },
-  keywords: ["cybersecurity consulting", "executive protection", "protective intelligence", "enterprise intelligence", "AI governance", "enterprise learning", "university cybersecurity training", "Obserra EIOS"],
+  keywords: ["cybersecurity consulting", "executive protection", "protective intelligence", "enterprise intelligence", "AI governance", "enterprise learning", "university cybersecurity training", EIOS_BRAND_NAME],
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION },
   openGraph: { siteName: LEGAL_ENTITY_NAME, type: "website", url: "https://www.obserrallc.com", title: `${LEGAL_ENTITY_NAME} | Cybersecurity, Intelligence and Secure Technology`, description: "Executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning.", locale: "en_US", images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: `${LEGAL_ENTITY_NAME} enterprise intelligence and cybersecurity` }] },
   twitter: { card: "summary_large_image", title: `${LEGAL_ENTITY_NAME} | Cybersecurity, Intelligence and Secure Technology`, description: "Executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning.", images: ["/brand/visuals/obserra-eios-intelligence-hero.png"] },
