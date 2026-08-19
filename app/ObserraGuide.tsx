@@ -3,7 +3,12 @@
 import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import {
+  ACADEMY_BRAND_NAME,
+  APPLICATIONS_BRAND_NAME,
+  EIOS_BRAND_NAME,
+  LEGAL_ENTITY_NAME,
+} from "@/lib/legal-identity";
 import styles from "./ObserraGuide.module.css";
 
 type MessageAction = { href: string; label: string };
@@ -29,22 +34,22 @@ function pageContext(pathname: string): PageContext {
   if (pathname.startsWith("/academy")) {
     return {
       label: "Academy Advisor",
-      welcome: "I can help you compare courses, understand secure enrollment, access training, or learn how Obserra Academy Certificates of Course Completion are earned.",
+      welcome: `I can help you compare courses, understand secure enrollment, access training, or learn how ${ACADEMY_BRAND_NAME} Certificates of Course Completion are earned.`,
       prompts: ["Recommend a course", "How does enrollment work?", "How do I earn a certificate?", "Enterprise training"],
     };
   }
   if (pathname.startsWith("/apps")) {
     return {
       label: "Product Advisor",
-      welcome: `I can help you evaluate ${LEGAL_ENTITY_NAME} applications, compare use cases, request a product briefing, or identify the right solution for your organization.`,
-      prompts: ["Recommend an application", "Show Obserra EIOS", "Request a product demo", "Discuss enterprise pricing"],
+      welcome: `I can help you evaluate ${APPLICATIONS_BRAND_NAME}, compare use cases, request a product briefing, or identify the right solution for your organization.`,
+      prompts: ["Recommend an application", `Show ${EIOS_BRAND_NAME}`, "Request a product demo", "Discuss enterprise pricing"],
     };
   }
   if (pathname.startsWith("/eios")) {
     return {
-      label: "Obserra EIOS Advisor",
-      welcome: "I can explain the Obserra Enterprise Intelligence Operating System (EIOS), guide you through the product views, or help arrange an executive platform briefing.",
-      prompts: ["What is Obserra EIOS?", "Show product views", "Explain the business value", "Request an Obserra EIOS briefing"],
+      label: `${EIOS_BRAND_NAME} Advisor`,
+      welcome: `I can explain ${EIOS_BRAND_NAME}, the Executive Intelligence Operating System from ${LEGAL_ENTITY_NAME}, guide you through the product views, or help arrange an executive platform briefing.`,
+      prompts: [`What is ${EIOS_BRAND_NAME}?`, "Show product views", "Explain the business value", `Request an ${EIOS_BRAND_NAME} briefing`],
     };
   }
   if (pathname.startsWith("/services") || pathname.startsWith("/protection-intelligence")) {
@@ -70,7 +75,7 @@ function pageContext(pathname: string): PageContext {
   }
   return {
     label: "Executive Intelligence Advisor",
-    welcome: `I can help you discover ${LEGAL_ENTITY_NAME} applications and services, Obserra Academy training, Obserra EIOS capabilities, and the right next step for your organization.`,
+    welcome: `I can help you discover ${APPLICATIONS_BRAND_NAME}, ${ACADEMY_BRAND_NAME} training, ${EIOS_BRAND_NAME} capabilities, ${LEGAL_ENTITY_NAME} services, and the right next step for your organization.`,
     prompts: ["Explore applications", "Find professional training", "Review services", "Speak with an advisor"],
   };
 }
@@ -81,9 +86,9 @@ function response(question: string, pathname: string): Message {
   if (/\beios\b|enterprise intelligence|situation room|decision intelligence|business value|product view/.test(input)) {
     return {
       from: "guide",
-      text: "Obserra Enterprise Intelligence Operating System (EIOS) is a governed enterprise intelligence and execution environment. It connects risk context, evidence, policy, approvals, actions, and verified outcomes to support defensible leadership decisions.",
+      text: `${EIOS_BRAND_NAME} is the governed Executive Intelligence Operating System from ${LEGAL_ENTITY_NAME}. It connects risk context, evidence, policy, approvals, actions, and verified outcomes to support defensible leadership decisions.`,
       actions: [
-        { href: "/eios", label: "Explore Obserra EIOS" },
+        { href: "/eios", label: `Explore ${EIOS_BRAND_NAME}` },
         { href: "/contact?interest=eios", label: "Request a briefing" },
       ],
     };
@@ -92,9 +97,9 @@ function response(question: string, pathname: string): Message {
   if (/app|application|software|product|demo|pricing/.test(input)) {
     return {
       from: "guide",
-      text: `${LEGAL_ENTITY_NAME} applications support cybersecurity, artificial intelligence governance, cyber risk, control evidence, vulnerability prioritization, executive exposure, and enterprise intelligence. Product availability is stated clearly on each commercial product page.`,
+      text: `${APPLICATIONS_BRAND_NAME} from ${LEGAL_ENTITY_NAME} support cybersecurity, artificial intelligence governance, cyber risk, control evidence, vulnerability prioritization, executive exposure, and enterprise intelligence. Product availability is stated clearly on each commercial product page.`,
       actions: [
-        { href: "/apps", label: "Browse applications" },
+        { href: "/apps", label: `Browse ${APPLICATIONS_BRAND_NAME}` },
         { href: "/contact?interest=applications", label: "Request product guidance" },
       ],
     };
@@ -103,9 +108,9 @@ function response(question: string, pathname: string): Message {
   if (/course|academy|training|learn|recommend/.test(input)) {
     return {
       from: "guide",
-      text: "Obserra Academy offers account-based, self-paced professional training across cybersecurity, protection, intelligence, leadership, artificial intelligence, and secure technology. Course pages show the level, duration, outcomes, and price before enrollment.",
+      text: `${ACADEMY_BRAND_NAME}, a learning product from ${LEGAL_ENTITY_NAME}, offers account-based, self-paced professional training across cybersecurity, protection, intelligence, leadership, artificial intelligence, and secure technology. Course pages show the level, duration, outcomes, and price before enrollment.`,
       actions: [
-        { href: "/academy#courses", label: "Browse courses" },
+        { href: "/academy#courses", label: `Browse ${ACADEMY_BRAND_NAME}` },
         { href: "/contact?interest=enterprise-training", label: "Discuss team training" },
       ],
     };
@@ -122,7 +127,7 @@ function response(question: string, pathname: string): Message {
   if (/certificate|certify|completion|assessment|exam/.test(input)) {
     return {
       from: "guide",
-      text: "To earn an Obserra Academy Certificate of Course Completion, complete every required lesson and meet the course's published passing-score requirement on the final assessment. The certificate is generated from the authenticated completion record and includes a unique verification ID. It is a proprietary course-completion record issued by OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC, not a professional certification, license, academic credit, or evidence of regulatory compliance.",
+      text: `To earn an ${ACADEMY_BRAND_NAME} Certificate of Course Completion, complete every required lesson and meet the course's published passing-score requirement on the final assessment. The certificate is generated from the authenticated completion record and includes a unique verification ID. It is a proprietary course-completion record issued by ${LEGAL_ENTITY_NAME}, not a professional certification, license, academic credit, or evidence of regulatory compliance.`,
       actions: [{ href: "/academy", label: "Review Academy standards" }],
     };
   }
@@ -171,11 +176,11 @@ function response(question: string, pathname: string): Message {
   const context = pageContext(pathname);
   return {
     from: "guide",
-    text: `I am currently your ${context.label}. I can guide you to a ${LEGAL_ENTITY_NAME} application or service, an Obserra Academy course, an Obserra EIOS briefing, or a confidential consultation.`,
+    text: `I am currently your ${context.label}. I can guide you to ${APPLICATIONS_BRAND_NAME}, a ${LEGAL_ENTITY_NAME} service, an ${ACADEMY_BRAND_NAME} course, an ${EIOS_BRAND_NAME} briefing, or a confidential consultation.`,
     actions: [
-      { href: "/apps", label: "Applications" },
+      { href: "/apps", label: APPLICATIONS_BRAND_NAME },
       { href: "/services", label: "Services" },
-      { href: "/academy", label: "Academy" },
+      { href: "/academy", label: ACADEMY_BRAND_NAME },
       { href: "/contact", label: "Contact" },
     ],
   };
