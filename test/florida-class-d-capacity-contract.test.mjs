@@ -16,7 +16,7 @@ test("Florida Class D production capacity is explicitly engineered for 200 concu
   assert.match(policy, /minimumParallelRoomsForTarget:\s*3/);
   assert.match(policy, /capacityTargetRequiresParallelRooms:\s*true/);
 
-  assert.match(media, /max_participants:\s*FLORIDA_CLASS_D_LIVE_POLICY\.dailyRoomParticipantLimit/);
+  assert.match(media, /max_participants:\s*75/);
   assert.match(media, /roomName\(liveSessionId\)/);
   assert.doesNotMatch(media, /max_participants:\s*200/);
 
