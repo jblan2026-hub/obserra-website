@@ -16,8 +16,8 @@ export const metadata: Metadata = {
 const capabilities = [
   ["01", "Executive Advisory", "Board-ready cyber, risk, governance, resilience, and transformation leadership for material enterprise decisions.", "/services", "Explore advisory"],
   ["02", "Protection and Intelligence", "Protective intelligence, executive exposure, travel risk, and discreet support for leaders and high-consequence operations.", "/protection-intelligence", "Explore protection"],
-  ["03", "EIOS and Secure Technology", "Enterprise intelligence, governed workflows, risk context, evidence, and executive decision support in one operating environment.", "/eios", "Explore EIOS"],
-  ["04", "Academy", "Professional learning for executives, practitioners, teams, and regulated training use cases with offering-specific controls.", "/academy", "Explore Academy"],
+  ["03", "Obserra EPI EIOS", "Enterprise intelligence, governed workflows, risk context, evidence, and executive decision support in one operating environment.", "/eios", "Explore EIOS"],
+  ["04", "Obserra EPI Academy", "Professional learning for executives, practitioners, teams, and regulated training use cases with offering-specific controls.", "/academy", "Explore Academy"],
 ];
 
 export default function HomePage() {
@@ -34,7 +34,7 @@ export default function HomePage() {
               evidence-disciplined operating model.
             </p>
             <div className="saas-hero__actions">
-              <ButtonLink href="/eios">Explore EIOS</ButtonLink>
+              <ButtonLink href="/eios">Explore Obserra EPI EIOS</ButtonLink>
               <ButtonLink href="/contact?interest=enterprise-consultation" variant="secondary">Request executive briefing</ButtonLink>
             </div>
             <div className="saas-hero__proof" aria-label={`${LEGAL_ENTITY_NAME} operating assurances`}>
@@ -45,10 +45,10 @@ export default function HomePage() {
             </div>
           </div>
           <div className="saas-hero__visual-shell">
-            <Link href="/eios" className="saas-hero__visual" aria-label="Explore EIOS">
+            <Link href="/eios" className="saas-hero__visual" aria-label="Explore Obserra EPI EIOS">
               <Image
                 src="/brand/visuals/obserra-eios-intelligence-hero.png"
-                alt={`${LEGAL_ENTITY_NAME} EIOS enterprise intelligence visualization`}
+                alt="Obserra EPI EIOS enterprise intelligence visualization"
                 fill
                 priority
                 sizes="(max-width: 1040px) 100vw, 50vw"
@@ -67,19 +67,19 @@ export default function HomePage() {
             <h2 id="direct-sales-heading">Applications and Academy are direct website destinations.</h2>
             <p>Move directly to secure applications or governed learning. Each destination preserves its own purchase, access, approval, and release controls.</p>
             <div className="saas-actions">
-              <ButtonLink href="/apps">Shop Applications</ButtonLink>
-              <ButtonLink href="/academy" variant="secondary">Browse Academy</ButtonLink>
+              <ButtonLink href="/apps">Shop Obserra EPI Applications</ButtonLink>
+              <ButtonLink href="/academy" variant="secondary">Browse Obserra EPI Academy</ButtonLink>
             </div>
           </div>
           <div className="saas-direct-sales__grid">
             <Link href="/apps" className="mission-direct-sales__card">
-              <span>APPLICATIONS MARKETPLACE</span>
+              <span>OBSERRA EPI APPLICATIONS</span>
               <h3>Secure software for executive and operational use.</h3>
               <p>Review product capabilities and commercial options directly from the public marketplace.</p>
               <strong>Shop Applications <span aria-hidden="true">→</span></strong>
             </Link>
             <Link href="/academy" className="mission-direct-sales__card">
-              <span>ACADEMY</span>
+              <span>OBSERRA EPI ACADEMY</span>
               <h3>Professional learning with governed access and completion.</h3>
               <p>Browse the reviewed nonregulated catalog and enterprise learning options. Purchases open only when a course is explicitly activated.</p>
               <strong>Browse Academy <span aria-hidden="true">→</span></strong>
@@ -88,10 +88,10 @@ export default function HomePage() {
         </section>
 
         <nav className="saas-product-nav" aria-label={`Primary destinations from ${LEGAL_ENTITY_NAME}`}>
-          <Link href="/apps"><strong>Applications</strong><span>Secure software built for executive and operational use.</span></Link>
-          <Link href="/academy"><strong>Academy</strong><span>Professional learning, enterprise programs, and controlled training.</span></Link>
+          <Link href="/apps"><strong>Obserra EPI Applications</strong><span>Secure software built for executive and operational use.</span></Link>
+          <Link href="/academy"><strong>Obserra EPI Academy</strong><span>Professional learning, enterprise programs, and controlled training.</span></Link>
           <Link href="/florida-security-training"><strong>Florida training</strong><span>Dedicated regulated-training LMS and student readiness experience.</span></Link>
-          <Link href="/eios"><strong>EIOS</strong><span>Executive intelligence, governance, risk, and decision support.</span></Link>
+          <Link href="/eios"><strong>Obserra EPI EIOS</strong><span>Executive intelligence, governance, risk, and decision support.</span></Link>
           <Link href="/trust"><strong>Trust Center</strong><span>Security, privacy, governance, and procurement assurance.</span></Link>
         </nav>
 
@@ -102,8 +102,8 @@ export default function HomePage() {
             <h2>One enterprise partner across intelligence, technology, protection, and learning.</h2>
             <p>
               Start with the mission in front of you. Each capability can operate independently, while
-              the broader operating model from {LEGAL_ENTITY_NAME} connects risk, evidence, ownership,
-              decisions, and execution.
+              the operating model from {LEGAL_ENTITY_NAME} connects risk, evidence, ownership, decisions,
+              and execution.
             </p>
           </div>
           <div className="saas-capability-list">
@@ -121,7 +121,7 @@ export default function HomePage() {
         <section className="saas-platform">
           <div className="saas-platform__inner">
             <div className="saas-platform__copy">
-              <h2>EIOS turns fragmented enterprise signals into accountable action.</h2>
+              <h2>Obserra EPI EIOS turns fragmented enterprise signals into accountable action.</h2>
               <p>
                 The Executive Intelligence Operating System from {LEGAL_ENTITY_NAME} is designed to connect
                 enterprise context, controls, evidence, risk, intelligence, decisions, and implementation
@@ -134,16 +134,16 @@ export default function HomePage() {
                 <div><b>04</b><span>Board reporting, recommendations, and implementation roadmaps</span></div>
               </div>
               <div className="saas-actions">
-                <ButtonLink href="/eios">Explore the platform</ButtonLink>
+                <ButtonLink href="/eios">Explore Obserra EPI EIOS</ButtonLink>
                 <ButtonLink href="/contact?interest=eios-demo" variant="secondary">Request an EIOS briefing</ButtonLink>
               </div>
             </div>
-            <Link href="/eios" className="saas-platform__visual" aria-label="View EIOS platform overview">
+            <Link href="/eios" className="saas-platform__visual" aria-label="View Obserra EPI EIOS platform overview">
               <Image
                 src="/eios/eios-overview-marketing.png"
                 width={1200}
                 height={675}
-                alt={`${LEGAL_ENTITY_NAME} EIOS executive intelligence dashboard`}
+                alt="Obserra EPI EIOS executive intelligence dashboard"
                 sizes="(max-width: 1040px) 100vw, 58vw"
               />
             </Link>
@@ -161,20 +161,20 @@ export default function HomePage() {
           <div className="saas-learning__copy">
             <h2>Learning built as a product, not a content library.</h2>
             <p>
-              The Academy from {LEGAL_ENTITY_NAME} combines professional learning with controlled enrollment,
-              protected access, assessment, completion records, and enterprise learning options. Regulated programs
-              follow separate eligibility and authorization gates. Identity, attendance, reporting, and completion
-              controls remain offering-specific.
+              The Obserra EPI Academy from {LEGAL_ENTITY_NAME} combines professional learning with controlled
+              enrollment, protected access, assessment, completion records, and enterprise learning options.
+              Regulated programs follow separate eligibility and authorization gates. Identity, attendance,
+              reporting, and completion controls remain offering-specific.
             </p>
             <div className="saas-actions">
-              <ButtonLink href="/academy">Browse Academy</ButtonLink>
+              <ButtonLink href="/academy">Browse Obserra EPI Academy</ButtonLink>
               <ButtonLink href="/academy/enterprise" variant="secondary">Plan enterprise learning</ButtonLink>
             </div>
           </div>
           <div className="saas-learning__routes">
-            <Link href="/academy"><span><strong>Professional Academy</strong><span>Self-paced and enterprise learning catalog.</span></span><b>Open →</b></Link>
+            <Link href="/academy"><span><strong>Obserra EPI Academy</strong><span>Self-paced and enterprise learning catalog.</span></span><b>Open →</b></Link>
             <Link href="/florida-security-training"><span><strong>Florida Class D LMS</strong><span>Dedicated regulated-training environment with live-instruction controls.</span></span><b>Open →</b></Link>
-            <Link href="/apps"><span><strong>Applications Marketplace</strong><span>Commercial software with product-specific purchase and access controls.</span></span><b>Open →</b></Link>
+            <Link href="/apps"><span><strong>Obserra EPI Applications</strong><span>Commercial software with product-specific purchase and access controls.</span></span><b>Open →</b></Link>
           </div>
         </section>
 
@@ -203,8 +203,8 @@ export default function HomePage() {
           <div>
             <h2>Bring {LEGAL_ENTITY_NAME} into the decision before risk becomes consequence.</h2>
             <p>
-              Engage for executive advisory, protective intelligence, EIOS, secure applications, or professional
-              learning through one controlled enterprise conversation.
+              Engage {LEGAL_ENTITY_NAME} for executive advisory, protective intelligence, Obserra EPI EIOS,
+              Obserra EPI Applications, or Obserra EPI Academy through one controlled enterprise conversation.
             </p>
             <div className="saas-actions">
               <ButtonLink href="/contact?interest=enterprise-consultation">Request executive consultation</ButtonLink>
