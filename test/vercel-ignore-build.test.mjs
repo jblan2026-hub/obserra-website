@@ -53,6 +53,27 @@ test("preview build continues when relevant source changed before an evidence-on
   }
 });
 
+test("preview build skips governed evidence-only updates when runtime source did not change", () => {
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "obserra-vercel-ignore-"));
+  try {
+    git(cwd, "init");
+    fs.mkdirSync(path.join(cwd, "app"), { recursive: true });
+    fs.mkdirSync(path.join(cwd, ".github", "workflows"), { recursive: true });
+    fs.mkdirSync(path.join(cwd, "docs", "compliance"), { recursive: true });
+    fs.writeFileSync(path.join(cwd, "app", "page.tsx"), "export default function Page(){return null}\n");
+    const baseline = commit(cwd, "baseline");
+
+    fs.writeFileSync(path.join(cwd, ".github", "workflows", "evidence.yml"), "name: Evidence\n");
+    fs.writeFileSync(path.join(cwd, "docs", "compliance", "evidence.json"), "{}\n");
+    commit(cwd, "governed evidence refresh");
+
+    const result = runIgnore(cwd, { VERCEL_GIT_PREVIOUS_SHA: baseline });
+    assert.equal(result.status, 0, `expected Vercel to skip evidence-only preview build, stderr: ${result.stderr}`);
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
 test("unrecognized Vercel project IDs fail open so a release cannot be silently skipped", () => {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "obserra-vercel-ignore-"));
   try {
