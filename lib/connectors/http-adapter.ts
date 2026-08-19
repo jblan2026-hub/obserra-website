@@ -205,7 +205,7 @@ export async function executeConnectorHttp(input: ConnectorHttpRequest): Promise
     );
   }
 
-  const secret = decryptConnectorSecret(secretRecord.secretEnvelope, {
+  const secret = await decryptConnectorSecret(secretRecord.secretEnvelope, {
     connectorId: connector.connectorId,
     tenantKey: connector.tenantKey,
     secretName: input.auth.secretName,

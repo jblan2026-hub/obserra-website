@@ -9,90 +9,16 @@ import {
   ConnectorRuntimeError,
   type ConnectorSecretContext,
 } from "./contracts";
+import {
+  resolveActiveConnectorEncryptionKey,
+  resolveConnectorEncryptionKey,
+} from "./key-provider";
 
 const ENVELOPE_VERSION = "v1";
 const ALGORITHM = "aes-256-gcm";
 const IV_BYTES = 12;
 const MAX_SECRET_BYTES = 64 * 1024;
 const KEY_ID_PATTERN = /^[A-Za-z0-9_.:-]{1,64}$/;
-
-type KeyRing = {
-  activeKeyId: string;
-  keys: ReadonlyMap<string, Buffer>;
-};
-
-function configurationError(message: string, code: string): never {
-  throw new ConnectorRuntimeError(message, code, "configuration", 503, false);
-}
-
-function parseKeyMaterial(value: string, keyId: string) {
-  let decoded: Buffer;
-  try {
-    decoded = Buffer.from(value.trim(), "base64url");
-  } catch {
-    decoded = Buffer.alloc(0);
-  }
-  if (decoded.length !== 32) {
-    configurationError(
-      `Connector encryption key ${keyId} must decode to exactly 32 bytes.`,
-      "OBSERRA_CONNECTOR_ENCRYPTION_KEY_INVALID",
-    );
-  }
-  return decoded;
-}
-
-function loadKeyRing(): KeyRing {
-  const activeKeyId = process.env.OBSERRA_CONNECTOR_ENCRYPTION_KEY_ID?.trim() || "primary";
-  if (!KEY_ID_PATTERN.test(activeKeyId)) {
-    configurationError(
-      "Connector encryption key ID is invalid.",
-      "OBSERRA_CONNECTOR_ENCRYPTION_KEY_ID_INVALID",
-    );
-  }
-
-  const activeKey = process.env.OBSERRA_CONNECTOR_ENCRYPTION_KEY?.trim();
-  if (!activeKey) {
-    configurationError(
-      "Connector encrypted credential storage is not configured.",
-      "OBSERRA_CONNECTOR_ENCRYPTION_KEY_MISSING",
-    );
-  }
-
-  const keys = new Map<string, Buffer>();
-  keys.set(activeKeyId, parseKeyMaterial(activeKey, activeKeyId));
-
-  const historical = process.env.OBSERRA_CONNECTOR_ENCRYPTION_KEYS_JSON?.trim();
-  if (historical) {
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(historical) as unknown;
-    } catch {
-      configurationError(
-        "Connector encryption key ring is invalid JSON.",
-        "OBSERRA_CONNECTOR_ENCRYPTION_KEYRING_INVALID",
-      );
-    }
-
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-      configurationError(
-        "Connector encryption key ring must be a JSON object.",
-        "OBSERRA_CONNECTOR_ENCRYPTION_KEYRING_INVALID",
-      );
-    }
-
-    for (const [keyId, material] of Object.entries(parsed as Record<string, unknown>)) {
-      if (!KEY_ID_PATTERN.test(keyId) || typeof material !== "string") {
-        configurationError(
-          "Connector encryption key ring contains an invalid entry.",
-          "OBSERRA_CONNECTOR_ENCRYPTION_KEYRING_INVALID",
-        );
-      }
-      keys.set(keyId, parseKeyMaterial(material, keyId));
-    }
-  }
-
-  return { activeKeyId, keys };
-}
 
 function additionalAuthenticatedData(context: ConnectorSecretContext) {
   const tenantKey = context.tenantKey.trim();
@@ -115,10 +41,10 @@ export type EncryptedConnectorSecret = {
   keyId: string;
 };
 
-export function encryptConnectorSecret(
+export async function encryptConnectorSecret(
   plaintext: string,
   context: ConnectorSecretContext,
-): EncryptedConnectorSecret {
+): Promise<EncryptedConnectorSecret> {
   const payload = Buffer.from(plaintext, "utf8");
   if (payload.length === 0 || payload.length > MAX_SECRET_BYTES) {
     throw new ConnectorRuntimeError(
@@ -130,26 +56,18 @@ export function encryptConnectorSecret(
     );
   }
 
-  const keyRing = loadKeyRing();
-  const key = keyRing.keys.get(keyRing.activeKeyId);
-  if (!key) {
-    configurationError(
-      "Active connector encryption key is unavailable.",
-      "OBSERRA_CONNECTOR_ENCRYPTION_KEY_MISSING",
-    );
-  }
-
+  const activeKey = await resolveActiveConnectorEncryptionKey();
   const iv = randomBytes(IV_BYTES);
-  const cipher = createCipheriv(ALGORITHM, key, iv);
+  const cipher = createCipheriv(ALGORITHM, activeKey.material, iv);
   cipher.setAAD(additionalAuthenticatedData(context));
   const ciphertext = Buffer.concat([cipher.update(payload), cipher.final()]);
   const authTag = cipher.getAuthTag();
 
   return {
-    keyId: keyRing.activeKeyId,
+    keyId: activeKey.keyId,
     envelope: [
       ENVELOPE_VERSION,
-      keyRing.activeKeyId,
+      activeKey.keyId,
       iv.toString("base64url"),
       ciphertext.toString("base64url"),
       authTag.toString("base64url"),
@@ -157,7 +75,7 @@ export function encryptConnectorSecret(
   };
 }
 
-export function decryptConnectorSecret(
+export async function decryptConnectorSecret(
   envelope: string,
   context: ConnectorSecretContext,
 ) {
@@ -173,13 +91,7 @@ export function decryptConnectorSecret(
   }
 
   const [, keyId, ivEncoded, ciphertextEncoded, authTagEncoded] = parts;
-  const key = loadKeyRing().keys.get(keyId);
-  if (!key) {
-    configurationError(
-      "Connector secret key required for decryption is unavailable.",
-      "OBSERRA_CONNECTOR_ENCRYPTION_KEY_MISSING",
-    );
-  }
+  const key = await resolveConnectorEncryptionKey(keyId);
 
   try {
     const iv = Buffer.from(ivEncoded, "base64url");
@@ -189,7 +101,7 @@ export function decryptConnectorSecret(
       throw new Error("invalid envelope");
     }
 
-    const decipher = createDecipheriv(ALGORITHM, key, iv);
+    const decipher = createDecipheriv(ALGORITHM, key.material, iv);
     decipher.setAAD(additionalAuthenticatedData(context));
     decipher.setAuthTag(authTag);
     return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString("utf8");
