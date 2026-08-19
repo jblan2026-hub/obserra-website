@@ -1,3 +1,3 @@
-refresh-request: 2026-08-19-connector-control-plane-hardening
-reason: regenerate legal identity and complete governed CMMC evidence after tenant-scoped connector control plane, encrypted secret envelope, SSRF-safe URL policy, durable health telemetry, retry/backoff, circuit-breaker, and failure-queue implementation
-validation-request: 2026-08-19-post-refresh-connector-control-plane-release
+refresh-request: 2026-08-19-authoritative-handoff-exact-head
+reason: regenerate governed legal identity, CMMC system evidence, disposition, continuous-audit handoff, and FDACS PII evidence after canonical engineering handoff and exact-head restart-state documentation changed governed source
+validation-request: 2026-08-19-exact-head-governed-evidence-release-baseline
