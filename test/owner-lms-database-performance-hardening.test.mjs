@@ -36,12 +36,17 @@ test("connector secret foreign keys are backed by explicit indexes and exposed c
     "integration_connector_health_events",
     "integration_connector_failures",
   ]) {
-    assert.match(sql, new RegExp(`drop policy if exists ${table}_external_deny`));
-    assert.match(sql, new RegExp(`create policy ${table}_external_deny on public\\.${table}`));
+    assert.ok(sql.includes(`'${table}'`), `${table} must remain in the explicit deny-policy table set`);
   }
-  assert.match(sql, /to anon, authenticated/);
-  assert.match(sql, /using \(false\)/);
-  assert.match(sql, /with check \(false\)/);
+
+  assert.match(
+    sql,
+    /execute format\('drop policy if exists %i_external_deny on public\.%i', table_name, table_name\)/,
+  );
+  assert.match(
+    sql,
+    /'create policy %i_external_deny on public\.%i for all to anon, authenticated using \(false\) with check \(false\)'/,
+  );
 });
 
 test("owner LMS foreign-key access paths are indexed for delete, join, and session workflows", () => {
