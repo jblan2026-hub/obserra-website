@@ -23,23 +23,25 @@ async function source(name) {
   return readFile(files[name], "utf8");
 }
 
-test("AAL2 owner test session is authenticated, release-bound, and preserves dependency outages as retriable", async () => {
+test("AAL2 owner test session is authenticated, preview-capable, release-bound, and fail closed", async () => {
   assert.equal(existsSync(files.ownerSession), true, "owner test session boundary must exist");
-  const [ownerSession, productionValidation] = await Promise.all([
-    source("ownerSession"),
-    source("productionValidation"),
-  ]);
-  assert.match(ownerSession, /requireFloridaClassDProductionOwnerPrincipal/);
-  assert.match(ownerSession, /FloridaClassDProductionOwnerAuthorizationError/);
-  assert.match(ownerSession, /error\.status === 503/);
+  const ownerSession = await source("ownerSession");
+  assert.match(ownerSession, /getInternalOwnerAuthority/);
+  assert.doesNotMatch(ownerSession, /requireFloridaClassDProductionOwnerPrincipal/);
+  assert.match(ownerSession, /ALLOWED_OWNER_TEST_ENVIRONMENTS/);
+  assert.match(ownerSession, /"preview", "production"/);
+  assert.match(ownerSession, /authority\.status === "unavailable"/);
+  assert.match(ownerSession, /authority\.status !== "ready"/);
+  assert.match(ownerSession, /authority\.internalIdentityAuthorized/);
+  assert.match(ownerSession, /authority\.emailVerified/);
+  assert.match(ownerSession, /authority\.protectedReadiness\.ready/);
+  assert.match(ownerSession, /roles\.includes\("owner"\)/);
+  assert.match(ownerSession, /assuranceLevel !== "aal2"/);
   assert.match(ownerSession, /FDACS_OWNER_TEST_AUTHORITY_UNAVAILABLE/);
   assert.match(ownerSession, /FDACS_OWNER_TEST_AAL2_REQUIRED/);
   assert.match(ownerSession, /VERCEL_GIT_COMMIT_SHA/);
   assert.match(ownerSession, /releaseCommitSha/);
   assert.doesNotMatch(ownerSession, /PRODUCTION_OWNER_VALIDATION_AUTHORIZED|OWNER_PREVIEW_ENABLED/);
-  assert.match(productionValidation, /class FloridaClassDProductionOwnerAuthorizationError/);
-  assert.match(productionValidation, /authority\.status === "unavailable"/);
-  assert.match(productionValidation, /FDACS_PRODUCTION_OWNER_AUTHORITY_UNAVAILABLE/);
 });
 
 test("owner provider test mutations are same-origin admitted and authenticated inside their routes", async () => {
