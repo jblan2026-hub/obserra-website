@@ -5,6 +5,7 @@ on:
     branches:
       - release/fdacs-lms-production-20260817
       - hotfix/fdacs-*
+      - hotfix/owner-lms-test-access-20260817
     paths:
       - .github/legal-identity-refresh.trigger
 
