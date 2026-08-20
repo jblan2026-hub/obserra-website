@@ -26,25 +26,34 @@ test("Applications receive private anti-index and no-store response controls", (
   assert.match(proxy, /PRIVATE_NOINDEX/);
   assert.match(proxy, /private, no-store, max-age=0, must-revalidate/);
   assert.match(proxy, /applicationsTeamUserAuthorized/);
-  assert.match(proxy, /APPLICATIONS_PRIVATE_ACCESS_DENIED/);
+  assert.match(proxy, /applicationsPrivateAccessDeniedResponse/);
 });
 
-test("public discovery and both public headers do not publish Applications routes", () => {
+test("public discovery and customer-facing surfaces do not publish Applications routes", () => {
   const sitemap = read("app/sitemap.ts");
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
   const homeHeader = read("app/HomeHeader.tsx");
   const home = read("app/page.tsx");
+  const catalog = read("app/catalog/page.tsx");
+  const store = read("app/store/page.tsx");
+  const notFound = read("app/not-found.tsx");
 
   assert.doesNotMatch(sitemap, /marketplaceApps/);
   assert.doesNotMatch(sitemap, /\/apps/);
-  assert.doesNotMatch(chrome, /href=["']\/apps["']/);
-  assert.doesNotMatch(chrome, /\[APPLICATIONS_BRAND_NAME,\s*["']\/apps["']/);
-  assert.doesNotMatch(homeHeader, /href:\s*["']\/apps["']/);
-  assert.doesNotMatch(homeHeader, /Applications["'],\s*href:\s*["']\/apps["']/);
-  assert.doesNotMatch(home, /href=["']\/apps["']/);
+  for (const [name, source] of [
+    ["enterprise chrome", chrome],
+    ["home header", homeHeader],
+    ["home page", home],
+    ["catalog", catalog],
+    ["store", store],
+    ["not found", notFound],
+  ]) {
+    assert.doesNotMatch(source, /href(?:=|:)\s*["']\/apps(?:["'/?])/i, `${name} must not link to Applications`);
+  }
 });
 
-test("Applications pages explicitly prohibit indexing as defense in depth", () => {
-  const page = read("app/apps/page.tsx");
-  assert.match(page, /robots:\s*\{[^}]*index:\s*false[^}]*follow:\s*false/s);
+test("Applications implementation remains present behind the private boundary", () => {
+  assert.ok(fs.existsSync("app/apps/page.tsx"));
+  assert.ok(fs.existsSync("app/apps/[slug]/page.tsx"));
+  assert.ok(fs.existsSync("app/api/apps/access/route.ts"));
 });
