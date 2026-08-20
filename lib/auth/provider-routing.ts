@@ -28,7 +28,6 @@ type IdentityProviderRequest = {
 
 const CLERK_PUBLIC_PREFIXES = ["/__clerk", "/owner-access"] as const;
 const CLERK_PROTECTED_PREFIXES = [
-  "/apps",
   "/api/apps",
   "/command-center",
   "/api/owner",

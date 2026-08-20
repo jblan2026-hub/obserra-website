@@ -19,16 +19,24 @@ function routingModule() {
   return module.exports;
 }
 
-test("Applications and Clerk infrastructure remain Clerk-owned", () => {
+test("public Applications storefront is public while Clerk infrastructure and protected operations remain Clerk-owned", () => {
   const { identityProviderForRequest } = routingModule();
   assert.equal(typeof identityProviderForRequest, "function");
 
   for (const pathname of [
-    "/__clerk",
-    "/__clerk/v1/client",
     "/apps",
     "/apps/obserra-eios",
     "/apps/obserra-eios/subscribe",
+  ]) {
+    const ownership = identityProviderForRequest({ pathname, method: "GET" });
+    assert.equal(ownership.provider, "public", pathname);
+    assert.equal(ownership.requiresAuthentication, false, pathname);
+    assert.equal(ownership.accessPolicy, "public", pathname);
+  }
+
+  for (const pathname of [
+    "/__clerk",
+    "/__clerk/v1/client",
     "/api/apps",
     "/api/apps/access",
     "/api/apps/billing-portal",
@@ -41,7 +49,12 @@ test("Applications and Clerk infrastructure remain Clerk-owned", () => {
     "/portal/orders",
     "/portal/success",
   ]) {
-    assert.equal(identityProviderForRequest({ pathname }).provider, "clerk", pathname);
+    const ownership = identityProviderForRequest({ pathname, method: "GET" });
+    assert.equal(ownership.provider, "clerk", pathname);
+    if (!pathname.startsWith("/__clerk")) {
+      assert.equal(ownership.requiresAuthentication, true, pathname);
+      assert.equal(ownership.accessPolicy, "applications_clerk", pathname);
+    }
   }
 });
 
