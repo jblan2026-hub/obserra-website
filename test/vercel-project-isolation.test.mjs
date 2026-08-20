@@ -89,8 +89,8 @@ test("unknown Vercel project IDs fail open instead of suppressing releases", () 
   }
 });
 
-test("repository config does not assign canonical custom domains to every connected Vercel project", () => {
+test("repository config assigns only the two canonical custom domains after duplicate builds are suppressed", () => {
   const config = JSON.parse(fs.readFileSync(VERCEL_CONFIG, "utf8"));
   assert.equal(config.ignoreCommand, "sh scripts/vercel-ignore-build.sh");
-  assert.equal(Object.hasOwn(config, "alias"), false, "custom domains must be owned in canonical Vercel Project Settings, not shared vercel.json aliases");
+  assert.deepEqual(config.alias, ["www.obserrallc.com", "obserrallc.com"]);
 });
