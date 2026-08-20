@@ -1,3 +1,3 @@
-refresh-request: 2026-08-20-pr156-evidence-remediation
-reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence from exact PR 156 head 2ef8f396bdef01019f60d7a8c77f82b0330029ae after the private Applications pre-filesystem boundary change while preserving payment, entitlement, identity implementation, Applications business logic, and regulated Florida Class D LMS business logic unchanged
-validation-request: 2026-08-20-pr156-governed-remediation-cycle-1
+refresh-request: 2026-08-20-canonical-vercel-alias-cutover
+reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence after assigning exactly www.obserrallc.com and obserrallc.com through vercel.json while preserving canonical-project-only build authority; canonical project prj_lxTKKDa9sbhht7FaigiaF1PONMiC always builds, duplicate project prj_FfAnssVJU8pcJydGNJHmCliP6Yme always skips, and application, payment, entitlement, identity, Applications implementation, and regulated LMS business logic remain unchanged
+validation-request: 2026-08-20-exact-governed-hotfix-post-canonical-vercel-alias-cutover
