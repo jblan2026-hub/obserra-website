@@ -4,76 +4,67 @@ import test from "node:test";
 
 const read = (path) => fs.readFileSync(path, "utf8");
 
-test("Applications are intercepted before filesystem resolution", () => {
-  const config = read("next.config.ts");
+test("Applications storefront remains a public first-party website surface", () => {
+  const page = read("app/apps/page.tsx");
 
-  assert.match(config, /async\s+rewrites\s*\(\)/);
-  assert.match(config, /beforeFiles\s*:/);
-  assert.match(config, /source:\s*["']\/apps\/:path\*["']/);
-  assert.match(config, /destination:\s*["']\/private-applications-gateway\/:path\*["']/);
-  assert.match(config, /source:\s*["']\/apps\/:path\*["'][\s\S]*headers:\s*protectedRouteHeaders/);
-  assert.match(config, /noindex, nofollow, noarchive, nosnippet, noimageindex/);
-  assert.match(config, /private, no-store, max-age=0, must-revalidate/);
+  assert.match(page, /Applications \| Obserra Enterprise Marketplace/);
+  assert.match(page, /alternates:\s*\{\s*canonical:\s*["']\/apps["']/);
+  assert.match(page, /AppsMarketplaceClient/);
+  assert.match(page, /SoftwareApplication/);
 });
 
-test("Vercel custom routes intercept Applications before filesystem resolution", () => {
+test("Next routing does not rewrite the public Applications storefront to a private gateway", () => {
+  const config = read("next.config.ts");
+
+  assert.doesNotMatch(
+    config,
+    /source:\s*["']\/apps\/:path\*["'][\s\S]{0,300}destination:\s*["']\/private-applications-gateway\/:path\*["']/,
+  );
+  assert.doesNotMatch(
+    config,
+    /source:\s*["']\/apps\/:path\*["'][\s\S]{0,200}headers:\s*protectedRouteHeaders/,
+  );
+});
+
+test("Vercel routing leaves the public Applications storefront to Next.js", () => {
   const config = JSON.parse(read("vercel.json"));
   const routes = Array.isArray(config.routes) ? config.routes : [];
 
-  assert.deepEqual(
-    routes.slice(0, 2),
-    [
-      { src: "/apps", dest: "/private-applications-gateway" },
-      { src: "/apps/(.*)", dest: "/private-applications-gateway/$1" },
-    ],
-    "the first Vercel routes must intercept the exact /apps root and nested Applications paths before filesystem resolution",
-  );
   assert.equal(
-    Object.prototype.hasOwnProperty.call(config, "rewrites"),
+    routes.some((route) => route?.src === "/apps" || route?.src === "/apps/(.*)"),
     false,
-    "the Applications privacy boundary must not depend on the higher-level Vercel rewrites phase",
+    "vercel.json must not intercept public /apps routes before the Next.js storefront",
   );
 });
 
-test("root Applications route is dynamic so Vercel cannot expose the /apps directory", () => {
-  const rootPage = read("app/apps/page.tsx");
-
-  assert.match(rootPage, /export\s+const\s+dynamic\s*=\s*["']force-dynamic["']/);
-  assert.match(rootPage, /export\s+const\s+revalidate\s*=\s*0/);
-});
-
-test("private gateway preserves the real Applications route family for authorized team members", () => {
-  const gateway = read("app/private-applications-gateway/[[...path]]/page.tsx");
-
-  assert.match(gateway, /applicationsTeamUserAuthorized/);
-  assert.match(gateway, /notFound\(\)/);
-  assert.doesNotMatch(
-    gateway,
-    /redirect\(["']\/portal\/applications["']\)/,
-    "authorized Apps traffic must not collapse every /apps route into the portal dashboard",
-  );
-  assert.match(gateway, /AppsPage/);
-  assert.match(gateway, /AppDetailPage/);
-  assert.match(gateway, /SubscribePage/);
-});
-
-test("public Apps metadata is suppressed at the private gateway boundary", () => {
-  const gateway = read("app/private-applications-gateway/[[...path]]/page.tsx");
-  assert.match(gateway, /index:\s*false/);
-  assert.match(gateway, /follow:\s*false/);
-  assert.match(gateway, /nocache:\s*true/);
-  assert.match(gateway, /noimageindex:\s*true/);
-});
-
-test("proxy remains a fail-closed authorization boundary for Applications", () => {
+test("proxy protects Applications operations without classifying the public storefront as private", () => {
   const proxy = read("proxy.ts");
-  assert.match(proxy, /APPLICATIONS_PRIVATE_PATH_PREFIXES\s*=\s*\["\/apps",\s*"\/api\/apps"\]/);
+
+  assert.match(proxy, /APPLICATIONS_PRIVATE_PATH_PREFIXES\s*=\s*\["\/api\/apps"\]/);
+  assert.doesNotMatch(proxy, /APPLICATIONS_PRIVATE_PATH_PREFIXES\s*=\s*\[[^\]]*"\/apps"/);
+  assert.doesNotMatch(proxy, /PROTECTED_PATH_PREFIXES\s*=\s*\[[\s\S]*?\n\s*"\/apps",/);
   assert.match(proxy, /applicationsTeamUserAuthorized/);
   assert.match(proxy, /applicationsPrivateAccessDeniedResponse/);
-  assert.match(proxy, /status:\s*404/);
 });
 
-test("privacy controls preserve the frozen Applications implementation except the approved root runtime directives", () => {
+test("operational Applications endpoints retain server-side authentication and entitlement controls", () => {
+  for (const route of [
+    "app/api/apps/access/route.ts",
+    "app/api/apps/billing-portal/route.ts",
+    "app/api/apps/checkout/route.ts",
+    "app/api/apps/download/route.ts",
+    "app/api/apps/license/route.ts",
+  ]) {
+    const source = read(route);
+    assert.match(source, /await\s+auth\(\)/, `${route} must authenticate on the server`);
+  }
+
+  const portal = read("app/portal/applications/page.tsx");
+  assert.match(portal, /await\s+auth\(\)/);
+  assert.match(portal, /redirect\(["']\/sign-in\?redirect_url=\/portal\/applications["']\)/);
+});
+
+test("legacy Applications implementation remains byte-for-byte governed", () => {
   const legacyNonRegression = read("test/supabase-auth-applications-nonregression.test.mjs");
   assert.match(
     legacyNonRegression,
