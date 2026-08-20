@@ -1,0 +1,76 @@
+name: PR168 CMMC Remediation
+
+on:
+  push:
+    branches:
+      - ci/pr168-cmmc-remediation-20260820
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      TARGET_BRANCH: docs/postmerge-handoff-20260820
+      EXPECTED_HEAD: 799ff3866471e8655069b8f8e0224fa40b75581c
+      CI: "true"
+    steps:
+      - name: Checkout exact target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+
+      - name: Require exact PR head
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EXPECTED_HEAD" || {
+            echo "Refusing remediation: expected $EXPECTED_HEAD, found $actual" >&2
+            exit 1
+          }
+          test -z "$(git status --porcelain)"
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Generate exact CMMC system evidence
+        run: npm run generate:cmmc-system-evidence
+
+      - name: Verify generated CMMC contract
+        run: npm run verify:cmmc-system-evidence
+
+      - name: Enforce generated-file allowlist
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          mapfile -t changed < <(git diff --name-only | sort)
+          printf '%s\n' "${changed[@]}"
+          test "${#changed[@]}" -eq 3
+          test "${changed[0]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.json"
+          test "${changed[1]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.md"
+          test "${changed[2]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256"
+
+      - name: Commit and push remediation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          git commit -m "docs(compliance): refresh CMMC evidence for handoff"
+          git push origin "HEAD:${TARGET_BRANCH}"
