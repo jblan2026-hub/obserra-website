@@ -1,6 +1,5 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse, type NextFetchEvent, type NextMiddleware, type NextRequest } from "next/server";
-import { applicationsTeamUserAuthorized } from "./lib/applications-team-access";
 import { identityFromVerifiedClaims } from "./lib/auth/claims";
 import { getInternalOwnerAuthorityFromProxyContext } from "./lib/auth/authority-repository";
 import { evaluateInternalOwnerAuthorization } from "./lib/auth/identity-governance";
@@ -23,9 +22,7 @@ const OWNER_PATH_PREFIXES = [
   "/owner-access",
   "/api/owner",
 ] as const;
-const APPLICATIONS_PRIVATE_PATH_PREFIXES = ["/apps", "/api/apps"] as const;
 const PROTECTED_PATH_PREFIXES = [
-  "/apps",
   "/api/apps",
   "/admin",
   "/portal",
@@ -80,10 +77,6 @@ function isOwnerPath(pathname: string) {
   return OWNER_PATH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix));
 }
 
-function isPrivateApplicationsPath(pathname: string) {
-  return APPLICATIONS_PRIVATE_PATH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix));
-}
-
 function requiresAuthentication(request: NextRequest) {
   const pathname = new URL(request.url).pathname;
   return PROTECTED_PATH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix));
@@ -106,14 +99,14 @@ function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest)
   const pathname = new URL(request.url).pathname;
   const host = requestHost(request);
   const isPreviewHost = Boolean(host && host.endsWith(".vercel.app"));
-  const privateApplicationsPath = isPrivateApplicationsPath(pathname);
+  const privateApplicationsOperation = pathMatchesPrefix(pathname, "/api/apps");
   const ownerPath = isOwnerPath(pathname);
 
   if (process.env.VERCEL_ENV !== "production" && isPreviewHost) {
     response.headers.set("X-Robots-Tag", PREVIEW_NOINDEX);
   }
 
-  if (ownerPath || privateApplicationsPath) {
+  if (ownerPath || privateApplicationsOperation) {
     response.headers.set("X-Robots-Tag", PRIVATE_NOINDEX);
     response.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
     response.headers.set("Pragma", "no-cache");
@@ -139,26 +132,6 @@ function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest)
   }
 
   return response;
-}
-
-function applicationsPrivateAccessDeniedResponse(request: NextRequest) {
-  return applyRouteSecurityHeaders(
-    NextResponse.json(
-      { error: "Not found.", code: "NOT_FOUND" },
-      {
-        status: 404,
-        headers: {
-          "cache-control": "private, no-store, max-age=0, must-revalidate",
-          pragma: "no-cache",
-          expires: "0",
-          "x-content-type-options": "nosniff",
-          "x-frame-options": "DENY",
-          "referrer-policy": "no-referrer",
-        },
-      },
-    ),
-    request,
-  );
 }
 
 function temporarilyDisableOwnerReviewRoute(request: NextRequest) {
@@ -308,9 +281,6 @@ function redirectToSignIn(request: NextRequest) {
 
 function identityConfigurationResponse(request: NextRequest) {
   const url = new URL(request.url);
-  if (isPrivateApplicationsPath(url.pathname)) {
-    return applicationsPrivateAccessDeniedResponse(request);
-  }
   if (pathMatchesPrefix(url.pathname, "/owner-access")) {
     const response = applyRouteSecurityHeaders(NextResponse.next(), request);
     response.headers.set("X-Obserra-Identity-Status", "configuration-required");
@@ -490,12 +460,7 @@ function getConfiguredClerkHandler(): NextMiddleware {
   configuredClerkHandler = clerkMiddleware(async (auth, request) => {
     const pathname = new URL(request.url).pathname;
 
-    if (isPrivateApplicationsPath(pathname)) {
-      const { userId } = await auth();
-      if (!applicationsTeamUserAuthorized(userId)) {
-        return applicationsPrivateAccessDeniedResponse(request);
-      }
-    } else if (requiresAuthentication(request)) {
+    if (requiresAuthentication(request)) {
       const { userId } = await auth();
       if (!userId) {
         const response = pathMatchesPrefix(pathname, "/command-center")
