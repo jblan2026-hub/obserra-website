@@ -1,0 +1,48 @@
+name: Applications Private Boundary Gate
+
+on:
+  pull_request:
+    paths:
+      - "app/apps/**"
+      - "app/private-applications-gateway/**"
+      - "lib/applications-team-access.ts"
+      - "next.config.ts"
+      - "proxy.ts"
+      - "test/applications-*.test.mjs"
+      - ".github/workflows/applications-private-boundary-gate.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: applications-private-boundary-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  routing-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout website
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Configure Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install supported npm major
+        run: |
+          npm install --global npm@11 --no-audit --no-fund
+          test "$(npm --version | cut -d. -f1)" = "11"
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify lockfile remains immutable
+        run: git diff --exit-code -- package-lock.json
+
+      - name: Run Applications private-boundary regression contract
+        run: node --test test/applications-before-filesystem-routing-contract.test.mjs

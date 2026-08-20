@@ -5,23 +5,15 @@ import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
   title: "Store",
-  description: `Purchase ${LEGAL_ENTITY_NAME} applications, courses, subscriptions, advisory services, and enterprise offerings through one secure commercial storefront.`,
+  description: `Purchase ${LEGAL_ENTITY_NAME} courses, advisory services, and enterprise offerings through one secure commercial storefront.`,
   alternates: { canonical: "/store" },
 };
 
 const categories = [
   {
-    eyebrow: "APPLICATIONS",
-    title: "Enterprise software and SaaS",
-    copy: `Subscribe to ${LEGAL_ENTITY_NAME} applications, launch entitled SaaS services, retrieve subscription-bound keys, and download approved releases.`,
-    href: "/apps",
-    action: "Browse applications",
-    status: "Stripe subscriptions",
-  },
-  {
     eyebrow: "ACADEMY",
     title: "Professional courses and completion records",
-    copy: "Evaluate cybersecurity, leadership, governance, intelligence, and executive education through Obserra Academy.",
+    copy: "Evaluate cybersecurity, leadership, governance, intelligence, and executive education through Obserra EPI Academy.",
     href: "/academy",
     action: "Browse courses",
     status: "Secure checkout",
@@ -46,9 +38,9 @@ const categories = [
 
 const commerceControls = [
   ["Secure payments", `Stripe-hosted checkout keeps payment-card data outside ${LEGAL_ENTITY_NAME} application code.`],
-  ["Subscription enforcement", "Application access is revalidated and denied automatically when billing is inactive."],
-  ["Protected delivery", "Approved software releases use authenticated entitlement checks and short-lived signed URLs."],
-  ["Customer fulfillment", "Purchases route to the protected portal for launch, licensing, downloads, billing, and support."],
+  ["Controlled access", "Protected services and learning access are revalidated against the applicable entitlement and identity controls."],
+  ["Protected delivery", "Approved digital delivery uses authenticated entitlement checks and controlled release paths."],
+  ["Customer fulfillment", "Purchases route to the protected portal for access, billing, records, and support."],
 ];
 
 const primaryButton = "inline-flex min-h-12 items-center justify-center rounded-lg bg-[#f4ba55] px-4 py-3 text-center text-sm font-black text-[#082033] transition hover:bg-[#ffd17a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4ba55] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03101d]";
@@ -65,7 +57,6 @@ export default function StorePage() {
         </Link>
         <nav className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center md:gap-3.5" aria-label="Store navigation">
           {[
-            ["Applications", "/apps"],
             ["Courses", "/academy"],
             ["Services", "/services"],
             ["Customer portal", "/portal"],
@@ -81,27 +72,26 @@ export default function StorePage() {
       <section className="grid gap-6 bg-[radial-gradient(circle_at_88%_12%,#1e648b4a,transparent_34%)] px-4 pb-7 pt-11 md:px-[max(5vw,24px)] md:pb-10 md:pt-[72px] xl:grid-cols-[minmax(0,1fr)_minmax(260px,.45fr)]">
         <div>
           <p className={eyebrow}>{LEGAL_ENTITY_NAME} COMMERCIAL PLATFORM</p>
-          <h1 className="mt-3 max-w-[1050px] text-[clamp(36px,11vw,52px)] font-black leading-[0.98] tracking-[-0.05em] md:text-[clamp(40px,5vw,72px)]">Applications, courses, subscriptions, and executive services in one secure store.</h1>
-          <p className="max-w-4xl text-[17px] leading-[1.65] text-[#b8d5e6]">Choose the offering that fits your organization, complete secure checkout where available, and manage access through the {LEGAL_ENTITY_NAME} customer portal.</p>
+          <h1 className="mt-3 max-w-[1050px] text-[clamp(36px,11vw,52px)] font-black leading-[0.98] tracking-[-0.05em] md:text-[clamp(40px,5vw,72px)]">Courses, executive services, and enterprise engagements in one secure store.</h1>
+          <p className="max-w-4xl text-[17px] leading-[1.65] text-[#b8d5e6]">Choose the offering that fits your organization, complete secure checkout where available, and manage protected access through the {LEGAL_ENTITY_NAME} customer portal.</p>
           <div className="mt-5 grid gap-3 sm:flex sm:flex-wrap">
-            <Link className={primaryButton} href="/apps">Shop applications</Link>
-            <Link className={secondaryButton} href="/academy">Shop courses</Link>
+            <Link className={primaryButton} href="/academy">Shop courses</Link>
+            <Link className={secondaryButton} href="/services">Explore services</Link>
             <Link className={secondaryButton} href="/contact?interest=enterprise-commerce">Request enterprise pricing</Link>
           </div>
         </div>
         <aside className="self-start rounded-2xl border border-[#6db8d833] bg-[#082a45] p-5 shadow-2xl">
           <span className={eyebrow}>COMMERCE MODEL</span>
-          <strong className="my-2 block text-xl">Secure, entitlement-based, and expandable</strong>
-          <p className="m-0 leading-[1.65] text-[#b8d5e6]">Applications, education, and services use the correct purchase or engagement pathway without exposing unverified pricing, inventory, or customer data.</p>
+          <strong className="my-2 block text-xl">Secure, controlled, and expandable</strong>
+          <p className="m-0 leading-[1.65] text-[#b8d5e6]">Education and services use the correct purchase or engagement pathway without exposing unverified pricing, inventory, or customer data.</p>
         </aside>
       </section>
 
-      <section className="grid gap-3 px-4 pb-6 sm:grid-cols-2 md:px-[max(5vw,24px)] xl:grid-cols-4" aria-label="Store capabilities">
+      <section className="grid gap-3 px-4 pb-6 sm:grid-cols-2 md:px-[max(5vw,24px)] xl:grid-cols-3" aria-label="Store capabilities">
         {[
-          ["APPLICATIONS", "Subscriptions", "SaaS, private cloud, hybrid, and on-premises options"],
           ["COURSES", "Enrollment", "Professional learning and course-completion pathways"],
           ["SERVICES", "Proposals", "Advisory, protection, and enterprise engagements"],
-          ["FULFILLMENT", "Protected", "Portal access, licensing, downloads, and billing"],
+          ["FULFILLMENT", "Protected", "Portal access, billing, records, and support"],
         ].map(([label, value, copy]) => (
           <article key={label} className="rounded-[14px] border border-[#6db8d833] bg-[#08243c] p-[18px]">
             <span className={eyebrow}>{label}</span>
@@ -114,9 +104,9 @@ export default function StorePage() {
       <section className="px-4 py-8 md:px-[max(5vw,24px)]">
         <div className="grid items-end gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(260px,.55fr)]">
           <div><p className={eyebrow}>SHOP BY OFFERING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Start with one capability and expand across the {LEGAL_ENTITY_NAME} platform.</h2></div>
-          <p className="m-0 text-[17px] leading-[1.65] text-[#b8d5e6]">Each category routes to its production purchase, enrollment, subscription, or consultation workflow.</p>
+          <p className="m-0 text-[17px] leading-[1.65] text-[#b8d5e6]">Each category routes to its production purchase, enrollment, or consultation workflow.</p>
         </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {categories.map((category) => (
             <article key={category.title} className="flex min-h-0 flex-col rounded-[14px] border border-[#6db8d833] bg-[linear-gradient(150deg,#0d3556,#071e33)] p-5 shadow-xl xl:min-h-[300px]">
               <div className="flex items-start justify-between gap-3"><span className={eyebrow}>{category.eyebrow}</span><small className="text-right text-[#9edfff]">{category.status}</small></div>
@@ -131,7 +121,7 @@ export default function StorePage() {
       <section className="border-y border-[#6db8d833] bg-[#05182a] px-4 py-8 md:px-[max(5vw,24px)]">
         <div className="grid items-end gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(260px,.55fr)]">
           <div><p className={eyebrow}>SECURE COMMERCE</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Commercial controls built for trusted customer transactions.</h2></div>
-          <p className="m-0 text-[17px] leading-[1.65] text-[#b8d5e6]">Payment, subscription, fulfillment, and delivery controls remain fail closed when required services are not configured.</p>
+          <p className="m-0 text-[17px] leading-[1.65] text-[#b8d5e6]">Payment, enrollment, fulfillment, and delivery controls remain fail closed when required services are not configured.</p>
         </div>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {commerceControls.map(([title, copy]) => <article key={title} className="rounded-[14px] border border-[#6db8d833] bg-[#08243c] p-[18px]"><h3 className="text-[23px] font-black tracking-[-0.03em]">{title}</h3><p className="m-0 leading-[1.55] text-[#b8d5e6]">{copy}</p></article>)}
@@ -139,7 +129,7 @@ export default function StorePage() {
       </section>
 
       <section className="grid items-center gap-6 bg-[radial-gradient(circle_at_90%_10%,#1e648b3d,transparent_35%),#06192a] px-4 py-10 md:px-[max(5vw,24px)] xl:grid-cols-[minmax(0,1fr)_auto]">
-        <div><p className={eyebrow}>ENTERPRISE PURCHASING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Need bundled applications, team training, deployment support, or a custom agreement?</h2><p className="text-[17px] leading-[1.65] text-[#b8d5e6]">{LEGAL_ENTITY_NAME} can coordinate enterprise pricing, procurement documentation, implementation planning, and controlled deployment.</p></div>
+        <div><p className={eyebrow}>ENTERPRISE PURCHASING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Need team training, deployment support, or a custom agreement?</h2><p className="text-[17px] leading-[1.65] text-[#b8d5e6]">{LEGAL_ENTITY_NAME} can coordinate enterprise pricing, procurement documentation, implementation planning, and controlled delivery.</p></div>
         <div className="grid gap-3 sm:flex sm:flex-wrap xl:justify-end"><Link className={primaryButton} href="/contact?interest=enterprise-commerce">Contact enterprise sales</Link><Link className={secondaryButton} href="/portal">Open customer portal</Link></div>
       </section>
     </main>
