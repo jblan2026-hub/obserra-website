@@ -1,166 +1,102 @@
-name: Governed Applications Public Lockdown
+name: Application Release Validation
 
 on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - agent/sitewide-governance-auto-academy
+    paths:
+      - "app/apps/**"
+      - "app/api/apps/**"
+      - "app/portal/applications/**"
+      - "lib/release-delivery.ts"
+      - "scripts/application-market-brain.mjs"
+      - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/validate-application-staging.mjs"
+      - "scripts/sync-final-apps.mjs"
+      - "config/application-market-intelligence-policy.json"
+      - "config/application-production-policy.json"
+      - "config/application-worker-scaling-policy.json"
+      - "config/site-workflow-operations-policy.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/application-release-validation.yml"
   push:
     branches:
-      - fix/production-authority-reconciliation-20260819
+      - agent/application-production-pipeline
+    paths:
+      - "app/apps/**"
+      - "app/api/apps/**"
+      - "app/portal/applications/**"
+      - "lib/release-delivery.ts"
+      - "scripts/application-market-brain.mjs"
+      - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/validate-application-staging.mjs"
+      - "scripts/sync-final-apps.mjs"
+      - "config/application-market-intelligence-policy.json"
+      - "config/application-production-policy.json"
+      - "config/application-worker-scaling-policy.json"
+      - "config/site-workflow-operations-policy.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/application-release-validation.yml"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: governed-applications-public-lockdown-${{ github.ref }}
-  cancel-in-progress: false
+  group: application-release-validation-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  lockdown:
-    if: github.actor != 'github-actions[bot]'
+  release-validation:
+    name: Validate governed application release staging
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-          fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Apply exact public lockdown and defense-in-depth controls
+      - name: Install supported npm major
         run: |
-          node - <<'NODE'
-          const fs = require('fs');
-          const { execFileSync } = require('child_process');
-
-          function read(path) { return fs.readFileSync(path, 'utf8'); }
-          function write(path, value) { fs.writeFileSync(path, value); }
-          function replaceOnce(path, before, after) {
-            const source = read(path);
-            const count = source.split(before).length - 1;
-            if (count !== 1) throw new Error(`${path}: expected exactly one literal replacement, found ${count}: ${before.slice(0, 120)}`);
-            write(path, source.replace(before, after));
-          }
-          function replaceRegexOnce(path, regex, after) {
-            const source = read(path);
-            const flags = regex.flags.includes('g') ? regex.flags : `${regex.flags}g`;
-            const matches = [...source.matchAll(new RegExp(regex.source, flags))];
-            if (matches.length !== 1) throw new Error(`${path}: expected exactly one regex replacement, found ${matches.length}: ${regex}`);
-            write(path, source.replace(regex, after));
-          }
-          function removeOnce(path, text) { replaceOnce(path, text, ''); }
-
-          replaceOnce(
-            'proxy.ts',
-            'const APPLICATIONS_PRIVATE_PATH_PREFIXES = ["/apps", "/api/apps"] as const;',
-            `const APPLICATIONS_PRIVATE_PATH_PREFIXES = [\n  "/apps",\n  "/api/apps",\n  "/portal/applications",\n  "/portal/enterprise",\n  "/portal/licenses",\n  "/portal/orders",\n  "/portal/success",\n] as const;`,
-          );
-
-          removeOnce('app/components/enterprise/EnterpriseChrome.tsx', '  [APPLICATIONS_BRAND_NAME, "/apps", "sales"],\n');
-          replaceOnce(
-            'app/components/enterprise/EnterpriseChrome.tsx',
-            '      <nav aria-label="Enterprise capabilities"><strong>Capabilities</strong><Link href="/apps">{APPLICATIONS_BRAND_NAME}</Link><Link href="/academy">{ACADEMY_BRAND_NAME}</Link><Link href="/services">Enterprise services</Link><Link href="/protection-intelligence">Protection and intelligence</Link><Link href="/eios">{EIOS_BRAND_NAME}</Link></nav>',
-            '      <nav aria-label="Enterprise capabilities"><strong>Capabilities</strong><Link href="/academy">{ACADEMY_BRAND_NAME}</Link><Link href="/services">Enterprise services</Link><Link href="/protection-intelligence">Protection and intelligence</Link><Link href="/eios">{EIOS_BRAND_NAME}</Link></nav>',
-          );
-
-          removeOnce('app/sitemap.ts', 'import { marketplaceApps } from "./apps/appsData";\n');
-          removeOnce('app/sitemap.ts', '    { url: `${siteUrl}/apps`, lastModified, changeFrequency: "weekly", priority: 0.9 },\n');
-          removeOnce('app/sitemap.ts', '    ...marketplaceApps.map((entry) => ({ url: `${siteUrl}/apps/${entry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.75 })),\n');
-
-          removeOnce('app/page.tsx', '  APPLICATIONS_BRAND_NAME,\n');
-          replaceOnce('app/page.tsx', 'secure technology, enterprise applications, and professional learning', 'secure technology and professional learning');
-          replaceOnce('app/page.tsx', 'governance, secure applications, and professional learning', 'governance, secure technology, and professional learning');
-          replaceOnce('app/page.tsx', '<h2 id="direct-sales-heading">Applications and Academy are direct website destinations.</h2>', '<h2 id="direct-sales-heading">{ACADEMY_BRAND_NAME} is a direct website destination.</h2>');
-          replaceOnce('app/page.tsx', '<p>Move directly to secure applications or governed learning. Each destination preserves its own purchase, access, approval, and release controls.</p>', '<p>Move directly to governed professional learning while protected technology environments remain restricted to explicitly authorized teams.</p>');
-          removeOnce('app/page.tsx', '              <ButtonLink href="/apps">Shop {APPLICATIONS_BRAND_NAME}</ButtonLink>\n');
-          replaceRegexOnce('app/page.tsx', /            <Link href="\/apps" className="mission-direct-sales__card">[\s\S]*?            <\/Link>\n/, '');
-          removeOnce('app/page.tsx', '          <Link href="/apps"><strong>{APPLICATIONS_BRAND_NAME}</strong><span>Secure software built for executive and operational use.</span></Link>\n');
-          removeOnce('app/page.tsx', '            <Link href="/apps"><span><strong>{APPLICATIONS_BRAND_NAME}</strong><span>Commercial software with product-specific purchase and access controls.</span></span><b>Open →</b></Link>\n');
-          replaceOnce('app/page.tsx', '              Engage {LEGAL_ENTITY_NAME} for executive advisory, protective intelligence, {EIOS_BRAND_NAME},\n              {" "}{APPLICATIONS_BRAND_NAME}, or {ACADEMY_BRAND_NAME} through one controlled enterprise conversation.', '              Engage {LEGAL_ENTITY_NAME} for executive advisory, protective intelligence, {EIOS_BRAND_NAME},\n              secure technology, or {ACADEMY_BRAND_NAME} through one controlled enterprise conversation.');
-
-          replaceOnce('app/catalog/page.tsx', '      `Direct-purchase training offers, proof assets, and clear next steps into ${LEGAL_ENTITY_NAME} services and applications.`', '      `Direct-purchase training offers, proof assets, and clear next steps into ${LEGAL_ENTITY_NAME} services and secure technology.`');
-          removeOnce('app/catalog/page.tsx', '          <a href="/apps">Applications</a>\n');
-          replaceOnce('app/catalog/page.tsx', '            Buy training here. Move consulting engagements to Services and software offerings to Apps.', '            Buy training here. Move consulting engagements to Services and secure technology evaluations to a controlled enterprise conversation.');
-          replaceRegexOnce(
-            'app/catalog/page.tsx',
-            /            <a className="catalog-route-card" href="\/apps">[\s\S]*?            <\/a>\n/,
-            `            <a className="catalog-route-card" href="/contact?interest=secure-technology">\n              <p>Secure technology</p>\n              <strong>Controlled product evaluation</strong>\n              <span>Request access, deployment, or technical evaluation through the responsible team.</span>\n            </a>\n`,
-          );
-
-          replaceOnce('app/store/page.tsx', '  description: `Purchase ${LEGAL_ENTITY_NAME} applications, courses, subscriptions, advisory services, and enterprise offerings through one secure commercial storefront.`,', '  description: `Purchase ${LEGAL_ENTITY_NAME} courses and coordinate advisory, protection, and enterprise offerings through one secure commercial storefront.`,');
-          replaceRegexOnce('app/store/page.tsx', /  \{\n    eyebrow: "APPLICATIONS",[\s\S]*?  \},\n  \{\n    eyebrow: "OBSERRA EPI ACADEMY",/, '  {\n    eyebrow: "OBSERRA EPI ACADEMY",');
-          removeOnce('app/store/page.tsx', '            ["Applications", "/apps"],\n');
-          replaceOnce('app/store/page.tsx', 'Applications, courses, subscriptions, and executive services in one secure store.', 'Courses, advisory services, protection, and enterprise engagements in one secure store.');
-          removeOnce('app/store/page.tsx', '            <Link className={primaryButton} href="/apps">Shop applications</Link>\n');
-          replaceOnce('app/store/page.tsx', 'Applications, education, and services use the correct purchase or engagement pathway without exposing unverified pricing, inventory, or customer data.', 'Education and services use the correct purchase or engagement pathway without exposing unverified pricing, inventory, or customer data.');
-          replaceOnce('app/store/page.tsx', '          ["APPLICATIONS", "Subscriptions", "SaaS, private cloud, hybrid, and on-premises options"],', '          ["ADVISORY", "Engagements", "Executive, cybersecurity, governance, and secure technology support"],');
-          replaceOnce('app/store/page.tsx', '        <div><p className={eyebrow}>ENTERPRISE PURCHASING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Need bundled applications, team training, deployment support, or a custom agreement?</h2>', '        <div><p className={eyebrow}>ENTERPRISE PURCHASING</p><h2 className="mt-2 text-[clamp(32px,4vw,50px)] font-black leading-none tracking-[-0.04em]">Need bundled services, team training, deployment support, or a custom agreement?</h2>');
-
-          replaceOnce('app/resources/page.tsx', '["Artificial Intelligence Governance", "Practical direction for governing enterprise artificial intelligence adoption, model use, accountability, risk, and human oversight.", "/apps/obserra-ai-governance-suite"],', '["Artificial Intelligence Governance", "Practical direction for governing enterprise artificial intelligence adoption, model use, accountability, risk, and human oversight.", "/services"],');
-          replaceOnce('app/resources/page.tsx', 'service, application, or training path', 'service, platform, or training path');
-
-          removeOnce('app/protection-intelligence/page.tsx', '          <a href="/apps">Applications</a>\n');
-
-          removeOnce('app/not-found.tsx', '  APPLICATIONS_BRAND_NAME,\n');
-          replaceOnce('app/not-found.tsx', '<article className="commercial-card"><span>Platform</span><h2>{APPLICATIONS_BRAND_NAME}</h2><p>Explore enterprise applications, {EIOS_BRAND_NAME}, governance, risk, assurance, and intelligence solutions.</p><Link href="/apps">View applications →</Link></article>', '<article className="commercial-card"><span>Platform</span><h2>{EIOS_BRAND_NAME}</h2><p>Explore executive intelligence, governance, risk, assurance, and decision-support capabilities.</p><Link href="/eios">Explore EIOS →</Link></article>');
-
-          replaceOnce('app/ObserraGuide.tsx', '      welcome: `Tell me what you are trying to accomplish and I will direct you to the most relevant ${LEGAL_ENTITY_NAME} service, application, training, or briefing.`,', '      welcome: `Tell me what you are trying to accomplish and I will direct you to the most relevant ${LEGAL_ENTITY_NAME} service, platform, training, or briefing.`,');
-          replaceOnce('app/ObserraGuide.tsx', '    welcome: `I can help you discover ${APPLICATIONS_BRAND_NAME}, ${ACADEMY_BRAND_NAME} training, ${EIOS_BRAND_NAME} capabilities, ${LEGAL_ENTITY_NAME} services, and the right next step for your organization.`,', '    welcome: `I can help you discover ${ACADEMY_BRAND_NAME} training, ${EIOS_BRAND_NAME} capabilities, ${LEGAL_ENTITY_NAME} services, and the right next step for your organization.`,');
-          replaceOnce('app/ObserraGuide.tsx', '    prompts: ["Explore applications", "Find professional training", "Review services", "Speak with an advisor"],', '    prompts: ["Explore EIOS", "Find professional training", "Review services", "Speak with an advisor"],');
-          replaceRegexOnce(
-            'app/ObserraGuide.tsx',
-            /  if \(\/app\|application\|software\|product\|demo\|pricing\/.test\(input\)\) \{[\s\S]*?  \}\n\n  if \(\/course\|academy\|training\|learn\|recommend\/.test\(input\)\) \{/,
-            `  if (/app|application|software|product|demo|pricing/.test(input)) {\n    return {\n      from: "guide",\n      text: `${LEGAL_ENTITY_NAME} keeps protected application environments restricted to authorized teams. I can help with ${EIOS_BRAND_NAME}, secure technology evaluation, or a controlled product briefing without exposing internal application routes.`,\n      actions: [\n        { href: "/eios", label: `Explore ${EIOS_BRAND_NAME}` },\n        { href: "/contact?interest=secure-technology", label: "Request product guidance" },\n      ],\n    };\n  }\n\n  if (/course|academy|training|learn|recommend/.test(input)) {`,
-          );
-          replaceOnce('app/ObserraGuide.tsx', '    text: `I am currently your ${context.label}. I can guide you to ${APPLICATIONS_BRAND_NAME}, a ${LEGAL_ENTITY_NAME} service, an ${ACADEMY_BRAND_NAME} course, an ${EIOS_BRAND_NAME} briefing, or a confidential consultation.`,', '    text: `I am currently your ${context.label}. I can guide you to a ${LEGAL_ENTITY_NAME} service, an ${ACADEMY_BRAND_NAME} course, an ${EIOS_BRAND_NAME} briefing, or a confidential consultation.`,');
-          removeOnce('app/ObserraGuide.tsx', '      { href: "/apps", label: APPLICATIONS_BRAND_NAME },\n');
-
-          replaceOnce('app/portal/page.tsx', '  description: `Access your protected ${LEGAL_ENTITY_NAME} customer workspace for Academy, applications, licenses, reports, billing, course-completion records, support, and account security.`,', '  description: `Access your protected ${LEGAL_ENTITY_NAME} customer workspace for Academy, licensing, reports, billing, course-completion records, support, and account security.`,');
-          removeOnce('app/portal/page.tsx', '  { eyebrow: "APPLICATIONS", title: `${LEGAL_ENTITY_NAME} applications`, copy: "Review secure enterprise applications and request deployment, licensing, or technical evaluation support.", href: "/apps", action: "View applications", state: "Available" },\n');
-          replaceOnce('app/portal/page.tsx', 'team training, and application deployment planning.', 'team training, and secure technology deployment planning.');
-          replaceOnce('app/portal/page.tsx', '          <Link href="/academy">Academy</Link><Link href="/apps">Applications</Link><Link href="/trust">Trust</Link><Link href="/contact">Contact</Link>', '          <Link href="/academy">Academy</Link><Link href="/trust">Trust</Link><Link href="/contact">Contact</Link>');
-          replaceOnce('app/portal/page.tsx', '<article><span>AVAILABLE PATHWAYS</span><strong>8</strong><p>Customer service modules</p></article>', '<article><span>AVAILABLE PATHWAYS</span><strong>7</strong><p>Customer service modules</p></article>');
-          replaceOnce('app/portal/page.tsx', 'Use customer support for enrollment, course-completion records, billing, licensing, reports, application access, active engagements, or account assistance.', 'Use customer support for enrollment, course-completion records, billing, licensing, reports, active engagements, secure technology requests, or account assistance.');
-
-          const testPath = 'test/applications-private-boundary-contract.test.mjs';
-          const testSource = read(testPath);
-          const marker = 'test("no non-private rendered surface links directly to Applications"';
-          if (!testSource.includes(marker)) {
-            const addition = `\n\ntest("no non-private rendered surface links directly to Applications", () => {\n  const privateRoots = [\n    "app/apps/",\n    "app/admin/",\n    "app/portal/applications/",\n    "app/portal/enterprise/",\n    "app/portal/licenses/",\n    "app/portal/orders/",\n    "app/portal/success/",\n  ];\n  const files = [];\n  function walk(directory) {\n    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {\n      const fullPath = `${directory}/${entry.name}`;\n      if (entry.isDirectory()) walk(fullPath);\n      else if (entry.isFile() && fullPath.endsWith(".tsx")) files.push(fullPath);\n    }\n  }\n  walk("app");\n  for (const file of files) {\n    if (privateRoots.some((root) => file.startsWith(root))) continue;\n    assert.doesNotMatch(read(file), /href(?:=|:)\\s*["']\\/apps(?:["'/?])/i, `${file} must not expose a direct Applications route`);\n  }\n});`;
-            write(testPath, `${testSource.trimEnd()}${addition}\n`);
-          }
-
-          const proxyBlobSha = execFileSync('git', ['hash-object', 'proxy.ts'], { encoding: 'utf8' }).trim();
-          replaceRegexOnce(
-            'lib/proxy-release-fingerprint.ts',
-            /gitBlobSha1: "[0-9a-f]{40}"/,
-            `gitBlobSha1: "${proxyBlobSha}"`,
-          );
-
-          const forbidden = execFileSync('git', ['grep', '-nE', 'href(=|:)[[:space:]]*["' + "'" + ']\\/apps(["' + "'" + '/?])', '--', 'app'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-          const allowedLines = forbidden ? forbidden.split('\n').filter((line) => {
-            const file = line.split(':', 1)[0];
-            return file.startsWith('app/apps/') || file.startsWith('app/admin/') || file.startsWith('app/portal/applications/') || file.startsWith('app/portal/enterprise/') || file.startsWith('app/portal/licenses/') || file.startsWith('app/portal/orders/') || file.startsWith('app/portal/success/');
-          }) : [];
-          const allLines = forbidden ? forbidden.split('\n') : [];
-          if (allLines.length !== allowedLines.length) {
-            const unexpected = allLines.filter((line) => !allowedLines.includes(line));
-            throw new Error(`Unexpected public Applications links remain:\n${unexpected.join('\n')}`);
-          }
-          NODE
+          npm install --global npm@11 --no-audit --no-fund
+          test "$(npm --version | cut -d. -f1)" = "11"
       - name: Install locked dependencies
-        run: npm ci --no-audit --no-fund
-      - name: Verify Applications privacy contract and repository tests
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verify lockfile remains immutable
+        run: git diff --exit-code -- package-lock.json
+      - name: Generate controlled staging manifests
+        run: npm run release:apps -- release/application-production
+      - name: Validate staging identity and artifact boundary
+        run: npm run validate:application-staging
+      - name: Generate governed market guidance
+        run: npm run market:apps
+      - name: Run repository tests
         run: npm test
-      - name: Run static quality validation
+      - name: Run lint
         run: npm run lint
       - name: Build production website
         run: npm run build
-      - name: Restore governed workflow and commit only intended remediation
+      - name: Validate market guidance coverage
         run: |
-          git show HEAD^:.github/workflows/application-release-validation.yml > .github/workflows/application-release-validation.yml
-          git diff --check
-          test "$(git hash-object .github/workflows/application-release-validation.yml)" = "ac587b3272d668477d3b31bad7e5e5f3b1a8c8eb"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add proxy.ts lib/proxy-release-fingerprint.ts test/applications-private-boundary-contract.test.mjs app/components/enterprise/EnterpriseChrome.tsx app/sitemap.ts app/page.tsx app/catalog/page.tsx app/store/page.tsx app/resources/page.tsx app/protection-intelligence/page.tsx app/not-found.tsx app/ObserraGuide.tsx app/portal/page.tsx .github/workflows/application-release-validation.yml
-          git commit -m "fix(apps): lock Applications to authorized team"
-          git push origin HEAD:${GITHUB_REF_NAME}
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const catalog = JSON.parse(fs.readFileSync(path.join('release', 'application-production', 'release-catalog.json'), 'utf8'));
+          const market = JSON.parse(fs.readFileSync(path.join('release', 'application-market-intelligence', 'portfolio-pricing-plan.json'), 'utf8'));
+          if (!Array.isArray(market.applications) || market.applications.length !== catalog.applications.length) {
+            throw new Error('market guidance does not cover the complete staged application catalog');
+          }
+          console.log(`Market guidance covers all ${catalog.applications.length} staged applications.`);
+          NODE
+      - name: Upload independently validated staging evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-release-validation-${{ github.sha }}
+          path: |
+            release/application-production/**
+            release/application-market-intelligence/**
+          if-no-files-found: error
+          retention-days: 180
