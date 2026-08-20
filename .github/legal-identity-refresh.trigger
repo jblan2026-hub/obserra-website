@@ -1,3 +1,3 @@
-refresh-request: 2026-08-20-canonical-vercel-build-isolation
-reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence after isolating Vercel build authority to canonical project prj_lxTKKDa9sbhht7FaigiaF1PONMiC, forcing duplicate project prj_FfAnssVJU8pcJydGNJHmCliP6Yme to skip all builds, and removing shared custom-domain aliases from vercel.json so public domains remain project-owned rather than repo-wide; application, payment, entitlement, identity, Applications implementation, and regulated LMS business logic remain unchanged
-validation-request: 2026-08-20-exact-governed-hotfix-post-canonical-vercel-build-isolation
+refresh-request: 2026-08-20-canonical-vercel-build-isolation-final-contract
+reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence after finalizing canonical Vercel build isolation and correcting the production-authority regression assertion; canonical project prj_lxTKKDa9sbhht7FaigiaF1PONMiC always builds, duplicate project prj_FfAnssVJU8pcJydGNJHmCliP6Yme always skips, shared custom-domain aliases are removed from vercel.json, and application, payment, entitlement, identity, Applications implementation, and regulated LMS business logic remain unchanged
+validation-request: 2026-08-20-exact-governed-hotfix-post-canonical-vercel-build-isolation-final-contract
