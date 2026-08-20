@@ -40,7 +40,7 @@ test("automatic cutover moves custom-domain ownership to the canonical project b
     cutover,
     /https:\/\/api\.vercel\.com\/v1\/projects\/\$\{AUXILIARY_PROJECT_ID\}\/domains\/\$\{domain\}\/move\?teamId=\$\{TEAM_ID\}/,
   );
-  assert.match(cutover, /--data "\{\\"projectId\\":\\"\$\{CANONICAL_PROJECT_ID\\}\\"\}"/);
+  assert.match(cutover, /--data "\{\\"projectId\\":\\"\$\{CANONICAL_PROJECT_ID\}\\"\}"/);
 });
 
 test("automatic cutover is idempotent and rollback reverses only ownership changed by that run", () => {
