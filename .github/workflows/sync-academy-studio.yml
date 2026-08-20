@@ -28,13 +28,13 @@ jobs:
         run: test -n "$ACADEMY_STUDIO_TOKEN"
 
       - name: Checkout website production baseline
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: main
           fetch-depth: 0
 
       - name: Checkout Academy Production Studio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: jblan2026-hub/obserra-academy-production-studio
           ref: ${{ github.event.client_payload.ref || inputs.studio_ref || 'main' }}
