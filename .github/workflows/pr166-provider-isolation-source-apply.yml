@@ -133,3 +133,5 @@ jobs:
           git add proxy.ts lib/proxy-release-fingerprint.ts
           git commit -m "fix(identity): isolate public and Supabase provider readiness for #165"
           git push origin "HEAD:${TARGET_BRANCH}"
+
+# exact-head retrigger: 2026-08-20T22:02Z
