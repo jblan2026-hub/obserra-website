@@ -98,27 +98,11 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31_536_000,
   },
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: "/apps/:path*",
-          destination: "/private-applications-gateway/:path*",
-        },
-      ],
-      afterFiles: [],
-      fallback: [],
-    };
-  },
   async headers() {
     return [
       {
         source: "/:path*",
         headers: publicSecurityHeaders,
-      },
-      {
-        source: "/apps/:path*",
-        headers: protectedRouteHeaders,
       },
       {
         source: "/private-applications-gateway/:path*",
