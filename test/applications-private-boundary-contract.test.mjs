@@ -29,15 +29,18 @@ test("Applications receive private anti-index and no-store response controls", (
   assert.match(proxy, /APPLICATIONS_PRIVATE_ACCESS_DENIED/);
 });
 
-test("public discovery and navigation do not publish Applications routes", () => {
+test("public discovery and both public headers do not publish Applications routes", () => {
   const sitemap = read("app/sitemap.ts");
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
+  const homeHeader = read("app/HomeHeader.tsx");
   const home = read("app/page.tsx");
 
   assert.doesNotMatch(sitemap, /marketplaceApps/);
   assert.doesNotMatch(sitemap, /\/apps/);
   assert.doesNotMatch(chrome, /href=["']\/apps["']/);
   assert.doesNotMatch(chrome, /\[APPLICATIONS_BRAND_NAME,\s*["']\/apps["']/);
+  assert.doesNotMatch(homeHeader, /href:\s*["']\/apps["']/);
+  assert.doesNotMatch(homeHeader, /Applications["'],\s*href:\s*["']\/apps["']/);
   assert.doesNotMatch(home, /href=["']\/apps["']/);
 });
 
