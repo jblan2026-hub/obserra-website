@@ -68,7 +68,12 @@ test("proxy remains a fail-closed authorization boundary for Applications", () =
   assert.match(proxy, /status:\s*404/);
 });
 
-test("privacy controls do not require edits to the frozen Applications implementation", () => {
+test("privacy controls preserve the frozen Applications implementation except the approved root runtime directives", () => {
   const legacyNonRegression = read("test/supabase-auth-applications-nonregression.test.mjs");
-  assert.match(legacyNonRegression, /Phase 2A Applications implementation surface is byte-for-byte unchanged/);
+  assert.match(
+    legacyNonRegression,
+    /Phase 2A Applications implementation surface is byte-for-byte unchanged apart from approved root runtime directives/,
+  );
+  assert.match(legacyNonRegression, /APPLICATION_SOURCE_DIGEST/);
+  assert.match(legacyNonRegression, /APPROVED_ROOT_RUNTIME_DIRECTIVES/);
 });
