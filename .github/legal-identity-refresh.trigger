@@ -1,3 +1,3 @@
-refresh-request: 2026-08-20-canonical-vercel-build-isolation-gate34-aligned
-reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence after aligning Gate 34 with canonical-project-only Vercel build authority and project-owned custom domains; canonical project prj_lxTKKDa9sbhht7FaigiaF1PONMiC always builds, duplicate project prj_FfAnssVJU8pcJydGNJHmCliP6Yme always skips, shared custom-domain aliases remain absent from vercel.json, and application, payment, entitlement, identity, Applications implementation, and regulated LMS business logic remain unchanged
-validation-request: 2026-08-20-exact-governed-hotfix-post-canonical-vercel-build-isolation-gate34-aligned
+refresh-request: 2026-08-20-canonical-vercel-alias-cutover
+reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence after assigning exactly www.obserrallc.com and obserrallc.com through vercel.json while preserving canonical-project-only build authority; canonical project prj_lxTKKDa9sbhht7FaigiaF1PONMiC always builds, duplicate project prj_FfAnssVJU8pcJydGNJHmCliP6Yme always skips, and application, payment, entitlement, identity, Applications implementation, and regulated LMS business logic remain unchanged
+validation-request: 2026-08-20-exact-governed-hotfix-post-canonical-vercel-alias-cutover
