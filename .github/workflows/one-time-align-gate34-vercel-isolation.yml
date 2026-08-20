@@ -1,0 +1,85 @@
+name: One-time align Gate 34 Vercel isolation contract
+
+on:
+  push:
+    branches:
+      - hotfix/fdacs-canonical-vercel-build-authority-20260820
+    paths:
+      - .github/workflows/one-time-align-gate34-vercel-isolation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  align:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Align Gate 34 with canonical-project isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'scripts/cmmc-level2-rev3-production-evidence.mjs';
+          let source = fs.readFileSync(path, 'utf8');
+          const oldBlock = `const vercelConfig = JSON.parse(read(vercelPath));
+const expectedCanonicalAliases = ["www.obserrallc.com", "obserrallc.com"];
+if (JSON.stringify(vercelConfig.alias) !== JSON.stringify(expectedCanonicalAliases)) {
+  fail("canonical aliases must remain exactly scoped to www.obserrallc.com and obserrallc.com");
+}
+if (vercelConfig.ignoreCommand !== "sh scripts/vercel-ignore-build.sh") {
+  fail("ignoreCommand must delegate to the bounded canonical-project guard script");
+}
+if (vercelConfig.ignoreCommand.length > 256) {
+  fail("ignoreCommand exceeds Vercel's 256-character schema limit");
+}
+const vercelIgnore = read(vercelIgnorePath);
+requireText(vercelIgnorePath, vercelIgnore, "\${VERCEL_PROJECT_ID:-}", "project-aware ignored-build guard");
+requireText(vercelIgnorePath, vercelIgnore, "prj_lxTKKDa9sbhht7FaigiaF1PONMiC", "canonical production Vercel project guard");
+requireText(vercelIgnorePath, vercelIgnore, "prj_FfAnssVJU8pcJydGNJHmCliP6Yme", "integration Vercel project guard");
+requireText(vercelIgnorePath, vercelIgnore, "\${VERCEL_ENV:-}", "environment-aware ignored-build guard");
+requireText(vercelIgnorePath, vercelIgnore, '!= "production"', "production-only alias deployment guard");
+requireText(vercelIgnorePath, vercelIgnore, "exit 0", "fail-closed noncanonical deployment suppression");
+requireText(vercelIgnorePath, vercelIgnore, "exit 1", "canonical changed-source deployment continuation");
+requireText(vercelIgnorePath, vercelIgnore, "scripts/vercel-ignore-build\\\\.sh$", "guard self-change deployment trigger");`;
+          const newBlock = `const vercelConfig = JSON.parse(read(vercelPath));
+if (Object.hasOwn(vercelConfig, "alias")) {
+  fail("canonical custom domains must remain owned in Vercel Project Settings, not repo-wide vercel.json aliases");
+}
+if (vercelConfig.ignoreCommand !== "sh scripts/vercel-ignore-build.sh") {
+  fail("ignoreCommand must delegate to the bounded canonical-project guard script");
+}
+if (vercelConfig.ignoreCommand.length > 256) {
+  fail("ignoreCommand exceeds Vercel's 256-character schema limit");
+}
+const vercelIgnore = read(vercelIgnorePath);
+requireText(vercelIgnorePath, vercelIgnore, "\${VERCEL_PROJECT_ID:-}", "project-aware ignored-build guard");
+requireText(vercelIgnorePath, vercelIgnore, 'PRODUCTION_PROJECT_ID="prj_lxTKKDa9sbhht7FaigiaF1PONMiC"', "canonical production Vercel project guard");
+requireText(vercelIgnorePath, vercelIgnore, 'DUPLICATE_PROJECT_ID="prj_FfAnssVJU8pcJydGNJHmCliP6Yme"', "duplicate Vercel project guard");
+requireText(vercelIgnorePath, vercelIgnore, '"$DUPLICATE_PROJECT_ID")', "duplicate-project branch");
+requireText(vercelIgnorePath, vercelIgnore, '"$PRODUCTION_PROJECT_ID")', "canonical-project branch");
+requireText(vercelIgnorePath, vercelIgnore, "exit 0", "duplicate deployment suppression");
+requireText(vercelIgnorePath, vercelIgnore, "exit 1", "canonical and unknown-project build continuation");
+forbidText(vercelIgnorePath, vercelIgnore, "INTEGRATION_PROJECT_ID", "legacy integration-project build authority");`;
+          if (!source.includes(oldBlock)) {
+            console.error('Expected Gate 34 Vercel block not found; refusing broad rewrite.');
+            process.exit(1);
+          }
+          source = source.replace(oldBlock, newBlock);
+          source = source.replace(
+            'console.log(`Gate 34 passed: production identity availability isolation, canonical routing, bounded project-scoped production aliases, Rev. 3/CMMC evidence mapping, generated audit view, and SHA-256 no-drift controls verified (${digest}).`);',
+            'console.log(`Gate 34 passed: production identity availability isolation, canonical routing, canonical-project-only Vercel build authority, project-owned custom domains, Rev. 3/CMMC evidence mapping, generated audit view, and SHA-256 no-drift controls verified (${digest}).`);',
+          );
+          fs.writeFileSync(path, source);
+          NODE
+          git rm .github/workflows/one-time-align-gate34-vercel-isolation.yml
+          git config user.name "jblan2026-hub"
+          git config user.email "309821056+jblan2026-hub@users.noreply.github.com"
+          git add scripts/cmmc-level2-rev3-production-evidence.mjs
+          git commit -m "fix(compliance): align Gate 34 with canonical Vercel isolation"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
