@@ -11,7 +11,7 @@ export type AnonymousAcademyState = {
 };
 
 const cookieName = "obserra_academy_access";
-const emptyState = (): AnonymousAcademyState => ({ courses: {}, progress: {}, learnerName: "Obserra Academy Learner", expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 365 });
+const emptyState = (): AnonymousAcademyState => ({ courses: {}, progress: {}, learnerName: "Obserra EPI Academy Learner", expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 365 });
 
 function signingKey() {
   const key = process.env.STRIPE_WEBHOOK_SECRET;
