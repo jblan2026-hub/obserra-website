@@ -58,22 +58,19 @@ jobs:
       - name: Verify complete CMMC evidence chain
         run: npm run verify:cmmc-evidence
 
-      - name: Enforce downstream generated-file allowlist
+      - name: Enforce proven downstream generated-file allowlist
         shell: bash
         run: |
           set -euo pipefail
           git diff --check
           mapfile -t changed < <(git diff --name-only | sort)
           printf '%s\n' "${changed[@]}"
-          test "${#changed[@]}" -eq 8
+          test "${#changed[@]}" -eq 5
           expected=(
-            "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md"
-            "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256"
             "docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json"
             "docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md"
             "docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256"
             "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json"
-            "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md"
             "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256"
           )
           for i in "${!expected[@]}"; do
@@ -88,13 +85,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
-            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md \
-            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256 \
             docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
             docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
             docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 \
             docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
             docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
           git commit -m "docs(compliance): converge handoff evidence chain"
           git push origin "HEAD:${TARGET_BRANCH}"
