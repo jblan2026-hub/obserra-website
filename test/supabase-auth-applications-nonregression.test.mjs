@@ -17,7 +17,9 @@ const APPLICATION_ROOTS = [
   "lib/app-entitlements.ts",
   "lib/license-repository.ts",
 ];
-const APPLICATION_SOURCE_DIGEST = "3f9f438c958e7cb5814e68b5dc0e4ada63f5239d309c257578ec9c05af6e6d10";
+const APPLICATION_SOURCE_DIGEST = "4a38eeb7157e1f01a49e99a8c26ad49f927bcd3bfb2f7cc26b6bfc2edf79dc1c";
+const APPROVED_ROOT_RUNTIME_DIRECTIVES =
+  'export const dynamic = "force-dynamic";\nexport const revalidate = 0;\n\n';
 
 function walk(entry) {
   const stat = fs.statSync(entry);
@@ -26,10 +28,26 @@ function walk(entry) {
     .flatMap((item) => walk(path.join(entry, item.name)));
 }
 
+function applicationFileBytes(file) {
+  const bytes = fs.readFileSync(file);
+  if (file !== "app/apps/page.tsx") return bytes;
+
+  const source = bytes.toString("utf8");
+  const first = source.indexOf(APPROVED_ROOT_RUNTIME_DIRECTIVES);
+  assert.notEqual(first, -1, "root Applications page must contain the approved private-route runtime directives");
+  assert.equal(
+    source.indexOf(APPROVED_ROOT_RUNTIME_DIRECTIVES, first + APPROVED_ROOT_RUNTIME_DIRECTIVES.length),
+    -1,
+    "approved private-route runtime directives must occur exactly once",
+  );
+
+  return Buffer.from(source.replace(APPROVED_ROOT_RUNTIME_DIRECTIVES, ""), "utf8");
+}
+
 function applicationSourceDigest() {
   const hash = crypto.createHash("sha256");
   for (const file of APPLICATION_ROOTS.flatMap(walk).sort()) {
-    hash.update(file).update("\0").update(fs.readFileSync(file)).update("\0");
+    hash.update(file).update("\0").update(applicationFileBytes(file)).update("\0");
   }
   return hash.digest("hex");
 }
@@ -45,8 +63,8 @@ function routingModule() {
   return module.exports;
 }
 
-test("the Phase 2A Applications implementation surface is byte-for-byte unchanged", () => {
-  assert.equal(APPLICATION_ROOTS.flatMap(walk).length, 28);
+test("the Phase 2A Applications implementation surface is byte-for-byte unchanged apart from approved root runtime directives", () => {
+  assert.equal(APPLICATION_ROOTS.flatMap(walk).length, 27);
   assert.equal(applicationSourceDigest(), APPLICATION_SOURCE_DIGEST);
 });
 

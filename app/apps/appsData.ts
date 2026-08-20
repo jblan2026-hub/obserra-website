@@ -1,3 +1,5 @@
+import { EIOS_BRAND_NAME } from "../../lib/legal-identity";
+
 export type AppStatus = "Available" | "Pilot" | "Coming Soon";
 
 export type DeploymentModel = "SaaS" | "Private Cloud" | "Hybrid" | "On-Premises";
@@ -28,7 +30,7 @@ export type MarketplaceApp = {
 export const marketplaceApps: MarketplaceApp[] = [
   {
     slug: "obserra-eios",
-    name: "Obserra EIOS",
+    name: EIOS_BRAND_NAME,
     status: "Available",
     category: "Intelligence",
     value: "Unifies enterprise context, decision governance, and verified outcomes in one command layer.",

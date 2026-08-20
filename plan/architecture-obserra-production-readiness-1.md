@@ -38,7 +38,7 @@ The platform must remain fail closed for regulated learner credit, attendance, c
 - **REQ-012**: Every production mutation path must validate authentication, authorization, origin, content type, input schema, expected state transition, and provider response shape at the server boundary.
 - **REQ-013**: A production change is complete only when `https://www.obserrallc.com/api/health` reports the exact intended Git SHA, canonical Vercel project, exact deployment ID, and verified routing authority, and the relevant live route exhibits the intended behavior.
 - **REQ-014**: Public marketing pages may remain public. Academy course interiors must require both a valid authenticated identity and a valid exact-course entitlement. Instructor, admin, owner LMS, and owner-validation surfaces must not grant access based on payment or general authenticated status alone.
-- **REQ-015**: Production and active source must not contain AXIONIS routes, output, metadata, headers, test names, active tests, current documentation, or generated evidence. Git history may preserve historical evidence only.
+- **REQ-015**: Production and active source must not contain retired-legacy-product-brand routes, output, metadata, headers, test names, active tests, current documentation, or generated evidence. Git history may preserve historical evidence only.
 - **SEC-001**: Security must be secure by design and secure by default. Apply least privilege, defense in depth, strong identity, AAL2 for owner controls, RLS, private privileged database functions, secret isolation, same-origin mutation admission, rate limiting where appropriate, auditability, and fail-closed provider error handling.
 - **SEC-002**: No `service_role`, private Stripe secret, Daily API key, signing secret, or equivalent privileged credential may be exposed in browser bundles or `NEXT_PUBLIC_` variables.
 - **SEC-003**: Supabase `SECURITY DEFINER` functions used by LMS authorization must remain in unexposed private schemas. Exposed tables must have RLS enabled and policies must enforce owner or learner scope explicitly.
@@ -60,7 +60,7 @@ The platform must remain fail closed for regulated learner credit, attendance, c
 - **VIS-003**: 3D experiences must use deterministic model manifests and integrity-checked local or approved hosted assets. Remote arbitrary model URLs are not permitted.
 - **BRD-001**: Branding work must preserve approved assets and executive visual hierarchy across website, Academy, owner LMS, reports, presentation surfaces, loading states, and visualization scenes.
 - **BRD-002**: The company name in branding and company-identifying sentences is `OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC`. Product names are `Obserra EPI Academy`, `Obserra EPI EIOS`, `Obserra EPI Applications`, and `Obserra EPI Products`. `EPI` means `Executive Protection & Intelligence`.
-- **SEO-001**: SEO must use correct canonical URLs, sitemap, robots, metadata, JSON-LD, noindex on protected surfaces, current EPI product names, and zero active AXIONIS routes or stale legacy naming.
+- **SEO-001**: SEO must use correct canonical URLs, sitemap, robots, metadata, JSON-LD, noindex on protected surfaces, current EPI product names, and zero active retired-legacy-product-brand routes or stale legacy naming.
 - **MKT-001**: Marketing copy must not overstate regulatory approval, certification, licensing, security posture, availability, performance, procurement readiness, or learner credit. Claims must be traceable to implemented and validated behavior.
 - **CI-001**: Pull requests are not release ready unless required GitHub checks complete successfully or an explicitly documented owner-approved exception exists. `action_required`, failure, cancelled, skipped-required, or stale checks are not green.
 - **CI-002**: Evidence generation must remain deterministic and governed through repository workflows. Generated legal, CMMC, FDACS, and release evidence must not be hand edited to make checks pass.
@@ -84,7 +84,7 @@ The platform must remain fail closed for regulated learner credit, attendance, c
 | TASK-004 | Re-run focused owner LMS tests, full Academy release validation, TypeScript, lint, Node tests, build, CMMC gates, Florida Class D gates, and CodeQL against the same head SHA. | | |
 | TASK-005 | Preserve explicit owner release control until the final owner live interaction gate completes on the exact release candidate SHA. | | |
 | TASK-074 | Restore GitHub `main` branch protection, required checks, and PR-based release governance after emergency stabilization. | | |
-| TASK-075 | Remove every active AXIONIS route, test, current documentation reference, metadata reference, build artifact, and live output. Reconcile PR 135 against current main before merge or reimplement its intent in a fresh governed branch. | | |
+| TASK-075 | Remove every active retired-legacy-product-brand route, test, current documentation reference, metadata reference, build artifact, and live output. Reconcile PR 135 against current main before merge or reimplement its intent in a fresh governed branch. | | |
 | TASK-076 | Enforce the full legal company name and Obserra EPI product naming across source, headers, metadata, JSON-LD, package metadata, active docs, tests, generated evidence, and live output. | | |
 | TASK-077 | Correct public identity-status routing so public pages do not report irrelevant provider configuration failure while protected Supabase and Clerk routes remain fail closed. | | |
 | TASK-078 | Retire obsolete Vercel project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC` only after canonical smoke passes, then prove both canonical domains remain on `prj_FfAnssVJU8pcJydGNJHmCliP6Yme`. | | |
@@ -192,7 +192,7 @@ The platform must remain fail closed for regulated learner credit, attendance, c
 | TASK-048 | Add motion only where it communicates hierarchy, state change, navigation, or focus. Respect `prefers-reduced-motion` and maintain stable layout to prevent CLS. | | |
 | TASK-049 | Audit marketing and public certification language against implemented release state. Remove or qualify claims that imply licensing, certification, approval, learner credit, security maturity, availability, capacity, or procurement readiness before evidence exists. | | |
 | TASK-082 | Run a full live SEO crawl covering canonicals, robots, sitemap, structured data, OpenGraph, Twitter metadata, internal links, status codes, retired routes, duplicate content, and protected noindex behavior. | | |
-| TASK-083 | Enforce zero active AXIONIS and zero bare active product naming in rendered HTML, route metadata, JSON-LD, manifest, package metadata, active tests, current docs, and generated evidence. | | |
+| TASK-083 | Enforce zero active retired-legacy-product-brand and zero bare active product naming in rendered HTML, route metadata, JSON-LD, manifest, package metadata, active tests, current docs, and generated evidence. | | |
 
 ### Implementation Phase 10: Interactive visualization, 3D modeling, and presentation track
 
@@ -249,7 +249,7 @@ The platform must remain fail closed for regulated learner credit, attendance, c
 - **ALT-004**: Put privileged Supabase LMS authorization in `public` for easier RPC access. Rejected because privileged functions must remain private and unexposed.
 - **ALT-005**: Ship heavy 3D scenes on initial page load. Rejected because visualization is progressive enhancement and cannot degrade LMS, live media, accessibility, or Core Web Vitals.
 - **ALT-006**: Enable regulated Academy sales before licensing is externally authorized. Rejected. Commerce infrastructure can be validated while the sales gate remains closed.
-- **ALT-007**: Keep legacy AXIONIS routes as 410 retirement pages indefinitely. Rejected because the owner requires complete removal from active source and production output.
+- **ALT-007**: Keep legacy retired-legacy-product-brand routes as 410 retirement pages indefinitely. Rejected because the owner requires complete removal from active source and production output.
 - **ALT-008**: Treat green PR/Vercel status as equivalent to production. Rejected. Canonical live exact-SHA verification is mandatory.
 
 ## 4. Dependencies
@@ -293,7 +293,7 @@ The platform must remain fail closed for regulated learner credit, attendance, c
 - **TEST-007**: Run database post-migration verification and Supabase advisors after schema changes.
 - **TEST-008**: Run visualization tests for no-WebGL, model failure, reduced motion, keyboard operation, fallback content, model integrity, payload budget, and route navigation.
 - **TEST-009**: Run production cutover smoke and rollback validation on the exact deployment SHA before declaring the canonical domain healthy.
-- **TEST-010**: Run current-tree and built-output scans proving zero active AXIONIS and correct Obserra EPI/legal entity naming.
+- **TEST-010**: Run current-tree and built-output scans proving zero active retired-legacy-product-brand and correct Obserra EPI/legal entity naming.
 - **TEST-011**: Run live network/header tests for HTTPS redirect, certificate validity, HSTS, CSP, CORS, permissions, COOP/CORP, referrer policy, MIME controls, caching, mixed content, and unintended management-plane exposure.
 - **TEST-012**: Run full live SEO crawl for status codes, canonicals, robots, sitemap, structured data, OpenGraph, internal links, duplicate content, retired routes, and protected noindex behavior.
 - **TEST-013**: Verify branch protection, required checks, commit provenance, canonical Vercel topology, and exact source/live SHA equality before release.
