@@ -6,7 +6,8 @@ import path from "node:path";
 import test from "node:test";
 
 const SCRIPT = path.resolve("scripts/vercel-ignore-build.sh");
-const CANONICAL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";
+const PRODUCTION_PROJECT_ID = "prj_lxTKKDa9sbhht7FaigiaF1PONMiC";
+const INTEGRATION_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";
 
 function git(cwd, ...args) {
   return execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
@@ -23,7 +24,7 @@ function runIgnore(cwd, env = {}) {
     cwd,
     env: {
       ...process.env,
-      VERCEL_PROJECT_ID: CANONICAL_PROJECT_ID,
+      VERCEL_PROJECT_ID: INTEGRATION_PROJECT_ID,
       VERCEL_ENV: "preview",
       ...env,
     },
@@ -31,7 +32,7 @@ function runIgnore(cwd, env = {}) {
   });
 }
 
-test("preview build continues when relevant source changed before an evidence-only follow-up", () => {
+test("integration preview build continues when relevant source changed before an evidence-only follow-up", () => {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "obserra-vercel-ignore-"));
   try {
     git(cwd, "init");
@@ -47,13 +48,13 @@ test("preview build continues when relevant source changed before an evidence-on
     commit(cwd, "evidence refresh");
 
     const result = runIgnore(cwd, { VERCEL_GIT_PREVIOUS_SHA: baseline });
-    assert.equal(result.status, 1, `expected Vercel to continue preview build, stderr: ${result.stderr}`);
+    assert.equal(result.status, 1, `expected Vercel to continue integration preview build, stderr: ${result.stderr}`);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }
 });
 
-test("preview build skips governed evidence-only updates when runtime source did not change", () => {
+test("integration preview skips governed evidence-only updates when runtime source did not change", () => {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "obserra-vercel-ignore-"));
   try {
     git(cwd, "init");
@@ -68,7 +69,28 @@ test("preview build skips governed evidence-only updates when runtime source did
     commit(cwd, "governed evidence refresh");
 
     const result = runIgnore(cwd, { VERCEL_GIT_PREVIOUS_SHA: baseline });
-    assert.equal(result.status, 0, `expected Vercel to skip evidence-only preview build, stderr: ${result.stderr}`);
+    assert.equal(result.status, 0, `expected Vercel to skip evidence-only integration preview build, stderr: ${result.stderr}`);
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("production project always builds even for governed evidence-only updates", () => {
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), "obserra-vercel-ignore-"));
+  try {
+    git(cwd, "init");
+    fs.mkdirSync(path.join(cwd, "docs", "compliance"), { recursive: true });
+    fs.writeFileSync(path.join(cwd, "README.md"), "baseline\n");
+    const baseline = commit(cwd, "baseline");
+
+    fs.writeFileSync(path.join(cwd, "docs", "compliance", "evidence.json"), "{}\n");
+    commit(cwd, "governed evidence refresh");
+
+    const result = runIgnore(cwd, {
+      VERCEL_PROJECT_ID: PRODUCTION_PROJECT_ID,
+      VERCEL_GIT_PREVIOUS_SHA: baseline,
+    });
+    assert.equal(result.status, 1, `expected canonical production project to build, stderr: ${result.stderr}`);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }
