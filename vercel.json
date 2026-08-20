@@ -1,6 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "ignoreCommand": "sh scripts/vercel-ignore-build.sh",
+  "rewrites": [
+    {
+      "source": "/apps/:path*",
+      "destination": "/private-applications-gateway/:path*"
+    }
+  ],
   "alias": [
     "www.obserrallc.com",
     "obserrallc.com"
