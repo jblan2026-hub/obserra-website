@@ -6,6 +6,9 @@ import "./apps-interactions.css";
 import "./apps-commercial.css";
 import "./apps-responsive.css";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Applications | Obserra Enterprise Marketplace",
   description:
