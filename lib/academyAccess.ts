@@ -13,27 +13,44 @@ export type AnonymousAcademyState = {
 const cookieName = "obserra_academy_access";
 const emptyState = (): AnonymousAcademyState => ({ courses: {}, progress: {}, learnerName: "Obserra EPI Academy Learner", expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 365 });
 
-function signingKey() {
-  const key = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!key) throw new Error("Academy access is not configured");
+function validateSigningKey(name: string, key: string) {
+  if (Buffer.byteLength(key, "utf8") < 32) throw new Error(`${name} must contain at least 32 bytes`);
   return key;
 }
 
-function sign(payload: string) {
-  return createHmac("sha256", signingKey()).update(payload).digest("base64url");
+function currentSigningKey() {
+  const key = process.env.ACADEMY_ACCESS_SIGNING_SECRET;
+  if (!key) throw new Error("Academy access signing is not configured");
+  return validateSigningKey("ACADEMY_ACCESS_SIGNING_SECRET", key);
+}
+
+function previousSigningKey() {
+  const key = process.env.ACADEMY_ACCESS_PREVIOUS_SIGNING_SECRET;
+  return key ? validateSigningKey("ACADEMY_ACCESS_PREVIOUS_SIGNING_SECRET", key) : null;
+}
+
+function sign(payload: string, key: string) {
+  return createHmac("sha256", key).update(payload).digest("base64url");
+}
+
+function signatureMatches(payload: string, suppliedSignature: string, key: string) {
+  const expectedSignature = sign(payload, key);
+  if (suppliedSignature.length !== expectedSignature.length) return false;
+  return timingSafeEqual(Buffer.from(suppliedSignature), Buffer.from(expectedSignature));
 }
 
 export function serializeAcademyAccess(state: AnonymousAcademyState) {
   const payload = Buffer.from(JSON.stringify(state)).toString("base64url");
-  return `${payload}.${sign(payload)}`;
+  return `${payload}.${sign(payload, currentSigningKey())}`;
 }
 
 export function parseAcademyAccess(value?: string): AnonymousAcademyState | null {
   if (!value) return null;
   const [payload, suppliedSignature] = value.split(".");
   if (!payload || !suppliedSignature) return null;
-  const expectedSignature = sign(payload);
-  if (suppliedSignature.length !== expectedSignature.length || !timingSafeEqual(Buffer.from(suppliedSignature), Buffer.from(expectedSignature))) return null;
+  const currentKey = currentSigningKey();
+  const previousKey = previousSigningKey();
+  if (!signatureMatches(payload, suppliedSignature, currentKey) && (!previousKey || !signatureMatches(payload, suppliedSignature, previousKey))) return null;
   try {
     const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as AnonymousAcademyState;
     if (!parsed || typeof parsed !== "object" || !parsed.courses || !parsed.progress || typeof parsed.expiresAt !== "number" || parsed.expiresAt < Date.now()) return null;
