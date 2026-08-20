@@ -53,26 +53,18 @@ jobs:
             | sort -u > /tmp/before-failures.txt || true
           grep -E '^# tests ' /tmp/before-tests.log | tail -1 | awk '{print $3}' > /tmp/before-test-count.txt || true
           echo "Baseline npm test exit: ${before_status}"
-          echo "Baseline failing tests:"
           cat /tmp/before-failures.txt || true
 
-      - name: Apply bounded production-authority reconciliation in workspace
+      - name: Apply bounded production authority reconciliation
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
           const fs = require('node:fs');
-
           const CANONICAL = 'prj_lxTKKDa9sbhht7FaigiaF1PONMiC';
           const AUXILIARY = 'prj_FfAnssVJU8pcJydGNJHmCliP6Yme';
-
-          function read(path) {
-            return fs.readFileSync(path, 'utf8');
-          }
-
-          function write(path, value) {
-            fs.writeFileSync(path, value);
-          }
+          const read = (path) => fs.readFileSync(path, 'utf8');
+          const write = (path, value) => fs.writeFileSync(path, value);
 
           function replaceExact(path, before, after) {
             const source = read(path);
@@ -113,18 +105,6 @@ jobs:
             `requireText(vercelIgnorePath, vercelIgnore, "${CANONICAL}", "canonical production Vercel project guard");\nrequireText(vercelIgnorePath, vercelIgnore, "${AUXILIARY}", "integration Vercel project guard");`,
           );
 
-          replaceExact(
-            'test/vercel-ignore-build.test.mjs',
-            'const CANONICAL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";',
-            `const CANONICAL_PROJECT_ID = "${CANONICAL}";`,
-          );
-
-          replaceExact(
-            'test/vercel-production-authority-consistency.test.mjs',
-            'assert.doesNotMatch(cutover, /request DELETE[\\s\\S]*projects\\/\\$\\{AUXILIARY_PROJECT_ID\\}\\?teamId=/);',
-            'assert.doesNotMatch(cutover, /--request DELETE(?:(?!--request)[\\s\\S])*projects\\/\\$\\{AUXILIARY_PROJECT_ID\\}\\?teamId=/);',
-          );
-
           const cutoverPath = '.github/workflows/production-vercel-public-cutover.yml';
           let cutover = read(cutoverPath);
           const oldCanonical = '      CANONICAL_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme';
@@ -135,8 +115,7 @@ jobs:
           cutover = cutover.replace(oldAuxiliary, `      AUXILIARY_PROJECT_ID: ${AUXILIARY}`);
 
           const retirePattern = /      - name: Retire obsolete auxiliary Vercel project\n[\s\S]*?(?=      - name: Roll back canonical domains on failed cutover)/;
-          const matches = cutover.match(retirePattern);
-          if (!matches || matches.length !== 1) throw new Error('obsolete-project retirement block was not found exactly once');
+          if (!retirePattern.test(cutover)) throw new Error('obsolete-project retirement block was not found exactly once');
           const quarantineBlock = [
             '      - name: Quarantine duplicate Vercel project',
             "        if: steps.smoke.outcome == 'success'",
@@ -188,11 +167,10 @@ jobs:
             '          fi',
             '',
           ].join('\n');
-          cutover = cutover.replace(retirePattern, quarantineBlock);
-          write(cutoverPath, cutover);
+          write(cutoverPath, cutover.replace(retirePattern, quarantineBlock));
           NODE
 
-      - name: Enforce exact authority-only source diff
+      - name: Enforce exact authority source delta
         shell: bash
         run: |
           set -euo pipefail
@@ -203,8 +181,6 @@ jobs:
           lib/auth/runtime-config.ts
           scripts/cmmc-level2-rev3-production-evidence.mjs
           scripts/florida-class-d-website-academy-commerce-gate.mjs
-          test/vercel-ignore-build.test.mjs
-          test/vercel-production-authority-consistency.test.mjs
           EOF
           sort -o /tmp/expected-authority-files.txt /tmp/expected-authority-files.txt
           diff -u /tmp/expected-authority-files.txt /tmp/actual-authority-files.txt
@@ -233,7 +209,6 @@ jobs:
             echo "::error::No payment/commerce regression tests were discovered."
             exit 1
           fi
-          printf 'Payment/commerce tests:\n%s\n' "${payment_tests[*]}"
           node --test "${payment_tests[@]}"
 
       - name: Verify Florida Class D LMS gates
@@ -260,19 +235,14 @@ jobs:
             | sed -E 's/^[[:space:]]*not ok [0-9]+ - //' \
             | sort -u > /tmp/after-failures.txt || true
           grep -E '^# tests ' /tmp/after-tests.log | tail -1 | awk '{print $3}' > /tmp/after-test-count.txt || true
-
           before_count="$(cat /tmp/before-test-count.txt 2>/dev/null || true)"
           after_count="$(cat /tmp/after-test-count.txt 2>/dev/null || true)"
-          if [ -z "${before_count}" ] || [ -z "${after_count}" ]; then
-            echo "::error::Unable to compare full test discovery counts."
-            tail -120 /tmp/after-tests.log
-            exit 1
-          fi
+          test -n "${before_count}"
+          test -n "${after_count}"
           if [ "${after_count}" -lt "${before_count}" ]; then
             echo "::error::Full test discovery regressed from ${before_count} to ${after_count}."
             exit 1
           fi
-
           comm -13 /tmp/before-failures.txt /tmp/after-failures.txt > /tmp/new-failures.txt
           if [ -s /tmp/new-failures.txt ]; then
             echo "::error::Authority reconciliation introduced new full-suite failures:"
@@ -286,10 +256,9 @@ jobs:
             exit 1
           fi
           echo "No new full-suite failures introduced."
-          echo "Remaining baseline failures, if any:"
           cat /tmp/after-failures.txt || true
 
-      - name: Commit only after all no-regression gates pass
+      - name: Commit validated authority source changes
         shell: bash
         run: |
           set -euo pipefail
@@ -300,9 +269,7 @@ jobs:
             .github/workflows/production-vercel-public-cutover.yml \
             .github/workflows/production-e2e-operational-gate.yml \
             scripts/florida-class-d-website-academy-commerce-gate.mjs \
-            scripts/cmmc-level2-rev3-production-evidence.mjs \
-            test/vercel-ignore-build.test.mjs \
-            test/vercel-production-authority-consistency.test.mjs
+            scripts/cmmc-level2-rev3-production-evidence.mjs
           git diff --cached --quiet && { echo "No authority source changes remain to commit."; exit 0; }
           git commit -m "fix(prod): align Vercel production authority"
           git push origin HEAD:fix/vercel-production-authority-current-20260820
