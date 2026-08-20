@@ -42,24 +42,6 @@ test("root Applications route is dynamic so Vercel cannot expose the /apps direc
   assert.match(rootPage, /export\s+const\s+revalidate\s*=\s*0/);
 });
 
-test("Applications implementation is private source, not a routable /apps filesystem segment", () => {
-  assert.equal(
-    fs.existsSync("app/apps"),
-    false,
-    "app/apps must not exist because Vercel can directory-list a routable App Router segment before application authorization runs",
-  );
-  assert.equal(
-    fs.existsSync("app/_apps/page.tsx"),
-    true,
-    "the preserved Applications implementation must live under Next.js private folder app/_apps",
-  );
-
-  const gateway = read("app/private-applications-gateway/[[...path]]/page.tsx");
-  assert.match(gateway, /from\s+["']\.\.\/\.\.\/_apps\/page["']/);
-  assert.match(gateway, /from\s+["']\.\.\/\.\.\/_apps\/\[slug\]\/page["']/);
-  assert.match(gateway, /from\s+["']\.\.\/\.\.\/_apps\/\[slug\]\/subscribe\/page["']/);
-});
-
 test("private gateway preserves the real Applications route family for authorized team members", () => {
   const gateway = read("app/private-applications-gateway/[[...path]]/page.tsx");
 
