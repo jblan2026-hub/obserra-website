@@ -491,9 +491,18 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
     redirectTarget: url.searchParams.get("redirect_url"),
     method: request.method,
   });
+  if (ownership.provider === "public") {
+    const response = applyRouteSecurityHeaders(NextResponse.next(), request);
+    response.headers.set("X-Obserra-Identity-Provider", "public");
+    response.headers.set("X-Obserra-Identity-Status", "not-required");
+    return response;
+  }
+
   const supabaseRuntime = prepareSupabaseAuthRuntime();
-  if (ownership.provider === "supabase" && supabaseRuntime.runtimeEnabled) {
-    if (!supabaseRuntime.ready) return identityConfigurationResponse(request);
+  if (ownership.provider === "supabase") {
+    if (!supabaseRuntime.runtimeEnabled || !supabaseRuntime.ready) {
+      return supabaseIdentityUnavailableResponse(request);
+    }
     try {
       return await handleSupabaseRequest(request, ownership);
     } catch {
