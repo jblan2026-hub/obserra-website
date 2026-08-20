@@ -1,22 +1,24 @@
 name: One-time align Gate 34 Vercel isolation contract
 
 on:
-  push:
+  pull_request:
+    types: [reopened]
     branches:
-      - hotfix/fdacs-canonical-vercel-build-authority-20260820
-    paths:
-      - .github/workflows/one-time-align-gate34-vercel-isolation.yml
+      - main
 
 permissions:
   contents: write
 
 jobs:
   align:
+    if: github.event.pull_request.head.ref == 'hotfix/fdacs-canonical-vercel-build-authority-20260820'
     runs-on: ubuntu-24.04
+    env:
+      TARGET_BRANCH: ${{ github.event.pull_request.head.ref }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
           persist-credentials: true
       - name: Align Gate 34 with canonical-project isolation
@@ -82,4 +84,4 @@ forbidText(vercelIgnorePath, vercelIgnore, "INTEGRATION_PROJECT_ID", "legacy int
           git config user.email "309821056+jblan2026-hub@users.noreply.github.com"
           git add scripts/cmmc-level2-rev3-production-evidence.mjs
           git commit -m "fix(compliance): align Gate 34 with canonical Vercel isolation"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "HEAD:${TARGET_BRANCH}"
