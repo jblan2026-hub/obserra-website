@@ -30,6 +30,13 @@ test("Vercel edge routing intercepts Applications before directory listing resol
   );
 });
 
+test("root Applications route is dynamic so Vercel cannot expose the /apps directory", () => {
+  const rootPage = read("app/apps/page.tsx");
+
+  assert.match(rootPage, /export\s+const\s+dynamic\s*=\s*["']force-dynamic["']/);
+  assert.match(rootPage, /export\s+const\s+revalidate\s*=\s*0/);
+});
+
 test("private gateway preserves the real Applications route family for authorized team members", () => {
   const gateway = read("app/private-applications-gateway/[[...path]]/page.tsx");
 
