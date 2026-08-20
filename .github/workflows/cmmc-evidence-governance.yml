@@ -258,3 +258,133 @@ jobs:
             gh issue create --title "${title}" --body "${body}"
           fi
           exit 1
+
+  pr166-remediation:
+    name: Apply exact PR166 CMMC remediation
+    if: github.event_name == 'pull_request' && github.event.pull_request.number == 166
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    env:
+      SOURCE_HEAD: e138f0f8770da747365551111572e7bd712f2db4
+      ARTIFACT_ID: "9427262243"
+      WORKFLOW_PATH: .github/workflows/cmmc-evidence-governance.yml
+      TARGET_BRANCH: fix/165-public-identity-readiness-20260820
+      CI: "true"
+    steps:
+      - name: Check out exact PR166 branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+
+      - name: Require exact source parent and workflow-only temporary delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          parent="$(git rev-parse HEAD^)"
+          test "$parent" = "$SOURCE_HEAD" || {
+            echo "Refusing remediation: expected parent $SOURCE_HEAD, found $parent" >&2
+            exit 1
+          }
+          mapfile -t changed < <(git diff --name-only "$SOURCE_HEAD" HEAD)
+          test "${#changed[@]}" -eq 1
+          test "${changed[0]}" = "$WORKFLOW_PATH"
+          test -z "$(git status --porcelain)"
+
+      - name: Restore governed workflow before evidence validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git show "$SOURCE_HEAD:$WORKFLOW_PATH" > "$WORKFLOW_PATH"
+          test -z "$(git diff --name-only "$SOURCE_HEAD")"
+
+      - name: Download exact generated CMMC remediation artifact
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/cmmc-remediation
+          curl --fail --silent --show-error --location \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" \
+            -o /tmp/cmmc-remediation.zip
+          unzip -q /tmp/cmmc-remediation.zip -d /tmp/cmmc-remediation
+
+      - name: Verify artifact allowlist and embedded hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find /tmp/cmmc-remediation -maxdepth 1 -type f -printf '%f\n' | sort)
+          test "${#files[@]}" -eq 3
+          test "${files[0]}" = "CMMC-SYSTEM-EVIDENCE.json"
+          test "${files[1]}" = "CMMC-SYSTEM-EVIDENCE.md"
+          test "${files[2]}" = "CMMC-SYSTEM-EVIDENCE.sha256"
+          cd /tmp/cmmc-remediation
+          expected_json="$(awk '$2 == "CMMC-SYSTEM-EVIDENCE.json" {print $1}' CMMC-SYSTEM-EVIDENCE.sha256)"
+          expected_md="$(awk '$2 == "CMMC-SYSTEM-EVIDENCE.md" {print $1}' CMMC-SYSTEM-EVIDENCE.sha256)"
+          actual_json="$(sha256sum CMMC-SYSTEM-EVIDENCE.json | awk '{print $1}')"
+          actual_md="$(sha256sum CMMC-SYSTEM-EVIDENCE.md | awk '{print $1}')"
+          test -n "$expected_json"
+          test -n "$expected_md"
+          test "$actual_json" = "$expected_json"
+          test "$actual_md" = "$expected_md"
+
+      - name: Apply exact generated evidence bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp /tmp/cmmc-remediation/CMMC-SYSTEM-EVIDENCE.json docs/compliance/CMMC-SYSTEM-EVIDENCE.json
+          cp /tmp/cmmc-remediation/CMMC-SYSTEM-EVIDENCE.md docs/compliance/CMMC-SYSTEM-EVIDENCE.md
+          cp /tmp/cmmc-remediation/CMMC-SYSTEM-EVIDENCE.sha256 docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          git diff --check
+
+      - name: Configure Node.js for evidence verification
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies for evidence verification
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify controlled inputs and regenerated system evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run verify:legal-identity-audit
+          npm run verify:cmmc-objectives
+          npm run verify:cmmc-authority-config
+          npm run verify:cmmc-system-evidence
+
+      - name: Enforce final evidence-only delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git diff --name-only "$SOURCE_HEAD" | sort)
+          printf '%s\n' "${changed[@]}"
+          test "${#changed[@]}" -eq 3
+          test "${changed[0]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.json"
+          test "${changed[1]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.md"
+          test "${changed[2]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256"
+          git diff --check
+
+      - name: Commit exact generated CMMC evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- \
+            "$WORKFLOW_PATH" \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          git diff --cached --check
+          git commit -m "docs(compliance): refresh CMMC system evidence for #165"
+          git push origin "HEAD:${TARGET_BRANCH}"
