@@ -43,6 +43,26 @@ test("automatic cutover moves custom-domain ownership to the canonical project b
   assert.match(cutover, /--data "\{\\"projectId\\":\\"\$\{CANONICAL_PROJECT_ID\}\\"\}"/);
 });
 
+test("automatic cutover is idempotent and rollback reverses only ownership changed by that run", () => {
+  const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
+
+  assert.match(
+    cutover,
+    /https:\/\/api\.vercel\.com\/v9\/projects\/\$\{AUXILIARY_PROJECT_ID\}\/domains\/\$\{domain\}\?teamId=\$\{TEAM_ID\}/,
+  );
+  assert.match(cutover, /if \[ "\$\{status\}" = "404" \]; then/);
+  assert.match(
+    cutover,
+    /https:\/\/api\.vercel\.com\/v9\/projects\/\$\{CANONICAL_PROJECT_ID\}\/domains\/\$\{domain\}\?teamId=\$\{TEAM_ID\}/,
+  );
+  assert.match(cutover, /echo "\$\{output_name\}_moved=false" >> "\$\{GITHUB_OUTPUT\}"/);
+  assert.match(cutover, /echo "\$\{output_name\}_moved=true" >> "\$\{GITHUB_OUTPUT\}"/);
+  assert.match(cutover, /MOVED_PRIMARY:\s*\$\{\{ steps\.move\.outputs\.primary_moved \}\}/);
+  assert.match(cutover, /MOVED_APEX:\s*\$\{\{ steps\.move\.outputs\.apex_moved \}\}/);
+  assert.match(cutover, /move_back_if_moved\(\)/);
+  assert.match(cutover, /if \[ "\$\{moved\}" != "true" \]; then/);
+});
+
 test("automatic cutover quarantines duplicates without deleting Vercel projects", () => {
   const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
   assert.doesNotMatch(cutover, /--request DELETE(?:(?!--request)[\s\S])*projects\/\$\{AUXILIARY_PROJECT_ID\}\?teamId=/);
