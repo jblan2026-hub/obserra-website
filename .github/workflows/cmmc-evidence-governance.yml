@@ -1,127 +1,260 @@
-name: PR156 Evidence Convergence Carrier
+name: CMMC Evidence Governance
 
 on:
   pull_request:
-    paths:
-      - ".github/workflows/cmmc-evidence-governance.yml"
+    paths-ignore:
+      - "app/apps/**"
+      - "app/api/apps/**"
+      - "app/portal/applications/**"
+      - "lib/apps/**"
+      - ".github/workflows/application-*.yml"
+      - "scripts/application-*.mjs"
+      - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/sync-final-apps.mjs"
+      - "scripts/validate-application-staging.mjs"
+      - "scripts/watch-final-apps.ps1"
+      - "docs/compliance/CMMC-SYSTEM-EVIDENCE.json"
+      - "docs/compliance/CMMC-SYSTEM-EVIDENCE.md"
+      - "docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256"
+      - "docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json"
+      - "docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json.sha256"
+  push:
+    branches: [main]
+    paths-ignore:
+      - "app/apps/**"
+      - "app/api/apps/**"
+      - "app/portal/applications/**"
+      - "lib/apps/**"
+      - ".github/workflows/application-*.yml"
+      - "scripts/application-*.mjs"
+      - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/sync-final-apps.mjs"
+      - "scripts/validate-application-staging.mjs"
+      - "scripts/watch-final-apps.ps1"
+      - "docs/compliance/CMMC-SYSTEM-EVIDENCE.json"
+      - "docs/compliance/CMMC-SYSTEM-EVIDENCE.md"
+      - "docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256"
+      - "docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json"
+      - "docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json.sha256"
+  schedule:
+    - cron: "17 13 * * 1"
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: cmmc-evidence-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  converge:
-    name: Reconcile governed PR156 evidence and self-restore
-    if: github.event.pull_request.number == 156 && github.event.pull_request.head.ref == 'fix/apps-private-boundary-main-20260820'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
+  evidence-contract:
+    name: Verify fail-closed evidence contract
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Check out exact PR branch
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Check out exact pull request revision
+        uses: actions/checkout@v4
         with:
-          ref: fix/apps-private-boundary-main-20260820
           fetch-depth: 0
-          persist-credentials: true
-
-      - name: Bind execution to triggering head
-        shell: bash
-        env:
-          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          actual="$(git rev-parse HEAD)"
-          test "$actual" = "$EXPECTED_HEAD"
-
-      - name: Restore production workflow before evidence generation
-        shell: bash
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          set -euo pipefail
-          git cat-file -e "${BASE_SHA}^{commit}"
-          git checkout "$BASE_SHA" -- .github/workflows/cmmc-evidence-governance.yml
-          git diff --cached -- .github/workflows/cmmc-evidence-governance.yml
 
       - name: Configure Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: 22
           cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Install supported npm major
-        run: |
-          npm install --global npm@11 --no-audit --no-fund
-          test "$(npm --version | cut -d. -f1)" = "11"
 
       - name: Install locked dependencies
-        run: npm ci --ignore-scripts --no-audit --no-fund
+        run: npm ci
 
-      - name: Regenerate governed evidence in dependency order
+      - name: Verify governing and supplemental objective catalogs
+        run: npm run verify:cmmc-objectives
+
+      - name: Verify official-source watch configuration
+        run: npm run verify:cmmc-authority-config
+
+      - name: Verify generated per-system evidence is current
+        id: cmmc-system-evidence
+        continue-on-error: true
+        run: npm run verify:cmmc-system-evidence
+
+      - name: Generate CMMC system-evidence remediation artifacts
+        if: ${{ steps.cmmc-system-evidence.outcome == 'failure' }}
+        run: npm run generate:cmmc-system-evidence
+
+      - name: Upload CMMC system-evidence remediation artifacts
+        if: ${{ steps.cmmc-system-evidence.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cmmc-system-evidence-remediation
+          if-no-files-found: error
+          retention-days: 3
+          path: |
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+
+      - name: Fail on CMMC system-evidence drift
+        if: ${{ steps.cmmc-system-evidence.outcome == 'failure' }}
         run: |
-          set -euo pipefail
-          npm run generate:legal-identity-audit
-          npm run generate:cmmc-system-evidence
+          echo "Generated CMMC system evidence drifted from controlled sources. Apply the uploaded remediation artifact and rerun CI."
+          exit 1
+
+      - name: Verify per-system objective evidence and generated audit views
+        run: npm run verify:cmmc-evidence
+
+      - name: Verify source quality gates
+        run: |
+          ./node_modules/.bin/tsc --noEmit
+          ./node_modules/.bin/eslint . --quiet
+
+  approved-release-evidence:
+    name: Generate and permanently archive approved release evidence
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: Check out exact approved merge revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Verify objective catalogs and evidence contract inputs
+        run: |
+          npm run verify:cmmc-objectives
+          npm run verify:cmmc-authority-config
+          npm run verify:cmmc-handoff
+
+      - name: Run exact-revision technical source gates
+        run: |
+          npm run verify:legal-identity-audit
+          ./node_modules/.bin/tsc --noEmit
+          ./node_modules/.bin/eslint . --quiet
+          node --test
+          npm run verify:florida-class-d
+
+      - name: Verify live official authority sources
+        env:
+          CMMC_CHECKED_AT: ${{ github.event.head_commit.timestamp }}
+        run: npm run verify:cmmc-authority-drift
+
+      - name: Generate final exact-revision system evidence
+        run: node scripts/cmmc-system-evidence.mjs --write --release "${GITHUB_SHA}"
+
+      - name: Generate paired disposition, FDACS audit, and continuity records
+        run: |
           npm run generate:cmmc-disposition
           npm run generate:fdacs-pii-audit
+          npm run generate:cmmc-handoff
 
-      - name: Enforce generated-file allowlist
-        shell: bash
+      - name: Verify final exact-revision system evidence and paired records
         run: |
-          set -euo pipefail
-          cat > /tmp/allowed.txt <<'EOF'
-          .github/workflows/cmmc-evidence-governance.yml
-          docs/compliance/CMMC-SYSTEM-EVIDENCE.json
-          docs/compliance/CMMC-SYSTEM-EVIDENCE.md
-          docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
-          docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json
-          docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md
-          docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256
-          docs/compliance/LEGAL-IDENTITY-AUDIT.json
-          docs/compliance/LEGAL-IDENTITY-AUDIT.md
-          docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
-          docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json
-          docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md
-          docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
-          EOF
-          git diff --name-only HEAD | sort > /tmp/changed.txt
-          grep -Fx '.github/workflows/cmmc-evidence-governance.yml' /tmp/changed.txt
-          while IFS= read -r file; do
-            grep -Fx "$file" /tmp/allowed.txt >/dev/null || {
-              echo "Unexpected generated change: $file" >&2
-              exit 1
-            }
-          done < /tmp/changed.txt
-          git diff --check HEAD
-
-      - name: Verify converged evidence graph
-        run: |
-          set -euo pipefail
-          npm run verify:legal-identity-audit
-          npm run verify:cmmc-system-evidence
+          node scripts/cmmc-system-evidence.mjs --check --release "${GITHUB_SHA}"
           npm run verify:cmmc-disposition
           npm run verify:fdacs-pii-audit
-          npm run verify:cmmc-evidence
+          npm run verify:cmmc-handoff
 
-      - name: Commit only verified generated evidence and restored workflow
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- \
-            .github/workflows/cmmc-evidence-governance.yml \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256 \
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.json \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.md \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 \
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
+      - name: Build and locally verify archive package
+        run: node scripts/cmmc-archive-release-evidence.mjs --dry-run --output "artifacts/obserra-cmmc-release-evidence-${GITHUB_SHA}.json"
+
+      - name: Archive final package under indefinite retention
+        env:
+          OBSERRA_CMMC_ARCHIVE_URL: ${{ secrets.OBSERRA_CMMC_ARCHIVE_URL }}
+          OBSERRA_CMMC_ARCHIVE_SERVICE_ROLE_KEY: ${{ secrets.OBSERRA_CMMC_ARCHIVE_SERVICE_ROLE_KEY }}
+          OBSERRA_CMMC_ARCHIVE_ACTOR_REF: github-actions:${{ github.repository }}:${{ github.run_id }}
+        run: node scripts/cmmc-archive-release-evidence.mjs --output "artifacts/obserra-cmmc-release-evidence-${GITHUB_SHA}.json" --receipt-output "artifacts/obserra-cmmc-release-evidence-${GITHUB_SHA}-receipt.json"
+
+      - name: Retain operational workflow copy and verified receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cmmc-release-evidence-${{ github.sha }}
+          path: |
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md
             docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
-          git diff --cached --check
-          git commit -m "ci(compliance): reconcile PR156 governed evidence"
-          git push origin HEAD:fix/apps-private-boundary-main-20260820
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.schema.json
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT-SOURCE.json
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256
+            docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json
+            docs/compliance/CMMC-AUTHORITY-DRIFT-CHECK.json.sha256
+            docs/compliance/LEGAL-IDENTITY-AUDIT.json
+            docs/compliance/LEGAL-IDENTITY-AUDIT.md
+            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
+            docs/compliance/LEGAL-IDENTITY-AUDIT.schema.json
+            artifacts/obserra-cmmc-release-evidence-${GITHUB_SHA}.json
+            artifacts/obserra-cmmc-release-evidence-${GITHUB_SHA}.json.sha256
+            artifacts/obserra-cmmc-release-evidence-${GITHUB_SHA}-receipt.json
+            artifacts/obserra-cmmc-release-evidence-${GITHUB_SHA}-receipt.md
+            artifacts/obserra-cmmc-release-evidence-${GITHUB_SHA}-receipt.sha256
+          if-no-files-found: warn
+          retention-days: 90
+
+  authority-drift:
+    name: Monitor official governing-source revisions
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Check out authority controls
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run live official-source drift checks
+        id: drift
+        continue-on-error: true
+        run: node scripts/cmmc-authority-source-drift.mjs --live --report artifacts/CMMC-AUTHORITY-DRIFT-CHECK.json
+
+      - name: Retain drift evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cmmc-authority-drift-${{ github.run_id }}
+          path: |
+            artifacts/CMMC-AUTHORITY-DRIFT-CHECK.json
+            artifacts/CMMC-AUTHORITY-DRIFT-CHECK.json.sha256
+          retention-days: 90
+
+      - name: Open or update blocking authority-drift issue
+        if: steps.drift.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="CMMC authority source drift requires reviewed reconciliation"
+          body="The fail-closed official-source monitor detected a changed artifact, revision signal, or retrieval error. Review workflow run ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}; download the hashed drift report; then update the authority profile, objective catalogs, per-system mappings, and release evidence through an approved pull request. Do not silently change the governing baseline."
+          existing="$(gh issue list --state open --search "${title} in:title" --json number --jq '.[0].number // empty')"
+          if [ -n "${existing}" ]; then
+            gh issue comment "${existing}" --body "${body}"
+          else
+            gh issue create --title "${title}" --body "${body}"
+          fi
+          exit 1
