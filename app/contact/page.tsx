@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
 import ContactExperience from "./ContactExperience";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import {
+  ACADEMY_BRAND_NAME,
+  EIOS_BRAND_NAME,
+  LEGAL_ENTITY_NAME,
+} from "@/lib/legal-identity";
 import "./contact.css";
 import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    `Contact ${LEGAL_ENTITY_NAME} for enterprise cybersecurity advisory, executive protection, intelligence, EIOS product briefings, Academy licensing, and scoped implementation planning.`,
+    `Contact ${LEGAL_ENTITY_NAME} for enterprise cybersecurity advisory, executive protection, intelligence, ${EIOS_BRAND_NAME} product briefings, ${ACADEMY_BRAND_NAME} licensing, and scoped implementation planning.`,
   alternates: { canonical: "/contact" },
   keywords: [`contact ${LEGAL_ENTITY_NAME}`, `${LEGAL_ENTITY_NAME} consultation`, "executive protection consulting", "cybersecurity advisory contact"],
   openGraph: {
     title: `Contact ${LEGAL_ENTITY_NAME} | Confidential Enterprise Consultation`,
-    description: "Start a confidential conversation on cybersecurity, protection, intelligence, EIOS, and professional training.",
+    description: `Start a confidential conversation on cybersecurity, protection, intelligence, ${EIOS_BRAND_NAME}, and professional training.`,
     url: "https://www.obserrallc.com/contact",
     type: "website",
     images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: `Contact ${LEGAL_ENTITY_NAME}` }],
@@ -33,15 +37,15 @@ const engagementTracks = [
     cta: "Request advisory consultation",
   },
   {
-    title: "Enterprise Intelligence Operating System Briefing",
+    title: `${EIOS_BRAND_NAME} Briefing`,
     copy: "Enterprise intelligence operating model walkthrough, adoption pathway, and implementation readiness review.",
-    action: "mailto:info@obserrallc.com?subject=EIOS%20Enterprise%20Briefing%20Request",
-    cta: "Book EIOS enterprise briefing",
+    action: `mailto:info@obserrallc.com?subject=${encodeURIComponent(`${EIOS_BRAND_NAME} Enterprise Briefing Request`)}`,
+    cta: `Book ${EIOS_BRAND_NAME} enterprise briefing`,
   },
   {
-    title: "Academy and Workforce Training",
+    title: `${ACADEMY_BRAND_NAME} and Workforce Training`,
     copy: "Course evaluation, enterprise cohort planning, and workforce capability discussions tied to cybersecurity, protection, intelligence, and secure technology.",
-    action: "mailto:info@obserrallc.com?subject=Academy%20Enterprise%20Training%20Inquiry",
+    action: `mailto:info@obserrallc.com?subject=${encodeURIComponent(`${ACADEMY_BRAND_NAME} Enterprise Training Inquiry`)}`,
     cta: "Discuss training options",
   },
   {
@@ -105,7 +109,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
         <h1>Start a focused conversation on the work you need done.</h1>
         <p>
           Engage {LEGAL_ENTITY_NAME} for cybersecurity leadership, protective intelligence, executive protection advisory,
-          enterprise risk guidance, AI governance, and EIOS through a scoped, security-conscious engagement process.
+          enterprise risk guidance, AI governance, and {EIOS_BRAND_NAME} through a scoped, security-conscious engagement process.
         </p>
         <div className="contact-actions">
           <a className="contact-button" href={`mailto:info@obserrallc.com?subject=${legalEntityMailName}%20Confidential%20Consultation`}>Request executive consultation</a>
@@ -141,7 +145,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
           <li>Fortune 500 Chief Information Security Officer leadership background</li>
           <li>Enterprise cybersecurity and risk advisory</li>
           <li>Protective intelligence and executive protection alignment</li>
-          <li>Professional and enterprise learning options through Obserra Academy</li>
+          <li>Professional and enterprise learning options through {ACADEMY_BRAND_NAME}</li>
         </ul>
       </section>
 
