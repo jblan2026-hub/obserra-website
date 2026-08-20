@@ -1,4 +1,4 @@
-name: PR168 CMMC Remediation
+name: PR168 Downstream Evidence Remediation
 
 on:
   push:
@@ -11,10 +11,10 @@ permissions:
 jobs:
   apply:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       TARGET_BRANCH: docs/postmerge-handoff-20260820
-      EXPECTED_HEAD: 799ff3866471e8655069b8f8e0224fa40b75581c
+      EXPECTED_HEAD: 5bcb192acc118df822ae80c24ddee7bce49c9c58
       CI: "true"
     steps:
       - name: Checkout exact target branch
@@ -44,33 +44,53 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Generate exact CMMC system evidence
-        run: npm run generate:cmmc-system-evidence
+      - name: Regenerate downstream governed evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run generate:cmmc-disposition
+          npm run generate:fdacs-pii-audit
+          npm run generate:cmmc-handoff
 
-      - name: Verify generated CMMC contract
-        run: npm run verify:cmmc-system-evidence
+      - name: Verify complete CMMC evidence chain
+        run: npm run verify:cmmc-evidence
 
-      - name: Enforce generated-file allowlist
+      - name: Enforce downstream generated-file allowlist
         shell: bash
         run: |
           set -euo pipefail
           git diff --check
           mapfile -t changed < <(git diff --name-only | sort)
           printf '%s\n' "${changed[@]}"
-          test "${#changed[@]}" -eq 3
-          test "${changed[0]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.json"
-          test "${changed[1]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.md"
-          test "${changed[2]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256"
+          test "${#changed[@]}" -eq 8
+          expected=(
+            "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md"
+            "docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256"
+            "docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json"
+            "docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md"
+            "docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256"
+            "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json"
+            "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md"
+            "docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256"
+          )
+          for i in "${!expected[@]}"; do
+            test "${changed[$i]}" = "${expected[$i]}"
+          done
 
-      - name: Commit and push remediation
+      - name: Commit and push downstream evidence
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
-          git commit -m "docs(compliance): refresh CMMC evidence for handoff"
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256 \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
+          git commit -m "docs(compliance): converge handoff evidence chain"
           git push origin "HEAD:${TARGET_BRANCH}"
