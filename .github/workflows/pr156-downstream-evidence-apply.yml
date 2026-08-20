@@ -1,0 +1,97 @@
+name: PR156 Downstream Evidence Apply
+
+on:
+  push:
+    branches:
+      - hotfix/fdacs-pr156-downstream-evidence-20260820-r2
+    paths:
+      - .github/workflows/pr156-downstream-evidence-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    name: Regenerate and apply PR156 downstream evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: fix/apps-private-boundary-main-20260820
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Require unchanged PR head
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="a33af90bdac5a7581c86cf536ee5aadbf33fdeb1"
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$expected"
+
+      - name: Configure Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Regenerate downstream governed evidence
+        run: |
+          npm run generate:cmmc-disposition
+          npm run generate:cmmc-handoff
+          npm run generate:fdacs-pii-audit
+
+      - name: Enforce generated-output boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git diff --name-only)
+          test "${#changed[@]}" -gt 0
+          for path in "${changed[@]}"; do
+            case "$path" in
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json|\
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md|\
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256|\
+              docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json|\
+              docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md|\
+              docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256|\
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json|\
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md|\
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256)
+                ;;
+              *)
+                echo "Unexpected generated path: $path" >&2
+                exit 1
+                ;;
+            esac
+          done
+          printf 'Verified generated paths:\n%s\n' "${changed[*]}"
+
+      - name: Verify complete CMMC evidence chain
+        run: npm run verify:cmmc-evidence
+
+      - name: Commit verified downstream evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256 \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
+          git diff --cached --check
+          git commit -m "ci(compliance): refresh PR156 downstream evidence"
+          git push origin HEAD:fix/apps-private-boundary-main-20260820
