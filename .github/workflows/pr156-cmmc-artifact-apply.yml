@@ -1,0 +1,82 @@
+name: PR156 CMMC Artifact Apply
+
+on:
+  push:
+    branches:
+      - hotfix/fdacs-pr156-artifact-apply-20260820
+    paths:
+      - .github/workflows/pr156-cmmc-artifact-apply.yml
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  apply:
+    name: Verify and apply exact PR156 CMMC remediation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: fix/apps-private-boundary-main-20260820
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Require unchanged PR head
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="2ef8f396bdef01019f60d7a8c77f82b0330029ae"
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$expected"
+
+      - name: Download exact CI remediation artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cmmc-system-evidence-remediation
+          path: /tmp/cmmc-remediation
+          github-token: ${{ github.token }}
+          repository: jblan2026-hub/obserra-website
+          run-id: 32401773944
+
+      - name: Verify remediation artifact hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/cmmc-remediation
+          echo "1888e1e80f52eeb7af8a45f53c74c6b2631c3808c3a8c3ec83b6e1a25df59aa1  CMMC-SYSTEM-EVIDENCE.json" | sha256sum --check --strict
+          echo "55829854e663f261904c099525c1bc67a10086d48ef59496ab5b60c126cec011  CMMC-SYSTEM-EVIDENCE.md" | sha256sum --check --strict
+          echo "1680251b9476cd8c0944758aca5e2d034937758eead0bb4bb815d5153fa38756  CMMC-SYSTEM-EVIDENCE.sha256" | sha256sum --check --strict
+
+      - name: Apply generated remediation only
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -m 0644 /tmp/cmmc-remediation/CMMC-SYSTEM-EVIDENCE.json docs/compliance/CMMC-SYSTEM-EVIDENCE.json
+          install -m 0644 /tmp/cmmc-remediation/CMMC-SYSTEM-EVIDENCE.md docs/compliance/CMMC-SYSTEM-EVIDENCE.md
+          install -m 0644 /tmp/cmmc-remediation/CMMC-SYSTEM-EVIDENCE.sha256 docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          git diff --name-only | sort > /tmp/changed-files.txt
+          printf '%s\n' \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256 | sort > /tmp/allowed-files.txt
+          diff -u /tmp/allowed-files.txt /tmp/changed-files.txt
+
+      - name: Verify CMMC system evidence before persistence
+        run: node scripts/cmmc-system-evidence.mjs --check
+
+      - name: Commit verified generated remediation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          git diff --cached --check
+          git commit -m "ci(compliance): apply exact PR156 CMMC remediation"
+          git push origin HEAD:fix/apps-private-boundary-main-20260820
