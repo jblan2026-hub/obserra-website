@@ -1,3 +1,3 @@
-refresh-request: 2026-08-20-vercel-project-domain-move-governed-hotfix-retry-safe
-reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence after hardening the Vercel project-domain production cutover for repeat releases: source and target domain ownership are probed before moving, already-canonical ownership is a verified no-op, successful per-domain moves are recorded as step outputs, and rollback reverses only ownership changed by the current run before restoring prior deployment aliases; application, payment, entitlement, identity, and regulated LMS business logic remain unchanged
-validation-request: 2026-08-20-exact-governed-hotfix-post-retry-safe-domain-move
+refresh-request: 2026-08-20-canonical-vercel-build-isolation
+reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence after isolating Vercel build authority to canonical project prj_lxTKKDa9sbhht7FaigiaF1PONMiC, forcing duplicate project prj_FfAnssVJU8pcJydGNJHmCliP6Yme to skip all builds, and removing shared custom-domain aliases from vercel.json so public domains remain project-owned rather than repo-wide; application, payment, entitlement, identity, Applications implementation, and regulated LMS business logic remain unchanged
+validation-request: 2026-08-20-exact-governed-hotfix-post-canonical-vercel-build-isolation
