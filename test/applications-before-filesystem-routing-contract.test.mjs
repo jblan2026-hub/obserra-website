@@ -29,6 +29,15 @@ test("private gateway preserves the real Applications route family for authorize
   assert.match(gateway, /SubscribePage/);
 });
 
+test("direct private gateway forced browsing uses the same proxy allowlist boundary", () => {
+  const proxy = read("proxy.ts");
+  const privatePrefixes = proxy.match(/const APPLICATIONS_PRIVATE_PATH_PREFIXES = \[[^\]]*\]/s)?.[0] ?? "";
+  const protectedPrefixes = proxy.match(/const PROTECTED_PATH_PREFIXES = \[[^\]]*\]/s)?.[0] ?? "";
+
+  assert.match(privatePrefixes, /["']\/private-applications-gateway["']/);
+  assert.match(protectedPrefixes, /["']\/private-applications-gateway["']/);
+});
+
 test("public Apps metadata is suppressed at the private gateway boundary", () => {
   const gateway = read("app/private-applications-gateway/[[...path]]/page.tsx");
   assert.match(gateway, /index:\s*false/);
