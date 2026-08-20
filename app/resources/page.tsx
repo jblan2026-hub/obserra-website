@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "../commercial-pages.css";
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const resources = [
   ["Executive Cybersecurity", "Board-ready guidance for connecting cyber exposure, enterprise value, accountability, and investment decisions.", "/services"],
   ["Artificial Intelligence Governance", "Practical direction for governing enterprise artificial intelligence adoption, model use, accountability, risk, and human oversight.", "/apps/obserra-ai-governance-suite"],
-  ["Enterprise Intelligence", "Explore how Obserra EIOS connects evidence, decisions, approvals, actions, and measurable outcomes.", "/eios"],
+  ["Enterprise Intelligence", `Explore how ${EIOS_BRAND_NAME} connects evidence, decisions, approvals, actions, and measurable outcomes.`, "/eios"],
   ["Protective Intelligence", "Understand executive exposure, travel risk, threat context, and proportionate protection planning.", "/protection-intelligence"],
   ["Professional Training", "Browse self-paced courses designed for cybersecurity, protection, intelligence, and technology leaders.", "/academy"],
   ["Trust and Procurement", `Review ${LEGAL_ENTITY_NAME} security, privacy, data-handling, licensing, accessibility, and buyer-protection disclosures.`, "/trust"],
