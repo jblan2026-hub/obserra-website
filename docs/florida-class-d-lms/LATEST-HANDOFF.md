@@ -49,7 +49,7 @@ Approved product naming is:
 
 Do not brand products as `Obserra Academy`, `Obserra EIOS`, `Obserra Applications`, or `Obserra Products` without the `EPI` identifier.
 
-`AXIONIS` is retired and must not remain anywhere in active application code, routes, headers, metadata, sitemap, robots logic, structured data, build output, UI, navigation, test names, active tests, active documentation, or generated evidence. Historical Git history may retain it, but the current tree and compiled production output must not.
+`retired-legacy-product-brand` is retired and must not remain anywhere in active application code, routes, headers, metadata, sitemap, robots logic, structured data, build output, UI, navigation, test names, active tests, active documentation, or generated evidence. Historical Git history may retain it, but the current tree and compiled production output must not.
 
 Approved visual direction is premium executive dark navy, black, and gold using repository approved OBSERRA assets. Do not invent alternate logos or unauthorized logo variants. Use approved assets including `public/brand/obserra-mark.svg` and the approved logo image assets already in the repository.
 
@@ -149,7 +149,7 @@ PR 135 branch: `fix/production-surface-cleanup-20260819`
 
 PR 135 head: `74bddcc70ff3fc1d065a86cc78d48d2d36ef7a08`
 
-PR 135 contains the intended complete retirement of the old AXIONIS route surfaces and additional branding cleanup. It is not merged and its base predates later emergency main commits. It must be reconciled with current main before use.
+PR 135 contains the intended complete retirement of the old retired-legacy-product-brand route surfaces and additional branding cleanup. It is not merged and its base predates later emergency main commits. It must be reconciled with current main before use.
 
 PR 136 remains open and draft.
 
@@ -266,7 +266,7 @@ Status definitions:
 | HR-001 | A change counts only when the canonical production domain serves the exact intended Git SHA. | Main is `1bea5517...`; live health reports `41bb83ed...`. | DRIFT | CRITICAL. Restore exact source to production parity before any production completion claim. |
 | HR-002 | Use full legal company name for company branding and sentences. | Live homepage title, metadata, schema, header and footer use full legal name. | PASS LIVE | Continue source and generated asset sweeps. |
 | HR-003 | Product names must use Obserra EPI Academy, Obserra EPI EIOS, Obserra EPI Applications, and Obserra EPI Products. | Live public navigation is corrected. Some internal package and historical source naming remains. | PARTIAL | HIGH. Remove bare active product naming from code, package metadata, active docs, tests, metadata, headers, and generated output. |
-| HR-004 | AXIONIS must be removed everywhere from the current tree and production output. | Current main still contains `app/axionis/route.ts`, `app/apps/axionis/route.ts`, and `test/retired-axionis-seo-contract.test.mjs`. PR 135 deletes the legacy route pattern but is unmerged. | DRIFT | CRITICAL. Reconcile PR 135 with current main, remove all active AXIONIS references, rebuild, deploy, crawl, and verify zero current-tree and live-output matches. |
+| HR-004 | retired-legacy-product-brand must be removed everywhere from the current tree and production output. | Current main still contains `app/retired-legacy-product-brand/route.ts`, `app/apps/retired-legacy-product-brand/route.ts`, and `test/retired-retired-legacy-product-brand-seo-contract.test.mjs`. PR 135 deletes the legacy route pattern but is unmerged. | DRIFT | CRITICAL. Reconcile PR 135 with current main, remove all active retired-legacy-product-brand references, rebuild, deploy, crawl, and verify zero current-tree and live-output matches. |
 | HR-005 | Public marketing pages may be public. Internal Academy pages require authentication and exact paid entitlement. | Unauthenticated Academy learn route redirects to Supabase sign in and is no-store/noindex. Entitlement behavior has not been freshly end-to-end verified in this handoff cycle. | PARTIAL | CRITICAL. Prove authenticated user without entitlement is denied and paid user with exact entitlement is granted. |
 | HR-006 | Instructor, admin, and owner LMS surfaces must be accessible only to the exact authorized owner identity. No paid-student exception. | Current proxy uses Supabase `internal_owner_read_only` with owner role, verified email, AAL2, internal authorization, and protected authority readiness. Unauthenticated requests are denied by redirect. | PARTIAL | CRITICAL. Run negative authenticated non-owner, AAL1, stale session, wrong session ID, and revoked owner tests. Reconcile PR 136 if it strengthens current boundary. |
 | HR-007 | Owner LMS authorization must bind to current durable authority and active session, not client metadata. | Private owner authorization migration is applied in Supabase identity project; public privileged helper is absent; current proxy queries current authority. | PARTIAL | CRITICAL. Reverify exact active session binding live and preserve private Security Definer location. |
@@ -293,7 +293,7 @@ Status definitions:
 | HR-028 | Release commits and deployment provenance must be trustworthy. | Current main direct commit is unsigned/unverified. | DRIFT | HIGH. Re-establish verified/signed merge path and avoid ungoverned direct main writes. |
 | HR-029 | Duplicate deployment projects must not create conflicting routing or false status signals. | `obserra-website-live` still exists and posts failure/canceled status. | DRIFT | CRITICAL. Complete verified retirement after canonical cutover succeeds. |
 | HR-030 | Public identity header must accurately reflect the route's provider requirement. Public routes must not inherit irrelevant Clerk readiness failure. | Root and health report `configuration-required`; protected Supabase sign-in reports `ready`. | DRIFT | HIGH. Fix provider readiness routing and verify live headers. |
-| HR-031 | SEO must have correct canonicals, sitemap, robots, noindex on protected routes, no retired brand routes, and no stale legacy naming. | Robots and protected noindex are good. AXIONIS active route/test source still exists. Full public canonical audit remains incomplete. | DRIFT / PARTIAL | HIGH. Finish PR 135 intent, crawl live site, validate all public canonicals and noindex surfaces. |
+| HR-031 | SEO must have correct canonicals, sitemap, robots, noindex on protected routes, no retired brand routes, and no stale legacy naming. | Robots and protected noindex are good. retired-legacy-product-brand active route/test source still exists. Full public canonical audit remains incomplete. | DRIFT / PARTIAL | HIGH. Finish PR 135 intent, crawl live site, validate all public canonicals and noindex surfaces. |
 | HR-032 | Public metadata and structured data must use legal name and current product names. | Homepage title, description, Organization and WebSite schema use legal name; current product nav uses EPI. | PASS LIVE / PARTIAL TREE | HIGH. Sweep hidden 404s, package metadata, OpenGraph, JSON-LD, manifest, route metadata, active docs and generated output. |
 | HR-033 | Website and LMS design must be advanced, consistent, premium, responsive, accessible, and production quality, not merely functional. | Current public homepage has improved executive design. Full site, Academy, LMS, payment, and owner workspace design unification is incomplete. | PARTIAL | HIGH. Execute phases 8, 9, and 10 of the roadmap after core security/release stability. |
 | HR-034 | Interactive visualization and 3D must be progressive enhancement and cannot block LMS, auth, payments, or media. | Roadmap is defined. Production 3D implementation has not landed. | OPEN | MEDIUM/HIGH. Implement only after dependency/security/performance gate. |
@@ -579,7 +579,7 @@ Current state: OPEN. PR 134 is already merged, so the old plan wording that TASK
 | Deliverable | Required artifact/evidence | Definition of accepted |
 |---|---|---|
 | DEL-001 Production source parity | GitHub main SHA, Vercel deployment ID, `/api/health` response | All three identify the same exact SHA and canonical project. |
-| DEL-002 Legacy retirement | Current-tree search, build output search, live crawl | Zero AXIONIS active references/routes/output. |
+| DEL-002 Legacy retirement | Current-tree search, build output search, live crawl | Zero retired-legacy-product-brand active references/routes/output. |
 | DEL-003 Brand identity | Source scan, rendered HTML, metadata/schema scan | Legal name correct; all Academy/EIOS/Applications/Products names use Obserra EPI. |
 | DEL-004 Access control | Auth negative/positive tests | Public only where intended; paid entitlement for course interiors; owner-only AAL2 for instructor/admin. |
 | DEL-005 Identity integrity | Supabase authority and session tests | Exact owner, verified email, AAL2, active session, current durable authority, fail closed on outage. |
@@ -606,7 +606,7 @@ Execute in this order unless new live evidence proves a more severe security iss
 3. Inspect current Vercel canonical and auxiliary projects. Do not treat a Vercel status check as live proof. Verify canonical deployment identity directly.
 4. Complete retirement of the obsolete `obserra-website-live` project only after canonical smoke succeeds. Verify canonical domains remain on `prj_FfAnssVJU8pcJydGNJHmCliP6Yme` after retirement.
 5. Restore GitHub main branch protection and required checks. Stop ungoverned direct writes to main after emergency stabilization.
-6. Reconcile PR 135 with current main and remove every AXIONIS current-tree route, test, source, metadata, and active documentation reference. Search again after merge. Build and live crawl again after deployment.
+6. Reconcile PR 135 with current main and remove every retired-legacy-product-brand current-tree route, test, source, metadata, and active documentation reference. Search again after merge. Build and live crawl again after deployment.
 7. Sweep bare product naming, including internal active package metadata such as the current package name `obserra-academy-restore`, shared 404s, sign-in, Academy success, course data, manifest, metadata, structured data, active tests, generated evidence, and active documentation. Apply EPI naming or full legal entity naming according to the permanent rule.
 8. Fix public identity routing so public pages do not report `configuration-required` merely because Clerk is not ready. Public route status must accurately reflect that the route is public. Supabase protected routes must remain fail closed.
 9. Reconcile PR 136 with current main only if it strengthens the current owner boundary without regressing the already-live `internal_owner_read_only` authority check.
@@ -710,7 +710,7 @@ The following statements are prohibited unless directly verified:
 
 `SEO is fixed` while retired routes, stale canonicals, or stale naming remain in current source or live output.
 
-`AXIONIS is removed` while any current active source, route, test, metadata, documentation, or production output still contains it.
+`retired-legacy-product-brand is removed` while any current active source, route, test, metadata, documentation, or production output still contains it.
 
 `The website is secure` based only on a header scan or CodeQL. Security acceptance requires code, auth, data, payments, headers, routing, dependencies, abuse testing and live production verification.
 
@@ -785,7 +785,7 @@ The immediate blockers are:
 1. Restore exact main/live production SHA parity.
 2. Complete safe retirement of `prj_lxTKKDa9sbhht7FaigiaF1PONMiC` without disturbing canonical domains.
 3. Restore protected-main release governance and required checks.
-4. Remove every active AXIONIS route/reference from current main and live output.
+4. Remove every active retired-legacy-product-brand route/reference from current main and live output.
 5. Complete active bare-product-name cleanup and EPI naming enforcement.
 6. Correct misleading public identity status while preserving Supabase fail-closed protected routing.
 7. Prove owner-only AAL2 with authenticated negative tests.
