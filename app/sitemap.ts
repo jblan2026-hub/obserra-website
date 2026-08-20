@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
 import { courses } from "./academy/courseData";
-import { marketplaceApps } from "./apps/appsData";
 import { eiosCapabilities } from "./eios/capabilities";
 import { industrySolutions } from "./industries/industryData";
 import { serviceCatalog } from "./services/serviceCatalog";
@@ -19,7 +18,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/services`, lastModified, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteUrl}/protection-intelligence`, lastModified, changeFrequency: "weekly", priority: 0.88 },
     { url: `${siteUrl}/eios`, lastModified, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${siteUrl}/apps`, lastModified, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteUrl}/catalog`, lastModified, changeFrequency: "weekly", priority: 0.85 },
     { url: `${siteUrl}/academy`, lastModified, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteUrl}/academy/enterprise`, lastModified, changeFrequency: "weekly", priority: 0.86 },
@@ -33,7 +31,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...industrySolutions.map((industry) => ({ url: `${siteUrl}/industries/${industry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.82 })),
     ...serviceCatalog.map((service) => ({ url: `${siteUrl}/services/${service.id}`, lastModified, changeFrequency: "monthly" as const, priority: 0.8 })),
     ...eiosCapabilities.map((entry) => ({ url: `${siteUrl}/eios/${entry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.82 })),
-    ...marketplaceApps.map((entry) => ({ url: `${siteUrl}/apps/${entry.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.75 })),
     ...productIntelligence.map((entry) => ({ url: `${siteUrl}/products/${entry.slug}`, lastModified: entry.publishedAt ? new Date(entry.publishedAt) : lastModified, changeFrequency: "weekly" as const, priority: 0.82 })),
     ...courses.map((course) => ({ url: `${siteUrl}/academy/${course.id}`, lastModified, changeFrequency: "monthly" as const, priority: 0.7 })),
     ...trustPolicies.map((policy) => ({ url: `${siteUrl}/trust/${policy.slug}`, lastModified, changeFrequency: "monthly" as const, priority: 0.65 })),
