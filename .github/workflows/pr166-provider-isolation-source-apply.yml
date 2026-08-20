@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - hotfix/pr166-provider-isolation-source-apply-20260820
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
@@ -133,5 +137,3 @@ jobs:
           git add proxy.ts lib/proxy-release-fingerprint.ts
           git commit -m "fix(identity): isolate public and Supabase provider readiness for #165"
           git push origin "HEAD:${TARGET_BRANCH}"
-
-# exact-head retrigger: 2026-08-20T22:02Z
