@@ -1,11 +1,8 @@
 name: Temporary CMMC Evidence Refresh
 
 on:
-  push:
-    branches:
-      - fix/production-authority-reconciliation-20260819
-    paths:
-      - ".github/workflows/application-release-validation.yml"
+  pull_request:
+    types: [reopened]
 
 permissions:
   contents: write
@@ -16,12 +13,14 @@ concurrency:
 
 jobs:
   refresh-cmmc:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fix/production-authority-reconciliation-20260819'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - name: Check out exact branch revision
+      - name: Check out exact PR head revision
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Configure Node.js
@@ -29,13 +28,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Confirm bounded branch
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "${GITHUB_REF_NAME}" = "fix/production-authority-reconciliation-20260819"
-
-      - name: Regenerate CMMC evidence from clean committed inputs
+      - name: Regenerate CMMC evidence from committed inputs
         shell: bash
         run: |
           set -euo pipefail
@@ -56,6 +49,8 @@ jobs:
           diff -u /tmp/expected.txt /tmp/actual.txt
 
       - name: Commit exact CMMC generated evidence
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         shell: bash
         run: |
           set -euo pipefail
@@ -67,4 +62,4 @@ jobs:
             docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
           git diff --cached --check
           git commit -m "chore(compliance): refresh CMMC evidence from clean inputs"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "HEAD:${HEAD_REF}"
