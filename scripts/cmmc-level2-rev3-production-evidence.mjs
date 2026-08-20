@@ -141,7 +141,8 @@ if (vercelConfig.ignoreCommand.length > 256) {
 }
 const vercelIgnore = read(vercelIgnorePath);
 requireText(vercelIgnorePath, vercelIgnore, "${VERCEL_PROJECT_ID:-}", "project-aware ignored-build guard");
-requireText(vercelIgnorePath, vercelIgnore, "prj_FfAnssVJU8pcJydGNJHmCliP6Yme", "canonical Vercel project guard");
+requireText(vercelIgnorePath, vercelIgnore, "prj_lxTKKDa9sbhht7FaigiaF1PONMiC", "canonical production Vercel project guard");
+requireText(vercelIgnorePath, vercelIgnore, "prj_FfAnssVJU8pcJydGNJHmCliP6Yme", "integration Vercel project guard");
 requireText(vercelIgnorePath, vercelIgnore, "${VERCEL_ENV:-}", "environment-aware ignored-build guard");
 requireText(vercelIgnorePath, vercelIgnore, '!= "production"', "production-only alias deployment guard");
 requireText(vercelIgnorePath, vercelIgnore, "exit 0", "fail-closed noncanonical deployment suppression");

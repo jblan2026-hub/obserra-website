@@ -20,7 +20,7 @@ export type SupabaseAuthRuntimeStatus = {
 
 type RuntimeEnvironment = Readonly<Record<string, string | undefined>>;
 
-export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";
+export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "prj_lxTKKDa9sbhht7FaigiaF1PONMiC";
 export const CONTROLLED_OWNER_VALIDATION_PREVIEW_REF = "hotfix/owner-lms-test-access-20260817";
 
 const CANONICAL_IDENTITY_PROJECT_REF = "ftkjhmtfyfkartfsnkjb";

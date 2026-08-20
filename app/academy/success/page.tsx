@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { ACADEMY_BRAND_NAME } from "../../../lib/legal-identity";
 
 type SuccessParams = { course?: string; session_id?: string };
 
@@ -11,9 +12,9 @@ export default async function AcademySuccessPage({ searchParams }: { searchParam
     <main className="academy-payment-recovery">
       <section>
         <p className="kicker">SECURE PAYMENT RETURN</p>
-        <h1>Confirm your Academy access</h1>
+        <h1>Confirm your {ACADEMY_BRAND_NAME} access</h1>
         <p>
-          Stripe has returned you to Obserra Academy. Access is granted only after the signed payment webhook is
+          Stripe has returned you to {ACADEMY_BRAND_NAME}. Access is granted only after the signed payment webhook is
           recorded and your signed-in learner identity matches the purchaser.
         </p>
         <form action="/api/academy/redeem" method="post">
