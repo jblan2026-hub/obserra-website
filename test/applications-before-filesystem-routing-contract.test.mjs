@@ -118,7 +118,7 @@ test("operational Applications endpoints retain server-side authentication and e
   assert.match(portal, /redirect\(["']\/sign-in\?redirect_url=\/portal\/applications["']\)/);
 });
 
-test("legacy Applications implementation remains byte-for-byte governed", () => {
+test("Applications implementation source digest remains governed", () => {
   const legacyNonRegression = read("test/supabase-auth-applications-nonregression.test.mjs");
   assert.match(
     legacyNonRegression,
