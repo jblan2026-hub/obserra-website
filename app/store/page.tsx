@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
   title: "Store",
@@ -21,7 +21,7 @@ const categories = [
   {
     eyebrow: "ACADEMY",
     title: "Professional courses and completion records",
-    copy: "Evaluate cybersecurity, leadership, governance, intelligence, and executive education through Obserra Academy.",
+    copy: `Evaluate cybersecurity, leadership, governance, intelligence, and executive education through ${ACADEMY_BRAND_NAME}.`,
     href: "/academy",
     action: "Browse courses",
     status: "Secure checkout",
