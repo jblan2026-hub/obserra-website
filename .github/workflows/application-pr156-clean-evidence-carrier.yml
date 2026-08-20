@@ -59,83 +59,91 @@ jobs:
       - name: Install locked dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Generate and commit legal identity evidence on clean tree
+      - name: Generate and optionally commit legal identity evidence
         shell: bash
         run: |
           set -euo pipefail
           npm run generate:legal-identity-audit
           git diff --name-only | sort > /tmp/legal.changed
-          printf '%s\n' \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.json \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.md \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 | sort > /tmp/legal.allowed
-          diff -u /tmp/legal.allowed /tmp/legal.changed
-          git add -- \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.json \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.md \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
-          git diff --cached --check
-          git commit -m "ci(compliance): refresh legal identity evidence"
+          if [ -s /tmp/legal.changed ]; then
+            printf '%s\n' \
+              docs/compliance/LEGAL-IDENTITY-AUDIT.json \
+              docs/compliance/LEGAL-IDENTITY-AUDIT.md \
+              docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 | sort > /tmp/legal.allowed
+            diff -u /tmp/legal.allowed /tmp/legal.changed
+            git add -- \
+              docs/compliance/LEGAL-IDENTITY-AUDIT.json \
+              docs/compliance/LEGAL-IDENTITY-AUDIT.md \
+              docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
+            git diff --cached --check
+            git commit -m "ci(compliance): refresh legal identity evidence"
+          fi
           test -z "$(git status --porcelain)"
           npm run verify:legal-identity-audit
 
-      - name: Generate and commit CMMC system evidence on clean tree
+      - name: Generate and optionally commit CMMC system evidence
         shell: bash
         run: |
           set -euo pipefail
           npm run generate:cmmc-system-evidence
           git diff --name-only | sort > /tmp/cmmc.changed
-          printf '%s\n' \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256 | sort > /tmp/cmmc.allowed
-          diff -u /tmp/cmmc.allowed /tmp/cmmc.changed
-          git add -- \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
-          git diff --cached --check
-          git commit -m "ci(compliance): refresh clean CMMC system evidence"
+          if [ -s /tmp/cmmc.changed ]; then
+            printf '%s\n' \
+              docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+              docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+              docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256 | sort > /tmp/cmmc.allowed
+            diff -u /tmp/cmmc.allowed /tmp/cmmc.changed
+            git add -- \
+              docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+              docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+              docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+            git diff --cached --check
+            git commit -m "ci(compliance): refresh clean CMMC system evidence"
+          fi
           test -z "$(git status --porcelain)"
           npm run verify:cmmc-system-evidence
 
-      - name: Generate and commit technical human disposition
+      - name: Generate and optionally commit technical human disposition
         shell: bash
         run: |
           set -euo pipefail
           npm run generate:cmmc-disposition
           git diff --name-only | sort > /tmp/disposition.changed
-          printf '%s\n' \
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 | sort > /tmp/disposition.allowed
-          diff -u /tmp/disposition.allowed /tmp/disposition.changed
-          git add -- \
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
-            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256
-          git diff --cached --check
-          git commit -m "ci(compliance): refresh CMMC disposition"
+          if [ -s /tmp/disposition.changed ]; then
+            printf '%s\n' \
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 | sort > /tmp/disposition.allowed
+            diff -u /tmp/disposition.allowed /tmp/disposition.changed
+            git add -- \
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256
+            git diff --cached --check
+            git commit -m "ci(compliance): refresh CMMC disposition"
+          fi
           test -z "$(git status --porcelain)"
           npm run verify:cmmc-disposition
 
-      - name: Generate and commit FDACS PII audit record
+      - name: Generate and optionally commit FDACS PII audit record
         shell: bash
         run: |
           set -euo pipefail
           npm run generate:fdacs-pii-audit
           git diff --name-only | sort > /tmp/fdacs.changed
-          printf '%s\n' \
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256 | sort > /tmp/fdacs.allowed
-          diff -u /tmp/fdacs.allowed /tmp/fdacs.changed
-          git add -- \
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
-            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
-          git diff --cached --check
-          git commit -m "ci(compliance): refresh FDACS PII audit"
+          if [ -s /tmp/fdacs.changed ]; then
+            printf '%s\n' \
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256 | sort > /tmp/fdacs.allowed
+            diff -u /tmp/fdacs.allowed /tmp/fdacs.changed
+            git add -- \
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
+            git diff --cached --check
+            git commit -m "ci(compliance): refresh FDACS PII audit"
+          fi
           test -z "$(git status --porcelain)"
           npm run verify:fdacs-pii-audit
 
@@ -146,7 +154,7 @@ jobs:
           test -z "$(git status --porcelain)"
           npm run verify:cmmc-evidence
           node --test test/applications-before-filesystem-routing-contract.test.mjs
-          git diff --check HEAD~4..HEAD
+          git diff --check
 
       - name: Push verified clean convergence commits
         shell: bash
