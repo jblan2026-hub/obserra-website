@@ -79,61 +79,16 @@ jobs:
 
           const proxyPath = 'proxy.ts';
           let proxy = fs.readFileSync(proxyPath, 'utf8');
-          proxy = replaceRequired(
-            proxy,
-            `import { applicationsTeamUserAuthorized } from "./lib/applications-team-access";\n`,
-            '',
-            'Applications team-only proxy import',
-          );
-          proxy = replaceRequired(
-            proxy,
-            `const APPLICATIONS_PRIVATE_PATH_PREFIXES = ["/apps", "/api/apps"] as const;\n`,
-            '',
-            'Applications private prefix list',
-          );
-          proxy = replaceRequired(
-            proxy,
-            `const PROTECTED_PATH_PREFIXES = [\n  "/apps",\n  "/api/apps",`,
-            `const PROTECTED_PATH_PREFIXES = [\n  "/api/apps",`,
-            'Public /apps protected prefix',
-          );
-          proxy = replaceRequired(
-            proxy,
-            `function isPrivateApplicationsPath(pathname: string) {\n  return APPLICATIONS_PRIVATE_PATH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix));\n}\n\n`,
-            '',
-            'isPrivateApplicationsPath helper',
-          );
-          proxy = replaceRequired(
-            proxy,
-            `  const privateApplicationsPath = isPrivateApplicationsPath(pathname);\n  const ownerPath = isOwnerPath(pathname);`,
-            `  const privateApplicationsOperation = pathMatchesPrefix(pathname, "/api/apps");\n  const ownerPath = isOwnerPath(pathname);`,
-            'private Applications header classification',
-          );
-          proxy = replaceRequired(
-            proxy,
-            `  if (ownerPath || privateApplicationsPath) {`,
-            `  if (ownerPath || privateApplicationsOperation) {`,
-            'private header conditional',
-          );
-          proxy = proxy.replace(
-            /\nfunction applicationsPrivateAccessDeniedResponse\(request: NextRequest\) \{[\s\S]*?\n\}\n\nfunction temporarilyDisableOwnerReviewRoute/,
-            '\nfunction temporarilyDisableOwnerReviewRoute',
-          );
-          if (proxy.includes('function applicationsPrivateAccessDeniedResponse')) {
-            throw new Error('Applications team-only denial helper was not removed');
-          }
-          proxy = replaceRequired(
-            proxy,
-            `  if (isPrivateApplicationsPath(url.pathname)) {\n    return applicationsPrivateAccessDeniedResponse(request);\n  }\n`,
-            '',
-            'identity configuration Applications team-only denial',
-          );
-          proxy = replaceRequired(
-            proxy,
-            `    if (isPrivateApplicationsPath(pathname)) {\n      const { userId } = await auth();\n      if (!applicationsTeamUserAuthorized(userId)) {\n        return applicationsPrivateAccessDeniedResponse(request);\n      }\n    } else if (requiresAuthentication(request)) {`,
-            `    if (requiresAuthentication(request)) {`,
-            'Clerk Applications team-only authorization branch',
-          );
+          proxy = replaceRequired(proxy, `import { applicationsTeamUserAuthorized } from "./lib/applications-team-access";\n`, '', 'Applications team-only proxy import');
+          proxy = replaceRequired(proxy, `const APPLICATIONS_PRIVATE_PATH_PREFIXES = ["/apps", "/api/apps"] as const;\n`, '', 'Applications private prefix list');
+          proxy = replaceRequired(proxy, `const PROTECTED_PATH_PREFIXES = [\n  "/apps",\n  "/api/apps",`, `const PROTECTED_PATH_PREFIXES = [\n  "/api/apps",`, 'Public /apps protected prefix');
+          proxy = replaceRequired(proxy, `function isPrivateApplicationsPath(pathname: string) {\n  return APPLICATIONS_PRIVATE_PATH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix));\n}\n\n`, '', 'isPrivateApplicationsPath helper');
+          proxy = replaceRequired(proxy, `  const privateApplicationsPath = isPrivateApplicationsPath(pathname);\n  const ownerPath = isOwnerPath(pathname);`, `  const privateApplicationsOperation = pathMatchesPrefix(pathname, "/api/apps");\n  const ownerPath = isOwnerPath(pathname);`, 'private Applications header classification');
+          proxy = replaceRequired(proxy, `  if (ownerPath || privateApplicationsPath) {`, `  if (ownerPath || privateApplicationsOperation) {`, 'private header conditional');
+          proxy = proxy.replace(/\nfunction applicationsPrivateAccessDeniedResponse\(request: NextRequest\) \{[\s\S]*?\n\}\n\nfunction temporarilyDisableOwnerReviewRoute/, '\nfunction temporarilyDisableOwnerReviewRoute');
+          if (proxy.includes('function applicationsPrivateAccessDeniedResponse')) throw new Error('Applications team-only denial helper was not removed');
+          proxy = replaceRequired(proxy, `  if (isPrivateApplicationsPath(url.pathname)) {\n    return applicationsPrivateAccessDeniedResponse(request);\n  }\n`, '', 'identity configuration Applications team-only denial');
+          proxy = replaceRequired(proxy, `    if (isPrivateApplicationsPath(pathname)) {\n      const { userId } = await auth();\n      if (!applicationsTeamUserAuthorized(userId)) {\n        return applicationsPrivateAccessDeniedResponse(request);\n      }\n    } else if (requiresAuthentication(request)) {`, `    if (requiresAuthentication(request)) {`, 'Clerk Applications team-only authorization branch');
           fs.writeFileSync(proxyPath, proxy);
           NODE
 
@@ -183,3 +138,5 @@ jobs:
           git diff --cached --check
           git commit -m "fix(apps): restore public SaaS storefront routing"
           git push origin HEAD:fix/apps-private-boundary-main-20260820
+
+# trigger after workflow registration
