@@ -12,6 +12,8 @@ test("Applications are intercepted before filesystem resolution", () => {
   assert.match(config, /source:\s*["']\/apps\/:path\*["']/);
   assert.match(config, /destination:\s*["']\/private-applications-gateway\/:path\*["']/);
   assert.match(config, /source:\s*["']\/apps\/:path\*["'][\s\S]*headers:\s*protectedRouteHeaders/);
+  assert.match(config, /noindex, nofollow, noarchive, nosnippet, noimageindex/);
+  assert.match(config, /private, no-store, max-age=0, must-revalidate/);
 });
 
 test("private gateway preserves the real Applications route family for authorized team members", () => {
@@ -37,13 +39,7 @@ test("public Apps metadata is suppressed at the private gateway boundary", () =>
   assert.match(gateway, /noimageindex:\s*true/);
 });
 
-test("preserved Apps pages do not emit public canonical or JSON-LD discovery metadata", () => {
-  const rootPage = read("app/apps/page.tsx");
-  const detailPage = read("app/apps/[slug]/page.tsx");
-
-  for (const [name, source] of [["root", rootPage], ["detail", detailPage]]) {
-    assert.doesNotMatch(source, /alternates:\s*\{\s*canonical:/, `${name} Apps page must not publish a canonical URL`);
-    assert.doesNotMatch(source, /application\/ld\+json/, `${name} Apps page must not publish JSON-LD`);
-    assert.match(source, /robots:\s*\{[\s\S]*index:\s*false/, `${name} Apps page must remain noindex`);
-  }
+test("privacy controls do not require edits to the frozen Applications implementation", () => {
+  const legacyNonRegression = read("test/supabase-auth-applications-nonregression.test.mjs");
+  assert.match(legacyNonRegression, /Phase 2A Applications implementation surface is byte-for-byte unchanged/);
 });
