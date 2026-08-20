@@ -94,7 +94,7 @@ forbidText(proxyPath, proxy, "export default clerkMiddleware(", "unconditional C
 // release SHA so routing ownership can be verified from a live response rather
 // than inferred from identical source deployed to multiple projects. Project
 // ownership is single-sourced with the canonical production identity runtime.
-requireText(authRuntimePath, authRuntime, 'export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme"', "canonical Vercel project authority");
+requireText(authRuntimePath, authRuntime, 'export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "prj_lxTKKDa9sbhht7FaigiaF1PONMiC"', "canonical Vercel project authority");
 requireText(websiteHealthPath, websiteHealth, 'import { CANONICAL_PUBLIC_VERCEL_PROJECT_ID } from "../../../lib/auth/runtime-config";', "single-source Vercel project authority import");
 requireText(websiteHealthPath, websiteHealth, "observedProjectId === CANONICAL_PUBLIC_VERCEL_PROJECT_ID", "canonical Vercel routing comparison");
 requireText(websiteHealthPath, websiteHealth, 'systemValue("VERCEL_PROJECT_ID")', "observed Vercel project identity");
