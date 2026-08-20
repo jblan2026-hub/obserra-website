@@ -17,14 +17,14 @@ test("production authority is single-sourced to the live canonical Vercel projec
 
   assert.match(runtime, new RegExp(`CANONICAL_PUBLIC_VERCEL_PROJECT_ID = ["']${CANONICAL_PROJECT_ID}["']`));
   assert.match(ignoreBuild, new RegExp(`PRODUCTION_PROJECT_ID=["']${CANONICAL_PROJECT_ID}["']`));
-  assert.match(ignoreBuild, new RegExp(`INTEGRATION_PROJECT_ID=["']${AUXILIARY_PROJECT_ID}["']`));
+  assert.match(ignoreBuild, new RegExp(`DUPLICATE_PROJECT_ID=["']${AUXILIARY_PROJECT_ID}["']`));
   assert.match(cutover, new RegExp(`CANONICAL_PROJECT_ID:\\s*${CANONICAL_PROJECT_ID}`));
   assert.match(cutover, new RegExp(`AUXILIARY_PROJECT_ID:\\s*${AUXILIARY_PROJECT_ID}`));
   assert.match(operationalGate, new RegExp(CANONICAL_PROJECT_ID, "g"));
   assert.match(commerceGate, new RegExp(CANONICAL_PROJECT_ID));
   assert.match(cmmcGate, new RegExp(CANONICAL_PROJECT_ID));
   assert.match(ignoreBuildTest, new RegExp(`PRODUCTION_PROJECT_ID = ["']${CANONICAL_PROJECT_ID}["']`));
-  assert.match(ignoreBuildTest, new RegExp(`INTEGRATION_PROJECT_ID = ["']${AUXILIARY_PROJECT_ID}["']`));
+  assert.match(ignoreBuildTest, new RegExp(`DUPLICATE_PROJECT_ID = ["']${AUXILIARY_PROJECT_ID}["']`));
 });
 
 test("automatic cutover moves custom-domain ownership to the canonical project before smoke validation", () => {
