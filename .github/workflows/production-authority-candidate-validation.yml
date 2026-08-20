@@ -96,12 +96,6 @@ jobs:
           replaceExact('scripts/cmmc-level2-rev3-production-evidence.mjs',
             'requireText(vercelIgnorePath, vercelIgnore, "prj_FfAnssVJU8pcJydGNJHmCliP6Yme", "canonical Vercel project guard");',
             `requireText(vercelIgnorePath, vercelIgnore, "${CANONICAL}", "canonical production Vercel project guard");\nrequireText(vercelIgnorePath, vercelIgnore, "${AUXILIARY}", "integration Vercel project guard");`);
-          replaceExact('test/vercel-ignore-build.test.mjs',
-            'const CANONICAL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";',
-            `const CANONICAL_PROJECT_ID = "${CANONICAL}";`);
-          replaceExact('test/vercel-production-authority-consistency.test.mjs',
-            'assert.doesNotMatch(cutover, /request DELETE[\\s\\S]*projects\\/\\$\\{AUXILIARY_PROJECT_ID\\}\\?teamId=/);',
-            'assert.doesNotMatch(cutover, /--request DELETE(?:(?!--request)[\\s\\S])*projects\\/\\$\\{AUXILIARY_PROJECT_ID\\}\\?teamId=/);');
 
           const cutoverPath = '.github/workflows/production-vercel-public-cutover.yml';
           let cutover = read(cutoverPath);
@@ -179,8 +173,6 @@ jobs:
           lib/auth/runtime-config.ts
           scripts/cmmc-level2-rev3-production-evidence.mjs
           scripts/florida-class-d-website-academy-commerce-gate.mjs
-          test/vercel-ignore-build.test.mjs
-          test/vercel-production-authority-consistency.test.mjs
           EOF
           sort -o /tmp/expected-authority-files.txt /tmp/expected-authority-files.txt
           diff -u /tmp/expected-authority-files.txt /tmp/actual-authority-files.txt
