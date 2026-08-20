@@ -27,12 +27,41 @@ test("rollback alias capture fails closed and distinguishes missing aliases from
   assert.match(workflow, /Vercel returned no deployment ID for required rollback alias/);
 });
 
-test("auxiliary Vercel project is configured to ignore duplicate builds", () => {
-  assert.match(workflow, /commandForIgnoringBuildStep\":\"exit 0\"/);
-  assert.doesNotMatch(workflow, /commandForIgnoringBuildStep\":\"exit 1\"/);
+test("cutover distinguishes the duplicate build project from every known noncanonical domain claimant", () => {
+  assert.match(workflow, /DUPLICATE_PROJECT_ID:\s*prj_FfAnssVJU8pcJydGNJHmCliP6Yme/);
+  assert.match(
+    workflow,
+    /NON_CANONICAL_DOMAIN_PROJECT_IDS:\s*"?prj_FfAnssVJU8pcJydGNJHmCliP6Yme prj_v6Hb7FkpkUoLKlHkjzKJ5HVgYDaL"?/,
+  );
+  assert.doesNotMatch(workflow, /AUXILIARY_PROJECT_ID:/);
+  assert.match(workflow, /for project_id in \$\{NON_CANONICAL_DOMAIN_PROJECT_IDS\}; do/);
 });
 
-test("partial project-domain move or smoke failure triggers rollback only after rollback state is captured", () => {
+test("only the proven duplicate project is configured to ignore duplicate builds", () => {
+  assert.match(workflow, /commandForIgnoringBuildStep\":\"exit 0\"/);
+  assert.doesNotMatch(workflow, /commandForIgnoringBuildStep\":\"exit 1\"/);
+  assert.match(workflow, /projects\/\$\{DUPLICATE_PROJECT_ID\}\?teamId=\$\{TEAM_ID\}/);
+  assert.doesNotMatch(workflow, /projects\/\$\{project_id\}\?teamId=\$\{TEAM_ID\}[\s\S]*commandForIgnoringBuildStep/);
+});
+
+test("domain move discovers the actual source owner and fails closed on ambiguous ownership", () => {
+  assert.match(workflow, /source_projects=\(\)/);
+  assert.match(workflow, /source_projects\+\=\("\$\{project_id\}"\)/);
+  assert.match(workflow, /if \[ "\$\{#source_projects\[@\]\}" -gt 1 \]/);
+  assert.match(workflow, /Ambiguous noncanonical ownership for \$\{domain\}/);
+  assert.match(
+    workflow,
+    /https:\/\/api\.vercel\.com\/v1\/projects\/\$\{source_project\}\/domains\/\$\{domain\}\/move\?teamId=\$\{TEAM_ID\}/,
+  );
+  assert.match(workflow, /echo "\$\{output_name\}_source_project=\$\{source_project\}" >> "\$\{GITHUB_OUTPUT\}"/);
+});
+
+test("post-cutover verification rejects canonical domains on every noncanonical project", () => {
+  assert.match(workflow, /for project_id in \$\{NON_CANONICAL_DOMAIN_PROJECT_IDS\}; do/);
+  assert.match(workflow, /Noncanonical Vercel project \$\{project_id\} still owns a canonical production domain after move/);
+});
+
+test("partial project-domain move or smoke failure restores each domain to its actual prior source", () => {
   assert.match(workflow, /id:\s*move/);
   assert.match(workflow, /continue-on-error:\s*true/);
   assert.match(workflow, /if:\s*steps\.move\.outcome == 'success'/);
@@ -40,8 +69,10 @@ test("partial project-domain move or smoke failure triggers rollback only after 
     workflow,
     /always\(\) && steps\.rollback\.outcome == 'success' && steps\.rollback\.outputs\.primary != '' && steps\.rollback\.outputs\.apex != '' && \(steps\.move\.outcome == 'failure' \|\| steps\.smoke\.outcome == 'failure'\)/,
   );
-  assert.match(workflow, /https:\/\/api\.vercel\.com\/v1\/projects\/\$\{CANONICAL_PROJECT_ID\}\/domains\/\$\{domain\}\/move\?teamId=\$\{TEAM_ID\}/);
-  assert.match(workflow, /--data "\{\\"projectId\\":\\"\$\{AUXILIARY_PROJECT_ID\}\\"\}"/);
+  assert.match(workflow, /ROLLBACK_PRIMARY_PROJECT:\s*\$\{\{ steps\.move\.outputs\.primary_source_project \}\}/);
+  assert.match(workflow, /ROLLBACK_APEX_PROJECT:\s*\$\{\{ steps\.move\.outputs\.apex_source_project \}\}/);
+  assert.match(workflow, /local source_project="\$3"/);
+  assert.match(workflow, /--data "\{\\"projectId\\":\\"\$\{source_project\}\\"\}"/);
   assert.match(workflow, /if \[ -z "\$\{ROLLBACK_PRIMARY\}" \] \|\| \[ -z "\$\{ROLLBACK_APEX\}" \]/);
   assert.match(workflow, /Rollback deployment IDs were not captured/);
 });
