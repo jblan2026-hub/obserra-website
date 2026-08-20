@@ -27,6 +27,22 @@ test("production authority is single-sourced to the live canonical Vercel projec
   assert.match(ignoreBuildTest, new RegExp(`INTEGRATION_PROJECT_ID = ["']${AUXILIARY_PROJECT_ID}["']`));
 });
 
+test("automatic cutover moves custom-domain ownership to the canonical project before smoke validation", () => {
+  const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
+  const moveStep = "Move canonical domains to production project";
+  const smokeStep = "Verify canonical LMS and prelicense commerce lock";
+  const moveIndex = cutover.indexOf(moveStep);
+  const smokeIndex = cutover.indexOf(smokeStep);
+
+  assert.ok(moveIndex >= 0, "cutover must contain the project-domain move step");
+  assert.ok(smokeIndex > moveIndex, "project-domain ownership must move before live smoke validation");
+  assert.match(
+    cutover,
+    /https:\/\/api\.vercel\.com\/v1\/projects\/\$\{AUXILIARY_PROJECT_ID\}\/domains\/\$\{domain\}\/move\?teamId=\$\{TEAM_ID\}/,
+  );
+  assert.match(cutover, /--data "\{\\"projectId\\":\\"\$\{CANONICAL_PROJECT_ID\}\\"\}"/);
+});
+
 test("automatic cutover quarantines duplicates without deleting Vercel projects", () => {
   const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
   assert.doesNotMatch(cutover, /--request DELETE(?:(?!--request)[\s\S])*projects\/\$\{AUXILIARY_PROJECT_ID\}\?teamId=/);
