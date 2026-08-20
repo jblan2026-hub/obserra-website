@@ -32,14 +32,16 @@ test("auxiliary Vercel project is configured to ignore duplicate builds", () => 
   assert.doesNotMatch(workflow, /commandForIgnoringBuildStep\":\"exit 1\"/);
 });
 
-test("partial alias attachment or smoke failure triggers rollback only after rollback state is captured", () => {
-  assert.match(workflow, /id:\s*attach/);
+test("partial project-domain move or smoke failure triggers rollback only after rollback state is captured", () => {
+  assert.match(workflow, /id:\s*move/);
   assert.match(workflow, /continue-on-error:\s*true/);
-  assert.match(workflow, /if:\s*steps\.attach\.outcome == 'success'/);
+  assert.match(workflow, /if:\s*steps\.move\.outcome == 'success'/);
   assert.match(
     workflow,
-    /always\(\) && steps\.rollback\.outcome == 'success' && steps\.rollback\.outputs\.primary != '' && steps\.rollback\.outputs\.apex != '' && \(steps\.attach\.outcome == 'failure' \|\| steps\.smoke\.outcome == 'failure'\)/,
+    /always\(\) && steps\.rollback\.outcome == 'success' && steps\.rollback\.outputs\.primary != '' && steps\.rollback\.outputs\.apex != '' && \(steps\.move\.outcome == 'failure' \|\| steps\.smoke\.outcome == 'failure'\)/,
   );
+  assert.match(workflow, /https:\/\/api\.vercel\.com\/v1\/projects\/\$\{CANONICAL_PROJECT_ID\}\/domains\/\$\{domain\}\/move\?teamId=\$\{TEAM_ID\}/);
+  assert.match(workflow, /--data "\{\\"projectId\\":\\"\$\{AUXILIARY_PROJECT_ID\}\\"\}"/);
   assert.match(workflow, /if \[ -z "\$\{ROLLBACK_PRIMARY\}" \] \|\| \[ -z "\$\{ROLLBACK_APEX\}" \]/);
   assert.match(workflow, /Rollback deployment IDs were not captured/);
 });
