@@ -3,13 +3,13 @@
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update the controlled source records and run `npm run generate:cmmc-system-evidence`.
 
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-- **Bundle:** `obserra-cmmc-working-031319ac2d5e1583f000bff0`
+- **Bundle:** `obserra-cmmc-working-56c95e5d61eac4120704f2eb`
 - **Bundle state:** `working_evidence_inventory`
 - **Generated at:** `2026-08-14T18:49:07Z`
 - **Git base/HEAD reference:** `0e72459a8940f23976038d85d6394409000f48c5`
 - **Revision binding:** `working_tree_digest`
 - **Exact release:** not assigned; working evidence inventory
-- **In-scope tree SHA-256:** `031319ac2d5e1583f000bff0d1d044ef6defc5446f5aa27a32d82ec7d750f0a2` (688 paths)
+- **In-scope tree SHA-256:** `56c95e5d61eac4120704f2ebb57999233da533d4a28b7097c7277449f605c0ba` (689 paths)
 
 ## Paired audit views
 
@@ -2825,7 +2825,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 
 | Artifact | Origin | State | Method/result | SHA-256 | Finding eligible | Claim boundary |
 | --- | --- | --- | --- | --- | --- | --- |
-| `EV-VERCEL-CONFIG` — Vercel deployment configuration<br>`vercel.json` | product_supplied_evidence | working | examine/not_run | `0da1055847e1c02a822e6b51e745dc713463f6b2fd3e015a19ef9b33f9e47955` | no | Repository configuration only. |
+| `EV-VERCEL-CONFIG` — Vercel deployment configuration<br>`vercel.json` | product_supplied_evidence | working | examine/not_run | `54582ba9b63ea2964bd3183aa6c2f3e56d500c563a17e345370c988313ca4f8f` | no | Repository configuration only. |
 | `EV-VERCEL-HEALTH` — Runtime release identity health route<br>`app/api/health/route.ts` | product_supplied_evidence | working | test/not_run | `9a2363b2048c7ae3e1d76cc9b97b95506df311060ae9465272530c98ac26cf40` | no | Health contract source only; live response is separate evidence. |
 | `EV-VERCEL-INTEGRITY-TEST` — Deployment integrity test<br>`test/vercel-deployment-integrity.test.mjs` | product_supplied_evidence | working | test/not_run | `433ac5c09c3acafee82b6b6b3085d0a614e840f16d3d71418e5239f48d994ecb` | no | Test definition only until exact-run results are retained. |
 | `EV-VERCEL-E2E-WORKFLOW` — Production E2E operational gate<br>`.github/workflows/production-e2e-operational-gate.yml` | product_supplied_evidence | working | examine/not_run | `912bb4e113e07f3cf5f95ab9e1be7ddfab475e1a9f3b3fe98660b891ce724512` | no | Workflow configuration only. |
