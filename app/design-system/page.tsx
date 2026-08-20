@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ButtonLink, Field, KpiCard, PageIntro, Panel, StatusBadge } from "../components/ui/ObserraUI";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { ACADEMY_BRAND_NAME, EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
   title: "Design System",
@@ -15,7 +15,7 @@ export default function DesignSystemPage() {
         <PageIntro
           eyebrow={`${LEGAL_ENTITY_NAME} DESIGN SYSTEM V1.0`}
           title="Enterprise components for executive intelligence experiences."
-          copy={`This non-indexed validation page proves the shared tokens, controls, cards, states, forms, and responsive behavior used by the ${LEGAL_ENTITY_NAME} website, Obserra Academy, and Obserra EIOS product experiences.`}
+          copy={`This non-indexed validation page proves the shared tokens, controls, cards, states, forms, and responsive behavior used by the ${LEGAL_ENTITY_NAME} website, ${ACADEMY_BRAND_NAME}, and ${EIOS_BRAND_NAME} product experiences.`}
           actions={<><ButtonLink href="/" variant="primary">Return home</ButtonLink><ButtonLink href="/trust" variant="secondary">Open Trust Center</ButtonLink></>}
         />
 
@@ -46,7 +46,7 @@ export default function DesignSystemPage() {
         <Panel title="Accessible form controls" eyebrow="FORM PRIMITIVES">
           <form className="obs-grid">
             <Field label="Executive email" hint="Use a business email for enterprise inquiries."><input className="obs-input" type="email" name="email" autoComplete="email" /></Field>
-            <Field label="Engagement type"><select className="obs-select" name="engagement" defaultValue=""><option value="" disabled>Select one</option><option>Executive advisory</option><option>EIOS platform</option><option>Enterprise training</option></select></Field>
+            <Field label="Engagement type"><select className="obs-select" name="engagement" defaultValue=""><option value="" disabled>Select one</option><option>Executive advisory</option><option>{EIOS_BRAND_NAME} platform</option><option>Enterprise training</option></select></Field>
             <Field label="Business objective"><textarea className="obs-textarea" name="objective" /></Field>
           </form>
         </Panel>
