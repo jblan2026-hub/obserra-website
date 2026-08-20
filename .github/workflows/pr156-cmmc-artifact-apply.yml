@@ -28,7 +28,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          expected="9ebb6752a22e3e491c554a4c74401e6e62c240b5"
+          expected="4ca1879da9a47f9c516500a791609edcf3d8082e"
           actual="$(git rev-parse HEAD)"
           test "$actual" = "$expected"
 
@@ -39,16 +39,16 @@ jobs:
           path: /tmp/cmmc-remediation
           github-token: ${{ github.token }}
           repository: jblan2026-hub/obserra-website
-          run-id: 32407908474
+          run-id: 32408824159
 
       - name: Verify remediation artifact hashes
         shell: bash
         run: |
           set -euo pipefail
           cd /tmp/cmmc-remediation
-          echo "7b08c75e49912e1d5662016618fa078945c2df2859b5a9f997f5865dabfa9b82  CMMC-SYSTEM-EVIDENCE.json" | sha256sum --check --strict
-          echo "824e34b7af396b9f6cdaa181b6070f38cabb82b2352ee5d83a524019e22dad25  CMMC-SYSTEM-EVIDENCE.md" | sha256sum --check --strict
-          echo "53f2f1a3ec8588552e4cd62675fe9e12efc1e9be88ad2a14780f081dfc5ac988  CMMC-SYSTEM-EVIDENCE.sha256" | sha256sum --check --strict
+          echo "1b0cceb2f8227bb34f6ec5aaeda4a8cd7905126ff70f5f0dd178a062b7a93a1a  CMMC-SYSTEM-EVIDENCE.json" | sha256sum --check --strict
+          echo "27d97c92fff5ead986cfa0a54c4c4f9bf1b412c33775af4c488a2e6de2a343f7  CMMC-SYSTEM-EVIDENCE.md" | sha256sum --check --strict
+          echo "b4a26dd12168b2d53a6a1c5e2b8a248f21ff190aabb40962c532669ad51dc1e5  CMMC-SYSTEM-EVIDENCE.sha256" | sha256sum --check --strict
 
       - name: Apply generated remediation only
         shell: bash
