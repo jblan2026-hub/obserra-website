@@ -19,9 +19,9 @@ const categories = [
     status: "Stripe subscriptions",
   },
   {
-    eyebrow: "ACADEMY",
+    eyebrow: "OBSERRA EPI ACADEMY",
     title: "Professional courses and completion records",
-    copy: "Evaluate cybersecurity, leadership, governance, intelligence, and executive education through Obserra Academy.",
+    copy: "Evaluate cybersecurity, leadership, governance, intelligence, and executive education through Obserra EPI Academy.",
     href: "/academy",
     action: "Browse courses",
     status: "Secure checkout",
