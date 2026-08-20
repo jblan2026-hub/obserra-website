@@ -35,18 +35,20 @@ jobs:
           npm run generate:cmmc-system-evidence
           npm run verify:cmmc-system-evidence
 
-      - name: Verify only CMMC generated evidence changed
+      - name: Verify only governed CMMC evidence changed
         shell: bash
         run: |
           set -euo pipefail
-          git diff --name-only | sort > /tmp/actual.txt
-          cat > /tmp/expected.txt <<'EOF'
-          docs/compliance/CMMC-SYSTEM-EVIDENCE.json
-          docs/compliance/CMMC-SYSTEM-EVIDENCE.md
-          docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
-          EOF
-          sort -o /tmp/expected.txt /tmp/expected.txt
-          diff -u /tmp/expected.txt /tmp/actual.txt
+          mapfile -t changed < <(git diff --name-only | sort)
+          test "${#changed[@]}" -ge 2
+          printf '%s\n' "${changed[@]}" | grep -qx 'docs/compliance/CMMC-SYSTEM-EVIDENCE.json'
+          printf '%s\n' "${changed[@]}" | grep -qx 'docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256'
+          for path in "${changed[@]}"; do
+            case "$path" in
+              docs/compliance/CMMC-SYSTEM-EVIDENCE.json|docs/compliance/CMMC-SYSTEM-EVIDENCE.md|docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256) ;;
+              *) echo "Unexpected generated path: $path" >&2; exit 1 ;;
+            esac
+          done
 
       - name: Commit exact CMMC generated evidence
         env:
