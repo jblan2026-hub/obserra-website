@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import EiosShowcase from "./EiosShowcase";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
   title: `EIOS | Governed Enterprise Intelligence and Action | ${LEGAL_ENTITY_NAME}`,
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
         url: "/eios/eios-overview-marketing.png",
         width: 1584,
         height: 889,
-        alt: "Obserra EIOS overview"
+        alt: `${EIOS_BRAND_NAME} overview`
       }
     ],
   },
@@ -36,7 +36,7 @@ export default function EiosPage() {
     "@graph": [
       {
         "@type": "SoftwareApplication",
-        name: "Obserra EIOS",
+        name: EIOS_BRAND_NAME,
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
         url: "https://www.obserrallc.com/eios",

@@ -4,7 +4,7 @@ import test from "node:test";
 
 const read = (path) => fs.readFileSync(path, "utf8");
 
-test("Obserra EPI Applications and Obserra EPI Academy are prominent direct website destinations", () => {
+test("Obserra EPI Academy stays public while Applications remain off public enterprise navigation", () => {
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
   const home = read("app/page.tsx");
   const identity = read("lib/legal-identity.ts");
@@ -12,20 +12,15 @@ test("Obserra EPI Applications and Obserra EPI Academy are prominent direct webs
 
   assert.match(identity, /APPLICATIONS_BRAND_NAME = `\$\{BRAND_PREFIX\} Applications`/);
   assert.match(identity, /ACADEMY_BRAND_NAME = `\$\{BRAND_PREFIX\} Academy`/);
-  assert.ok(
-    chrome.indexOf('[APPLICATIONS_BRAND_NAME, "/apps", "sales"]') <
-      chrome.indexOf('[ACADEMY_BRAND_NAME, "/academy", "sales"]'),
-    "Applications must remain ahead of Academy in primary sales navigation",
-  );
+  assert.doesNotMatch(chrome, /\[APPLICATIONS_BRAND_NAME, "\/apps", "sales"\]/);
+  assert.doesNotMatch(chrome, /<Link href="\/apps">/);
+  assert.match(chrome, /\[ACADEMY_BRAND_NAME, "\/academy", "sales"\]/);
   assert.match(chrome, /className=\{prominence === "sales" \? "ent-header__sales-link"/);
-  assert.match(chrome, /<Link href="\/apps">\{APPLICATIONS_BRAND_NAME\}<\/Link><Link href="\/academy">\{ACADEMY_BRAND_NAME\}<\/Link>/);
+  assert.match(chrome, /<Link href="\/academy">\{ACADEMY_BRAND_NAME\}<\/Link>/);
   assert.match(styles, /> a\.ent-header__sales-link/);
-  assert.match(home, /<ButtonLink href="\/apps">Shop \{APPLICATIONS_BRAND_NAME\}<\/ButtonLink>/);
   assert.match(home, /<ButtonLink href="\/academy" variant="secondary">Browse \{ACADEMY_BRAND_NAME\}<\/ButtonLink>/);
-  assert.match(home, /Applications and Academy are direct website destinations/);
-  assert.match(home, /href="\/apps" className="mission-direct-sales__card"/);
-  assert.match(home, /href="\/academy" className="mission-direct-sales__card"/);
-  assert.doesNotMatch(home, /href="\/portal\/applications" className="mission-direct-sales__card"/);
+  assert.ok(fs.existsSync("app/apps/page.tsx"), "private Applications implementation must remain present");
+  assert.ok(fs.existsSync("lib/applications-team-access.ts"), "Applications team authorization must remain present");
 });
 
 test("Academy catalog exposes checkout only for explicitly activated courses", () => {

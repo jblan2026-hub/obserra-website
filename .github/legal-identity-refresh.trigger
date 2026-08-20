@@ -1,3 +1,3 @@
-refresh-request: 2026-08-19-remove-unavailable-vercel-mutation-path
-reason: regenerate governed evidence after removing the nonfunctional auxiliary Vercel mutation workflow and restoring the established governed evidence refresher; direct Vercel connector verification continues to expose the external verified-commit project conflict fail closed
-validation-request: 2026-08-19-post-vercel-mutation-cleanup
+refresh-request: 2026-08-20-vercel-production-authority-governed-hotfix-complete-brand-sweep
+reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence after the consolidated customer-facing product identity sweep replaced remaining hardcoded Obserra Academy and Obserra EIOS names in EIOS metadata and schema, EIOS capability pages, Industries, Resources, Store, Contact, Academy payment return, and the non-indexed design-system validation page with centralized governed Obserra EPI brand constants; production authority reconciliation and regulated security boundaries remain unchanged
+validation-request: 2026-08-20-exact-governed-hotfix-post-complete-brand-sweep

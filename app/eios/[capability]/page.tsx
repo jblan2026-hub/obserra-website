@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { eiosCapabilities, getEiosCapability } from "../capabilities";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "../product-center.css";
 
 export function generateStaticParams() {
@@ -15,11 +15,11 @@ export async function generateMetadata({ params }: { params: Promise<{ capabilit
   const entry = getEiosCapability(capability);
   if (!entry) return {};
   return {
-    title: `${entry.title} | Obserra EIOS`,
+    title: `${entry.title} | ${EIOS_BRAND_NAME}`,
     description: entry.summary,
     alternates: { canonical: `/eios/${entry.slug}` },
     openGraph: {
-      title: `${entry.title} | Obserra EIOS`,
+      title: `${entry.title} | ${EIOS_BRAND_NAME}`,
       description: entry.summary,
       url: `https://www.obserrallc.com/eios/${entry.slug}`,
       type: "website",
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ capabilit
     },
     twitter: {
       card: "summary_large_image",
-      title: `${entry.title} | Obserra EIOS`,
+      title: `${entry.title} | ${EIOS_BRAND_NAME}`,
       description: entry.summary,
       images: [entry.image],
     },
@@ -44,14 +44,14 @@ export default async function EiosCapabilityPage({ params }: { params: Promise<{
     "@graph": [
       {
         "@type": "SoftwareApplication",
-        name: `Obserra EIOS ${entry.title}`,
+        name: `${EIOS_BRAND_NAME} ${entry.title}`,
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
         url: `https://www.obserrallc.com/eios/${entry.slug}`,
         description: entry.summary,
         provider: {
           "@type": "Organization",
-          name: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+          name: LEGAL_ENTITY_NAME,
           url: "https://www.obserrallc.com",
         },
       },

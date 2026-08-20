@@ -4,7 +4,7 @@ import test from "node:test";
 
 const read = (path) => fs.readFileSync(path, "utf8");
 
-test("the public Florida training route is a live LMS surface linked from the website and Academy", () => {
+test("the public Florida training route is a live LMS surface while instructor access remains private", () => {
   const home = read("app/page.tsx");
   const header = read("app/HomeHeader.tsx");
   const enterpriseChrome = read("app/components/enterprise/EnterpriseChrome.tsx");
@@ -28,7 +28,8 @@ test("the public Florida training route is a live LMS surface linked from the we
   assert.match(page, /Photo-ID controls before secure live video/);
   assert.match(page, /robots: \{ index: true, follow: true \}/);
   assert.match(page, /floridaClassDPublicLearnerControlsEnabled\(\)/);
-  assert.match(page, /href="\/florida-security-training\/owner-validation\/lms">Instructor sign in<\/Link>/);
+  assert.doesNotMatch(page, /href="\/florida-security-training\/owner-validation\/lms"/);
+  assert.match(page, /Instructor LMS access is restricted and is not exposed through public navigation/);
   assert.match(controls, /aria-disabled="true"/);
   assert.match(controls, /Enrollment and payment unavailable pending license activation/);
   assert.match(activation, /floridaClassDProductionActivationAuthorized\(\)[\s\S]*enabled\("OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED"\)/);

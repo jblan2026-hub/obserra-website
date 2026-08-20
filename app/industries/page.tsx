@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Building2, Brain, GraduationCap, ShieldCheck } from "lucide-react";
 import { industrySolutions } from "./industryData";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./industries.css";
 import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 
@@ -96,7 +96,7 @@ export default function IndustriesPage() {
         </div>
         <div className="industry-model-grid">
           <article><ShieldCheck size={20} /><strong>Services</strong><p>Executive advisory and delivery aligned to sector-specific risk.</p><Link href="/services">View services</Link></article>
-          <article><Brain size={20} /><strong>Obserra EIOS</strong><p>The Enterprise Intelligence Operating System (EIOS) connects intelligence, digital-twin context, knowledge graphs, and artificial intelligence decision support.</p><Link href="/eios">View Obserra EIOS</Link></article>
+          <article><Brain size={20} /><strong>{EIOS_BRAND_NAME}</strong><p>The Enterprise Intelligence Operating System (EIOS) connects intelligence, digital-twin context, knowledge graphs, and artificial intelligence decision support.</p><Link href="/eios">View {EIOS_BRAND_NAME}</Link></article>
           <article><GraduationCap size={20} /><strong>Academy</strong><p>Role-based learning options for leaders, practitioners, and teams, subject to offering-specific controls.</p><Link href="/academy/enterprise">View enterprise learning</Link></article>
           <article><Building2 size={20} /><strong>Trust Center</strong><p>Security architecture, framework alignment, policy, and procurement assurance.</p><Link href="/trust">Open Trust Center</Link></article>
         </div>
