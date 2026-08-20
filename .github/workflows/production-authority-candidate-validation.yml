@@ -1,0 +1,259 @@
+name: Production Authority Candidate Validation
+
+on:
+  pull_request:
+    paths:
+      - "lib/auth/runtime-config.ts"
+      - "scripts/vercel-ignore-build.sh"
+      - ".github/workflows/production-vercel-public-cutover.yml"
+      - ".github/workflows/production-e2e-operational-gate.yml"
+      - "scripts/florida-class-d-website-academy-commerce-gate.mjs"
+      - "scripts/cmmc-level2-rev3-production-evidence.mjs"
+      - "test/vercel-ignore-build.test.mjs"
+      - "test/vercel-production-authority-consistency.test.mjs"
+      - ".github/workflows/production-authority-contract.yml"
+      - ".github/workflows/production-authority-candidate-validation.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-authority-candidate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  candidate-validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Configure Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install supported npm and locked dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global npm@11 --no-audit --no-fund
+          test "$(npm --version | cut -d. -f1)" = "11"
+          npm ci --ignore-scripts --no-audit --no-fund
+          git diff --exit-code -- package-lock.json
+
+      - name: Capture baseline full-suite failures
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          npm test > /tmp/before-tests.log 2>&1
+          before_status=$?
+          set -e
+          grep -E '^[[:space:]]*not ok [0-9]+ - ' /tmp/before-tests.log \
+            | sed -E 's/^[[:space:]]*not ok [0-9]+ - //' \
+            | sort -u > /tmp/before-failures.txt || true
+          grep -E '^# tests ' /tmp/before-tests.log | tail -1 | awk '{print $3}' > /tmp/before-test-count.txt || true
+          echo "Baseline npm test exit: ${before_status}"
+          cat /tmp/before-failures.txt || true
+
+      - name: Apply proposed authority patch only in runner workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const CANONICAL = 'prj_lxTKKDa9sbhht7FaigiaF1PONMiC';
+          const AUXILIARY = 'prj_FfAnssVJU8pcJydGNJHmCliP6Yme';
+          const read = (path) => fs.readFileSync(path, 'utf8');
+          const write = (path, value) => fs.writeFileSync(path, value);
+
+          function replaceExact(path, before, after) {
+            const source = read(path);
+            const count = source.split(before).length - 1;
+            if (count !== 1) throw new Error(`${path}: expected exactly one guarded match, found ${count}`);
+            write(path, source.replace(before, after));
+          }
+
+          function replaceAllExact(path, before, after, expectedCount) {
+            const source = read(path);
+            const count = source.split(before).length - 1;
+            if (count !== expectedCount) throw new Error(`${path}: expected ${expectedCount} guarded matches, found ${count}`);
+            write(path, source.split(before).join(after));
+          }
+
+          replaceExact('lib/auth/runtime-config.ts',
+            'export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";',
+            `export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "${CANONICAL}";`);
+          replaceAllExact('.github/workflows/production-e2e-operational-gate.yml',
+            'prj_FfAnssVJU8pcJydGNJHmCliP6Yme', CANONICAL, 2);
+          replaceExact('scripts/florida-class-d-website-academy-commerce-gate.mjs',
+            'export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme"',
+            `export const CANONICAL_PUBLIC_VERCEL_PROJECT_ID = "${CANONICAL}"`);
+          replaceExact('scripts/cmmc-level2-rev3-production-evidence.mjs',
+            'requireText(vercelIgnorePath, vercelIgnore, "prj_FfAnssVJU8pcJydGNJHmCliP6Yme", "canonical Vercel project guard");',
+            `requireText(vercelIgnorePath, vercelIgnore, "${CANONICAL}", "canonical production Vercel project guard");\nrequireText(vercelIgnorePath, vercelIgnore, "${AUXILIARY}", "integration Vercel project guard");`);
+          replaceExact('test/vercel-ignore-build.test.mjs',
+            'const CANONICAL_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";',
+            `const CANONICAL_PROJECT_ID = "${CANONICAL}";`);
+          replaceExact('test/vercel-production-authority-consistency.test.mjs',
+            'assert.doesNotMatch(cutover, /request DELETE[\\s\\S]*projects\\/\\$\\{AUXILIARY_PROJECT_ID\\}\\?teamId=/);',
+            'assert.doesNotMatch(cutover, /--request DELETE(?:(?!--request)[\\s\\S])*projects\\/\\$\\{AUXILIARY_PROJECT_ID\\}\\?teamId=/);');
+
+          const cutoverPath = '.github/workflows/production-vercel-public-cutover.yml';
+          let cutover = read(cutoverPath);
+          const oldCanonical = '      CANONICAL_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme';
+          const oldAuxiliary = '      AUXILIARY_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC';
+          if ((cutover.split(oldCanonical).length - 1) !== 1) throw new Error('cutover canonical project guard did not match exactly once');
+          if ((cutover.split(oldAuxiliary).length - 1) !== 1) throw new Error('cutover auxiliary project guard did not match exactly once');
+          cutover = cutover.replace(oldCanonical, `      CANONICAL_PROJECT_ID: ${CANONICAL}`);
+          cutover = cutover.replace(oldAuxiliary, `      AUXILIARY_PROJECT_ID: ${AUXILIARY}`);
+
+          const retirePattern = /      - name: Retire obsolete auxiliary Vercel project\n[\s\S]*?(?=      - name: Roll back canonical domains on failed cutover)/;
+          if (!retirePattern.test(cutover)) throw new Error('obsolete-project retirement block was not found exactly once');
+          const quarantineBlock = [
+            '      - name: Quarantine duplicate Vercel project',
+            "        if: steps.smoke.outcome == 'success'",
+            '        shell: bash',
+            '        run: |',
+            '          set -euo pipefail',
+            '',
+            '          remove_domain_if_present() {',
+            '            local domain="$1"',
+            '            local body',
+            '            local status',
+            '            body="$(mktemp)"',
+            '            status="$(curl --silent --show-error \\',
+            '              --connect-timeout 10 \\',
+            '              --max-time 20 \\',
+            '              --output "${body}" \\',
+            "              --write-out '%{http_code}' \\",
+            '              --request DELETE \\',
+            '              --header "Authorization: Bearer ${VERCEL_TOKEN}" \\',
+            '              "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"',
+            '            if [ "${status}" != "200" ] && [ "${status}" != "204" ] && [ "${status}" != "404" ]; then',
+            '              cat "${body}" >&2 || true',
+            '              rm -f "${body}"',
+            '              echo "::error::Failed to remove ${domain} from duplicate Vercel project: HTTP ${status}."',
+            '              return 1',
+            '            fi',
+            '            rm -f "${body}"',
+            '          }',
+            '',
+            '          remove_domain_if_present "${PRIMARY_DOMAIN}"',
+            '          remove_domain_if_present "${APEX_DOMAIN}"',
+            '',
+            '          curl --silent --show-error --fail-with-body \\',
+            '            --connect-timeout 10 \\',
+            '            --max-time 20 \\',
+            '            --request PATCH \\',
+            '            --header "Authorization: Bearer ${VERCEL_TOKEN}" \\',
+            '            --header "Content-Type: application/json" \\',
+            "            --data '{\"commandForIgnoringBuildStep\":\"exit 0\"}' \\",
+            '            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}" \\',
+            '            >/dev/null',
+            '',
+            '          health="$(curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/api/health")"',
+            "          observed_project=\"$(jq -r '.routing.observedProjectId // empty' <<<\"${health}\")\"",
+            "          observed_sha=\"$(jq -r '.routing.gitCommitSha // empty' <<<\"${health}\")\"",
+            '          if [ "${observed_project}" != "${CANONICAL_PROJECT_ID}" ] || [ "${observed_sha}" != "${GITHUB_SHA}" ]; then',
+            '            echo "::error::Canonical production identity changed during duplicate-project quarantine."',
+            '            exit 1',
+            '          fi',
+            '',
+          ].join('\n');
+          write(cutoverPath, cutover.replace(retirePattern, quarantineBlock));
+          NODE
+
+      - name: Enforce exact proposed source delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --name-only | sort > /tmp/actual-authority-files.txt
+          cat > /tmp/expected-authority-files.txt <<'EOF'
+          .github/workflows/production-e2e-operational-gate.yml
+          .github/workflows/production-vercel-public-cutover.yml
+          lib/auth/runtime-config.ts
+          scripts/cmmc-level2-rev3-production-evidence.mjs
+          scripts/florida-class-d-website-academy-commerce-gate.mjs
+          test/vercel-ignore-build.test.mjs
+          test/vercel-production-authority-consistency.test.mjs
+          EOF
+          sort -o /tmp/expected-authority-files.txt /tmp/expected-authority-files.txt
+          diff -u /tmp/expected-authority-files.txt /tmp/actual-authority-files.txt
+          git diff --exit-code -- package-lock.json
+
+      - name: Verify authority, identity, and cutover contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test \
+            test/vercel-production-authority-consistency.test.mjs \
+            test/vercel-ignore-build.test.mjs \
+            test/supabase-auth-runtime.test.mjs \
+            test/production-vercel-public-cutover.test.mjs
+          node scripts/florida-class-d-website-academy-commerce-gate.mjs
+          node scripts/cmmc-level2-rev3-production-evidence.mjs --check
+
+      - name: Verify payment and commerce regression subset
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t payment_tests < <(find test -maxdepth 1 -type f -name '*.test.mjs' \
+            | grep -Ei '(payment|stripe|checkout|commerce)' \
+            | sort)
+          if [ "${#payment_tests[@]}" -eq 0 ]; then
+            echo "::error::No payment/commerce regression tests were discovered."
+            exit 1
+          fi
+          node --test "${payment_tests[@]}"
+
+      - name: Verify Florida Class D LMS gates
+        run: npm run verify:florida-class-d
+
+      - name: Verify typecheck, lint, production build, and dependency audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run typecheck
+          npm run lint
+          npm run build
+          npm audit --audit-level=high
+
+      - name: Compare full-suite failures against baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          npm test > /tmp/after-tests.log 2>&1
+          after_status=$?
+          set -e
+          grep -E '^[[:space:]]*not ok [0-9]+ - ' /tmp/after-tests.log \
+            | sed -E 's/^[[:space:]]*not ok [0-9]+ - //' \
+            | sort -u > /tmp/after-failures.txt || true
+          grep -E '^# tests ' /tmp/after-tests.log | tail -1 | awk '{print $3}' > /tmp/after-test-count.txt || true
+          before_count="$(cat /tmp/before-test-count.txt 2>/dev/null || true)"
+          after_count="$(cat /tmp/after-test-count.txt 2>/dev/null || true)"
+          test -n "${before_count}"
+          test -n "${after_count}"
+          if [ "${after_count}" -lt "${before_count}" ]; then
+            echo "::error::Full test discovery regressed from ${before_count} to ${after_count}."
+            exit 1
+          fi
+          comm -13 /tmp/before-failures.txt /tmp/after-failures.txt > /tmp/new-failures.txt
+          if [ -s /tmp/new-failures.txt ]; then
+            echo "::error::Proposed authority patch introduces new full-suite failures:"
+            cat /tmp/new-failures.txt
+            tail -160 /tmp/after-tests.log
+            exit 1
+          fi
+          if [ "${after_status}" -ne 0 ] && [ ! -s /tmp/after-failures.txt ]; then
+            echo "::error::Full suite failed without a baseline-comparable test failure."
+            tail -160 /tmp/after-tests.log
+            exit 1
+          fi
+          echo "Candidate introduced no new full-suite failures."
+          cat /tmp/after-failures.txt || true
