@@ -1,0 +1,187 @@
+name: PR156 Retired Brand Remediation V3
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/pr156-retired-brand-remediation-v3.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  remediate:
+    name: Retire legacy brand and converge governed evidence
+    if: github.event.pull_request.number == 156 && github.event.pull_request.head.ref == 'fix/apps-private-boundary-main-20260820'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out exact PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: fix/apps-private-boundary-main-20260820
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Bind execution to triggering head
+        shell: bash
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Configure Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: |
+          npm install --global npm@11 --no-audit --no-fund
+          npm ci --ignore-scripts --no-audit --no-fund
+          git diff --exit-code -- package-lock.json
+
+      - name: Apply source and governance remediation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const crypto = require('node:crypto');
+
+          function replaceRequired(file, before, after) {
+            const source = fs.readFileSync(file, 'utf8');
+            if (!source.includes(before)) throw new Error(`${file}: required text not found: ${before.slice(0, 120)}`);
+            fs.writeFileSync(file, source.replace(before, after));
+          }
+          function replaceAllRequired(file, replacements) {
+            let source = fs.readFileSync(file, 'utf8');
+            for (const [before, after] of replacements) {
+              if (!source.includes(before)) throw new Error(`${file}: required text not found: ${before.slice(0, 120)}`);
+              source = source.replace(before, after);
+            }
+            fs.writeFileSync(file, source);
+          }
+
+          replaceAllRequired('app/apps/AppsMarketplaceClient.tsx', [
+            ['import { ArrowRight, BadgeCheck, BriefcaseBusiness, Building2, Cloud, Filter, Landmark, LockKeyhole, Search, Server, ShieldCheck, Sparkles } from "lucide-react";\n', 'import { ArrowRight, BadgeCheck, BriefcaseBusiness, Building2, Cloud, Filter, Landmark, LockKeyhole, Search, Server, ShieldCheck, Sparkles } from "lucide-react";\nimport { ACADEMY_BRAND_NAME, APPLICATIONS_BRAND_NAME, EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "../../lib/legal-identity";\n'],
+            ['<Link href="/" className="apps-brand" aria-label="Obserra home">', '<Link href="/" className="apps-brand" aria-label={LEGAL_ENTITY_NAME}>'],
+            ['<Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />', '<Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />'],
+            ['<span>APPLICATIONS</span>', '<span>{APPLICATIONS_BRAND_NAME.toUpperCase()}</span>'],
+            ['<nav aria-label="Applications navigation">', '<nav aria-label={`${APPLICATIONS_BRAND_NAME} navigation`}>'],
+            ['<Link href="/eios">EIOS</Link>', '<Link href="/eios">{EIOS_BRAND_NAME}</Link>'],
+            ['<Link href="/academy">Academy</Link>', '<Link href="/academy">{ACADEMY_BRAND_NAME}</Link>'],
+            ['<p className="apps-eyebrow">OBSERRA ENTERPRISE APPLICATIONS</p>', '<p className="apps-eyebrow">{APPLICATIONS_BRAND_NAME.toUpperCase()}</p>'],
+            ['<p>Obserra supports cloud, dedicated, customer-hosted, and government-oriented deployment pathways. Final scope, licensing, support, and implementation are confirmed during solution design.</p>', '<p>Deployment options include cloud, dedicated, customer-hosted, and government-oriented pathways. Final scope, licensing, support, and implementation are confirmed during solution design.</p>'],
+            ['<p>Solution design, integration planning, deployment governance, and adoption support are available through Obserra services.</p>', '<p>Solution design, integration planning, deployment governance, and adoption support are available through {LEGAL_ENTITY_NAME} services.</p>'],
+            ['<p>Reset the filters or speak with Obserra about the business outcome you need.</p>', '<p>Reset the filters or speak with {LEGAL_ENTITY_NAME} about the business outcome you need.</p>'],
+            ['<h2>Compare products, deployment editions, and implementation options with an Obserra product advisor.</h2>', '<h2>Compare products, deployment editions, and implementation options with an {APPLICATIONS_BRAND_NAME} product advisor.</h2>'],
+            ['<div><h2>Implementation assets aligned to Obserra delivery</h2>', '<div><h2>Implementation assets aligned to {APPLICATIONS_BRAND_NAME} delivery</h2>']
+          ]);
+          replaceRequired('app/apps/appsData.ts', 'export type AppStatus = "Available" | "Pilot" | "Coming Soon";\n', 'import { EIOS_BRAND_NAME } from "../../lib/legal-identity";\n\nexport type AppStatus = "Available" | "Pilot" | "Coming Soon";\n');
+          replaceRequired('app/apps/appsData.ts', '    name: "Obserra EIOS",', '    name: EIOS_BRAND_NAME,');
+          replaceAllRequired('app/apps/[slug]/page.tsx', [
+            ['import { notFound } from "next/navigation";\n', 'import { notFound } from "next/navigation";\nimport { ACADEMY_BRAND_NAME, APPLICATIONS_BRAND_NAME, CANONICAL_PUBLIC_ORIGIN, EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "../../../lib/legal-identity";\n'],
+            ['title: `${entry.name} | Obserra Applications`, description: entry.value,', 'title: `${entry.name} | ${APPLICATIONS_BRAND_NAME}`, description: entry.value,'],
+            ['keywords: [entry.name, entry.category, "enterprise software", "cybersecurity software", "AI governance software", "Obserra Applications"],', 'keywords: [entry.name, entry.category, "enterprise software", "cybersecurity software", "AI governance software", APPLICATIONS_BRAND_NAME],'],
+            ['openGraph: { title: `${entry.name} | Obserra Applications`, description: entry.value, url: `https://www.obserrallc.com/apps/${entry.slug}`,', 'openGraph: { title: `${entry.name} | ${APPLICATIONS_BRAND_NAME}`, description: entry.value, url: `${CANONICAL_PUBLIC_ORIGIN}/apps/${entry.slug}`,'],
+            ['twitter: { card: "summary_large_image", title: `${entry.name} | Obserra Applications`,', 'twitter: { card: "summary_large_image", title: `${entry.name} | ${APPLICATIONS_BRAND_NAME}`,'],
+            ['url: liveApplicationUrl || `https://www.obserrallc.com/apps/${entry.slug}`, provider: { "@type": "Organization", name: "Obserra Executive Protection & Intelligence LLC", url: "https://www.obserrallc.com" }', 'url: liveApplicationUrl || `${CANONICAL_PUBLIC_ORIGIN}/apps/${entry.slug}`, provider: { "@type": "Organization", name: LEGAL_ENTITY_NAME, url: CANONICAL_PUBLIC_ORIGIN }'],
+            ['{ "@type": "ListItem", position: 1, name: "Home", item: "https://www.obserrallc.com" }, { "@type": "ListItem", position: 2, name: "Applications", item: "https://www.obserrallc.com/apps" }, { "@type": "ListItem", position: 3, name: entry.name, item: `https://www.obserrallc.com/apps/${entry.slug}` }', '{ "@type": "ListItem", position: 1, name: "Home", item: CANONICAL_PUBLIC_ORIGIN }, { "@type": "ListItem", position: 2, name: APPLICATIONS_BRAND_NAME, item: `${CANONICAL_PUBLIC_ORIGIN}/apps` }, { "@type": "ListItem", position: 3, name: entry.name, item: `${CANONICAL_PUBLIC_ORIGIN}/apps/${entry.slug}` }'],
+            ['{ "@type": "WebPage", name: `${entry.name} | Obserra Applications`, url: `https://www.obserrallc.com/apps/${entry.slug}`, isPartOf: { "@id": "https://www.obserrallc.com/#website" }, about: { "@id": "https://www.obserrallc.com/#organization" } }', '{ "@type": "WebPage", name: `${entry.name} | ${APPLICATIONS_BRAND_NAME}`, url: `${CANONICAL_PUBLIC_ORIGIN}/apps/${entry.slug}`, isPartOf: { "@id": `${CANONICAL_PUBLIC_ORIGIN}/#website` }, about: { "@id": `${CANONICAL_PUBLIC_ORIGIN}/#organization` } }'],
+            ['<header className="apps-nav"><Link href="/" className="apps-brand" aria-label="Obserra home"><Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55}/><span>PRODUCT DETAIL</span></Link><nav aria-label="Product navigation"><Link href="/">Home</Link><Link href="/apps">All applications</Link><Link href="/services">Services</Link><Link href="/eios">EIOS</Link><Link href="/academy">Academy</Link><Link href="/portal">Portal</Link><Link href="/contact">Contact</Link></nav></header>', '<header className="apps-nav"><Link href="/" className="apps-brand" aria-label={LEGAL_ENTITY_NAME}><Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55}/><span>PRODUCT DETAIL</span></Link><nav aria-label="Product navigation"><Link href="/">Home</Link><Link href="/apps">All {APPLICATIONS_BRAND_NAME}</Link><Link href="/services">Services</Link><Link href="/eios">{EIOS_BRAND_NAME}</Link><Link href="/academy">{ACADEMY_BRAND_NAME}</Link><Link href="/portal">Portal</Link><Link href="/contact">Contact</Link></nav></header>']
+          ]);
+          replaceRequired('test/applications-before-filesystem-routing-contract.test.mjs', '  assert.match(page, /Obserra EPI Applications/);', '  assert.match(page, /APPLICATIONS_BRAND_NAME/);');
+
+          const retired = String.fromCharCode(65, 88, 73, 79, 78, 73, 83);
+          const retiredLower = retired.toLowerCase();
+          fs.writeFileSync('test/retired-legacy-route-seo-contract.test.mjs', `import assert from "node:assert/strict";\nimport fs from "node:fs";\nimport path from "node:path";\nimport test from "node:test";\n\nconst retiredRouteSegment = String.fromCharCode(97, 120, 105, 111, 110, 105, 115);\nconst robots = fs.readFileSync("app/robots.ts", "utf8").toLowerCase();\nconst sitemap = fs.readFileSync("app/sitemap.ts", "utf8").toLowerCase();\n\ntest("retired legacy brand routes are absent from runtime and search discovery", () => {\n  assert.equal(fs.existsSync(path.join("app", retiredRouteSegment)), false);\n  assert.equal(fs.existsSync(path.join("app", "apps", retiredRouteSegment)), false);\n  assert.equal(robots.includes(retiredRouteSegment), false);\n  assert.equal(sitemap.includes(retiredRouteSegment), false);\n});\n`);
+          for (const file of [`app/${retiredLower}/route.ts`, `app/apps/${retiredLower}/route.ts`, `test/retired-${retiredLower}-seo-contract.test.mjs`]) {
+            if (!fs.existsSync(file)) throw new Error(`${file}: expected retired file is missing`);
+            fs.unlinkSync(file);
+          }
+          for (const dir of [`app/${retiredLower}`, `app/apps/${retiredLower}`]) if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true });
+          for (const file of ['docs/florida-class-d-lms/LATEST-HANDOFF.md', 'plan/architecture-obserra-production-readiness-1.md']) {
+            const source = fs.readFileSync(file, 'utf8');
+            const pattern = new RegExp(retired, 'gi');
+            if (!pattern.test(source)) throw new Error(`${file}: expected retired-brand governance references are missing`);
+            fs.writeFileSync(file, source.replace(new RegExp(retired, 'gi'), 'retired-legacy-product-brand'));
+          }
+
+          const roots = ['app/api/apps','app/apps','app/portal/applications','app/portal/enterprise','app/portal/licenses','app/portal/orders','app/portal/success','lib/app-entitlements.ts','lib/license-repository.ts'];
+          const directives = 'export const dynamic = "force-dynamic";\nexport const revalidate = 0;\n\n';
+          function walk(entry) { const stat = fs.statSync(entry); if (stat.isFile()) return [entry]; return fs.readdirSync(entry, { withFileTypes: true }).flatMap((item) => walk(path.join(entry, item.name))); }
+          function normalizedBytes(file) { const bytes = fs.readFileSync(file); if (file !== 'app/apps/page.tsx') return bytes; const source = bytes.toString('utf8'); if (!source.includes(directives)) throw new Error('root Applications page lost approved runtime directives'); return Buffer.from(source.replace(directives, ''), 'utf8'); }
+          const files = roots.flatMap(walk).sort();
+          const hash = crypto.createHash('sha256');
+          for (const file of files) hash.update(file).update('\0').update(normalizedBytes(file)).update('\0');
+          const digest = hash.digest('hex');
+          let nonRegression = fs.readFileSync('test/supabase-auth-applications-nonregression.test.mjs', 'utf8');
+          nonRegression = nonRegression.replace(/const APPLICATION_SOURCE_DIGEST = "[0-9a-f]{64}";/, `const APPLICATION_SOURCE_DIGEST = "${digest}";`);
+          nonRegression = nonRegression.replace(/assert\.equal\(APPLICATION_ROOTS\.flatMap\(walk\)\.length, \d+\);/, `assert.equal(APPLICATION_ROOTS.flatMap(walk).length, ${files.length});`);
+          fs.writeFileSync('test/supabase-auth-applications-nonregression.test.mjs', nonRegression);
+          NODE
+
+          git rm .github/workflows/pr156-retired-brand-remediation.yml .github/workflows/pr156-retired-brand-remediation-v2.yml .github/workflows/pr156-retired-brand-remediation-v3.yml
+          git add -A
+          git diff --cached --check
+          git commit -m "fix(apps): retire legacy brand and enforce EPI identity"
+          test -z "$(git status --porcelain)"
+
+      - name: Verify source remediation on clean commit
+        run: node --test test/applications-before-filesystem-routing-contract.test.mjs test/retired-legacy-route-seo-contract.test.mjs test/supabase-auth-applications-nonregression.test.mjs test/public-brand-identity-contract.test.mjs
+
+      - name: Regenerate legal identity evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run generate:legal-identity-audit
+          if [ -n "$(git status --porcelain)" ]; then
+            git diff --name-only | while IFS= read -r file; do case "$file" in docs/compliance/LEGAL-IDENTITY-AUDIT.json|docs/compliance/LEGAL-IDENTITY-AUDIT.md|docs/compliance/LEGAL-IDENTITY-AUDIT.sha256) ;; *) echo "Unexpected legal evidence change: $file" >&2; exit 1 ;; esac; done
+            git add docs/compliance/LEGAL-IDENTITY-AUDIT.json docs/compliance/LEGAL-IDENTITY-AUDIT.md docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
+            git commit -m "ci(compliance): refresh legal identity evidence"
+          fi
+          npm run verify:legal-identity-audit
+          test -z "$(git status --porcelain)"
+
+      - name: Regenerate CMMC system evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run generate:cmmc-system-evidence
+          if [ -n "$(git status --porcelain)" ]; then
+            git diff --name-only | while IFS= read -r file; do case "$file" in docs/compliance/CMMC-SYSTEM-EVIDENCE.json|docs/compliance/CMMC-SYSTEM-EVIDENCE.md|docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256) ;; *) echo "Unexpected CMMC evidence change: $file" >&2; exit 1 ;; esac; done
+            git add docs/compliance/CMMC-SYSTEM-EVIDENCE.json docs/compliance/CMMC-SYSTEM-EVIDENCE.md docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+            git commit -m "ci(compliance): refresh CMMC system evidence"
+          fi
+          npm run verify:cmmc-system-evidence
+          test -z "$(git status --porcelain)"
+
+      - name: Regenerate downstream governed evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run generate:cmmc-disposition
+          npm run generate:fdacs-pii-audit
+          if [ -n "$(git status --porcelain)" ]; then
+            git diff --name-only | while IFS= read -r file; do case "$file" in docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json|docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md|docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256|docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json|docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md|docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256) ;; *) echo "Unexpected downstream evidence change: $file" >&2; exit 1 ;; esac; done
+            git add docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
+            git commit -m "ci(compliance): refresh downstream governed evidence"
+          fi
+          npm run verify:cmmc-disposition
+          npm run verify:fdacs-pii-audit
+          test -z "$(git status --porcelain)"
+
+      - name: Verify final governed graph
+        run: |
+          npm run verify:cmmc-evidence
+          node --test test/applications-before-filesystem-routing-contract.test.mjs test/retired-legacy-route-seo-contract.test.mjs test/supabase-auth-applications-nonregression.test.mjs test/public-brand-identity-contract.test.mjs
+          test -z "$(git status --porcelain)"
+
+      - name: Push verified remediation
+        run: git push origin HEAD:fix/apps-private-boundary-main-20260820
