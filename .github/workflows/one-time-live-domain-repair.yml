@@ -1,0 +1,325 @@
+name: One-time live Vercel domain authority repair
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/one-time-live-domain-repair.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: one-time-live-vercel-domain-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    if: ${{ github.event.pull_request.head.ref == 'hotfix/fdacs-live-domain-repair-20260820' && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
+      GITHUB_TOKEN: ${{ github.token }}
+      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+      CANONICAL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+      AUXILIARY_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme
+      PRIMARY_DOMAIN: www.obserrallc.com
+      APEX_DOMAIN: obserrallc.com
+      EXPECTED_MAIN_SHA: a923580b09912fced58b8238f823de1d8d8c618c
+
+    steps:
+      - name: Require exact current main and Vercel credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${VERCEL_TOKEN}" ]; then
+            echo "::error::Neither VERCEL_TOKEN nor VERCEL_ACCESS_TOKEN is configured."
+            exit 1
+          fi
+          actual_main="$(curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --header "Authorization: Bearer ${GITHUB_TOKEN}" \
+            --header "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/main" | jq -r '.sha')"
+          if [ "${actual_main}" != "${EXPECTED_MAIN_SHA}" ]; then
+            echo "::error::main moved from ${EXPECTED_MAIN_SHA} to ${actual_main}; refusing production mutation."
+            exit 1
+          fi
+
+      - name: Resolve exact canonical READY production deployment
+        id: candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v6/deployments?projectId=${CANONICAL_PROJECT_ID}&teamId=${TEAM_ID}&limit=100")"
+          candidate="$(jq -r --arg sha "${EXPECTED_MAIN_SHA}" '
+            [.deployments[]
+              | select((.meta.githubCommitSha // "") == $sha)
+              | select((.readyState // .state // "") == "READY")
+              | select((.target // "") == "production")
+              | (.uid // .id // empty)][0] // empty
+          ' <<<"${response}")"
+          if [ -z "${candidate}" ]; then
+            echo "::error::No exact READY canonical production deployment exists for ${EXPECTED_MAIN_SHA}."
+            exit 1
+          fi
+          details="$(curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v13/deployments/${candidate}?teamId=${TEAM_ID}")"
+          project="$(jq -r '.projectId // .project.id // empty' <<<"${details}")"
+          sha="$(jq -r '.meta.githubCommitSha // empty' <<<"${details}")"
+          ready="$(jq -r '.readyState // .state // empty' <<<"${details}")"
+          target="$(jq -r '.target // empty' <<<"${details}")"
+          test "${project}" = "${CANONICAL_PROJECT_ID}"
+          test "${sha}" = "${EXPECTED_MAIN_SHA}"
+          test "${ready}" = "READY"
+          test "${target}" = "production"
+          echo "deployment_id=${candidate}" >> "${GITHUB_OUTPUT}"
+
+      - name: Capture exact rollback deployments
+        id: rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          alias_deployment() {
+            local alias="$1"
+            local body
+            local status
+            local deployment
+            body="$(mktemp)"
+            status="$(curl --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${body}" \
+              --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v4/aliases/${alias}?teamId=${TEAM_ID}")"
+            if [ "${status}" != "200" ]; then
+              cat "${body}" >&2 || true
+              rm -f "${body}"
+              echo "::error::Unable to capture rollback deployment for ${alias}: HTTP ${status}." >&2
+              return 1
+            fi
+            deployment="$(jq -r '.deploymentId // .deployment.id // empty' "${body}")"
+            rm -f "${body}"
+            if [ -z "${deployment}" ]; then
+              echo "::error::No rollback deployment returned for ${alias}." >&2
+              return 1
+            fi
+            printf '%s\n' "${deployment}"
+          }
+          primary="$(alias_deployment "${PRIMARY_DOMAIN}")"
+          apex="$(alias_deployment "${APEX_DOMAIN}")"
+          echo "primary=${primary}" >> "${GITHUB_OUTPUT}"
+          echo "apex=${apex}" >> "${GITHUB_OUTPUT}"
+
+      - name: Move canonical domains to canonical production project
+        id: move
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          move_domain() {
+            local domain="$1"
+            local output_name="$2"
+            local body status source_project target_body target_status target_project move_response moved_project moved_name
+            body="$(mktemp)"
+            status="$(curl --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${body}" \
+              --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"
+            if [ "${status}" = "404" ]; then
+              rm -f "${body}"
+              target_body="$(mktemp)"
+              target_status="$(curl --silent --show-error \
+                --connect-timeout 10 \
+                --max-time 20 \
+                --output "${target_body}" \
+                --write-out '%{http_code}' \
+                --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+                "https://api.vercel.com/v9/projects/${CANONICAL_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"
+              if [ "${target_status}" != "200" ]; then
+                cat "${target_body}" >&2 || true
+                rm -f "${target_body}"
+                echo "::error::${domain} is owned by neither expected project."
+                return 1
+              fi
+              target_project="$(jq -r '.projectId // empty' "${target_body}")"
+              rm -f "${target_body}"
+              test "${target_project}" = "${CANONICAL_PROJECT_ID}"
+              echo "${output_name}_moved=false" >> "${GITHUB_OUTPUT}"
+              return 0
+            fi
+            if [ "${status}" != "200" ]; then
+              cat "${body}" >&2 || true
+              rm -f "${body}"
+              echo "::error::Unable to inspect ownership for ${domain}: HTTP ${status}."
+              return 1
+            fi
+            source_project="$(jq -r '.projectId // empty' "${body}")"
+            rm -f "${body}"
+            test "${source_project}" = "${AUXILIARY_PROJECT_ID}"
+            move_response="$(curl --silent --show-error --fail-with-body \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --request POST \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "{\"projectId\":\"${CANONICAL_PROJECT_ID}\"}" \
+              "https://api.vercel.com/v1/projects/${AUXILIARY_PROJECT_ID}/domains/${domain}/move?teamId=${TEAM_ID}")"
+            moved_project="$(jq -r '.projectId // empty' <<<"${move_response}")"
+            moved_name="$(jq -r '.name // empty' <<<"${move_response}")"
+            test "${moved_project}" = "${CANONICAL_PROJECT_ID}"
+            test "${moved_name}" = "${domain}"
+            echo "${output_name}_moved=true" >> "${GITHUB_OUTPUT}"
+          }
+          move_domain "${PRIMARY_DOMAIN}" primary
+          move_domain "${APEX_DOMAIN}" apex
+
+      - name: Verify live site, LMS, and prelicense commerce after ownership move
+        id: smoke
+        if: steps.move.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        env:
+          CANDIDATE_DEPLOYMENT: ${{ steps.candidate.outputs.deployment_id }}
+        run: |
+          set -euo pipefail
+          observed_deployment=""
+          observed_sha=""
+          observed_project=""
+          authority=""
+          for attempt in $(seq 1 18); do
+            health="$(curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/api/health" || true)"
+            observed_deployment="$(jq -r '.routing.deploymentId // empty' <<<"${health}" 2>/dev/null || true)"
+            observed_sha="$(jq -r '.routing.gitCommitSha // empty' <<<"${health}" 2>/dev/null || true)"
+            observed_project="$(jq -r '.routing.observedProjectId // empty' <<<"${health}" 2>/dev/null || true)"
+            authority="$(jq -r '.routing.authority // empty' <<<"${health}" 2>/dev/null || true)"
+            if [ "${observed_deployment}" = "${CANDIDATE_DEPLOYMENT}" ] \
+              && [ "${observed_sha}" = "${EXPECTED_MAIN_SHA}" ] \
+              && [ "${observed_project}" = "${CANONICAL_PROJECT_ID}" ] \
+              && [ "${authority}" = "verified" ]; then
+              break
+            fi
+            sleep 10
+          done
+          test "${observed_deployment}" = "${CANDIDATE_DEPLOYMENT}"
+          test "${observed_sha}" = "${EXPECTED_MAIN_SHA}"
+          test "${observed_project}" = "${CANONICAL_PROJECT_ID}"
+          test "${authority}" = "verified"
+
+          apex_health="$(curl --silent --show-error --fail --location --max-time 20 "https://${APEX_DOMAIN}/api/health")"
+          test "$(jq -r '.routing.gitCommitSha // empty' <<<"${apex_health}")" = "${EXPECTED_MAIN_SHA}"
+          test "$(jq -r '.routing.observedProjectId // empty' <<<"${apex_health}")" = "${CANONICAL_PROJECT_ID}"
+
+          curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/" >/dev/null
+          academy="$(curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/academy")"
+          printf '%s' "${academy}" | grep -F "Academy LMS is live; new enrollment is not yet open" >/dev/null
+          curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/florida-security-training" >/dev/null
+
+          attempt_id="$(cat /proc/sys/kernel/random/uuid)"
+          issued_at="$(date +%s)"
+          headers="$(mktemp)"
+          body="$(mktemp)"
+          status="$(curl --silent --show-error --max-time 20 \
+            --output "${body}" \
+            --dump-header "${headers}" \
+            --write-out '%{http_code}' \
+            --request POST \
+            --header "Origin: https://${PRIMARY_DOMAIN}" \
+            --header "Content-Type: application/x-www-form-urlencoded" \
+            --data-urlencode "course=zero-trust-strategy" \
+            --data-urlencode "checkoutAttemptId=${attempt_id}" \
+            --data-urlencode "checkoutAttemptIssuedAt=${issued_at}" \
+            "https://${PRIMARY_DOMAIN}/api/academy/checkout")"
+          test "${status}" = "307"
+          grep -i '^location: .*enrollment=licensing-pending' "${headers}" >/dev/null
+          grep -i '^x-obserra-sales-license: pending' "${headers}" >/dev/null
+
+          duplicate_domains="$(curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}/domains?teamId=${TEAM_ID}&limit=100")"
+          if jq -e --arg primary "${PRIMARY_DOMAIN}" --arg apex "${APEX_DOMAIN}" '.domains[]? | select(.name == $primary or .name == $apex)' <<<"${duplicate_domains}" >/dev/null; then
+            echo "::error::Duplicate project still owns a canonical domain."
+            exit 1
+          fi
+
+      - name: Quarantine duplicate project after successful live verification
+        if: steps.smoke.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --silent --show-error --fail-with-body \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --request PATCH \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data '{"commandForIgnoringBuildStep":"exit 0"}' \
+            "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}" >/dev/null
+
+      - name: Roll back ownership and aliases on failed repair
+        if: ${{ always() && steps.rollback.outcome == 'success' && (steps.move.outcome == 'failure' || steps.smoke.outcome == 'failure') }}
+        shell: bash
+        env:
+          ROLLBACK_PRIMARY: ${{ steps.rollback.outputs.primary }}
+          ROLLBACK_APEX: ${{ steps.rollback.outputs.apex }}
+          MOVED_PRIMARY: ${{ steps.move.outputs.primary_moved }}
+          MOVED_APEX: ${{ steps.move.outputs.apex_moved }}
+        run: |
+          set -euo pipefail
+          move_back_if_moved() {
+            local domain="$1"
+            local moved="$2"
+            if [ "${moved}" != "true" ]; then
+              return 0
+            fi
+            curl --silent --show-error --fail-with-body \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --request POST \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "{\"projectId\":\"${AUXILIARY_PROJECT_ID}\"}" \
+              "https://api.vercel.com/v1/projects/${CANONICAL_PROJECT_ID}/domains/${domain}/move?teamId=${TEAM_ID}" >/dev/null
+          }
+          attach() {
+            local deployment="$1"
+            local alias="$2"
+            curl --silent --show-error --fail-with-body \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --request POST \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "{\"alias\":\"${alias}\"}" \
+              "https://api.vercel.com/v2/deployments/${deployment}/aliases?teamId=${TEAM_ID}" >/dev/null
+          }
+          move_back_if_moved "${PRIMARY_DOMAIN}" "${MOVED_PRIMARY}"
+          move_back_if_moved "${APEX_DOMAIN}" "${MOVED_APEX}"
+          attach "${ROLLBACK_PRIMARY}" "${PRIMARY_DOMAIN}"
+          attach "${ROLLBACK_APEX}" "${APEX_DOMAIN}"
+          echo "::error::Live domain repair failed and was rolled back."
+          exit 1
+
+      - name: Require successful repair
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ steps.move.outcome }}" = "success"
+          test "${{ steps.smoke.outcome }}" = "success"
