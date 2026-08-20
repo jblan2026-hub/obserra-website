@@ -37,10 +37,21 @@ test("public routes are explicitly identity-independent before provider readines
   assert.match(proxy, /X-Obserra-Identity-Status", "not-required"/);
 });
 
+test("Supabase-owned routes fail closed before Clerk fallback when Supabase runtime is disabled or unready", () => {
+  const proxy = fs.readFileSync(PROXY_MODULE, "utf8");
+  const supabaseBoundary = proxy.indexOf('if (ownership.provider === "supabase")');
+  const clerkReadinessBoundary = proxy.indexOf("if (!authenticationReady())");
+
+  assert.ok(supabaseBoundary >= 0, "proxy must handle Supabase ownership independently of runtime enablement");
+  assert.ok(
+    supabaseBoundary < clerkReadinessBoundary,
+    "Supabase-owned routes must fail closed before any Clerk fallback can run",
+  );
+  assert.match(proxy, /!supabaseRuntime\.runtimeEnabled\s*\|\|\s*!supabaseRuntime\.ready/);
+});
+
 test("protected Supabase and owner authorization boundaries remain fail closed", () => {
   const proxy = fs.readFileSync(PROXY_MODULE, "utf8");
-  assert.match(proxy, /ownership\.provider === "supabase"/);
-  assert.match(proxy, /!supabaseRuntime\.ready/);
   assert.match(proxy, /ownership\.accessPolicy === "internal_owner_read_only"/);
   assert.match(proxy, /authority\.emailVerified/);
   assert.match(proxy, /authority\.internalIdentityAuthorized/);
