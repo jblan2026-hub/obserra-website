@@ -5,7 +5,6 @@ import { ButtonLink } from "./components/ui/ObserraUI";
 import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "./components/enterprise/EnterpriseChrome";
 import {
   ACADEMY_BRAND_NAME,
-  APPLICATIONS_BRAND_NAME,
   EIOS_BRAND_NAME,
   LEGAL_ENTITY_NAME,
 } from "../lib/legal-identity";
@@ -14,7 +13,7 @@ import "./saas-home.css";
 export const metadata: Metadata = {
   title: `${LEGAL_ENTITY_NAME} | Executive Intelligence, Cybersecurity and Secure Technology`,
   description:
-    `${LEGAL_ENTITY_NAME} provides executive intelligence, cybersecurity, protective intelligence, secure technology, enterprise applications, and professional learning for high-consequence organizations.`,
+    `${LEGAL_ENTITY_NAME} provides executive intelligence, cybersecurity, protective intelligence, secure technology, and professional learning for high-consequence organizations.`,
   alternates: { canonical: "/" },
 };
 
@@ -35,7 +34,7 @@ export default function HomePage() {
             <h1>Executive intelligence for consequential decisions.</h1>
             <p>
               {LEGAL_ENTITY_NAME} connects senior judgment, cybersecurity, protective intelligence,
-              governance, secure applications, and professional learning so leaders can act from one
+              governance, secure technology, and professional learning so leaders can act from one
               evidence-disciplined operating model.
             </p>
             <div className="saas-hero__actions">
@@ -68,21 +67,15 @@ export default function HomePage() {
 
         <section className="saas-direct-sales" aria-labelledby="direct-sales-heading">
           <div className="saas-direct-sales__intro">
-            <span>DIRECT FROM {LEGAL_ENTITY_NAME}</span>
-            <h2 id="direct-sales-heading">Applications and Academy are direct website destinations.</h2>
-            <p>Move directly to secure applications or governed learning. Each destination preserves its own purchase, access, approval, and release controls.</p>
+            <span>PROFESSIONAL LEARNING FROM {LEGAL_ENTITY_NAME}</span>
+            <h2 id="direct-sales-heading">Governed learning for professionals and enterprise teams.</h2>
+            <p>Move directly to reviewed professional learning while preserving offering-specific purchase, access, approval, and completion controls.</p>
             <div className="saas-actions">
-              <ButtonLink href="/apps">Shop {APPLICATIONS_BRAND_NAME}</ButtonLink>
-              <ButtonLink href="/academy" variant="secondary">Browse {ACADEMY_BRAND_NAME}</ButtonLink>
+              <ButtonLink href="/academy">Browse {ACADEMY_BRAND_NAME}</ButtonLink>
+              <ButtonLink href="/academy/enterprise" variant="secondary">Plan enterprise learning</ButtonLink>
             </div>
           </div>
           <div className="saas-direct-sales__grid">
-            <Link href="/apps" className="mission-direct-sales__card">
-              <span>{APPLICATIONS_BRAND_NAME.toUpperCase()}</span>
-              <h3>Secure software for executive and operational use.</h3>
-              <p>Review product capabilities and commercial options directly from the public marketplace.</p>
-              <strong>Shop Applications <span aria-hidden="true">→</span></strong>
-            </Link>
             <Link href="/academy" className="mission-direct-sales__card">
               <span>{ACADEMY_BRAND_NAME.toUpperCase()}</span>
               <h3>Professional learning with governed access and completion.</h3>
@@ -93,7 +86,6 @@ export default function HomePage() {
         </section>
 
         <nav className="saas-product-nav" aria-label={`Primary destinations from ${LEGAL_ENTITY_NAME}`}>
-          <Link href="/apps"><strong>{APPLICATIONS_BRAND_NAME}</strong><span>Secure software built for executive and operational use.</span></Link>
           <Link href="/academy"><strong>{ACADEMY_BRAND_NAME}</strong><span>Professional learning, enterprise programs, and controlled training.</span></Link>
           <Link href="/florida-security-training"><strong>Florida training</strong><span>Dedicated regulated-training LMS and student readiness experience.</span></Link>
           <Link href="/eios"><strong>{EIOS_BRAND_NAME}</strong><span>Executive intelligence, governance, risk, and decision support.</span></Link>
@@ -179,7 +171,6 @@ export default function HomePage() {
           <div className="saas-learning__routes">
             <Link href="/academy"><span><strong>{ACADEMY_BRAND_NAME}</strong><span>Self-paced and enterprise learning catalog.</span></span><b>Open →</b></Link>
             <Link href="/florida-security-training"><span><strong>Florida Class D LMS</strong><span>Dedicated regulated-training environment with live-instruction controls.</span></span><b>Open →</b></Link>
-            <Link href="/apps"><span><strong>{APPLICATIONS_BRAND_NAME}</strong><span>Commercial software with product-specific purchase and access controls.</span></span><b>Open →</b></Link>
           </div>
         </section>
 
@@ -209,7 +200,7 @@ export default function HomePage() {
             <h2>Bring {LEGAL_ENTITY_NAME} into the decision before risk becomes consequence.</h2>
             <p>
               Engage {LEGAL_ENTITY_NAME} for executive advisory, protective intelligence, {EIOS_BRAND_NAME},
-              {" "}{APPLICATIONS_BRAND_NAME}, or {ACADEMY_BRAND_NAME} through one controlled enterprise conversation.
+              or {ACADEMY_BRAND_NAME} through one controlled enterprise conversation.
             </p>
             <div className="saas-actions">
               <ButtonLink href="/contact?interest=enterprise-consultation">Request executive consultation</ButtonLink>
