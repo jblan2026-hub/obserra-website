@@ -1,0 +1,149 @@
+name: PR164 Governed Evidence Apply
+
+on:
+  push:
+    branches:
+      - hotfix/pr164-governed-evidence-apply-20260820
+    paths:
+      - .github/workflows/pr164-governed-evidence-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    name: Regenerate and apply PR164 complete governed evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: fix/vercel-multi-project-domain-cutover-20260820
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Require unchanged PR head
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="b2ba0c9cf3c7a05abeea822a9527bf426dcd19a6"
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$expected"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Configure Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: |
+          npm install --global npm@11 --no-audit --no-fund
+          npm ci --ignore-scripts --no-audit --no-fund
+          git diff --exit-code -- package-lock.json
+
+      - name: Regenerate and commit legal identity evidence first
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/legal-identity-audit.mjs --write
+          node scripts/legal-identity-audit.mjs --check
+          mapfile -t changed < <(git diff --name-only)
+          if [ "${#changed[@]}" -gt 0 ]; then
+            for path in "${changed[@]}"; do
+              case "$path" in
+                docs/compliance/LEGAL-IDENTITY-AUDIT.json|\
+                docs/compliance/LEGAL-IDENTITY-AUDIT.md|\
+                docs/compliance/LEGAL-IDENTITY-AUDIT.sha256)
+                  ;;
+                *)
+                  echo "Unexpected legal-evidence path: $path" >&2
+                  exit 1
+                  ;;
+              esac
+            done
+            git add -- \
+              docs/compliance/LEGAL-IDENTITY-AUDIT.json \
+              docs/compliance/LEGAL-IDENTITY-AUDIT.md \
+              docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
+            git diff --cached --check
+            git commit -m "ci(compliance): refresh PR164 legal identity evidence"
+          fi
+          test -z "$(git status --porcelain)"
+
+      - name: Regenerate complete derived evidence from clean governed tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/cmmc-system-evidence.mjs --write
+          npm run generate:cmmc-disposition
+          npm run generate:cmmc-handoff
+          npm run generate:fdacs-pii-audit
+
+      - name: Enforce generated-output boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git diff --name-only)
+          test "${#changed[@]}" -gt 0
+          for path in "${changed[@]}"; do
+            case "$path" in
+              docs/compliance/CMMC-SYSTEM-EVIDENCE.json|\
+              docs/compliance/CMMC-SYSTEM-EVIDENCE.md|\
+              docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256|\
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json|\
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md|\
+              docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256|\
+              docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json|\
+              docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md|\
+              docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256|\
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json|\
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md|\
+              docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256)
+                ;;
+              *)
+                echo "Unexpected generated path: $path" >&2
+                exit 1
+                ;;
+            esac
+          done
+          printf 'Verified generated paths:\n%s\n' "${changed[*]}"
+
+      - name: Verify complete governed evidence chain
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/legal-identity-audit.mjs --check
+          node scripts/cmmc-system-evidence.mjs --check
+          npm run verify:cmmc-disposition
+          npm run verify:cmmc-handoff
+          npm run verify:fdacs-pii-audit
+          npm run verify:cmmc-evidence
+
+      - name: Commit verified complete derived evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256 \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256 \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
+          git diff --cached --check
+          git commit -m "ci(compliance): converge PR164 governed evidence"
+          test -z "$(git status --porcelain)"
+
+      - name: Push verified evidence chain
+        run: git push origin HEAD:fix/vercel-multi-project-domain-cutover-20260820
