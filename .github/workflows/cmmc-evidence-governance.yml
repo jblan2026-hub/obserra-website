@@ -39,7 +39,7 @@ jobs:
           set -euo pipefail
           git cat-file -e "${BASE_SHA}^{commit}"
           git checkout "$BASE_SHA" -- .github/workflows/cmmc-evidence-governance.yml
-          git diff -- .github/workflows/cmmc-evidence-governance.yml
+          git diff --cached -- .github/workflows/cmmc-evidence-governance.yml
 
       - name: Configure Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
@@ -83,7 +83,7 @@ jobs:
           docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md
           docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
           EOF
-          git diff --name-only | sort > /tmp/changed.txt
+          git diff --name-only HEAD | sort > /tmp/changed.txt
           grep -Fx '.github/workflows/cmmc-evidence-governance.yml' /tmp/changed.txt
           while IFS= read -r file; do
             grep -Fx "$file" /tmp/allowed.txt >/dev/null || {
@@ -91,7 +91,7 @@ jobs:
               exit 1
             }
           done < /tmp/changed.txt
-          git diff --check
+          git diff --check HEAD
 
       - name: Verify converged evidence graph
         run: |
