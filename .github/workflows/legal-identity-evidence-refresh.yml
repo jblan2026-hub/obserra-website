@@ -6,7 +6,6 @@ on:
       - release/fdacs-lms-production-20260817
       - hotfix/fdacs-*
       - hotfix/owner-lms-test-access-20260817
-      - fix/vercel-production-authority-current-20260820
     paths:
       - .github/legal-identity-refresh.trigger
 
