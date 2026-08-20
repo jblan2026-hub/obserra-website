@@ -4,7 +4,7 @@
 
 - **Legal entity:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
 - **Canonical public origin:** https://www.obserrallc.com
-- **Source-tree SHA-256:** `79f616cbbab93b071cb7918f03216121c9f7de2e871af18403b96613950b4fcf`
+- **Source-tree SHA-256:** `876e78d3ce01d89ac5830a162134b1073558dddd1b8bda22ca506f14c52fc5fb`
 - **Files inspected:** 386
 - **Authoritative technical result:** `not_tested` — unpublished candidate; not green
 - **Candidate validation:** `satisfied_locally_non_authoritative` (0 findings)
@@ -22,8 +22,10 @@ The public website, LMS/Academy, payment-facing source, FDACS source, database m
 
 ## Permitted product brands
 
-- Obserra Academy
-- Obserra EIOS
+- Obserra EPI Academy
+- Obserra EPI EIOS
+- Obserra EPI Applications
+- Obserra EPI Products
 - Obserra Certificate of Training
 - Obserra Certificates of Training
 - Obserra Cloud
