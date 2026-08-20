@@ -16,7 +16,12 @@ test("legal identity audit recognizes the current EPI product family", () => {
   assert.match(source, /"Obserra EPI Products"/);
 });
 
-test("legal identity regex exceptions do not whitelist bare Academy or EIOS product names", () => {
-  assert.doesNotMatch(source, /\(\?:Academy\|EIOS\|/);
-  assert.match(source, /EPI\s+\(\?:Academy\|EIOS\|Applications\|Products\)/);
+test("LEGAL-013 detects bare product names while EPI-qualified names remain permitted", () => {
+  const legal013 = source.match(/\["LEGAL-013",\s*(\/[^\n]+\/g),/m)?.[1] ?? "";
+
+  assert.ok(legal013, "LEGAL-013 detector must remain present");
+  assert.match(legal013, /Obserra/);
+  assert.match(legal013, /Academy\|EIOS\|Applications\|Products/);
+  assert.doesNotMatch(legal013, /EPI\\s\+/);
+  assert.match(source, /EPI\\s\+\(\?:Academy\|EIOS\|Applications\|Products\)/);
 });
