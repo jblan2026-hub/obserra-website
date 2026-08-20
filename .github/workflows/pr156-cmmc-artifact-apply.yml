@@ -6,6 +6,11 @@ on:
       - hotfix/fdacs-pr156-artifact-apply-20260820
     paths:
       - .github/workflows/pr156-cmmc-artifact-apply.yml
+  pull_request:
+    branches:
+      - hotfix/fdacs-pr156-artifact-apply-20260820
+    paths:
+      - .github/triggers/pr156-cmmc-artifact-apply.txt
 
 permissions:
   contents: write
