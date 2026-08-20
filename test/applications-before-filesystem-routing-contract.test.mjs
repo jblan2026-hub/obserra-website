@@ -37,14 +37,14 @@ test("Vercel routing leaves the public Applications storefront to Next.js", () =
   );
 });
 
-test("proxy protects Applications operations without classifying the public storefront as private", () => {
+test("proxy authenticates Applications operations without making the public storefront private or team-only", () => {
   const proxy = read("proxy.ts");
 
-  assert.match(proxy, /APPLICATIONS_PRIVATE_PATH_PREFIXES\s*=\s*\["\/api\/apps"\]/);
-  assert.doesNotMatch(proxy, /APPLICATIONS_PRIVATE_PATH_PREFIXES\s*=\s*\[[^\]]*"\/apps"/);
+  assert.match(proxy, /PROTECTED_PATH_PREFIXES\s*=\s*\[[\s\S]*?"\/api\/apps"/);
   assert.doesNotMatch(proxy, /PROTECTED_PATH_PREFIXES\s*=\s*\[[\s\S]*?\n\s*"\/apps",/);
-  assert.match(proxy, /applicationsTeamUserAuthorized/);
-  assert.match(proxy, /applicationsPrivateAccessDeniedResponse/);
+  assert.doesNotMatch(proxy, /APPLICATIONS_PRIVATE_PATH_PREFIXES/);
+  assert.doesNotMatch(proxy, /applicationsTeamUserAuthorized/);
+  assert.doesNotMatch(proxy, /applicationsPrivateAccessDeniedResponse/);
 });
 
 test("operational Applications endpoints retain server-side authentication and entitlement controls", () => {
@@ -57,6 +57,15 @@ test("operational Applications endpoints retain server-side authentication and e
   ]) {
     const source = read(route);
     assert.match(source, /await\s+auth\(\)/, `${route} must authenticate on the server`);
+  }
+
+  for (const route of [
+    "app/api/apps/access/route.ts",
+    "app/api/apps/billing-portal/route.ts",
+    "app/api/apps/download/route.ts",
+    "app/api/apps/license/route.ts",
+  ]) {
+    assert.match(read(route), /resolve(?:Unified)?App?Entitlement|resolveUnifiedEntitlement/);
   }
 
   const portal = read("app/portal/applications/page.tsx");
