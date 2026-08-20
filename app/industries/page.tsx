@@ -6,6 +6,8 @@ import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./industries.css";
 import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 
+const EIOS_PRODUCT_NAME = "Obserra EPI EIOS";
+
 export const metadata: Metadata = {
   title: `Industries | ${LEGAL_ENTITY_NAME} Enterprise Intelligence and Security Solutions`,
   description: "Industry-aware cybersecurity, executive protection, AI governance, intelligence, risk, and secure technology for regulated and high-consequence sectors.",
@@ -96,8 +98,8 @@ export default function IndustriesPage() {
         </div>
         <div className="industry-model-grid">
           <article><ShieldCheck size={20} /><strong>Services</strong><p>Executive advisory and delivery aligned to sector-specific risk.</p><Link href="/services">View services</Link></article>
-          <article><Brain size={20} /><strong>Obserra EIOS</strong><p>The Enterprise Intelligence Operating System (EIOS) connects intelligence, digital-twin context, knowledge graphs, and artificial intelligence decision support.</p><Link href="/eios">View Obserra EIOS</Link></article>
-          <article><GraduationCap size={20} /><strong>Academy</strong><p>Role-based learning options for leaders, practitioners, and teams, subject to offering-specific controls.</p><Link href="/academy/enterprise">View enterprise learning</Link></article>
+          <article><Brain size={20} /><strong>{EIOS_PRODUCT_NAME}</strong><p>The Enterprise Intelligence Operating System connects intelligence, digital-twin context, knowledge graphs, and artificial intelligence decision support.</p><Link href="/eios">View {EIOS_PRODUCT_NAME}</Link></article>
+          <article><GraduationCap size={20} /><strong>Obserra EPI Academy</strong><p>Role-based learning options for leaders, practitioners, and teams, subject to offering-specific controls.</p><Link href="/academy/enterprise">View enterprise learning</Link></article>
           <article><Building2 size={20} /><strong>Trust Center</strong><p>Security architecture, framework alignment, policy, and procurement assurance.</p><Link href="/trust">Open Trust Center</Link></article>
         </div>
       </section>
