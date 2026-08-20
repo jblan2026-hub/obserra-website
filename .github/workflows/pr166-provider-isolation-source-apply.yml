@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - hotfix/pr166-provider-isolation-source-apply-20260820
-  pull_request:
-    branches:
-      - main
-    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
@@ -46,42 +42,56 @@ jobs:
           const fs = require('node:fs');
           const path = 'proxy.ts';
           const source = fs.readFileSync(path, 'utf8');
-          const before = `  const supabaseRuntime = prepareSupabaseAuthRuntime();
-          if (ownership.provider === "supabase" && supabaseRuntime.runtimeEnabled) {
-            if (!supabaseRuntime.ready) return identityConfigurationResponse(request);
-            try {
-              return await handleSupabaseRequest(request, ownership);
-            } catch {
-              return supabaseIdentityUnavailableResponse(request);
-            }
-          }
-
-          if (!authenticationReady()) {`;
-          const after = `  if (ownership.provider === "public") {
-            const response = applyRouteSecurityHeaders(NextResponse.next(), request);
-            response.headers.set("X-Obserra-Identity-Provider", "public");
-            response.headers.set("X-Obserra-Identity-Status", "not-required");
-            return response;
-          }
-
-          const supabaseRuntime = prepareSupabaseAuthRuntime();
-          if (ownership.provider === "supabase") {
-            if (!supabaseRuntime.runtimeEnabled || !supabaseRuntime.ready) {
-              return supabaseIdentityUnavailableResponse(request);
-            }
-            try {
-              return await handleSupabaseRequest(request, ownership);
-            } catch {
-              return supabaseIdentityUnavailableResponse(request);
-            }
-          }
-
-          if (!authenticationReady()) {`;
+          const before = [
+            '  const supabaseRuntime = prepareSupabaseAuthRuntime();',
+            '  if (ownership.provider === "supabase" && supabaseRuntime.runtimeEnabled) {',
+            '    if (!supabaseRuntime.ready) return identityConfigurationResponse(request);',
+            '    try {',
+            '      return await handleSupabaseRequest(request, ownership);',
+            '    } catch {',
+            '      return supabaseIdentityUnavailableResponse(request);',
+            '    }',
+            '  }',
+            '',
+            '  if (!authenticationReady()) {',
+          ].join('\n');
+          const after = [
+            '  if (ownership.provider === "public") {',
+            '    const response = applyRouteSecurityHeaders(NextResponse.next(), request);',
+            '    response.headers.set("X-Obserra-Identity-Provider", "public");',
+            '    response.headers.set("X-Obserra-Identity-Status", "not-required");',
+            '    return response;',
+            '  }',
+            '',
+            '  const supabaseRuntime = prepareSupabaseAuthRuntime();',
+            '  if (ownership.provider === "supabase") {',
+            '    if (!supabaseRuntime.runtimeEnabled || !supabaseRuntime.ready) {',
+            '      return supabaseIdentityUnavailableResponse(request);',
+            '    }',
+            '    try {',
+            '      return await handleSupabaseRequest(request, ownership);',
+            '    } catch {',
+            '      return supabaseIdentityUnavailableResponse(request);',
+            '    }',
+            '  }',
+            '',
+            '  if (!authenticationReady()) {',
+          ].join('\n');
           const occurrences = source.split(before).length - 1;
           if (occurrences !== 1) {
             throw new Error(`Expected exactly one provider-boundary block, found ${occurrences}`);
           }
-          fs.writeFileSync(path, source.replace(before, after));
+          const updated = source.replace(before, after);
+          if (updated.includes('ownership.provider === "supabase" && supabaseRuntime.runtimeEnabled')) {
+            throw new Error('Legacy Supabase runtime-gated provider boundary remains');
+          }
+          if (!updated.includes('if (ownership.provider === "public")')) {
+            throw new Error('Public provider boundary was not inserted');
+          }
+          if (!updated.includes('!supabaseRuntime.runtimeEnabled || !supabaseRuntime.ready')) {
+            throw new Error('Supabase fail-closed runtime boundary was not inserted');
+          }
+          fs.writeFileSync(path, updated);
           NODE
 
           proxy_blob="$(git hash-object proxy.ts)"
