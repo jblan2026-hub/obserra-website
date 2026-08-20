@@ -1,0 +1,135 @@
+name: PR166 Provider Isolation Source Apply
+
+on:
+  push:
+    branches:
+      - hotfix/pr166-provider-isolation-source-apply-20260820
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      TARGET_BRANCH: fix/165-public-identity-readiness-20260820
+      EXPECTED_HEAD: 068eeb3fe0a76f9d894693da0113a91e62b739b6
+      CI: "true"
+    steps:
+      - name: Checkout exact target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_BRANCH }}
+          fetch-depth: 0
+
+      - name: Require exact RED head
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EXPECTED_HEAD" || {
+            echo "Refusing to apply: expected $EXPECTED_HEAD, found $actual" >&2
+            exit 1
+          }
+          test -z "$(git status --porcelain)"
+
+      - name: Apply minimal provider-isolation change
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = 'proxy.ts';
+          const source = fs.readFileSync(path, 'utf8');
+          const before = `  const supabaseRuntime = prepareSupabaseAuthRuntime();
+          if (ownership.provider === "supabase" && supabaseRuntime.runtimeEnabled) {
+            if (!supabaseRuntime.ready) return identityConfigurationResponse(request);
+            try {
+              return await handleSupabaseRequest(request, ownership);
+            } catch {
+              return supabaseIdentityUnavailableResponse(request);
+            }
+          }
+
+          if (!authenticationReady()) {`;
+          const after = `  if (ownership.provider === "public") {
+            const response = applyRouteSecurityHeaders(NextResponse.next(), request);
+            response.headers.set("X-Obserra-Identity-Provider", "public");
+            response.headers.set("X-Obserra-Identity-Status", "not-required");
+            return response;
+          }
+
+          const supabaseRuntime = prepareSupabaseAuthRuntime();
+          if (ownership.provider === "supabase") {
+            if (!supabaseRuntime.runtimeEnabled || !supabaseRuntime.ready) {
+              return supabaseIdentityUnavailableResponse(request);
+            }
+            try {
+              return await handleSupabaseRequest(request, ownership);
+            } catch {
+              return supabaseIdentityUnavailableResponse(request);
+            }
+          }
+
+          if (!authenticationReady()) {`;
+          const occurrences = source.split(before).length - 1;
+          if (occurrences !== 1) {
+            throw new Error(`Expected exactly one provider-boundary block, found ${occurrences}`);
+          }
+          fs.writeFileSync(path, source.replace(before, after));
+          NODE
+
+          proxy_blob="$(git hash-object proxy.ts)"
+          node - "$proxy_blob" <<'NODE'
+          const fs = require('node:fs');
+          const blob = process.argv[2];
+          if (!/^[0-9a-f]{40}$/.test(blob)) throw new Error('Invalid proxy Git blob identity');
+          const path = 'lib/proxy-release-fingerprint.ts';
+          const source = fs.readFileSync(path, 'utf8');
+          const pattern = /gitBlobSha1: "[0-9a-f]{40}"/g;
+          const matches = source.match(pattern) ?? [];
+          if (matches.length !== 1) throw new Error(`Expected one proxy fingerprint, found ${matches.length}`);
+          fs.writeFileSync(path, source.replace(pattern, `gitBlobSha1: "${blob}"`));
+          NODE
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install supported npm major
+        run: |
+          npm install --global npm@11 --no-audit --no-fund
+          test "$(npm --version | cut -d. -f1)" = "11"
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify GREEN tests and lint
+        run: |
+          npm test
+          npm run lint
+
+      - name: Enforce narrow source diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          mapfile -t changed < <(git diff --name-only | sort)
+          printf '%s\n' "${changed[@]}"
+          test "${#changed[@]}" -eq 2
+          test "${changed[0]}" = "lib/proxy-release-fingerprint.ts"
+          test "${changed[1]}" = "proxy.ts"
+
+      - name: Commit and push verified GREEN source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add proxy.ts lib/proxy-release-fingerprint.ts
+          git commit -m "fix(identity): isolate public and Supabase provider readiness for #165"
+          git push origin "HEAD:${TARGET_BRANCH}"
