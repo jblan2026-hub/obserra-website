@@ -1,80 +1,102 @@
-name: Temporary Production Secret Provisioning
+name: Application Release Validation
 
 on:
+  workflow_dispatch:
   pull_request:
-    types: [reopened]
+    branches:
+      - main
+      - agent/sitewide-governance-auto-academy
+    paths:
+      - "app/apps/**"
+      - "app/api/apps/**"
+      - "app/portal/applications/**"
+      - "lib/release-delivery.ts"
+      - "scripts/application-market-brain.mjs"
+      - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/validate-application-staging.mjs"
+      - "scripts/sync-final-apps.mjs"
+      - "config/application-market-intelligence-policy.json"
+      - "config/application-production-policy.json"
+      - "config/application-worker-scaling-policy.json"
+      - "config/site-workflow-operations-policy.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/application-release-validation.yml"
+  push:
+    branches:
+      - agent/application-production-pipeline
+    paths:
+      - "app/apps/**"
+      - "app/api/apps/**"
+      - "app/portal/applications/**"
+      - "lib/release-delivery.ts"
+      - "scripts/application-market-brain.mjs"
+      - "scripts/generate-app-release-bundle.mjs"
+      - "scripts/validate-application-staging.mjs"
+      - "scripts/sync-final-apps.mjs"
+      - "config/application-market-intelligence-policy.json"
+      - "config/application-production-policy.json"
+      - "config/application-worker-scaling-policy.json"
+      - "config/site-workflow-operations-policy.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/application-release-validation.yml"
 
 permissions:
   contents: read
 
 concurrency:
-  group: temporary-production-secret-provisioning
-  cancel-in-progress: false
+  group: application-release-validation-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  provision-academy-access-signing-secret:
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'fix/production-authority-reconciliation-20260819'
+  release-validation:
+    name: Validate governed application release staging
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
-      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
-      CANONICAL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+    timeout-minutes: 45
     steps:
-      - name: Require Vercel credential
-        shell: bash
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install supported npm major
         run: |
-          set -euo pipefail
-          test -n "${VERCEL_TOKEN}"
-
-      - name: Upsert dedicated Academy signing secret
-        shell: bash
+          npm install --global npm@11 --no-audit --no-fund
+          test "$(npm --version | cut -d. -f1)" = "11"
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Verify lockfile remains immutable
+        run: git diff --exit-code -- package-lock.json
+      - name: Generate controlled staging manifests
+        run: npm run release:apps -- release/application-production
+      - name: Validate staging identity and artifact boundary
+        run: npm run validate:application-staging
+      - name: Generate governed market guidance
+        run: npm run market:apps
+      - name: Run repository tests
+        run: npm test
+      - name: Run lint
+        run: npm run lint
+      - name: Build production website
+        run: npm run build
+      - name: Validate market guidance coverage
         run: |
-          set -euo pipefail
-          SIGNING_SECRET="$(openssl rand -base64 48 | tr -d '\n')"
-          export SIGNING_SECRET
-          node <<'NODE'
+          node - <<'NODE'
           const fs = require('fs');
-          const payload = [{
-            key: 'ACADEMY_ACCESS_SIGNING_SECRET',
-            value: process.env.SIGNING_SECRET,
-            type: 'sensitive',
-            target: ['production'],
-            comment: 'Dedicated HMAC key for Obserra EPI Academy anonymous access cookies. Managed separately from Stripe webhook credentials.'
-          }];
-          fs.writeFileSync('/tmp/vercel-env-payload.json', JSON.stringify(payload), { mode: 0o600 });
+          const path = require('path');
+          const catalog = JSON.parse(fs.readFileSync(path.join('release', 'application-production', 'release-catalog.json'), 'utf8'));
+          const market = JSON.parse(fs.readFileSync(path.join('release', 'application-market-intelligence', 'portfolio-pricing-plan.json'), 'utf8'));
+          if (!Array.isArray(market.applications) || market.applications.length !== catalog.applications.length) {
+            throw new Error('market guidance does not cover the complete staged application catalog');
+          }
+          console.log(`Market guidance covers all ${catalog.applications.length} staged applications.`);
           NODE
-          status="$(curl --silent --show-error \
-            --connect-timeout 10 \
-            --max-time 30 \
-            --output /tmp/vercel-env-response.json \
-            --write-out '%{http_code}' \
-            --request POST \
-            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-            --header 'Content-Type: application/json' \
-            --data-binary @/tmp/vercel-env-payload.json \
-            "https://api.vercel.com/v10/projects/${CANONICAL_PROJECT_ID}/env?upsert=true&teamId=${TEAM_ID}")"
-          rm -f /tmp/vercel-env-payload.json
-          unset SIGNING_SECRET
-          if [ "${status}" != "200" ] && [ "${status}" != "201" ]; then
-            rm -f /tmp/vercel-env-response.json
-            echo "::error::Vercel environment-variable upsert failed with HTTP ${status}."
-            exit 1
-          fi
-          rm -f /tmp/vercel-env-response.json
-
-      - name: Verify secret metadata without decryption
-        shell: bash
-        run: |
-          set -euo pipefail
-          response="$(curl --silent --show-error --fail-with-body \
-            --connect-timeout 10 \
-            --max-time 30 \
-            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-            "https://api.vercel.com/v10/projects/${CANONICAL_PROJECT_ID}/env?teamId=${TEAM_ID}")"
-          count="$(jq '[.envs[]? | select(.key == "ACADEMY_ACCESS_SIGNING_SECRET") | select(.type == "sensitive") | select((.target // []) | index("production"))] | length' <<<"${response}")"
-          if [ "${count}" -lt 1 ]; then
-            echo "::error::Dedicated Academy signing secret metadata was not present after upsert."
-            exit 1
-          fi
-          echo "Dedicated Academy signing secret is configured as sensitive for production on the canonical project."
+      - name: Upload independently validated staging evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-release-validation-${{ github.sha }}
+          path: |
+            release/application-production/**
+            release/application-market-intelligence/**
+          if-no-files-found: error
+          retention-days: 180
