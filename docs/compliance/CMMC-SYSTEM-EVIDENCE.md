@@ -3,13 +3,13 @@
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update the controlled source records and run `npm run generate:cmmc-system-evidence`.
 
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-- **Bundle:** `obserra-cmmc-working-c904a823d0c9fa9cdf7a4f7d`
+- **Bundle:** `obserra-cmmc-working-b9d7c000d1d14e0396c51315`
 - **Bundle state:** `working_evidence_inventory`
 - **Generated at:** `2026-08-14T18:49:07Z`
 - **Git base/HEAD reference:** `0e72459a8940f23976038d85d6394409000f48c5`
 - **Revision binding:** `working_tree_digest`
 - **Exact release:** not assigned; working evidence inventory
-- **In-scope tree SHA-256:** `c904a823d0c9fa9cdf7a4f7d7c043c935d51be0f5ea4ada9c416a2cddd458a1d` (692 paths)
+- **In-scope tree SHA-256:** `b9d7c000d1d14e0396c5131536e06d79c0483463a439897c1a428e6d9023205e` (692 paths)
 
 ## Paired audit views
 
@@ -971,15 +971,15 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 
 | Artifact | Origin | State | Method/result | SHA-256 | Finding eligible | Claim boundary |
 | --- | --- | --- | --- | --- | --- | --- |
-| `EV-WEBSITE-PROXY` — Website request security boundary<br>`proxy.ts` | product_supplied_evidence | working | test/not_run | `59dae0c6438b6b128415262ffc267a3f8a7633a8171b86972be2ff1ef413b2ee` | no | Demonstrates source-level routing and header logic only. |
+| `EV-WEBSITE-PROXY` — Website request security boundary<br>`proxy.ts` | product_supplied_evidence | working | test/not_run | `f11194aa12dc51df5cdd7f6de1c3a258ad0464c4a4635e26a963998c33431168` | no | Demonstrates source-level routing and header logic only. |
 | `EV-WEBSITE-CREDENTIALS` — Verified credential frontend<br>`app/about/VerifiedCredentials.tsx` | product_supplied_evidence | working | examine/not_run | `64562c56725811ad4c20f7e527d36e644c2bb895937914bf72220a72532fcbf4` | no | Demonstrates credential image/link rendering source, not issuer validation by itself. |
 | `EV-WEBSITE-BADGE-MANIFEST` — Approved credential asset and issuer-observation manifest<br>`public/badges/eccouncil/asset-manifest.json` | organization_evidence | working | test/not_run | `b3fb489e362a03bb0ec379423c86847bf73221644f8bd0957d0a5afb06165ca9` | no | Records approved local asset identities, hashes, three time-bound live ADG issuer observations, and verification destinations; external issuer pages remain authoritative for credential validity. |
 | `EV-WEBSITE-BADGE-SCHEMA` — Fail-closed credential asset evidence schema<br>`public/badges/eccouncil/asset-manifest.schema.json` | product_supplied_evidence | working | test/not_run | `b4a7ae42ee34b8c0b5d3a0970f4f021c9402f0395b459bd862934038b38342a4` | no | Defines mandatory provenance, hash, issuer-observation, and claim-boundary fields; schema presence is not a live deployment result. |
 | `EV-WEBSITE-BADGE-GATE` — Credential asset integrity and provenance gate<br>`scripts/ec-council-badge-integrity.test.mjs` | product_supplied_evidence | working | test/not_run | `93aa89a30a6f1af8ad94bff04eb57a01fde308947e6525cf82592f5c53e17d9a` | no | Fail-closed source gate for the nine authorized assets and three issuer observations; exact CI run and production HTTP evidence remain release-specific. |
-| `EV-WEBSITE-LEGAL-IDENTITY-AUDIT` — Machine-readable legal identity source audit<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.json` | organization_evidence | working | test/not_run | `874bc21b8b4ed468b7e599d56ccd35444db31231c15b6330a3cf2b67fc19a53f` | no | Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence. |
+| `EV-WEBSITE-LEGAL-IDENTITY-AUDIT` — Machine-readable legal identity source audit<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.json` | organization_evidence | working | test/not_run | `7943b406dbe1e0ad72107c4e0bc2321e13699052a7f859296b3bb0bb5f870c69` | no | Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence. |
 | `EV-WEBSITE-LEGAL-IDENTITY-SCHEMA` — Legal identity audit machine schema<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.schema.json` | product_supplied_evidence | working | examine/not_run | `37d5bc13bed30feafb4a7c661ed867a74e432062c98ff262aecad006404d9314` | no | Defines the machine-readable audit contract and mandatory disposition fields; schema presence is not a live operating result. |
 | `EV-WEBSITE-LEGAL-IDENTITY-GATE` — Fail-closed legal identity drift gate<br>`scripts/legal-identity-audit.mjs` | product_supplied_evidence | working | test/not_run | `6323945d11fc056b0205f2f18f259779aef12a3e94ece8a69560ddc482895605` | no | Rejects malformed legal names, retired company wording, stale public origins, and unapproved short-name company claims while preserving enumerated product brands and stable technical identifiers. |
-| `EV-WEBSITE-NEXT-CONFIG` — Website response security and image-delivery configuration<br>`next.config.ts` | product_supplied_evidence | working | examine/not_run | `9840ee437e9d297ab77ac7f913b66021a7924f0d8880dac5e4ce119f71b911a5` | no | Source-level CSP, transport, browser, and image-delivery configuration only; Vercel production behavior requires exact-deployment verification. |
+| `EV-WEBSITE-NEXT-CONFIG` — Website response security and image-delivery configuration<br>`next.config.ts` | product_supplied_evidence | working | examine/not_run | `3c3895b43e6dfc3b6b0481653d238dfe90c2bd1c97f63dfbe1f046aad7ecc4e8` | no | Source-level CSP, transport, browser, and image-delivery configuration only; Vercel production behavior requires exact-deployment verification. |
 | `EV-WEBSITE-CI` — Website continuous integration gate<br>`.github/workflows/website-ci.yml` | product_supplied_evidence | working | examine/not_run | `29c3d34dc2ffe69d7e7586d17b43dc3199d20ab665c664ff5bb72159bf083c23` | no | Shows configured CI controls; a run-specific result is separately required. |
 
 ### Objective-level CMMC evidence mapping
@@ -2825,7 +2825,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 
 | Artifact | Origin | State | Method/result | SHA-256 | Finding eligible | Claim boundary |
 | --- | --- | --- | --- | --- | --- | --- |
-| `EV-VERCEL-CONFIG` — Vercel deployment configuration<br>`vercel.json` | product_supplied_evidence | working | examine/not_run | `ae56754cd70a632a92501b79c3f421539d06a51d8da752a6ec1b230cda025f0f` | no | Repository configuration only. |
+| `EV-VERCEL-CONFIG` — Vercel deployment configuration<br>`vercel.json` | product_supplied_evidence | working | examine/not_run | `132e10067e84b3080caf83d8796383f814d803ce712ca32f328fe6b519a01267` | no | Repository configuration only. |
 | `EV-VERCEL-HEALTH` — Runtime release identity health route<br>`app/api/health/route.ts` | product_supplied_evidence | working | test/not_run | `9a2363b2048c7ae3e1d76cc9b97b95506df311060ae9465272530c98ac26cf40` | no | Health contract source only; live response is separate evidence. |
 | `EV-VERCEL-INTEGRITY-TEST` — Deployment integrity test<br>`test/vercel-deployment-integrity.test.mjs` | product_supplied_evidence | working | test/not_run | `433ac5c09c3acafee82b6b6b3085d0a614e840f16d3d71418e5239f48d994ecb` | no | Test definition only until exact-run results are retained. |
 | `EV-VERCEL-E2E-WORKFLOW` — Production E2E operational gate<br>`.github/workflows/production-e2e-operational-gate.yml` | product_supplied_evidence | working | examine/not_run | `912bb4e113e07f3cf5f95ab9e1be7ddfab475e1a9f3b3fe98660b891ce724512` | no | Workflow configuration only. |
