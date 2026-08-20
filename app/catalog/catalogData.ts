@@ -138,14 +138,14 @@ export const academyFlagshipCatalog = [
 export const pricingArchitecture = [
   "Advisory packages: fixed-scope outcomes with clear delivery windows",
   "Application subscriptions: annual licensing by edition plus onboarding",
-  "Academy: per-learner checkout for the public catalog and cohort pricing for enterprise",
+  "Obserra EPI Academy: per-learner checkout for the public catalog and cohort pricing for enterprise",
   "Pilot pricing: low-friction 30 to 90 day entry programs with upgrade credits",
   "Expansion pricing: add-on modules for integrations, reporting, and governance depth"
 ] as const;
 
 export const productBriefs = [
   {
-    name: "EIOS Executive Command Brief",
+    name: "Obserra EPI EIOS Executive Command Brief",
     purpose: "Unify cross-domain operational intelligence, governance, and decision evidence for executive buyers.",
     deliverables: ["Architecture map", "Integration plan", "Executive dashboard storyboard"]
   },
@@ -160,7 +160,7 @@ export const productBriefs = [
     deliverables: ["Campaign baseline", "Exception handling runbook", "Certification KPI pack"]
   },
   {
-    name: "Obserra Academy Enterprise Cohort Brief",
+    name: "Obserra EPI Academy Enterprise Cohort Brief",
     purpose: "Build workforce capability with role-aligned cyber and intelligence training.",
     deliverables: ["Cohort curriculum map", "Completion dashboard", "Leadership impact summary"]
   }
@@ -192,7 +192,7 @@ export const pilotOffers = [
     successMetric: "First certification cycle completed with evidence and remediation closure"
   },
   {
-    name: "Academy Cohort Pilot",
+    name: "Obserra EPI Academy Cohort Pilot",
     target: "Security leadership and operations teams",
     successMetric: "80 percent completion and measurable readiness uplift"
   }
@@ -220,9 +220,9 @@ export const caseStudies = [
 ] as const;
 
 export const proofBacklog = [
-  "Publish founder product videos for EIOS, AI Governance Suite, and Academy cohorts",
+  "Publish founder product videos for Obserra EPI EIOS, AI Governance Suite, and Obserra EPI Academy cohorts",
   "Release app demonstration recordings for three available products",
-  "Add course preview clips for flagship Academy offerings",
+  "Add course preview clips for flagship Obserra EPI Academy offerings",
   "Publish redacted sample reports from risk, identity, and intelligence engagements",
   "Recruit 10 pilot users across app and advisory lines",
   "Collect 6 verified testimonials tied to measurable business outcomes",
@@ -236,7 +236,7 @@ export const demandGenerationPlan = [
   "Activate targeted email outreach to CISOs, CSOs, risk executives, and transformation leaders",
   "Build referral partnerships with legal, compliance, and managed security providers",
   "Pursue joint briefs with corporate security and cyber advisory firms",
-  "Run Academy cohort campaigns with role-based enrollment offers",
+  "Run Obserra EPI Academy cohort campaigns with role-based enrollment offers",
   "Launch qualified app pilots with conversion paths to annual editions"
 ] as const;
 
