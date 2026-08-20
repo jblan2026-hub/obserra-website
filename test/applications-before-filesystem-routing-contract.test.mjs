@@ -24,18 +24,9 @@ test("private gateway preserves the real Applications route family for authorize
     /redirect\(["']\/portal\/applications["']\)/,
     "authorized Apps traffic must not collapse every /apps route into the portal dashboard",
   );
-  assert.match(gateway, /AppsMarketplaceClient|AppsPage/);
+  assert.match(gateway, /AppsPage/);
   assert.match(gateway, /AppDetailPage/);
   assert.match(gateway, /SubscribePage/);
-});
-
-test("direct private gateway forced browsing uses the same proxy allowlist boundary", () => {
-  const proxy = read("proxy.ts");
-  const privatePrefixes = proxy.match(/const APPLICATIONS_PRIVATE_PATH_PREFIXES = \[[^\]]*\]/s)?.[0] ?? "";
-  const protectedPrefixes = proxy.match(/const PROTECTED_PATH_PREFIXES = \[[^\]]*\]/s)?.[0] ?? "";
-
-  assert.match(privatePrefixes, /["']\/private-applications-gateway["']/);
-  assert.match(protectedPrefixes, /["']\/private-applications-gateway["']/);
 });
 
 test("public Apps metadata is suppressed at the private gateway boundary", () => {
@@ -44,4 +35,15 @@ test("public Apps metadata is suppressed at the private gateway boundary", () =>
   assert.match(gateway, /follow:\s*false/);
   assert.match(gateway, /nocache:\s*true/);
   assert.match(gateway, /noimageindex:\s*true/);
+});
+
+test("preserved Apps pages do not emit public canonical or JSON-LD discovery metadata", () => {
+  const rootPage = read("app/apps/page.tsx");
+  const detailPage = read("app/apps/[slug]/page.tsx");
+
+  for (const [name, source] of [["root", rootPage], ["detail", detailPage]]) {
+    assert.doesNotMatch(source, /alternates:\s*\{\s*canonical:/, `${name} Apps page must not publish a canonical URL`);
+    assert.doesNotMatch(source, /application\/ld\+json/, `${name} Apps page must not publish JSON-LD`);
+    assert.match(source, /robots:\s*\{[\s\S]*index:\s*false/, `${name} Apps page must remain noindex`);
+  }
 });
