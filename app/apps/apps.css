@@ -475,6 +475,13 @@
 }
 
 .app-detail-page {
+  --apps-bg: #041220;
+  --apps-surface: #081d31;
+  --apps-line: #79bfe33b;
+  --apps-text: #eaf6ff;
+  --apps-gold: #f4ba55;
+  --apps-cyan: #83d0f8;
+  --apps-font: "Sora", "Avenir Next", "Trebuchet MS", sans-serif;
   background: var(--apps-bg);
   color: var(--apps-text);
   min-height: 100svh;

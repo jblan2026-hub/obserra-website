@@ -1,51 +1,18 @@
-import { marketplaceApps, type MarketplaceApp } from "./appsData";
-import rawStoreCatalog from "./store-catalog.json";
+import { marketplaceApps } from "./appsData";
 
-type GeneratedStoreRecord = {
-  slug: string;
-  name: string;
-  status: string;
-  category: string;
-  version: string;
-  deployment: string[];
-  pricing: string;
-  description: string;
+const legacyAliases: Record<string, string> = {
+  "obserra-incident-command": "obserra-crisis-commander",
+  "obserra-incident-command-console": "obserra-crisis-commander",
+  "obserra-cyber-crisis-commander": "obserra-crisis-commander",
 };
 
-const storeCatalog = rawStoreCatalog as { applications: GeneratedStoreRecord[] };
-const generatedApps: MarketplaceApp[] = storeCatalog.applications.map((entry) => {
-  const status = entry.status === "Pilot" || entry.status === "Coming Soon" ? entry.status : "Available";
-  const releaseFeature = status === "Coming Soon"
-    ? "Governed pre-release enrollment"
-    : `Published release ${entry.version}`;
-
-  return {
-    slug: entry.slug,
-    name: entry.name,
-    status,
-    category: entry.category as MarketplaceApp["category"],
-    value: entry.description,
-    features: ["Subscription-controlled access", "Secure customer delivery", releaseFeature],
-    integrations: [],
-    deployment: entry.deployment as MarketplaceApp["deployment"],
-    pricing: entry.pricing,
-    documentation: status === "Coming Soon"
-      ? ["Product preview", "Deployment architecture", "Customer support"]
-      : ["Release notes", "Deployment guide", "Customer support"],
-    faq: [{
-      q: "How is access provided?",
-      a: status === "Coming Soon"
-        ? "This application is in governed pre-release status. Purchase activation will be exposed through the Obserra store only after commercial release approval and pricing configuration."
-        : "Purchase through the Obserra store. Active subscriptions receive portal access, a subscription-bound application key, and authorized downloads where applicable.",
-    }],
-  };
-});
-
-const bySlug = new Map<string, MarketplaceApp>();
-for (const entry of marketplaceApps) bySlug.set(entry.slug, entry);
-for (const entry of generatedApps) bySlug.set(entry.slug, { ...bySlug.get(entry.slug), ...entry });
-
-export const storefrontApps = [...bySlug.values()];
+/**
+ * Generated catalog records are deliberately not merged here. A release source
+ * can only add availability after it supplies a separately reviewed evidence
+ * contract and an exact approved action target.
+ */
+export const storefrontApps = marketplaceApps;
 export function findStorefrontAppBySlug(slug: string) {
-  return storefrontApps.find((entry) => entry.slug === slug);
+  const canonicalSlug = legacyAliases[slug] ?? slug;
+  return storefrontApps.find((entry) => entry.slug === canonicalSlug);
 }
