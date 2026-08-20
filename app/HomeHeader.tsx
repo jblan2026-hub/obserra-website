@@ -9,7 +9,6 @@ import "./site-header.css";
 
 const navigation = [
   { label: "Services", href: "/services" },
-  { label: "Applications", href: "/apps" },
   { label: "Industries", href: "/industries" },
   { label: "Academy LMS", href: "/academy" },
   { label: "Florida Training", href: "/florida-security-training" },
