@@ -16,17 +16,22 @@ test("Applications are intercepted before filesystem resolution", () => {
   assert.match(config, /private, no-store, max-age=0, must-revalidate/);
 });
 
-test("Vercel edge routing intercepts Applications before directory listing resolution", () => {
+test("Vercel custom routes intercept Applications before filesystem resolution", () => {
   const config = JSON.parse(read("vercel.json"));
-  const rewrites = Array.isArray(config.rewrites) ? config.rewrites : [];
+  const routes = Array.isArray(config.routes) ? config.routes : [];
 
-  assert.ok(
-    rewrites.some(
-      (rewrite) =>
-        rewrite?.source === "/apps/:path*" &&
-        rewrite?.destination === "/private-applications-gateway/:path*",
-    ),
-    "vercel.json must rewrite /apps/:path* to the authenticated private gateway before Vercel can expose directory listings",
+  assert.deepEqual(
+    routes.slice(0, 2),
+    [
+      { src: "/apps", dest: "/private-applications-gateway" },
+      { src: "/apps/(.*)", dest: "/private-applications-gateway/$1" },
+    ],
+    "the first Vercel routes must intercept the exact /apps root and nested Applications paths before filesystem resolution",
+  );
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(config, "rewrites"),
+    false,
+    "the Applications privacy boundary must not depend on the higher-level Vercel rewrites phase",
   );
 });
 
