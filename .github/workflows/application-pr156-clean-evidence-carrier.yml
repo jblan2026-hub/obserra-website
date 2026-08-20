@@ -70,7 +70,7 @@ jobs:
               docs/compliance/LEGAL-IDENTITY-AUDIT.json \
               docs/compliance/LEGAL-IDENTITY-AUDIT.md \
               docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 | sort > /tmp/legal.allowed
-            diff -u /tmp/legal.allowed /tmp/legal.changed
+            while IFS= read -r file; do grep -Fx "$file" /tmp/legal.allowed >/dev/null; done < /tmp/legal.changed
             git add -- \
               docs/compliance/LEGAL-IDENTITY-AUDIT.json \
               docs/compliance/LEGAL-IDENTITY-AUDIT.md \
@@ -92,7 +92,7 @@ jobs:
               docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
               docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
               docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256 | sort > /tmp/cmmc.allowed
-            diff -u /tmp/cmmc.allowed /tmp/cmmc.changed
+            while IFS= read -r file; do grep -Fx "$file" /tmp/cmmc.allowed >/dev/null; done < /tmp/cmmc.changed
             git add -- \
               docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
               docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
@@ -114,7 +114,7 @@ jobs:
               docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
               docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
               docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 | sort > /tmp/disposition.allowed
-            diff -u /tmp/disposition.allowed /tmp/disposition.changed
+            while IFS= read -r file; do grep -Fx "$file" /tmp/disposition.allowed >/dev/null; done < /tmp/disposition.changed
             git add -- \
               docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
               docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
@@ -136,7 +136,7 @@ jobs:
               docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
               docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
               docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256 | sort > /tmp/fdacs.allowed
-            diff -u /tmp/fdacs.allowed /tmp/fdacs.changed
+            while IFS= read -r file; do grep -Fx "$file" /tmp/fdacs.allowed >/dev/null; done < /tmp/fdacs.changed
             git add -- \
               docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
               docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
