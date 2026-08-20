@@ -74,7 +74,7 @@ test("automatic cutover is idempotent and rollback reverses only ownership chang
   assert.match(cutover, /move_back_if_moved\(\)/);
   assert.match(cutover, /local source_project="\$3"/);
   assert.match(cutover, /if \[ "\$\{moved\}" != "true" \]; then/);
-  assert.match(cutover, /--data "\{\\"projectId\\":\\"\$\{source_project\\"\}"/);
+  assert.match(cutover, /--data "\{\\"projectId\\":\\"\$\{source_project\}\\"\}"/);
 });
 
 test("automatic cutover quarantines only the proven duplicate and preserves legitimate projects", () => {
