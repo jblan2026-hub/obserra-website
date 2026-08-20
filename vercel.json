@@ -1,10 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "ignoreCommand": "sh scripts/vercel-ignore-build.sh",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/apps/:path*",
-      "destination": "/private-applications-gateway/:path*"
+      "src": "/apps",
+      "dest": "/private-applications-gateway"
+    },
+    {
+      "src": "/apps/(.*)",
+      "dest": "/private-applications-gateway/$1"
     }
   ],
   "alias": [
