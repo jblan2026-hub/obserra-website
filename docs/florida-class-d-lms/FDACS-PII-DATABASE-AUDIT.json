@@ -299,9 +299,9 @@
     "pendingHumanIsTechnicalFailure": false,
     "assessmentFinding": "not_assessed",
     "claimBoundary": "The CMMC system mapping is the controlled security-protocol description. It becomes verified FDACS proof of operation only after exact-release technical results and the protected package are registered live. Human review remains separate; assessor findings are not created by the product.",
-    "centralMachineSha256": "14acca31edb3102089ad602d36782c5de560a710ef944fcb56b4613a0ad394ae",
-    "centralHumanSha256": "ce5b1d04b47f35d915b9b929f4afc54f2ae28a87c85cb2879dd30eaecf035d6c",
-    "separateDispositionSha256": "4ac2fd489aae6f2e2848ac385be05a33c07140cfdf85749704941e7d8a9909ab",
+    "centralMachineSha256": "9f0366638bd2fbdf9fa19dca718be4a6989d5a15bada9f5561b889b0ecaea8b4",
+    "centralHumanSha256": "fdfab441e141be3e568ddee4e758af30b9fad930f48e730d4e85d5edafb866f9",
+    "separateDispositionSha256": "8d530f1d9151d1c2b9af20b9a14912edfa0bfb1696726cebedf2a5d1e82ae3f4",
     "mappedObjectiveCount": 287,
     "centralTechnicalDisposition": "not_tested",
     "centralHumanDisposition": "pending"
