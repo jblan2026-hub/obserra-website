@@ -4,28 +4,22 @@ import test from "node:test";
 
 const read = (path) => fs.readFileSync(path, "utf8");
 
-test("Obserra EPI Applications and Obserra EPI Academy are prominent direct website destinations", () => {
+test("Obserra EPI Academy remains public while Obserra EPI Applications stays off public navigation", () => {
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
+  const homeHeader = read("app/HomeHeader.tsx");
   const home = read("app/page.tsx");
   const identity = read("lib/legal-identity.ts");
-  const styles = read("app/components/enterprise/enterprise-sales-navigation.css");
 
   assert.match(identity, /APPLICATIONS_BRAND_NAME = `\$\{BRAND_PREFIX\} Applications`/);
   assert.match(identity, /ACADEMY_BRAND_NAME = `\$\{BRAND_PREFIX\} Academy`/);
-  assert.ok(
-    chrome.indexOf('[APPLICATIONS_BRAND_NAME, "/apps", "sales"]') <
-      chrome.indexOf('[ACADEMY_BRAND_NAME, "/academy", "sales"]'),
-    "Applications must remain ahead of Academy in primary sales navigation",
-  );
-  assert.match(chrome, /className=\{prominence === "sales" \? "ent-header__sales-link"/);
-  assert.match(chrome, /<Link href="\/apps">\{APPLICATIONS_BRAND_NAME\}<\/Link><Link href="\/academy">\{ACADEMY_BRAND_NAME\}<\/Link>/);
-  assert.match(styles, /> a\.ent-header__sales-link/);
-  assert.match(home, /<ButtonLink href="\/apps">Shop \{APPLICATIONS_BRAND_NAME\}<\/ButtonLink>/);
-  assert.match(home, /<ButtonLink href="\/academy" variant="secondary">Browse \{ACADEMY_BRAND_NAME\}<\/ButtonLink>/);
-  assert.match(home, /Applications and Academy are direct website destinations/);
-  assert.match(home, /href="\/apps" className="mission-direct-sales__card"/);
+  assert.doesNotMatch(chrome, /\[APPLICATIONS_BRAND_NAME,\s*["']\/apps["']/);
+  assert.doesNotMatch(chrome, /href=["']\/apps["']/);
+  assert.doesNotMatch(homeHeader, /href:\s*["']\/apps["']/);
+  assert.doesNotMatch(home, /href=["']\/apps["']/);
+  assert.match(chrome, /\[ACADEMY_BRAND_NAME,\s*["']\/academy["'],\s*["']sales["']\]/);
+  assert.match(chrome, /<Link href="\/academy">\{ACADEMY_BRAND_NAME\}<\/Link>/);
+  assert.match(home, /<ButtonLink href="\/academy"/);
   assert.match(home, /href="\/academy" className="mission-direct-sales__card"/);
-  assert.doesNotMatch(home, /href="\/portal\/applications" className="mission-direct-sales__card"/);
 });
 
 test("Academy catalog exposes checkout only for explicitly activated courses", () => {
