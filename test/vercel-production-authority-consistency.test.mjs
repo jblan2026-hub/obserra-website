@@ -23,12 +23,13 @@ test("production authority is single-sourced to the live canonical Vercel projec
   assert.match(operationalGate, new RegExp(CANONICAL_PROJECT_ID, "g"));
   assert.match(commerceGate, new RegExp(CANONICAL_PROJECT_ID));
   assert.match(cmmcGate, new RegExp(CANONICAL_PROJECT_ID));
-  assert.match(ignoreBuildTest, new RegExp(`CANONICAL_PROJECT_ID = ["']${CANONICAL_PROJECT_ID}["']`));
+  assert.match(ignoreBuildTest, new RegExp(`PRODUCTION_PROJECT_ID = ["']${CANONICAL_PROJECT_ID}["']`));
+  assert.match(ignoreBuildTest, new RegExp(`INTEGRATION_PROJECT_ID = ["']${AUXILIARY_PROJECT_ID}["']`));
 });
 
 test("automatic cutover quarantines duplicates without deleting Vercel projects", () => {
   const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
-  assert.doesNotMatch(cutover, /request DELETE[\s\S]*projects\/\$\{AUXILIARY_PROJECT_ID\}\?teamId=/);
+  assert.doesNotMatch(cutover, /--request DELETE(?:(?!--request)[\s\S])*projects\/\$\{AUXILIARY_PROJECT_ID\}\?teamId=/);
   assert.doesNotMatch(cutover, /Retire obsolete auxiliary Vercel project/);
   assert.match(cutover, /commandForIgnoringBuildStep/);
 });
