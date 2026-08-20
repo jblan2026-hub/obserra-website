@@ -1,3 +1,3 @@
-refresh-request: 2026-08-20-canonical-vercel-alias-cutover
-reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence after assigning exactly www.obserrallc.com and obserrallc.com through vercel.json while preserving canonical-project-only build authority; canonical project prj_lxTKKDa9sbhht7FaigiaF1PONMiC always builds, duplicate project prj_FfAnssVJU8pcJydGNJHmCliP6Yme always skips, and application, payment, entitlement, identity, Applications implementation, and regulated LMS business logic remain unchanged
-validation-request: 2026-08-20-exact-governed-hotfix-post-canonical-vercel-alias-cutover
+refresh-request: 2026-08-20-apps-private-boundary
+reason: regenerate governed legal identity, CMMC, continuous-audit, and FDACS evidence after adding the pre-filesystem private Applications routing boundary while preserving the existing Applications implementation, payment, entitlement, identity implementation, and regulated Florida Class D LMS business logic unchanged
+validation-request: 2026-08-20-exact-governed-apps-private-boundary
