@@ -1,4 +1,4 @@
-name: Diagnose Vercel cutover credential and ownership
+name: Diagnose Vercel OIDC REST authentication
 
 on:
   pull_request:
@@ -9,44 +9,71 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   diagnose:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
       TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
       CANONICAL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
       AUXILIARY_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme
     steps:
-      - name: Report credential presence without disclosure
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -z "${VERCEL_TOKEN}" ]; then
-            echo "VERCEL_CREDENTIAL_CONFIGURED=false"
-            exit 2
-          fi
-          echo "VERCEL_CREDENTIAL_CONFIGURED=true"
+      - name: Mint GitHub Actions OIDC token
+        id: oidc
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken();
+            core.setSecret(token);
+            core.setOutput('token', token);
 
-      - name: Read project-domain and live-alias ownership
+      - name: Exchange OIDC token and test read-only Vercel REST access
         shell: bash
+        env:
+          OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
         run: |
           set -euo pipefail
+          exchange_body="$(mktemp)"
+          exchange_status="$(curl --silent --show-error \
+            --output "${exchange_body}" \
+            --write-out '%{http_code}' \
+            --request POST \
+            https://api.vercel.com/login/oauth/token \
+            --data "grant_type=urn:ietf:params:oauth:grant-type:token-exchange" \
+            --data "client_id=cl_kyUx2zVvA4MGptBohkmtYHJly2XltXzD" \
+            --data "subject_token_type=urn:ietf:params:oauth:token-type:id_token" \
+            --data "requested_token_type=urn:ietf:params:oauth:token-type:access_token" \
+            --data-urlencode "team_id_or_slug=${TEAM_ID}" \
+            --data-urlencode "subject_token=${OIDC_TOKEN}")"
+
+          access_token="$(jq -r '.access_token // empty' "${exchange_body}" 2>/dev/null || true)"
+          error_code="$(jq -r '.error // .error.code // empty' "${exchange_body}" 2>/dev/null || true)"
+          rm -f "${exchange_body}"
+
+          echo "OIDC_EXCHANGE_HTTP=${exchange_status}"
+          if [ "${exchange_status}" != "200" ] || [ -z "${access_token}" ]; then
+            echo "OIDC_EXCHANGE_SUCCEEDED=false"
+            echo "OIDC_EXCHANGE_ERROR=${error_code}"
+            exit 3
+          fi
+          echo "::add-mask::${access_token}"
+          echo "OIDC_EXCHANGE_SUCCEEDED=true"
+
           for domain in www.obserrallc.com obserrallc.com; do
             aux_body="$(mktemp)"
             canonical_body="$(mktemp)"
             alias_body="$(mktemp)"
 
             aux_status="$(curl --silent --show-error --output "${aux_body}" --write-out '%{http_code}' \
-              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Authorization: Bearer ${access_token}" \
               "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"
             canonical_status="$(curl --silent --show-error --output "${canonical_body}" --write-out '%{http_code}' \
-              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Authorization: Bearer ${access_token}" \
               "https://api.vercel.com/v9/projects/${CANONICAL_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"
             alias_status="$(curl --silent --show-error --output "${alias_body}" --write-out '%{http_code}' \
-              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Authorization: Bearer ${access_token}" \
               "https://api.vercel.com/v4/aliases/${domain}?teamId=${TEAM_ID}")"
 
             echo "DOMAIN=${domain}"
