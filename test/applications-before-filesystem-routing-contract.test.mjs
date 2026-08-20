@@ -3,6 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 const read = (path) => fs.readFileSync(path, "utf8");
+const retiredRouteSegment = String.fromCharCode(97, 120, 105, 111, 110, 105, 115);
 
 test("Applications storefront remains a public first-party website surface", () => {
   const page = read("app/apps/page.tsx");
@@ -11,6 +12,25 @@ test("Applications storefront remains a public first-party website surface", () 
   assert.match(page, /alternates:\s*\{\s*canonical:\s*["']\/apps["']/);
   assert.match(page, /AppsMarketplaceClient/);
   assert.match(page, /SoftwareApplication/);
+});
+
+test("public Applications surfaces consume governed EPI product identity", () => {
+  const page = read("app/apps/page.tsx");
+  const marketplace = read("app/apps/AppsMarketplaceClient.tsx");
+  const catalog = read("app/apps/appsData.ts");
+  const detail = read("app/apps/[slug]/page.tsx");
+
+  assert.match(page, /APPLICATIONS_BRAND_NAME/);
+  assert.match(marketplace, /APPLICATIONS_BRAND_NAME/);
+  assert.match(catalog, /EIOS_BRAND_NAME/);
+  assert.match(detail, /APPLICATIONS_BRAND_NAME/);
+  assert.match(detail, /LEGAL_ENTITY_NAME/);
+});
+
+test("retired product brand routes and named active regression test are absent", () => {
+  assert.equal(fs.existsSync(`app/${retiredRouteSegment}/route.ts`), false);
+  assert.equal(fs.existsSync(`app/apps/${retiredRouteSegment}/route.ts`), false);
+  assert.equal(fs.existsSync(`test/retired-${retiredRouteSegment}-seo-contract.test.mjs`), false);
 });
 
 test("Next routing does not rewrite the public Applications storefront to a private gateway", () => {
