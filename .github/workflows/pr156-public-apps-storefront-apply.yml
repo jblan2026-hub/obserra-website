@@ -1,0 +1,185 @@
+name: PR156 Public Applications Storefront Apply
+
+on:
+  push:
+    branches:
+      - hotfix/pr156-public-apps-storefront-20260820
+    paths:
+      - .github/workflows/pr156-public-apps-storefront-apply.yml
+
+permissions:
+  contents: write
+
+env:
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+  CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+  CI: true
+
+jobs:
+  apply:
+    name: Restore public SaaS storefront and retain protected operations
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact PR branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: fix/apps-private-boundary-main-20260820
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Require unchanged RED head
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="c0195f02e40812db5c5c20ea5fa37c86219f04dc"
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$expected"
+
+      - name: Remove public storefront routing collisions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          function replaceRequired(source, before, after, label) {
+            if (!source.includes(before)) throw new Error(`Missing expected anchor: ${label}`);
+            return source.replace(before, after);
+          }
+
+          const vercelPath = 'vercel.json';
+          const vercel = JSON.parse(fs.readFileSync(vercelPath, 'utf8'));
+          if (!Array.isArray(vercel.routes) || vercel.routes.length !== 2) {
+            throw new Error('Expected the two obsolete /apps Vercel routes');
+          }
+          for (const route of vercel.routes) {
+            if (route.src !== '/apps' && route.src !== '/apps/(.*)') {
+              throw new Error(`Unexpected Vercel custom route: ${route.src}`);
+            }
+          }
+          delete vercel.routes;
+          fs.writeFileSync(vercelPath, `${JSON.stringify(vercel, null, 2)}\n`);
+
+          const nextPath = 'next.config.ts';
+          let next = fs.readFileSync(nextPath, 'utf8');
+          next = replaceRequired(
+            next,
+            `  async rewrites() {\n    return {\n      beforeFiles: [\n        {\n          source: "/apps/:path*",\n          destination: "/private-applications-gateway/:path*",\n        },\n      ],\n      afterFiles: [],\n      fallback: [],\n    };\n  },\n`,
+            '',
+            'Next /apps private gateway rewrite',
+          );
+          next = replaceRequired(
+            next,
+            `      {\n        source: "/apps/:path*",\n        headers: protectedRouteHeaders,\n      },\n`,
+            '',
+            'Next /apps protected headers',
+          );
+          fs.writeFileSync(nextPath, next);
+
+          const proxyPath = 'proxy.ts';
+          let proxy = fs.readFileSync(proxyPath, 'utf8');
+          proxy = replaceRequired(
+            proxy,
+            `import { applicationsTeamUserAuthorized } from "./lib/applications-team-access";\n`,
+            '',
+            'Applications team-only proxy import',
+          );
+          proxy = replaceRequired(
+            proxy,
+            `const APPLICATIONS_PRIVATE_PATH_PREFIXES = ["/apps", "/api/apps"] as const;\n`,
+            '',
+            'Applications private prefix list',
+          );
+          proxy = replaceRequired(
+            proxy,
+            `const PROTECTED_PATH_PREFIXES = [\n  "/apps",\n  "/api/apps",`,
+            `const PROTECTED_PATH_PREFIXES = [\n  "/api/apps",`,
+            'Public /apps protected prefix',
+          );
+          proxy = replaceRequired(
+            proxy,
+            `function isPrivateApplicationsPath(pathname: string) {\n  return APPLICATIONS_PRIVATE_PATH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix));\n}\n\n`,
+            '',
+            'isPrivateApplicationsPath helper',
+          );
+          proxy = replaceRequired(
+            proxy,
+            `  const privateApplicationsPath = isPrivateApplicationsPath(pathname);\n  const ownerPath = isOwnerPath(pathname);`,
+            `  const privateApplicationsOperation = pathMatchesPrefix(pathname, "/api/apps");\n  const ownerPath = isOwnerPath(pathname);`,
+            'private Applications header classification',
+          );
+          proxy = replaceRequired(
+            proxy,
+            `  if (ownerPath || privateApplicationsPath) {`,
+            `  if (ownerPath || privateApplicationsOperation) {`,
+            'private header conditional',
+          );
+          proxy = proxy.replace(
+            /\nfunction applicationsPrivateAccessDeniedResponse\(request: NextRequest\) \{[\s\S]*?\n\}\n\nfunction temporarilyDisableOwnerReviewRoute/,
+            '\nfunction temporarilyDisableOwnerReviewRoute',
+          );
+          if (proxy.includes('function applicationsPrivateAccessDeniedResponse')) {
+            throw new Error('Applications team-only denial helper was not removed');
+          }
+          proxy = replaceRequired(
+            proxy,
+            `  if (isPrivateApplicationsPath(url.pathname)) {\n    return applicationsPrivateAccessDeniedResponse(request);\n  }\n`,
+            '',
+            'identity configuration Applications team-only denial',
+          );
+          proxy = replaceRequired(
+            proxy,
+            `    if (isPrivateApplicationsPath(pathname)) {\n      const { userId } = await auth();\n      if (!applicationsTeamUserAuthorized(userId)) {\n        return applicationsPrivateAccessDeniedResponse(request);\n      }\n    } else if (requiresAuthentication(request)) {`,
+            `    if (requiresAuthentication(request)) {`,
+            'Clerk Applications team-only authorization branch',
+          );
+          fs.writeFileSync(proxyPath, proxy);
+          NODE
+
+      - name: Verify public/private routing boundary source
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test test/applications-before-filesystem-routing-contract.test.mjs
+          ! grep -Fq 'destination: "/private-applications-gateway/:path*"' next.config.ts
+          ! grep -Fq 'source: "/apps/:path*"' next.config.ts
+          ! grep -Fq '"src": "/apps"' vercel.json
+          ! grep -Fq '"src": "/apps/(.*)"' vercel.json
+          ! grep -Fq 'APPLICATIONS_PRIVATE_PATH_PREFIXES' proxy.ts
+          ! grep -Fq 'applicationsTeamUserAuthorized' proxy.ts
+          grep -Fq '"/api/apps"' proxy.ts
+          git diff --check
+
+      - name: Configure Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install supported npm major
+        run: |
+          npm install --global npm@11 --no-audit --no-fund
+          test "$(npm --version | cut -d. -f1)" = "11"
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify full application regression suite
+        run: |
+          git diff --exit-code -- package-lock.json
+          npm test
+          npm run lint
+          npm run build
+
+      - name: Commit verified public storefront correction
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- vercel.json next.config.ts proxy.ts
+          git diff --cached --check
+          git commit -m "fix(apps): restore public SaaS storefront routing"
+          git push origin HEAD:fix/apps-private-boundary-main-20260820
