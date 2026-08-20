@@ -1,8 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "alias": [
-    "www.obserrallc.com",
-    "obserrallc.com"
-  ],
   "ignoreCommand": "sh scripts/vercel-ignore-build.sh"
 }
