@@ -1,0 +1,61 @@
+name: Diagnose Vercel cutover credential and ownership
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/diagnose-vercel-cutover.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
+      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+      CANONICAL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+      AUXILIARY_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme
+    steps:
+      - name: Report credential presence without disclosure
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${VERCEL_TOKEN}" ]; then
+            echo "VERCEL_CREDENTIAL_CONFIGURED=false"
+            exit 2
+          fi
+          echo "VERCEL_CREDENTIAL_CONFIGURED=true"
+
+      - name: Read project-domain and live-alias ownership
+        shell: bash
+        run: |
+          set -euo pipefail
+          for domain in www.obserrallc.com obserrallc.com; do
+            aux_body="$(mktemp)"
+            canonical_body="$(mktemp)"
+            alias_body="$(mktemp)"
+
+            aux_status="$(curl --silent --show-error --output "${aux_body}" --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"
+            canonical_status="$(curl --silent --show-error --output "${canonical_body}" --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v9/projects/${CANONICAL_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"
+            alias_status="$(curl --silent --show-error --output "${alias_body}" --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v4/aliases/${domain}?teamId=${TEAM_ID}")"
+
+            echo "DOMAIN=${domain}"
+            echo "AUX_STATUS=${aux_status}"
+            echo "AUX_PROJECT=$(jq -r '.projectId // empty' "${aux_body}" 2>/dev/null || true)"
+            echo "CANONICAL_STATUS=${canonical_status}"
+            echo "CANONICAL_PROJECT=$(jq -r '.projectId // empty' "${canonical_body}" 2>/dev/null || true)"
+            echo "ALIAS_STATUS=${alias_status}"
+            echo "ALIAS_DEPLOYMENT=$(jq -r '.deploymentId // .deployment.id // empty' "${alias_body}" 2>/dev/null || true)"
+
+            rm -f "${aux_body}" "${canonical_body}" "${alias_body}"
+          done
