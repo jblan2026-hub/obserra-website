@@ -16,6 +16,20 @@ test("Applications are intercepted before filesystem resolution", () => {
   assert.match(config, /private, no-store, max-age=0, must-revalidate/);
 });
 
+test("Vercel edge routing intercepts Applications before directory listing resolution", () => {
+  const config = JSON.parse(read("vercel.json"));
+  const rewrites = Array.isArray(config.rewrites) ? config.rewrites : [];
+
+  assert.ok(
+    rewrites.some(
+      (rewrite) =>
+        rewrite?.source === "/apps/:path*" &&
+        rewrite?.destination === "/private-applications-gateway/:path*",
+    ),
+    "vercel.json must rewrite /apps/:path* to the authenticated private gateway before Vercel can expose directory listings",
+  );
+});
+
 test("private gateway preserves the real Applications route family for authorized team members", () => {
   const gateway = read("app/private-applications-gateway/[[...path]]/page.tsx");
 
