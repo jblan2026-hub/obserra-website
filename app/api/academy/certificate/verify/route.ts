@@ -106,7 +106,7 @@ export async function GET(request: Request) {
   const certificateId = new URL(request.url).searchParams.get("certificateId")?.trim().toUpperCase() ?? "";
   if (!certificateId || certificateId.length > 180 || !CERTIFICATE_ID_PATTERN.test(certificateId)) {
     return NextResponse.json(
-      { valid: false, error: "A valid Obserra Academy certificate ID is required" },
+      { valid: false, error: "A valid Obserra EPI Academy certificate ID is required" },
       {
         status: 400,
         headers: {
