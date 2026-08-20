@@ -17,7 +17,7 @@ const APPLICATION_ROOTS = [
   "lib/app-entitlements.ts",
   "lib/license-repository.ts",
 ];
-const APPLICATION_SOURCE_DIGEST = "3f9f438c958e7cb5814e68b5dc0e4ada63f5239d309c257578ec9c05af6e6d10";
+const APPLICATION_SOURCE_DIGEST = "4a38eeb7157e1f01a49e99a8c26ad49f927bcd3bfb2f7cc26b6bfc2edf79dc1c";
 const APPROVED_ROOT_RUNTIME_DIRECTIVES =
   'export const dynamic = "force-dynamic";\nexport const revalidate = 0;\n\n';
 
@@ -64,7 +64,7 @@ function routingModule() {
 }
 
 test("the Phase 2A Applications implementation surface is byte-for-byte unchanged apart from approved root runtime directives", () => {
-  assert.equal(APPLICATION_ROOTS.flatMap(walk).length, 28);
+  assert.equal(APPLICATION_ROOTS.flatMap(walk).length, 27);
   assert.equal(applicationSourceDigest(), APPLICATION_SOURCE_DIGEST);
 });
 

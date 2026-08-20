@@ -24,7 +24,7 @@ function walkActiveTextFiles(entry, output = []) {
 test("Applications storefront remains a public first-party website surface", () => {
   const page = read("app/apps/page.tsx");
 
-  assert.match(page, /Obserra EPI Applications/);
+  assert.match(page, /APPLICATIONS_BRAND_NAME/);
   assert.match(page, /alternates:\s*\{\s*canonical:\s*["']\/apps["']/);
   assert.match(page, /AppsMarketplaceClient/);
   assert.match(page, /SoftwareApplication/);

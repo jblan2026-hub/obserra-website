@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, BadgeCheck, BriefcaseBusiness, Building2, Cloud, Filter, Landmark, LockKeyhole, Search, Server, ShieldCheck, Sparkles } from "lucide-react";
+import { ACADEMY_BRAND_NAME, APPLICATIONS_BRAND_NAME, EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "../../lib/legal-identity";
 import type { AppCategory, AppStatus, MarketplaceApp } from "./appsData";
 import { appCategories, marketplaceApps } from "./appsData";
 
@@ -89,17 +90,17 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
   return (
     <main className="apps-page">
       <header className="apps-nav">
-        <Link href="/" className="apps-brand" aria-label="Obserra home">
-          <Image src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
-          <span>APPLICATIONS</span>
+        <Link href="/" className="apps-brand" aria-label={LEGAL_ENTITY_NAME}>
+          <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
+          <span>{APPLICATIONS_BRAND_NAME.toUpperCase()}</span>
         </Link>
-        <nav aria-label="Applications navigation">
+        <nav aria-label={`${APPLICATIONS_BRAND_NAME} navigation`}>
           <Link href="/">Home</Link>
           <Link href="/services">Services</Link>
           <Link href="/protection-intelligence">Protection</Link>
           <Link href="/industries">Industries</Link>
-          <Link href="/eios">EIOS</Link>
-          <Link href="/academy">Academy</Link>
+          <Link href="/eios">{EIOS_BRAND_NAME}</Link>
+          <Link href="/academy">{ACADEMY_BRAND_NAME}</Link>
           <Link href="/resources">Resources</Link>
           <Link href="/contact">Contact</Link>
           <Link href="/contact?interest=application-demo" className="apps-nav-cta">Schedule demo</Link>
@@ -108,7 +109,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
 
       <section className="apps-hero">
         <div>
-          <p className="apps-eyebrow">OBSERRA ENTERPRISE APPLICATIONS</p>
+          <p className="apps-eyebrow">{APPLICATIONS_BRAND_NAME.toUpperCase()}</p>
           <h1>Purpose-built applications for enterprise risk, governance, intelligence, and accountable execution.</h1>
           <p>
             Explore commercial solutions that help leaders convert fragmented information into defensible decisions,
@@ -169,7 +170,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
         <div className="apps-deployment-heading">
           <p className="apps-eyebrow">DEPLOYMENT AND LICENSING</p>
           <h2>Choose the operating model that fits your security, regulatory, and mission requirements.</h2>
-          <p>Obserra supports cloud, dedicated, customer-hosted, and government-oriented deployment pathways. Final scope, licensing, support, and implementation are confirmed during solution design.</p>
+          <p>Deployment options include cloud, dedicated, customer-hosted, and government-oriented pathways. Final scope, licensing, support, and implementation are confirmed during solution design.</p>
         </div>
         <div className="apps-deployment-grid">
           {deploymentEditions.map(({ icon: Icon, title, label, copy, points }) => (
@@ -191,7 +192,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
       <section className="apps-assurance" aria-label="Commercial assurance">
         <article><ShieldCheck size={20} /><div><strong>Secure by design</strong><p>Identity, least privilege, auditability, encryption, monitoring, and governed administration are treated as foundational requirements.</p></div></article>
         <article><BadgeCheck size={20} /><div><strong>Executive and technical depth</strong><p>Board-ready summaries are supported by control-level evidence, implementation detail, and technical exports.</p></div></article>
-        <article><BriefcaseBusiness size={20} /><div><strong>Commercial implementation support</strong><p>Solution design, integration planning, deployment governance, and adoption support are available through Obserra services.</p></div></article>
+        <article><BriefcaseBusiness size={20} /><div><strong>Commercial implementation support</strong><p>Solution design, integration planning, deployment governance, and adoption support are available through {LEGAL_ENTITY_NAME} services.</p></div></article>
       </section>
 
       <section className="apps-filter-wrap" aria-label="Filter applications">
@@ -257,7 +258,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
         {visibleApps.length === 0 && (
           <div className="apps-empty">
             <h2>No products match those filters.</h2>
-            <p>Reset the filters or speak with Obserra about the business outcome you need.</p>
+            <p>Reset the filters or speak with {LEGAL_ENTITY_NAME} about the business outcome you need.</p>
             <button type="button" onClick={() => { setQuery(""); setCategory("All"); setStatus("All"); }}>Reset filters</button>
             <Link href="/contact?interest=application-demo">Talk with a product advisor</Link>
           </div>
@@ -267,7 +268,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
       <section className="apps-commercial-cta">
         <div>
           <p className="apps-eyebrow">ENTERPRISE PROCUREMENT</p>
-          <h2>Compare products, deployment editions, and implementation options with an Obserra product advisor.</h2>
+          <h2>Compare products, deployment editions, and implementation options with an {APPLICATIONS_BRAND_NAME} product advisor.</h2>
           <p>Enterprise, government, and custom licensing are scoped around organizational size, deployment model, integrations, assurance requirements, and support needs.</p>
         </div>
         <div className="apps-actions">
@@ -289,7 +290,7 @@ export function ProductInfoSections({ entry }: { entry: MarketplaceApp }) {
       </section>
 
       <section className="app-docs">
-        <div><h2>Implementation assets aligned to Obserra delivery</h2><ul>{entry.documentation.map((item) => <li key={item}>{item}</li>)}</ul></div>
+        <div><h2>Implementation assets aligned to {APPLICATIONS_BRAND_NAME} delivery</h2><ul>{entry.documentation.map((item) => <li key={item}>{item}</li>)}</ul></div>
         <div><h2>FAQ</h2>{entry.faq.map((item) => <article key={item.q}><h3>{item.q}</h3><p>{item.a}</p></article>)}</div>
       </section>
 
