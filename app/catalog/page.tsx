@@ -59,7 +59,7 @@ const courseTones = [
 export const metadata: Metadata = {
   title: `Enterprise Product Catalog | ${LEGAL_ENTITY_NAME}`,
   description:
-    `Buyable Academy courses, direct checkout, and buyer-ready proof assets for teams evaluating ${LEGAL_ENTITY_NAME} training and capabilities.`,
+    `Buyable Academy courses, direct checkout, and buyer-ready proof assets for teams evaluating ${LEGAL_ENTITY_NAME} training and services.`,
   alternates: { canonical: "/catalog" },
   keywords: [
     "enterprise product catalog",
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${LEGAL_ENTITY_NAME} Enterprise Product Catalog`,
     description:
-      `Direct-purchase training offers, proof assets, and clear next steps into ${LEGAL_ENTITY_NAME} services and applications.`,
+      `Direct-purchase training offers, proof assets, and clear next steps into ${LEGAL_ENTITY_NAME} services.`,
     url: "https://www.obserrallc.com/catalog",
     type: "website",
     images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: `${LEGAL_ENTITY_NAME} enterprise product catalog` }],
@@ -96,7 +96,6 @@ export default function CatalogPage() {
         </a>
         <nav aria-label="Enterprise catalog navigation">
           <a href="/services">Services</a>
-          <a href="/apps">Applications</a>
           <a href="/academy">Academy</a>
           <a href="/trust">Trust Center</a>
           <a href="/contact" className="catalog-cta">Book executive briefing</a>
@@ -117,18 +116,13 @@ export default function CatalogPage() {
           <p className="catalog-panel-label">FASTEST PATH TO BUY</p>
           <h2>Choose your lane and move to action.</h2>
           <p>
-            Buy training here. Move consulting engagements to Services and software offerings to Apps.
+            Buy training here. Move consulting and enterprise engagements to Services.
           </p>
           <div className="catalog-route-grid">
             <a className="catalog-route-card" href="/services">
               <p>Services</p>
               <strong>Consulting, engagements, retainers</strong>
               <span>Get scoped advisory and execution support.</span>
-            </a>
-            <a className="catalog-route-card" href="/apps">
-              <p>Apps</p>
-              <strong>Products, editions, licensing</strong>
-              <span>Review software offerings and deployment paths.</span>
             </a>
             <a className="catalog-route-card" href="/academy">
               <p>Academy</p>
