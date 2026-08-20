@@ -1,14 +1,30 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import path from "node:path";
 import test from "node:test";
 
-const read = (path) => fs.readFileSync(path, "utf8");
+const read = (filePath) => fs.readFileSync(filePath, "utf8");
 const retiredRouteSegment = String.fromCharCode(97, 120, 105, 111, 110, 105, 115);
+const activeTextRoots = [".github", "app", "docs", "lib", "plan", "scripts", "test"];
+const activeTextExtensions = new Set([".css", ".js", ".json", ".md", ".mjs", ".ts", ".tsx", ".yaml", ".yml"]);
+
+function walkActiveTextFiles(entry, output = []) {
+  if (!fs.existsSync(entry)) return output;
+  const stat = fs.statSync(entry);
+  if (stat.isFile()) {
+    if (activeTextExtensions.has(path.extname(entry))) output.push(entry.replaceAll(path.sep, "/"));
+    return output;
+  }
+  for (const child of fs.readdirSync(entry, { withFileTypes: true })) {
+    walkActiveTextFiles(path.join(entry, child.name), output);
+  }
+  return output;
+}
 
 test("Applications storefront remains a public first-party website surface", () => {
   const page = read("app/apps/page.tsx");
 
-  assert.match(page, /Applications \| Obserra Enterprise Marketplace/);
+  assert.match(page, /Obserra EPI Applications/);
   assert.match(page, /alternates:\s*\{\s*canonical:\s*["']\/apps["']/);
   assert.match(page, /AppsMarketplaceClient/);
   assert.match(page, /SoftwareApplication/);
@@ -31,6 +47,15 @@ test("retired product brand routes and named active regression test are absent",
   assert.equal(fs.existsSync(`app/${retiredRouteSegment}/route.ts`), false);
   assert.equal(fs.existsSync(`app/apps/${retiredRouteSegment}/route.ts`), false);
   assert.equal(fs.existsSync(`test/retired-${retiredRouteSegment}-seo-contract.test.mjs`), false);
+});
+
+test("retired product brand is absent from the active repository surface", () => {
+  const token = retiredRouteSegment.toLowerCase();
+  const offenders = activeTextRoots
+    .flatMap((root) => walkActiveTextFiles(root))
+    .filter((filePath) => filePath.toLowerCase().includes(token) || read(filePath).toLowerCase().includes(token));
+
+  assert.deepEqual(offenders, [], `retired brand remains in active files: ${offenders.join(", ")}`);
 });
 
 test("Next routing does not rewrite the public Applications storefront to a private gateway", () => {
