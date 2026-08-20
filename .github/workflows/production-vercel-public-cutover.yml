@@ -139,20 +139,88 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           move_domain() {
             local domain="$1"
-            curl --silent --show-error --fail-with-body \
+            local output_name="$2"
+            local body
+            local status
+            local source_project
+            local target_body
+            local target_status
+            local target_project
+            local move_response
+            local moved_project
+            local moved_name
+
+            body="$(mktemp)"
+            status="$(curl --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${body}" \
+              --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"
+
+            if [ "${status}" = "404" ]; then
+              rm -f "${body}"
+              target_body="$(mktemp)"
+              target_status="$(curl --silent --show-error \
+                --connect-timeout 10 \
+                --max-time 20 \
+                --output "${target_body}" \
+                --write-out '%{http_code}' \
+                --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+                "https://api.vercel.com/v9/projects/${CANONICAL_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"
+              if [ "${target_status}" != "200" ]; then
+                cat "${target_body}" >&2 || true
+                rm -f "${target_body}"
+                echo "::error::Domain ${domain} is absent from the duplicate project and not owned by the canonical project (HTTP ${target_status})."
+                return 1
+              fi
+              target_project="$(jq -r '.projectId // empty' "${target_body}")"
+              rm -f "${target_body}"
+              if [ "${target_project}" != "${CANONICAL_PROJECT_ID}" ]; then
+                echo "::error::Domain ${domain} is already moved, but its canonical ownership response is inconsistent."
+                return 1
+              fi
+              echo "${output_name}_moved=false" >> "${GITHUB_OUTPUT}"
+              return 0
+            fi
+
+            if [ "${status}" != "200" ]; then
+              cat "${body}" >&2 || true
+              rm -f "${body}"
+              echo "::error::Unable to determine duplicate-project ownership for ${domain}: HTTP ${status}."
+              return 1
+            fi
+
+            source_project="$(jq -r '.projectId // empty' "${body}")"
+            rm -f "${body}"
+            if [ "${source_project}" != "${AUXILIARY_PROJECT_ID}" ]; then
+              echo "::error::Domain ${domain} lookup returned an unexpected source project."
+              return 1
+            fi
+
+            move_response="$(curl --silent --show-error --fail-with-body \
               --connect-timeout 10 \
               --max-time 20 \
               --request POST \
               --header "Authorization: Bearer ${VERCEL_TOKEN}" \
               --header "Content-Type: application/json" \
               --data "{\"projectId\":\"${CANONICAL_PROJECT_ID}\"}" \
-              "https://api.vercel.com/v1/projects/${AUXILIARY_PROJECT_ID}/domains/${domain}/move?teamId=${TEAM_ID}" \
-              >/dev/null
+              "https://api.vercel.com/v1/projects/${AUXILIARY_PROJECT_ID}/domains/${domain}/move?teamId=${TEAM_ID}")"
+            moved_project="$(jq -r '.projectId // empty' <<<"${move_response}")"
+            moved_name="$(jq -r '.name // empty' <<<"${move_response}")"
+            if [ "${moved_project}" != "${CANONICAL_PROJECT_ID}" ] || [ "${moved_name}" != "${domain}" ]; then
+              echo "::error::Vercel returned an inconsistent ownership result while moving ${domain}."
+              return 1
+            fi
+            echo "${output_name}_moved=true" >> "${GITHUB_OUTPUT}"
           }
-          move_domain "${PRIMARY_DOMAIN}"
-          move_domain "${APEX_DOMAIN}"
+
+          move_domain "${PRIMARY_DOMAIN}" primary
+          move_domain "${APEX_DOMAIN}" apex
 
       - name: Verify canonical LMS and prelicense commerce lock
         id: smoke
@@ -250,6 +318,8 @@ jobs:
         env:
           ROLLBACK_PRIMARY: ${{ steps.rollback.outputs.primary }}
           ROLLBACK_APEX: ${{ steps.rollback.outputs.apex }}
+          MOVED_PRIMARY: ${{ steps.move.outputs.primary_moved }}
+          MOVED_APEX: ${{ steps.move.outputs.apex_moved }}
         run: |
           set -euo pipefail
           if [ -z "${ROLLBACK_PRIMARY}" ] || [ -z "${ROLLBACK_APEX}" ]; then
@@ -257,10 +327,16 @@ jobs:
             exit 1
           fi
 
-          move_back_if_present() {
+          move_back_if_moved() {
             local domain="$1"
+            local moved="$2"
             local body
             local status
+
+            if [ "${moved}" != "true" ]; then
+              return 0
+            fi
+
             body="$(mktemp)"
             status="$(curl --silent --show-error \
               --connect-timeout 10 \
@@ -272,7 +348,7 @@ jobs:
               --header "Content-Type: application/json" \
               --data "{\"projectId\":\"${AUXILIARY_PROJECT_ID}\"}" \
               "https://api.vercel.com/v1/projects/${CANONICAL_PROJECT_ID}/domains/${domain}/move?teamId=${TEAM_ID}")"
-            if [ "${status}" != "200" ] && [ "${status}" != "404" ]; then
+            if [ "${status}" != "200" ]; then
               cat "${body}" >&2 || true
               rm -f "${body}"
               echo "::error::Failed to return ${domain} to the previous Vercel project: HTTP ${status}."
@@ -295,8 +371,8 @@ jobs:
               >/dev/null
           }
 
-          move_back_if_present "${PRIMARY_DOMAIN}"
-          move_back_if_present "${APEX_DOMAIN}"
+          move_back_if_moved "${PRIMARY_DOMAIN}" "${MOVED_PRIMARY}"
+          move_back_if_moved "${APEX_DOMAIN}" "${MOVED_APEX}"
           attach "${ROLLBACK_PRIMARY}" "${PRIMARY_DOMAIN}"
           attach "${ROLLBACK_APEX}" "${APEX_DOMAIN}"
           echo "::error::Production cutover failed; canonical domains were returned to their prior project and deployments."
