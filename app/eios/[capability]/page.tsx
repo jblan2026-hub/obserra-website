@@ -6,6 +6,9 @@ import { eiosCapabilities, getEiosCapability } from "../capabilities";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "../product-center.css";
 
+const EIOS_PRODUCT_NAME = "Obserra EPI EIOS";
+const EIOS_CANONICAL_URL = "https://www.obserrallc.com/eios";
+
 export function generateStaticParams() {
   return eiosCapabilities.map((entry) => ({ capability: entry.slug }));
 }
@@ -14,20 +17,22 @@ export async function generateMetadata({ params }: { params: Promise<{ capabilit
   const { capability } = await params;
   const entry = getEiosCapability(capability);
   if (!entry) return {};
+  const canonicalUrl = `${EIOS_CANONICAL_URL}/${entry.slug}`;
+  const title = `${entry.title} | ${EIOS_PRODUCT_NAME}`;
   return {
-    title: `${entry.title} | Obserra EIOS`,
+    title,
     description: entry.summary,
     alternates: { canonical: `/eios/${entry.slug}` },
     openGraph: {
-      title: `${entry.title} | Obserra EIOS`,
+      title,
       description: entry.summary,
-      url: `https://www.obserrallc.com/eios/${entry.slug}`,
+      url: canonicalUrl,
       type: "website",
-      images: [{ url: entry.image, alt: entry.title }],
+      images: [{ url: entry.image, alt: `${entry.title} capability in ${EIOS_PRODUCT_NAME}` }],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${entry.title} | Obserra EIOS`,
+      title,
       description: entry.summary,
       images: [entry.image],
     },
@@ -39,28 +44,41 @@ export default async function EiosCapabilityPage({ params }: { params: Promise<{
   const entry = getEiosCapability(capability);
   if (!entry) notFound();
 
+  const canonicalUrl = `${EIOS_CANONICAL_URL}/${entry.slug}`;
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "SoftwareApplication",
-        name: `Obserra EIOS ${entry.title}`,
+        "@id": `${canonicalUrl}#software-application`,
+        name: `${EIOS_PRODUCT_NAME}: ${entry.title}`,
+        alternateName: entry.title,
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
-        url: `https://www.obserrallc.com/eios/${entry.slug}`,
+        url: canonicalUrl,
         description: entry.summary,
+        isPartOf: { "@id": `${EIOS_CANONICAL_URL}#software-application` },
         provider: {
           "@type": "Organization",
-          name: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+          "@id": "https://www.obserrallc.com/#organization",
+          name: LEGAL_ENTITY_NAME,
           url: "https://www.obserrallc.com",
         },
+      },
+      {
+        "@type": "WebPage",
+        "@id": `${canonicalUrl}#webpage`,
+        url: canonicalUrl,
+        name: `${entry.title} | ${EIOS_PRODUCT_NAME}`,
+        description: entry.summary,
+        about: { "@id": `${canonicalUrl}#software-application` },
       },
       {
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: "https://www.obserrallc.com" },
-          { "@type": "ListItem", position: 2, name: "EIOS", item: "https://www.obserrallc.com/eios" },
-          { "@type": "ListItem", position: 3, name: entry.title, item: `https://www.obserrallc.com/eios/${entry.slug}` },
+          { "@type": "ListItem", position: 2, name: EIOS_PRODUCT_NAME, item: EIOS_CANONICAL_URL },
+          { "@type": "ListItem", position: 3, name: entry.title, item: canonicalUrl },
         ],
       },
     ],
@@ -70,8 +88,8 @@ export default async function EiosCapabilityPage({ params }: { params: Promise<{
     <main className="eios-product-page">
       <header className="eios-product-nav">
         <Link href="/" aria-label={`${LEGAL_ENTITY_NAME} home`}><Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={245} height={48} /></Link>
-        <nav aria-label="EIOS product navigation">
-          <Link href="/eios">EIOS overview</Link>
+        <nav aria-label={`${EIOS_PRODUCT_NAME} product navigation`}>
+          <Link href="/eios">{EIOS_PRODUCT_NAME} overview</Link>
           <Link href="/apps">Applications</Link>
           <Link href="/trust">Trust Center</Link>
           <Link href={`/contact?interest=eios-demo&capability=${encodeURIComponent(entry.title)}`} className="eios-product-cta">Request demo</Link>
@@ -85,7 +103,7 @@ export default async function EiosCapabilityPage({ params }: { params: Promise<{
           <p className="eios-product-summary">{entry.summary}</p>
           <div className="eios-product-actions">
             <Link href={`/contact?interest=eios-demo&capability=${encodeURIComponent(entry.title)}`}>Request tailored demo</Link>
-            <Link href="/eios">Explore full EIOS platform</Link>
+            <Link href="/eios">Explore {EIOS_PRODUCT_NAME}</Link>
           </div>
         </div>
         <figure>
@@ -123,8 +141,8 @@ export default async function EiosCapabilityPage({ params }: { params: Promise<{
 
       <section className="eios-product-center">
         <div className="eios-product-heading">
-          <p>EIOS PRODUCT CENTER</p>
-          <h2>Explore the connected capabilities that form the Executive Intelligence Operating System.</h2>
+          <p>{EIOS_PRODUCT_NAME.toUpperCase()} PRODUCT CENTER</p>
+          <h2>Explore the connected capabilities that form the Enterprise Intelligence Operating System.</h2>
         </div>
         <div className="eios-product-links">
           {eiosCapabilities.filter((item) => item.slug !== entry.slug).map((item) => (
@@ -141,7 +159,7 @@ export default async function EiosCapabilityPage({ params }: { params: Promise<{
         <p>ENTERPRISE BRIEFING</p>
         <h2>See how {entry.title} fits your operating model, risk profile, and deployment requirements.</h2>
         <div className="eios-product-actions">
-          <Link href={`/contact?interest=eios-demo&capability=${encodeURIComponent(entry.title)}`}>Schedule an EIOS briefing</Link>
+          <Link href={`/contact?interest=eios-demo&capability=${encodeURIComponent(entry.title)}`}>Schedule an {EIOS_PRODUCT_NAME} briefing</Link>
           <Link href="/trust">Review security and trust</Link>
         </div>
       </section>
