@@ -68,7 +68,7 @@ const protectedRouteHeaders = [
   { key: "Cache-Control", value: "private, no-store, max-age=0, must-revalidate" },
   { key: "Pragma", value: "no-cache" },
   { key: "Expires", value: "0" },
-  { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+  { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive, nosnippet, noimageindex" },
 ];
 
 const protectedVideoParticipantHeaders = [
@@ -98,11 +98,31 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31_536_000,
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/apps/:path*",
+          destination: "/private-applications-gateway/:path*",
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
   async headers() {
     return [
       {
         source: "/:path*",
         headers: publicSecurityHeaders,
+      },
+      {
+        source: "/apps/:path*",
+        headers: protectedRouteHeaders,
+      },
+      {
+        source: "/private-applications-gateway/:path*",
+        headers: protectedRouteHeaders,
       },
       {
         source: "/checkout/:path*",
