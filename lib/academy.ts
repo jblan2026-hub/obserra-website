@@ -167,7 +167,7 @@ export async function recordAssessment(
   let certificate: SignedCertificateClaim | undefined;
   if (passed && !current.signedCertificate) {
     if (!certificateSigningReady()) {
-      throw new Error("Certificate signing is not configured. Contact Obserra Academy support.");
+      throw new Error("Certificate signing is not configured. Contact Obserra EPI Academy support.");
     }
     completedAt = current.completedAt ?? new Date().toISOString();
     certificateId = current.certificateId ?? `OBS-${courseId.toUpperCase().replaceAll("-", "")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
@@ -254,7 +254,7 @@ function verifiedCertificateResult(
   return {
     valid: true as const,
     certificateId: progress.certificateId,
-    learnerName: fullName || "Obserra Academy Learner",
+    learnerName: fullName || "Obserra EPI Academy Learner",
     courseId,
     courseTitle: signed.schemaVersion === "1.1" ? signed.courseTitle : course.title,
     courseVersion: signed.schemaVersion === "1.1" ? signed.courseVersion : governedCourseVersion(courseId),

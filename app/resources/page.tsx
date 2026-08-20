@@ -3,6 +3,9 @@ import Link from "next/link";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "../commercial-pages.css";
 
+const EIOS_PRODUCT_NAME = "Obserra EPI EIOS";
+const ACADEMY_PRODUCT_NAME = "Obserra EPI Academy";
+
 export const metadata: Metadata = {
   title: "Resources | Executive Cybersecurity and Intelligence Guidance",
   description: `Explore ${LEGAL_ENTITY_NAME} executive resources across cybersecurity, AI governance, protective intelligence, enterprise risk, leadership, and professional training.`,
@@ -12,9 +15,9 @@ export const metadata: Metadata = {
 const resources = [
   ["Executive Cybersecurity", "Board-ready guidance for connecting cyber exposure, enterprise value, accountability, and investment decisions.", "/services"],
   ["Artificial Intelligence Governance", "Practical direction for governing enterprise artificial intelligence adoption, model use, accountability, risk, and human oversight.", "/apps/obserra-ai-governance-suite"],
-  ["Enterprise Intelligence", "Explore how Obserra EIOS connects evidence, decisions, approvals, actions, and measurable outcomes.", "/eios"],
+  ["Enterprise Intelligence", `Explore how ${EIOS_PRODUCT_NAME} connects evidence, decisions, approvals, actions, and measurable outcomes.`, "/eios"],
   ["Protective Intelligence", "Understand executive exposure, travel risk, threat context, and proportionate protection planning.", "/protection-intelligence"],
-  ["Professional Training", "Browse self-paced courses designed for cybersecurity, protection, intelligence, and technology leaders.", "/academy"],
+  ["Professional Training", `Browse ${ACADEMY_PRODUCT_NAME} self-paced courses designed for cybersecurity, protection, intelligence, and technology leaders.`, "/academy"],
   ["Trust and Procurement", `Review ${LEGAL_ENTITY_NAME} security, privacy, data-handling, licensing, accessibility, and buyer-protection disclosures.`, "/trust"],
 ];
 

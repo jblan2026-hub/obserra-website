@@ -2,30 +2,41 @@ import type { Metadata } from "next";
 import EiosShowcase from "./EiosShowcase";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
+const EIOS_PRODUCT_NAME = "Obserra EPI EIOS";
+const EIOS_CANONICAL_URL = "https://www.obserrallc.com/eios";
+const EIOS_DESCRIPTION =
+  "Obserra EPI EIOS is an Enterprise Intelligence Operating System that connects enterprise context, supports evidence-backed executive decisions, governs authorized action, and verifies outcomes.";
+
 export const metadata: Metadata = {
-  title: `EIOS | Governed Enterprise Intelligence and Action | ${LEGAL_ENTITY_NAME}`,
-  description:
-    "EIOS connects enterprise context, helps leaders make evidence-backed decisions, governs authorized action, and independently verifies outcomes.",
+  title: `${EIOS_PRODUCT_NAME} | Enterprise Intelligence Operating System`,
+  description: EIOS_DESCRIPTION,
   alternates: { canonical: "/eios" },
-  keywords: ["enterprise intelligence operating system", "governed AI", "decision intelligence", "EIOS"],
+  keywords: [
+    "enterprise intelligence operating system",
+    "executive intelligence",
+    "decision intelligence",
+    "AI governance",
+    "enterprise digital twin",
+    "enterprise knowledge graph",
+  ],
   openGraph: {
-    title: "EIOS | Governed Enterprise Intelligence and Action",
-    description: "Connect context, govern decisions, authorize action, and verify enterprise outcomes with EIOS.",
-    url: "https://www.obserrallc.com/eios",
+    title: `${EIOS_PRODUCT_NAME} | Enterprise Intelligence Operating System`,
+    description: EIOS_DESCRIPTION,
+    url: EIOS_CANONICAL_URL,
     type: "website",
     images: [
       {
         url: "/eios/eios-overview-marketing.png",
         width: 1584,
         height: 889,
-        alt: "Obserra EIOS overview"
-      }
+        alt: `${EIOS_PRODUCT_NAME} platform overview`,
+      },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EIOS | Governed Enterprise Intelligence and Action",
-    description: "Enterprise Intelligence Operating System with accountable, evidence-backed decisions.",
+    title: `${EIOS_PRODUCT_NAME} | Enterprise Intelligence Operating System`,
+    description: EIOS_DESCRIPTION,
     images: ["/eios/eios-overview-marketing.png"],
   },
 };
@@ -36,22 +47,28 @@ export default function EiosPage() {
     "@graph": [
       {
         "@type": "SoftwareApplication",
-        name: "Obserra EIOS",
+        "@id": `${EIOS_CANONICAL_URL}#software-application`,
+        name: EIOS_PRODUCT_NAME,
+        alternateName: "EIOS",
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
-        url: "https://www.obserrallc.com/eios",
-        description: "A governed Enterprise Intelligence Operating System that connects enterprise context, supports evidence-backed decisions, governs authorized action, and verifies outcomes.",
+        url: EIOS_CANONICAL_URL,
+        description: EIOS_DESCRIPTION,
         provider: {
           "@type": "Organization",
+          "@id": "https://www.obserrallc.com/#organization",
           name: LEGAL_ENTITY_NAME,
-          url: "https://www.obserrallc.com"
+          url: "https://www.obserrallc.com",
         },
       },
       {
         "@type": "WebPage",
-        url: "https://www.obserrallc.com/eios",
-        name: `EIOS | Governed Enterprise Intelligence and Action | ${LEGAL_ENTITY_NAME}`,
-        description: "EIOS connects enterprise context, helps leaders make evidence-backed decisions, governs authorized action, and independently verifies outcomes.",
+        "@id": `${EIOS_CANONICAL_URL}#webpage`,
+        url: EIOS_CANONICAL_URL,
+        name: `${EIOS_PRODUCT_NAME} | Enterprise Intelligence Operating System`,
+        description: EIOS_DESCRIPTION,
+        about: { "@id": `${EIOS_CANONICAL_URL}#software-application` },
+        isPartOf: { "@id": "https://www.obserrallc.com/#website" },
       },
       {
         "@type": "BreadcrumbList",
@@ -60,12 +77,12 @@ export default function EiosPage() {
           {
             "@type": "ListItem",
             position: 2,
-            name: "EIOS",
-            item: "https://www.obserrallc.com/eios"
-          }
-        ]
-      }
-    ]
+            name: EIOS_PRODUCT_NAME,
+            item: EIOS_CANONICAL_URL,
+          },
+        ],
+      },
+    ],
   };
 
   return (

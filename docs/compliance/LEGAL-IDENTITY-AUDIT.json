@@ -5,7 +5,7 @@
   "canonicalPublicOrigin": "https://www.obserrallc.com",
   "sourceRevision": {
     "kind": "working_tree_content_digest",
-    "sourceTreeSha256": "79f616cbbab93b071cb7918f03216121c9f7de2e871af18403b96613950b4fcf",
+    "sourceTreeSha256": "b57ec9b0deca75e252e8806d9625806935ad9066452a1a6aef1bc2c794093a2f",
     "checkedFileCount": 386
   },
   "scope": {
@@ -46,8 +46,10 @@
     ]
   },
   "permittedProductBrands": [
-    "Obserra Academy",
-    "Obserra EIOS",
+    "Obserra EPI Academy",
+    "Obserra EPI EIOS",
+    "Obserra EPI Applications",
+    "Obserra EPI Products",
     "Obserra Certificate of Training",
     "Obserra Certificates of Training",
     "Obserra Cloud",

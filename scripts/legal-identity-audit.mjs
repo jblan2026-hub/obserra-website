@@ -44,8 +44,10 @@ const excludedExactPaths = new Set([
 ]);
 const textExtensions = new Set([".cjs", ".html", ".js", ".json", ".jsx", ".md", ".mjs", ".ps1", ".ts", ".tsx", ".txt", ".yaml", ".yml"]);
 const permittedProductBrands = [
-  "Obserra Academy",
-  "Obserra EIOS",
+  "Obserra EPI Academy",
+  "Obserra EPI EIOS",
+  "Obserra EPI Applications",
+  "Obserra EPI Products",
   "Obserra Certificate of Training",
   "Obserra Certificates of Training",
   "Obserra Cloud",
@@ -136,18 +138,19 @@ for (const file of sortedFiles) {
       violations,
       file,
       text,
-      /\bObserra\b(?!\s+(?:Academy|EIOS|Certificate(?:s)? of Training|Cloud))\s+(?:applications?|is|will|may|can|uses|provides|supports|applies|processes|helps|connects|delivers|aligns|scopes|serves|follows|works|targets|engagements|clients|identity|account|team|relationship|platform|website|company|merchant|provider|employer|owner|school|records?|certificates?|training)\b/gi,
+      /\bObserra\b(?!\s+(?:EPI\s+(?:Academy|EIOS|Applications|Products)|Certificate(?:s)? of Training|Cloud))\s+(?:applications?|is|will|may|can|uses|provides|supports|applies|processes|helps|connects|delivers|aligns|scopes|serves|follows|works|targets|engagements|clients|identity|account|team|relationship|platform|website|company|merchant|provider|employer|owner|school|records?|certificates?|training)\b/gi,
       "LEGAL-003",
       "A company/provider reference uses the short brand instead of the full legal name.",
     );
     for (const [ruleId, regex, message] of [
-      ["LEGAL-004", /\b(?:Contact|About)\s+Obserra\b(?!\s+(?:Academy|EIOS))/gi, "A contact/about label uses the short brand as the company name."],
-      ["LEGAL-005", /\|\s*Obserra\b(?!\s+(?:Academy|EIOS|EXECUTIVE PROTECTION))(?=[\s"'`]|$)/gim, "A page title uses the short brand as the owning entity."],
+      ["LEGAL-004", /\b(?:Contact|About)\s+Obserra\b(?!\s+EPI\s+(?:Academy|EIOS|Applications|Products))/gi, "A contact/about label uses the short brand as the company name."],
+      ["LEGAL-005", /\|\s*Obserra\b(?!\s+(?:EPI\s+(?:Academy|EIOS|Applications|Products)|EXECUTIVE PROTECTION))(?=[\s"'`]|$)/gim, "A page title uses the short brand as the owning entity."],
       ["LEGAL-006", /aria-label\s*=\s*["']Obserra home["']/gi, "A home-link label uses the short brand as the owning entity."],
       ["LEGAL-007", /alt\s*=\s*["']Obserra["']/gi, "A company logo alt label omits the legal entity name."],
       ["LEGAL-008", /\b(?:PROPERTY OF|OWNED BY|THE BUSINESS CASE FOR)\s+OBSERRA\b(?!\s+EXECUTIVE)/g, "An ownership statement uses the short brand instead of the legal entity."],
       ["LEGAL-009", /\bObserra Technologies\b/gi, "The retired Obserra Technologies label is not an authorized product brand."],
       ["LEGAL-010", /\bOBSERRA\s+(?:CUSTOMER|COMMERCIAL|ENTERPRISE|TRUST|DESIGN|SITE)\b/g, "A named company surface omits the full legal entity name."],
+      ["LEGAL-013", /\bObserra\s+(?:Academy|EIOS|Applications|Products)\b/g, "A product name omits the required EPI designation."],
     ]) recordMatches(violations, file, text, regex, ruleId, message);
   }
 }

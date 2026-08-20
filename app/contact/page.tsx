@@ -4,15 +4,18 @@ import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./contact.css";
 import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 
+const EIOS_PRODUCT_NAME = "Obserra EPI EIOS";
+const ACADEMY_PRODUCT_NAME = "Obserra EPI Academy";
+
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    `Contact ${LEGAL_ENTITY_NAME} for enterprise cybersecurity advisory, executive protection, intelligence, EIOS product briefings, Academy licensing, and scoped implementation planning.`,
+    `Contact ${LEGAL_ENTITY_NAME} for enterprise cybersecurity advisory, executive protection, intelligence, ${EIOS_PRODUCT_NAME} product briefings, ${ACADEMY_PRODUCT_NAME} licensing, and scoped implementation planning.`,
   alternates: { canonical: "/contact" },
   keywords: [`contact ${LEGAL_ENTITY_NAME}`, `${LEGAL_ENTITY_NAME} consultation`, "executive protection consulting", "cybersecurity advisory contact"],
   openGraph: {
     title: `Contact ${LEGAL_ENTITY_NAME} | Confidential Enterprise Consultation`,
-    description: "Start a confidential conversation on cybersecurity, protection, intelligence, EIOS, and professional training.",
+    description: `Start a confidential conversation on cybersecurity, protection, intelligence, ${EIOS_PRODUCT_NAME}, and professional training.`,
     url: "https://www.obserrallc.com/contact",
     type: "website",
     images: [{ url: "/brand/visuals/obserra-eios-intelligence-hero.png", width: 1672, height: 941, alt: `Contact ${LEGAL_ENTITY_NAME}` }],
@@ -33,13 +36,13 @@ const engagementTracks = [
     cta: "Request advisory consultation",
   },
   {
-    title: "Enterprise Intelligence Operating System Briefing",
+    title: `${EIOS_PRODUCT_NAME} Briefing`,
     copy: "Enterprise intelligence operating model walkthrough, adoption pathway, and implementation readiness review.",
     action: "mailto:info@obserrallc.com?subject=EIOS%20Enterprise%20Briefing%20Request",
-    cta: "Book EIOS enterprise briefing",
+    cta: `Book ${EIOS_PRODUCT_NAME} briefing`,
   },
   {
-    title: "Academy and Workforce Training",
+    title: `${ACADEMY_PRODUCT_NAME} and Workforce Training`,
     copy: "Course evaluation, enterprise cohort planning, and workforce capability discussions tied to cybersecurity, protection, intelligence, and secure technology.",
     action: "mailto:info@obserrallc.com?subject=Academy%20Enterprise%20Training%20Inquiry",
     cta: "Discuss training options",
@@ -105,7 +108,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
         <h1>Start a focused conversation on the work you need done.</h1>
         <p>
           Engage {LEGAL_ENTITY_NAME} for cybersecurity leadership, protective intelligence, executive protection advisory,
-          enterprise risk guidance, AI governance, and EIOS through a scoped, security-conscious engagement process.
+          enterprise risk guidance, AI governance, and {EIOS_PRODUCT_NAME} through a scoped, security-conscious engagement process.
         </p>
         <div className="contact-actions">
           <a className="contact-button" href={`mailto:info@obserrallc.com?subject=${legalEntityMailName}%20Confidential%20Consultation`}>Request executive consultation</a>
@@ -141,7 +144,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
           <li>Fortune 500 Chief Information Security Officer leadership background</li>
           <li>Enterprise cybersecurity and risk advisory</li>
           <li>Protective intelligence and executive protection alignment</li>
-          <li>Professional and enterprise learning options through Obserra Academy</li>
+          <li>Professional and enterprise learning options through {ACADEMY_PRODUCT_NAME}</li>
         </ul>
       </section>
 

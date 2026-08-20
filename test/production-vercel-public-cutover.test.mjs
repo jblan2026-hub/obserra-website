@@ -27,9 +27,20 @@ test("rollback alias capture fails closed and distinguishes missing aliases from
   assert.match(workflow, /Vercel returned no deployment ID for required rollback alias/);
 });
 
-test("auxiliary Vercel project is configured to ignore duplicate builds", () => {
+test("canonical production authority is the obserra-website-live Vercel project", () => {
+  assert.match(workflow, /CANONICAL_PROJECT_ID:\s*prj_lxTKKDa9sbhht7FaigiaF1PONMiC/);
+  assert.match(workflow, /AUXILIARY_PROJECT_ID:\s*prj_FfAnssVJU8pcJydGNJHmCliP6Yme/);
+  assert.doesNotMatch(workflow, /CANONICAL_PROJECT_ID:\s*prj_FfAnssVJU8pcJydGNJHmCliP6Yme/);
+});
+
+test("duplicate Vercel project is configured to ignore duplicate builds", () => {
   assert.match(workflow, /commandForIgnoringBuildStep\":\"exit 0\"/);
   assert.doesNotMatch(workflow, /commandForIgnoringBuildStep\":\"exit 1\"/);
+});
+
+test("cutover never deletes a Vercel project as part of automatic domain promotion", () => {
+  assert.doesNotMatch(workflow, /Retire obsolete auxiliary Vercel project/);
+  assert.doesNotMatch(workflow, /Failed to retire obsolete Vercel project/);
 });
 
 test("partial alias attachment or smoke failure triggers rollback only after rollback state is captured", () => {

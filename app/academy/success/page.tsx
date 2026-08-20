@@ -13,7 +13,7 @@ export default async function AcademySuccessPage({ searchParams }: { searchParam
         <p className="kicker">SECURE PAYMENT RETURN</p>
         <h1>Confirm your Academy access</h1>
         <p>
-          Stripe has returned you to Obserra Academy. Access is granted only after the signed payment webhook is
+          Stripe has returned you to Obserra EPI Academy. Access is granted only after the signed payment webhook is
           recorded and your signed-in learner identity matches the purchaser.
         </p>
         <form action="/api/academy/redeem" method="post">
