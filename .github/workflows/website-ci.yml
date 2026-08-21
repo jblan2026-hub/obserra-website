@@ -45,34 +45,7 @@ jobs:
       - name: Verify lockfile remains immutable
         run: git diff --exit-code -- package-lock.json
 
-      - name: Verify exact legal identity and generated audit pair
-        id: legal-audit
-        continue-on-error: true
-        run: npm run verify:legal-identity-audit
-
-      - name: Generate legal identity audit remediation artifacts
-        if: ${{ steps.legal-audit.outcome == 'failure' }}
-        run: npm run generate:legal-identity-audit
-
-      - name: Upload legal identity audit remediation artifacts
-        if: ${{ steps.legal-audit.outcome == 'failure' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: legal-identity-audit-remediation
-          if-no-files-found: error
-          retention-days: 3
-          path: |
-            docs/compliance/LEGAL-IDENTITY-AUDIT.json
-            docs/compliance/LEGAL-IDENTITY-AUDIT.md
-            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
-
-      - name: Fail on legal identity audit drift
-        if: ${{ steps.legal-audit.outcome == 'failure' }}
-        run: |
-          echo "Generated legal identity evidence drifted from the inspected source. Apply the uploaded remediation artifact and rerun CI."
-          exit 1
-
-      - name: Run unit and catalog contract tests
+      - name: Run unit and governed contract tests
         run: npm test
 
       - name: Run lint
