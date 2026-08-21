@@ -3,6 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 const route = fs.readFileSync("app/api/florida-class-d/health/ready/route.ts", "utf8");
+const gate27 = fs.readFileSync("scripts/florida-class-d-resilience-observability-gate.mjs", "utf8");
 
 test("Florida readiness logs only internal failing-check identifiers while public payload stays minimal", () => {
   assert.match(route, /getFloridaClassDResilienceSnapshot/);
@@ -18,4 +19,18 @@ test("Florida readiness logs only internal failing-check identifiers while publi
   assert.doesNotMatch(route, /apiKey/i);
   assert.doesNotMatch(route, /nonLicenseBlockingKeys\s*:/, "public response must not serialize internal readiness keys");
   assert.doesNotMatch(route, /failingCheckKeys\s*:/, "public response must not serialize internal HA keys");
+  assert.doesNotMatch(route, /NextResponse\.json\(\s*snapshot/, "public response must not serialize the detailed snapshot");
+});
+
+test("Gate 27 permits sanitized server diagnostics without weakening the public health boundary", () => {
+  assert.match(gate27, /getFloridaClassDResilienceSnapshot/);
+  assert.match(gate27, /technicalFailureKeys/);
+  assert.match(gate27, /highAvailabilityFailureKeys/);
+  assert.match(gate27, /NextResponse\.json/);
+  assert.match(gate27, /public readiness/i);
+  assert.doesNotMatch(
+    gate27,
+    /public readiness may not expose the detailed resilience snapshot/,
+    "Gate 27 must distinguish internal snapshot inspection from public snapshot serialization",
+  );
 });
