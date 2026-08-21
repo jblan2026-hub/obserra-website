@@ -1,0 +1,53 @@
+name: Diagnose Vercel domain ownership
+
+on:
+  push:
+    branches:
+      - diag/vercel-domain-ownership-live-20260821
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    if: github.event.head_commit.message == 'diag(vercel): probe canonical domain ownership'
+    runs-on: ubuntu-24.04
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
+      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+      CANONICAL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+      LCN2_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme
+      INTEGRATED_PROJECT_ID: prj_v6Hb7FkpkUoLKlHkjzKJ5HVgYDaL
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe non-secret ownership state
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${VERCEL_TOKEN}"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          Path('/tmp/result.json').write_text(json.dumps({'tokenPresent': True, 'domains': {}, 'aliases': {}}, indent=2))
+          PY
+          for domain in www.obserrallc.com obserrallc.com; do
+            for pair in "canonical:${CANONICAL_PROJECT_ID}" "lcn2:${LCN2_PROJECT_ID}" "integrated:${INTEGRATED_PROJECT_ID}"; do
+              label="${pair%%:*}"; project="${pair#*:}"
+              body="$(mktemp)"
+              status="$(curl --silent --show-error --connect-timeout 10 --max-time 20 --output "${body}" --write-out '%{http_code}' --header "Authorization: Bearer ${VERCEL_TOKEN}" "https://api.vercel.com/v9/projects/${project}/domains/${domain}?teamId=${TEAM_ID}")"
+              reported="$(jq -r '.projectId // empty' "${body}" 2>/dev/null || true)"
+              jq --arg d "${domain}" --arg l "${label}" --arg s "${status}" --arg p "${reported}" '.domains[$d][$l] = {httpStatus:$s, reportedProjectId:$p}' /tmp/result.json > /tmp/result.next && mv /tmp/result.next /tmp/result.json
+              rm -f "${body}"
+            done
+            alias_body="$(mktemp)"
+            alias_status="$(curl --silent --show-error --connect-timeout 10 --max-time 20 --output "${alias_body}" --write-out '%{http_code}' --header "Authorization: Bearer ${VERCEL_TOKEN}" "https://api.vercel.com/v4/aliases/${domain}?teamId=${TEAM_ID}")"
+            alias_deployment="$(jq -r '.deploymentId // .deployment.id // empty' "${alias_body}" 2>/dev/null || true)"
+            jq --arg d "${domain}" --arg s "${alias_status}" --arg dep "${alias_deployment}" '.aliases[$d] = {httpStatus:$s, deploymentId:$dep}' /tmp/result.json > /tmp/result.next && mv /tmp/result.next /tmp/result.json
+            rm -f "${alias_body}"
+          done
+          cp /tmp/result.json vercel-domain-diagnostic.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add vercel-domain-diagnostic.json
+          git commit -m 'diag(vercel): record canonical domain ownership snapshot'
+          git push
