@@ -28,6 +28,7 @@ var supabaseIdentityPublishableKey = 'sb_publishable_mRE63bML7dsVY_YqaervqA_TUEW
 var academySupabaseUrl = 'https://nwxnyqlyzyufgoadtqxs.supabase.co'
 var fdacsSupabaseUrl = 'https://ggkxgjhsbgbifiqrhavr.supabase.co'
 var fdacsSupabaseProjectRef = 'ggkxgjhsbgbifiqrhavr'
+var fdacsDocumentsBucket = 'fdacs-class-d-completion-documents'
 var publicOrigin = 'https://www.obserrallc.com'
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
@@ -116,6 +117,10 @@ var commonAppSettings = [
     value: 'production'
   }
   {
+    name: 'OBSERRA_RUNTIME_ENVIRONMENT'
+    value: 'production'
+  }
+  {
     name: 'HOSTNAME'
     value: '0.0.0.0'
   }
@@ -186,6 +191,14 @@ var commonAppSettings = [
   {
     name: 'OBSERRA_FDACS_SUPABASE_PROJECT_REF'
     value: fdacsSupabaseProjectRef
+  }
+  {
+    name: 'OBSERRA_FDACS_CLASS_D_MEDIA_PROVIDER'
+    value: 'daily'
+  }
+  {
+    name: 'OBSERRA_FDACS_DOCUMENTS_BUCKET'
+    value: fdacsDocumentsBucket
   }
   {
     name: 'OBSERRA_FDACS_PUBLIC_ORIGIN'
