@@ -1,6 +1,8 @@
 # Obserra website
 
-Private Next.js website for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**. The authoritative production project is Vercel project `obserra-integrated-services`; the public canonical URL is `https://www.obserrallc.com`.
+Private Next.js website for **OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC**. The authoritative production Vercel project is `obserra-website-live` (`prj_lxTKKDa9sbhht7FaigiaF1PONMiC`). The public canonical URL is `https://www.obserrallc.com`.
+
+The repository is connected to multiple Vercel projects, but only `obserra-website-live` is authorized to build production releases. `scripts/vercel-ignore-build.sh` fails closed for every other Vercel project identity. Canonical custom domains are Vercel control-plane state and must not be declared as shared repository-level aliases in `vercel.json`.
 
 ## Secure runtime configuration
 
@@ -26,4 +28,4 @@ Protected learning and certificate routes are private, non-indexable, and sent w
 npm run build
 ```
 
-Before a production deployment, verify public routes, protected Academy routes, Stripe signature rejection, navigation links, robots, sitemap, and headers. Deploy only the `main` branch through the `obserra-integrated-services` project, then alias the validated production deployment to `www.obserrallc.com`.
+Before a production deployment, verify public routes, protected Academy routes, Stripe signature rejection, navigation links, robots, sitemap, and security headers. Deploy only the `main` branch through `obserra-website-live` (`prj_lxTKKDa9sbhht7FaigiaF1PONMiC`). After the exact candidate deployment is READY, move canonical domain ownership only through the authenticated Vercel control plane or the governed `.github/workflows/production-vercel-public-cutover.yml` workflow. Require `/api/health` to prove the intended project, deployment, Git SHA, and verified release authority before classifying the public site as live.
