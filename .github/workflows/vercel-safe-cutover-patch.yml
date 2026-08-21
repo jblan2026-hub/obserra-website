@@ -1,0 +1,160 @@
+name: Patch Vercel safe fail-closed cutover
+
+on:
+  push:
+    branches:
+      - automation/vercel-safe-cutover-patch-20260821
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: c2d9b9e6faa66a0ea7adce7c4c55466097c33653
+          fetch-depth: 0
+      - name: Patch preflight contract and regression test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+
+          workflow_path = Path('.github/workflows/production-vercel-public-cutover.yml')
+          workflow = workflow_path.read_text()
+
+          old_commerce = '''          test "${commerce_status}" = "200"
+          jq -e '\''
+            .contract == "academy-commerce-health-v1" and
+            .operational == true and
+            .paymentProvider == "stripe" and
+            .providerVerification.environment == "live" and
+            .providerVerification.connected == true and
+            .providerVerification.chargesEnabled == true and
+            .webhookVerification == "required" and
+            .identity == "available" and
+            .identityEnvironment == "live" and
+            .durableStorage == "available" and
+            .storageSchema == "academy-durable-state-v2" and
+            .purchaserIdentityHashing == "available" and
+            .fulfillment.idempotencyKey == "stripe-event-id" and
+            .fulfillment.auditLedger == "durable-supabase"
+          '\'' "${commerce_body}" >/dev/null
+          grep -Eqi '\''^cache-control:[[:space:]]*no-store'\'' "${commerce_headers}"
+          grep -Eqi '\''^x-obserra-commerce-contract:[[:space:]]*academy-commerce-health-v1'\'' "${commerce_headers}"
+'''
+
+          new_commerce = '''          if [ "${commerce_status}" = "200" ]; then
+            jq -e '\''
+              .contract == "academy-commerce-health-v1" and
+              .operational == true and
+              .paymentProvider == "stripe" and
+              .providerVerification.environment == "live" and
+              .providerVerification.connected == true and
+              .providerVerification.chargesEnabled == true and
+              .webhookVerification == "required" and
+              .identity == "available" and
+              .identityEnvironment == "live" and
+              .durableStorage == "available" and
+              .storageSchema == "academy-durable-state-v2" and
+              .purchaserIdentityHashing == "available" and
+              .fulfillment.idempotencyKey == "stripe-event-id" and
+              .fulfillment.auditLedger == "durable-supabase"
+            '\'' "${commerce_body}" >/dev/null
+          elif [ "${commerce_status}" = "503" ]; then
+            jq -e '\''
+              .contract == "academy-commerce-health-v1" and
+              .operational == false and
+              .identity == "available" and
+              .identityEnvironment == "live" and
+              .checkoutModes == ["authenticated", "guest-email"] and
+              .claimPolicy == "purchaser-email-match-v1" and
+              .fulfillment.idempotencyKey == "stripe-event-id" and
+              .fulfillment.auditLedger == "durable-supabase"
+            '\'' "${commerce_body}" >/dev/null
+          else
+            echo "::error::Academy commerce health returned unexpected HTTP ${commerce_status}; expected operational 200 or explicit fail-closed 503."
+            exit 1
+          fi
+          grep -Eqi '\''^cache-control:[[:space:]]*no-store'\'' "${commerce_headers}"
+          grep -Eqi '\''^x-obserra-commerce-contract:[[:space:]]*academy-commerce-health-v1'\'' "${commerce_headers}"
+'''
+
+          old_florida = '''          florida_ready="$(mktemp)"
+          florida_ready_status="$(curl --silent --show-error --max-time 30 \\
+            --output "${florida_ready}" \\
+            --write-out '\''%{http_code}'\'' \\
+            "${CANDIDATE_URL}/api/florida-class-d/health/ready")"
+          test "${florida_ready_status}" = "200"
+          jq -e '\''.service == "florida-class-d-lms" and .status == "ready"'\'' "${florida_ready}" >/dev/null
+'''
+
+          new_florida = '''          florida_ready_headers="$(mktemp)"
+          florida_ready="$(mktemp)"
+          florida_ready_status="$(curl --silent --show-error --max-time 30 \\
+            --output "${florida_ready}" \\
+            --dump-header "${florida_ready_headers}" \\
+            --write-out '\''%{http_code}'\'' \\
+            "${CANDIDATE_URL}/api/florida-class-d/health/ready")"
+          if [ "${florida_ready_status}" = "200" ]; then
+            jq -e '\''.service == "florida-class-d-lms" and .status == "ready"'\'' "${florida_ready}" >/dev/null
+          elif [ "${florida_ready_status}" = "503" ]; then
+            jq -e '\''.service == "florida-class-d-lms" and .status == "not_ready"'\'' "${florida_ready}" >/dev/null
+            grep -Eqi '\''^retry-after:[[:space:]]*60'\'' "${florida_ready_headers}"
+          else
+            echo "::error::Florida readiness returned unexpected HTTP ${florida_ready_status}; expected ready 200 or explicit fail-closed 503."
+            exit 1
+          fi
+'''
+
+          if workflow.count(old_commerce) != 1:
+              raise SystemExit(f'expected one commerce preflight block, found {workflow.count(old_commerce)}')
+          if workflow.count(old_florida) != 1:
+              raise SystemExit(f'expected one Florida readiness preflight block, found {workflow.count(old_florida)}')
+
+          workflow = workflow.replace(old_commerce, new_commerce).replace(old_florida, new_florida)
+          workflow_path.write_text(workflow)
+
+          test_path = Path('test/production-vercel-public-cutover.test.mjs')
+          test_text = test_path.read_text()
+          addition = r'''
+
+test("preflight accepts only healthy or explicit fail-closed regulated subsystem states", () => {
+  assert.match(workflow, /if \[ "\$\{commerce_status\}" = "200" \]; then/);
+  assert.match(workflow, /elif \[ "\$\{commerce_status\}" = "503" \]; then/);
+  assert.match(workflow, /\.operational == false/);
+  assert.match(workflow, /\.identity == "available"/);
+  assert.match(workflow, /\.identityEnvironment == "live"/);
+  assert.match(workflow, /unexpected HTTP \$\{commerce_status\}; expected operational 200 or explicit fail-closed 503/);
+  assert.match(workflow, /elif \[ "\$\{florida_ready_status\}" = "503" \]; then/);
+  assert.match(workflow, /\.status == "not_ready"/);
+  assert.match(workflow, /\^retry-after:\[\[:space:\]\]\*60/);
+  assert.match(workflow, /unexpected HTTP \$\{florida_ready_status\}; expected ready 200 or explicit fail-closed 503/);
+});
+'''
+          if 'preflight accepts only healthy or explicit fail-closed regulated subsystem states' not in test_text:
+              test_path.write_text(test_text + addition)
+          PY
+
+          node --test test/production-vercel-public-cutover.test.mjs
+          git diff --check
+          git diff -- .github/workflows/production-vercel-public-cutover.yml test/production-vercel-public-cutover.test.mjs
+
+      - name: Commit two-file release-gate repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git status --porcelain=v1 | sed 's/^...//' | sort)
+          test "${#changed[@]}" -eq 2
+          test "${changed[0]}" = ".github/workflows/production-vercel-public-cutover.yml"
+          test "${changed[1]}" = "test/production-vercel-public-cutover.test.mjs"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -b fix/vercel-safe-failclosed-cutover-20260821
+          git add .github/workflows/production-vercel-public-cutover.yml test/production-vercel-public-cutover.test.mjs
+          git commit -m 'fix(vercel): allow verified fail-closed prelicense cutover'
+          git push origin HEAD:fix/vercel-safe-failclosed-cutover-20260821
+          git push origin --delete automation/vercel-safe-cutover-patch-20260821
