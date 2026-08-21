@@ -7,6 +7,9 @@ import { isProductionRuntime } from "./lib/runtime-environment";
 const identityOrigins = prepareIdentityOriginContract();
 const supabaseAuthRuntime = prepareSupabaseAuthRuntime();
 const productionRuntime = isProductionRuntime();
+const standaloneAppServiceBuild =
+  process.env.VERCEL !== "1" &&
+  process.env.OBSERRA_HOSTING_PROVIDER === "azure-app-service";
 const identityScriptSources = identityOrigins.scriptSources.join(" ");
 const identityConnectSources = [
   ...new Set([
@@ -95,7 +98,7 @@ const transactionalRouteHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  ...(standaloneAppServiceBuild ? { output: "standalone" as const } : {}),
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
