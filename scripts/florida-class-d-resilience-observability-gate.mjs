@@ -34,11 +34,25 @@ requireText(liveRoute, 'status: 200', "liveness route must return HTTP 200 when 
 requireText(liveRoute, '"cache-control": "no-store', "liveness response must not be cached");
 if (liveRoute.includes("getFloridaClassDResilienceSnapshot")) throw new Error("Gate 27 failed: public liveness may not expose the detailed resilience snapshot");
 
-requireText(readyRoute, "getFloridaClassDPublicReadiness", "readiness route must use the minimal readiness response");
-requireText(readyRoute, 'health.status === "ready" ? 200 : 503', "readiness route must return 503 when readiness is not satisfied");
+requireText(readyRoute, "getFloridaClassDResilienceSnapshot", "public readiness may inspect the detailed snapshot only for sanitized server diagnostics");
+requireText(readyRoute, 'const ready = snapshot.readiness.state === "ready"', "readiness route must derive its public status from the server-controlled readiness state");
+requireText(readyRoute, 'status: ready ? 200 : 503', "readiness route must return 503 when readiness is not satisfied");
 requireText(readyRoute, '"retry-after": "60"', "degraded readiness must provide a bounded retry hint");
 requireText(readyRoute, '"cache-control": "no-store', "readiness response must not be cached");
-if (readyRoute.includes("getFloridaClassDResilienceSnapshot")) throw new Error("Gate 27 failed: public readiness may not expose the detailed resilience snapshot");
+requireText(readyRoute, "console.warn", "degraded readiness must emit an internal diagnostic event");
+requireText(readyRoute, "technicalFailureKeys", "internal readiness diagnostics must use a sanitized technical-failure label");
+requireText(readyRoute, "snapshot.runtime.nonLicenseBlockingKeys", "internal readiness diagnostics must use non-license technical failure identifiers");
+requireText(readyRoute, "highAvailabilityFailureKeys", "internal readiness diagnostics must use a sanitized HA-failure label");
+requireText(readyRoute, "snapshot.highAvailability.failingCheckKeys", "internal readiness diagnostics must use HA failure identifiers");
+requireText(readyRoute, "NextResponse.json", "public readiness must return a bounded JSON response");
+requireText(readyRoute, 'service: "florida-class-d-lms"', "public readiness response must retain only the service identity");
+requireText(readyRoute, 'status: ready ? "ready" : "not_ready"', "public readiness response must retain only the ready/not_ready status");
+if (/NextResponse\.json\(\s*snapshot/.test(readyRoute)) throw new Error("Gate 27 failed: public readiness must not serialize the detailed resilience snapshot");
+if (/nonLicenseBlockingKeys\s*:/.test(readyRoute)) throw new Error("Gate 27 failed: public readiness must not serialize raw technical failure keys");
+if (/failingCheckKeys\s*:/.test(readyRoute)) throw new Error("Gate 27 failed: public readiness must not serialize raw HA failure keys");
+for (const forbidden of ["process.env", "serviceRole", "apiKey"]) {
+  if (readyRoute.toLowerCase().includes(forbidden.toLowerCase())) throw new Error(`Gate 27 failed: public readiness route contains forbidden runtime detail ${forbidden}`);
+}
 
 requireText(adminRoute, 'requireFloridaClassDStaff(["school_admin", "compliance_admin"])', "detailed resilience API must require protected staff roles");
 requireText(adminRoute, "getFloridaClassDResilienceSnapshot", "detailed resilience API must return the server-controlled snapshot");
@@ -61,4 +75,4 @@ requireText(handoff, "Gate 27 makes no production database migration", "Gate 27 
 requireText(workflow, "Run Gate 27 resilience and observability source verification", "the dedicated Class D workflow must make Gate 27 mandatory");
 requireText(workflow, "node scripts/florida-class-d-resilience-observability-gate.mjs", "the Gate 27 verifier must run in CI");
 
-console.log("Florida Class D Gate 27 passed: liveness, readiness, high availability, production activation authorization, and regulatory approval remain distinct; public health responses are minimal; detailed resilience state is staff protected and non-cacheable; HA failure blocks readiness; and CI enforcement is active.");
+console.log("Florida Class D Gate 27 passed: liveness, readiness, high availability, production activation authorization, and regulatory approval remain distinct; public health responses stay minimal while non-secret readiness failure keys may be logged server-side; detailed resilience state is staff protected and non-cacheable; HA failure blocks readiness; and CI enforcement is active.");

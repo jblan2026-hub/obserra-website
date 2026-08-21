@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getFloridaClassDPublicReadiness } from "../../../../../lib/florida-class-d-resilience";
+import { getFloridaClassDResilienceSnapshot } from "../../../../../lib/florida-class-d-resilience";
 
 export const dynamic = "force-dynamic";
 
@@ -11,9 +11,24 @@ const headers = {
 };
 
 export async function GET() {
-  const health = getFloridaClassDPublicReadiness();
-  return NextResponse.json(health, {
-    status: health.status === "ready" ? 200 : 503,
-    headers: health.status === "ready" ? headers : { ...headers, "retry-after": "60" },
-  });
+  const snapshot = getFloridaClassDResilienceSnapshot();
+  const ready = snapshot.readiness.state === "ready";
+
+  if (!ready) {
+    console.warn("Florida Class D readiness not ready", {
+      technicalFailureKeys: snapshot.runtime.nonLicenseBlockingKeys,
+      highAvailabilityFailureKeys: snapshot.highAvailability.failingCheckKeys,
+    });
+  }
+
+  return NextResponse.json(
+    {
+      service: "florida-class-d-lms",
+      status: ready ? "ready" : "not_ready",
+    },
+    {
+      status: ready ? 200 : 503,
+      headers: ready ? headers : { ...headers, "retry-after": "60" },
+    },
+  );
 }
