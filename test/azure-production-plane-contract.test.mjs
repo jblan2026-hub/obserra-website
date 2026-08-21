@@ -33,6 +33,32 @@ test("Azure infrastructure is App Service with a staging slot and managed identi
   assert.match(bicep, /value:\s*'disabled'/);
 });
 
+test("Azure production storage is hardened GPv2 and rejects legacy storage kinds", async () => {
+  const storage = await read("infra/storage-gpv2.bicep");
+  const workflow = await read(".github/workflows/azure-production-deploy.yml");
+  const bootstrap = await read("scripts/azure-bootstrap-production.sh");
+
+  assert.match(storage, /Microsoft\.Storage\/storageAccounts/);
+  assert.match(storage, /kind:\s*'StorageV2'/);
+  assert.match(storage, /name:\s*'Standard_GRS'/);
+  assert.match(storage, /allowBlobPublicAccess:\s*false/);
+  assert.match(storage, /allowSharedKeyAccess:\s*false/);
+  assert.match(storage, /defaultToOAuthAuthentication:\s*true/);
+  assert.match(storage, /minimumTlsVersion:\s*'TLS1_2'/);
+  assert.match(storage, /supportsHttpsTrafficOnly:\s*true/);
+  assert.match(storage, /defaultAction:\s*'Deny'/);
+  assert.match(storage, /isVersioningEnabled:\s*true/);
+  assert.doesNotMatch(storage, /kind:\s*'BlobStorage'/);
+  assert.doesNotMatch(storage, /kind:\s*'Storage'\s*$/m);
+
+  assert.match(workflow, /infra\/storage-gpv2\.bicep/);
+  assert.match(workflow, /az storage account show/);
+  assert.match(workflow, /StorageV2/);
+  assert.match(bootstrap, /Microsoft\.Storage/);
+  assert.match(bootstrap, /infra\/storage-gpv2\.bicep|STORAGE_BICEP_TEMPLATE/);
+  assert.match(bootstrap, /az storage account show/);
+});
+
 test("GitHub deployment uses OIDC, staging verification, slot swap, and rollback", async () => {
   const workflow = await read(".github/workflows/azure-production-deploy.yml");
 
