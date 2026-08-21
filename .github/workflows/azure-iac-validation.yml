@@ -11,6 +11,7 @@ on:
       - '.github/workflows/azure-production-deploy.yml'
       - '.github/workflows/azure-iac-validation.yml'
       - 'test/azure-production-plane-contract.test.mjs'
+      - 'test/azure-governed-release-contract.test.mjs'
   push:
     branches:
       - main
@@ -23,6 +24,7 @@ on:
       - '.github/workflows/azure-production-deploy.yml'
       - '.github/workflows/azure-iac-validation.yml'
       - 'test/azure-production-plane-contract.test.mjs'
+      - 'test/azure-governed-release-contract.test.mjs'
 
 permissions:
   contents: read
@@ -65,4 +67,4 @@ jobs:
           bash -n scripts/azure-converge-production.sh
 
       - name: Validate Azure production governed baseline contracts
-        run: node --test test/azure-production-plane-contract.test.mjs
+        run: node --test test/azure-production-plane-contract.test.mjs test/azure-governed-release-contract.test.mjs
