@@ -1,13 +1,18 @@
 targetScope = 'resourceGroup'
 
 @description('Azure region for the Obserra production storage account.')
-param location string
+param location string = 'eastus'
 
 @description('Stable suffix used for globally unique resource names.')
-param resourceSuffix string
+param resourceSuffix string = '38d660'
 
 @description('Production resource tags.')
-param tags object
+param tags object = {
+  workload: 'obserra-website'
+  environment: 'production'
+  owner: 'OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC'
+  managedBy: 'bicep-github-oidc'
+}
 
 var storageAccountName = 'stobserraprod${resourceSuffix}'
 
