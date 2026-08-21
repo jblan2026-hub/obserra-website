@@ -44,9 +44,14 @@ test("Gate 35 enforces the same Supabase runtime readiness contract as commerce 
     /academyIdentityEnvironment/,
     "Gate 35 must require the Supabase identity environment contract",
   );
+  assert.match(
+    durableCommerceGate,
+    /forbidText\(commerceHealthFile, commerceHealth, "prepareClerkRuntime"/,
+    "Gate 35 must explicitly forbid Clerk learner readiness in public Academy commerce health",
+  );
   assert.doesNotMatch(
     durableCommerceGate,
-    /prepareClerkRuntime|identity\.ready/,
-    "Gate 35 must not regress Academy learner readiness to Clerk",
+    /requireText\(commerceHealthFile, commerceHealth, "prepareClerkRuntime"/,
+    "Gate 35 must not require Clerk learner readiness",
   );
 });

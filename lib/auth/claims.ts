@@ -65,12 +65,9 @@ function roleVersionFromAppMetadata(appMetadata: Record<string, unknown>) {
 
 function safeDisplayName(value: unknown) {
   if (typeof value !== "string") return null;
+  if (/[\u0000-\u001f\u007f]/.test(value)) return null;
   const normalized = value.replace(/\s+/g, " ").trim();
-  if (
-    !normalized ||
-    normalized.length > DISPLAY_NAME_MAX_LENGTH ||
-    /[\u0000-\u001f\u007f]/.test(normalized)
-  ) return null;
+  if (!normalized || normalized.length > DISPLAY_NAME_MAX_LENGTH) return null;
   return normalized;
 }
 

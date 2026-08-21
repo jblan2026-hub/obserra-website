@@ -91,7 +91,7 @@ test("signed fulfillment validates every material payment field before persisten
 test("entitlement recovery is authenticated same-origin POST and never creates a charge", () => {
   assert.match(redeem, /export async function POST\(request: Request\)/);
   assert.match(redeem, /if \(!isSameOrigin\(request, requestUrl\)\)/);
-  assert.match(redeem, /safeIdentity\(\)/);
+  assert.match(redeem, /safeAcademyIdentity\(\)/);
   assert.match(redeem, /retrieveVerifiedAcademyPaidSession/);
   assert.doesNotMatch(redeem, /academyCourseAmountCents|amountCents: academyCourseAmountCents/);
   assert.doesNotMatch(webhook, /academyCourseAmountCents|course-price-invalid/);

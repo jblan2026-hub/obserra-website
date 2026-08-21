@@ -72,7 +72,9 @@ test("presentation display names are bounded and cannot carry control characters
     sub: "11111111-1111-4111-8111-111111111111",
     app_metadata: {},
   };
-  assert.equal(identityFromVerifiedClaims({ ...base, user_metadata: { full_name: "A\nB" } }).displayName, null);
+  for (const fullName of ["A\nB", "A\rB", "A\tB", "A\u007fB"]) {
+    assert.equal(identityFromVerifiedClaims({ ...base, user_metadata: { full_name: fullName } }).displayName, null);
+  }
   assert.equal(identityFromVerifiedClaims({ ...base, user_metadata: { full_name: "x".repeat(161) } }).displayName, null);
   assert.equal(identityFromVerifiedClaims({ ...base, user_metadata: { given_name: "Jody", family_name: "Blanchard" } }).displayName, "Jody Blanchard");
 });
