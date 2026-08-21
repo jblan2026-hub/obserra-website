@@ -4,6 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { supabaseAuthCookieOptions } from "../auth/cookie-contract";
 import { prepareSupabaseAuthRuntime } from "../auth/runtime-config";
+import { isProductionRuntime } from "../runtime-environment";
 
 export class SupabaseAuthConfigurationError extends Error {
   constructor(readonly reasonCodes: string[]) {
@@ -22,7 +23,7 @@ export async function createSupabaseServerClient() {
   return createServerClient(runtime.url, runtime.publishableKey, {
     cookieOptions: supabaseAuthCookieOptions({
       projectRef: runtime.projectRef,
-      production: process.env.VERCEL_ENV === "production",
+      production: isProductionRuntime(),
     }),
     cookies: {
       getAll() {

@@ -19,6 +19,7 @@ vm.runInNewContext(ts.transpileModule(paymentSource, {
   require(specifier) {
     if (specifier === "server-only") return {};
     if (specifier === "node:crypto") return crypto;
+    if (specifier === "./runtime-environment") return { isProductionRuntime: () => false };
     throw new Error(`Unexpected payment reversal test import: ${specifier}`);
   },
 });

@@ -5,7 +5,7 @@ import test from "node:test";
 const read = (path) => fs.readFileSync(path, "utf8");
 const CANONICAL_PROJECT_ID = "prj_lxTKKDa9sbhht7FaigiaF1PONMiC";
 
-test("canonical production deployment exposes only read-only health routes before public cutover", () => {
+test("approved production deployment hosts expose only read-only health routes before public cutover", () => {
   assert.ok(
     fs.existsSync("lib/direct-deployment-health-routing.ts"),
     "direct deployment health routing policy must exist",
@@ -25,10 +25,15 @@ test("canonical production deployment exposes only read-only health routes befor
   }
 
   assert.match(routing, /import\s*\{\s*CANONICAL_PUBLIC_VERCEL_PROJECT_ID\s*\}\s*from\s*["']\.\/auth\/runtime-config["']/);
-  assert.match(routing, /VERCEL_PROJECT_ID\?\.trim\(\)\s*!==\s*CANONICAL_PUBLIC_VERCEL_PROJECT_ID/);
   assert.match(runtimeConfig, new RegExp(`CANONICAL_PUBLIC_VERCEL_PROJECT_ID\\s*=\\s*["']${CANONICAL_PROJECT_ID}["']`));
   assert.match(routing, /VERCEL_ENV/);
+  assert.match(routing, /VERCEL_PROJECT_ID/);
+  assert.match(routing, /CANONICAL_PUBLIC_VERCEL_PROJECT_ID/);
   assert.match(routing, /\.vercel\.app/);
+  assert.match(routing, /OBSERRA_HOSTING_PROVIDER/);
+  assert.match(routing, /azure-app-service/);
+  assert.match(routing, /\.azurewebsites\.net/);
+  assert.match(routing, /isProductionRuntime/);
   assert.match(routing, /method\.toUpperCase\(\)\s*!==\s*["']GET["']/);
   assert.match(proxy, /shouldServeDirectDeploymentHealth/);
 

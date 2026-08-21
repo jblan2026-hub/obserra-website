@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isProductionRuntime } from "../../../../lib/runtime-environment";
 
 export const runtime = "nodejs";
 
@@ -44,7 +45,7 @@ export async function POST(request: Request) {
   response.cookies.set(COOKIE_NAME, browserId, {
     httpOnly: true,
     sameSite: "strict",
-    secure: process.env.VERCEL_ENV === "production",
+    secure: isProductionRuntime(),
     path: "/",
     maxAge: 365 * 24 * 60 * 60,
   });

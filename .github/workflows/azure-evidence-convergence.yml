@@ -1,0 +1,126 @@
+name: Azure Production Evidence Convergence
+# Refresh governed legal evidence after the GPv2/autoscale production-plane expansion.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/azure-production-plane-20260821
+    paths:
+      - .github/workflows/azure-evidence-convergence.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: azure-production-evidence-convergence
+  cancel-in-progress: false
+
+jobs:
+  converge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact Azure feature branch
+        uses: actions/checkout@v6
+        with:
+          ref: feat/azure-production-plane-20260821
+          fetch-depth: 0
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Converge provider-neutral production contracts and proxy fingerprint
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import subprocess
+
+          def replace_exact(path_name: str, old: str, new: str, already: str):
+              path = Path(path_name)
+              source = path.read_text()
+              if old in source:
+                  path.write_text(source.replace(old, new, 1))
+                  return
+              if already not in source:
+                  raise SystemExit(f"{path_name} was neither legacy nor already converged")
+
+          replace_exact(
+              "scripts/florida-class-d-website-academy-commerce-gate.mjs",
+              '''requireText(paymentPath, payment, 'process.env.VERCEL_ENV === "production"', "production live-mode binding");''',
+              '''requireText(paymentPath, payment, 'isProductionRuntime()', "provider-neutral production live-mode binding");\nrequireText(paymentPath, payment, 'from "./runtime-environment"', "provider-neutral production runtime authority");''',
+              '''provider-neutral production live-mode binding''',
+          )
+
+          replace_exact(
+              "test/academy-payment-production-contract.test.mjs",
+              '''  assert.match(contract, /process\\.env\\.VERCEL_ENV === "production"/);''',
+              '''  assert.match(contract, /isProductionRuntime\\(\\)/);\n  assert.match(contract, /from "\\.\\/runtime-environment"/);''',
+              '''assert.match(contract, /isProductionRuntime\\(\\)/);''',
+          )
+
+          proxy_sha = subprocess.check_output(["git", "hash-object", "proxy.ts"], text=True).strip()
+          if not re.fullmatch(r"[0-9a-f]{40}", proxy_sha):
+              raise SystemExit("Unable to calculate exact proxy.ts Git blob SHA-1")
+          fingerprint = Path("lib/proxy-release-fingerprint.ts")
+          source = fingerprint.read_text()
+          updated, count = re.subn(
+              r'gitBlobSha1: "[0-9a-f]{40}"',
+              f'gitBlobSha1: "{proxy_sha}"',
+              source,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit("Proxy release fingerprint field was not found exactly once")
+          fingerprint.write_text(updated)
+          PY
+
+      - name: Verify affected release contracts before evidence generation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/florida-class-d-website-academy-commerce-gate.mjs
+          node scripts/academy-durable-commerce-gate.mjs
+          node --test \
+            test/academy-payment-production-contract.test.mjs \
+            test/academy-payment-reversal-contract.test.mjs \
+            test/academy-stripe-webhook-mode.test.mjs \
+            test/azure-production-plane-contract.test.mjs \
+            test/cmmc-archive-target-isolation.test.mjs \
+            test/vercel-canonical-deployment-preflight.test.mjs \
+            test/vercel-deployment-integrity.test.mjs
+
+      - name: Generate governed legal identity audit
+        run: npm run generate:legal-identity-audit
+
+      - name: Verify governed legal identity audit
+        run: npm run verify:legal-identity-audit
+
+      - name: Commit exact governed convergence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            scripts/florida-class-d-website-academy-commerce-gate.mjs \
+            test/academy-payment-production-contract.test.mjs \
+            lib/proxy-release-fingerprint.ts \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.json \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.md \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
+          if git diff --cached --quiet; then
+            echo "Azure source contracts and governed legal evidence are already converged."
+            exit 0
+          fi
+          git commit -m "chore(azure): converge host-neutral release evidence"
+          git push origin HEAD:feat/azure-production-plane-20260821

@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isMissingSupabaseAuthSession } from "../auth/claims";
 import { supabaseAuthCookieOptions } from "../auth/cookie-contract";
 import { prepareSupabaseAuthRuntime, type SupabaseAuthRuntimeReason } from "../auth/runtime-config";
+import { isProductionRuntime } from "../runtime-environment";
 
 export type SupabaseAuthProxyResult = {
   configured: boolean;
@@ -37,7 +38,7 @@ export async function updateSupabaseAuthSession(
   const supabase = createServerClient(runtime.url, runtime.publishableKey, {
     cookieOptions: supabaseAuthCookieOptions({
       projectRef: runtime.projectRef,
-      production: process.env.VERCEL_ENV === "production",
+      production: isProductionRuntime(),
     }),
     cookies: {
       getAll() {

@@ -2,9 +2,11 @@ import type { NextConfig } from "next";
 import { prepareIdentityOriginContract } from "./lib/auth/identity-origin-contract";
 import { prepareSupabaseAuthRuntime } from "./lib/auth/runtime-config";
 import { CANONICAL_PUBLIC_ORIGIN } from "./lib/legal-identity";
+import { isProductionRuntime } from "./lib/runtime-environment";
 
 const identityOrigins = prepareIdentityOriginContract();
 const supabaseAuthRuntime = prepareSupabaseAuthRuntime();
+const productionRuntime = isProductionRuntime();
 const identityScriptSources = identityOrigins.scriptSources.join(" ");
 const identityConnectSources = [
   ...new Set([
@@ -23,7 +25,7 @@ const clerkIdentitySources = [
   "https://*.protect.clerk.com",
   "https://clerk-telemetry.com",
   "https://*.clerk-telemetry.com",
-  ...(process.env.VERCEL_ENV === "production"
+  ...(productionRuntime
     ? []
     : [
         "https://clerk.accounts.dev",
@@ -93,6 +95,7 @@ const transactionalRouteHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],

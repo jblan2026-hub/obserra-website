@@ -18,7 +18,8 @@ const reservationMigration = read("supabase/migrations/20260815200000_academy_ch
 const ci = read(".github/workflows/website-ci.yml");
 
 test("Academy commerce cannot use live Stripe outside production or test Stripe in production", () => {
-  assert.match(contract, /process\.env\.VERCEL_ENV === "production"/);
+  assert.match(contract, /isProductionRuntime\(\)/);
+  assert.match(contract, /from "\.\/runtime-environment"/);
   assert.match(contract, /return keyMode === true \? true : null/);
   assert.match(contract, /return keyMode === false \? false : null/);
   assert.match(checkout, /academyCommerceLivemode\(\)/);

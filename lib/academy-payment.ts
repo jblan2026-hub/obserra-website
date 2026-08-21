@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash } from "node:crypto";
 import type Stripe from "stripe";
+import { isProductionRuntime } from "./runtime-environment";
 
 export const ACADEMY_PAYMENT_CONTRACT = "academy-payment-v3";
 export const ACADEMY_PAYMENT_CURRENCY = "usd";
@@ -14,7 +15,7 @@ export const ACADEMY_CHECKOUT_SESSION_LIFETIME_SECONDS = 23 * 60 * 60;
 export function academyCommerceLivemode() {
   const key = process.env.ACADEMY_STRIPE_SECRET_KEY?.trim() ?? "";
   const keyMode = key.startsWith("rk_live_") ? true : key.startsWith("rk_test_") ? false : null;
-  if (process.env.VERCEL_ENV === "production") return keyMode === true ? true : null;
+  if (isProductionRuntime()) return keyMode === true ? true : null;
   return keyMode === false ? false : null;
 }
 

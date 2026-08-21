@@ -1,3 +1,5 @@
+import { isProductionRuntime } from "./runtime-environment";
+
 export type ClerkEnvironment = "test" | "live";
 
 export type ClerkRuntimeReason =
@@ -93,7 +95,7 @@ export function prepareClerkRuntime(): ClerkRuntimeStatus {
   }
 
   if (
-    process.env.VERCEL_ENV === "production" &&
+    isProductionRuntime() &&
     ((publishableEnv && publishableEnv !== "live") || (secretEnv && secretEnv !== "live"))
   ) {
     reasonCodes.push("production_requires_live_keys");
