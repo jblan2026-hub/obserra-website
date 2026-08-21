@@ -95,3 +95,5 @@ jobs:
         run: |
           echo "Production runtime smoke requires real Clerk GitHub Actions credentials."
           exit 1
+
+# Verification-only trigger over the already-applied main cleanup.
