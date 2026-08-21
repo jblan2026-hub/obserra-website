@@ -4,7 +4,6 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import { getInternalOwnerAuthority } from "./auth/authority-repository";
 import { requireSupabaseIdentity } from "./auth/identity";
 import { prepareSupabaseAuthRuntime } from "./auth/runtime-config";
-import { ownerEmailAllowed } from "./academy";
 import { floridaClassDOwnerUatProfileRequested } from "./florida-class-d-owner-uat";
 import type { FloridaClassDRecordRole } from "./florida-class-d-records";
 
@@ -34,6 +33,18 @@ export class FloridaClassDAuthorizationError extends Error {
 
 function supabaseIdentityEnabled() {
   return prepareSupabaseAuthRuntime().runtimeEnabled;
+}
+
+function ownerEmailAllowed(emails: readonly string[]) {
+  const configuredOwners = [
+    process.env.OBSERRA_OWNER_EMAIL,
+    ...(process.env.OBSERRA_OWNER_EMAILS ?? "").split(","),
+  ]
+    .map((value) => value?.trim().toLowerCase() ?? "")
+    .filter(Boolean);
+  const approvedOwners = new Set(configuredOwners);
+  return approvedOwners.size > 0
+    && emails.some((email) => approvedOwners.has(email.trim().toLowerCase()));
 }
 
 async function requireFloridaClassDAuthenticatedSession() {
