@@ -95,15 +95,7 @@ jobs:
           npm run verify:cmmc-system-evidence
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            .github/workflows/cmmc-evidence-governance.yml \
-            .github/workflows/branch-remediation-cmmc-172.yml \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.json \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.md \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          git add -A
           git commit -m "docs(compliance): converge Vercel authority evidence"
           git push origin HEAD:fix/vercel-exclusive-authority-regression-20260820
 
