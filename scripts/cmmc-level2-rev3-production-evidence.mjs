@@ -129,9 +129,8 @@ for (const forbidden of ["sk_live_", "sk_test_", "STRIPE_WEBHOOK_SECRET=", "STRI
 }
 
 const vercelConfig = JSON.parse(read(vercelPath));
-const expectedCanonicalAliases = ["www.obserrallc.com", "obserrallc.com"];
-if (JSON.stringify(vercelConfig.alias) !== JSON.stringify(expectedCanonicalAliases)) {
-  fail("canonical aliases must remain exactly scoped to www.obserrallc.com and obserrallc.com");
+if (Object.hasOwn(vercelConfig, "alias")) {
+  fail("canonical custom domains must remain owned in canonical Vercel Project Settings, not shared vercel.json aliases");
 }
 if (vercelConfig.ignoreCommand !== "sh scripts/vercel-ignore-build.sh") {
   fail("ignoreCommand must delegate to the bounded canonical-project guard script");
@@ -200,4 +199,4 @@ if (mode === "write") {
   if (read(digestPath) !== expectedDigest) fail(`${digestPath} drifted from machine-readable source`);
 }
 
-console.log(`Gate 34 passed: production identity availability isolation, canonical routing, canonical-project-only Vercel build authority, exact two-domain deployment aliases, Rev. 3/CMMC evidence mapping, generated audit view, and SHA-256 no-drift controls verified (${digest}).`);
+console.log(`Gate 34 passed: production identity availability isolation, canonical routing, canonical-project-only Vercel build authority, project-settings-owned canonical domains, Rev. 3/CMMC evidence mapping, generated audit view, and SHA-256 no-drift controls verified (${digest}).`);

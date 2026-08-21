@@ -12,7 +12,6 @@ const DUPLICATE_PROJECT_IDS = [
   "prj_FfAnssVJU8pcJydGNJHmCliP6Yme",
   "prj_v6Hb7FkpkUoLKlHkjzKJ5HVgYDaL",
 ];
-const CANONICAL_ALIASES = ["www.obserrallc.com", "obserrallc.com"];
 
 function git(cwd, ...args) {
   return execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
@@ -95,12 +94,12 @@ test("unknown Vercel project IDs fail closed instead of creating another deploym
   }
 });
 
-test("canonical aliases are assigned only after every noncanonical Vercel project is build-suppressed", () => {
+test("repository config never propagates canonical custom domains across every connected Vercel project", () => {
   const config = JSON.parse(fs.readFileSync(VERCEL_CONFIG, "utf8"));
   assert.equal(config.ignoreCommand, "sh scripts/vercel-ignore-build.sh");
-  assert.deepEqual(
-    config.alias,
-    CANONICAL_ALIASES,
-    "the canonical project must reclaim the two public aliases after duplicate projects are fail-closed",
+  assert.equal(
+    Object.hasOwn(config, "alias"),
+    false,
+    "canonical domains must be owned by the canonical Vercel project settings, not shared vercel.json aliases",
   );
 });
