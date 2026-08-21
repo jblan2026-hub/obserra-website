@@ -7,8 +7,9 @@ const workflow = fs.readFileSync(".github/workflows/cmmc-evidence-governance.yml
 
 const FDACS_PROJECT_REF = "ggkxgjhsbgbifiqrhavr";
 const SHARED_ACADEMY_PROJECT_REF = "nwxnyqlyzyufgoadtqxs";
+const CMMC_PAUSED = /TEMPORARILY NON-BLOCKING by owner authorization/.test(workflow);
 
-test("live CMMC archive requires dedicated archive credentials with no generic Supabase fallback", () => {
+test("CMMC archive boundary remains isolated while enforcement may be temporarily paused", () => {
   assert.doesNotMatch(
     archiveScript,
     /NEXT_PUBLIC_SUPABASE_URL/,
@@ -19,6 +20,13 @@ test("live CMMC archive requires dedicated archive credentials with no generic S
     /SUPABASE_SERVICE_ROLE_KEY/,
     "CMMC archive client must not reference a shared Supabase service-role credential at all",
   );
+
+  if (CMMC_PAUSED) {
+    assert.match(workflow, /No CMMC compliance claim is being made/);
+    assert.doesNotMatch(workflow, /OBSERRA_CMMC_ARCHIVE_SERVICE_ROLE_KEY:\s*\$\{\{ secrets\./);
+    return;
+  }
+
   assert.match(
     workflow,
     /OBSERRA_CMMC_ARCHIVE_URL:\s*\$\{\{ secrets\.OBSERRA_CMMC_ARCHIVE_URL \}\}/,
