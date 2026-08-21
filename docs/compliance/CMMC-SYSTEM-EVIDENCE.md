@@ -3,13 +3,13 @@
 > GENERATED FILE. DO NOT EDIT MANUALLY. Update the controlled source records and run `npm run generate:cmmc-system-evidence`.
 
 - **Legal owner:** OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC
-- **Bundle:** `obserra-cmmc-working-a938c1610bb4dc655cfb3198`
+- **Bundle:** `obserra-cmmc-working-534ee100c8ac8d5374f4e679`
 - **Bundle state:** `working_evidence_inventory`
 - **Generated at:** `2026-08-14T18:49:07Z`
 - **Git base/HEAD reference:** `0e72459a8940f23976038d85d6394409000f48c5`
 - **Revision binding:** `working_tree_digest`
 - **Exact release:** not assigned; working evidence inventory
-- **In-scope tree SHA-256:** `a938c1610bb4dc655cfb319886c115a90484946e19028936a59dc12b4ad23114` (694 paths)
+- **In-scope tree SHA-256:** `534ee100c8ac8d5374f4e6796f002b56369b987754eb11207aa5916ebf6b758c` (695 paths)
 
 ## Paired audit views
 
@@ -976,7 +976,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | `EV-WEBSITE-BADGE-MANIFEST` — Approved credential asset and issuer-observation manifest<br>`public/badges/eccouncil/asset-manifest.json` | organization_evidence | working | test/not_run | `b3fb489e362a03bb0ec379423c86847bf73221644f8bd0957d0a5afb06165ca9` | no | Records approved local asset identities, hashes, three time-bound live ADG issuer observations, and verification destinations; external issuer pages remain authoritative for credential validity. |
 | `EV-WEBSITE-BADGE-SCHEMA` — Fail-closed credential asset evidence schema<br>`public/badges/eccouncil/asset-manifest.schema.json` | product_supplied_evidence | working | test/not_run | `b4a7ae42ee34b8c0b5d3a0970f4f021c9402f0395b459bd862934038b38342a4` | no | Defines mandatory provenance, hash, issuer-observation, and claim-boundary fields; schema presence is not a live deployment result. |
 | `EV-WEBSITE-BADGE-GATE` — Credential asset integrity and provenance gate<br>`scripts/ec-council-badge-integrity.test.mjs` | product_supplied_evidence | working | test/not_run | `93aa89a30a6f1af8ad94bff04eb57a01fde308947e6525cf82592f5c53e17d9a` | no | Fail-closed source gate for the nine authorized assets and three issuer observations; exact CI run and production HTTP evidence remain release-specific. |
-| `EV-WEBSITE-LEGAL-IDENTITY-AUDIT` — Machine-readable legal identity source audit<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.json` | organization_evidence | working | test/not_run | `d1910dabb541a5ec72355e5e35d309c44dfb3c384847db6aead772e007ce53f3` | no | Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence. |
+| `EV-WEBSITE-LEGAL-IDENTITY-AUDIT` — Machine-readable legal identity source audit<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.json` | organization_evidence | working | test/not_run | `8db467a752cbdfb1727884fcc730a3657f64d58a775a90a5dc4eb726a70e681d` | no | Binds the exact legal entity, permitted product brands, inspected source-tree digest, CMMC configuration mapping, and separated technical/human disposition; live rendering and an exact approved release remain separate evidence. |
 | `EV-WEBSITE-LEGAL-IDENTITY-SCHEMA` — Legal identity audit machine schema<br>`docs/compliance/LEGAL-IDENTITY-AUDIT.schema.json` | product_supplied_evidence | working | examine/not_run | `37d5bc13bed30feafb4a7c661ed867a74e432062c98ff262aecad006404d9314` | no | Defines the machine-readable audit contract and mandatory disposition fields; schema presence is not a live operating result. |
 | `EV-WEBSITE-LEGAL-IDENTITY-GATE` — Fail-closed legal identity drift gate<br>`scripts/legal-identity-audit.mjs` | product_supplied_evidence | working | test/not_run | `6323945d11fc056b0205f2f18f259779aef12a3e94ece8a69560ddc482895605` | no | Rejects malformed legal names, retired company wording, stale public origins, and unapproved short-name company claims while preserving enumerated product brands and stable technical identifiers. |
 | `EV-WEBSITE-NEXT-CONFIG` — Website response security and image-delivery configuration<br>`next.config.ts` | product_supplied_evidence | working | examine/not_run | `3c3895b43e6dfc3b6b0481653d238dfe90c2bd1c97f63dfbe1f046aad7ecc4e8` | no | Source-level CSP, transport, browser, and image-delivery configuration only; Vercel production behavior requires exact-deployment verification. |
@@ -2679,7 +2679,7 @@ Finding eligibility: **not eligible** — Human assessment remains pending and n
 | `EV-ARCHIVE-HA-CONTRACT` — Candidate-bound HA evidence contract<br>`lib/florida-class-d-ha-evidence.ts` | product_supplied_evidence | working | test/not_run | `1ba1a894e9cd5d948461c36dd42272f3c31433d593d38037f95974ff420148f0` | no | Validates manifest structure and hashes; it does not manufacture provider HA evidence. |
 | `EV-ARCHIVE-HA-GATE` — HA evidence integrity gate<br>`scripts/florida-class-d-ha-evidence-integrity-gate.mjs` | product_supplied_evidence | working | test/not_run | `1d93a4baec5f6589a237b1b9243ac50749f5fedfd687395859bfa2aade69441f` | no | Gate definition only until an exact-revision result is archived. |
 | `EV-ARCHIVE-V2-SQL` — Objective-level exact-revision archive contract<br>`supabase/migrations/20260814180000_cmmc_objective_evidence_contract.sql` | product_supplied_evidence | working | test/not_run | `b1217c5994d9f33d59603ed425098a2bed0e9cbbe18b317468fd253e6bca07df` | no | Database enforcement source only; applied production state requires live verification. |
-| `EV-ARCHIVE-CLIENT` — Release evidence archive verifier and client<br>`scripts/cmmc-archive-release-evidence.mjs` | product_supplied_evidence | working | test/not_run | `32a582b8fad4cd375d13f790fbb938fea42885a71ae63e0fde49fbb08c55f36c` | no | Builds, verifies, and submits a final non-CUI package; a successful live RPC receipt is separately required. |
+| `EV-ARCHIVE-CLIENT` — Release evidence archive verifier and client<br>`scripts/cmmc-archive-release-evidence.mjs` | product_supplied_evidence | working | test/not_run | `ce986a375d8e0fbcc0265ea8842583a06170e7cbee670dd35758215a518b95ac` | no | Builds, verifies, and submits a final non-CUI package; a successful live RPC receipt is separately required. |
 | `EV-ARCHIVE-TARGET-DECISION` — Archive isolation and HA activation decision<br>`docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.json` | organization_evidence | working | examine/not_run | `bcd40682edb74166eb5b01c85f0cbe6fc28525fd81f1897dd0adc388e44669cd` | no | Records the rejected shared Academy target, dedicated-project quote, provider HA facts, and pending tests; it is not evidence that HA or the archive is live. |
 
 ### Objective-level CMMC evidence mapping
