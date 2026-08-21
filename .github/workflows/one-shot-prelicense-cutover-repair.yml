@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - fix/vercel-prelicense-cutover-20260821
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
