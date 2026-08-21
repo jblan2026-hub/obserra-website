@@ -204,7 +204,8 @@ requireText(academyStripePath, academyStripe, "rk_test_", "nonproduction restric
 for (const [path, source] of [[checkoutPath, checkout], [redeemPath, redeem], [webhookPath, webhook], [paymentPath, payment], [academyStripePath, academyStripe]]) {
   forbidText(path, source, "process.env.STRIPE_SECRET_KEY", "shared unrestricted Stripe key fallback");
 }
-requireText(paymentPath, payment, 'process.env.VERCEL_ENV === "production"', "production live-mode binding");
+requireText(paymentPath, payment, 'isProductionRuntime()', "provider-neutral production live-mode binding");
+requireText(paymentPath, payment, 'from "./runtime-environment"', "provider-neutral production runtime authority");
 requireText(checkoutPath, checkout, 'runtimeCourse.controlPlane !== "operational"', "operational control-plane requirement");
 requireText(checkoutPath, checkout, "!runtimeCourse.control.purchaseEnabled", "purchase authorization requirement");
 requireText(checkoutPath, checkout, "academyStorageHealth", "durable fulfillment readiness check");
