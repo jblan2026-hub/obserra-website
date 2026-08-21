@@ -8,6 +8,7 @@ import {
 } from "./auth/identity";
 import { prepareSupabaseAuthRuntime } from "./auth/runtime-config";
 import { ACADEMY_BRAND_NAME } from "./legal-identity";
+import { isProductionRuntime } from "./runtime-environment";
 
 type RuntimeEnvironment = Readonly<Record<string, string | undefined>>;
 
@@ -28,7 +29,7 @@ export function academyIdentityRuntimeReady(environment: RuntimeEnvironment = pr
 
 export function academyIdentityEnvironment(environment: RuntimeEnvironment = process.env) {
   if (!academyIdentityRuntimeReady(environment)) return "unavailable" as const;
-  return environment.VERCEL_ENV?.trim().toLowerCase() === "production"
+  return isProductionRuntime(environment)
     ? "live" as const
     : "nonproduction" as const;
 }
