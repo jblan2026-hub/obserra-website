@@ -59,6 +59,25 @@ test("Azure production storage is hardened GPv2 and rejects legacy storage kinds
   assert.match(bootstrap, /az storage account show/);
 });
 
+test("Azure production capacity keeps two-instance headroom and controlled autoscale", async () => {
+  const autoscale = await read("infra/autoscale.bicep");
+  const workflow = await read(".github/workflows/azure-production-deploy.yml");
+  const bootstrap = await read("scripts/azure-bootstrap-production.sh");
+
+  assert.match(autoscale, /Microsoft\.Insights\/autoscaleSettings/);
+  assert.match(autoscale, /minimum:\s*'2'/);
+  assert.match(autoscale, /default:\s*'2'/);
+  assert.match(autoscale, /maximum:\s*'4'/);
+  assert.match(autoscale, /metricName:\s*'CpuPercentage'/);
+  assert.match(autoscale, /threshold:\s*70/);
+  assert.match(autoscale, /direction:\s*'Increase'/);
+  assert.match(autoscale, /direction:\s*'Decrease'/);
+  assert.match(workflow, /infra\/autoscale\.bicep/);
+  assert.match(workflow, /az monitor autoscale show/);
+  assert.match(bootstrap, /infra\/autoscale\.bicep|AUTOSCALE_BICEP_TEMPLATE/);
+  assert.match(bootstrap, /az monitor autoscale show/);
+});
+
 test("GitHub deployment uses OIDC, staging verification, slot swap, and rollback", async () => {
   const workflow = await read(".github/workflows/azure-production-deploy.yml");
 
