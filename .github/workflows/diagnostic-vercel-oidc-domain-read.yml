@@ -1,0 +1,120 @@
+name: Diagnostic Vercel OIDC domain read
+
+on:
+  push:
+    branches:
+      - diag/vercel-oidc-domain-access-20260820
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  oidc-domain-read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+      CANONICAL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+      DUPLICATE_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme
+      PRIMARY_DOMAIN: www.obserrallc.com
+      VERCEL_OAUTH_CLIENT_ID: cl_kyUx2zVvA4MGptBohkmtYHJly2XltXzD
+    steps:
+      - name: Mint GitHub OIDC token
+        id: github_oidc
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken();
+            core.setSecret(token);
+            core.setOutput('token', token);
+
+      - name: Exchange OIDC token and test Vercel management read access
+        shell: bash
+        env:
+          GITHUB_OIDC_TOKEN: ${{ steps.github_oidc.outputs.token }}
+        run: |
+          set -euo pipefail
+
+          exchange_body="$(mktemp)"
+          exchange_status="$(curl --silent --show-error \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --output "${exchange_body}" \
+            --write-out '%{http_code}' \
+            --request POST \
+            https://api.vercel.com/login/oauth/token \
+            --data 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
+            --data-urlencode "client_id=${VERCEL_OAUTH_CLIENT_ID}" \
+            --data 'subject_token_type=urn:ietf:params:oauth:token-type:id_token' \
+            --data 'requested_token_type=urn:ietf:params:oauth:token-type:access_token' \
+            --data-urlencode "team_id_or_slug=${TEAM_ID}" \
+            --data-urlencode "subject_token=${GITHUB_OIDC_TOKEN}")"
+
+          if [ "${exchange_status}" != "200" ]; then
+            code="$(jq -r '.error // .error.code // empty' "${exchange_body}" 2>/dev/null || true)"
+            description="$(jq -r '.error_description // .error.message // empty' "${exchange_body}" 2>/dev/null || true)"
+            rm -f "${exchange_body}"
+            echo "OIDC_EXCHANGE_HTTP_STATUS=${exchange_status}"
+            echo "OIDC_EXCHANGE_RESULT=denied"
+            if [ -n "${code}" ]; then echo "OIDC_EXCHANGE_ERROR_CODE=${code}"; fi
+            if [ -n "${description}" ]; then echo "OIDC_EXCHANGE_ERROR_DESCRIPTION=${description}"; fi
+            exit 1
+          fi
+
+          access_token="$(jq -r '.access_token // empty' "${exchange_body}")"
+          rm -f "${exchange_body}"
+          if [ -z "${access_token}" ]; then
+            echo "OIDC_EXCHANGE_HTTP_STATUS=200"
+            echo "OIDC_EXCHANGE_RESULT=no_access_token"
+            exit 1
+          fi
+          echo "::add-mask::${access_token}"
+          echo "OIDC_EXCHANGE_HTTP_STATUS=200"
+          echo "OIDC_EXCHANGE_RESULT=access_token_received"
+
+          read_domain() {
+            local project_id="$1"
+            local label="$2"
+            local body
+            local status
+            local project
+            local name
+            local verified
+            local code
+            local message
+
+            body="$(mktemp)"
+            status="$(curl --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${body}" \
+              --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${access_token}" \
+              "https://api.vercel.com/v9/projects/${project_id}/domains/${PRIMARY_DOMAIN}?teamId=${TEAM_ID}")"
+
+            echo "${label}_HTTP_STATUS=${status}"
+            if [ "${status}" = "200" ]; then
+              project="$(jq -r '.projectId // empty' "${body}")"
+              name="$(jq -r '.name // empty' "${body}")"
+              verified="$(jq -r '.verified // false' "${body}")"
+              echo "${label}_RESULT=authorized"
+              echo "${label}_PROJECT_ID=${project}"
+              echo "${label}_DOMAIN=${name}"
+              echo "${label}_VERIFIED=${verified}"
+              rm -f "${body}"
+              return 0
+            fi
+
+            code="$(jq -r '.error.code // empty' "${body}" 2>/dev/null || true)"
+            message="$(jq -r '.error.message // empty' "${body}" 2>/dev/null || true)"
+            echo "${label}_RESULT=denied_or_absent"
+            if [ -n "${code}" ]; then echo "${label}_ERROR_CODE=${code}"; fi
+            if [ -n "${message}" ]; then echo "${label}_ERROR_MESSAGE=${message}"; fi
+            rm -f "${body}"
+            return 0
+          }
+
+          read_domain "${CANONICAL_PROJECT_ID}" CANONICAL_DOMAIN_READ
+          read_domain "${DUPLICATE_PROJECT_ID}" DUPLICATE_DOMAIN_READ
