@@ -11,6 +11,7 @@ OIDC_ISSUER="https://token.actions.githubusercontent.com"
 OIDC_AUDIENCE="api://AzureADTokenExchange"
 EXPECTED_STORAGE_ACCOUNT="stobserraprod38d660"
 EXPECTED_AUTOSCALE_NAME="autoscale-obserra-prod"
+RUNTIME_KEYVAULT_ROLE="Key Vault Secrets User"
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
@@ -112,20 +113,28 @@ if ! az identity federated-credential show \
     >/dev/null
 fi
 
-for role in "Contributor" "User Access Administrator"; do
-  if ! az role assignment list \
+if ! az role assignment list \
+  --assignee-object-id "${PRINCIPAL_ID}" \
+  --scope "${RG_ID}" \
+  --query "[?roleDefinitionName=='Contributor'] | [0].id" \
+  -o tsv | grep -q .; then
+  az role assignment create \
     --assignee-object-id "${PRINCIPAL_ID}" \
+    --assignee-principal-type ServicePrincipal \
+    --role "Contributor" \
     --scope "${RG_ID}" \
-    --query "[?roleDefinitionName=='${role}'] | [0].id" \
-    -o tsv | grep -q .; then
-    az role assignment create \
-      --assignee-object-id "${PRINCIPAL_ID}" \
-      --assignee-principal-type ServicePrincipal \
-      --role "${role}" \
-      --scope "${RG_ID}" \
-      >/dev/null
-  fi
-done
+    >/dev/null
+fi
+
+# Governed least-privilege convergence: recurring GitHub deployment must not retain RBAC mutation authority.
+while IFS= read -r assignment_id; do
+  [[ -z "${assignment_id}" ]] && continue
+  az role assignment delete --ids "${assignment_id}" >/dev/null
+done < <(az role assignment list \
+  --assignee-object-id "${PRINCIPAL_ID}" \
+  --scope "${RG_ID}" \
+  --query "[?roleDefinitionName=='User Access Administrator'].id" \
+  -o tsv)
 
 FEDERATED_JSON="$(az identity federated-credential show \
   --resource-group "${RESOURCE_GROUP}" \
@@ -137,7 +146,10 @@ jq -e --arg audience "${OIDC_AUDIENCE}" '.audiences | index($audience) != null' 
 
 ROLE_JSON="$(az role assignment list --assignee-object-id "${PRINCIPAL_ID}" --scope "${RG_ID}" -o json)"
 jq -e 'any(.[]; .roleDefinitionName == "Contributor")' <<<"${ROLE_JSON}" >/dev/null
-jq -e 'any(.[]; .roleDefinitionName == "User Access Administrator")' <<<"${ROLE_JSON}" >/dev/null
+if jq -e 'any(.[]; .roleDefinitionName == "User Access Administrator")' <<<"${ROLE_JSON}" >/dev/null; then
+  echo "Deployment identity still has User Access Administrator at the production resource-group scope." >&2
+  exit 1
+fi
 
 az bicep build --file "${BICEP_TEMPLATE}" --stdout >/dev/null
 az bicep build --file "${STORAGE_BICEP_TEMPLATE}" --stdout >/dev/null
@@ -161,10 +173,31 @@ WEB_APP_NAME="$(jq -r '.properties.outputs.webAppName.value' "${DEPLOYMENT_FILE}
 PRODUCTION_HOST="$(jq -r '.properties.outputs.productionHostName.value' "${DEPLOYMENT_FILE}")"
 STAGING_HOST="$(jq -r '.properties.outputs.stagingHostName.value' "${DEPLOYMENT_FILE}")"
 KEY_VAULT_NAME="$(jq -r '.properties.outputs.keyVaultName.value' "${DEPLOYMENT_FILE}")"
+KEY_VAULT_ID="$(jq -r '.properties.outputs.keyVaultId.value' "${DEPLOYMENT_FILE}")"
 RUNTIME_IDENTITY_CLIENT_ID="$(jq -r '.properties.outputs.runtimeIdentityClientId.value' "${DEPLOYMENT_FILE}")"
-for value in "${WEB_APP_NAME}" "${PRODUCTION_HOST}" "${STAGING_HOST}" "${KEY_VAULT_NAME}" "${RUNTIME_IDENTITY_CLIENT_ID}"; do
+RUNTIME_IDENTITY_PRINCIPAL_ID="$(jq -r '.properties.outputs.runtimeIdentityPrincipalId.value' "${DEPLOYMENT_FILE}")"
+for value in "${WEB_APP_NAME}" "${PRODUCTION_HOST}" "${STAGING_HOST}" "${KEY_VAULT_NAME}" "${KEY_VAULT_ID}" "${RUNTIME_IDENTITY_CLIENT_ID}" "${RUNTIME_IDENTITY_PRINCIPAL_ID}"; do
   test -n "${value}" && test "${value}" != "null"
 done
+
+# Bootstrap-only privilege operation. The runtime identity gets read-only secret access; GitHub does not keep role-assignment authority.
+if ! az role assignment list \
+  --assignee-object-id "${RUNTIME_IDENTITY_PRINCIPAL_ID}" \
+  --scope "${KEY_VAULT_ID}" \
+  --query "[?roleDefinitionName=='${RUNTIME_KEYVAULT_ROLE}'] | [0].id" \
+  -o tsv | grep -q .; then
+  az role assignment create \
+    --assignee-object-id "${RUNTIME_IDENTITY_PRINCIPAL_ID}" \
+    --assignee-principal-type ServicePrincipal \
+    --role "${RUNTIME_KEYVAULT_ROLE}" \
+    --scope "${KEY_VAULT_ID}" \
+    >/dev/null
+fi
+
+RUNTIME_ROLE_JSON="$(az role assignment list \
+  --assignee-object-id "${RUNTIME_IDENTITY_PRINCIPAL_ID}" \
+  --scope "${KEY_VAULT_ID}" -o json)"
+jq -e --arg role "${RUNTIME_KEYVAULT_ROLE}" 'any(.[]; .roleDefinitionName == $role)' <<<"${RUNTIME_ROLE_JSON}" >/dev/null
 
 az deployment group validate --resource-group "${RESOURCE_GROUP}" --template-file "${AUTOSCALE_BICEP_TEMPLATE}" --parameters location="${LOCATION}" --only-show-errors >/dev/null
 AUTOSCALE_DEPLOYMENT_FILE="${HOME}/obserra-azure-autoscale-deployment.json"
@@ -205,6 +238,7 @@ AZURE_LOCATION=${LOCATION}
 AZURE_RESOURCE_GROUP=${RESOURCE_GROUP}
 AZURE_CLIENT_ID=${CLIENT_ID}
 AZURE_DEPLOY_IDENTITY=${DEPLOY_IDENTITY}
+AZURE_DEPLOY_IDENTITY_ROLE=Contributor
 GITHUB_OIDC_SUBJECT=${GITHUB_SUBJECT}
 POLICY_ASSIGNMENT_COUNT=${POLICY_COUNT}
 AZURE_WEBAPP_NAME=${WEB_APP_NAME}
@@ -212,6 +246,7 @@ AZURE_PRODUCTION_HOST=https://${PRODUCTION_HOST}
 AZURE_STAGING_HOST=https://${STAGING_HOST}
 AZURE_KEY_VAULT_NAME=${KEY_VAULT_NAME}
 AZURE_RUNTIME_IDENTITY_CLIENT_ID=${RUNTIME_IDENTITY_CLIENT_ID}
+AZURE_RUNTIME_KEYVAULT_ROLE=${RUNTIME_KEYVAULT_ROLE}
 AZURE_AUTOSCALE_NAME=${AUTOSCALE_NAME}
 AZURE_AUTOSCALE_MIN=2
 AZURE_AUTOSCALE_MAX=4
