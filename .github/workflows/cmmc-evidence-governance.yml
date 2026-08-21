@@ -1,31 +1,23 @@
 name: CMMC Evidence Governance
 
-# TEMPORARILY NON-BLOCKING by owner authorization on 2026-08-21.
-# Preserve this workflow/check name so existing branch-protection rules do not
-# deadlock while CMMC enforcement is paused. Historical evidence, scripts, and
-# control mappings remain in the repository and can be re-enabled deliberately.
+# TEMPORARILY PAUSED by owner authorization on 2026-08-21.
+# Historical evidence, scripts, and control mappings remain preserved.
+# This workflow is manual-only until the owner explicitly re-enables CMMC.
 
 on:
-  pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: cmmc-evidence-paused-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   evidence-contract:
-    name: Verify fail-closed evidence contract
+    name: CMMC paused acknowledgement
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
       - name: CMMC enforcement temporarily paused
         run: |
-          echo "CMMC evidence governance is temporarily NON-BLOCKING by owner authorization."
+          echo "CMMC evidence governance is temporarily paused by owner authorization."
           echo "No CMMC compliance claim is being made by this workflow."
           echo "Historical CMMC evidence and generators remain preserved for later reactivation."
