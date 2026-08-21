@@ -22,9 +22,6 @@ on:
       - "tsconfig.json"
       - "vercel.json"
       - "scripts/florida-class-d-*.mjs"
-      - "scripts/cmmc-level2-rev3-traceability.mjs"
-      - "scripts/cmmc-level2-rev3-production-evidence.mjs"
-      - "scripts/cmmc-level2-dual-baseline.mjs"
       - "scripts/academy-durable-commerce-gate.mjs"
       - "test/florida-class-d-capacity-contract.test.mjs"
       - "test/vercel-deployment-integrity.test.mjs"
@@ -55,7 +52,7 @@ env:
 
 jobs:
   regulated-source-gates:
-    name: Gates 1-36 and production deployment integrity
+    name: Regulated runtime, security, commerce, capacity and build gates
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -125,17 +122,12 @@ jobs:
       - name: Run Gate 32 website Academy commerce security verification
         run: node scripts/florida-class-d-website-academy-commerce-gate.mjs
 
-      - name: Run Gate 33 CMMC Level 2 Rev 3 traceability verification
-        run: npm run verify:cmmc-traceability
-
-      - name: Run Gate 34 production identity, routing, and CMMC evidence verification
-        run: npm run verify:cmmc-production-evidence
+      # CMMC Gate 33, the CMMC portion of Gate 34, and the CMMC dual-baseline
+      # gate are intentionally paused by owner authorization on 2026-08-21.
+      # This does not assert CMMC compliance and does not remove historical evidence.
 
       - name: Run Gate 35 durable Academy commerce verification
         run: npm run verify:academy-durable-commerce
-
-      - name: Run Gate 35 complete CMMC Level 2 dual-baseline verification
-        run: npm run verify:cmmc-dual-baseline
 
       - name: Run Gate 36 concurrent learner capacity verification
         run: node scripts/florida-class-d-capacity-gate.mjs
