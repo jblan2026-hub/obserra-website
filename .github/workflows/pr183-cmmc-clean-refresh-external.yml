@@ -1,5 +1,6 @@
 name: PR183 Clean CMMC Evidence Refresh
 
+# Existing-workflow trigger retry after initial creation.
 on:
   push:
     branches:
