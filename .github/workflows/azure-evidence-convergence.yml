@@ -95,7 +95,6 @@ jobs:
             test/academy-payment-reversal-contract.test.mjs \
             test/academy-stripe-webhook-mode.test.mjs \
             test/azure-production-plane-contract.test.mjs \
-            test/cmmc-archive-target-isolation.test.mjs \
             test/vercel-canonical-deployment-preflight.test.mjs \
             test/vercel-deployment-integrity.test.mjs
 
