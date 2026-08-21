@@ -108,7 +108,7 @@ jobs:
           test "$(find release/application-pipeline-evidence -maxdepth 1 -name 'worker-*.json' | wc -l)" -eq 20
           if [ "$failed" -ne 0 ]; then exit 1; fi
       - name: Upload consolidated worker evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: application-worker-pool-${{ github.sha }}
           path: release/application-pipeline-evidence/**
@@ -170,7 +170,7 @@ jobs:
           console.log(`Validated ${catalog.applications.length} governed application release records without false production-artifact claims.`);
           NODE
       - name: Upload governed staging evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: application-production-staging-${{ github.sha }}
           path: |
