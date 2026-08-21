@@ -180,8 +180,8 @@ test("Azure secret delivery remains Key Vault referenced and does not embed secr
   assert.doesNotMatch(bicep, /sb_secret_[A-Za-z0-9]/);
 });
 
-test("Next.js produces a standalone artifact for App Service", async () => {
+test("Next.js keeps standalone output for App Service and defers to the Vercel adapter on Vercel", async () => {
   const config = await read("next.config.ts");
-  assert.match(config, /output:\s*"standalone"/);
+  assert.match(config, /output:\s*process\.env\.VERCEL\s*===\s*"1"\s*\?\s*undefined\s*:\s*"standalone"/);
   assert.match(config, /isProductionRuntime/);
 });
