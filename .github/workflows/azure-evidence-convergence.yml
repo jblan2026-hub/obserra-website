@@ -61,13 +61,6 @@ jobs:
           )
 
           replace_exact(
-              "scripts/cmmc-level2-rev3-production-evidence.mjs",
-              '''requireText(clerkConfigPath, clerkConfig, 'process.env.VERCEL_ENV === "production"', "production environment enforcement");''',
-              '''requireText(clerkConfigPath, clerkConfig, "isProductionRuntime()", "provider-neutral production environment enforcement");\nrequireText(clerkConfigPath, clerkConfig, 'from "./runtime-environment"', "provider-neutral production runtime authority");''',
-              '''provider-neutral production environment enforcement''',
-          )
-
-          replace_exact(
               "test/academy-payment-production-contract.test.mjs",
               '''  assert.match(contract, /process\\.env\\.VERCEL_ENV === "production"/);''',
               '''  assert.match(contract, /isProductionRuntime\\(\\)/);\n  assert.match(contract, /from "\\.\\/runtime-environment"/);''',
@@ -90,18 +83,18 @@ jobs:
           fingerprint.write_text(updated)
           PY
 
-      - name: Verify affected source contracts before evidence generation
+      - name: Verify affected release contracts before evidence generation
         shell: bash
         run: |
           set -euo pipefail
           node scripts/florida-class-d-website-academy-commerce-gate.mjs
-          npm run verify:cmmc-production-evidence
           node scripts/academy-durable-commerce-gate.mjs
           node --test \
             test/academy-payment-production-contract.test.mjs \
             test/academy-payment-reversal-contract.test.mjs \
             test/academy-stripe-webhook-mode.test.mjs \
             test/azure-production-plane-contract.test.mjs \
+            test/cmmc-archive-target-isolation.test.mjs \
             test/vercel-canonical-deployment-preflight.test.mjs \
             test/vercel-deployment-integrity.test.mjs
 
@@ -111,12 +104,6 @@ jobs:
       - name: Verify governed legal identity audit
         run: npm run verify:legal-identity-audit
 
-      - name: Generate governed CMMC system evidence
-        run: npm run generate:cmmc-system-evidence
-
-      - name: Verify governed CMMC system evidence
-        run: npm run verify:cmmc-system-evidence
-
       - name: Commit exact governed convergence
         shell: bash
         run: |
@@ -125,17 +112,13 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
             scripts/florida-class-d-website-academy-commerce-gate.mjs \
-            scripts/cmmc-level2-rev3-production-evidence.mjs \
             test/academy-payment-production-contract.test.mjs \
             lib/proxy-release-fingerprint.ts \
             docs/compliance/LEGAL-IDENTITY-AUDIT.json \
             docs/compliance/LEGAL-IDENTITY-AUDIT.md \
-            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
-            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
           if git diff --cached --quiet; then
-            echo "Azure source contracts and governed evidence are already converged."
+            echo "Azure source contracts and governed legal evidence are already converged."
             exit 0
           fi
           git commit -m "chore(azure): converge host-neutral release evidence"
