@@ -11,13 +11,13 @@ const SHARED_ACADEMY_PROJECT_REF = "nwxnyqlyzyufgoadtqxs";
 test("live CMMC archive requires dedicated archive credentials with no generic Supabase fallback", () => {
   assert.doesNotMatch(
     archiveScript,
-    /OBSERRA_CMMC_ARCHIVE_URL\s*\|\|\s*process\.env\.NEXT_PUBLIC_SUPABASE_URL/,
-    "CMMC archive URL must never fall back to the website/FDACS Supabase URL",
+    /NEXT_PUBLIC_SUPABASE_URL/,
+    "CMMC archive client must not reference the website/FDACS Supabase URL at all",
   );
   assert.doesNotMatch(
     archiveScript,
-    /OBSERRA_CMMC_ARCHIVE_SERVICE_ROLE_KEY\s*\|\|\s*process\.env\.SUPABASE_SERVICE_ROLE_KEY/,
-    "CMMC archive credential must never fall back to a shared Supabase service role",
+    /SUPABASE_SERVICE_ROLE_KEY/,
+    "CMMC archive client must not reference a shared Supabase service-role credential at all",
   );
   assert.match(
     workflow,
