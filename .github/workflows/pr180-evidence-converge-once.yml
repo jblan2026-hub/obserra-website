@@ -1,0 +1,106 @@
+name: PR180 evidence converge once
+
+on:
+  push:
+    branches:
+      - fix/academy-commerce-health-identity-readiness-20260821
+
+permissions:
+  contents: write
+
+jobs:
+  converge:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/academy-commerce-health-identity-readiness-20260821
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Remove helper before measured generation
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/pr180-evidence-converge-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/pr180-evidence-converge-once.yml
+          git commit -m "ci(compliance): remove PR180 evidence helper"
+          git push origin HEAD:fix/academy-commerce-health-identity-readiness-20260821
+          test -z "$(git status --porcelain)"
+
+      - name: Refresh legal identity evidence from clean source
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run generate:legal-identity-audit
+          npm run verify:legal-identity-audit
+          changed="$(git status --porcelain | awk '{print $2}' | sort)"
+          expected="$(printf '%s\n' 'docs/compliance/LEGAL-IDENTITY-AUDIT.json' 'docs/compliance/LEGAL-IDENTITY-AUDIT.md' 'docs/compliance/LEGAL-IDENTITY-AUDIT.sha256' | sort)"
+          test "${changed}" = "${expected}"
+          git add docs/compliance/LEGAL-IDENTITY-AUDIT.json docs/compliance/LEGAL-IDENTITY-AUDIT.md docs/compliance/LEGAL-IDENTITY-AUDIT.sha256
+          git commit -m "docs(compliance): refresh PR180 legal identity evidence"
+          git push origin HEAD:fix/academy-commerce-health-identity-readiness-20260821
+          test -z "$(git status --porcelain)"
+
+      - name: Refresh governed CMMC and FDACS evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run generate:cmmc-system-evidence
+          npm run generate:cmmc-disposition
+          npm run generate:cmmc-handoff
+          npm run generate:fdacs-pii-audit
+          npm run verify:cmmc-evidence
+
+      - name: Allow only generated evidence outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          allowed="$(printf '%s\n' \
+            'docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md' \
+            'docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256' \
+            'docs/compliance/CMMC-SYSTEM-EVIDENCE.json' \
+            'docs/compliance/CMMC-SYSTEM-EVIDENCE.md' \
+            'docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256' \
+            'docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json' \
+            'docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md' \
+            'docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256' \
+            'docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json' \
+            'docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md' \
+            'docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256' | sort)"
+          changed="$(git status --porcelain | awk '{print $2}' | sort)"
+          while IFS= read -r file; do
+            [ -z "${file}" ] && continue
+            grep -Fxq "${file}" <<<"${allowed}" || { echo "Unexpected generated change: ${file}" >&2; exit 1; }
+          done <<<"${changed}"
+          test -n "${changed}"
+
+      - name: Commit verified generated evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256 \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256 \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
+          git diff --cached --quiet && { echo "Expected generated evidence changes are absent" >&2; exit 1; }
+          git commit -m "docs(compliance): converge PR180 governed evidence"
+          git push origin HEAD:fix/academy-commerce-health-identity-readiness-20260821
+          test -z "$(git status --porcelain)"
