@@ -10,7 +10,7 @@ const baseHeaders = {
   "x-obserra-health-contract": "website-liveness-v1",
 };
 
-function runtimeValue(name: string) {
+function systemValue(name: string) {
   return process.env[name]?.trim() || null;
 }
 
@@ -19,11 +19,11 @@ function validReleaseSha(value: string | null) {
 }
 
 export async function GET() {
-  const observedProjectId = runtimeValue("VERCEL_PROJECT_ID");
-  const provider = runtimeValue("OBSERRA_HOSTING_PROVIDER") ?? (observedProjectId ? "vercel" : "unknown");
-  const expectedProvider = runtimeValue("OBSERRA_EXPECTED_HOSTING_PROVIDER") ?? (provider === "vercel" ? "vercel" : null);
-  const deploymentId = runtimeValue("OBSERRA_DEPLOYMENT_ID") ?? runtimeValue("VERCEL_DEPLOYMENT_ID");
-  const gitCommitSha = runtimeValue("OBSERRA_RELEASE_SHA") ?? runtimeValue("VERCEL_GIT_COMMIT_SHA");
+  const observedProjectId = systemValue("VERCEL_PROJECT_ID");
+  const provider = systemValue("OBSERRA_HOSTING_PROVIDER") ?? (observedProjectId ? "vercel" : "unknown");
+  const expectedProvider = systemValue("OBSERRA_EXPECTED_HOSTING_PROVIDER") ?? (provider === "vercel" ? "vercel" : null);
+  const deploymentId = systemValue("OBSERRA_DEPLOYMENT_ID") ?? systemValue("VERCEL_DEPLOYMENT_ID");
+  const gitCommitSha = systemValue("OBSERRA_RELEASE_SHA") ?? systemValue("VERCEL_GIT_COMMIT_SHA");
 
   const routingAuthority =
     observedProjectId === null
