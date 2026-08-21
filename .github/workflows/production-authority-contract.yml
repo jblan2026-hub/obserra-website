@@ -8,7 +8,6 @@ on:
       - ".github/workflows/production-vercel-public-cutover.yml"
       - ".github/workflows/production-e2e-operational-gate.yml"
       - "scripts/florida-class-d-website-academy-commerce-gate.mjs"
-      - "scripts/cmmc-level2-rev3-production-evidence.mjs"
       - "test/vercel-ignore-build.test.mjs"
       - "test/vercel-production-authority-consistency.test.mjs"
       - ".github/workflows/production-authority-contract.yml"
