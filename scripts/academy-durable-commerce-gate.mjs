@@ -239,13 +239,15 @@ for (const text of [
   "chargesEnabled",
   "academyStorageHealth",
   "academyPurchaserHashConfigured",
-  "identity.configured",
+  "prepareClerkRuntime",
+  "identity.ready",
   'status: operational ? 200 : 503',
   'idempotencyKey: "stripe-event-id"',
   'auditLedger: "durable-supabase"',
 ]) {
   requireText(commerceHealthFile, commerceHealth, text, "live Academy commerce health contract");
 }
+forbidText(commerceHealthFile, commerceHealth, "safeIdentity", "session-level identity dependency in public Academy commerce health");
 
 for (const text of [
   '.operational == true',
