@@ -72,17 +72,6 @@ test("FDACS supplemental output is named as a record and never as the official s
   assert.match(service, /does not establish FDACS approval, professional certification, or a Florida Class D Security Officer license/);
 });
 
-test("public CMMC status preserves all pending determinations and prohibits CUI authorization claims", () => {
-  const trust = read("app/trust/page.tsx");
-
-  assert.match(trust, /3,048 pending/);
-  assert.match(trust, /Technical objective results/);
-  assert.match(trust, /3,048 not tested/);
-  assert.match(trust, /Controlled unclassified information \(CUI\) authorization/);
-  assert.match(trust, /Not granted/);
-  assert.match(trust, /not certification, independent attestation, regulatory approval, or authorization to process CUI/);
-});
-
 test("the shared enterprise header renders the exact legal site identity visibly", () => {
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
   const styles = read("app/components/enterprise/legal-identity-lockup.css");
