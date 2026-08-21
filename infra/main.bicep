@@ -81,20 +81,6 @@ resource runtimeIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
   tags: tags
 }
 
-// Key Vault Secrets User: read-only data-plane access for App Service Key Vault references.
-resource runtimeKeyVaultSecretsUser 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(keyVault.id, runtimeIdentity.id, 'key-vault-secrets-user')
-  scope: keyVault
-  properties: {
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions',
-      '4633458b-17de-408a-b874-0445c86b69e6'
-    )
-    principalId: runtimeIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: appServicePlanName
   location: location
@@ -360,5 +346,7 @@ output webAppName string = webApp.name
 output productionHostName string = webApp.properties.defaultHostName
 output stagingHostName string = stagingSlot.properties.defaultHostName
 output keyVaultName string = keyVault.name
+output keyVaultId string = keyVault.id
 output runtimeIdentityClientId string = runtimeIdentity.properties.clientId
+output runtimeIdentityPrincipalId string = runtimeIdentity.properties.principalId
 output appServicePlanName string = appServicePlan.name
