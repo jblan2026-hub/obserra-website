@@ -19,7 +19,6 @@ concurrency:
 
 env:
   AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
-  AZURE_TENANT_ID: 5a08a33a-d2b5-491d-ac6d-32f325138143
   AZURE_LOCATION: eastus
   AZURE_RESOURCE_GROUP: rg-obserra-prod-eastus
   OBSERRA_WEBAPP_NAME: obserra-web-prod-38d660
@@ -46,16 +45,23 @@ jobs:
           ref: main
           fetch-depth: 1
 
-      - name: Require configured Azure OIDC client ID
+      - name: Require current-directory Azure OIDC identifiers
         shell: bash
         env:
           AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
         run: |
           set -euo pipefail
           test -n "${AZURE_CLIENT_ID:-}" || {
-            echo "::error::Repository variable AZURE_CLIENT_ID is not configured. Run scripts/azure-bootstrap-production.sh in Azure Cloud Shell and configure the returned client ID.";
+            echo "::error::Repository variable AZURE_CLIENT_ID is not configured. Use the value returned by scripts/azure-bootstrap-current-directory.sh.";
             exit 1;
           }
+          test -n "${AZURE_TENANT_ID:-}" || {
+            echo "::error::Repository variable AZURE_TENANT_ID is not configured. Use the subscription-current tenant returned by scripts/azure-bootstrap-current-directory.sh.";
+            exit 1;
+          }
+          echo "AZURE_TENANT_ID=${AZURE_TENANT_ID}" >> "${GITHUB_ENV}"
+          echo "AZURE_CLIENT_ID=${AZURE_CLIENT_ID}" >> "${GITHUB_ENV}"
 
       - name: Use Node.js 22
         uses: actions/setup-node@v6
@@ -97,7 +103,7 @@ jobs:
       - name: Authenticate to Azure with GitHub OIDC
         uses: azure/login@v2
         with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          client-id: ${{ env.AZURE_CLIENT_ID }}
           tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
