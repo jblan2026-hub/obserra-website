@@ -10,6 +10,9 @@ FEDERATED_CREDENTIAL="github-main"
 GITHUB_SUBJECT="repo:jblan2026-hub/obserra-website:ref:refs/heads/main"
 OIDC_ISSUER="https://token.actions.githubusercontent.com"
 OIDC_AUDIENCE="api://AzureADTokenExchange"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+BICEP_TEMPLATE="${REPO_ROOT}/infra/main.bicep"
 
 required_commands=(az jq grep)
 for command_name in "${required_commands[@]}"; do
@@ -18,6 +21,12 @@ for command_name in "${required_commands[@]}"; do
     exit 1
   fi
 done
+
+if [[ ! -f "${BICEP_TEMPLATE}" ]]; then
+  echo "Azure infrastructure template is missing: ${BICEP_TEMPLATE}" >&2
+  echo "Run this script from a checkout of jblan2026-hub/obserra-website." >&2
+  exit 1
+fi
 
 az account set --subscription "${SUBSCRIPTION_ID}"
 ACCOUNT_JSON="$(az account show --output json)"
@@ -33,13 +42,9 @@ if [[ "${ACTUAL_TENANT}" != "${TENANT_ID}" ]]; then
   exit 1
 fi
 
-# Confirm the approved region exists and the selected Linux Standard App Service SKU is offered there.
+# Confirm the approved Azure region exists for this subscription context. Actual
+# service/SKU capacity and policy enforcement are proven by the real Bicep deployment below.
 az account list-locations --query "[?name=='${LOCATION}'].name" -o tsv | grep -Fxq "${LOCATION}"
-APP_SERVICE_LOCATIONS="$(az appservice list-locations --sku S1 --linux-workers-enabled true -o json)"
-if ! jq -e 'any(.[]; ((.name // "") | ascii_downcase) == "east us" or ((.name // "") | ascii_downcase) == "eastus")' <<<"${APP_SERVICE_LOCATIONS}" >/dev/null; then
-  echo "Standard S1 Linux App Service is not reported as available in East US for this subscription." >&2
-  exit 1
-fi
 
 # Register only the providers required by this production plane.
 providers=(
@@ -60,7 +65,7 @@ for provider in "${providers[@]}"; do
   fi
 done
 
-# Capture policy assignments before mutation for an auditable bootstrap record.
+# Capture subscription policy assignments before mutation for an auditable bootstrap record.
 POLICY_FILE="${HOME}/obserra-azure-policy-assignments.json"
 az policy assignment list --scope "/subscriptions/${SUBSCRIPTION_ID}" -o json > "${POLICY_FILE}"
 POLICY_COUNT="$(jq 'length' "${POLICY_FILE}")"
@@ -108,8 +113,8 @@ if ! az identity federated-credential show \
     >/dev/null
 fi
 
-# Contributor deploys the resources. User Access Administrator is required only so the
-# Bicep deployment can grant the runtime identity Key Vault data-plane access.
+# Contributor deploys resources. User Access Administrator is required only so the Bicep
+# deployment can grant the runtime managed identity read-only Key Vault secret access.
 for role in "Contributor" "User Access Administrator"; do
   if ! az role assignment list \
     --assignee-object-id "${PRINCIPAL_ID}" \
@@ -125,7 +130,7 @@ for role in "Contributor" "User Access Administrator"; do
   fi
 done
 
-# Verify the exact federation and least-privilege resource-group scope before returning success.
+# Verify the exact GitHub federation and resource-group-only deployment authority.
 FEDERATED_JSON="$(az identity federated-credential show \
   --resource-group "${RESOURCE_GROUP}" \
   --identity-name "${DEPLOY_IDENTITY}" \
@@ -140,6 +145,31 @@ ROLE_JSON="$(az role assignment list --assignee-object-id "${PRINCIPAL_ID}" --sc
 jq -e 'any(.[]; .roleDefinitionName == "Contributor")' <<<"${ROLE_JSON}" >/dev/null
 jq -e 'any(.[]; .roleDefinitionName == "User Access Administrator")' <<<"${ROLE_JSON}" >/dev/null
 
+# Provision the actual Azure plane under the interactive Owner session. This is the live
+# policy/SKU/capacity preflight: any Azure Policy, provider, quota, or SKU restriction fails
+# the bootstrap rather than being papered over by a source-only readiness claim.
+DEPLOYMENT_FILE="${HOME}/obserra-azure-bootstrap-deployment.json"
+az deployment group create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "obserra-bootstrap-$(date -u +%Y%m%d%H%M%S)" \
+  --template-file "${BICEP_TEMPLATE}" \
+  --parameters location="${LOCATION}" \
+  --mode Incremental \
+  --only-show-errors \
+  --output json > "${DEPLOYMENT_FILE}"
+
+test "$(jq -r '.properties.provisioningState' "${DEPLOYMENT_FILE}")" = "Succeeded"
+WEB_APP_NAME="$(jq -r '.properties.outputs.webAppName.value' "${DEPLOYMENT_FILE}")"
+PRODUCTION_HOST="$(jq -r '.properties.outputs.productionHostName.value' "${DEPLOYMENT_FILE}")"
+STAGING_HOST="$(jq -r '.properties.outputs.stagingHostName.value' "${DEPLOYMENT_FILE}")"
+KEY_VAULT_NAME="$(jq -r '.properties.outputs.keyVaultName.value' "${DEPLOYMENT_FILE}")"
+RUNTIME_IDENTITY_CLIENT_ID="$(jq -r '.properties.outputs.runtimeIdentityClientId.value' "${DEPLOYMENT_FILE}")"
+
+test -n "${WEB_APP_NAME}" && test "${WEB_APP_NAME}" != "null"
+test -n "${PRODUCTION_HOST}" && test "${PRODUCTION_HOST}" != "null"
+test -n "${STAGING_HOST}" && test "${STAGING_HOST}" != "null"
+test -n "${KEY_VAULT_NAME}" && test "${KEY_VAULT_NAME}" != "null"
+
 cat <<EOF
 OBSERRA_AZURE_BOOTSTRAP=verified
 AZURE_SUBSCRIPTION_ID=${SUBSCRIPTION_ID}
@@ -150,4 +180,11 @@ AZURE_CLIENT_ID=${CLIENT_ID}
 AZURE_DEPLOY_IDENTITY=${DEPLOY_IDENTITY}
 GITHUB_OIDC_SUBJECT=${GITHUB_SUBJECT}
 POLICY_ASSIGNMENT_COUNT=${POLICY_COUNT}
+AZURE_WEBAPP_NAME=${WEB_APP_NAME}
+AZURE_PRODUCTION_HOST=https://${PRODUCTION_HOST}
+AZURE_STAGING_HOST=https://${STAGING_HOST}
+AZURE_KEY_VAULT_NAME=${KEY_VAULT_NAME}
+AZURE_RUNTIME_IDENTITY_CLIENT_ID=${RUNTIME_IDENTITY_CLIENT_ID}
+AZURE_POLICY_RECORD=${POLICY_FILE}
+AZURE_DEPLOYMENT_RECORD=${DEPLOYMENT_FILE}
 EOF
