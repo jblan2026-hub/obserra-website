@@ -1,6 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
+import { safeAcademyIdentity } from "../../../../lib/academy-identity";
 import { lessonBrief } from "../../../academy/courseExperience";
 
 export const runtime = "nodejs";
@@ -61,8 +61,11 @@ function groundedPreviewAnswer(question: string, lesson: NonNullable<ReturnType<
 }
 
 export async function POST(request: Request) {
-  const { userId } = await auth();
-  if (!userId) {
+  const identity = await safeAcademyIdentity();
+  if (!identity.configured || identity.status === "claims_unavailable") {
+    return NextResponse.json({ error: "Identity service is unavailable" }, { status: 503, headers: responseHeaders });
+  }
+  if (!identity.principalId || !identity.identity) {
     return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers: responseHeaders });
   }
 
@@ -82,7 +85,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid tutor request" }, { status: 400, headers: responseHeaders });
   }
 
-  const state = await academyStateWithOwnerAccess(userId, courseId);
+  const state = await academyStateWithOwnerAccess(
+    identity.principalId,
+    courseId,
+    identity.identity.roles,
+  );
   if (!state.entitlements[courseId]) {
     return NextResponse.json({ error: "Paid course access is required" }, { status: 403, headers: responseHeaders });
   }

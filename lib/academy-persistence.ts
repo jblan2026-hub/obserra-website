@@ -6,6 +6,15 @@ import { academyCommerceStorageReady } from "./academy-payment";
 const COURSE_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
 
+/**
+ * Persistence compatibility boundary.
+ *
+ * The deployed Academy schema predates the Supabase identity cutover and still names
+ * its canonical learner key `clerk_user_id` / `p_clerk_user_id`. During the runtime
+ * migration that legacy field stores the Obserra Academy canonical `principalId`.
+ * No Clerk semantics are inferred from this field. A separate expand/contract database
+ * migration will rename the column and RPC arguments after runtime identity is stable.
+ */
 export type DurableAcademyState = {
   clerk_user_id: string;
   course_slug: string;
@@ -179,10 +188,14 @@ export async function durableAcademyAggregateMetrics() {
   return rpc<DurableAcademyAggregateMetrics>("academy_aggregate_metrics", {});
 }
 
-export async function durableAcademyState(userId: string, courseId: string) {
-  if (!userId || !COURSE_ID_PATTERN.test(courseId)) return null;
+export function durableAcademyPrincipalId(state: DurableAcademyState) {
+  return state.clerk_user_id;
+}
+
+export async function durableAcademyState(principalId: string, courseId: string) {
+  if (!principalId || !COURSE_ID_PATTERN.test(courseId)) return null;
   return rpc<DurableAcademyState | null>("academy_get_learner_state", {
-    p_clerk_user_id: userId,
+    p_clerk_user_id: principalId,
     p_course_slug: courseId,
   });
 }
@@ -251,7 +264,7 @@ export async function recordPaidCheckout(input: {
   courseId: string;
   courseVersion: string;
   identityMode: "authenticated" | "guest-email";
-  clerkUserId?: string;
+  academyPrincipalId?: string;
   purchaserEmail?: string;
 }) {
   requireCourseVersion(input.courseId, input.courseVersion);
@@ -266,7 +279,7 @@ export async function recordPaidCheckout(input: {
       p_course_slug: input.courseId,
       p_course_version: input.courseVersion,
       p_identity_mode: input.identityMode,
-      p_clerk_user_id: input.clerkUserId ?? "",
+      p_clerk_user_id: input.academyPrincipalId ?? "",
       p_purchaser_email_hash: purchaserHash,
     },
   );
@@ -317,7 +330,7 @@ export async function claimPaidCheckout(input: {
   checkoutSessionId: string;
   courseId: string;
   courseVersion: string;
-  clerkUserId: string;
+  academyPrincipalId: string;
   purchaserEmail?: string;
 }) {
   requireCourseVersion(input.courseId, input.courseVersion);
@@ -325,8 +338,37 @@ export async function claimPaidCheckout(input: {
     p_checkout_session_id: input.checkoutSessionId,
     p_course_slug: input.courseId,
     p_course_version: input.courseVersion,
-    p_clerk_user_id: input.clerkUserId,
+    p_clerk_user_id: input.academyPrincipalId,
     p_purchaser_email_hash: input.purchaserEmail ? purchaserEmailHash(input.purchaserEmail) : "",
+  });
+}
+
+type AcademyStateProvisionInput = {
+  principalId: string;
+  courseId: string;
+  courseVersion: string;
+  enrolledAt: string;
+  paymentReference: string;
+  completedLessons: number[];
+  assessmentScore?: number;
+  completedAt?: string;
+  certificateId?: string;
+  signedCertificate?: Record<string, unknown>;
+};
+
+export async function provisionAcademyPrincipalState(input: AcademyStateProvisionInput) {
+  requireCourseVersion(input.courseId, input.courseVersion);
+  return rpc<DurableAcademyState>("academy_import_legacy_state", {
+    p_clerk_user_id: input.principalId,
+    p_course_slug: input.courseId,
+    p_enrolled_at: input.enrolledAt,
+    p_payment_reference: input.paymentReference,
+    p_completed_lessons: input.completedLessons,
+    p_assessment_score: input.assessmentScore ?? null,
+    p_completed_at: input.completedAt ?? null,
+    p_certificate_id: input.certificateId ?? "",
+    p_signed_certificate: input.signedCertificate ?? null,
+    p_course_version: input.courseVersion,
   });
 }
 
@@ -342,23 +384,22 @@ export async function importLegacyAcademyState(input: {
   certificateId?: string;
   signedCertificate?: Record<string, unknown>;
 }) {
-  requireCourseVersion(input.courseId, input.courseVersion);
-  return rpc<DurableAcademyState>("academy_import_legacy_state", {
-    p_clerk_user_id: input.userId,
-    p_course_slug: input.courseId,
-    p_enrolled_at: input.enrolledAt,
-    p_payment_reference: input.paymentReference,
-    p_completed_lessons: input.completedLessons,
-    p_assessment_score: input.assessmentScore ?? null,
-    p_completed_at: input.completedAt ?? null,
-    p_certificate_id: input.certificateId ?? "",
-    p_signed_certificate: input.signedCertificate ?? null,
-    p_course_version: input.courseVersion,
+  return provisionAcademyPrincipalState({
+    principalId: input.userId,
+    courseId: input.courseId,
+    courseVersion: input.courseVersion,
+    enrolledAt: input.enrolledAt,
+    paymentReference: input.paymentReference,
+    completedLessons: input.completedLessons,
+    assessmentScore: input.assessmentScore,
+    completedAt: input.completedAt,
+    certificateId: input.certificateId,
+    signedCertificate: input.signedCertificate,
   });
 }
 
 export async function completeDurableLesson(input: {
-  userId: string;
+  principalId: string;
   courseId: string;
   lessonIndex: number;
   lessonCount: number;
@@ -366,7 +407,7 @@ export async function completeDurableLesson(input: {
 }) {
   requireCourseVersion(input.courseId, input.courseVersion);
   return rpc<DurableAcademyState>("academy_complete_lesson", {
-    p_clerk_user_id: input.userId,
+    p_clerk_user_id: input.principalId,
     p_course_slug: input.courseId,
     p_lesson_index: input.lessonIndex,
     p_lesson_count: input.lessonCount,
@@ -375,7 +416,7 @@ export async function completeDurableLesson(input: {
 }
 
 export async function recordDurableAssessment(input: {
-  userId: string;
+  principalId: string;
   courseId: string;
   score: number;
   correctCount: number;
@@ -388,7 +429,7 @@ export async function recordDurableAssessment(input: {
 }) {
   requireCourseVersion(input.courseId, input.assessmentVersion);
   return rpc<DurableAcademyState>("academy_record_assessment", {
-    p_clerk_user_id: input.userId,
+    p_clerk_user_id: input.principalId,
     p_course_slug: input.courseId,
     p_score: input.score,
     p_correct_count: input.correctCount,

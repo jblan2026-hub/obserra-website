@@ -1,15 +1,16 @@
 import "server-only";
 
-import { clerkClient } from "@clerk/nextjs/server";
 import { courses } from "../app/academy/courseData";
 import { studioCoursePublicationMetadataById } from "../app/academy/studioCatalog";
+import type { ObserraAuthorizationRole } from "./auth/claims";
 import {
   claimPaidCheckout,
   completeDurableLesson,
   durableAcademyAggregateMetrics,
+  durableAcademyPrincipalId,
   durableAcademyState,
   durableCertificate,
-  importLegacyAcademyState,
+  provisionAcademyPrincipalState,
   recordDurableAssessment,
   type DurableAcademyState,
 } from "./academy-persistence";
@@ -78,49 +79,8 @@ function stateFromDurableState(value: DurableAcademyState): AcademyState {
   };
 }
 
-export function academyStateFromUser(user: { privateMetadata: Record<string, unknown> }): AcademyState {
-  const raw = user.privateMetadata?.academy;
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return emptyState();
-  const candidate = raw as Partial<AcademyState>;
-  return {
-    entitlements: candidate.entitlements && typeof candidate.entitlements === "object" ? candidate.entitlements : {},
-    progress: candidate.progress && typeof candidate.progress === "object" ? candidate.progress : {},
-  };
-}
-
-function validIsoDate(value: string | undefined, fallback: string) {
-  return value && Number.isFinite(Date.parse(value)) ? value : fallback;
-}
-
-async function migrateLegacyCourseState(userId: string, courseId: string, state: AcademyState) {
-  const entitlement = state.entitlements[courseId];
-  if (!entitlement) return null;
-  const course = courseForId(courseId);
-  if (!course) return null;
-  const progress = state.progress[courseId];
-  const completedLessons = (progress?.completedLessons ?? [])
-    .filter((item) => Number.isSafeInteger(item) && item >= 0 && item < course.modules.length);
-  const hasCompleteCertificate = Boolean(
-    progress?.completedAt && progress.certificateId && progress.signedCertificate,
-  );
-  return importLegacyAcademyState({
-    userId,
-    courseId,
-    courseVersion: governedCourseVersion(courseId),
-    enrolledAt: validIsoDate(entitlement.enrolledAt, new Date().toISOString()),
-    paymentReference: entitlement.paymentReference?.slice(0, 255) || "legacy-metadata-import",
-    completedLessons,
-    assessmentScore: typeof progress?.assessmentScore === "number" ? progress.assessmentScore : undefined,
-    completedAt: hasCompleteCertificate ? progress?.completedAt : undefined,
-    certificateId: hasCompleteCertificate ? progress?.certificateId : undefined,
-    signedCertificate: hasCompleteCertificate
-      ? progress?.signedCertificate as unknown as Record<string, unknown>
-      : undefined,
-  });
-}
-
 export async function claimCourseAccess(input: {
-  userId: string;
+  principalId: string;
   courseId: string;
   courseVersion: string;
   checkoutSessionId: string;
@@ -130,16 +90,16 @@ export async function claimCourseAccess(input: {
     checkoutSessionId: input.checkoutSessionId,
     courseId: input.courseId,
     courseVersion: input.courseVersion,
-    clerkUserId: input.userId,
+    academyPrincipalId: input.principalId,
     purchaserEmail: input.purchaserEmail,
   });
 }
 
-export async function markLessonComplete(userId: string, courseId: string, lessonIndex: number) {
+export async function markLessonComplete(principalId: string, courseId: string, lessonIndex: number) {
   const course = courseForId(courseId);
   if (!course || lessonIndex < 0 || lessonIndex >= course.modules.length) throw new Error("Invalid course lesson");
   const durable = await completeDurableLesson({
-    userId,
+    principalId,
     courseId,
     lessonIndex,
     lessonCount: course.modules.length,
@@ -149,14 +109,19 @@ export async function markLessonComplete(userId: string, courseId: string, lesso
 }
 
 export async function recordAssessment(
-  userId: string,
+  principalId: string,
   courseId: string,
   score: number,
-  result: { correctCount: number; questionCount: number },
+  result: {
+    correctCount: number;
+    questionCount: number;
+    learnerName: string;
+    roles?: readonly ObserraAuthorizationRole[];
+  },
 ) {
   const course = courseForId(courseId);
   if (!course) throw new Error("Unknown course");
-  const state = await academyStateWithOwnerAccess(userId, courseId);
+  const state = await academyStateWithOwnerAccess(principalId, courseId, result.roles ?? []);
   if (!state.entitlements[courseId]) throw new Error("Enrollment required");
   const current = state.progress[courseId] ?? { completedLessons: [] };
   if (current.completedLessons.length !== course.modules.length) throw new Error("Complete every lesson before the assessment");
@@ -176,13 +141,14 @@ export async function recordAssessment(
       courseId,
       courseTitle: course.title,
       courseVersion: governedCourseVersion(courseId),
+      learnerName: result.learnerName,
       completedAt,
       assessmentScore: score,
     });
   }
 
   const durable = await recordDurableAssessment({
-    userId,
+    principalId,
     courseId,
     score,
     correctCount: result.correctCount,
@@ -196,35 +162,19 @@ export async function recordAssessment(
   return progressFromDurableState(durable);
 }
 
-export function ownerEmailAllowed(emails: string[]) {
-  const singleOwner = process.env.OBSERRA_OWNER_EMAIL?.trim().toLowerCase();
-  const ownerList = (process.env.OBSERRA_OWNER_EMAILS ?? "")
-    .split(",")
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean);
-  const approvedOwners = new Set<string>(singleOwner ? [singleOwner, ...ownerList] : ownerList);
-  return approvedOwners.size > 0 && emails.some((email) => approvedOwners.has(email.toLowerCase()));
-}
-
-function emailsForUser(user: { emailAddresses: { emailAddress: string }[] }) {
-  return user.emailAddresses.map((item) => item.emailAddress);
-}
-
-export async function academyStateWithOwnerAccess(userId: string, courseId: string) {
+export async function academyStateWithOwnerAccess(
+  principalId: string,
+  courseId: string,
+  roles: readonly ObserraAuthorizationRole[] = [],
+) {
   const course = courseForId(courseId);
   if (!course) throw new Error("Unknown course");
-  const durable = await durableAcademyState(userId, courseId);
+  const durable = await durableAcademyState(principalId, courseId);
   if (durable) return stateFromDurableState(durable);
+  if (!roles.includes("owner")) return emptyState();
 
-  const client = await clerkClient();
-  const user = await client.users.getUser(userId);
-  const legacy = academyStateFromUser(user);
-  const migrated = await migrateLegacyCourseState(userId, courseId, legacy);
-  if (migrated) return stateFromDurableState(migrated);
-  if (!ownerEmailAllowed(emailsForUser(user))) return emptyState();
-
-  const ownerState = await importLegacyAcademyState({
-    userId,
+  const ownerState = await provisionAcademyPrincipalState({
+    principalId,
     courseId,
     courseVersion: governedCourseVersion(courseId),
     enrolledAt: new Date().toISOString(),
@@ -234,8 +184,8 @@ export async function academyStateWithOwnerAccess(userId: string, courseId: stri
   return stateFromDurableState(ownerState);
 }
 
-function verifiedCertificateResult(
-  user: { firstName: string | null; lastName: string | null },
+async function verifiedCertificateResult(
+  learnerName: string,
   courseId: string,
   progress: CourseProgress,
 ) {
@@ -250,14 +200,13 @@ function verifiedCertificateResult(
     signed.courseId !== courseId ||
     signed.certificateId !== progress.certificateId
   ) return null;
-  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
   return {
     valid: true as const,
     certificateId: progress.certificateId,
-    learnerName: fullName || "Obserra Academy Learner",
+    learnerName,
     courseId,
-    courseTitle: signed.schemaVersion === "1.1" ? signed.courseTitle : course.title,
-    courseVersion: signed.schemaVersion === "1.1" ? signed.courseVersion : governedCourseVersion(courseId),
+    courseTitle: signed.schemaVersion === "1.0" ? course.title : signed.courseTitle,
+    courseVersion: signed.schemaVersion === "1.0" ? governedCourseVersion(courseId) : signed.courseVersion,
     completedAt: progress.completedAt,
     assessmentScore: progress.assessmentScore,
     trainingHours: course.duration,
@@ -272,32 +221,20 @@ function verifiedCertificateResult(
 export async function findVerifiedCertificate(certificateId: string) {
   const normalized = certificateId.trim().toUpperCase();
   if (!normalized || normalized.length > 180 || !certificateSigningReady()) return null;
-  const client = await clerkClient();
   const durable = await durableCertificate(normalized);
   if (durable) {
-    const user = await client.users.getUser(durable.clerk_user_id);
-    return verifiedCertificateResult(user, durable.course_slug, progressFromDurableState(durable));
+    const progress = progressFromDurableState(durable);
+    const signed = progress.signedCertificate;
+    let learnerName = signed?.schemaVersion === "1.2" ? signed.learnerName : null;
+    if (!learnerName) {
+      const { legacyClerkLearnerName } = await import("./academy-legacy-clerk");
+      learnerName = await legacyClerkLearnerName(durableAcademyPrincipalId(durable));
+    }
+    return verifiedCertificateResult(learnerName || "Obserra Academy Learner", durable.course_slug, progress);
   }
 
-  const pageSize = 100;
-  let offset = 0;
-  let totalCount = 0;
-  do {
-    const page = await client.users.getUserList({ limit: pageSize, offset });
-    totalCount = page.totalCount;
-    for (const user of page.data) {
-      const legacy = academyStateFromUser(user);
-      for (const [courseId, progress] of Object.entries(legacy.progress)) {
-        if (progress.certificateId?.toUpperCase() !== normalized) continue;
-        const verified = verifiedCertificateResult(user, courseId, progress);
-        if (!verified) return null;
-        await migrateLegacyCourseState(user.id, courseId, legacy);
-        return verified;
-      }
-    }
-    offset += page.data.length;
-  } while (offset < totalCount && offset < 10_000);
-  return null;
+  const { findLegacyClerkCertificate } = await import("./academy-legacy-clerk");
+  return findLegacyClerkCertificate(normalized);
 }
 
 export async function getAcademyAggregateMetrics() {

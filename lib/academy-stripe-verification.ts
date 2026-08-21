@@ -15,7 +15,7 @@ const MATERIAL_METADATA_KEYS = [
   "expectedAmountCents",
   "checkoutAttemptId",
   "identityMode",
-  "clerkUserId",
+  "academyPrincipalId",
   "purchaserReference",
 ] as const;
 

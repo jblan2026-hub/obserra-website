@@ -16,7 +16,7 @@ export type LegacyCertificateClaim = {
   issuer: typeof CERTIFICATE_ISSUER;
 };
 
-export type CertificateClaim = {
+export type Version11CertificateClaim = {
   schemaVersion: "1.1";
   certificateId: string;
   courseId: string;
@@ -28,7 +28,20 @@ export type CertificateClaim = {
   issuer: typeof CERTIFICATE_ISSUER;
 };
 
-export type SignedCertificateClaim = (LegacyCertificateClaim | CertificateClaim) & {
+export type CertificateClaim = {
+  schemaVersion: "1.2";
+  certificateId: string;
+  courseId: string;
+  courseTitle: string;
+  courseVersion: string;
+  learnerName: string;
+  completedAt: string;
+  assessmentScore: number;
+  signerName: typeof CERTIFICATE_SIGNER_NAME;
+  issuer: typeof CERTIFICATE_ISSUER;
+};
+
+export type SignedCertificateClaim = (LegacyCertificateClaim | Version11CertificateClaim | CertificateClaim) & {
   signatureAlgorithm: typeof CERTIFICATE_SIGNATURE_ALGORITHM;
   signature: string;
   publicKeyFingerprint: string;
@@ -40,12 +53,25 @@ function normalizePem(value: string | undefined, variableName: string) {
   return normalized;
 }
 
-function canonicalClaim(claim: LegacyCertificateClaim | CertificateClaim) {
+function canonicalClaim(claim: LegacyCertificateClaim | Version11CertificateClaim | CertificateClaim) {
   if (claim.schemaVersion === "1.0") {
     return JSON.stringify({
       schemaVersion: claim.schemaVersion,
       certificateId: claim.certificateId,
       courseId: claim.courseId,
+      completedAt: claim.completedAt,
+      assessmentScore: claim.assessmentScore,
+      signerName: claim.signerName,
+      issuer: claim.issuer,
+    });
+  }
+  if (claim.schemaVersion === "1.1") {
+    return JSON.stringify({
+      schemaVersion: claim.schemaVersion,
+      certificateId: claim.certificateId,
+      courseId: claim.courseId,
+      courseTitle: claim.courseTitle,
+      courseVersion: claim.courseVersion,
       completedAt: claim.completedAt,
       assessmentScore: claim.assessmentScore,
       signerName: claim.signerName,
@@ -58,6 +84,7 @@ function canonicalClaim(claim: LegacyCertificateClaim | CertificateClaim) {
     courseId: claim.courseId,
     courseTitle: claim.courseTitle,
     courseVersion: claim.courseVersion,
+    learnerName: claim.learnerName,
     completedAt: claim.completedAt,
     assessmentScore: claim.assessmentScore,
     signerName: claim.signerName,
@@ -92,11 +119,12 @@ export function certificateSigningReady() {
 
 export function signCertificateClaim(input: Omit<CertificateClaim, "schemaVersion" | "signerName" | "issuer">): SignedCertificateClaim {
   const claim: CertificateClaim = {
-    schemaVersion: "1.1",
+    schemaVersion: "1.2",
     certificateId: input.certificateId,
     courseId: input.courseId,
     courseTitle: input.courseTitle,
     courseVersion: input.courseVersion,
+    learnerName: input.learnerName,
     completedAt: input.completedAt,
     assessmentScore: input.assessmentScore,
     signerName: CERTIFICATE_SIGNER_NAME,
@@ -112,11 +140,12 @@ export function signCertificateClaim(input: Omit<CertificateClaim, "schemaVersio
 }
 
 export function verifyCertificateClaim(claim: SignedCertificateClaim) {
-  if (claim.schemaVersion !== "1.0" && claim.schemaVersion !== "1.1") return false;
+  if (claim.schemaVersion !== "1.0" && claim.schemaVersion !== "1.1" && claim.schemaVersion !== "1.2") return false;
   if (claim.signatureAlgorithm !== CERTIFICATE_SIGNATURE_ALGORITHM) return false;
   if (claim.signerName !== CERTIFICATE_SIGNER_NAME || claim.issuer !== CERTIFICATE_ISSUER) return false;
   if (claim.publicKeyFingerprint !== publicKeyFingerprint()) return false;
-  if (claim.schemaVersion === "1.1" && (!claim.courseTitle?.trim() || !/^\d+\.\d+\.\d+$/.test(claim.courseVersion))) return false;
+  if (claim.schemaVersion !== "1.0" && (!claim.courseTitle?.trim() || !/^\d+\.\d+\.\d+$/.test(claim.courseVersion))) return false;
+  if (claim.schemaVersion === "1.2" && (!claim.learnerName?.trim() || claim.learnerName.length > 160 || /[\u0000-\u001f\u007f]/.test(claim.learnerName))) return false;
   return verify(
     null,
     Buffer.from(canonicalClaim(claim), "utf8"),

@@ -24,6 +24,8 @@ const persistenceFile = "lib/academy-persistence.ts";
 const paymentFile = "lib/academy-payment.ts";
 const academyStripeFile = "lib/academy-stripe.ts";
 const academyFile = "lib/academy.ts";
+const academyIdentityFile = "lib/academy-identity.ts";
+const legacyClerkFile = "lib/academy-legacy-clerk.ts";
 const requestFile = "lib/academy-request.ts";
 const checkoutFile = "app/api/academy/checkout/route.ts";
 const webhookFile = "app/api/webhook/stripe/route.ts";
@@ -43,6 +45,8 @@ const persistence = read(persistenceFile);
 const payment = read(paymentFile);
 const academyStripe = read(academyStripeFile);
 const academy = read(academyFile);
+const academyIdentity = read(academyIdentityFile);
+const legacyClerk = read(legacyClerkFile);
 const request = read(requestFile);
 const checkout = read(checkoutFile);
 const webhook = read(webhookFile);
@@ -179,7 +183,10 @@ forbidText(persistenceFile, persistence, "NEXT_PUBLIC_", "client-exposed Academy
 forbidText(persistenceFile, persistence, "supabase.co", "hard-coded Academy storage project");
 
 requireText(academyFile, academy, "durableAcademyState", "durable learner-state primary read");
-requireText(academyFile, academy, "importLegacyAcademyState", "one-time Clerk metadata migration");
+requireText(academyIdentityFile, academyIdentity, "safeSupabaseIdentity", "Supabase learner identity authority");
+requireText(academyIdentityFile, academyIdentity, "academyIdentityRuntimeReady", "session-independent Supabase identity readiness");
+requireText(legacyClerkFile, legacyClerk, "importLegacyAcademyState", "isolated one-time Clerk metadata migration");
+forbidText(academyFile, academy, "@clerk/nextjs/server", "Clerk runtime dependency in canonical Academy domain service");
 requireText(academyFile, academy, "durableCertificate", "durable certificate lookup");
 requireText(academyFile, academy, "durableAcademyAggregateMetrics", "durable administrative metrics");
 forbidText(academyFile, academy, "updateUserMetadata", "new Clerk private-metadata writes");
@@ -239,8 +246,9 @@ for (const text of [
   "chargesEnabled",
   "academyStorageHealth",
   "academyPurchaserHashConfigured",
-  "prepareClerkRuntime",
-  "identity.ready",
+  "academyIdentityRuntimeReady",
+  "academyIdentityEnvironment",
+  "identityReady",
   'status: operational ? 200 : 503',
   'idempotencyKey: "stripe-event-id"',
   'auditLedger: "durable-supabase"',
@@ -248,6 +256,8 @@ for (const text of [
   requireText(commerceHealthFile, commerceHealth, text, "live Academy commerce health contract");
 }
 forbidText(commerceHealthFile, commerceHealth, "safeIdentity", "session-level identity dependency in public Academy commerce health");
+forbidText(commerceHealthFile, commerceHealth, "safeAcademyIdentity", "learner-session dependency in public Academy commerce health");
+forbidText(commerceHealthFile, commerceHealth, "prepareClerkRuntime", "Clerk learner identity dependency in public Academy commerce health");
 
 for (const text of [
   '.operational == true',

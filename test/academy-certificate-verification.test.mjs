@@ -4,6 +4,7 @@ import test from "node:test";
 
 const route = fs.readFileSync("app/api/academy/certificate/verify/route.ts", "utf8");
 const academy = fs.readFileSync("lib/academy.ts", "utf8");
+const legacyClerk = fs.readFileSync("lib/academy-legacy-clerk.ts", "utf8");
 const signing = fs.readFileSync("lib/certificate-signing.ts", "utf8");
 const certificatePage = fs.readFileSync("app/academy/certificate/[courseId]/page.tsx", "utf8");
 const certificateView = fs.readFileSync("app/academy/certificate/[courseId]/CertificateView.tsx", "utf8");
@@ -58,33 +59,41 @@ test("public certificate verification minimizes learner data while preserving co
   assert.doesNotMatch(publicPayload, /paymentReference/);
 });
 
-test("new signed certificate claims bind canonical course title and semantic version", () => {
-  assert.match(signing, /schemaVersion: "1\.1"/);
+test("new signed certificate claims bind learner name, canonical course title, and semantic version", () => {
+  assert.match(signing, /schemaVersion: "1\.2"/);
   assert.match(signing, /courseTitle: string/);
   assert.match(signing, /courseVersion: string/);
-  assert.match(signing, /courseTitle: claim\.courseTitle/);
-  assert.match(signing, /courseVersion: claim\.courseVersion/);
+  assert.match(signing, /learnerName: string/);
+  assert.match(signing, /courseTitle: input\.courseTitle/);
+  assert.match(signing, /courseVersion: input\.courseVersion/);
+  assert.match(signing, /learnerName: input\.learnerName/);
   assert.match(signing, /\^\\d\+\\\.\\d\+\\\.\\d\+\$/);
   assert.match(academy, /courseTitle: course\.title/);
   assert.match(academy, /courseVersion: governedCourseVersion\(courseId\)/);
+  assert.match(academy, /learnerName: result\.learnerName/);
 });
 
-test("legacy schema 1.0 certificates remain explicitly supported", () => {
+test("legacy schema 1.0 and 1.1 certificates remain explicitly supported", () => {
   assert.match(signing, /schemaVersion: "1\.0"/);
-  assert.match(signing, /claim\.schemaVersion !== "1\.0" && claim\.schemaVersion !== "1\.1"/);
-  assert.match(academy, /signed\.schemaVersion === "1\.1" \? signed\.courseTitle : course\.title/);
+  assert.match(signing, /schemaVersion: "1\.1"/);
+  assert.match(signing, /claim\.schemaVersion !== "1\.0" && claim\.schemaVersion !== "1\.1" && claim\.schemaVersion !== "1\.2"/);
+  assert.match(academy, /signed\.schemaVersion === "1\.0" \? course\.title : signed\.courseTitle/);
+  assert.match(academy, /signed\.schemaVersion === "1\.0" \? governedCourseVersion\(courseId\) : signed\.courseVersion/);
 });
 
-test("certificate presentation renders signed title and governed version and uses canonical credential name", () => {
-  assert.match(certificatePage, /signed\.schemaVersion === "1\.1" \? signed\.courseTitle : course\.title/);
-  assert.match(certificatePage, /const courseVersion = signed\.schemaVersion === "1\.1"[\s\S]*\? signed\.courseVersion[\s\S]*: \(publication\.version \|\| BASELINE_COURSE_VERSION\)/);
+test("certificate presentation renders signed title, governed version, signed learner identity, and canonical credential name", () => {
+  assert.match(certificatePage, /signed\.schemaVersion === "1\.0" \? course\.title : signed\.courseTitle/);
+  assert.match(certificatePage, /const courseVersion = signed\.schemaVersion === "1\.0"[\s\S]*\? \(publication\.version \|\| BASELINE_COURSE_VERSION\)[\s\S]*: signed\.courseVersion/);
+  assert.match(certificatePage, /const learnerName = signed\.schemaVersion === "1\.2"[\s\S]*\? signed\.learnerName[\s\S]*: academyLearnerDisplayName\(identity\.identity\)/);
   assert.match(certificatePage, /publicationForCourse\(courseId\)/);
   assert.match(certificatePage, /BASELINE_COURSE_VERSION/);
   assert.match(certificateView, /Certificate of Course Completion/);
   assert.match(certificateView, /Course Version/);
 });
 
-test("legacy certificate lookup retains an explicit bounded user scan", () => {
-  assert.match(academy, /offset < 10_000/);
-  assert.match(academy, /pageSize = 100/);
+test("legacy certificate lookup retains an explicit bounded Clerk scan only in the compatibility module", () => {
+  assert.match(academy, /import\("\.\/academy-legacy-clerk"\)/);
+  assert.doesNotMatch(academy, /@clerk\/nextjs\/server/);
+  assert.match(legacyClerk, /offset < 10_000/);
+  assert.match(legacyClerk, /pageSize = 100/);
 });

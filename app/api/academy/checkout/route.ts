@@ -3,6 +3,7 @@ import type Stripe from "stripe";
 import { BASELINE_COURSE_VERSION, publicationForCourse } from "../../../academy/coursePublication";
 import { courseForId } from "../../../../lib/academy";
 import { publicAcademyCourse } from "../../../../lib/academy-control";
+import { safeAcademyIdentity } from "../../../../lib/academy-identity";
 import { academyLicensedSalesEnabled } from "../../../../lib/academy-licensing";
 import {
   academyPurchaserHashConfigured,
@@ -18,7 +19,6 @@ import {
   studioCourseIsApproved,
   studioLicenseMetadata,
 } from "../../../../lib/academy-studio";
-import { safeIdentity } from "../../../../lib/identity-runtime";
 import {
   ACADEMY_PAYMENT_CONTRACT,
   ACADEMY_PAYMENT_CURRENCY,
@@ -147,32 +147,36 @@ export async function POST(request: Request) {
   }
 
   const course = runtimeCourse.course;
-
-  const identity = await safeIdentity();
+  const identity = await safeAcademyIdentity();
   if (!identity.configured) {
     return unavailableRedirect(requestUrl, "identity-configuration-required");
   }
+  if (identity.status === "claims_unavailable") {
+    return unavailableRedirect(requestUrl, "identity-verification-unavailable");
+  }
+
+  const principalId = identity.principalId;
   let existingState: Awaited<ReturnType<typeof durableAcademyState>> = null;
   try {
     await academyStorageHealth();
-    existingState = identity.userId ? await durableAcademyState(identity.userId, course.id) : null;
+    existingState = principalId ? await durableAcademyState(principalId, course.id) : null;
   } catch {
     return unavailableRedirect(requestUrl, "durable-storage-unavailable");
   }
   if (existingState?.access_status === "active") {
     return unavailableRedirect(requestUrl, "already-enrolled");
   }
-  if (!identity.userId && !academyPurchaserHashConfigured()) {
+  if (!principalId && !academyPurchaserHashConfigured()) {
     return unavailableRedirect(requestUrl, "purchaser-identity-storage-unavailable");
   }
-  const browserId = identity.userId ? null : checkoutBrowserId(request);
-  if (!identity.userId && !browserId) {
+  const browserId = principalId ? null : checkoutBrowserId(request);
+  if (!principalId && !browserId) {
     return unavailableRedirect(requestUrl, "purchaser-identity-storage-unavailable");
   }
 
   try {
-    const purchaserReference = identity.userId ?? `guest_${browserId}`;
-    const identityMode = identity.userId ? "authenticated" : "guest-email";
+    const purchaserReference = principalId ?? `guest_${browserId}`;
+    const identityMode = principalId ? "authenticated" : "guest-email";
     const stripe = getAcademyStripe();
     const studioCourse = studioCourseIsApproved(course.id) ? studioCourseForId(course.id) : null;
     const publication = publicationForCourse(course.id);
@@ -227,10 +231,10 @@ export async function POST(request: Request) {
       courseTitle: course.title,
       courseVersion,
       courseReleaseStatus,
-      clerkUserId: identity.userId ?? "",
+      academyPrincipalId: principalId ?? "",
       purchaserReference,
       identityMode,
-      enrollmentMode: identity.userId ? "authenticated-paid-access" : "paid-pending-account-claim",
+      enrollmentMode: principalId ? "authenticated-paid-access" : "paid-pending-account-claim",
       claimPolicy: CLAIM_POLICY,
       entitlementType: license.entitlementType,
       entitlementCode: license.entitlementCode,

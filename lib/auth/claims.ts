@@ -14,6 +14,7 @@ export type VerifiedSupabaseIdentity = {
   sessionId: string | null;
   email: string | null;
   emailVerified: boolean;
+  displayName: string | null;
   assuranceLevel: "aal1" | "aal2" | null;
   roles: ObserraAuthorizationRole[];
   roleVersion: number | null;
@@ -22,6 +23,7 @@ export type VerifiedSupabaseIdentity = {
 const AUTH_USER_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const PRINCIPAL_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.:-]{2,254}$/;
 const ROLE_SET = new Set<string>(OBSERRA_AUTHORIZATION_ROLES);
+const DISPLAY_NAME_MAX_LENGTH = 160;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -61,12 +63,31 @@ function roleVersionFromAppMetadata(appMetadata: Record<string, unknown>) {
     : null;
 }
 
+function safeDisplayName(value: unknown) {
+  if (typeof value !== "string") return null;
+  if (/[\u0000-\u001f\u007f]/.test(value)) return null;
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (!normalized || normalized.length > DISPLAY_NAME_MAX_LENGTH) return null;
+  return normalized;
+}
+
+function displayNameFromUserMetadata(userMetadata: Record<string, unknown>) {
+  const fullName = safeDisplayName(userMetadata.full_name);
+  if (fullName) return fullName;
+  const name = safeDisplayName(userMetadata.name);
+  if (name) return name;
+  const givenName = safeDisplayName(userMetadata.given_name);
+  const familyName = safeDisplayName(userMetadata.family_name);
+  return safeDisplayName([givenName, familyName].filter(Boolean).join(" "));
+}
+
 export function identityFromVerifiedClaims(claims: unknown): VerifiedSupabaseIdentity | null {
   if (!isRecord(claims)) return null;
   const authUserId = claims.sub;
   if (typeof authUserId !== "string" || !AUTH_USER_ID_PATTERN.test(authUserId)) return null;
 
   const appMetadata = isRecord(claims.app_metadata) ? claims.app_metadata : {};
+  const userMetadata = isRecord(claims.user_metadata) ? claims.user_metadata : {};
   const principalId = subjectIdFromAppMetadata(appMetadata) ?? authUserId;
   const sessionId = typeof claims.session_id === "string" && AUTH_USER_ID_PATTERN.test(claims.session_id)
     ? claims.session_id
@@ -82,6 +103,7 @@ export function identityFromVerifiedClaims(claims: unknown): VerifiedSupabaseIde
     sessionId,
     email,
     emailVerified: claims.email_verified === true,
+    displayName: displayNameFromUserMetadata(userMetadata),
     assuranceLevel,
     roles: rolesFromAppMetadata(appMetadata),
     roleVersion: roleVersionFromAppMetadata(appMetadata),

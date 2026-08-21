@@ -130,11 +130,14 @@ requireText(contractsPath, contracts, "purchaseEnabled: false", "non-purchasable
 requireText(controlPath, control, "courses: []", "empty degraded public catalog");
 requireText(controlPath, control, "course: null", "unavailable degraded public course");
 
-// Paid Academy media and AI tutor access must never bypass authentication or entitlement checks in preview.
+// Paid Academy media and AI tutor access must never bypass Supabase authentication or entitlement checks in preview.
 for (const [path, source] of [[mediaPath, media], [tutorPath, tutor]]) {
-  requireText(path, source, "await auth()", "Clerk authentication");
+  requireText(path, source, "safeAcademyIdentity", "Supabase Academy learner authentication");
+  requireText(path, source, "identity.principalId", "Supabase Academy principal binding");
+  requireText(path, source, "identity.identity", "verified Supabase Academy identity");
   requireText(path, source, "academyStateWithOwnerAccess", "entitlement lookup");
   requireText(path, source, "Paid course access is required", "paid entitlement enforcement");
+  forbidText(path, source, "await auth()", "Clerk learner authentication");
   forbidText(path, source, 'process.env.VERCEL_ENV === "preview"', "preview authentication bypass");
   forbidText(path, source, "ownerPreview", "preview entitlement bypass");
 }
@@ -220,15 +223,18 @@ requireText(persistencePath, persistence, "academyCommerceStorageReady(value)", 
 requireText(checkoutPath, checkout, 'response.headers.set("cache-control", NO_STORE)', "no-store commerce response");
 
 // Deferred payment claims must be POST-only/same-origin, re-fetch and fully
-// validate the paid Stripe session, then match a verified Clerk email address.
+// validate the paid Stripe session, then match a verified Supabase email address.
 requireText(redeemPath, redeem, "export async function POST(request: Request)", "POST redemption handler");
 requireText(redeemPath, redeem, "export async function GET()", "non-mutating GET handler");
 requireText(redeemPath, redeem, "isSameOrigin(request, requestUrl)", "same-origin redemption check");
+requireText(redeemPath, redeem, "safeAcademyIdentity()", "Supabase Academy learner authentication");
+requireText(redeemPath, redeem, "identity.emailVerified", "verified Supabase email requirement");
+requireText(redeemPath, redeem, "normalizeEmail(identity.email) === expected", "verified Supabase purchaser-email binding");
 requireText(redeemPath, redeem, "retrieveVerifiedAcademyPaidSession", "canonical paid-session, product, and payment-intent validation");
-requireText(redeemPath, redeem, 'item.verification?.status === "verified"', "verified Clerk email requirement");
 requireText(redeemPath, redeem, "authenticatedUserOwnsVerifiedPurchaserEmail", "verified purchaser-email ownership check");
 requireText(redeemPath, redeem, "claimCourseAccess", "durable paid checkout claim");
 requireText(redeemPath, redeem, "courseVersion: validation.courseVersion", "immutable paid claim course version");
+forbidText(redeemPath, redeem, 'item.verification?.status === "verified"', "Clerk email verification dependency");
 
 // Fulfillment must be driven by signed Stripe webhooks and only after a paid event.
 requireText(webhookPath, webhook, 'request.headers.get("stripe-signature")', "Stripe signature header");
@@ -285,4 +291,4 @@ forbidText(checkoutPath, checkout.toLowerCase(), "florida-class-d", "Florida Cla
 forbidText(redeemPath, redeem.toLowerCase(), "florida-class-d", "Florida Class D generic Academy redemption coupling");
 forbidText(webhookPath, webhook.toLowerCase(), "florida-class-d", "Florida Class D generic Stripe fulfillment coupling");
 
-console.log("Gate 32 passed: public availability is isolated from Clerk failure, protected identity remains fail-closed, website headers, Academy paid media/tutor access, publication/control plane, database dependencies, POST-only commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");
+console.log("Gate 32 passed: public availability is isolated from Clerk failure, protected Academy learner identity is Supabase-backed and fail-closed, website headers, paid media/tutor access, publication/control plane, database dependencies, POST-only commerce, verified payment claims, webhook, and regulated separation are secure-by-default.");

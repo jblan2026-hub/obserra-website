@@ -206,14 +206,14 @@ test("fulfillment and redemption preserve a paid historical price after catalog 
   const currentCatalogAmountCents = 14900;
   const purchaserReference = "guest_11111111-1111-4111-8111-111111111111";
   const metadata = {
-    paymentContractVersion: "academy-payment-v2",
+    paymentContractVersion: "academy-payment-v3",
     courseId: "foundation",
     courseVersion: "1.0.0",
     expectedCurrency: "usd",
     expectedAmountCents: String(paidAmountCents),
     checkoutAttemptId: "22222222-2222-4222-8222-222222222222",
     identityMode: "guest-email",
-    clerkUserId: "",
+    academyPrincipalId: "",
     purchaserReference,
   };
   const paymentIntent = {

@@ -37,14 +37,14 @@ function validSession() {
     client_reference_id: "user_123",
     payment_intent: "pi_paid_123",
     metadata: {
-      paymentContractVersion: "academy-payment-v2",
+      paymentContractVersion: "academy-payment-v3",
       courseId: "foundation",
       courseVersion: "1.0.0",
       expectedCurrency: "usd",
       expectedAmountCents: "9900",
       checkoutAttemptId: "550e8400-e29b-41d4-a716-446655440000",
       identityMode: "authenticated",
-      clerkUserId: "user_123",
+      academyPrincipalId: "user_123",
       purchaserReference: "user_123",
     },
   };

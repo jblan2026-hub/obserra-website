@@ -69,7 +69,7 @@ async function fulfillPaidSession(
     courseId: course.id,
     courseVersion: verified.validation.courseVersion,
     identityMode: verified.validation.identityMode,
-    clerkUserId: verified.validation.learnerId,
+    academyPrincipalId: verified.validation.learnerId,
     purchaserEmail: verified.validation.learnerId
       ? undefined
       : verified.session.customer_details?.email ?? verified.session.customer_email ?? undefined,

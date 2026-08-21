@@ -1,12 +1,9 @@
-import { clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import {
-  academyCommerceLivemode,
-} from "../../../../lib/academy-payment";
 import { claimCourseAccess, courseForId } from "../../../../lib/academy";
-import { safeIdentity } from "../../../../lib/identity-runtime";
-import { retrieveVerifiedAcademyPaidSession } from "../../../../lib/academy-stripe-verification";
+import { safeAcademyIdentity } from "../../../../lib/academy-identity";
+import { academyCommerceLivemode } from "../../../../lib/academy-payment";
 import { getAcademyStripe } from "../../../../lib/academy-stripe";
+import { retrieveVerifiedAcademyPaidSession } from "../../../../lib/academy-stripe-verification";
 
 export const runtime = "nodejs";
 
@@ -33,13 +30,12 @@ function isSameOrigin(request: Request, requestUrl: URL) {
   }
 }
 
-async function authenticatedUserOwnsVerifiedPurchaserEmail(userId: string, purchaserEmail: string) {
-  const client = await clerkClient();
-  const user = await client.users.getUser(userId);
+function authenticatedUserOwnsVerifiedPurchaserEmail(
+  identity: Awaited<ReturnType<typeof safeAcademyIdentity>>,
+  purchaserEmail: string,
+) {
   const expected = normalizeEmail(purchaserEmail);
-  return expected.length > 0 && user.emailAddresses.some((item) => (
-    item.verification?.status === "verified" && normalizeEmail(item.emailAddress) === expected
-  ));
+  return identity.emailVerified && expected.length > 0 && normalizeEmail(identity.email) === expected;
 }
 
 function retryUrl(requestUrl: URL, courseId: string, sessionId: string, enrollment: string) {
@@ -72,14 +68,14 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/academy?enrollment=invalid", requestUrl), 303);
   }
 
-  const identity = await safeIdentity();
+  const identity = await safeAcademyIdentity();
   const returnUrl = new URL("/academy/success", requestUrl);
   returnUrl.searchParams.set("course", course.id);
   returnUrl.searchParams.set("session_id", sessionId);
-  if (!identity.configured) {
+  if (!identity.configured || identity.status === "claims_unavailable") {
     return NextResponse.redirect(retryUrl(requestUrl, course.id, sessionId, "identity-configuration-required"), 303);
   }
-  if (!identity.userId) {
+  if (!identity.principalId) {
     const signInUrl = new URL("/sign-in", requestUrl);
     signInUrl.searchParams.set("redirect_url", returnUrl.toString());
     return NextResponse.redirect(signInUrl, 303);
@@ -98,10 +94,10 @@ export async function POST(request: Request) {
     );
     const { session, validation } = verified;
 
-    let authorizedClaim = validation.learnerId === identity.userId;
+    let authorizedClaim = validation.learnerId === identity.principalId;
     const purchaserEmail = session.customer_details?.email ?? session.customer_email ?? undefined;
     if (!authorizedClaim && validation.identityMode === "guest-email" && !validation.learnerId) {
-      authorizedClaim = await authenticatedUserOwnsVerifiedPurchaserEmail(identity.userId, purchaserEmail ?? "");
+      authorizedClaim = authenticatedUserOwnsVerifiedPurchaserEmail(identity, purchaserEmail ?? "");
     }
     if (!authorizedClaim) {
       console.warn("academy deferred claim rejected", {
@@ -114,7 +110,7 @@ export async function POST(request: Request) {
     }
 
     await claimCourseAccess({
-      userId: identity.userId,
+      principalId: identity.principalId,
       courseId: course.id,
       courseVersion: validation.courseVersion,
       checkoutSessionId: session.id,

@@ -1,9 +1,11 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 import CertificateView from "./CertificateView";
 import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
+import {
+  academyLearnerDisplayName,
+  safeAcademyIdentity,
+} from "../../../../lib/academy-identity";
 import { verifyCertificateClaim } from "../../../../lib/certificate-signing";
-import { ACADEMY_BRAND_NAME } from "../../../../lib/legal-identity";
 import { BASELINE_COURSE_VERSION, publicationForCourse } from "../../coursePublication";
 
 export default async function CertificatePage({ params }: { params: Promise<{ courseId: string }> }) {
@@ -11,12 +13,19 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
   const course = courseForId(courseId);
   if (!course) notFound();
 
-  const { userId } = await auth();
-  if (!userId) {
+  const identity = await safeAcademyIdentity();
+  if (!identity.configured || identity.status === "claims_unavailable") {
+    redirect("/academy?identity=configuration-required");
+  }
+  if (!identity.principalId || !identity.identity) {
     redirect(`/sign-in?redirect_url=${encodeURIComponent(`/academy/certificate/${courseId}`)}`);
   }
 
-  const state = await academyStateWithOwnerAccess(userId, courseId);
+  const state = await academyStateWithOwnerAccess(
+    identity.principalId,
+    courseId,
+    identity.identity.roles,
+  );
   if (!state.entitlements[courseId]) redirect(`/academy/${courseId}?required=paid-access`);
 
   const progress = state.progress[courseId];
@@ -34,14 +43,13 @@ export default async function CertificatePage({ params }: { params: Promise<{ co
 
   const signed = progress.signedCertificate;
   const publication = publicationForCourse(courseId);
-  const courseTitle = signed.schemaVersion === "1.1" ? signed.courseTitle : course.title;
-  const courseVersion = signed.schemaVersion === "1.1"
-    ? signed.courseVersion
-    : (publication.version || BASELINE_COURSE_VERSION);
-
-  const user = await (await clerkClient()).users.getUser(userId);
-  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
-  const learnerName = fullName || user.emailAddresses[0]?.emailAddress || `${ACADEMY_BRAND_NAME} Learner`;
+  const courseTitle = signed.schemaVersion === "1.0" ? course.title : signed.courseTitle;
+  const courseVersion = signed.schemaVersion === "1.0"
+    ? (publication.version || BASELINE_COURSE_VERSION)
+    : signed.courseVersion;
+  const learnerName = signed.schemaVersion === "1.2"
+    ? signed.learnerName
+    : academyLearnerDisplayName(identity.identity);
 
   return (
     <CertificateView
