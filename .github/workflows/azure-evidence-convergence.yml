@@ -1,0 +1,95 @@
+name: Azure Production Evidence Convergence
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/azure-production-plane-20260821
+    paths:
+      - .github/workflows/azure-evidence-convergence.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: azure-production-evidence-convergence
+  cancel-in-progress: false
+
+jobs:
+  converge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact Azure feature branch
+        uses: actions/checkout@v6
+        with:
+          ref: feat/azure-production-plane-20260821
+          fetch-depth: 0
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Update Gate 32 to provider-neutral production authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("scripts/florida-class-d-website-academy-commerce-gate.mjs")
+          source = path.read_text()
+          old = '''requireText(paymentPath, payment, 'process.env.VERCEL_ENV === "production"', "production live-mode binding");'''
+          new = '''requireText(paymentPath, payment, 'isProductionRuntime()', "provider-neutral production live-mode binding");\nrequireText(paymentPath, payment, 'from "./runtime-environment"', "provider-neutral production runtime authority");'''
+          if old in source:
+              source = source.replace(old, new, 1)
+              path.write_text(source)
+          elif new not in source:
+              raise SystemExit("Gate 32 production-mode contract was neither legacy nor already converged")
+          PY
+
+      - name: Verify affected source gates before evidence generation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/florida-class-d-website-academy-commerce-gate.mjs
+          node scripts/academy-durable-commerce-gate.mjs
+          node --test test/academy-payment-reversal-contract.test.mjs test/academy-stripe-webhook-mode.test.mjs test/azure-production-plane-contract.test.mjs test/vercel-canonical-deployment-preflight.test.mjs
+
+      - name: Generate governed legal identity audit
+        run: npm run generate:legal-identity-audit
+
+      - name: Verify governed legal identity audit
+        run: npm run verify:legal-identity-audit
+
+      - name: Generate governed CMMC system evidence
+        run: npm run generate:cmmc-system-evidence
+
+      - name: Verify governed CMMC system evidence
+        run: npm run verify:cmmc-system-evidence
+
+      - name: Commit exact governed convergence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            scripts/florida-class-d-website-academy-commerce-gate.mjs \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.json \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.md \
+            docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          if git diff --cached --quiet; then
+            echo "Azure source contracts and governed evidence are already converged."
+            exit 0
+          fi
+          git commit -m "chore(azure): converge production contracts and governed evidence"
+          git push origin HEAD:feat/azure-production-plane-20260821
