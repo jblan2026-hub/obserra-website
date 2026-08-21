@@ -6,6 +6,7 @@ import { identityProviderForRequest } from "@/lib/auth/provider-routing";
 import { safeRelativeRedirect } from "@/lib/auth/redirects";
 import { prepareSupabaseAuthRuntime } from "@/lib/auth/runtime-config";
 import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { isProductionRuntime } from "@/lib/runtime-environment";
 import SupabaseSignInForm from "./SupabaseSignInForm";
 
 export const metadata: Metadata = {
@@ -52,7 +53,7 @@ export default async function SignInPage({
                   url: supabaseRuntime.url,
                   projectRef: supabaseRuntime.projectRef,
                   publishableKey: supabaseRuntime.publishableKey,
-                  production: process.env.VERCEL_ENV === "production",
+                  production: isProductionRuntime(),
                 }}
               />
             ) : (
