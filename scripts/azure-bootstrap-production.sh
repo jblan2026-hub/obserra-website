@@ -13,6 +13,8 @@ OIDC_AUDIENCE="api://AzureADTokenExchange"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 BICEP_TEMPLATE="${REPO_ROOT}/infra/main.bicep"
+STORAGE_BICEP_TEMPLATE="${REPO_ROOT}/infra/storage-gpv2.bicep"
+EXPECTED_STORAGE_ACCOUNT="stobserraprod38d660"
 
 required_commands=(az jq grep)
 for command_name in "${required_commands[@]}"; do
@@ -22,11 +24,13 @@ for command_name in "${required_commands[@]}"; do
   fi
 done
 
-if [[ ! -f "${BICEP_TEMPLATE}" ]]; then
-  echo "Azure infrastructure template is missing: ${BICEP_TEMPLATE}" >&2
-  echo "Run this script from a checkout of jblan2026-hub/obserra-website." >&2
-  exit 1
-fi
+for template in "${BICEP_TEMPLATE}" "${STORAGE_BICEP_TEMPLATE}"; do
+  if [[ ! -f "${template}" ]]; then
+    echo "Azure infrastructure template is missing: ${template}" >&2
+    echo "Run this script from a checkout of jblan2026-hub/obserra-website." >&2
+    exit 1
+  fi
+done
 
 az account set --subscription "${SUBSCRIPTION_ID}"
 ACCOUNT_JSON="$(az account show --output json)"
@@ -43,10 +47,10 @@ if [[ "${ACTUAL_TENANT}" != "${TENANT_ID}" ]]; then
 fi
 
 # Confirm the approved Azure region exists for this subscription context. Actual
-# service/SKU capacity and policy enforcement are proven by the real Bicep deployment below.
+# service/SKU capacity and policy enforcement are proven by the real deployments below.
 az account list-locations --query "[?name=='${LOCATION}'].name" -o tsv | grep -Fxq "${LOCATION}"
 
-# Register only the providers required by this production plane.
+# Register only providers required by the production plane.
 providers=(
   Microsoft.Web
   Microsoft.KeyVault
@@ -54,6 +58,7 @@ providers=(
   Microsoft.OperationalInsights
   Microsoft.Insights
   Microsoft.Authorization
+  Microsoft.Storage
 )
 for provider in "${providers[@]}"; do
   echo "Registering ${provider}..."
@@ -145,6 +150,20 @@ ROLE_JSON="$(az role assignment list --assignee-object-id "${PRINCIPAL_ID}" --sc
 jq -e 'any(.[]; .roleDefinitionName == "Contributor")' <<<"${ROLE_JSON}" >/dev/null
 jq -e 'any(.[]; .roleDefinitionName == "User Access Administrator")' <<<"${ROLE_JSON}" >/dev/null
 
+# Compile and validate IaC before resource mutation.
+az bicep build --file "${BICEP_TEMPLATE}" --stdout >/dev/null
+az bicep build --file "${STORAGE_BICEP_TEMPLATE}" --stdout >/dev/null
+az deployment group validate \
+  --resource-group "${RESOURCE_GROUP}" \
+  --template-file "${BICEP_TEMPLATE}" \
+  --parameters location="${LOCATION}" \
+  --only-show-errors >/dev/null
+az deployment group validate \
+  --resource-group "${RESOURCE_GROUP}" \
+  --template-file "${STORAGE_BICEP_TEMPLATE}" \
+  --parameters location="${LOCATION}" \
+  --only-show-errors >/dev/null
+
 # Provision the actual Azure plane under the interactive Owner session. This is the live
 # policy/SKU/capacity preflight: any Azure Policy, provider, quota, or SKU restriction fails
 # the bootstrap rather than being papered over by a source-only readiness claim.
@@ -170,6 +189,37 @@ test -n "${PRODUCTION_HOST}" && test "${PRODUCTION_HOST}" != "null"
 test -n "${STAGING_HOST}" && test "${STAGING_HOST}" != "null"
 test -n "${KEY_VAULT_NAME}" && test "${KEY_VAULT_NAME}" != "null"
 
+# Build GPv2 from day one. No GPv1 or Blob Only account is accepted.
+STORAGE_DEPLOYMENT_FILE="${HOME}/obserra-azure-storage-gpv2-deployment.json"
+az deployment group create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "obserra-storage-gpv2-$(date -u +%Y%m%d%H%M%S)" \
+  --template-file "${STORAGE_BICEP_TEMPLATE}" \
+  --parameters location="${LOCATION}" \
+  --mode Incremental \
+  --only-show-errors \
+  --output json > "${STORAGE_DEPLOYMENT_FILE}"
+
+test "$(jq -r '.properties.provisioningState' "${STORAGE_DEPLOYMENT_FILE}")" = "Succeeded"
+STORAGE_ACCOUNT_NAME="$(jq -r '.properties.outputs.storageAccountName.value' "${STORAGE_DEPLOYMENT_FILE}")"
+test "${STORAGE_ACCOUNT_NAME}" = "${EXPECTED_STORAGE_ACCOUNT}"
+
+az storage account show \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "${STORAGE_ACCOUNT_NAME}" \
+  --output json > "${HOME}/obserra-azure-storage-gpv2-live.json"
+
+jq -e '
+  .kind == "StorageV2" and
+  .sku.name == "Standard_GRS" and
+  .allowBlobPublicAccess == false and
+  .allowSharedKeyAccess == false and
+  .defaultToOAuthAuthentication == true and
+  .minimumTlsVersion == "TLS1_2" and
+  .enableHttpsTrafficOnly == true and
+  .networkRuleSet.defaultAction == "Deny"
+' "${HOME}/obserra-azure-storage-gpv2-live.json" >/dev/null
+
 cat <<EOF
 OBSERRA_AZURE_BOOTSTRAP=verified
 AZURE_SUBSCRIPTION_ID=${SUBSCRIPTION_ID}
@@ -185,6 +235,10 @@ AZURE_PRODUCTION_HOST=https://${PRODUCTION_HOST}
 AZURE_STAGING_HOST=https://${STAGING_HOST}
 AZURE_KEY_VAULT_NAME=${KEY_VAULT_NAME}
 AZURE_RUNTIME_IDENTITY_CLIENT_ID=${RUNTIME_IDENTITY_CLIENT_ID}
+AZURE_STORAGE_ACCOUNT=${STORAGE_ACCOUNT_NAME}
+AZURE_STORAGE_KIND=StorageV2
+AZURE_STORAGE_SKU=Standard_GRS
 AZURE_POLICY_RECORD=${POLICY_FILE}
 AZURE_DEPLOYMENT_RECORD=${DEPLOYMENT_FILE}
+AZURE_STORAGE_DEPLOYMENT_RECORD=${STORAGE_DEPLOYMENT_FILE}
 EOF
