@@ -95,7 +95,10 @@ const transactionalRouteHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Vercel's Next.js 16.3 adapter does not emit the root server trace files
+  // required by standalone output. Vercel uses its native adapter while Azure
+  // and other self-hosted targets retain the standalone artifact.
+  output: process.env.VERCEL === "1" ? undefined : "standalone",
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
