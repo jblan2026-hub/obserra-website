@@ -273,9 +273,35 @@ if (dryRun) {
   process.exit(0);
 }
 
-const archiveUrl = (process.env.OBSERRA_CMMC_ARCHIVE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim().replace(/\/$/, "");
-const serviceRoleKey = (process.env.OBSERRA_CMMC_ARCHIVE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
-if (!archiveUrl.startsWith("https://") || !serviceRoleKey) fail("live archive requires OBSERRA_CMMC_ARCHIVE_URL and OBSERRA_CMMC_ARCHIVE_SERVICE_ROLE_KEY (or the controlled Supabase equivalents)");
+let archiveUrl = (process.env.OBSERRA_CMMC_ARCHIVE_URL ?? "").trim().replace(/\/$/, "");
+const serviceRoleKey = (process.env.OBSERRA_CMMC_ARCHIVE_SERVICE_ROLE_KEY ?? "").trim();
+if (!archiveUrl || !serviceRoleKey) {
+  fail("live archive requires OBSERRA_CMMC_ARCHIVE_URL and OBSERRA_CMMC_ARCHIVE_SERVICE_ROLE_KEY for a dedicated CMMC archive project");
+}
+
+let archiveTarget;
+try {
+  archiveTarget = new URL(archiveUrl);
+} catch (error) {
+  fail(`OBSERRA_CMMC_ARCHIVE_URL must be a valid URL for the dedicated CMMC archive project: ${error instanceof Error ? error.message : String(error)}`);
+}
+if (archiveTarget.protocol !== "https:" || archiveTarget.username || archiveTarget.password || archiveTarget.search || archiveTarget.hash || (archiveTarget.pathname !== "/" && archiveTarget.pathname !== "")) {
+  fail("OBSERRA_CMMC_ARCHIVE_URL must be a credential-free HTTPS origin for the dedicated CMMC archive project");
+}
+
+const archiveHostMatch = archiveTarget.hostname.toLowerCase().match(/^([a-z0-9]{20})\.supabase\.co$/);
+if (!archiveHostMatch) {
+  fail("OBSERRA_CMMC_ARCHIVE_URL must resolve to the dedicated Supabase CMMC archive project origin");
+}
+const archiveProjectRef = archiveHostMatch[1];
+const forbiddenArchiveProjectRefs = new Set([
+  "ggkxgjhsbgbifiqrhavr",
+  "nwxnyqlyzyufgoadtqxs",
+]);
+if (forbiddenArchiveProjectRefs.has(archiveProjectRef)) {
+  fail(`shared Supabase project ${archiveProjectRef} cannot be used as the CMMC evidence archive; a dedicated CMMC archive project is required`);
+}
+archiveUrl = archiveTarget.origin;
 
 async function callRpc(name, payload, timeout = 120_000) {
   const response = await fetch(`${archiveUrl}/rest/v1/rpc/${name}`, {
