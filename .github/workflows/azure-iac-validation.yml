@@ -5,6 +5,7 @@ on:
     paths:
       - 'infra/**'
       - 'scripts/azure-bootstrap-production.sh'
+      - 'scripts/azure-bootstrap-current-directory.sh'
       - '.github/workflows/azure-production-deploy.yml'
       - '.github/workflows/azure-iac-validation.yml'
       - 'test/azure-production-plane-contract.test.mjs'
@@ -14,6 +15,7 @@ on:
     paths:
       - 'infra/**'
       - 'scripts/azure-bootstrap-production.sh'
+      - 'scripts/azure-bootstrap-current-directory.sh'
       - '.github/workflows/azure-production-deploy.yml'
       - '.github/workflows/azure-iac-validation.yml'
       - 'test/azure-production-plane-contract.test.mjs'
@@ -50,7 +52,11 @@ jobs:
           done
 
       - name: Validate bootstrap shell syntax
-        run: bash -n scripts/azure-bootstrap-production.sh
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n scripts/azure-bootstrap-production.sh
+          bash -n scripts/azure-bootstrap-current-directory.sh
 
       - name: Validate Azure production contracts
         run: node --test test/azure-production-plane-contract.test.mjs
