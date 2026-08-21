@@ -1,0 +1,280 @@
+name: Azure Production Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      promote_to_azure_production:
+        description: "Swap verified staging release into the Azure production slot"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: obserra-azure-production
+  cancel-in-progress: false
+
+env:
+  AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
+  AZURE_TENANT_ID: 5a08a33a-d2b5-491d-ac6d-32f325138143
+  AZURE_LOCATION: eastus
+  AZURE_RESOURCE_GROUP: rg-obserra-prod-eastus
+  OBSERRA_WEBAPP_NAME: obserra-web-prod-38d660
+  OBSERRA_STAGING_SLOT: staging
+  OBSERRA_RUNTIME_ENVIRONMENT: production
+  OBSERRA_HOSTING_PROVIDER: azure-app-service
+  OBSERRA_EXPECTED_HOSTING_PROVIDER: azure-app-service
+  OBSERRA_SUPABASE_AUTH_RUNTIME_ENABLED: "true"
+  NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_URL: https://ftkjhmtfyfkartfsnkjb.supabase.co
+  NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_PUBLISHABLE_KEY: sb_publishable_mRE63bML7dsVY_YqaervqA_TUEWsxVB
+  OBSERRA_AUTH_SUPABASE_PROJECT_REF: ftkjhmtfyfkartfsnkjb
+
+jobs:
+  deploy:
+    name: Build, stage, verify, swap, verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out exact main release
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Require configured Azure OIDC client ID
+        shell: bash
+        env:
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+        run: |
+          set -euo pipefail
+          test -n "${AZURE_CLIENT_ID:-}" || {
+            echo "::error::Repository variable AZURE_CLIENT_ID is not configured. Run scripts/azure-bootstrap-production.sh in Azure Cloud Shell and configure the returned client ID.";
+            exit 1;
+          }
+          echo "AZURE_CLIENT_ID=${AZURE_CLIENT_ID}" >> "${GITHUB_ENV}"
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Verify source before packaging
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test
+
+      - name: Build Azure standalone release
+        env:
+          OBSERRA_IDENTITY_RUNTIME_ENABLED: "false"
+        run: npm run build
+
+      - name: Package immutable standalone artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .next/standalone/server.js
+          rm -rf release obserra-release.zip
+          mkdir -p release/.next
+          cp -R .next/standalone/. release/
+          cp -R .next/static release/.next/static
+          cp -R public release/public
+          printf '%s\n' "${GITHUB_SHA}" > release/OBSERRA_RELEASE_SHA
+          (
+            cd release
+            zip -qr ../obserra-release.zip .
+          )
+          test -s obserra-release.zip
+
+      - name: Authenticate to Azure with GitHub OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify exact Azure authority and resource-group scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual_subscription="$(az account show --query id -o tsv)"
+          actual_tenant="$(az account show --query tenantId -o tsv)"
+          test "${actual_subscription}" = "${AZURE_SUBSCRIPTION_ID}"
+          test "${actual_tenant}" = "${AZURE_TENANT_ID}"
+          az group show --name "${AZURE_RESOURCE_GROUP}" --query id -o tsv >/dev/null
+
+      - name: Converge Azure production infrastructure
+        shell: bash
+        run: |
+          set -euo pipefail
+          az deployment group create \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --name "obserra-${GITHUB_RUN_ID}" \
+            --template-file infra/main.bicep \
+            --parameters location="${AZURE_LOCATION}" \
+            --mode Incremental \
+            --only-show-errors \
+            --output json > /tmp/obserra-azure-deployment.json
+          test "$(jq -r '.properties.provisioningState' /tmp/obserra-azure-deployment.json)" = "Succeeded"
+          test "$(jq -r '.properties.outputs.webAppName.value' /tmp/obserra-azure-deployment.json)" = "${OBSERRA_WEBAPP_NAME}"
+
+      - name: Bind exact release authority to staging slot
+        shell: bash
+        run: |
+          set -euo pipefail
+          deployment_id="azapp-${GITHUB_SHA:0:12}"
+          az webapp config appsettings set \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --name "${OBSERRA_WEBAPP_NAME}" \
+            --slot "${OBSERRA_STAGING_SLOT}" \
+            --settings \
+              OBSERRA_RELEASE_SHA="${GITHUB_SHA}" \
+              OBSERRA_DEPLOYMENT_ID="${deployment_id}" \
+            --only-show-errors >/dev/null
+
+      - name: Deploy exact artifact to staging slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.OBSERRA_WEBAPP_NAME }}
+          slot-name: ${{ env.OBSERRA_STAGING_SLOT }}
+          package: obserra-release.zip
+
+      - name: Verify staged release authority and behavior
+        shell: bash
+        run: |
+          set -euo pipefail
+          staging_host="$(az webapp show \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --name "${OBSERRA_WEBAPP_NAME}" \
+            --slot "${OBSERRA_STAGING_SLOT}" \
+            --query defaultHostName -o tsv)"
+          test -n "${staging_host}"
+          staging_url="https://${staging_host}"
+
+          for attempt in $(seq 1 24); do
+            status="$(curl --silent --show-error --max-time 20 \
+              --output /tmp/staging-health.json \
+              --write-out '%{http_code}' \
+              "${staging_url}/api/health" || true)"
+            if [[ "${status}" = "200" ]] && jq -e \
+              --arg sha "${GITHUB_SHA}" '
+                .service == "obserra-website" and
+                .status == "live" and
+                .contract == "website-liveness-v1" and
+                .hosting.provider == "azure-app-service" and
+                .hosting.authority == "verified" and
+                .hosting.verified == true and
+                .hosting.gitCommitSha == $sha
+              ' /tmp/staging-health.json >/dev/null 2>&1; then
+              break
+            fi
+            if [[ "${attempt}" = "24" ]]; then
+              echo "::error::Azure staging health did not converge to the exact release authority."
+              cat /tmp/staging-health.json || true
+              exit 1
+            fi
+            sleep 10
+          done
+
+          curl --fail --silent --show-error --location --max-time 30 "${staging_url}/" -o /tmp/staging-home.html
+          grep -Eqi 'Obserra' /tmp/staging-home.html
+
+          commerce_status="$(curl --silent --show-error --max-time 30 \
+            --output /tmp/staging-commerce.json \
+            --write-out '%{http_code}' \
+            "${staging_url}/api/academy/commerce-health")"
+          if [[ "${commerce_status}" != "200" && "${commerce_status}" != "503" ]]; then
+            echo "::error::Unexpected Academy commerce health HTTP ${commerce_status}."
+            exit 1
+          fi
+
+          florida_live_status="$(curl --silent --show-error --max-time 30 \
+            --output /tmp/staging-florida-live.json \
+            --write-out '%{http_code}' \
+            "${staging_url}/api/florida-class-d/health/live")"
+          test "${florida_live_status}" = "200"
+          jq -e '.service == "florida-class-d-lms" and .status == "live"' /tmp/staging-florida-live.json >/dev/null
+
+          florida_ready_headers="$(mktemp)"
+          florida_ready_status="$(curl --silent --show-error --max-time 30 \
+            --dump-header "${florida_ready_headers}" \
+            --output /tmp/staging-florida-ready.json \
+            --write-out '%{http_code}' \
+            "${staging_url}/api/florida-class-d/health/ready")"
+          if [[ "${florida_ready_status}" = "200" ]]; then
+            jq -e '.service == "florida-class-d-lms" and .status == "ready"' /tmp/staging-florida-ready.json >/dev/null
+          elif [[ "${florida_ready_status}" = "503" ]]; then
+            jq -e '.service == "florida-class-d-lms" and .status == "not_ready"' /tmp/staging-florida-ready.json >/dev/null
+            grep -Eqi '^retry-after:[[:space:]]*[0-9]+' "${florida_ready_headers}"
+          else
+            echo "::error::Unexpected Florida readiness HTTP ${florida_ready_status}."
+            exit 1
+          fi
+
+      - name: Swap verified staging release into Azure production
+        if: ${{ inputs.promote_to_azure_production }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          az webapp deployment slot swap \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --name "${OBSERRA_WEBAPP_NAME}" \
+            --slot "${OBSERRA_STAGING_SLOT}" \
+            --target-slot production \
+            --only-show-errors
+
+      - name: Verify Azure production and reverse swap on failure
+        if: ${{ inputs.promote_to_azure_production }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          production_host="$(az webapp show \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --name "${OBSERRA_WEBAPP_NAME}" \
+            --query defaultHostName -o tsv)"
+          production_url="https://${production_host}"
+
+          verified=false
+          for attempt in $(seq 1 18); do
+            status="$(curl --silent --show-error --max-time 20 \
+              --output /tmp/production-health.json \
+              --write-out '%{http_code}' \
+              "${production_url}/api/health" || true)"
+            if [[ "${status}" = "200" ]] && jq -e \
+              --arg sha "${GITHUB_SHA}" '
+                .hosting.provider == "azure-app-service" and
+                .hosting.authority == "verified" and
+                .hosting.verified == true and
+                .hosting.gitCommitSha == $sha
+              ' /tmp/production-health.json >/dev/null 2>&1; then
+              verified=true
+              break
+            fi
+            sleep 10
+          done
+
+          if [[ "${verified}" != "true" ]]; then
+            echo "::error::Azure production did not prove the exact release. Reversing the slot swap."
+            az webapp deployment slot swap \
+              --resource-group "${AZURE_RESOURCE_GROUP}" \
+              --name "${OBSERRA_WEBAPP_NAME}" \
+              --slot "${OBSERRA_STAGING_SLOT}" \
+              --target-slot production \
+              --only-show-errors || true
+            exit 1
+          fi
+
+          curl --fail --silent --show-error --location --max-time 30 "${production_url}/" -o /tmp/production-home.html
+          grep -Eqi 'Obserra' /tmp/production-home.html
+          echo "Azure exact release verified at ${production_url}"
+
+      - name: Azure logout
+        if: always()
+        run: az logout
