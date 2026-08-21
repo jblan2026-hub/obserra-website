@@ -122,10 +122,6 @@ jobs:
       - name: Run Gate 32 website Academy commerce security verification
         run: node scripts/florida-class-d-website-academy-commerce-gate.mjs
 
-      # CMMC Gate 33, the CMMC portion of Gate 34, and the CMMC dual-baseline
-      # gate are intentionally paused by owner authorization on 2026-08-21.
-      # This does not assert CMMC compliance and does not remove historical evidence.
-
       - name: Run Gate 35 durable Academy commerce verification
         run: npm run verify:academy-durable-commerce
 
