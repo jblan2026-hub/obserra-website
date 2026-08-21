@@ -35,31 +35,75 @@ jobs:
       - name: Install exact dependencies
         run: npm ci
 
-      - name: Update Gate 32 to provider-neutral production authority
+      - name: Converge provider-neutral production contracts and proxy fingerprint
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
+          import re
+          import subprocess
 
-          path = Path("scripts/florida-class-d-website-academy-commerce-gate.mjs")
-          source = path.read_text()
-          old = '''requireText(paymentPath, payment, 'process.env.VERCEL_ENV === "production"', "production live-mode binding");'''
-          new = '''requireText(paymentPath, payment, 'isProductionRuntime()', "provider-neutral production live-mode binding");\nrequireText(paymentPath, payment, 'from "./runtime-environment"', "provider-neutral production runtime authority");'''
-          if old in source:
-              source = source.replace(old, new, 1)
-              path.write_text(source)
-          elif new not in source:
-              raise SystemExit("Gate 32 production-mode contract was neither legacy nor already converged")
+          def replace_exact(path_name: str, old: str, new: str, already: str):
+              path = Path(path_name)
+              source = path.read_text()
+              if old in source:
+                  path.write_text(source.replace(old, new, 1))
+                  return
+              if already not in source:
+                  raise SystemExit(f"{path_name} was neither legacy nor already converged")
+
+          replace_exact(
+              "scripts/florida-class-d-website-academy-commerce-gate.mjs",
+              '''requireText(paymentPath, payment, 'process.env.VERCEL_ENV === "production"', "production live-mode binding");''',
+              '''requireText(paymentPath, payment, 'isProductionRuntime()', "provider-neutral production live-mode binding");\nrequireText(paymentPath, payment, 'from "./runtime-environment"', "provider-neutral production runtime authority");''',
+              '''provider-neutral production live-mode binding''',
+          )
+
+          replace_exact(
+              "scripts/cmmc-level2-rev3-production-evidence.mjs",
+              '''requireText(clerkConfigPath, clerkConfig, 'process.env.VERCEL_ENV === "production"', "production environment enforcement");''',
+              '''requireText(clerkConfigPath, clerkConfig, "isProductionRuntime()", "provider-neutral production environment enforcement");\nrequireText(clerkConfigPath, clerkConfig, 'from "./runtime-environment"', "provider-neutral production runtime authority");''',
+              '''provider-neutral production environment enforcement''',
+          )
+
+          replace_exact(
+              "test/academy-payment-production-contract.test.mjs",
+              '''  assert.match(contract, /process\\.env\\.VERCEL_ENV === "production"/);''',
+              '''  assert.match(contract, /isProductionRuntime\\(\\)/);\n  assert.match(contract, /from "\\.\\/runtime-environment"/);''',
+              '''assert.match(contract, /isProductionRuntime\\(\\)/);''',
+          )
+
+          proxy_sha = subprocess.check_output(["git", "hash-object", "proxy.ts"], text=True).strip()
+          if not re.fullmatch(r"[0-9a-f]{40}", proxy_sha):
+              raise SystemExit("Unable to calculate exact proxy.ts Git blob SHA-1")
+          fingerprint = Path("lib/proxy-release-fingerprint.ts")
+          source = fingerprint.read_text()
+          updated, count = re.subn(
+              r'gitBlobSha1: "[0-9a-f]{40}"',
+              f'gitBlobSha1: "{proxy_sha}"',
+              source,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit("Proxy release fingerprint field was not found exactly once")
+          fingerprint.write_text(updated)
           PY
 
-      - name: Verify affected source gates before evidence generation
+      - name: Verify affected source contracts before evidence generation
         shell: bash
         run: |
           set -euo pipefail
           node scripts/florida-class-d-website-academy-commerce-gate.mjs
+          npm run verify:cmmc-production-evidence
           node scripts/academy-durable-commerce-gate.mjs
-          node --test test/academy-payment-reversal-contract.test.mjs test/academy-stripe-webhook-mode.test.mjs test/azure-production-plane-contract.test.mjs test/vercel-canonical-deployment-preflight.test.mjs
+          node --test \
+            test/academy-payment-production-contract.test.mjs \
+            test/academy-payment-reversal-contract.test.mjs \
+            test/academy-stripe-webhook-mode.test.mjs \
+            test/azure-production-plane-contract.test.mjs \
+            test/vercel-canonical-deployment-preflight.test.mjs \
+            test/vercel-deployment-integrity.test.mjs
 
       - name: Generate governed legal identity audit
         run: npm run generate:legal-identity-audit
@@ -81,6 +125,9 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
             scripts/florida-class-d-website-academy-commerce-gate.mjs \
+            scripts/cmmc-level2-rev3-production-evidence.mjs \
+            test/academy-payment-production-contract.test.mjs \
+            lib/proxy-release-fingerprint.ts \
             docs/compliance/LEGAL-IDENTITY-AUDIT.json \
             docs/compliance/LEGAL-IDENTITY-AUDIT.md \
             docs/compliance/LEGAL-IDENTITY-AUDIT.sha256 \
@@ -91,5 +138,5 @@ jobs:
             echo "Azure source contracts and governed evidence are already converged."
             exit 0
           fi
-          git commit -m "chore(azure): converge production contracts and governed evidence"
+          git commit -m "chore(azure): converge host-neutral release evidence"
           git push origin HEAD:feat/azure-production-plane-20260821
