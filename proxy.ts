@@ -12,6 +12,7 @@ import {
   floridaClassDMutationOriginAuthorized,
 } from "./lib/florida-class-d-mutation-boundary";
 import { floridaClassDProductionOwnerReviewExecutionAuthorized } from "./lib/florida-class-d-owner-preview";
+import { isPreviewRuntime, isProductionRuntime } from "./lib/runtime-environment";
 import { updateSupabaseAuthSession } from "./lib/supabase/proxy";
 
 const CANONICAL_HOST = "www.obserrallc.com";
@@ -99,11 +100,11 @@ function ownerHost() {
 function applyRouteSecurityHeaders(response: NextResponse, request: NextRequest) {
   const pathname = new URL(request.url).pathname;
   const host = requestHost(request);
-  const isPreviewHost = Boolean(host && host.endsWith(".vercel.app"));
+  const isVercelPreviewHost = Boolean(host && host.endsWith(".vercel.app"));
   const privateApplicationsOperation = pathMatchesPrefix(pathname, "/api/apps");
   const ownerPath = isOwnerPath(pathname);
 
-  if (process.env.VERCEL_ENV !== "production" && isPreviewHost) {
+  if (!isProductionRuntime() && isVercelPreviewHost) {
     response.headers.set("X-Robots-Tag", PREVIEW_NOINDEX);
   }
 
@@ -217,7 +218,7 @@ function regulatedMutationBoundary(request: NextRequest) {
 }
 
 function redirectToOwnerSite(request: NextRequest) {
-  if (process.env.VERCEL_ENV !== "production") return null;
+  if (!isProductionRuntime()) return null;
   const source = new URL(request.url);
   if (!isOwnerPath(source.pathname)) return null;
   const host = requestHost(request);
@@ -228,7 +229,7 @@ function redirectToOwnerSite(request: NextRequest) {
 }
 
 function redirectOwnerHostToCorrectSurface(request: NextRequest) {
-  if (process.env.VERCEL_ENV !== "production") return null;
+  if (!isProductionRuntime()) return null;
   const host = requestHost(request);
   if (host !== ownerHost()) return null;
   const source = new URL(request.url);
@@ -248,7 +249,7 @@ function redirectOwnerHostToCorrectSurface(request: NextRequest) {
 function canonicalRedirect(request: NextRequest) {
   const host = requestHost(request);
   if (isLocalHost(host) || host === CANONICAL_HOST || host === ownerHost()) return null;
-  if (process.env.VERCEL_ENV !== "production") return null;
+  if (!isProductionRuntime()) return null;
 
   const source = new URL(request.url);
   const destination = new URL(source.pathname + source.search, `https://${CANONICAL_HOST}`);
@@ -264,7 +265,7 @@ function safeOwnerReturnTo(request: NextRequest) {
 }
 
 function redirectToIdentityGateway(request: NextRequest, status?: string) {
-  const gatewayBase = process.env.VERCEL_ENV === "production"
+  const gatewayBase = isProductionRuntime()
     ? new URL("/owner-access", ownerOrigin())
     : new URL("/owner-access", request.url);
   gatewayBase.searchParams.set("redirect_url", safeOwnerReturnTo(request));
@@ -412,7 +413,7 @@ async function handleSupabaseRequest(
       internalIdentityAuthorized: authority.internalIdentityAuthorized,
       assuranceLevel: identity.assuranceLevel,
       protectedAuthorityReady: authority.protectedReadiness.ready,
-      previewEnvironment: process.env.VERCEL_ENV === "preview",
+      previewEnvironment: isPreviewRuntime(),
       productionOwnerReviewAuthorized:
         (pathMatchesPrefix(new URL(request.url).pathname, "/florida-security-training/owner-preview")
           || pathMatchesPrefix(new URL(request.url).pathname, "/api/florida-class-d/owner-preview"))
