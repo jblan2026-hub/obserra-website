@@ -23,6 +23,7 @@ env:
   AZURE_LOCATION: eastus
   AZURE_RESOURCE_GROUP: rg-obserra-prod-eastus
   OBSERRA_WEBAPP_NAME: obserra-web-prod-38d660
+  OBSERRA_STORAGE_ACCOUNT: stobserraprod38d660
   OBSERRA_STAGING_SLOT: staging
   OBSERRA_RUNTIME_ENVIRONMENT: production
   OBSERRA_HOSTING_PROVIDER: azure-app-service
@@ -36,7 +37,7 @@ jobs:
   deploy:
     name: Build, stage, verify, swap, verify
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     steps:
       - name: Check out exact main release
         uses: actions/checkout@v6
@@ -109,13 +110,30 @@ jobs:
           test "${actual_tenant}" = "${AZURE_TENANT_ID}"
           az group show --name "${AZURE_RESOURCE_GROUP}" --query id -o tsv >/dev/null
 
+      - name: Validate Azure infrastructure templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          az bicep build --file infra/main.bicep --stdout >/dev/null
+          az bicep build --file infra/storage-gpv2.bicep --stdout >/dev/null
+          az deployment group validate \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --template-file infra/main.bicep \
+            --parameters location="${AZURE_LOCATION}" \
+            --only-show-errors >/dev/null
+          az deployment group validate \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --template-file infra/storage-gpv2.bicep \
+            --parameters location="${AZURE_LOCATION}" \
+            --only-show-errors >/dev/null
+
       - name: Converge Azure production infrastructure
         shell: bash
         run: |
           set -euo pipefail
           az deployment group create \
             --resource-group "${AZURE_RESOURCE_GROUP}" \
-            --name "obserra-${GITHUB_RUN_ID}" \
+            --name "obserra-app-${GITHUB_RUN_ID}" \
             --template-file infra/main.bicep \
             --parameters location="${AZURE_LOCATION}" \
             --mode Incremental \
@@ -123,6 +141,36 @@ jobs:
             --output json > /tmp/obserra-azure-deployment.json
           test "$(jq -r '.properties.provisioningState' /tmp/obserra-azure-deployment.json)" = "Succeeded"
           test "$(jq -r '.properties.outputs.webAppName.value' /tmp/obserra-azure-deployment.json)" = "${OBSERRA_WEBAPP_NAME}"
+
+          az deployment group create \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --name "obserra-storage-${GITHUB_RUN_ID}" \
+            --template-file infra/storage-gpv2.bicep \
+            --parameters location="${AZURE_LOCATION}" \
+            --mode Incremental \
+            --only-show-errors \
+            --output json > /tmp/obserra-storage-deployment.json
+          test "$(jq -r '.properties.provisioningState' /tmp/obserra-storage-deployment.json)" = "Succeeded"
+          test "$(jq -r '.properties.outputs.storageAccountName.value' /tmp/obserra-storage-deployment.json)" = "${OBSERRA_STORAGE_ACCOUNT}"
+
+      - name: Prove live Azure storage is hardened GPv2
+        shell: bash
+        run: |
+          set -euo pipefail
+          az storage account show \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --name "${OBSERRA_STORAGE_ACCOUNT}" \
+            --output json > /tmp/obserra-storage-live.json
+          jq -e '
+            .kind == "StorageV2" and
+            .sku.name == "Standard_GRS" and
+            .allowBlobPublicAccess == false and
+            .allowSharedKeyAccess == false and
+            .defaultToOAuthAuthentication == true and
+            .minimumTlsVersion == "TLS1_2" and
+            .enableHttpsTrafficOnly == true and
+            .networkRuleSet.defaultAction == "Deny"
+          ' /tmp/obserra-storage-live.json >/dev/null
 
       - name: Bind exact release authority to staging slot
         shell: bash
