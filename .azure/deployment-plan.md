@@ -1,6 +1,6 @@
 # Azure Deployment Plan
 
-> **Status:** Executing
+> **Status:** Ready for Validation
 
 Generated: 2026-08-21
 
@@ -142,16 +142,17 @@ The one-time Azure Cloud Shell bootstrap therefore performs the live control-pla
 
 ### Phase 2: Execution
 - [x] Research App Service, deployment slots, Key Vault, managed identity, monitoring, and OIDC patterns
-- [ ] Generate Bicep infrastructure
-- [ ] Add one-time Azure Cloud Shell bootstrap for GitHub OIDC
-- [ ] Convert Vercel-only release authority into hosting-provider-neutral release authority
-- [ ] Configure Next.js standalone production output
-- [ ] Add GitHub OIDC staging-deploy / verify / swap / rollback workflow
-- [ ] Preserve regulated fail-closed module behavior
-- [ ] Update plan status to `Ready for Validation`
+- [x] Generate Bicep infrastructure
+- [x] Add one-time Azure Cloud Shell bootstrap for GitHub OIDC
+- [x] Convert Vercel-only release authority into hosting-provider-neutral release authority for the critical production request/identity/commerce paths
+- [x] Configure Next.js standalone production output
+- [x] Add GitHub OIDC staging-deploy / verify / swap / rollback workflow
+- [x] Preserve regulated fail-closed module behavior
+- [x] Converge generated CMMC system evidence through the governed repository generator
+- [x] Update plan status to `Ready for Validation`
 
 ### Phase 3: Validation
-- [ ] Invoke Azure validation workflow/skill where available
+- [ ] Run current exact-head GitHub CI to completion
 - [ ] Run unit tests, lint, typecheck, and production build
 - [ ] Validate Bicep syntax in an authenticated Azure/GitHub runner
 - [ ] Verify no secrets in repository/build artifact
@@ -179,25 +180,28 @@ The one-time Azure Cloud Shell bootstrap therefore performs the live control-pla
 
 | Check | Command Run | Result | Timestamp |
 |-------|-------------|--------|-----------|
-| Pending | Pending Phase 3 | Not yet run | - |
+| Governed CMMC regeneration | `npm run generate:cmmc-system-evidence` then `npm run verify:cmmc-system-evidence` in one-shot GitHub runner | Generated and committed by repository workflow; final exact-head CI pending | 2026-08-21 |
+| Azure production-plane contract | `node --test` through repository CI | Pending exact-head CI | 2026-08-21 |
+| Florida Class D Gates | repository workflow | Pending exact-head CI after provider-neutral health correction | 2026-08-21 |
 
-**Validated by:** pending Azure validation phase
+**Validated by:** pending exact-head repository CI and Azure control-plane validation
 
 ---
 
-## 9. Files to Generate
+## 9. Files Generated
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `.azure/deployment-plan.md` | Migration and deployment source of truth | Updated / executing |
-| `infra/main.bicep` | App Service, slot, Key Vault, monitoring, runtime identity | Pending |
-| `scripts/azure-bootstrap-production.sh` | One-time subscription/provider/RBAC/OIDC bootstrap | Pending |
-| `.github/workflows/azure-production-deploy.yml` | OIDC build, staging deploy, verify, swap, rollback | Pending |
-| `app/api/health/route.ts` | Provider-neutral exact-release health contract | Pending |
-| `next.config.ts` | Standalone Azure-compatible production build | Pending |
+| `.azure/deployment-plan.md` | Migration and deployment source of truth | Ready for Validation |
+| `infra/main.bicep` | App Service, slot, Key Vault, monitoring, runtime identity | Generated |
+| `scripts/azure-bootstrap-production.sh` | One-time subscription/provider/RBAC/OIDC bootstrap | Generated |
+| `.github/workflows/azure-production-deploy.yml` | OIDC build, staging deploy, verify, swap, rollback | Generated |
+| `app/api/health/route.ts` | Provider-neutral exact-release health contract | Generated |
+| `lib/runtime-environment.ts` | Provider-neutral production/preview authority | Generated |
+| `next.config.ts` | Standalone Azure-compatible production build | Updated |
 
 ---
 
 ## 10. Current Next Step
 
-Generate and merge the Azure deployment artifacts, then run the one-time Azure bootstrap under the confirmed Owner account to establish GitHub OIDC. No DNS or Vercel production routing changes occur during this phase.
+Complete exact-head GitHub CI. Do not merge while any required source gate is red. After source validation is green, merge immediately and run the one-time Azure Cloud Shell bootstrap to establish GitHub OIDC. No DNS or Vercel production routing changes occur during this phase.
