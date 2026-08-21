@@ -7,7 +7,10 @@ import test from "node:test";
 
 const SCRIPT = path.resolve("scripts/vercel-ignore-build.sh");
 const PRODUCTION_PROJECT_ID = "prj_lxTKKDa9sbhht7FaigiaF1PONMiC";
-const DUPLICATE_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";
+const NON_CANONICAL_PROJECT_IDS = [
+  "prj_FfAnssVJU8pcJydGNJHmCliP6Yme",
+  "prj_v6Hb7FkpkUoLKlHkjzKJ5HVgYDaL",
+];
 
 function git(cwd, ...args) {
   return execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
@@ -40,39 +43,43 @@ function makeRepo() {
   return { cwd, baseline };
 }
 
-test("duplicate Vercel project skips runtime-source builds", () => {
-  const { cwd, baseline } = makeRepo();
-  try {
-    fs.writeFileSync(path.join(cwd, "app", "page.tsx"), "export default function Page(){return <main/>}\n");
-    commit(cwd, "runtime source change");
-
-    const result = runIgnore(cwd, {
-      VERCEL_PROJECT_ID: DUPLICATE_PROJECT_ID,
-      VERCEL_ENV: "production",
-      VERCEL_GIT_COMMIT_REF: "main",
-      VERCEL_GIT_PREVIOUS_SHA: baseline,
-    });
-    assert.equal(result.status, 0, `expected duplicate project build to be skipped, stderr: ${result.stderr}`);
-  } finally {
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test("duplicate Vercel project also skips hotfix and release builds", () => {
-  for (const ref of ["hotfix/fdacs-production-fix", "release/production-20260820"]) {
+test("every known noncanonical Vercel project skips runtime-source builds", () => {
+  for (const projectId of NON_CANONICAL_PROJECT_IDS) {
     const { cwd, baseline } = makeRepo();
     try {
       fs.writeFileSync(path.join(cwd, "app", "page.tsx"), "export default function Page(){return <main/>}\n");
       commit(cwd, "runtime source change");
+
       const result = runIgnore(cwd, {
-        VERCEL_PROJECT_ID: DUPLICATE_PROJECT_ID,
-        VERCEL_ENV: "preview",
-        VERCEL_GIT_COMMIT_REF: ref,
+        VERCEL_PROJECT_ID: projectId,
+        VERCEL_ENV: "production",
+        VERCEL_GIT_COMMIT_REF: "main",
         VERCEL_GIT_PREVIOUS_SHA: baseline,
       });
-      assert.equal(result.status, 0, `expected duplicate project to skip ${ref}, stderr: ${result.stderr}`);
+      assert.equal(result.status, 0, `expected noncanonical project ${projectId} build to be skipped, stderr: ${result.stderr}`);
     } finally {
       fs.rmSync(cwd, { recursive: true, force: true });
+    }
+  }
+});
+
+test("every known noncanonical Vercel project also skips hotfix and release builds", () => {
+  for (const projectId of NON_CANONICAL_PROJECT_IDS) {
+    for (const ref of ["hotfix/fdacs-production-fix", "release/production-20260820"]) {
+      const { cwd, baseline } = makeRepo();
+      try {
+        fs.writeFileSync(path.join(cwd, "app", "page.tsx"), "export default function Page(){return <main/>}\n");
+        commit(cwd, "runtime source change");
+        const result = runIgnore(cwd, {
+          VERCEL_PROJECT_ID: projectId,
+          VERCEL_ENV: "preview",
+          VERCEL_GIT_COMMIT_REF: ref,
+          VERCEL_GIT_PREVIOUS_SHA: baseline,
+        });
+        assert.equal(result.status, 0, `expected noncanonical project ${projectId} to skip ${ref}, stderr: ${result.stderr}`);
+      } finally {
+        fs.rmSync(cwd, { recursive: true, force: true });
+      }
     }
   }
 });
@@ -114,7 +121,7 @@ test("canonical production project always builds hotfix and release branches", (
   }
 });
 
-test("unrecognized Vercel project IDs fail open so a release cannot be silently skipped", () => {
+test("unrecognized Vercel project IDs fail closed so they cannot become another deployment authority", () => {
   const { cwd } = makeRepo();
   try {
     const result = runIgnore(cwd, {
@@ -122,7 +129,21 @@ test("unrecognized Vercel project IDs fail open so a release cannot be silently 
       VERCEL_ENV: "production",
       VERCEL_GIT_COMMIT_REF: "main",
     });
-    assert.equal(result.status, 1, `expected Vercel to build on an unrecognized project ID, stderr: ${result.stderr}`);
+    assert.equal(result.status, 0, `expected unrecognized Vercel project to be suppressed, stderr: ${result.stderr}`);
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("missing Vercel project identity also fails closed", () => {
+  const { cwd } = makeRepo();
+  try {
+    const result = runIgnore(cwd, {
+      VERCEL_PROJECT_ID: "",
+      VERCEL_ENV: "production",
+      VERCEL_GIT_COMMIT_REF: "main",
+    });
+    assert.equal(result.status, 0, `expected missing Vercel project identity to be suppressed, stderr: ${result.stderr}`);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }
