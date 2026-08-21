@@ -1,7 +1,7 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { lessonBrief } from "../../../academy/courseExperience";
 import { markLessonComplete } from "../../../../lib/academy";
+import { safeAcademyIdentity } from "../../../../lib/academy-identity";
 import { validateAcademyJsonMutation } from "../../../../lib/academy-request";
 
 const responseHeaders = {
@@ -14,8 +14,13 @@ export async function POST(request: Request) {
   if (rejection) {
     return NextResponse.json({ error: rejection.error }, { status: rejection.status, headers: responseHeaders });
   }
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers: responseHeaders });
+  const identity = await safeAcademyIdentity();
+  if (!identity.configured || identity.status === "claims_unavailable") {
+    return NextResponse.json({ error: "Identity service is unavailable" }, { status: 503, headers: responseHeaders });
+  }
+  if (!identity.principalId) {
+    return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers: responseHeaders });
+  }
 
   let body: { courseId?: string; lessonIndex?: number; checkAnswer?: number };
   try {
@@ -46,7 +51,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const progress = await markLessonComplete(userId, body.courseId, body.lessonIndex);
+    const progress = await markLessonComplete(identity.principalId, body.courseId, body.lessonIndex);
     return NextResponse.json({ progress }, { headers: responseHeaders });
   } catch (error) {
     return NextResponse.json(

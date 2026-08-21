@@ -1,7 +1,7 @@
-import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 import CoursePlayer from "../CoursePlayer";
 import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
+import { safeAcademyIdentity } from "../../../../lib/academy-identity";
 import { finalAssessmentQuestions, lessonBrief } from "../../courseExperience";
 
 export default async function LearnCoursePage({ params }: { params: Promise<{ courseId: string }> }) {
@@ -9,12 +9,19 @@ export default async function LearnCoursePage({ params }: { params: Promise<{ co
   const course = courseForId(courseId);
   if (!course) notFound();
 
-  const { userId } = await auth();
-  if (!userId) {
+  const identity = await safeAcademyIdentity();
+  if (!identity.configured || identity.status === "claims_unavailable") {
+    redirect("/academy?identity=configuration-required");
+  }
+  if (!identity.principalId || !identity.identity) {
     redirect(`/sign-in?redirect_url=${encodeURIComponent(`/academy/learn/${courseId}`)}`);
   }
 
-  const state = await academyStateWithOwnerAccess(userId, courseId);
+  const state = await academyStateWithOwnerAccess(
+    identity.principalId,
+    courseId,
+    identity.identity.roles,
+  );
   if (!state.entitlements[courseId]) redirect(`/academy/${courseId}?required=paid-access`);
 
   const lessons = course.modules

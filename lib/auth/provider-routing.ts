@@ -46,6 +46,18 @@ const SUPABASE_PROTECTED_PREFIXES = [
   "/auth/mfa",
 ] as const;
 const SUPABASE_PUBLIC_PREFIXES = ["/auth/callback", "/sign-out", "/sign-up"] as const;
+const ACADEMY_SUPABASE_PUBLIC_PREFIXES = [
+  "/api/academy/checkout",
+  "/api/academy/enrollment-status",
+] as const;
+const ACADEMY_SUPABASE_PROTECTED_PREFIXES = [
+  "/api/academy/redeem",
+  "/api/academy/progress",
+  "/api/academy/assessment",
+  "/api/academy/media",
+  "/api/academy/tutor",
+  "/api/admin/academy-commerce",
+] as const;
 const FDACS_HEALTH_PREFIXES = [
   "/api/florida-class-d/health/live",
   "/api/florida-class-d/health/ready",
@@ -99,7 +111,7 @@ function normalizedPathname(pathname: string) {
 function mutationClass(pathname: string, method: string | null | undefined): IdentityMutationClass {
   const normalizedMethod = method?.trim().toUpperCase() || "GET";
   if (normalizedMethod === "GET" || normalizedMethod === "HEAD") return "read";
-  if (/\/(?:enrollment|enrollments)(?:\/|$)/.test(pathname)) return "enrollment";
+  if (/\/(?:enrollment|enrollments|redeem)(?:\/|$)/.test(pathname)) return "enrollment";
   if (/\/(?:payment|payments|checkout)(?:\/|$)/.test(pathname)) return "payment";
   if (/\/(?:completion|completion-documents|completion-packet|certificate|lias)(?:\/|$)/.test(pathname)) return "completion_certificate_lias";
   return "training_operation";
@@ -119,6 +131,13 @@ function ownedRoute(pathname: string, method?: string | null): IdentityRouteOwne
   if (CLERK_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("clerk", false, "applications_clerk");
   if (FDACS_HEALTH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("public", false, "public");
   if (FDACS_PUBLIC_READ_PATHS.has(pathname) && readMethod(method)) return route("public", false, "public");
+
+  if (ACADEMY_SUPABASE_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
+    return route("supabase", true, "standard_authenticated", mutationClass(pathname, method), true);
+  }
+  if (ACADEMY_SUPABASE_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) {
+    return route("supabase", false, "standard_public", mutationClass(pathname, method), true);
+  }
 
   if (pathMatchesPrefix(pathname, "/florida-security-training/owner-validation") || pathMatchesPrefix(pathname, "/api/florida-class-d/owner-validation")) {
     return route("supabase", true, "internal_owner_read_only", mutationClass(pathname, method), false);

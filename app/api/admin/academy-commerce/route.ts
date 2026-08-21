@@ -1,21 +1,19 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { courses } from "../../../academy/courseData";
-import { ownerEmailAllowed } from "../../../../lib/academy";
+import { safeAcademyIdentity } from "../../../../lib/academy-identity";
 import { paymentLinksByCourse, provisionCoursePaymentLink } from "../../../../lib/stripe";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function POST() {
-  let approved = false;
-  try {
-    const { userId } = await auth();
-    const user = userId ? await currentUser() : null;
-    approved = ownerEmailAllowed(user?.emailAddresses.map((entry) => entry.emailAddress) ?? []);
-  } catch {
-    approved = false;
-  }
+  const identity = await safeAcademyIdentity();
+  const approved = Boolean(
+    identity.configured &&
+    identity.identity?.roles.includes("owner") &&
+    identity.identity.emailVerified &&
+    identity.identity.assuranceLevel === "aal2"
+  );
   if (!approved) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json({ error: "Stripe production configuration is incomplete." }, { status: 503 });

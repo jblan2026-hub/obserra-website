@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import {
+  academyIdentityEnvironment,
+  academyIdentityRuntimeReady,
+} from "../../../../lib/academy-identity";
+import {
   academyPersistenceConfigured,
   academyPurchaserHashConfigured,
   academyStorageHealth,
 } from "../../../../lib/academy-persistence";
-import { prepareClerkRuntime } from "../../../../lib/clerk-runtime-config";
 import { getAcademyStripe } from "../../../../lib/academy-stripe";
 import { academyStripeWebhookSecret } from "../../../../lib/academy-payment";
 
@@ -15,7 +18,8 @@ const CLAIM_POLICY = "purchaser-email-match-v1";
 const CONTRACT_VERSION = "academy-commerce-health-v1";
 
 export async function GET() {
-  const identity = prepareClerkRuntime();
+  const identityReady = academyIdentityRuntimeReady();
+  const identityEnvironment = academyIdentityEnvironment();
   const stripeKey = process.env.ACADEMY_STRIPE_SECRET_KEY?.trim() ?? "";
   const stripeEnvironment = stripeKey.startsWith("rk_live_")
     ? "live"
@@ -56,7 +60,7 @@ export async function GET() {
   }
 
   const paymentOperational = productionModeAccepted && providerConnected && chargesEnabled && webhookConfigured;
-  const operational = paymentOperational && storageOperational && purchaserHashConfigured && identity.ready;
+  const operational = paymentOperational && storageOperational && purchaserHashConfigured && identityReady;
 
   return NextResponse.json(
     {
@@ -78,8 +82,8 @@ export async function GET() {
       ],
       checkoutModes: ["authenticated", "guest-email"],
       claimPolicy: CLAIM_POLICY,
-      identity: identity.ready ? "available" : "degraded",
-      identityEnvironment: identity.environment,
+      identity: identityReady ? "available" : "degraded",
+      identityEnvironment,
       durableStorage: storageOperational ? "available" : "unavailable",
       storageSchema,
       purchaserIdentityHashing: purchaserHashConfigured ? "available" : "unavailable",

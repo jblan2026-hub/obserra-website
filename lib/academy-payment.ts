@@ -3,7 +3,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import type Stripe from "stripe";
 
-export const ACADEMY_PAYMENT_CONTRACT = "academy-payment-v2";
+export const ACADEMY_PAYMENT_CONTRACT = "academy-payment-v3";
 export const ACADEMY_PAYMENT_CURRENCY = "usd";
 
 const SEMVER = /^\d+\.\d+\.\d+$/;
@@ -240,7 +240,7 @@ export function validateAcademyPaidSession(
     ? session.payment_intent
     : session.payment_intent?.id;
   const identityMode = metadata.identityMode;
-  const learnerId = metadata.clerkUserId || undefined;
+  const learnerId = metadata.academyPrincipalId || undefined;
   const purchaserReference = metadata.purchaserReference ?? "";
   if (identityMode !== "authenticated" && identityMode !== "guest-email") {
     return { valid: false, reason: "identity-mode-invalid" };

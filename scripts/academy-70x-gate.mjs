@@ -111,6 +111,7 @@ const requiredFiles = [
   "app/api/academy/checkout/route.ts",
   "app/api/webhook/stripe/route.ts",
   "lib/academy.ts",
+  "lib/academy-identity.ts",
 ];
 for (const file of requiredFiles) check(`required file exists: ${file}`, exists(file));
 
@@ -176,13 +177,13 @@ check(
 
 check("assessment generates 25 questions", /Array\.from\(\{ length: 25 \}/.test(experience));
 check("assessment answer keys remain server side", /finalAssessmentQuestions/.test(experience) && /finalAssessment\(body\.courseId\)/.test(assessmentRoute));
-check("assessment requires authentication", /if \(!userId\)/.test(assessmentRoute));
+check("assessment requires Supabase authentication", /safeAcademyIdentity/.test(assessmentRoute) && /if \(!identity\.principalId/.test(assessmentRoute) && /status: 401/.test(assessmentRoute));
 check("assessment requires every answer", /answers\.length !== questions\.length/.test(assessmentRoute));
 check("assessment passing threshold is 80 percent", /score >= 80/.test(assessmentRoute));
 check("assessment returns certificate URL only when eligible", /certificateId \? `\/academy\/certificate/.test(assessmentRoute));
 check("assessment errors fail closed", /status: 400/.test(assessmentRoute));
 
-check("lesson progress requires authentication", /if \(!userId\)/.test(progressRoute));
+check("lesson progress requires Supabase authentication", /safeAcademyIdentity/.test(progressRoute) && /if \(!identity\.principalId/.test(progressRoute) && /status: 401/.test(progressRoute));
 check("lesson progress requires integer knowledge check answer", /checkAnswer/.test(progressRoute) && /Number\.isInteger\(body\.checkAnswer\)/.test(progressRoute));
 check("lesson progress validates the server answer key", /body\.checkAnswer !== lesson\.check\.answer/.test(progressRoute));
 check("lesson progress fails closed on incorrect knowledge check", /Complete the lesson knowledge check correctly/.test(progressRoute));
@@ -266,7 +267,7 @@ check("grounding includes intelligence analytic standards", /Intelligence Commun
 check("grounding includes SEC cyber disclosure requirements", /Regulation S-K Item 106/.test(grounding));
 check("grounding includes public practice examples", /Google/.test(grounding) && /Equifax/.test(grounding) && /SolarWinds/.test(grounding));
 
-check("tutor requires authentication", /if \(!userId\)/.test(tutorRoute));
+check("tutor requires Supabase authentication", /safeAcademyIdentity/.test(tutorRoute) && /if \(!identity\.principalId/.test(tutorRoute) && /status: 401/.test(tutorRoute));
 check("tutor requires paid entitlement", /Paid course access is required/.test(tutorRoute) && /state\.entitlements\[courseId\]/.test(tutorRoute));
 check("tutor is scoped to current course", /courseForId\(courseId\)/.test(tutorRoute));
 check("tutor is scoped to current lesson", /lessonBrief\(courseId, lessonIndex\)/.test(tutorRoute));

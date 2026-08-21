@@ -1,6 +1,6 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
+import { safeAcademyIdentity } from "../../../../lib/academy-identity";
 import { lessonMedia } from "../../../../lib/academy-media";
 
 export const runtime = "nodejs";
@@ -20,11 +20,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid lesson media request" }, { status: 400, headers });
   }
 
-  const { userId } = await auth();
-  if (!userId) {
+  const identity = await safeAcademyIdentity();
+  if (!identity.configured || identity.status === "claims_unavailable") {
+    return NextResponse.json({ error: "Identity service is unavailable" }, { status: 503, headers });
+  }
+  if (!identity.principalId || !identity.identity) {
     return NextResponse.json({ error: "Sign in is required" }, { status: 401, headers });
   }
-  const state = await academyStateWithOwnerAccess(userId, courseId);
+  const state = await academyStateWithOwnerAccess(
+    identity.principalId,
+    courseId,
+    identity.identity.roles,
+  );
   if (!state.entitlements[courseId]) {
     return NextResponse.json({ error: "Paid course access is required" }, { status: 403, headers });
   }

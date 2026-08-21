@@ -1,9 +1,9 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { courses } from "../academy/courseData";
-import { getAcademyAggregateMetrics, getAcademyCommerceMetrics, ownerEmailAllowed } from "../../lib/academy";
+import { getAcademyAggregateMetrics, getAcademyCommerceMetrics } from "../../lib/academy";
+import { safeAcademyIdentity } from "../../lib/academy-identity";
 import AcademyCommerceProvisioner from "./AcademyCommerceProvisioner";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./admin.css";
@@ -12,11 +12,15 @@ import "./admin-refine.css";
 export const metadata: Metadata = { title: "Owner Administration", robots: { index: false, follow: false } };
 
 export default async function AdminPage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in?redirect_url=/admin");
-  const user = await currentUser();
-  const emails = user?.emailAddresses.map((item) => item.emailAddress) ?? [];
-  if (!ownerEmailAllowed(emails)) notFound();
+  const auth = await safeAcademyIdentity();
+  if (!auth.configured || auth.status === "claims_unavailable") {
+    redirect("/academy?identity=configuration-required");
+  }
+  if (!auth.principalId || !auth.identity) redirect("/sign-in?redirect_url=/admin");
+  if (!auth.identity.roles.includes("owner") || !auth.identity.emailVerified) notFound();
+  if (auth.identity.assuranceLevel !== "aal2") {
+    redirect(`/auth/mfa?redirect_url=${encodeURIComponent("/admin")}`);
+  }
 
   const [metrics, commerce] = await Promise.all([getAcademyAggregateMetrics(), getAcademyCommerceMetrics()]);
   const grossRevenue = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(commerce.grossUsdCents / 100);
@@ -32,7 +36,7 @@ export default async function AdminPage() {
 
   return <main className="admin-shell">
     <header><Image src="/brand/obserra-logo.png" alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" width={286} height={55} /><span>SECURED OWNER CONTROL ROOM</span></header>
-    <section className="admin-hero"><p>Signed in owner: {emails[0]}</p><h1>{LEGAL_ENTITY_NAME} site administration</h1><p>Protected Academy controls, commerce performance, traffic intelligence, and release readiness for {LEGAL_ENTITY_NAME}.</p></section>
+    <section className="admin-hero"><p>Verified owner identity: {auth.identity.email ?? auth.identity.principalId}</p><h1>{LEGAL_ENTITY_NAME} site administration</h1><p>Protected Academy controls, commerce performance, traffic intelligence, and release readiness for {LEGAL_ENTITY_NAME}.</p></section>
     <section className="admin-grid">
       <article><span>Catalog courses</span><strong>{courses.length}</strong><small>Structured paid courses in Academy</small></article>
       <article><span>Learner accounts observed</span><strong>{metrics.learnerAccounts}</strong><small>Durable Academy learner records</small></article>
@@ -46,6 +50,6 @@ export default async function AdminPage() {
     <section className="admin-section"><h2>Commerce provisioning</h2><AcademyCommerceProvisioner /></section>
     <section className="admin-section"><h2>Website activity and tracking</h2><p>Privacy-first page views, top pages, conversion events, traffic sources, and API execution traces are available in private Vercel and Stripe consoles. Use the links below for rapid operational review.</p><div className="admin-action-row"><a href="https://vercel.com/obserra/obserra-website-live/analytics" target="_blank" rel="noreferrer">Open Vercel Web Analytics</a><a href="https://vercel.com/obserra/obserra-website-live/observability" target="_blank" rel="noreferrer">Open Vercel Observability</a><a href="https://dashboard.stripe.com/payments" target="_blank" rel="noreferrer">Open Stripe Payments</a><a href="https://dashboard.stripe.com/events" target="_blank" rel="noreferrer">Open Stripe Events</a></div></section>
     <section className="admin-section"><h2>Course performance intelligence</h2><div className="admin-course-list">{coursePerformance.map(({ course, enrollments, certificates, completionRate }) => <article key={course.id}><div><span>{course.department}</span><h3>{course.title}</h3><p>{course.modules.length} interactive lessons, 25 question final, and 80 percent certificate threshold</p></div><div><b>{enrollments} enrollments</b><b>{certificates} certificates</b><b>{completionRate} completion rate</b><a href={`/academy/${course.id}`}>Open public course page</a></div></article>)}</div></section>
-    <section className="admin-section"><h2>Admin access and passwordless security</h2><p>Admin access is controlled by signed-in Clerk account email allowlist. Configure OBSERRA_OWNER_EMAIL for single owner access or OBSERRA_OWNER_EMAILS for comma-separated multi-admin access. We do not generate or expose admin credentials in code.</p><p>For passwordless access with no username and password entry, configure Clerk to allow passkeys (WebAuthn) and/or email link sign-in, then disable password-based sign-in strategies in the Clerk dashboard for your production instance.</p></section>
+    <section className="admin-section"><h2>Admin identity security</h2><p>Admin access uses {LEGAL_ENTITY_NAME} Identity on Supabase with verified email, the governed owner role, and AAL2 multi-factor assurance. Authorization roles are issued only from trusted application metadata; learner profile metadata cannot grant administrative access.</p></section>
   </main>;
 }
