@@ -8,7 +8,10 @@ import test from "node:test";
 const SCRIPT = path.resolve("scripts/vercel-ignore-build.sh");
 const VERCEL_CONFIG = path.resolve("vercel.json");
 const PRODUCTION_PROJECT_ID = "prj_lxTKKDa9sbhht7FaigiaF1PONMiC";
-const DUPLICATE_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";
+const DUPLICATE_PROJECT_IDS = [
+  "prj_FfAnssVJU8pcJydGNJHmCliP6Yme",
+  "prj_v6Hb7FkpkUoLKlHkjzKJ5HVgYDaL",
+];
 
 function git(cwd, ...args) {
   return execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
@@ -39,22 +42,24 @@ function createRepo() {
   return { cwd, baseline };
 }
 
-test("duplicate Vercel project always skips builds for this repository", () => {
-  for (const env of [
-    { VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "feature/runtime-change" },
-    { VERCEL_ENV: "production", VERCEL_GIT_COMMIT_REF: "main" },
-    { VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "hotfix/fdacs-live-domain-repair" },
-  ]) {
-    const { cwd, baseline } = createRepo();
-    try {
-      const result = runIgnore(cwd, {
-        VERCEL_PROJECT_ID: DUPLICATE_PROJECT_ID,
-        VERCEL_GIT_PREVIOUS_SHA: baseline,
-        ...env,
-      });
-      assert.equal(result.status, 0, `expected duplicate project build to be skipped, stderr: ${result.stderr}`);
-    } finally {
-      fs.rmSync(cwd, { recursive: true, force: true });
+test("every known noncanonical Vercel project always skips builds for this repository", () => {
+  for (const projectId of DUPLICATE_PROJECT_IDS) {
+    for (const env of [
+      { VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "feature/runtime-change" },
+      { VERCEL_ENV: "production", VERCEL_GIT_COMMIT_REF: "main" },
+      { VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "hotfix/fdacs-live-domain-repair" },
+    ]) {
+      const { cwd, baseline } = createRepo();
+      try {
+        const result = runIgnore(cwd, {
+          VERCEL_PROJECT_ID: projectId,
+          VERCEL_GIT_PREVIOUS_SHA: baseline,
+          ...env,
+        });
+        assert.equal(result.status, 0, `expected noncanonical project ${projectId} build to be skipped, stderr: ${result.stderr}`);
+      } finally {
+        fs.rmSync(cwd, { recursive: true, force: true });
+      }
     }
   }
 });
@@ -74,7 +79,7 @@ test("canonical production Vercel project always builds", () => {
   }
 });
 
-test("unknown Vercel project IDs fail open instead of suppressing releases", () => {
+test("unknown Vercel project IDs fail closed instead of creating another deployment authority", () => {
   const { cwd, baseline } = createRepo();
   try {
     const result = runIgnore(cwd, {
@@ -83,14 +88,18 @@ test("unknown Vercel project IDs fail open instead of suppressing releases", () 
       VERCEL_GIT_COMMIT_REF: "main",
       VERCEL_GIT_PREVIOUS_SHA: baseline,
     });
-    assert.equal(result.status, 1, `expected unknown project to build, stderr: ${result.stderr}`);
+    assert.equal(result.status, 0, `expected unknown project to be suppressed, stderr: ${result.stderr}`);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }
 });
 
-test("repository config assigns only the two canonical custom domains after duplicate builds are suppressed", () => {
+test("repository config never propagates canonical custom domains across every connected Vercel project", () => {
   const config = JSON.parse(fs.readFileSync(VERCEL_CONFIG, "utf8"));
   assert.equal(config.ignoreCommand, "sh scripts/vercel-ignore-build.sh");
-  assert.deepEqual(config.alias, ["www.obserrallc.com", "obserrallc.com"]);
+  assert.equal(
+    Object.hasOwn(config, "alias"),
+    false,
+    "canonical domains must be owned by the canonical Vercel project settings, not shared vercel.json aliases",
+  );
 });
