@@ -3,6 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 const CANONICAL_PROJECT_ID = "prj_lxTKKDa9sbhht7FaigiaF1PONMiC";
+const CANONICAL_PROJECT_NAME = "obserra-website-live";
 const DUPLICATE_PROJECT_ID = "prj_FfAnssVJU8pcJydGNJHmCliP6Yme";
 const INTEGRATED_SERVICES_PROJECT_ID = "prj_v6Hb7FkpkUoLKlHkjzKJ5HVgYDaL";
 const read = (path) => fs.readFileSync(path, "utf8");
@@ -15,6 +16,7 @@ test("production authority is single-sourced to the live canonical Vercel projec
   const commerceGate = read("scripts/florida-class-d-website-academy-commerce-gate.mjs");
   const cmmcGate = read("scripts/cmmc-level2-rev3-production-evidence.mjs");
   const ignoreBuildTest = read("test/vercel-ignore-build.test.mjs");
+  const readme = read("README.md");
 
   assert.match(runtime, new RegExp(`CANONICAL_PUBLIC_VERCEL_PROJECT_ID = ["']${CANONICAL_PROJECT_ID}["']`));
   assert.match(ignoreBuild, new RegExp(`PRODUCTION_PROJECT_ID=["']${CANONICAL_PROJECT_ID}["']`));
@@ -33,6 +35,10 @@ test("production authority is single-sourced to the live canonical Vercel projec
   assert.match(cmmcGate, new RegExp(CANONICAL_PROJECT_ID));
   assert.match(ignoreBuildTest, new RegExp(`PRODUCTION_PROJECT_ID = ["']${CANONICAL_PROJECT_ID}["']`));
   assert.match(ignoreBuildTest, /NON_CANONICAL_PROJECT_IDS/);
+  assert.match(readme, new RegExp(CANONICAL_PROJECT_NAME));
+  assert.match(readme, new RegExp(CANONICAL_PROJECT_ID));
+  assert.doesNotMatch(readme, /authoritative production project is Vercel project `obserra-integrated-services`/i);
+  assert.doesNotMatch(readme, /Deploy only[^\n]*`obserra-integrated-services` project/i);
 });
 
 test("automatic cutover discovers the actual noncanonical owner before moving to the canonical project", () => {
