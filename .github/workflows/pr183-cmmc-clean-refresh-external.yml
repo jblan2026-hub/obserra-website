@@ -1,0 +1,110 @@
+name: PR183 Clean CMMC Evidence Refresh
+
+on:
+  push:
+    branches:
+      - automation/pr183-cmmc-clean-refresh-20260821
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pr183-cmmc-clean-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    if: >-
+      github.repository == 'jblan2026-hub/obserra-website' &&
+      github.ref == 'refs/heads/automation/pr183-cmmc-clean-refresh-20260821' &&
+      github.actor == 'jblan2026-hub'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TARGET_BRANCH: fix/vercel-prelicense-cutover-20260821
+      EXPECTED_TARGET_SHA: 3be7f2d1a10e69efd46dcb4f7f8ac06728842e0f
+      AUTOMATION_BRANCH: automation/pr183-cmmc-clean-refresh-20260821
+    steps:
+      - name: Check out exact clean PR target branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/vercel-prelicense-cutover-20260821
+          fetch-depth: 0
+
+      - name: Verify target is exact and clean
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EXPECTED_TARGET_SHA"
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+          if [[ -e .github/workflows/pr183-cmmc-clean-refresh-external.yml ]]; then
+            echo "Temporary CMMC refresh workflow leaked into PR target tree." >&2
+            exit 1
+          fi
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify legal identity evidence is already current
+        run: npm run verify:legal-identity-audit
+
+      - name: Regenerate CMMC evidence from clean target tree
+        run: npm run generate:cmmc-system-evidence
+
+      - name: Verify regenerated CMMC evidence
+        run: npm run verify:cmmc-system-evidence
+
+      - name: Enforce CMMC-only generated diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          allowed=(
+            'docs/compliance/CMMC-SYSTEM-EVIDENCE.json'
+            'docs/compliance/CMMC-SYSTEM-EVIDENCE.md'
+            'docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256'
+          )
+          mapfile -t changed < <(git status --porcelain=v1 --untracked-files=all | sed -E 's/^.. //; s/.* -> //')
+          if [[ "${#changed[@]}" -ne 3 ]]; then
+            printf 'Expected exactly three CMMC evidence changes; observed %s\n' "${#changed[@]}" >&2
+            printf '%s\n' "${changed[@]}" >&2
+            exit 1
+          fi
+          for path in "${changed[@]}"; do
+            permitted=false
+            for candidate in "${allowed[@]}"; do
+              if [[ "$path" == "$candidate" ]]; then permitted=true; break; fi
+            done
+            if [[ "$permitted" != true ]]; then
+              echo "Unexpected generated change outside CMMC evidence boundary: $path" >&2
+              exit 1
+            fi
+          done
+          grep -F '"workingTreeState": "clean"' docs/compliance/CMMC-SYSTEM-EVIDENCE.json >/dev/null
+
+      - name: Commit clean CMMC evidence to PR target branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.json \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.md \
+            docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore(evidence): record clean PR183 CMMC target tree'
+          git push origin "HEAD:${TARGET_BRANCH}"
+
+      - name: Delete temporary automation branch
+        if: ${{ success() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git push origin --delete "$AUTOMATION_BRANCH"
