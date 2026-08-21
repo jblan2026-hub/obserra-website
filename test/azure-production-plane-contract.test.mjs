@@ -107,6 +107,23 @@ test("Azure bootstrap scopes GitHub OIDC to the production resource group", asyn
   assert.doesNotMatch(bootstrap, /client[_-]?secret/i);
 });
 
+test("current-directory bootstrap trusts the subscription tenant and preserves hardened controls", async () => {
+  const bootstrap = await read("scripts/azure-bootstrap-current-directory.sh");
+
+  assert.match(bootstrap, /az account show --subscription "\$\{SUBSCRIPTION_ID\}"/);
+  assert.match(bootstrap, /TENANT_ID="\$\(jq -r '\.tenantId'/);
+  assert.match(bootstrap, /Using subscription current directory tenant/);
+  assert.match(bootstrap, /repo:jblan2026-hub\/obserra-website:ref:refs\/heads\/main/);
+  assert.match(bootstrap, /--scope "\$\{RG_ID\}"/);
+  assert.match(bootstrap, /Microsoft\.Storage/);
+  assert.match(bootstrap, /StorageV2/);
+  assert.match(bootstrap, /az storage account show/);
+  assert.match(bootstrap, /az monitor autoscale show/);
+  assert.doesNotMatch(bootstrap, /5a08a33a-d2b5-491d-ac6d-32f325138143/);
+  assert.doesNotMatch(bootstrap, /password/i);
+  assert.doesNotMatch(bootstrap, /client[_-]?secret/i);
+});
+
 test("Next.js produces a standalone artifact for App Service", async () => {
   const config = await read("next.config.ts");
   assert.match(config, /output:\s*"standalone"/);
