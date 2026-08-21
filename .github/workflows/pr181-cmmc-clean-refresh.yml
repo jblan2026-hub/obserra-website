@@ -1,0 +1,52 @@
+name: PR181 clean CMMC evidence refresh
+
+on:
+  push:
+    branches:
+      - automation/pr181-cmmc-clean-20260821
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: e5ee197f6574bd941013cdb9105f734972d0da9d
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Assert clean exact target
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "e5ee197f6574bd941013cdb9105f734972d0da9d"
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+      - name: Generate and verify clean CMMC evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run generate:cmmc-system-evidence
+          grep -q '^157c0402bd9c91148141c24c1e1ccb451bd59c6989e5bd137cef0ae04e019293  CMMC-SYSTEM-EVIDENCE.json$' docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          npm run verify:cmmc-system-evidence
+          mapfile -t changed < <(git status --porcelain=v1 | sed 's/^...//' | sort)
+          printf '%s\n' "${changed[@]}"
+          test "${#changed[@]}" -eq 3
+          test "${changed[0]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.json"
+          test "${changed[1]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.md"
+          test "${changed[2]}" = "docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256"
+      - name: Commit only generated CMMC evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/compliance/CMMC-SYSTEM-EVIDENCE.json docs/compliance/CMMC-SYSTEM-EVIDENCE.md docs/compliance/CMMC-SYSTEM-EVIDENCE.sha256
+          git commit -m 'chore(cmmc): refresh clean-tree system evidence'
+          git push origin HEAD:fix/academy-supabase-runtime-identity-20260821
+          git push origin --delete automation/pr181-cmmc-clean-20260821
