@@ -12,6 +12,7 @@ on:
 permissions:
   contents: read
   id-token: write
+  issues: write
 
 jobs:
   oidc-domain-read:
@@ -34,11 +35,21 @@ jobs:
             core.setOutput('token', token);
 
       - name: Exchange OIDC token and test Vercel management read access
+        id: vercel_oidc
         shell: bash
         env:
           GITHUB_OIDC_TOKEN: ${{ steps.github_oidc.outputs.token }}
         run: |
           set -euo pipefail
+
+          echo "exchange_status=not-run" >> "${GITHUB_OUTPUT}"
+          echo "exchange_result=not-run" >> "${GITHUB_OUTPUT}"
+          echo "canonical_status=not-run" >> "${GITHUB_OUTPUT}"
+          echo "canonical_result=not-run" >> "${GITHUB_OUTPUT}"
+          echo "canonical_project=" >> "${GITHUB_OUTPUT}"
+          echo "duplicate_status=not-run" >> "${GITHUB_OUTPUT}"
+          echo "duplicate_result=not-run" >> "${GITHUB_OUTPUT}"
+          echo "duplicate_project=" >> "${GITHUB_OUTPUT}"
 
           exchange_body="$(mktemp)"
           exchange_status="$(curl --silent --show-error \
@@ -55,38 +66,32 @@ jobs:
             --data-urlencode "team_id_or_slug=${TEAM_ID}" \
             --data-urlencode "subject_token=${GITHUB_OIDC_TOKEN}")"
 
+          echo "exchange_status=${exchange_status}" >> "${GITHUB_OUTPUT}"
           if [ "${exchange_status}" != "200" ]; then
-            code="$(jq -r '.error // .error.code // empty' "${exchange_body}" 2>/dev/null || true)"
-            description="$(jq -r '.error_description // .error.message // empty' "${exchange_body}" 2>/dev/null || true)"
+            error_code="$(jq -r '.error.code // .error // empty' "${exchange_body}" 2>/dev/null || true)"
             rm -f "${exchange_body}"
-            echo "OIDC_EXCHANGE_HTTP_STATUS=${exchange_status}"
-            echo "OIDC_EXCHANGE_RESULT=denied"
-            if [ -n "${code}" ]; then echo "OIDC_EXCHANGE_ERROR_CODE=${code}"; fi
-            if [ -n "${description}" ]; then echo "OIDC_EXCHANGE_ERROR_DESCRIPTION=${description}"; fi
-            exit 1
+            echo "exchange_result=denied${error_code:+:${error_code}}" >> "${GITHUB_OUTPUT}"
+            exit 0
           fi
 
           access_token="$(jq -r '.access_token // empty' "${exchange_body}")"
           rm -f "${exchange_body}"
           if [ -z "${access_token}" ]; then
-            echo "OIDC_EXCHANGE_HTTP_STATUS=200"
-            echo "OIDC_EXCHANGE_RESULT=no_access_token"
-            exit 1
+            echo "exchange_result=no-access-token" >> "${GITHUB_OUTPUT}"
+            exit 0
           fi
           echo "::add-mask::${access_token}"
-          echo "OIDC_EXCHANGE_HTTP_STATUS=200"
-          echo "OIDC_EXCHANGE_RESULT=access_token_received"
+          echo "exchange_result=access-token-received" >> "${GITHUB_OUTPUT}"
 
           read_domain() {
             local project_id="$1"
-            local label="$2"
+            local status_output="$2"
+            local result_output="$3"
+            local project_output="$4"
             local body
             local status
             local project
-            local name
-            local verified
             local code
-            local message
 
             body="$(mktemp)"
             status="$(curl --silent --show-error \
@@ -97,27 +102,54 @@ jobs:
               --header "Authorization: Bearer ${access_token}" \
               "https://api.vercel.com/v9/projects/${project_id}/domains/${PRIMARY_DOMAIN}?teamId=${TEAM_ID}")"
 
-            echo "${label}_HTTP_STATUS=${status}"
+            echo "${status_output}=${status}" >> "${GITHUB_OUTPUT}"
             if [ "${status}" = "200" ]; then
               project="$(jq -r '.projectId // empty' "${body}")"
-              name="$(jq -r '.name // empty' "${body}")"
-              verified="$(jq -r '.verified // false' "${body}")"
-              echo "${label}_RESULT=authorized"
-              echo "${label}_PROJECT_ID=${project}"
-              echo "${label}_DOMAIN=${name}"
-              echo "${label}_VERIFIED=${verified}"
+              echo "${result_output}=authorized" >> "${GITHUB_OUTPUT}"
+              echo "${project_output}=${project}" >> "${GITHUB_OUTPUT}"
               rm -f "${body}"
               return 0
             fi
 
             code="$(jq -r '.error.code // empty' "${body}" 2>/dev/null || true)"
-            message="$(jq -r '.error.message // empty' "${body}" 2>/dev/null || true)"
-            echo "${label}_RESULT=denied_or_absent"
-            if [ -n "${code}" ]; then echo "${label}_ERROR_CODE=${code}"; fi
-            if [ -n "${message}" ]; then echo "${label}_ERROR_MESSAGE=${message}"; fi
+            echo "${result_output}=denied-or-absent${code:+:${code}}" >> "${GITHUB_OUTPUT}"
             rm -f "${body}"
-            return 0
           }
 
-          read_domain "${CANONICAL_PROJECT_ID}" CANONICAL_DOMAIN_READ
-          read_domain "${DUPLICATE_PROJECT_ID}" DUPLICATE_DOMAIN_READ
+          read_domain "${CANONICAL_PROJECT_ID}" canonical_status canonical_result canonical_project
+          read_domain "${DUPLICATE_PROJECT_ID}" duplicate_status duplicate_result duplicate_project
+
+      - name: Report sanitized diagnostic result to PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          EXCHANGE_STATUS: ${{ steps.vercel_oidc.outputs.exchange_status }}
+          EXCHANGE_RESULT: ${{ steps.vercel_oidc.outputs.exchange_result }}
+          CANONICAL_STATUS: ${{ steps.vercel_oidc.outputs.canonical_status }}
+          CANONICAL_RESULT: ${{ steps.vercel_oidc.outputs.canonical_result }}
+          CANONICAL_PROJECT: ${{ steps.vercel_oidc.outputs.canonical_project }}
+          DUPLICATE_STATUS: ${{ steps.vercel_oidc.outputs.duplicate_status }}
+          DUPLICATE_RESULT: ${{ steps.vercel_oidc.outputs.duplicate_result }}
+          DUPLICATE_PROJECT: ${{ steps.vercel_oidc.outputs.duplicate_project }}
+        with:
+          script: |
+            const body = [
+              '### Vercel OIDC diagnostic result',
+              '',
+              `- Exchange HTTP status: ${process.env.EXCHANGE_STATUS || 'unavailable'}`,
+              `- Exchange result: ${process.env.EXCHANGE_RESULT || 'unavailable'}`,
+              `- Canonical project-domain read HTTP status: ${process.env.CANONICAL_STATUS || 'unavailable'}`,
+              `- Canonical read result: ${process.env.CANONICAL_RESULT || 'unavailable'}`,
+              `- Canonical reported project: ${process.env.CANONICAL_PROJECT || 'none'}`,
+              `- Duplicate project-domain read HTTP status: ${process.env.DUPLICATE_STATUS || 'unavailable'}`,
+              `- Duplicate read result: ${process.env.DUPLICATE_RESULT || 'unavailable'}`,
+              `- Duplicate reported project: ${process.env.DUPLICATE_PROJECT || 'none'}`,
+              '',
+              'No token values are included in this report and this workflow performs no Vercel mutation.'
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
