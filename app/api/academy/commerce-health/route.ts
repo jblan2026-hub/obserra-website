@@ -10,6 +10,7 @@ import {
 } from "../../../../lib/academy-persistence";
 import { getAcademyStripe } from "../../../../lib/academy-stripe";
 import { academyStripeWebhookSecret } from "../../../../lib/academy-payment";
+import { isProductionRuntime } from "../../../../lib/runtime-environment";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export async function GET() {
     : stripeKey.startsWith("rk_test_")
       ? "test"
       : "unavailable";
-  const productionModeAccepted = process.env.VERCEL_ENV === "production"
+  const productionModeAccepted = isProductionRuntime()
     ? stripeEnvironment === "live"
     : stripeEnvironment !== "unavailable";
   const webhookConfigured = academyStripeWebhookSecret() !== null;
