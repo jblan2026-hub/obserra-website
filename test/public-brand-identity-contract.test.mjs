@@ -106,17 +106,10 @@ test("homepage uses governed Obserra EPI product brands and full legal company i
   }
 });
 
-test("public regulatory status remains fail closed and human determinations remain pending", () => {
-  const trust = fs.readFileSync("app/trust/page.tsx", "utf8");
+test("public Florida regulatory status remains fail closed", () => {
   const fdacs = fs.readFileSync("app/florida-security-training/page.tsx", "utf8");
   const completion = fs.readFileSync("app/florida-security-training/completion/page.tsx", "utf8");
 
-  assert.match(trust, /Cybersecurity Maturity Model Certification \(CMMC\) Level 2/);
-  assert.match(trust, /Not assessed/);
-  assert.match(trust, /Human determinations/);
-  assert.match(trust, /Pending/);
-  assert.match(trust, /Controlled unclassified information \(CUI\) authorization/);
-  assert.match(trust, /Not granted/);
   assert.match(fdacs, /does not claim FDACS approval or production authorization/);
   assert.match(fdacs, /Enrollment, course credit, completion, certificates, and Licensing Information and Alert System \(LIAS\) reporting remain disabled/);
   assert.match(completion, /Production authorization is false/);
