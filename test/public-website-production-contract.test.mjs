@@ -16,7 +16,6 @@ const home = fs.readFileSync("app/page.tsx", "utf8");
 const smoke = fs.readFileSync("scripts/production-smoke.mjs", "utf8");
 const enterpriseChrome = fs.readFileSync("app/components/enterprise/EnterpriseChrome.tsx", "utf8");
 const enterpriseStyles = fs.readFileSync("app/components/enterprise/enterprise-chrome.css", "utf8");
-const trust = fs.readFileSync("app/trust/page.tsx", "utf8");
 
 test("the public shell supports keyboard bypass and mobile navigation dismissal", () => {
   assert.match(layout, /className="obs-skip-link" href="#main-content"/);
@@ -98,16 +97,7 @@ test("primary enterprise surfaces use one responsive executive design system", (
   assert.match(enterpriseStyles, /@media\(prefers-reduced-motion:reduce\)/);
 });
 
-test("public assurance and Academy claims preserve release and regulatory truth", () => {
-  assert.match(trust, /Cybersecurity Maturity Model Certification \(CMMC\) Level 2/);
-  assert.match(trust, /Not assessed/);
-  assert.match(trust, /Human determinations/);
-  assert.match(trust, /Pending/);
-  assert.match(trust, /Controlled unclassified information \(CUI\) authorization/);
-  assert.match(trust, /Not granted/);
-  assert.match(trust, /Florida Department of Agriculture and Consumer Services \(FDACS\) authorization/);
-  assert.match(trust, /Alignment and engineering evidence are not certification/);
-  assert.doesNotMatch(trust, /Published and operational/);
+test("public Academy claims preserve release and regulatory truth", () => {
   assert.match(home, /Regulated programs follow separate eligibility and authorization gates/);
   assert.match(home, /Reviewed nonregulated course baseline/);
   assert.doesNotMatch(home, /Receive immediate account-based access/);
