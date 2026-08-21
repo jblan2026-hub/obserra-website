@@ -1,0 +1,101 @@
+name: PR172 Evidence Chain Converge Once
+
+on:
+  push:
+    branches:
+      - fix/vercel-exclusive-authority-regression-20260820
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pr172-evidence-chain-converge-once
+  cancel-in-progress: false
+
+jobs:
+  converge:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout controlled branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/vercel-exclusive-authority-regression-20260820
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies without repository credentials
+        run: npm ci
+
+      - name: Remove one-shot helper and commit clean source tree
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/pr172-evidence-chain-converge.yml
+          git commit -m "ci: remove one-shot evidence-chain convergence helper"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin HEAD:fix/vercel-exclusive-authority-regression-20260820
+          git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
+
+      - name: Verify canonical system evidence before downstream generation
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain --untracked-files=all)"
+          npm run verify:cmmc-system-evidence
+
+      - name: Regenerate dependent governed evidence in source-defined order
+        run: |
+          set -euo pipefail
+          npm run generate:cmmc-disposition
+          npm run generate:cmmc-handoff
+          npm run generate:fdacs-pii-audit
+
+      - name: Verify complete governed CMMC evidence chain
+        run: |
+          set -euo pipefail
+          npm run verify:cmmc-evidence
+
+      - name: Stage only governed generated outputs
+        run: |
+          set -euo pipefail
+          git add \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.json \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.md \
+            docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION.sha256 \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.md \
+            docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF.sha256 \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.json \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.md \
+            docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT.sha256
+          unexpected="$(git diff --cached --name-only | grep -Ev '^(docs/compliance/CMMC-TECHNICAL-HUMAN-DISPOSITION\.(json|md|sha256)|docs/compliance/CMMC-CONTINUOUS-AUDIT-HANDOFF\.(md|sha256)|docs/florida-class-d-lms/FDACS-PII-DATABASE-AUDIT\.(json|md|sha256))$' || true)"
+          if [ -n "$unexpected" ]; then
+            printf 'Unexpected staged files:\n%s\n' "$unexpected" >&2
+            exit 1
+          fi
+
+      - name: Commit verified generated evidence only
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if git diff --cached --quiet; then
+            echo "No downstream evidence changes required"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs(compliance): converge governed evidence dependency chain"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin HEAD:fix/vercel-exclusive-authority-regression-20260820
