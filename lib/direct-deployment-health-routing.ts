@@ -1,4 +1,5 @@
 import { CANONICAL_PUBLIC_VERCEL_PROJECT_ID } from "./auth/runtime-config";
+import { isProductionRuntime } from "./runtime-environment";
 
 const DIRECT_DEPLOYMENT_HEALTH_PATHS = new Set([
   "/api/health",
@@ -24,9 +25,19 @@ export function shouldServeDirectDeploymentHealth({
 }: DirectDeploymentHealthRequest) {
   if (method.toUpperCase() !== "GET") return false;
   if (!DIRECT_DEPLOYMENT_HEALTH_PATHS.has(pathname)) return false;
-  if (environment.VERCEL_ENV?.trim() !== "production") return false;
-  if (environment.VERCEL_PROJECT_ID?.trim() !== CANONICAL_PUBLIC_VERCEL_PROJECT_ID) return false;
 
   const normalizedHost = host.trim().toLowerCase().replace(/\.$/, "");
-  return normalizedHost.endsWith(".vercel.app");
+  if (!normalizedHost) return false;
+
+  const vercelDirect =
+    environment.VERCEL_ENV?.trim() === "production" &&
+    environment.VERCEL_PROJECT_ID?.trim() === CANONICAL_PUBLIC_VERCEL_PROJECT_ID &&
+    normalizedHost.endsWith(".vercel.app");
+  if (vercelDirect) return true;
+
+  const azureDirect =
+    isProductionRuntime(environment) &&
+    environment.OBSERRA_HOSTING_PROVIDER?.trim().toLowerCase() === "azure-app-service" &&
+    normalizedHost.endsWith(".azurewebsites.net");
+  return azureDirect;
 }
