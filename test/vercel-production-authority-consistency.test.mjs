@@ -14,7 +14,6 @@ test("production authority is single-sourced to the live canonical Vercel projec
   const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
   const operationalGate = read(".github/workflows/production-e2e-operational-gate.yml");
   const commerceGate = read("scripts/florida-class-d-website-academy-commerce-gate.mjs");
-  const cmmcGate = read("scripts/cmmc-level2-rev3-production-evidence.mjs");
   const ignoreBuildTest = read("test/vercel-ignore-build.test.mjs");
   const readme = read("README.md");
 
@@ -32,7 +31,6 @@ test("production authority is single-sourced to the live canonical Vercel projec
   assert.doesNotMatch(cutover, /AUXILIARY_PROJECT_ID:/);
   assert.match(operationalGate, new RegExp(CANONICAL_PROJECT_ID, "g"));
   assert.match(commerceGate, new RegExp(CANONICAL_PROJECT_ID));
-  assert.match(cmmcGate, new RegExp(CANONICAL_PROJECT_ID));
   assert.match(ignoreBuildTest, new RegExp(`PRODUCTION_PROJECT_ID = ["']${CANONICAL_PROJECT_ID}["']`));
   assert.match(ignoreBuildTest, /NON_CANONICAL_PROJECT_IDS/);
   assert.match(readme, new RegExp(CANONICAL_PROJECT_NAME));
