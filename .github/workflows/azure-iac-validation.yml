@@ -6,6 +6,8 @@ on:
       - 'infra/**'
       - 'scripts/azure-bootstrap-production.sh'
       - 'scripts/azure-bootstrap-current-directory.sh'
+      - 'scripts/azure-first-release-current-directory.sh'
+      - 'scripts/azure-converge-production.sh'
       - '.github/workflows/azure-production-deploy.yml'
       - '.github/workflows/azure-iac-validation.yml'
       - 'test/azure-production-plane-contract.test.mjs'
@@ -16,6 +18,8 @@ on:
       - 'infra/**'
       - 'scripts/azure-bootstrap-production.sh'
       - 'scripts/azure-bootstrap-current-directory.sh'
+      - 'scripts/azure-first-release-current-directory.sh'
+      - 'scripts/azure-converge-production.sh'
       - '.github/workflows/azure-production-deploy.yml'
       - '.github/workflows/azure-iac-validation.yml'
       - 'test/azure-production-plane-contract.test.mjs'
@@ -51,12 +55,14 @@ jobs:
             az bicep build --file "${template}" --stdout >/dev/null
           done
 
-      - name: Validate bootstrap shell syntax
+      - name: Validate governed Azure shell syntax
         shell: bash
         run: |
           set -euo pipefail
           bash -n scripts/azure-bootstrap-production.sh
           bash -n scripts/azure-bootstrap-current-directory.sh
+          bash -n scripts/azure-first-release-current-directory.sh
+          bash -n scripts/azure-converge-production.sh
 
-      - name: Validate Azure production contracts
+      - name: Validate Azure production governed baseline contracts
         run: node --test test/azure-production-plane-contract.test.mjs
