@@ -14,7 +14,9 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 BICEP_TEMPLATE="${REPO_ROOT}/infra/main.bicep"
 STORAGE_BICEP_TEMPLATE="${REPO_ROOT}/infra/storage-gpv2.bicep"
+AUTOSCALE_BICEP_TEMPLATE="${REPO_ROOT}/infra/autoscale.bicep"
 EXPECTED_STORAGE_ACCOUNT="stobserraprod38d660"
+EXPECTED_AUTOSCALE_NAME="autoscale-obserra-prod"
 
 required_commands=(az jq grep)
 for command_name in "${required_commands[@]}"; do
@@ -24,7 +26,7 @@ for command_name in "${required_commands[@]}"; do
   fi
 done
 
-for template in "${BICEP_TEMPLATE}" "${STORAGE_BICEP_TEMPLATE}"; do
+for template in "${BICEP_TEMPLATE}" "${STORAGE_BICEP_TEMPLATE}" "${AUTOSCALE_BICEP_TEMPLATE}"; do
   if [[ ! -f "${template}" ]]; then
     echo "Azure infrastructure template is missing: ${template}" >&2
     echo "Run this script from a checkout of jblan2026-hub/obserra-website." >&2
@@ -150,9 +152,10 @@ ROLE_JSON="$(az role assignment list --assignee-object-id "${PRINCIPAL_ID}" --sc
 jq -e 'any(.[]; .roleDefinitionName == "Contributor")' <<<"${ROLE_JSON}" >/dev/null
 jq -e 'any(.[]; .roleDefinitionName == "User Access Administrator")' <<<"${ROLE_JSON}" >/dev/null
 
-# Compile and validate IaC before resource mutation.
+# Compile IaC and validate templates that do not depend on an already-created App Service plan.
 az bicep build --file "${BICEP_TEMPLATE}" --stdout >/dev/null
 az bicep build --file "${STORAGE_BICEP_TEMPLATE}" --stdout >/dev/null
+az bicep build --file "${AUTOSCALE_BICEP_TEMPLATE}" --stdout >/dev/null
 az deployment group validate \
   --resource-group "${RESOURCE_GROUP}" \
   --template-file "${BICEP_TEMPLATE}" \
@@ -188,6 +191,36 @@ test -n "${WEB_APP_NAME}" && test "${WEB_APP_NAME}" != "null"
 test -n "${PRODUCTION_HOST}" && test "${PRODUCTION_HOST}" != "null"
 test -n "${STAGING_HOST}" && test "${STAGING_HOST}" != "null"
 test -n "${KEY_VAULT_NAME}" && test "${KEY_VAULT_NAME}" != "null"
+
+# Enable bounded autoscale after the App Service plan exists.
+az deployment group validate \
+  --resource-group "${RESOURCE_GROUP}" \
+  --template-file "${AUTOSCALE_BICEP_TEMPLATE}" \
+  --parameters location="${LOCATION}" \
+  --only-show-errors >/dev/null
+AUTOSCALE_DEPLOYMENT_FILE="${HOME}/obserra-azure-autoscale-deployment.json"
+az deployment group create \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "obserra-autoscale-$(date -u +%Y%m%d%H%M%S)" \
+  --template-file "${AUTOSCALE_BICEP_TEMPLATE}" \
+  --parameters location="${LOCATION}" \
+  --mode Incremental \
+  --only-show-errors \
+  --output json > "${AUTOSCALE_DEPLOYMENT_FILE}"
+
+test "$(jq -r '.properties.provisioningState' "${AUTOSCALE_DEPLOYMENT_FILE}")" = "Succeeded"
+AUTOSCALE_NAME="$(jq -r '.properties.outputs.autoscaleSettingName.value' "${AUTOSCALE_DEPLOYMENT_FILE}")"
+test "${AUTOSCALE_NAME}" = "${EXPECTED_AUTOSCALE_NAME}"
+az monitor autoscale show \
+  --resource-group "${RESOURCE_GROUP}" \
+  --name "${AUTOSCALE_NAME}" \
+  --output json > "${HOME}/obserra-azure-autoscale-live.json"
+jq -e '
+  .enabled == true and
+  .profiles[0].capacity.minimum == "2" and
+  .profiles[0].capacity.default == "2" and
+  .profiles[0].capacity.maximum == "4"
+' "${HOME}/obserra-azure-autoscale-live.json" >/dev/null
 
 # Build GPv2 from day one. No GPv1 or Blob Only account is accepted.
 STORAGE_DEPLOYMENT_FILE="${HOME}/obserra-azure-storage-gpv2-deployment.json"
@@ -235,10 +268,14 @@ AZURE_PRODUCTION_HOST=https://${PRODUCTION_HOST}
 AZURE_STAGING_HOST=https://${STAGING_HOST}
 AZURE_KEY_VAULT_NAME=${KEY_VAULT_NAME}
 AZURE_RUNTIME_IDENTITY_CLIENT_ID=${RUNTIME_IDENTITY_CLIENT_ID}
+AZURE_AUTOSCALE_NAME=${AUTOSCALE_NAME}
+AZURE_AUTOSCALE_MIN=2
+AZURE_AUTOSCALE_MAX=4
 AZURE_STORAGE_ACCOUNT=${STORAGE_ACCOUNT_NAME}
 AZURE_STORAGE_KIND=StorageV2
 AZURE_STORAGE_SKU=Standard_GRS
 AZURE_POLICY_RECORD=${POLICY_FILE}
 AZURE_DEPLOYMENT_RECORD=${DEPLOYMENT_FILE}
+AZURE_AUTOSCALE_DEPLOYMENT_RECORD=${AUTOSCALE_DEPLOYMENT_FILE}
 AZURE_STORAGE_DEPLOYMENT_RECORD=${STORAGE_DEPLOYMENT_FILE}
 EOF
