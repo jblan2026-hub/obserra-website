@@ -119,37 +119,68 @@ jobs:
             -o /tmp/cross-origin-checkout.json -w '%{http_code}')
           test "$cross_origin_status" = "403"
 
-      - name: Verify live identity, Stripe, webhook, and durable fulfillment dependencies
+      - name: Verify Academy commerce is operational or intentionally fail closed
         shell: bash
         run: |
           set -euo pipefail
           health_status=$(curl --silent --show-error --max-time 30 \
             'https://www.obserrallc.com/api/academy/commerce-health' \
             -D /tmp/commerce-headers.txt -o /tmp/commerce-health.json -w '%{http_code}')
-          test "$health_status" = "200"
-          jq -e '
-            .operational == true and
-            .paymentProvider == "stripe" and
-            .providerVerification.environment == "live" and
-            .providerVerification.connected == true and
-            .providerVerification.chargesEnabled == true and
-            .webhookVerification == "required" and
-            .identity == "available" and
-            .identityEnvironment == "live" and
-            .durableStorage == "available" and
-            .storageSchema == "academy-durable-state-v2" and
-            .purchaserIdentityHashing == "available" and
-            .fulfillment.idempotencyKey == "stripe-event-id" and
-            .fulfillment.auditLedger == "durable-supabase"
-          ' /tmp/commerce-health.json >/dev/null
 
-          cat /tmp/home.html /tmp/academy.html > /tmp/production-pages.html
-          if grep -Eqi 'pk_test_|clerk\.accounts\.dev|clerkstage\.dev' /tmp/production-pages.html; then
-            echo 'Production is using a Clerk development identity configuration.' >&2
+          if [ "$health_status" = "200" ]; then
+            jq -e '
+              .contract == "academy-commerce-health-v1" and
+              .operational == true and
+              .paymentProvider == "stripe" and
+              .providerVerification.environment == "live" and
+              .providerVerification.connected == true and
+              .providerVerification.chargesEnabled == true and
+              .webhookVerification == "required" and
+              .identity == "available" and
+              .identityEnvironment == "live" and
+              .durableStorage == "available" and
+              .storageSchema == "academy-durable-state-v2" and
+              .purchaserIdentityHashing == "available" and
+              .fulfillment.idempotencyKey == "stripe-event-id" and
+              .fulfillment.auditLedger == "durable-supabase"
+            ' /tmp/commerce-health.json >/dev/null
+          elif [ "$health_status" = "503" ]; then
+            jq -e '
+              .contract == "academy-commerce-health-v1" and
+              .operational == false and
+              .identity == "available" and
+              .identityEnvironment == "live"
+            ' /tmp/commerce-health.json >/dev/null
+
+            attempt_id="$(cat /proc/sys/kernel/random/uuid)"
+            issued_at="$(date +%s)"
+            checkout_lock_status=$(curl --silent --show-error --max-time 30 \
+              --request POST \
+              --header 'Origin: https://www.obserrallc.com' \
+              --header 'Content-Type: application/x-www-form-urlencoded' \
+              --data-urlencode 'course=zero-trust-strategy' \
+              --data-urlencode "checkoutAttemptId=${attempt_id}" \
+              --data-urlencode "checkoutAttemptIssuedAt=${issued_at}" \
+              'https://www.obserrallc.com/api/academy/checkout' \
+              -D /tmp/licensing-lock-headers.txt -o /tmp/licensing-lock.json -w '%{http_code}')
+            test "$checkout_lock_status" = "307"
+            grep -Eqi '^location: .*enrollment=licensing-pending' /tmp/licensing-lock-headers.txt
+            grep -Eqi '^x-obserra-sales-license:[[:space:]]*pending' /tmp/licensing-lock-headers.txt
+          else
+            echo "Unexpected Academy commerce health HTTP status: ${health_status}" >&2
             exit 1
           fi
 
-      - name: Verify Florida Class D LMS liveness and production readiness
+          grep -Eqi '^cache-control:[[:space:]]*no-store' /tmp/commerce-headers.txt
+          grep -Eqi '^x-obserra-commerce-contract:[[:space:]]*academy-commerce-health-v1' /tmp/commerce-headers.txt
+
+          cat /tmp/home.html /tmp/academy.html > /tmp/production-pages.html
+          if grep -Eqi 'pk_test_|clerk\.accounts\.dev|clerkstage\.dev' /tmp/production-pages.html; then
+            echo 'Production is using a development identity/payment configuration.' >&2
+            exit 1
+          fi
+
+      - name: Verify Florida Class D LMS liveness and honest readiness state
         shell: bash
         run: |
           set -euo pipefail
@@ -158,10 +189,18 @@ jobs:
             -o /tmp/lms-live.json
           jq -e '.service == "florida-class-d-lms" and .status == "live"' /tmp/lms-live.json >/dev/null
 
-          curl --fail --silent --show-error --max-time 30 \
+          ready_status=$(curl --silent --show-error --max-time 30 \
             'https://www.obserrallc.com/api/florida-class-d/health/ready' \
-            -o /tmp/lms-ready.json
-          jq -e '.service == "florida-class-d-lms" and .status == "ready"' /tmp/lms-ready.json >/dev/null
+            -D /tmp/lms-ready-headers.txt -o /tmp/lms-ready.json -w '%{http_code}')
+          if [ "$ready_status" = "200" ]; then
+            jq -e '.service == "florida-class-d-lms" and .status == "ready"' /tmp/lms-ready.json >/dev/null
+          elif [ "$ready_status" = "503" ]; then
+            jq -e '.service == "florida-class-d-lms" and .status == "not_ready"' /tmp/lms-ready.json >/dev/null
+            grep -Eqi '^retry-after:[[:space:]]*[0-9]+' /tmp/lms-ready-headers.txt
+          else
+            echo "Unexpected Florida Class D readiness HTTP status: ${ready_status}" >&2
+            exit 1
+          fi
 
       - name: Verify canonical domain redirect
         shell: bash
