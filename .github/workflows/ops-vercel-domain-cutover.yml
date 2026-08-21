@@ -1,0 +1,190 @@
+name: One-shot canonical Vercel domain cutover
+
+on:
+  push:
+    branches:
+      - automation/vercel-domain-cutover-ops-20260821
+
+permissions:
+  contents: write
+
+concurrency:
+  group: production-vercel-public-cutover
+  cancel-in-progress: false
+
+jobs:
+  cutover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+      CANONICAL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+      DUPLICATE_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme
+      NON_CANONICAL_PROJECT_IDS: "prj_FfAnssVJU8pcJydGNJHmCliP6Yme prj_v6Hb7FkpkUoLKlHkjzKJ5HVgYDaL"
+      TARGET_SHA: 6777531409a3c3bf818f5212ef9fdaf2a44250c7
+      TARGET_DEPLOYMENT: dpl_CiF1HT4PAb8YC9RB1uPLmJUgAqxN
+      CANDIDATE_URL: https://obserra-website-live-mr1l0mvw3-obserra.vercel.app
+      PRIMARY_DOMAIN: www.obserrallc.com
+      APEX_DOMAIN: obserrallc.com
+    steps:
+      - name: Controlled cutover with rollback
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          if [ -z "${VERCEL_TOKEN}" ]; then
+            echo "::error::Vercel credential is unavailable."
+            exit 1
+          fi
+
+          rollback_primary=""
+          rollback_apex=""
+          primary_source=""
+          apex_source=""
+          primary_moved=false
+          apex_moved=false
+
+          api_get() {
+            curl --silent --show-error --fail-with-body --connect-timeout 10 --max-time 25 \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" "$1"
+          }
+
+          alias_deployment() {
+            api_get "https://api.vercel.com/v4/aliases/$1?teamId=${TEAM_ID}" | jq -r '.deploymentId // .deployment.id // empty'
+          }
+
+          rollback() {
+            code=$?
+            trap - ERR
+            set +e
+            move_back() {
+              local domain="$1" moved="$2" source="$3" deployment="$4"
+              if [ "${moved}" != "true" ]; then return 0; fi
+              if [ -z "${source}" ] || [ -z "${deployment}" ]; then
+                echo "::error::Rollback metadata missing for ${domain}."
+                return 1
+              fi
+              curl --silent --show-error --fail-with-body --connect-timeout 10 --max-time 25 \
+                --request POST \
+                --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+                --header "Content-Type: application/json" \
+                --data "{\"projectId\":\"${source}\"}" \
+                "https://api.vercel.com/v1/projects/${CANONICAL_PROJECT_ID}/domains/${domain}/move?teamId=${TEAM_ID}" >/dev/null || return 1
+              curl --silent --show-error --fail-with-body --connect-timeout 10 --max-time 25 \
+                --request POST \
+                --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+                --header "Content-Type: application/json" \
+                --data "{\"alias\":\"${domain}\"}" \
+                "https://api.vercel.com/v2/deployments/${deployment}/aliases?teamId=${TEAM_ID}" >/dev/null || return 1
+            }
+            move_back "${PRIMARY_DOMAIN}" "${primary_moved}" "${primary_source}" "${rollback_primary}"
+            move_back "${APEX_DOMAIN}" "${apex_moved}" "${apex_source}" "${rollback_apex}"
+            echo "::error::Cutover failed; moved domains were restored to captured prior project/deployment."
+            exit "${code}"
+          }
+          trap rollback ERR
+
+          details="$(api_get "https://api.vercel.com/v13/deployments/${TARGET_DEPLOYMENT}?teamId=${TEAM_ID}")"
+          test "$(jq -r '.projectId // .project.id // empty' <<<"${details}")" = "${CANONICAL_PROJECT_ID}"
+          test "$(jq -r '.meta.githubCommitSha // empty' <<<"${details}")" = "${TARGET_SHA}"
+          test "$(jq -r '.readyState // .state // empty' <<<"${details}")" = "READY"
+          test "$(jq -r '.meta.githubCommitVerification // empty' <<<"${details}")" = "verified"
+
+          health="$(curl --silent --show-error --fail --max-time 25 "${CANDIDATE_URL}/api/health")"
+          jq -e --arg p "${CANONICAL_PROJECT_ID}" --arg d "${TARGET_DEPLOYMENT}" --arg s "${TARGET_SHA}" '
+            .status == "live" and .routing.observedProjectId == $p and .routing.deploymentId == $d and
+            .routing.gitCommitSha == $s and .routing.authority == "verified" and .routing.verified == true
+          ' <<<"${health}" >/dev/null
+
+          commerce_headers="$(mktemp)"; commerce_body="$(mktemp)"
+          commerce_status="$(curl --silent --show-error --max-time 25 --output "${commerce_body}" --dump-header "${commerce_headers}" --write-out '%{http_code}' "${CANDIDATE_URL}/api/academy/commerce-health")"
+          if [ "${commerce_status}" = "200" ]; then
+            jq -e '.contract == "academy-commerce-health-v1" and .operational == true and .identity == "available" and .identityEnvironment == "live"' "${commerce_body}" >/dev/null
+          elif [ "${commerce_status}" = "503" ]; then
+            jq -e '.contract == "academy-commerce-health-v1" and .operational == false and .identity == "available" and .identityEnvironment == "live" and .claimPolicy == "purchaser-email-match-v1" and .fulfillment.idempotencyKey == "stripe-event-id"' "${commerce_body}" >/dev/null
+          else
+            echo "::error::Unexpected Academy commerce health ${commerce_status}."; false
+          fi
+          grep -Eqi '^cache-control:[[:space:]]*no-store' "${commerce_headers}"
+
+          florida_live="$(curl --silent --show-error --fail --max-time 25 "${CANDIDATE_URL}/api/florida-class-d/health/live")"
+          jq -e '.service == "florida-class-d-lms" and .status == "live"' <<<"${florida_live}" >/dev/null
+          florida_headers="$(mktemp)"; florida_body="$(mktemp)"
+          florida_status="$(curl --silent --show-error --max-time 25 --output "${florida_body}" --dump-header "${florida_headers}" --write-out '%{http_code}' "${CANDIDATE_URL}/api/florida-class-d/health/ready")"
+          if [ "${florida_status}" = "200" ]; then
+            jq -e '.service == "florida-class-d-lms" and .status == "ready"' "${florida_body}" >/dev/null
+          elif [ "${florida_status}" = "503" ]; then
+            jq -e '.service == "florida-class-d-lms" and .status == "not_ready"' "${florida_body}" >/dev/null
+            grep -Eqi '^retry-after:[[:space:]]*60' "${florida_headers}"
+          else
+            echo "::error::Unexpected Florida readiness ${florida_status}."; false
+          fi
+
+          rollback_primary="$(alias_deployment "${PRIMARY_DOMAIN}")"
+          rollback_apex="$(alias_deployment "${APEX_DOMAIN}")"
+          test -n "${rollback_primary}"; test -n "${rollback_apex}"
+
+          move_domain() {
+            local domain="$1" kind="$2" project_id body status owner="" count=0
+            for project_id in ${NON_CANONICAL_PROJECT_IDS}; do
+              body="$(mktemp)"
+              status="$(curl --silent --show-error --connect-timeout 10 --max-time 25 --output "${body}" --write-out '%{http_code}' --header "Authorization: Bearer ${VERCEL_TOKEN}" "https://api.vercel.com/v9/projects/${project_id}/domains/${domain}?teamId=${TEAM_ID}")"
+              if [ "${status}" = "200" ]; then owner="${project_id}"; count=$((count+1)); elif [ "${status}" != "404" ]; then cat "${body}" >&2; false; fi
+              rm -f "${body}"
+            done
+            if [ "${count}" -gt 1 ]; then echo "::error::Ambiguous ownership for ${domain}."; false; fi
+            if [ "${count}" -eq 0 ]; then
+              canonical="$(api_get "https://api.vercel.com/v9/projects/${CANONICAL_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}" | jq -r '.projectId // empty')"
+              test "${canonical}" = "${CANONICAL_PROJECT_ID}"
+              return 0
+            fi
+            response="$(curl --silent --show-error --fail-with-body --connect-timeout 10 --max-time 25 --request POST --header "Authorization: Bearer ${VERCEL_TOKEN}" --header "Content-Type: application/json" --data "{\"projectId\":\"${CANONICAL_PROJECT_ID}\"}" "https://api.vercel.com/v1/projects/${owner}/domains/${domain}/move?teamId=${TEAM_ID}")"
+            test "$(jq -r '.projectId // empty' <<<"${response}")" = "${CANONICAL_PROJECT_ID}"
+            test "$(jq -r '.name // empty' <<<"${response}")" = "${domain}"
+            if [ "${kind}" = "primary" ]; then primary_source="${owner}"; primary_moved=true; else apex_source="${owner}"; apex_moved=true; fi
+          }
+
+          move_domain "${PRIMARY_DOMAIN}" primary
+          move_domain "${APEX_DOMAIN}" apex
+
+          observed_project=""; observed_sha=""; observed_deployment=""
+          for attempt in $(seq 1 18); do
+            body="$(curl --silent --show-error --max-time 20 "https://${PRIMARY_DOMAIN}/api/health" || true)"
+            observed_project="$(jq -r '.routing.observedProjectId // empty' <<<"${body}" 2>/dev/null || true)"
+            observed_sha="$(jq -r '.routing.gitCommitSha // empty' <<<"${body}" 2>/dev/null || true)"
+            observed_deployment="$(jq -r '.routing.deploymentId // empty' <<<"${body}" 2>/dev/null || true)"
+            if [ "${observed_project}" = "${CANONICAL_PROJECT_ID}" ] && [ "${observed_sha}" = "${TARGET_SHA}" ] && [ "${observed_deployment}" = "${TARGET_DEPLOYMENT}" ]; then break; fi
+            sleep 5
+          done
+          test "${observed_project}" = "${CANONICAL_PROJECT_ID}"
+          test "${observed_sha}" = "${TARGET_SHA}"
+          test "${observed_deployment}" = "${TARGET_DEPLOYMENT}"
+
+          curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/" >/dev/null
+          academy="$(curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/academy")"
+          grep -F "Academy LMS is live; new enrollment is not yet open" <<<"${academy}" >/dev/null
+          curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/florida-security-training" >/dev/null
+          curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/apps" >/dev/null
+          curl --silent --show-error --fail --max-time 20 "https://app.obserrallc.com/api/health" >/dev/null
+
+          attempt_id="$(cat /proc/sys/kernel/random/uuid)"; issued_at="$(date +%s)"
+          h="$(mktemp)"; b="$(mktemp)"
+          status="$(curl --silent --show-error --max-time 20 --output "${b}" --dump-header "${h}" --write-out '%{http_code}' --request POST --header "Origin: https://${PRIMARY_DOMAIN}" --header "Content-Type: application/x-www-form-urlencoded" --data-urlencode "course=zero-trust-strategy" --data-urlencode "checkoutAttemptId=${attempt_id}" --data-urlencode "checkoutAttemptIssuedAt=${issued_at}" "https://${PRIMARY_DOMAIN}/api/academy/checkout")"
+          test "${status}" = "307"
+          grep -i '^location: .*enrollment=licensing-pending' "${h}" >/dev/null
+          grep -i '^x-obserra-sales-license: pending' "${h}" >/dev/null
+
+          curl --silent --show-error --fail-with-body --connect-timeout 10 --max-time 25 --request PATCH --header "Authorization: Bearer ${VERCEL_TOKEN}" --header "Content-Type: application/json" --data '{"commandForIgnoringBuildStep":"exit 0"}' "https://api.vercel.com/v9/projects/${DUPLICATE_PROJECT_ID}?teamId=${TEAM_ID}" >/dev/null
+          for project_id in ${NON_CANONICAL_PROJECT_IDS}; do
+            domains="$(api_get "https://api.vercel.com/v9/projects/${project_id}/domains?teamId=${TEAM_ID}&limit=100")"
+            if jq -e --arg p "${PRIMARY_DOMAIN}" --arg a "${APEX_DOMAIN}" '.domains[]? | select(.name == $p or .name == $a)' <<<"${domains}" >/dev/null; then echo "::error::Noncanonical project ${project_id} still owns a canonical domain."; false; fi
+          done
+
+          trap - ERR
+          curl --silent --show-error --fail --request DELETE \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/git/refs/heads/automation%2Fvercel-domain-cutover-ops-20260821" >/dev/null
+          echo "Canonical domain cutover verified for ${TARGET_SHA} on ${TARGET_DEPLOYMENT}."
