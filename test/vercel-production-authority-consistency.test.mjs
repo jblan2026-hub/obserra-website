@@ -18,7 +18,9 @@ test("production authority is single-sourced to the live canonical Vercel projec
 
   assert.match(runtime, new RegExp(`CANONICAL_PUBLIC_VERCEL_PROJECT_ID = ["']${CANONICAL_PROJECT_ID}["']`));
   assert.match(ignoreBuild, new RegExp(`PRODUCTION_PROJECT_ID=["']${CANONICAL_PROJECT_ID}["']`));
-  assert.match(ignoreBuild, new RegExp(`DUPLICATE_PROJECT_ID=["']${DUPLICATE_PROJECT_ID}["']`));
+  assert.doesNotMatch(ignoreBuild, /DUPLICATE_PROJECT_ID|INTEGRATED_SERVICES_PROJECT_ID/);
+  assert.match(ignoreBuild, /"\$PRODUCTION_PROJECT_ID"\)[\s\S]*exit 1/);
+  assert.match(ignoreBuild, /\*\)[\s\S]*exit 0/);
   assert.match(cutover, new RegExp(`CANONICAL_PROJECT_ID:\\s*${CANONICAL_PROJECT_ID}`));
   assert.match(cutover, new RegExp(`DUPLICATE_PROJECT_ID:\\s*${DUPLICATE_PROJECT_ID}`));
   assert.match(
@@ -30,7 +32,7 @@ test("production authority is single-sourced to the live canonical Vercel projec
   assert.match(commerceGate, new RegExp(CANONICAL_PROJECT_ID));
   assert.match(cmmcGate, new RegExp(CANONICAL_PROJECT_ID));
   assert.match(ignoreBuildTest, new RegExp(`PRODUCTION_PROJECT_ID = ["']${CANONICAL_PROJECT_ID}["']`));
-  assert.match(ignoreBuildTest, new RegExp(`DUPLICATE_PROJECT_ID = ["']${DUPLICATE_PROJECT_ID}["']`));
+  assert.match(ignoreBuildTest, /NON_CANONICAL_PROJECT_IDS/);
 });
 
 test("automatic cutover discovers the actual noncanonical owner before moving to the canonical project", () => {
