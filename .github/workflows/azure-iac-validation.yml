@@ -1,0 +1,56 @@
+name: Azure IaC Validation
+
+on:
+  pull_request:
+    paths:
+      - 'infra/**'
+      - 'scripts/azure-bootstrap-production.sh'
+      - '.github/workflows/azure-production-deploy.yml'
+      - '.github/workflows/azure-iac-validation.yml'
+      - 'test/azure-production-plane-contract.test.mjs'
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/**'
+      - 'scripts/azure-bootstrap-production.sh'
+      - '.github/workflows/azure-production-deploy.yml'
+      - '.github/workflows/azure-iac-validation.yml'
+      - 'test/azure-production-plane-contract.test.mjs'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: azure-iac-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v6
+
+      - name: Verify Azure CLI and Bicep compiler
+        shell: bash
+        run: |
+          set -euo pipefail
+          az version >/dev/null
+          az bicep version
+
+      - name: Compile all Azure Bicep templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          for template in infra/*.bicep; do
+            echo "Compiling ${template}"
+            az bicep build --file "${template}" --stdout >/dev/null
+          done
+
+      - name: Validate bootstrap shell syntax
+        run: bash -n scripts/azure-bootstrap-production.sh
+
+      - name: Validate Azure production contracts
+        run: node --test test/azure-production-plane-contract.test.mjs
