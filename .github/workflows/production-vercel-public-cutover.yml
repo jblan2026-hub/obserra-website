@@ -79,11 +79,93 @@ jobs:
           project="$(jq -r '.projectId // .project.id // empty' <<<"${details}")"
           sha="$(jq -r '.meta.githubCommitSha // empty' <<<"${details}")"
           ready="$(jq -r '.readyState // .state // empty' <<<"${details}")"
+          deployment_url="$(jq -r '.url // empty' <<<"${details}")"
           if [ "${project}" != "${CANONICAL_PROJECT_ID}" ] || [ "${sha}" != "${GITHUB_SHA}" ] || [ "${ready}" != "READY" ]; then
             echo "::error::Canonical deployment identity verification failed."
             exit 1
           fi
+          if [ -z "${deployment_url}" ] || [[ ! "${deployment_url}" =~ ^[A-Za-z0-9.-]+\.vercel\.app$ ]]; then
+            echo "::error::Canonical deployment URL is missing or invalid."
+            exit 1
+          fi
           echo "deployment_id=${candidate}" >> "${GITHUB_OUTPUT}"
+          echo "deployment_url=https://${deployment_url}" >> "${GITHUB_OUTPUT}"
+
+      - name: Preflight exact canonical deployment health
+        shell: bash
+        env:
+          CANDIDATE_DEPLOYMENT: ${{ steps.candidate.outputs.deployment_id }}
+          CANDIDATE_URL: ${{ steps.candidate.outputs.deployment_url }}
+        run: |
+          set -euo pipefail
+
+          website_headers="$(mktemp)"
+          website_body="$(mktemp)"
+          website_status="$(curl --silent --show-error --max-time 30 \
+            --output "${website_body}" \
+            --dump-header "${website_headers}" \
+            --write-out '%{http_code}' \
+            "${CANDIDATE_URL}/api/health")"
+          test "${website_status}" = "200"
+          jq -e \
+            --arg expected_project_id "${CANONICAL_PROJECT_ID}" \
+            --arg expected_deployment "${CANDIDATE_DEPLOYMENT}" \
+            --arg expected_sha "${GITHUB_SHA}" '
+              .service == "obserra-website" and
+              .status == "live" and
+              .contract == "website-liveness-v1" and
+              .routing.expectedProjectId == $expected_project_id and
+              .routing.observedProjectId == $expected_project_id and
+              .routing.deploymentId == $expected_deployment and
+              .routing.gitCommitSha == $expected_sha and
+              .routing.authority == "verified" and
+              .routing.verified == true
+            ' "${website_body}" >/dev/null
+          grep -Eqi '^cache-control:[[:space:]]*no-store' "${website_headers}"
+          grep -Eqi '^x-obserra-routing-authority:[[:space:]]*verified' "${website_headers}"
+
+          commerce_headers="$(mktemp)"
+          commerce_body="$(mktemp)"
+          commerce_status="$(curl --silent --show-error --max-time 30 \
+            --output "${commerce_body}" \
+            --dump-header "${commerce_headers}" \
+            --write-out '%{http_code}' \
+            "${CANDIDATE_URL}/api/academy/commerce-health")"
+          test "${commerce_status}" = "200"
+          jq -e '
+            .contract == "academy-commerce-health-v1" and
+            .operational == true and
+            .paymentProvider == "stripe" and
+            .providerVerification.environment == "live" and
+            .providerVerification.connected == true and
+            .providerVerification.chargesEnabled == true and
+            .webhookVerification == "required" and
+            .identity == "available" and
+            .identityEnvironment == "live" and
+            .durableStorage == "available" and
+            .storageSchema == "academy-durable-state-v2" and
+            .purchaserIdentityHashing == "available" and
+            .fulfillment.idempotencyKey == "stripe-event-id" and
+            .fulfillment.auditLedger == "durable-supabase"
+          ' "${commerce_body}" >/dev/null
+          grep -Eqi '^cache-control:[[:space:]]*no-store' "${commerce_headers}"
+          grep -Eqi '^x-obserra-commerce-contract:[[:space:]]*academy-commerce-health-v1' "${commerce_headers}"
+
+          florida_live="$(mktemp)"
+          florida_live_status="$(curl --silent --show-error --max-time 30 \
+            --output "${florida_live}" \
+            --write-out '%{http_code}' \
+            "${CANDIDATE_URL}/api/florida-class-d/health/live")"
+          test "${florida_live_status}" = "200"
+          jq -e '.service == "florida-class-d-lms" and .status == "live"' "${florida_live}" >/dev/null
+
+          florida_ready="$(mktemp)"
+          florida_ready_status="$(curl --silent --show-error --max-time 30 \
+            --output "${florida_ready}" \
+            --write-out '%{http_code}' \
+            "${CANDIDATE_URL}/api/florida-class-d/health/ready")"
+          test "${florida_ready_status}" = "200"
+          jq -e '.service == "florida-class-d-lms" and .status == "ready"' "${florida_ready}" >/dev/null
 
       - name: Capture rollback aliases
         id: rollback

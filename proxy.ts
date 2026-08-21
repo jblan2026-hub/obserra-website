@@ -6,6 +6,7 @@ import { evaluateInternalOwnerAuthorization } from "./lib/auth/identity-governan
 import { identityProviderForRequest } from "./lib/auth/provider-routing";
 import { prepareSupabaseAuthRuntime } from "./lib/auth/runtime-config";
 import { prepareClerkRuntime } from "./lib/clerk-runtime-config";
+import { shouldServeDirectDeploymentHealth } from "./lib/direct-deployment-health-routing";
 import {
   evaluateFloridaClassDMutationBoundary,
   floridaClassDMutationOriginAuthorized,
@@ -448,8 +449,16 @@ function preIdentityBoundary(request: NextRequest) {
   const ownerHostRoute = redirectOwnerHostToCorrectSurface(request);
   if (ownerHostRoute) return ownerHostRoute;
 
-  const canonical = canonicalRedirect(request);
-  if (canonical) return canonical;
+  const source = new URL(request.url);
+  const directDeploymentHealth = shouldServeDirectDeploymentHealth({
+    pathname: source.pathname,
+    method: request.method,
+    host: source.hostname,
+  });
+  if (!directDeploymentHealth) {
+    const canonical = canonicalRedirect(request);
+    if (canonical) return canonical;
+  }
 
   return regulatedMutationBoundary(request);
 }
