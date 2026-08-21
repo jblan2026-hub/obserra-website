@@ -6,6 +6,7 @@ import { getInternalOwnerAuthority } from "@/lib/auth/authority-repository";
 import { safeRelativeRedirect } from "@/lib/auth/redirects";
 import { prepareSupabaseAuthRuntime } from "@/lib/auth/runtime-config";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { isProductionRuntime } from "@/lib/runtime-environment";
 import MfaChallenge from "./MfaChallenge";
 
 export const metadata: Metadata = {
@@ -50,7 +51,7 @@ export default async function MfaPage({
                 url: runtime.url,
                 projectRef: runtime.projectRef,
                 publishableKey: runtime.publishableKey,
-                production: process.env.VERCEL_ENV === "production",
+                production: isProductionRuntime(),
               }}
             />
           ) : (
