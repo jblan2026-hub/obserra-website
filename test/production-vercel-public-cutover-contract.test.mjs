@@ -37,9 +37,13 @@ test("public cutover keeps candidate preflight read-only and verifies locked com
   assert.match(canonicalSmoke, /\/api\/apps\/commerce-health/);
   assert.match(canonicalSmoke, /applications-commerce-health-v1/);
   assert.ok(canonicalSmoke.includes("https://${PRIMARY_DOMAIN}/api/academy/checkout"));
-  assert.ok(canonicalSmoke.includes('test "${status}" = "307"'));
+  assert.ok(canonicalSmoke.includes('if [ "${status}" != "307" ]; then'));
   assert.ok(canonicalSmoke.includes("enrollment=licensing-pending"));
-  assert.ok(canonicalSmoke.includes("x-obserra-sales-license: pending"));
+  assert.ok(canonicalSmoke.includes("header_value x-obserra-sales-license"));
+  assert.ok(canonicalSmoke.includes('if [ "${checkout_license}" != "pending" ]; then'));
+  assert.ok(canonicalSmoke.includes("title=Canonical checkout lock status"));
+  assert.ok(canonicalSmoke.includes("title=Canonical checkout lock redirect"));
+  assert.ok(canonicalSmoke.includes("title=Canonical checkout sales license"));
   assert.ok(canonicalSmoke.includes("if: steps.alias.outcome == 'success'"));
 });
 
