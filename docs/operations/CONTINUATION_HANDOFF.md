@@ -502,3 +502,12 @@ All must be observed from the public canonical host:
 - **Source state:** head `2ee096ccd372d36b91dfa828120b162d2ee25030`, base `78bb0c25a8857ac6c8f851dd1d4c01b34aa3baab`; 2 files changed (+219/−420); unmerged and mergeable at inspection.
 - **Production evidence:** no production deployment, canonical endpoint, credential, payment, or LMS setting was changed by this event.
 - **Next safe action:** keep PR #65 isolated from the active production-runtime repair; evaluate it through normal dependency and release gates before any merge.
+
+
+## 2026-08-22T21:39:28Z — PR #66/#67 synchronization; canonical cutover remains fail-closed
+
+- **GitHub events:** Dependabot synchronized open PR [#66](https://github.com/jblan2026-hub/obserra-website/pull/66), `chore(connections): bump lucide-react from 0.543.0 to 1.33.0`, and open PR [#67](https://github.com/jblan2026-hub/obserra-website/pull/67), `chore(connections): bump framer-motion from 12.43.0 to 13.1.0`.
+- **Source state:** #66 head `f8de4da45ee4a6c80a75d10518b93d25e3321457` (2 files, +5/−5) and #67 head `730317117101dd1980b7b554173708e910b3cb74` (2 files, +14/−18) are both unmerged against base `78bb0c25a8857ac6c8f851dd1d4c01b34aa3baab`. Neither event changed production routing, runtime configuration, payments, or LMS state.
+- **Release-control evidence:** rerun attempt 2 of canonical cutover workflow [32599875004](https://github.com/jblan2026-hub/obserra-website/actions/runs/32599875004), job `97097249698`, accepted the configured release credential and found production candidate `dpl_3TKmo9VZGoqVTr1RfeFdzbXzcgoy` for exact SHA `78bb0c25a8857ac6c8f851dd1d4c01b34aa3baab`, then failed at **Preflight exact canonical deployment health**. All alias/domain-mutation and rollback steps were skipped.
+- **Canonical status:** the latest recorded canonical proof remains the prior deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` / SHA `6c2cddd84503c7cb0af3ca976fd8308183379146`; no canonical cutover or commerce/LMS live result is claimed.
+- **Next safe action:** isolate the dependency PRs from the incident. Correct the failing preflight assertion with non-secret condition-level diagnostics, retain verified-commit and fail-closed controls, then rerun the guarded cutover and require canonical exact deployment/SHA plus independent operational commerce/readiness contracts.
