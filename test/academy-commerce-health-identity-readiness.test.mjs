@@ -33,6 +33,18 @@ test("Academy commerce health checks Supabase runtime readiness without requirin
   );
 });
 
+test("Academy commerce health preserves identity evidence when production secret hydration fails", () => {
+  const hydration = route.indexOf("await ensureAcademyRuntimeSecrets()");
+  const identityReadiness = route.indexOf("const identityReady = academyIdentityRuntimeReady()");
+  const hydrationFailure = route.slice(route.indexOf("} catch {"), route.indexOf("const stripeKey"));
+
+  assert.ok(identityReadiness >= 0 && identityReadiness < hydration);
+  assert.match(hydrationFailure, /identity:\\s*identityReady\\s*\\?\\s*["']available["']\\s*:\\s*["']degraded["']/);
+  assert.match(hydrationFailure, /identityEnvironment/);
+  assert.match(hydrationFailure, /operational:\\s*false/);
+  assert.match(hydrationFailure, /durableStorage:\\s*["']unavailable["']/);
+});
+
 test("Gate 35 enforces the same Supabase runtime readiness contract as commerce health", () => {
   assert.match(
     durableCommerceGate,
