@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ACADEMY_BRAND_NAME, APPLICATIONS_BRAND_NAME, CANONICAL_PUBLIC_ORIGIN, EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "../../../lib/legal-identity";
 import { ProductInfoSections } from "../AppsMarketplaceClient";
-import { findAppBySlug, marketplaceApps } from "../appsData";
+import { findAppBySlug, marketplaceApps, marketplaceEngagementLabel } from "../appsData";
 import "../apps.css";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -41,7 +41,7 @@ export default async function AppDetailPage({ params }: Props) {
   return <main className="app-detail-page">
     <header className="apps-nav"><Link href="/" className="apps-brand" aria-label={LEGAL_ENTITY_NAME}><Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55}/><span>PRODUCT DETAIL</span></Link><nav aria-label="Product navigation"><Link href="/">Home</Link><Link href="/apps">All {APPLICATIONS_BRAND_NAME}</Link><Link href="/services">Services</Link><Link href="/eios">{EIOS_BRAND_NAME}</Link><Link href="/academy">{ACADEMY_BRAND_NAME}</Link><Link href="/portal">Portal</Link><Link href="/contact">Contact</Link></nav></header>
 
-    <section className="app-detail-hero"><span className={`status-pill ${entry.status === "Available" ? "status-available" : entry.status === "Pilot" ? "status-pilot" : "status-coming"}`}>{entry.status}</span><h1>{entry.name}</h1><p>{entry.value}</p><div className="app-detail-meta"><span>{entry.category}</span>{entry.deployment.map((model)=><span key={model}>{model}</span>)}</div></section>
+    <section className="app-detail-hero"><span className={`status-pill ${entry.status === "Available" ? "status-available" : entry.status === "Pilot" ? "status-pilot" : "status-coming"}`}>{marketplaceEngagementLabel[entry.status]}</span><h1>{entry.name}</h1><p>{entry.value}</p><div className="app-detail-meta"><span>{entry.category}</span>{entry.deployment.map((model)=><span key={model}>{model}</span>)}</div></section>
 
     <ProductInfoSections entry={entry}/>
 
