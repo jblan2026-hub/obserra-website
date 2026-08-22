@@ -88,7 +88,7 @@ test("automatic cutover restores aliases even when a domain was already canonica
   assert.match(cutover, /echo "\$\{output_name\}_moved=false" >> "\$\{GITHUB_OUTPUT\}"/);
   assert.match(cutover, /echo "\$\{output_name\}_moved=true" >> "\$\{GITHUB_OUTPUT\}"/);
   assert.match(cutover, /restore_domain\(\)/);
-  assert.match(cutover, /if \[ "\$\{moved\}" = "true" \]; then/);
+  assert.match(cutover, /if \[ "\$\{moved\}" = "true" \] \|\| \[ -n "\$\{source_project\}" \]; then/);
   assert.match(cutover, /--data "\{\\"projectId\\":\\"\$\{source_project\}\\"\}"/);
   assert.match(cutover, /--data "\{\\"alias\\":\\"\$\{domain\}\\"\}"/);
   assert.match(

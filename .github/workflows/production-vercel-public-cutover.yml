@@ -303,6 +303,8 @@ jobs:
             local moved_name
             local -a source_projects
             source_projects=()
+            echo "${output_name}_moved=false" >> "${GITHUB_OUTPUT}"
+            echo "${output_name}_source_project=" >> "${GITHUB_OUTPUT}"
 
             for project_id in ${NON_CANONICAL_DOMAIN_PROJECT_IDS}; do
               body="$(mktemp)"
@@ -368,12 +370,14 @@ jobs:
                 echo "::error::Domain ${domain} canonical ownership response is inconsistent."
                 return 1
               fi
-              echo "${output_name}_moved=false" >> "${GITHUB_OUTPUT}"
-              echo "${output_name}_source_project=" >> "${GITHUB_OUTPUT}"
               return 0
             fi
 
             source_project="${source_projects[0]}"
+            # Journal the known prior owner before the mutating request. If the
+            # request completes but its response is lost or malformed, recovery
+            # can reconcile live ownership instead of assuming no move occurred.
+            echo "${output_name}_source_project=${source_project}" >> "${GITHUB_OUTPUT}"
             move_response="$(curl --silent --show-error --fail-with-body \
               --connect-timeout 10 \
               --max-time 20 \
@@ -389,7 +393,6 @@ jobs:
               return 1
             fi
             echo "${output_name}_moved=true" >> "${GITHUB_OUTPUT}"
-            echo "${output_name}_source_project=${source_project}" >> "${GITHUB_OUTPUT}"
           }
 
           move_domain "${PRIMARY_DOMAIN}" primary
@@ -442,8 +445,52 @@ jobs:
             fi
           }
 
+          verify_alias() {
+            local domain="$1"
+            local body
+            local status
+            local observed=""
+
+            for attempt in $(seq 1 12); do
+              body="$(mktemp)"
+              if ! status="$(curl --silent --show-error \
+                --connect-timeout 10 \
+                --max-time 20 \
+                --output "${body}" \
+                --write-out '%{http_code}' \
+                --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+                "https://api.vercel.com/v4/aliases/${domain}?teamId=${TEAM_ID}")"; then
+                rm -f "${body}"
+                echo "::warning::Unable to verify ${domain} alias propagation on attempt ${attempt}/12."
+              elif [ "${status}" = "200" ]; then
+                observed="$(jq -r '.deploymentId // .deployment.id // empty' "${body}" 2>/dev/null || true)"
+                rm -f "${body}"
+                if [ "${observed}" = "${CANDIDATE_DEPLOYMENT}" ]; then
+                  return 0
+                fi
+                echo "::warning::Alias ${domain} has not converged to the approved candidate on attempt ${attempt}/12."
+              elif [ "${status}" = "404" ]; then
+                rm -f "${body}"
+                echo "::warning::Alias ${domain} is not visible yet on attempt ${attempt}/12."
+              else
+                rm -f "${body}"
+                echo "::error::Unable to verify ${domain} alias propagation: HTTP ${status}."
+                return 1
+              fi
+
+              if [ "${attempt}" -lt 12 ]; then
+                sleep 5
+              fi
+            done
+
+            echo "::error::Alias ${domain} did not converge to the exact approved deployment ${CANDIDATE_DEPLOYMENT}; observed ${observed:-<empty>}."
+            return 1
+          }
+
           assign_alias "${PRIMARY_DOMAIN}"
           assign_alias "${APEX_DOMAIN}"
+          verify_alias "${PRIMARY_DOMAIN}"
+          verify_alias "${APEX_DOMAIN}"
 
       - name: Verify canonical LMS and prelicense commerce lock
         id: smoke
@@ -580,35 +627,97 @@ jobs:
             local deployment="$4"
             local body
             local status
+            local reported_project
+            local reported_name
+            local source_body
+            local source_status
+            local source_owner
+            local must_move=false
 
             if [ -z "${deployment}" ]; then
               echo "::error::Rollback deployment was not captured for ${domain}."
               return 1
             fi
 
-            if [ "${moved}" = "true" ]; then
+            if [ "${moved}" = "true" ] || [ -n "${source_project}" ]; then
               if [ -z "${source_project}" ]; then
                 echo "::error::Rollback source project was not captured for moved domain ${domain}."
                 return 1
               fi
 
+              # Reconcile live ownership before moving back. This covers the
+              # fail-closed case where Vercel accepted the forward move but the
+              # runner never received a parseable success response.
               body="$(mktemp)"
-              status="$(curl --silent --show-error \
+              if ! status="$(curl --silent --show-error \
                 --connect-timeout 10 \
                 --max-time 20 \
                 --output "${body}" \
                 --write-out '%{http_code}' \
-                --request POST \
                 --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-                --header "Content-Type: application/json" \
-                --data "{\"projectId\":\"${source_project}\"}" \
-                "https://api.vercel.com/v1/projects/${CANONICAL_PROJECT_ID}/domains/${domain}/move?teamId=${TEAM_ID}")"
-              if [ "${status}" != "200" ]; then
+                "https://api.vercel.com/v9/projects/${CANONICAL_PROJECT_ID}/domains/${domain}?teamId=${TEAM_ID}")"; then
                 rm -f "${body}"
-                echo "::error::Failed to return ${domain} to prior Vercel project ${source_project}: HTTP ${status}."
+                echo "::error::Unable to reconcile canonical ownership for ${domain} during rollback."
                 return 1
               fi
-              rm -f "${body}"
+              if [ "${status}" = "200" ]; then
+                reported_project="$(jq -r '.projectId // empty' "${body}" 2>/dev/null || true)"
+                rm -f "${body}"
+                if [ "${reported_project}" != "${CANONICAL_PROJECT_ID}" ]; then
+                  echo "::error::Canonical ownership response was inconsistent for ${domain} during rollback."
+                  return 1
+                fi
+                must_move=true
+              elif [ "${status}" = "404" ]; then
+                rm -f "${body}"
+                source_body="$(mktemp)"
+                if ! source_status="$(curl --silent --show-error \
+                  --connect-timeout 10 \
+                  --max-time 20 \
+                  --output "${source_body}" \
+                  --write-out '%{http_code}' \
+                  --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+                  "https://api.vercel.com/v9/projects/${source_project}/domains/${domain}?teamId=${TEAM_ID}")"; then
+                  rm -f "${source_body}"
+                  echo "::error::Unable to verify prior ownership for ${domain} during rollback."
+                  return 1
+                fi
+                source_owner="$(jq -r '.projectId // empty' "${source_body}" 2>/dev/null || true)"
+                rm -f "${source_body}"
+                if [ "${source_status}" != "200" ] || [ "${source_owner}" != "${source_project}" ]; then
+                  echo "::error::Domain ${domain} is owned by neither the canonical nor captured prior project during rollback."
+                  return 1
+                fi
+              else
+                rm -f "${body}"
+                echo "::error::Canonical ownership lookup failed for ${domain} during rollback: HTTP ${status}."
+                return 1
+              fi
+
+              if [ "${must_move}" = "true" ]; then
+                body="$(mktemp)"
+                if ! status="$(curl --silent --show-error \
+                  --connect-timeout 10 \
+                  --max-time 20 \
+                  --output "${body}" \
+                  --write-out '%{http_code}' \
+                  --request POST \
+                  --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+                  --header "Content-Type: application/json" \
+                  --data "{\"projectId\":\"${source_project}\"}" \
+                  "https://api.vercel.com/v1/projects/${CANONICAL_PROJECT_ID}/domains/${domain}/move?teamId=${TEAM_ID}")"; then
+                  rm -f "${body}"
+                  echo "::error::Failed to return ${domain} to prior Vercel project ${source_project} before an HTTP response was received."
+                  return 1
+                fi
+                reported_project="$(jq -r '.projectId // empty' "${body}" 2>/dev/null || true)"
+                reported_name="$(jq -r '.name // empty' "${body}" 2>/dev/null || true)"
+                rm -f "${body}"
+                if [ "${status}" != "200" ] || [ "${reported_project}" != "${source_project}" ] || [ "${reported_name}" != "${domain}" ]; then
+                  echo "::error::Failed to verify ${domain} was returned to prior Vercel project ${source_project}: HTTP ${status}."
+                  return 1
+                fi
+              fi
             fi
 
             curl --silent --show-error --fail-with-body \
@@ -622,10 +731,51 @@ jobs:
               >/dev/null
           }
 
+          verify_restored_alias() {
+            local domain="$1"
+            local deployment="$2"
+            local body
+            local status
+            local observed=""
+
+            for attempt in $(seq 1 12); do
+              body="$(mktemp)"
+              if ! status="$(curl --silent --show-error \
+                --connect-timeout 10 \
+                --max-time 20 \
+                --output "${body}" \
+                --write-out '%{http_code}' \
+                --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+                "https://api.vercel.com/v4/aliases/${domain}?teamId=${TEAM_ID}")"; then
+                rm -f "${body}"
+              elif [ "${status}" = "200" ]; then
+                observed="$(jq -r '.deploymentId // .deployment.id // empty' "${body}" 2>/dev/null || true)"
+                rm -f "${body}"
+                if [ "${observed}" = "${deployment}" ]; then
+                  return 0
+                fi
+              elif [ "${status}" = "404" ]; then
+                rm -f "${body}"
+              else
+                rm -f "${body}"
+                echo "::error::Rollback alias verification failed for ${domain}: HTTP ${status}."
+                return 1
+              fi
+
+              if [ "${attempt}" -lt 12 ]; then
+                sleep 5
+              fi
+            done
+
+            echo "::error::Rollback alias ${domain} did not converge to captured deployment ${deployment}; observed ${observed:-<empty>}."
+            return 1
+          }
+
           restore_domain "${PRIMARY_DOMAIN}" "${MOVED_PRIMARY}" "${ROLLBACK_PRIMARY_PROJECT}" "${ROLLBACK_PRIMARY}"
           restore_domain "${APEX_DOMAIN}" "${MOVED_APEX}" "${ROLLBACK_APEX_PROJECT}" "${ROLLBACK_APEX}"
-          echo "::error::Production cutover failed; every canonical alias was restored and every moved domain was returned to its captured prior project."
-          exit 1
+          verify_restored_alias "${PRIMARY_DOMAIN}" "${ROLLBACK_PRIMARY}"
+          verify_restored_alias "${APEX_DOMAIN}" "${ROLLBACK_APEX}"
+          echo "::notice::Production cutover failed; every canonical alias was restored and every moved domain was returned to its captured prior project."
 
       - name: Publish safe cutover control-plane outcome
         if: always()
@@ -648,7 +798,9 @@ jobs:
           state="failure"
           description="cutover failed before recorded phase"
 
-          if [ "${RECOVERY_OUTCOME}" = "failure" ]; then
+          if [ "${RECOVERY_OUTCOME}" = "success" ]; then
+            description="cutover failed; canonical rollback verified"
+          elif [ "${RECOVERY_OUTCOME}" = "failure" ]; then
             description="cutover failed; canonical rollback did not complete"
           elif [ "${CREDENTIAL_OUTCOME}" != "success" ]; then
             description="blocked: Vercel credential unavailable"
@@ -675,3 +827,38 @@ jobs:
           payload="$(jq -nc             --arg state "${state}"             --arg context "${context}"             --arg description "${description}"             --arg target_url "${target_url}"             '{state: $state, context: $context, description: $description, target_url: $target_url}')"
 
           curl --silent --show-error --fail-with-body             --request POST             --header "Authorization: Bearer ${GITHUB_TOKEN}"             --header "Accept: application/vnd.github+json"             --header "Content-Type: application/json"             --data "${payload}"             "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}"             >/dev/null
+
+      - name: Enforce fail-closed cutover result
+        if: always()
+        shell: bash
+        env:
+          CREDENTIAL_OUTCOME: ${{ steps.credential.outcome }}
+          CANDIDATE_OUTCOME: ${{ steps.candidate.outcome }}
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          ROLLBACK_CAPTURE_OUTCOME: ${{ steps.rollback.outcome }}
+          MOVE_OUTCOME: ${{ steps.move.outcome }}
+          ALIAS_OUTCOME: ${{ steps.alias.outcome }}
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+          QUARANTINE_OUTCOME: ${{ steps.quarantine.outcome }}
+          RECOVERY_OUTCOME: ${{ steps.recovery.outcome }}
+        run: |
+          set -euo pipefail
+          if [ "${CREDENTIAL_OUTCOME}" = "success" ] \
+            && [ "${CANDIDATE_OUTCOME}" = "success" ] \
+            && [ "${PREFLIGHT_OUTCOME}" = "success" ] \
+            && [ "${ROLLBACK_CAPTURE_OUTCOME}" = "success" ] \
+            && [ "${MOVE_OUTCOME}" = "success" ] \
+            && [ "${ALIAS_OUTCOME}" = "success" ] \
+            && [ "${SMOKE_OUTCOME}" = "success" ] \
+            && [ "${QUARANTINE_OUTCOME}" = "success" ]; then
+            exit 0
+          fi
+
+          if [ "${RECOVERY_OUTCOME}" = "success" ]; then
+            echo "::error::Production cutover failed; canonical rollback completed and was verified."
+          elif [ "${MOVE_OUTCOME}" = "failure" ] || [ "${ALIAS_OUTCOME}" = "failure" ] || [ "${SMOKE_OUTCOME}" = "failure" ]; then
+            echo "::error::Production cutover failed and canonical rollback did not complete."
+          else
+            echo "::error::Production cutover was blocked before successful completion."
+          fi
+          exit 1

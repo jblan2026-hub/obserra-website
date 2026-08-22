@@ -61,6 +61,24 @@ test("post-cutover verification rejects canonical domains on every noncanonical 
   assert.match(workflow, /Noncanonical Vercel project \$\{project_id\} still owns a canonical production domain after move/);
 });
 
+test("alias assignment verifies both canonical aliases converge to the exact candidate before smoke", () => {
+  const aliasStart = workflow.indexOf("- name: Assign canonical domains to exact candidate deployment");
+  const smokeStart = workflow.indexOf("- name: Verify canonical LMS and prelicense commerce lock");
+  assert.ok(aliasStart >= 0 && smokeStart > aliasStart, "alias verification must precede canonical smoke");
+
+  const aliasStep = workflow.slice(aliasStart, smokeStart);
+  assert.match(aliasStep, /verify_alias\(\)/);
+  assert.match(
+    aliasStep,
+    /https:\/\/api\.vercel\.com\/v4\/aliases\/\$\{domain\}\?teamId=\$\{TEAM_ID\}/,
+  );
+  assert.match(aliasStep, /observed=.*\.deploymentId \/\/ \.deployment\.id \/\/ empty/);
+  assert.match(aliasStep, /if \[ "\$\{observed\}" = "\$\{CANDIDATE_DEPLOYMENT\}" \]; then/);
+  assert.match(aliasStep, /verify_alias "\$\{PRIMARY_DOMAIN\}"/);
+  assert.match(aliasStep, /verify_alias "\$\{APEX_DOMAIN\}"/);
+  assert.match(aliasStep, /did not converge to the exact approved deployment/);
+});
+
 test("partial project-domain move, alias assignment, or smoke failure restores each domain to its captured prior state", () => {
   assert.match(workflow, /id:\s*move/);
   assert.match(workflow, /id:\s*alias/);
@@ -75,7 +93,7 @@ test("partial project-domain move, alias assignment, or smoke failure restores e
   assert.match(workflow, /ROLLBACK_APEX_PROJECT:\s*\$\{\{ steps\.move\.outputs\.apex_source_project \}\}/);
   assert.match(workflow, /restore_domain\(\)/);
   assert.match(workflow, /local source_project="\$3"/);
-  assert.match(workflow, /if \[ "\$\{moved\}" = "true" \]; then/);
+  assert.match(workflow, /if \[ "\$\{moved\}" = "true" \] \|\| \[ -n "\$\{source_project\}" \]; then/);
   assert.match(workflow, /--data "\{\\"projectId\\":\\"\$\{source_project\}\\"\}"/);
   assert.match(workflow, /--data "\{\\"alias\\":\\"\$\{domain\}\\"\}"/);
   assert.match(
@@ -84,4 +102,35 @@ test("partial project-domain move, alias assignment, or smoke failure restores e
   );
   assert.match(workflow, /if \[ -z "\$\{ROLLBACK_PRIMARY\}" \] \|\| \[ -z "\$\{ROLLBACK_APEX\}" \]/);
   assert.match(workflow, /Rollback deployment IDs were not captured/);
+});
+
+test("rollback journals prior ownership before mutation and verifies restoration without masking the original failure", () => {
+  const moveStart = workflow.indexOf("- name: Move canonical domains to production project");
+  const aliasStart = workflow.indexOf("- name: Assign canonical domains to exact candidate deployment");
+  const recoveryStart = workflow.indexOf("- name: Roll back canonical domains on failed cutover");
+  const outcomeStart = workflow.indexOf("- name: Publish safe cutover control-plane outcome");
+  const enforcementStart = workflow.indexOf("- name: Enforce fail-closed cutover result");
+  assert.ok(moveStart >= 0 && aliasStart > moveStart);
+  assert.ok(recoveryStart > aliasStart && outcomeStart > recoveryStart && enforcementStart > outcomeStart);
+
+  const move = workflow.slice(moveStart, aliasStart);
+  const recovery = workflow.slice(recoveryStart, outcomeStart);
+  const enforcement = workflow.slice(enforcementStart);
+  const journalIndex = move.indexOf('echo "${output_name}_source_project=${source_project}"');
+  const mutationIndex = move.indexOf('https://api.vercel.com/v1/projects/${source_project}/domains/${domain}/move');
+  assert.ok(journalIndex >= 0 && mutationIndex > journalIndex, "prior owner must be journaled before mutation");
+
+  assert.match(recovery, /projects\/\$\{CANONICAL_PROJECT_ID\}\/domains\/\$\{domain\}/);
+  assert.match(recovery, /projects\/\$\{source_project\}\/domains\/\$\{domain\}/);
+  assert.match(recovery, /verify_restored_alias "\$\{PRIMARY_DOMAIN\}" "\$\{ROLLBACK_PRIMARY\}"/);
+  assert.match(recovery, /verify_restored_alias "\$\{APEX_DOMAIN\}" "\$\{ROLLBACK_APEX\}"/);
+  assert.match(recovery, /::notice::Production cutover failed/);
+  assert.doesNotMatch(
+    recovery,
+    /::error::Production cutover failed; every canonical alias was restored[^\n]*\n\s*exit 1/,
+  );
+
+  assert.match(enforcement, /RECOVERY_OUTCOME/);
+  assert.match(enforcement, /canonical rollback completed and was verified/);
+  assert.match(enforcement, /exit 1/);
 });
