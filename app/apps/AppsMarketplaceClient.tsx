@@ -21,13 +21,6 @@ const statusToneClass: Record<AppStatus, string> = {
   "Coming Soon": "status-coming",
 };
 
-const enterpriseVisuals = [
-  { src: "/eios/eios-overview-marketing.png", alt: "Executive overview dashboard" },
-  { src: "/eios/eios-situation-room-marketing.png", alt: "Enterprise situation room dashboard" },
-  { src: "/eios/eios-asset-intelligence-marketing.png", alt: "Asset intelligence dashboard" },
-  { src: "/eios/eios-report-center-marketing.png", alt: "Evidence and reporting dashboard" },
-];
-
 const deploymentEditions = [
   {
     icon: Cloud,
@@ -294,22 +287,7 @@ export function ProductInfoSections({ entry }: { entry: MarketplaceApp }) {
         <div><h2>FAQ</h2>{entry.faq.map((item) => <article key={item.q}><h3>{item.q}</h3><p>{item.a}</p></article>)}</div>
       </section>
 
-      <section className="app-screenshot-placeholder">
-        <h2>Product visuals and architecture narrative</h2>
-        <p>Qualified briefings connect product visuals, deployment models, security boundaries, and implementation planning to the buyer&apos;s active priorities.</p>
-        <div className="app-visual-grid">
-          {enterpriseVisuals.map((visual) => (
-            <figure key={visual.src} className="app-visual-card">
-              <Image src={visual.src} alt={visual.alt} fill sizes="(max-width: 900px) 100vw, 25vw" />
-              <figcaption>{visual.alt}</figcaption>
-            </figure>
-          ))}
-        </div>
-        <div className="apps-actions">
-          <Link href={`/contact?interest=application-demo&product=${encodeURIComponent(entry.name)}`} className="apps-button">Request a tailored demo</Link>
-          <Link href="/trust" className="apps-outline">Review Trust Center</Link>
-        </div>
-      </section>
     </>
   );
 }
+
