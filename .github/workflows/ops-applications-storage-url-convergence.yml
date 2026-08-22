@@ -1,0 +1,51 @@
+name: Ops Applications Storage URL Convergence
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  converge-production-url:
+    name: Converge known Applications production URL
+    if: >-
+      (github.event_name == 'pull_request'
+        && github.event.pull_request.head.repo.full_name == github.repository
+        && github.head_ref == 'ops/applications-storage-url-convergence-20260822')
+      || (github.event_name == 'workflow_dispatch'
+        && github.ref == 'refs/heads/ops/applications-storage-url-convergence-20260822')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Upsert the verified non-secret Applications durable-store URL
+        shell: bash
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ACCESS_TOKEN: ${{ secrets.VERCEL_ACCESS_TOKEN }}
+          VERCEL_TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+          VERCEL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+        run: |
+          set -euo pipefail
+
+          # The value below is a verified public project URL, not a credential.
+          # This job does not read, decrypt, print, copy, or modify any secret.
+          token="${VERCEL_TOKEN:-${VERCEL_ACCESS_TOKEN:-}}"
+          if [[ -z "${token}" ]]; then
+            echo "::error::No Vercel API credential is available for safe URL convergence."
+            exit 1
+          fi
+
+          curl --silent --show-error --fail \
+            --request POST \
+            --header "Authorization: Bearer ${token}" \
+            --header "Content-Type: application/json" \
+            --data '[{"key":"OBSERRA_APPLICATIONS_SUPABASE_URL","value":"https://ykmrlcfitsubqajgfnye.supabase.co","type":"plain","target":["production"],"comment":"Verified Applications durable-commerce authority URL"}]' \
+            "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env?upsert=true&teamId=${VERCEL_TEAM_ID}" \
+            --output /dev/null
+
+          echo "::notice::Known Applications durable-store URL convergence completed."
