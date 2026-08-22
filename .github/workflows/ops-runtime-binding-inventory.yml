@@ -131,7 +131,7 @@ jobs:
 
           echo "::notice::Production binding-name inventory completed without logging values."
 
-      - name: Verify Vercel-managed Applications secret aliases
+      - name: Inventory Vercel-managed Applications shared environment aliases
         shell: bash
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -141,24 +141,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          # This is read-only. It tests only pre-approved alias names; no secret
-          # value is requested, printed, copied, or attached to the project.
+          # Read-only alias inventory. It requests only shared-env metadata, never
+          # decrypted values. Values are neither printed, exported, nor written.
           token="${VERCEL_TOKEN:-${VERCEL_ACCESS_TOKEN:-}}"
           test -n "${token}" || {
-            echo "::error::No Vercel API credential is available for alias discovery."
+            echo "::error::No Vercel API credential is available for alias inventory."
             exit 1
           }
 
-          response_file="$(mktemp)"
-          trap 'rm -f "${response_file}"' EXIT
-          curl --silent --show-error --fail \
-            --header "Authorization: Bearer ${token}" \
-            --header "Accept: application/json" \
-            "https://api.vercel.com/v1/env?projectId=${VERCEL_PROJECT_ID}&teamId=${VERCEL_TEAM_ID}" \
-            --output "${response_file}"
-
-          jq -e '(.data // []) | type == "array"' "${response_file}" >/dev/null
-
+          linked=0
+          unlinked=0
+          absent_or_nonproduction=0
           for alias in \
             applications-supabase-service-role-key \
             applications-commerce-hash-secret \
@@ -167,13 +160,46 @@ jobs:
             applications-stripe-price-catalog-json \
             clerk-secret-key \
             clerk-publishable-key; do
-            jq -e --arg alias "${alias}" \
-              '(.data // []) | any(.[]?; .key == $alias)' \
-              "${response_file}" >/dev/null || {
-                echo "::error::An approved Applications Vercel-managed shared environment alias is not linked to the canonical project."
-                exit 1
-              }
+            response_file="$(mktemp)"
+            trap 'rm -f "${response_file}"' EXIT
+            curl --silent --show-error --fail --get \
+              --header "Authorization: Bearer ${token}" \
+              --header "Accept: application/json" \
+              --data-urlencode "search=${alias}" \
+              --data-urlencode "teamId=${VERCEL_TEAM_ID}" \
+              "https://api.vercel.com/v1/env" \
+              --output "${response_file}"
+
+            jq -e '(.data // []) | type == "array"' "${response_file}" >/dev/null
+            entry="$(jq -c --arg alias "${alias}" 'first(.data[]? | select(.key == $alias)) // empty' "${response_file}")"
+            if [[ -z "${entry}" ]] || ! jq -e '(.target | type == "array") and (.target | index("production") != null)' <<<"${entry}" >/dev/null; then
+              absent_or_nonproduction=$((absent_or_nonproduction + 1))
+            elif jq -e --arg project "${VERCEL_PROJECT_ID}" '(.projectId | type == "array") and (.projectId | index($project) != null)' <<<"${entry}" >/dev/null; then
+              linked=$((linked + 1))
+            else
+              unlinked=$((unlinked + 1))
+            fi
+            rm -f "${response_file}"
+            trap - EXIT
           done
 
-          echo "::notice::All required Applications Vercel-managed shared environment aliases are linked to the canonical project."
+          {
+            echo "## Applications shared-environment alias inventory — names only"
+            echo
+            echo "No environment value was printed, exported, uploaded, or changed."
+            echo
+            echo "| Production-scoped aliases linked | Existing but unlinked | Absent or not production-scoped |"
+            echo "| ---: | ---: | ---: |"
+            printf '| %s | %s | %s |\n' "${linked}" "${unlinked}" "${absent_or_nonproduction}"
+          } >> "${GITHUB_STEP_SUMMARY}"
 
+          if (( absent_or_nonproduction > 0 )); then
+            echo "::error::At least one required shared environment alias is absent or not production-scoped."
+            exit 1
+          fi
+          if (( unlinked > 0 )); then
+            echo "::error::Required shared environment aliases exist but are not linked to the canonical project."
+            exit 1
+          fi
+
+          echo "::notice::All required Applications shared environment aliases are linked to the canonical project."
