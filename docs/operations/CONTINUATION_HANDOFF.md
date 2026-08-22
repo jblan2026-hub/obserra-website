@@ -482,3 +482,23 @@ All must be observed from the public canonical host:
 - **Controlled repair result:** a second attempt to create the reviewed, normal-PR workflow for the scoped Key Vault-to-Vercel runtime-binding transfer was rejected by the security control before a repository file, pull request, or deployment was created. The control continued to require an explicit authorization naming the credential payload and destination.
 - **No mutation occurred:** no secret value was read, displayed, committed, copied, exported, or sent; no Vercel environment value, deployment, routing alias, payment configuration, customer record, Academy setting, or LMS setting changed.
 - **Blocker and next safe action:** obtain explicit authorization for a one-way transfer of the eight existing production Key Vault values to sensitive Production variables only in canonical Vercel project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`, with no logging or repository storage. Then use the reviewed PR/merge workflow, redeploy the exact `main` SHA, and require the canonical public contracts to pass before any commerce or LMS live claim.
+
+
+## 2026-08-22T21:36:27.175Z — PR #210 merged runtime repair; canonical proof pending
+
+- **GitHub event:** PR [#210](https://github.com/jblan2026-hub/obserra-website/pull/210) closed as merged. The verified GitHub merge commit is `78bb0c25a8857ac6c8f851dd1d4c01b34aa3baab`.
+- **Changed work:** the merged change adds governed Vercel production runtime identity/bootstrap code and a guarded release workflow, and corrects modern Applications service-key request authentication. It does not place provider credentials in source control.
+- **Source checks:** the applicable pull-request source workflows completed successfully before merge (Website CI, Application Production Pipeline, CodeQL Advanced, Florida Class D LMS Gates, Academy production gate, Applications private-boundary gate, and Application Release Validation). These are source results only.
+- **Verified-commit control:** Vercel canceled the unverified branch preview before build. The project Verified Commits policy was preserved; the GitHub-signed merge is verified.
+- **Production deployment record:** Vercel reports `dpl_3TKmo9VZGoqVTr1RfeFdzbXzcgoy` as `READY`, target `production`, for exact main SHA `78bb0c25a8857ac6c8f851dd1d4c01b34aa3baab`. Its deployment URL health contract returned HTTP `200` with that exact deployment ID/SHA and verified routing authority. This is not canonical-domain proof.
+- **Fresh canonical identity:** `GET https://www.obserrallc.com/api/health` returned HTTP `200` at `2026-08-22T21:36:27.175Z`, but still reported prior deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` / SHA `6c2cddd84503c7cb0af3ca976fd8308183379146`.
+- **Fresh canonical operational results:** Applications commerce remained HTTP `503` / `operational:false` (`durable-commerce-unavailable`); Academy commerce remained HTTP `503` / `operational:false`, with provider and durable storage unavailable.
+- **Blocker:** canonical routing has not yet proved the merged SHA, and neither canonical commerce contract is operational. No payment, entitlement, Academy enrollment, or regulated LMS operation is claimed live.
+- **Next safe action:** complete/observe the guarded post-merge bootstrap, then re-probe canonical identity and both commerce contracts. Treat the repair as live only if the canonical domain reports exact deployment/SHA and both commerce contracts independently return HTTP `200` with `operational:true`.
+
+## 2026-08-22T21:36:27.175Z — PR #65 synchronization
+
+- **GitHub event:** Dependabot synchronized open PR [#65](https://github.com/jblan2026-hub/obserra-website/pull/65), `chore(connections): bump eslint from 9.39.5 to 10.8.1`.
+- **Source state:** head `2ee096ccd372d36b91dfa828120b162d2ee25030`, base `78bb0c25a8857ac6c8f851dd1d4c01b34aa3baab`; 2 files changed (+219/−420); unmerged and mergeable at inspection.
+- **Production evidence:** no production deployment, canonical endpoint, credential, payment, or LMS setting was changed by this event.
+- **Next safe action:** keep PR #65 isolated from the active production-runtime repair; evaluate it through normal dependency and release gates before any merge.
