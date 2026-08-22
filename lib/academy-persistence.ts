@@ -13,8 +13,7 @@ import { academyCommerceStorageReady } from "./academy-payment";
 const COURSE_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
 const ACADEMY_GATEWAY_KEY_ID = "academy-gateway-v1";
-const ACADEMY_GATEWAY_URL =
-  "https://nwxnyqlyzyufgoadtqxs.supabase.co/functions/v1/academy-internal-rpc";
+const ACADEMY_GATEWAY_PATH = "/functions/v1/academy-internal-rpc";
 
 /**
  * Persistence compatibility boundary.
@@ -100,19 +99,27 @@ function academyGatewayRequested() {
 }
 
 function academyGatewayConfig(): AcademyGatewayConfig {
-  const rawUrl = process.env.OBSERRA_ACADEMY_GATEWAY_URL?.trim() ?? "";
+  const rawGatewayUrl = process.env.OBSERRA_ACADEMY_GATEWAY_URL?.trim() ?? "";
+  const rawSupabaseUrl = process.env.OBSERRA_ACADEMY_SUPABASE_URL?.trim() ?? "";
   const privateKeyB64 = process.env.OBSERRA_ACADEMY_GATEWAY_PRIVATE_KEY_B64?.trim() ?? "";
 
   try {
-    const url = new URL(rawUrl);
-    const normalized = `${url.origin}${url.pathname.replace(/\/$/, "")}`;
+    const gatewayUrl = new URL(rawGatewayUrl);
+    const supabaseUrl = new URL(rawSupabaseUrl);
     if (
-      url.protocol !== "https:"
-      || url.username
-      || url.password
-      || url.search
-      || url.hash
-      || normalized !== ACADEMY_GATEWAY_URL
+      gatewayUrl.protocol !== "https:"
+      || gatewayUrl.username
+      || gatewayUrl.password
+      || gatewayUrl.search
+      || gatewayUrl.hash
+      || gatewayUrl.origin !== supabaseUrl.origin
+      || gatewayUrl.pathname.replace(/\/$/, "") !== ACADEMY_GATEWAY_PATH
+      || supabaseUrl.protocol !== "https:"
+      || supabaseUrl.username
+      || supabaseUrl.password
+      || supabaseUrl.search
+      || supabaseUrl.hash
+      || (supabaseUrl.pathname !== "/" && supabaseUrl.pathname !== "")
       || !privateKeyB64
     ) {
       throw new Error("invalid");
@@ -122,7 +129,11 @@ function academyGatewayConfig(): AcademyGatewayConfig {
     const privateKey = createPrivateKey(pem);
     if (privateKey.asymmetricKeyType !== "ed25519") throw new Error("invalid-key-type");
 
-    return { url: ACADEMY_GATEWAY_URL, keyId: ACADEMY_GATEWAY_KEY_ID, privateKey };
+    return {
+      url: `${supabaseUrl.origin}${ACADEMY_GATEWAY_PATH}`,
+      keyId: ACADEMY_GATEWAY_KEY_ID,
+      privateKey,
+    };
   } catch {
     throw new AcademyPersistenceError(
       "Academy durable storage gateway is not configured.",
