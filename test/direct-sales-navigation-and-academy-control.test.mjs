@@ -60,3 +60,13 @@ test("Academy LMS stays live while new enrollment and payment remain licensing-g
   assert.match(learnPage, /academyStateWithOwnerAccess/);
   assert.doesNotMatch(learnPage, /academyLicensedSalesEnabled/);
 });
+
+
+test("Marketplace URL permanently resolves to the real Applications marketplace", () => {
+  const marketplaceRoute = read("app/marketplace/page.tsx");
+  const applicationsPage = read("app/apps/page.tsx");
+
+  assert.match(marketplaceRoute, /import \{ permanentRedirect \} from "next\/navigation"/);
+  assert.match(marketplaceRoute, /permanentRedirect\("\/apps"\)/);
+  assert.match(applicationsPage, /alternates: \{ canonical: "\/apps" \}/);
+});
