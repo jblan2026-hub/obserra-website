@@ -243,3 +243,12 @@ All must be observed from the public canonical host:
 - **Scope control:** no production workflow behavior was loosened. The candidate health/commerce/Florida preflight remains intact; the canonical locked-checkout smoke and rollback ordering remain required. No secrets, provider settings, payments, LMS readiness, aliases, or public pages were changed.
 - **Fresh public evidence (2026-08-22T18:12:29.779Z):** canonical health continues to return verified old deployment `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / SHA `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`; Academy commerce remains HTTP `503` / `operational: false`; Florida readiness remains HTTP `503` / `not_ready`. These facts do not satisfy live payment or LMS acceptance.
 - **Next safe action:** require a new complete source-gate run for head `20da5ea0541f8befec2c97e2d539e43ba908f7d9`; if it passes, merge the PR and test the generated canonical candidate only through the guarded cutover and canonical public endpoint proof.
+
+
+### 2026-08-22T18:13:27.259Z — PR #205 synchronize event
+
+- **Event:** [PR #205](https://github.com/jblan2026-hub/obserra-website/pull/205) synchronized to corrective head `20da5ea0541f8befec2c97e2d539e43ba908f7d9`.
+- **Current source-gate state:** CodeQL Advanced run `32590034776` and Production Authority Contract run `32590034779` succeeded. Website CI run `32590034777` is still in progress. The branch Vercel status is not production evidence and is not accepted as a live result.
+- **Fresh canonical evidence (2026-08-22T18:13:27.259Z):** `https://www.obserrallc.com/api/health` still returns verified deployment `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / SHA `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`; it does not prove this PR's source is live.
+- **Blocker:** Website CI must complete successfully; then a merge-created exact Vercel candidate must pass guarded alias cutover and the canonical host must prove the exact deployment/SHA. Payments and regulated LMS readiness remain separately fail-closed.
+- **Next safe action:** inspect the completed Website CI result; if it fails, repair the concrete test/build failure. If it passes, merge PR #205 and continue only with canonical endpoint evidence.
