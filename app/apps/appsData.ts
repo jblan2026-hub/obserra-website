@@ -2,6 +2,12 @@ import { EIOS_BRAND_NAME } from "../../lib/legal-identity";
 
 export type AppStatus = "Available" | "Pilot" | "Coming Soon";
 
+export const marketplaceEngagementLabel: Record<AppStatus, string> = {
+  Available: "Enterprise assessment",
+  Pilot: "Pilot assessment",
+  "Coming Soon": "Pre-release",
+};
+
 export type DeploymentModel = "SaaS" | "Private Cloud" | "Hybrid" | "On-Premises";
 
 export type AppCategory =
