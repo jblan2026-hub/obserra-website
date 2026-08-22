@@ -1,5 +1,6 @@
 name: Production Vercel public cutover
-run-name: Canonical Vercel public cutover — ${{ github.sha }}
+# The exact merge SHA is required for independently auditable public cutover evidence.
+run-name: Canonical Vercel public cutover for ${{ github.sha }}
 
 on:
   push:
