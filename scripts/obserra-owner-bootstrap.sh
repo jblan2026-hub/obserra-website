@@ -20,6 +20,16 @@ test -z "$(git status --porcelain)" || {
   echo "The repository has uncommitted changes. Commit them before the production owner bootstrap." >&2
   exit 1
 }
+test "$(git branch --show-current)" = "main" || {
+  echo "The owner bootstrap must run from the reviewed main branch." >&2
+  exit 1
+}
+git fetch --prune origin main
+approved_release_sha="$(git rev-parse HEAD)"
+test "${approved_release_sha}" = "$(git rev-parse origin/main)" || {
+  echo "Local main is not the current reviewed origin/main. Pull the reviewed main branch and rerun." >&2
+  exit 1
+}
 
 echo "Phase 1/4: Azure production resource, OIDC, managed identity, storage, and observability convergence"
 bash "${SCRIPT_DIR}/azure-bootstrap-current-directory.sh"
@@ -36,6 +46,7 @@ echo "Phase 4/4: Launch exact-main Azure staging verification and controlled pro
 gh workflow run azure-production-deploy.yml \
   --repo jblan2026-hub/obserra-website \
   --ref main \
+  --field expected_release_sha="${approved_release_sha}" \
   --field promote_to_azure_production=true
 sleep 5
 run_id="$(gh run list --repo jblan2026-hub/obserra-website --workflow azure-production-deploy.yml --branch main --limit 1 --json databaseId --jq '.[0].databaseId')"
