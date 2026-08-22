@@ -103,6 +103,9 @@ jobs:
           CANDIDATE_URL: ${{ steps.candidate.outputs.deployment_url }}
         run: |
           set -euo pipefail
+          # This block never receives a provider credential. The trace is limited to
+          # the failed public-contract command and its exit code.
+          trap 'code=$?; printf "::error::Candidate preflight command failed (exit %s): %s\\n" "$code" "$BASH_COMMAND" >&2; exit "$code"' ERR
 
           website_headers="$(mktemp)"
           website_body="$(mktemp)"
