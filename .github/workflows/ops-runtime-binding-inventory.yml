@@ -80,6 +80,8 @@ jobs:
             ' "${response_file}"
           }
 
+          missing_labels=()
+
           requirement() {
             local label="$1"
             shift
@@ -100,6 +102,7 @@ jobs:
               done <<< "${entries}"
             else
               printf '| %s | missing | — |\n' "${label}" >> "${GITHUB_STEP_SUMMARY}"
+              missing_labels+=("${label}")
             fi
           }
 
@@ -129,6 +132,11 @@ jobs:
           requirement 'Academy durable-store service role' OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY
           requirement 'Academy email integrity secret' OBSERRA_ACADEMY_EMAIL_HASH_SECRET
 
+          if (( ${#missing_labels[@]} > 0 )); then
+            echo "::notice::Missing production binding categories (names only): ${missing_labels[*]}"
+          else
+            echo "::notice::All required production binding categories are present."
+          fi
           echo "::notice::Production binding-name inventory completed without logging values."
 
       - name: Inventory Vercel-managed Applications shared environment aliases
