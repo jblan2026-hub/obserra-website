@@ -3,6 +3,10 @@ name: Azure Production Deploy
 on:
   workflow_dispatch:
     inputs:
+      expected_release_sha:
+        description: "Exact reviewed 40-character main commit SHA to build and promote"
+        required: true
+        type: string
       promote_to_azure_production:
         description: "Swap verified staging release into the Azure production slot"
         required: true
@@ -32,6 +36,7 @@ env:
   NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_URL: https://ftkjhmtfyfkartfsnkjb.supabase.co
   NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_PUBLISHABLE_KEY: sb_publishable_mRE63bML7dsVY_YqaervqA_TUEWsxVB
   OBSERRA_AUTH_SUPABASE_PROJECT_REF: ftkjhmtfyfkartfsnkjb
+  OBSERRA_APPROVED_RELEASE_SHA: ${{ inputs.expected_release_sha }}
 
 jobs:
   deploy:
@@ -39,11 +44,23 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
-      - name: Check out exact main release
+      - name: Check out exact approved main release
         uses: actions/checkout@v6
         with:
-          ref: main
-          fetch-depth: 1
+          ref: ${{ env.OBSERRA_APPROVED_RELEASE_SHA }}
+          fetch-depth: 0
+
+      - name: Prove immutable release selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${OBSERRA_APPROVED_RELEASE_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "${OBSERRA_APPROVED_RELEASE_SHA}"
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "${OBSERRA_APPROVED_RELEASE_SHA}" || {
+            echo "::error::main moved after owner approval. Rerun the bootstrap against the new reviewed main SHA."
+            exit 1
+          }
 
       - name: Require current-directory Azure OIDC identifiers
         shell: bash
@@ -94,7 +111,7 @@ jobs:
           cp -R .next/standalone/. release/
           cp -R .next/static release/.next/static
           cp -R public release/public
-          printf '%s\n' "${GITHUB_SHA}" > release/OBSERRA_RELEASE_SHA
+          printf '%s\n' "${OBSERRA_APPROVED_RELEASE_SHA}" > release/OBSERRA_RELEASE_SHA
           (
             cd release
             zip -qr ../obserra-release.zip .
@@ -212,13 +229,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          deployment_id="azapp-${GITHUB_SHA:0:12}"
+          deployment_id="azapp-${OBSERRA_APPROVED_RELEASE_SHA:0:12}"
           az webapp config appsettings set \
             --resource-group "${AZURE_RESOURCE_GROUP}" \
             --name "${OBSERRA_WEBAPP_NAME}" \
             --slot "${OBSERRA_STAGING_SLOT}" \
             --settings \
-              OBSERRA_RELEASE_SHA="${GITHUB_SHA}" \
+              OBSERRA_RELEASE_SHA="${OBSERRA_APPROVED_RELEASE_SHA}" \
               OBSERRA_DEPLOYMENT_ID="${deployment_id}" \
             --only-show-errors >/dev/null
 
@@ -247,7 +264,7 @@ jobs:
               --write-out '%{http_code}' \
               "${staging_url}/api/health" || true)"
             if [[ "${status}" = "200" ]] && jq -e \
-              --arg sha "${GITHUB_SHA}" '
+              --arg sha "${OBSERRA_APPROVED_RELEASE_SHA}" '
                 .service == "obserra-website" and
                 .status == "live" and
                 .contract == "website-liveness-v1" and
@@ -321,6 +338,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git fetch --no-tags origin main
+          test "$(git rev-parse origin/main)" = "${OBSERRA_APPROVED_RELEASE_SHA}" || {
+            echo "::error::main moved during staging verification. Promotion is blocked; review and rerun the new main SHA."
+            exit 1
+          }
           az webapp deployment slot swap \
             --resource-group "${AZURE_RESOURCE_GROUP}" \
             --name "${OBSERRA_WEBAPP_NAME}" \
@@ -346,7 +368,7 @@ jobs:
               --write-out '%{http_code}' \
               "${production_url}/api/health" || true)"
             if [[ "${status}" = "200" ]] && jq -e \
-              --arg sha "${GITHUB_SHA}" '
+              --arg sha "${OBSERRA_APPROVED_RELEASE_SHA}" '
                 .hosting.provider == "azure-app-service" and
                 .hosting.authority == "verified" and
                 .hosting.verified == true and
