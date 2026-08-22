@@ -162,3 +162,12 @@ All must be observed from the public canonical host:
 - **Merge:** PR #203 was merged through GitHub as `6ac0879c2e8cdf1f9cea6a72e4923408aed79910`.
 - **Scope retained:** workflow-only safe observability; no secrets, private-library content, canonical aliases, payments, LMS readiness, or public product behavior changed by the merge itself.
 - **Next safe action:** wait for a Vercel production candidate carrying exact main SHA `6ac0879c2e8cdf1f9cea6a72e4923408aed79910`; read its non-secret cutover-phase status; then use the canonical public health endpoint to prove or reject cutover.
+
+
+### 2026-08-22T17:57:11Z — PR #203 merged event and first observable cutover attempt
+
+- **Merged source:** PR #203 merge commit `6ac0879c2e8cdf1f9cea6a72e4923408aed79910` is the current cutover input. Its candidate is Vercel production deployment `dpl_6sTjCaYjahoLaqD155s1wKGsTKoR` at `https://obserra-website-live-pajgjo5iu-obserra.vercel.app`, `READY`, exact SHA-matched, and Vercel reports GitHub commit verification `verified`.
+- **Safe cutover result:** Actions run `32589227487`, job `97070274053`, accepted the configured Vercel credential and found the exact candidate. It failed in **Preflight exact canonical deployment health**. Every later mutation step—rollback-alias capture, domain move, alias assignment, canonical smoke, duplicate-project quarantine, and rollback—was skipped. No canonical domain was changed.
+- **Candidate endpoint evidence:** Direct candidate probes returned health HTTP `200`, exact deployment/SHA, verified routing authority, `cache-control: no-store`, and the required routing header; commerce HTTP `503` with its fail-closed contract; Florida liveness HTTP `200/live`; Florida readiness HTTP `503/not_ready` with `Retry-After: 60`. These candidate results do not prove canonical cutover and do not establish the specific preflight assertion that failed.
+- **Canonical state:** No new canonical public proof was produced; the last canonical probe remains old deployment `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`.
+- **Safe next action:** rerun the failed cutover job once against the now-READY candidate. If preflight fails again, add phase-granular preflight diagnostics before any alias mutation; do not bypass or weaken preflight.
