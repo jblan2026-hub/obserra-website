@@ -154,3 +154,11 @@ All must be observed from the public canonical host:
 - **Fresh public routes:** `/marketplace` still rendered the old deployment’s not-found response; Academy commerce remained `operational: false` with payment provider and durable storage unavailable; Florida readiness remained `not_ready`.
 - **Blocker:** canonical alias movement remains unproven and therefore not complete. Payments and regulated LMS operation remain fail-closed.
 - **Next safe action:** await PR #203 source-gate evidence, merge only if those gates are satisfactory, then read its non-secret cutover phase status and verify the canonical public host’s exact deployment/SHA.
+
+
+### 2026-08-22T17:56:xxZ — PR #203 gated merge
+
+- **Source gates:** PR #203 head `d33276938200ebe38b04f9e6d9efad130014748f` completed Production Authority Contract (run `32589119989`), CodeQL Advanced (run `32589119981`), and Website CI (run `32589119978`) successfully. These are source controls only; they are not live acceptance.
+- **Merge:** PR #203 was merged through GitHub as `6ac0879c2e8cdf1f9cea6a72e4923408aed79910`.
+- **Scope retained:** workflow-only safe observability; no secrets, private-library content, canonical aliases, payments, LMS readiness, or public product behavior changed by the merge itself.
+- **Next safe action:** wait for a Vercel production candidate carrying exact main SHA `6ac0879c2e8cdf1f9cea6a72e4923408aed79910`; read its non-secret cutover-phase status; then use the canonical public health endpoint to prove or reject cutover.
