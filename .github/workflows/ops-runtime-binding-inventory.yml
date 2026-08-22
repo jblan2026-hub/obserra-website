@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - ops/runtime-binding-inventory-20260822
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
@@ -12,7 +16,13 @@ permissions:
 jobs:
   production-binding-names:
     name: Production binding names only
-    if: github.ref == 'refs/heads/ops/runtime-binding-inventory-20260822'
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/ops/runtime-binding-inventory-20260822')
+      || (github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
+          && github.head_ref == 'ops/runtime-binding-inventory-20260822')
+      || (github.event_name == 'workflow_dispatch'
+          && github.ref == 'refs/heads/ops/runtime-binding-inventory-20260822')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
