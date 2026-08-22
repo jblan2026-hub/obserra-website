@@ -391,3 +391,14 @@ All must be observed from the public canonical host:
 - `GET https://www.obserrallc.com/api/health` returned HTTP 200 at `2026-08-22T19:12:46.431Z`.
 - Canonical endpoint reported verified Vercel authority for project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`, deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U`, commit `6c2cddd84503c7cb0af3ca976fd8308183379146`.
 - This proves the public site routing target only; it does not change the immediately preceding canonical commerce HTTP 503 result.
+
+
+## 2026-08-22T19:22:29.196Z — PR #205 synchronization; first-party CI/CD release path reviewed
+
+- GitHub event recorded: pull request #205 synchronized (unmerged event payload).
+- Changed work: reviewed the applicable first-party DevSecOps/CI-CD baseline and the repository's existing Azure production workflow. The existing workflow is source-controlled, manually dispatched, release-SHA bound, gates a staging deployment on health and commerce checks, and includes a failed-gate rollback path.
+- Security boundary: no credential was copied, exposed, or transferred; no Azure or Vercel deployment was triggered during this update.
+- Public endpoint: `GET https://www.obserrallc.com/api/health` returned HTTP 200 at `2026-08-22T19:22:29.196Z`, with verified Vercel authority for project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`, deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U`, commit `6c2cddd84503c7cb0af3ca976fd8308183379146`.
+- Public endpoint: `GET https://www.obserrallc.com/api/apps/commerce-health` returned HTTP 503 at `2026-08-22T19:22:27Z`; it reported `operational:false`, unavailable event ledger and entitlement authority, `stripeConfigured:false`, `providerConnected:false`, `chargesEnabled:false`, and `identityReady:false`.
+- Blocker: the canonical public runtime still does not prove a functioning Applications commerce release. The available GitHub connector cannot enumerate the manually-dispatched Azure workflow runs, and no Azure management connector is available in this session; no unsupported deployment claim is made.
+- Next safe action: use the existing Azure staging workflow with the exact intended release SHA only after its approved Key Vault/runtime configuration is available, then require its own health and commerce gates before any production cutover or live-commerce claim.
