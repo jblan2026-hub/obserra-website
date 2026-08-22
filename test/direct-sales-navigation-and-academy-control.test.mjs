@@ -70,3 +70,19 @@ test("Marketplace URL permanently resolves to the real Applications marketplace"
   assert.match(marketplaceRoute, /permanentRedirect\("\/apps"\)/);
   assert.match(applicationsPage, /alternates: \{ canonical: "\/apps" \}/);
 });
+
+
+test("Application product pages omit placeholder visuals and unverified runtime commerce claims", () => {
+  const marketplace = read("app/apps/AppsMarketplaceClient.tsx");
+  const styles = read("app/apps/apps.css");
+  const detail = read("app/apps/[slug]/page.tsx");
+
+  assert.doesNotMatch(marketplace, /app-screenshot-placeholder/);
+  assert.doesNotMatch(styles, /app-screenshot-placeholder/);
+  assert.doesNotMatch(detail, /liveApplicationUrls/);
+  assert.doesNotMatch(detail, /Subscribe & Launch/);
+  assert.doesNotMatch(detail, /manage billing in Stripe/);
+  assert.doesNotMatch(detail, /\/api\/apps\/(?:access|billing-portal|download)/);
+  assert.match(detail, /Request enterprise demo/);
+  assert.match(detail, /Request deployment assessment/);
+});
