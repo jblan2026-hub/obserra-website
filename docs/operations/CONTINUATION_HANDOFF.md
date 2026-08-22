@@ -402,3 +402,14 @@ All must be observed from the public canonical host:
 - Public endpoint: `GET https://www.obserrallc.com/api/apps/commerce-health` returned HTTP 503 at `2026-08-22T19:22:27Z`; it reported `operational:false`, unavailable event ledger and entitlement authority, `stripeConfigured:false`, `providerConnected:false`, `chargesEnabled:false`, and `identityReady:false`.
 - Blocker: the canonical public runtime still does not prove a functioning Applications commerce release. The available GitHub connector cannot enumerate the manually-dispatched Azure workflow runs, and no Azure management connector is available in this session; no unsupported deployment claim is made.
 - Next safe action: use the existing Azure staging workflow with the exact intended release SHA only after its approved Key Vault/runtime configuration is available, then require its own health and commerce gates before any production cutover or live-commerce claim.
+
+
+## 2026-08-22T19:24:33.502Z — PR #205 changed-work evidence reconciled
+
+- Pull request: [#205](https://github.com/jblan2026-hub/obserra-website/pull/205) `fix(release): keep candidate preflight read-only` is merged; merge commit `902bd58d00f83becf026e4b85b079a356d7428b7`.
+- Changed files: `.github/workflows/production-vercel-public-cutover.yml`, `test/production-vercel-public-cutover-contract.test.mjs`, and `test/vercel-canonical-deployment-preflight.test.mjs`.
+- Verified source change: candidate deployment preflight no longer sends a checkout `POST`; it keeps direct candidate validation read-only. The canonical checkout-lock smoke remains ordered after successful alias assignment, and the two regression tests enforce that ordering and non-transactional candidate behavior.
+- Scope boundary: this PR does not activate payments, bypass licensing, move aliases, alter secrets, or make Applications commerce operational.
+- Workspace verification: the current execution environment has neither the Azure CLI nor GitHub CLI installed. The authorized GitHub connector exposes no workflow-dispatch action, and no Azure management connector is available here. Therefore no Azure staging or production run was initiated.
+- Current public evidence remains: canonical health proves Vercel deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` / commit `6c2cddd84503c7cb0af3ca976fd8308183379146`; Applications commerce remains HTTP 503 as recorded above.
+- Next safe action: dispatch the existing SHA-bound Azure staging workflow through an authorized Azure/GitHub control plane only after its Key Vault-backed runtime configuration is confirmed; require its staged health and commerce gates before cutover.
