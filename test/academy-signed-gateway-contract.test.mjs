@@ -26,8 +26,12 @@ test("Academy persistence prefers the signed gateway and fails closed on malform
 
   assert.match(source, /OBSERRA_ACADEMY_GATEWAY_URL/);
   assert.match(source, /OBSERRA_ACADEMY_GATEWAY_PRIVATE_KEY_B64/);
+  assert.match(source, /OBSERRA_ACADEMY_SUPABASE_URL/);
   assert.match(source, /academy-gateway-v1/);
-  assert.match(source, /https:\/\/nwxnyqlyzyufgoadtqxs\.supabase\.co\/functions\/v1\/academy-internal-rpc/);
+  assert.match(source, /ACADEMY_GATEWAY_PATH = "\/functions\/v1\/academy-internal-rpc"/);
+  assert.match(source, /gatewayUrl\.origin !== supabaseUrl\.origin/);
+  assert.match(source, /gatewayUrl\.pathname\.replace\(\/\\\/$\/, ""\) !== ACADEMY_GATEWAY_PATH/);
+  assert.doesNotMatch(source, /supabase\.co/);
   assert.match(source, /asymmetricKeyType !== "ed25519"/);
   assert.match(source, /if \(academyGatewayRequested\(\)\) return gatewayRpc/);
   assert.match(source, /if \(academyGatewayRequested\(\)\) academyGatewayConfig\(\)/);
