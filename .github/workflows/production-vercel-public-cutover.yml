@@ -164,24 +164,9 @@ jobs:
               .identityEnvironment == "live"
             ' "${commerce_body}" >/dev/null
 
-            attempt_id="$(cat /proc/sys/kernel/random/uuid)"
-            issued_at="$(date +%s)"
-            candidate_checkout_headers="$(mktemp)"
-            candidate_checkout_body="$(mktemp)"
-            candidate_checkout_status="$(curl --silent --show-error --max-time 20 \
-              --output "${candidate_checkout_body}" \
-              --dump-header "${candidate_checkout_headers}" \
-              --write-out '%{http_code}' \
-              --request POST \
-              --header "Origin: ${CANDIDATE_URL}" \
-              --header "Content-Type: application/x-www-form-urlencoded" \
-              --data-urlencode "course=zero-trust-strategy" \
-              --data-urlencode "checkoutAttemptId=${attempt_id}" \
-              --data-urlencode "checkoutAttemptIssuedAt=${issued_at}" \
-              "${CANDIDATE_URL}/api/academy/checkout")"
-            test "${candidate_checkout_status}" = "307"
-            grep -i '^location: .*enrollment=licensing-pending' "${candidate_checkout_headers}" >/dev/null
-            grep -i '^x-obserra-sales-license: pending' "${candidate_checkout_headers}" >/dev/null
+            # Direct deployment hosts intentionally expose read-only GET health contracts.
+            # The checkout lock is verified on the canonical host after alias assignment,
+            # when rollback aliases have already been captured.
           else
             echo "::error::Academy commerce health returned unexpected HTTP ${commerce_status}."
             exit 1
