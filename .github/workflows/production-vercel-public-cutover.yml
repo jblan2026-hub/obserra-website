@@ -370,9 +370,59 @@ jobs:
           move_domain "${PRIMARY_DOMAIN}" primary
           move_domain "${APEX_DOMAIN}" apex
 
+      - name: Assign canonical domains to exact candidate deployment
+        id: alias
+        if: steps.move.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        env:
+          CANDIDATE_DEPLOYMENT: ${{ steps.candidate.outputs.deployment_id }}
+        run: |
+          set -euo pipefail
+          test -n "${CANDIDATE_DEPLOYMENT}"
+
+          assign_alias() {
+            local domain="$1"
+            local body
+            local status
+            local assigned
+
+            body="$(mktemp)"
+            if ! status="$(curl --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${body}" \
+              --write-out '%{http_code}' \
+              --request POST \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "{\"alias\":\"${domain}\"}" \
+              "https://api.vercel.com/v2/deployments/${CANDIDATE_DEPLOYMENT}/aliases?teamId=${TEAM_ID}")"; then
+              rm -f "${body}"
+              echo "::error::Unable to assign ${domain} to the approved candidate deployment before an HTTP response was received."
+              return 1
+            fi
+
+            if [ "${status}" != "200" ] && [ "${status}" != "201" ]; then
+              rm -f "${body}"
+              echo "::error::Unable to assign ${domain} to the approved candidate deployment: HTTP ${status}."
+              return 1
+            fi
+
+            assigned="$(jq -r '.alias // .name // empty' "${body}")"
+            rm -f "${body}"
+            if [ "${assigned}" != "${domain}" ]; then
+              echo "::error::Vercel returned an inconsistent alias assignment for ${domain}."
+              return 1
+            fi
+          }
+
+          assign_alias "${PRIMARY_DOMAIN}"
+          assign_alias "${APEX_DOMAIN}"
+
       - name: Verify canonical LMS and prelicense commerce lock
         id: smoke
-        if: steps.move.outcome == 'success'
+        if: steps.alias.outcome == 'success'
         continue-on-error: true
         shell: bash
         env:
@@ -463,7 +513,7 @@ jobs:
           fi
 
       - name: Roll back canonical domains on failed cutover
-        if: ${{ always() && steps.rollback.outcome == 'success' && steps.rollback.outputs.primary != '' && steps.rollback.outputs.apex != '' && (steps.move.outcome == 'failure' || steps.smoke.outcome == 'failure') }}
+        if: ${{ always() && steps.rollback.outcome == 'success' && steps.rollback.outputs.primary != '' && steps.rollback.outputs.apex != '' && (steps.move.outcome == 'failure' || steps.alias.outcome == 'failure' || steps.smoke.outcome == 'failure') }}
         shell: bash
         env:
           ROLLBACK_PRIMARY: ${{ steps.rollback.outputs.primary }}
@@ -479,7 +529,7 @@ jobs:
             exit 1
           fi
 
-          move_back_if_moved() {
+          restore_domain() {
             local domain="$1"
             local moved="$2"
             local source_project="$3"
@@ -487,32 +537,35 @@ jobs:
             local body
             local status
 
-            if [ "${moved}" != "true" ]; then
-              return 0
-            fi
-            if [ -z "${source_project}" ]; then
-              echo "::error::Rollback source project was not captured for moved domain ${domain}."
+            if [ -z "${deployment}" ]; then
+              echo "::error::Rollback deployment was not captured for ${domain}."
               return 1
             fi
 
-            body="$(mktemp)"
-            status="$(curl --silent --show-error \
-              --connect-timeout 10 \
-              --max-time 20 \
-              --output "${body}" \
-              --write-out '%{http_code}' \
-              --request POST \
-              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
-              --header "Content-Type: application/json" \
-              --data "{\"projectId\":\"${source_project}\"}" \
-              "https://api.vercel.com/v1/projects/${CANONICAL_PROJECT_ID}/domains/${domain}/move?teamId=${TEAM_ID}")"
-            if [ "${status}" != "200" ]; then
-              cat "${body}" >&2 || true
+            if [ "${moved}" = "true" ]; then
+              if [ -z "${source_project}" ]; then
+                echo "::error::Rollback source project was not captured for moved domain ${domain}."
+                return 1
+              fi
+
+              body="$(mktemp)"
+              status="$(curl --silent --show-error \
+                --connect-timeout 10 \
+                --max-time 20 \
+                --output "${body}" \
+                --write-out '%{http_code}' \
+                --request POST \
+                --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+                --header "Content-Type: application/json" \
+                --data "{\"projectId\":\"${source_project}\"}" \
+                "https://api.vercel.com/v1/projects/${CANONICAL_PROJECT_ID}/domains/${domain}/move?teamId=${TEAM_ID}")"
+              if [ "${status}" != "200" ]; then
+                rm -f "${body}"
+                echo "::error::Failed to return ${domain} to prior Vercel project ${source_project}: HTTP ${status}."
+                return 1
+              fi
               rm -f "${body}"
-              echo "::error::Failed to return ${domain} to prior Vercel project ${source_project}: HTTP ${status}."
-              return 1
             fi
-            rm -f "${body}"
 
             curl --silent --show-error --fail-with-body \
               --connect-timeout 10 \
@@ -525,7 +578,7 @@ jobs:
               >/dev/null
           }
 
-          move_back_if_moved "${PRIMARY_DOMAIN}" "${MOVED_PRIMARY}" "${ROLLBACK_PRIMARY_PROJECT}" "${ROLLBACK_PRIMARY}"
-          move_back_if_moved "${APEX_DOMAIN}" "${MOVED_APEX}" "${ROLLBACK_APEX_PROJECT}" "${ROLLBACK_APEX}"
-          echo "::error::Production cutover failed; every moved canonical domain was returned to its captured prior project and deployment."
+          restore_domain "${PRIMARY_DOMAIN}" "${MOVED_PRIMARY}" "${ROLLBACK_PRIMARY_PROJECT}" "${ROLLBACK_PRIMARY}"
+          restore_domain "${APEX_DOMAIN}" "${MOVED_APEX}" "${ROLLBACK_APEX_PROJECT}" "${ROLLBACK_APEX}"
+          echo "::error::Production cutover failed; every canonical alias was restored and every moved domain was returned to its captured prior project."
           exit 1
