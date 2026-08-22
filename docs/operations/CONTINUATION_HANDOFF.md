@@ -413,3 +413,14 @@ All must be observed from the public canonical host:
 - Workspace verification: the current execution environment has neither the Azure CLI nor GitHub CLI installed. The authorized GitHub connector exposes no workflow-dispatch action, and no Azure management connector is available here. Therefore no Azure staging or production run was initiated.
 - Current public evidence remains: canonical health proves Vercel deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` / commit `6c2cddd84503c7cb0af3ca976fd8308183379146`; Applications commerce remains HTTP 503 as recorded above.
 - Next safe action: dispatch the existing SHA-bound Azure staging workflow through an authorized Azure/GitHub control plane only after its Key Vault-backed runtime configuration is confirmed; require its staged health and commerce gates before cutover.
+
+
+## 2026-08-22T19:28:21.204Z — Applications authority backend verified; runtime binding isolated
+
+- Authorized read-only Supabase management evidence: project `ykmrlcfitsubqajgfnye` (Applications Release Authority) is `ACTIVE_HEALTHY`.
+- Schema-only inspection confirmed dedicated commerce and release-authority tables, including checkout, customer, payment-event, subscription, append-only ledger, promotion, rollback, and staged-package tables. No customer records were read.
+- Direct execution of the public commerce-health database routine returned `operational:true`, `eventLedger:"append-only"`, and `entitlementAuthority:"durable-subscription-snapshot-v1"`; its reported counters were zero. This proves the durable Applications backend is present and responding.
+- Source evidence: current `lib/applications-commerce.ts` requires a valid server-side Applications Supabase credential before calling that routine. The canonical public endpoint continues to return HTTP 503, so the failure is isolated to the website runtime binding/release path rather than a missing commerce schema.
+- CI/CD and identity/automation packages in the uploaded workspace were inspected. They provide release-control instructions and metadata, not an executable Azure control-plane bridge or deploy credential.
+- Execution-environment evidence: `az`, `gh`, and `pwsh` are not installed; no Azure management connector or GitHub workflow-dispatch action is exposed. No secret was read, copied, or transferred; no deployment was triggered.
+- Next safe action: use an authorized Azure or GitHub Actions control-plane session to dispatch the existing exact-SHA Azure staging workflow after its Key Vault-backed runtime binding is confirmed, then require its public health and commerce gates before production cutover.
