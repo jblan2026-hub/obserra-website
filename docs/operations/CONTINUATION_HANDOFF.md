@@ -268,3 +268,11 @@ All must be observed from the public canonical host:
 - **Source gate evidence only:** its corrected head completed Website CI (`32590034777`), CodeQL Advanced (`32590034776`), and Production Authority Contract (`32590034779`) successfully. The earlier stale contract failure was repaired before merge; this does not establish runtime state.
 - **Release-target decision:** `902bd58d00f83becf026e4b85b079a356d7428b7` is the newest observed merged main commit after #201 and is the only SHA that may be accepted for the next canonical candidate/cutover. The direct-host GET-only boundary and post-alias canonical checkout lock remain in that release path.
 - **Blocker / next safe action:** wait for a READY canonical Vercel candidate for exact SHA `902bd58d00f83becf026e4b85b079a356d7428b7`, inspect the guarded cutover phase result, then require `https://www.obserrallc.com/api/health` to return that exact deployment and SHA. Until then, the canonical public site remains old and payments/LMS readiness remain not live.
+
+
+### 2026-08-22T18:15:50.731Z — Audit correction: canonical cutover confirmed during prior probe
+
+- **Correction to the immediately preceding merge-event entry:** its prepared sentence that canonical health was still the old deployment was stale by the time the fresh probe completed. That statement is superseded; the erroneous statement remains visible for audit.
+- **Actual canonical public proof:** `https://www.obserrallc.com/api/health` at `2026-08-22T18:15:11.215Z` returned HTTP `200`, verified routing authority, deployment `dpl_jMgbmP4i4KacdJratNCsaMZJK6xu`, and exact SHA `902bd58d00f83becf026e4b85b079a356d7428b7`. This is the first public proof that the canonical host reached the merged PR #205 release target.
+- **What this proves / does not prove:** canonical website cutover identity is confirmed. The same probe still showed Academy commerce `503` / `operational: false` and Florida readiness `503` / `not_ready`; it does not prove payments or regulated LMS operation live.
+- **Audit impact:** no source, provider, alias, or customer action occurred during this documentation error; it was a stale-text assembly error only. The next record will contain fresh endpoint checks for marketplace, Applications, canonical checkout lock, Academy, and Florida.
