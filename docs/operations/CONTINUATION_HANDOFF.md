@@ -216,3 +216,12 @@ All must be observed from the public canonical host:
 - **Safety retained:** The direct deployment route policy remains GET-only. The canonical checkout lock still runs only after alias assignment and with rollback aliases already captured. No payment activation, secret/configuration change, public alias mutation, LMS readiness override, or marketplace package publication occurred.
 - **Current live evidence remains unchanged:** canonical health is still `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`; commerce and Florida readiness remain fail-closed HTTP `503`.
 - **Next safe action:** wait for source-gate evidence for PR #205. If it passes, merge it and require a fresh canonical endpoint proof for the generated exact Vercel candidate; do not treat the PR or CI as a live outcome.
+
+
+### 2026-08-22T18:10:22.719Z — PR #201 synchronize event
+
+- **Event:** Pull request [#201](https://github.com/jblan2026-hub/obserra-website/pull/201) synchronized. It remains open and unmerged; GitHub currently titles it `Harden production commerce and prepare governed Azure cutover` and reports an update at `2026-08-22T18:09:40Z`.
+- **Evidence boundary:** The PR description contains proposed/claimed source and provider state, but this webhook event provides no exact head SHA, successful deployment, or canonical-runtime proof. Those statements are therefore not accepted here as production evidence.
+- **Fresh canonical public evidence:** at `2026-08-22T18:09:57.666Z`, `https://www.obserrallc.com/api/health` returned HTTP `200` with verified deployment `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` and SHA `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`. Academy commerce returned HTTP `503`, `operational: false`, payment provider unavailable, durable storage unavailable. Florida readiness returned HTTP `503`, `not_ready`.
+- **Current blocker:** Canonical public identity is still the old deployment; payments and regulated LMS readiness remain fail-closed. This PR event does not change those facts.
+- **Next safe action:** continue the separate exact cutover fix in [PR #205](https://github.com/jblan2026-hub/obserra-website/pull/205); for #201, require independent source-gate, provider, and canonical exact-SHA evidence before accepting any claimed cutover or commerce state.
