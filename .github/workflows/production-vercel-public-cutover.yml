@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   group: production-vercel-public-cutover
@@ -29,6 +30,7 @@ jobs:
       APEX_DOMAIN: obserrallc.com
     steps:
       - name: Require configured Vercel credential
+        id: credential
         shell: bash
         run: |
           set -euo pipefail
@@ -94,6 +96,7 @@ jobs:
           echo "deployment_url=https://${deployment_url}" >> "${GITHUB_OUTPUT}"
 
       - name: Preflight exact canonical deployment health
+        id: preflight
         shell: bash
         env:
           CANDIDATE_DEPLOYMENT: ${{ steps.candidate.outputs.deployment_id }}
@@ -477,6 +480,7 @@ jobs:
           grep -i '^x-obserra-sales-license: pending' "${checkout_headers}" >/dev/null
 
       - name: Quarantine duplicate project and verify canonical domain ownership
+        id: quarantine
         if: steps.smoke.outcome == 'success'
         shell: bash
         run: |
@@ -515,6 +519,7 @@ jobs:
           fi
 
       - name: Roll back canonical domains on failed cutover
+        id: recovery
         if: ${{ always() && steps.rollback.outcome == 'success' && steps.rollback.outputs.primary != '' && steps.rollback.outputs.apex != '' && (steps.move.outcome == 'failure' || steps.alias.outcome == 'failure' || steps.smoke.outcome == 'failure') }}
         shell: bash
         env:
@@ -584,3 +589,52 @@ jobs:
           restore_domain "${APEX_DOMAIN}" "${MOVED_APEX}" "${ROLLBACK_APEX_PROJECT}" "${ROLLBACK_APEX}"
           echo "::error::Production cutover failed; every canonical alias was restored and every moved domain was returned to its captured prior project."
           exit 1
+
+      - name: Publish safe cutover control-plane outcome
+        if: always()
+        continue-on-error: true
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CREDENTIAL_OUTCOME: ${{ steps.credential.outcome }}
+          CANDIDATE_OUTCOME: ${{ steps.candidate.outcome }}
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          ROLLBACK_CAPTURE_OUTCOME: ${{ steps.rollback.outcome }}
+          MOVE_OUTCOME: ${{ steps.move.outcome }}
+          ALIAS_OUTCOME: ${{ steps.alias.outcome }}
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+          QUARANTINE_OUTCOME: ${{ steps.quarantine.outcome }}
+          RECOVERY_OUTCOME: ${{ steps.recovery.outcome }}
+        run: |
+          set -euo pipefail
+          context="Obserra canonical cutover evidence"
+          state="failure"
+          description="cutover failed before recorded phase"
+
+          if [ "${RECOVERY_OUTCOME}" = "failure" ]; then
+            description="cutover failed; canonical rollback did not complete"
+          elif [ "${CREDENTIAL_OUTCOME}" != "success" ]; then
+            description="blocked: Vercel credential unavailable"
+          elif [ "${CANDIDATE_OUTCOME}" != "success" ]; then
+            description="blocked: exact candidate not verified"
+          elif [ "${PREFLIGHT_OUTCOME}" != "success" ]; then
+            description="blocked: candidate preflight failed"
+          elif [ "${ROLLBACK_CAPTURE_OUTCOME}" != "success" ]; then
+            description="blocked: prior canonical aliases not captured"
+          elif [ "${MOVE_OUTCOME}" != "success" ]; then
+            description="blocked: canonical domain ownership move failed"
+          elif [ "${ALIAS_OUTCOME}" != "success" ]; then
+            description="blocked: canonical alias assignment failed"
+          elif [ "${SMOKE_OUTCOME}" != "success" ]; then
+            description="blocked: canonical post-cutover smoke failed"
+          elif [ "${QUARANTINE_OUTCOME}" != "success" ]; then
+            description="blocked: duplicate-project quarantine failed"
+          else
+            state="success"
+            description="canonical host verified exact candidate"
+          fi
+
+          target_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          payload="$(jq -nc             --arg state "${state}"             --arg context "${context}"             --arg description "${description}"             --arg target_url "${target_url}"             '{state: $state, context: $context, description: $description, target_url: $target_url}')"
+
+          curl --silent --show-error --fail-with-body             --request POST             --header "Authorization: Bearer ${GITHUB_TOKEN}"             --header "Accept: application/vnd.github+json"             --header "Content-Type: application/json"             --data "${payload}"             "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}"             >/dev/null
