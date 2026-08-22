@@ -46,6 +46,49 @@ test("approved production deployment hosts expose only read-only health routes b
   );
 });
 
+test("candidate preflight stays read-only while canonical smoke verifies the checkout lock", () => {
+  const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
+  const preflightStart = cutover.indexOf("Preflight exact canonical deployment health");
+  const moveStart = cutover.indexOf("Move canonical domains to production project");
+  const smokeStart = cutover.indexOf("Verify canonical LMS and prelicense commerce lock");
+  const quarantineStart = cutover.indexOf("Quarantine duplicate project and verify canonical domain ownership");
+
+  assert.ok(preflightStart >= 0, "candidate preflight must exist");
+  assert.ok(moveStart > preflightStart, "domain movement must follow candidate preflight");
+  assert.ok(smokeStart > moveStart, "canonical smoke must follow alias movement");
+  assert.ok(quarantineStart > smokeStart, "quarantine must follow canonical smoke");
+
+  const preflight = cutover.slice(preflightStart, moveStart);
+  const canonicalSmoke = cutover.slice(smokeStart, quarantineStart);
+
+  assert.equal(
+    preflight.includes("/api/academy/checkout"),
+    false,
+    "a direct deployment host must not receive a checkout request",
+  );
+  assert.equal(
+    preflight.includes("--request POST"),
+    false,
+    "candidate preflight must remain read-only",
+  );
+  assert.ok(
+    canonicalSmoke.includes("https://${PRIMARY_DOMAIN}/api/academy/checkout"),
+    "checkout lock must be tested on the canonical host",
+  );
+  assert.ok(
+    canonicalSmoke.includes('test "${status}" = "307"'),
+    "canonical checkout lock must retain its intentional redirect assertion",
+  );
+  assert.ok(
+    canonicalSmoke.includes("x-obserra-sales-license: pending"),
+    "canonical checkout lock must retain the licensing-pending response header",
+  );
+  assert.ok(
+    canonicalSmoke.includes("if: steps.alias.outcome == 'success'"),
+    "canonical checkout smoke must run only after alias assignment succeeds",
+  );
+});
+
 test("Vercel cutover preflights exact website, Academy commerce, and Florida LMS health before moving domains", () => {
   const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
   const preflightStep = "Preflight exact canonical deployment health";
