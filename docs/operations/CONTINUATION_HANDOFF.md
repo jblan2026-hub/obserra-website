@@ -121,3 +121,12 @@ All must be observed from the public canonical host:
 - **Observed facts:** direct main commit `f21ade991bcc5473027fd88cf68e9af991b9b9c7` produced canceled Vercel deployment `dpl_Gow62JNvbk8piFKZLiMXT4uPdN5f`; signed main commit `278567f6a9c42c2f795a552714984d98f311e4d0` produced READY candidate `dpl_HyUZkePdAL8Rxtn29WC7FxbV5Vxt`; canonical aliases are still old.
 - **Inference, not proof:** the production cutover workflow uses a non-canceling concurrency group and waits up to 60 × 10 seconds for an exact READY deployment. The canceled direct-commit run may be holding the group until its bounded timeout, leaving the signed run queued. This explains the current delay without treating it as a success or guessing credential state.
 - **Next action:** allow the bounded run to fail closed, then re-probe canonical identity and record whether the signed cutover starts. If it does not, obtain the actual Actions failure evidence before changing alias logic.
+
+
+### 2026-08-22T17:49:53.804Z — canonical public recheck
+
+- **Canonical identity:** `https://www.obserrallc.com/api/health` returned HTTP `200` from `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` at `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`, with Vercel/project authority reported as verified. This is still the earlier canonical deployment, not signed candidate `dpl_HyUZkePdAL8Rxtn29WC7FxbV5Vxt` / `278567f6a9c42c2f795a552714984d98f311e4d0`.
+- **Marketplace:** `/marketplace` rendered the canonical deployment's “PAGE NOT FOUND” response; it has not reached the merged Applications routing behavior.
+- **Commerce:** `/api/academy/commerce-health` remained fail-closed: `operational: false`, payment provider unavailable, durable storage unavailable. Payment is not live.
+- **Florida LMS:** `/api/florida-class-d/health/ready` remained `status: "not_ready"`. Regulated learner operation is not live.
+- **Safe next action:** no source or alias change was made from this probe. Inspect the Vercel production deployment/cutover state and obtain direct failure evidence if the signed candidate remains unassigned.
