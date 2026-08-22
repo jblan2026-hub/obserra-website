@@ -29,6 +29,7 @@ bash "${SCRIPT_DIR}/azure-keyvault-critical-onboarding.sh"
 
 echo "Phase 3/4: Exact one-owner Entra P2 and Intune baseline in workforce tenant 5a08a33a-d2b5-491d-ac6d-32f325138143"
 pwsh -NoProfile -File "${SCRIPT_DIR}/entra-intune-owner-baseline.ps1" \
+  -DisableNonOwnerIntuneServicePlans \
   -EvidencePath "${REPO_ROOT}/obserra-entra-intune-owner-evidence.json"
 
 echo "Phase 4/4: Launch exact-main Azure staging verification and controlled production-slot promotion"

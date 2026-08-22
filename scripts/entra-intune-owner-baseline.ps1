@@ -2,6 +2,7 @@
 param(
   [string]$TenantId = "5a08a33a-d2b5-491d-ac6d-32f325138143",
   [string]$OwnerUserPrincipalName = "",
+  [switch]$DisableNonOwnerIntuneServicePlans,
   [switch]$Enforce,
   [switch]$AcknowledgeSingleAdminRecoveryRisk,
   [string]$EvidencePath = "./obserra-entra-intune-owner-evidence.json"
@@ -56,6 +57,14 @@ function Get-Collection {
   return @($items)
 }
 
+function Get-ActiveIntunePlans {
+  param([Parameter(Mandatory)][string]$UserId)
+  $details = Get-Collection "https://graph.microsoft.com/v1.0/users/$UserId/licenseDetails"
+  return @($details | ForEach-Object { @($_.servicePlans) } | Where-Object {
+    $_.servicePlanName -match '^INTUNE' -and $_.provisioningStatus -eq "Success"
+  })
+}
+
 $context = Get-MgContext
 if ($context.TenantId -ne $TenantId) { throw "Microsoft Graph authenticated to the wrong tenant." }
 $owner = Invoke-Graph -Method GET -Uri "https://graph.microsoft.com/v1.0/me?`$select=id,displayName,userPrincipalName,accountEnabled"
@@ -92,13 +101,53 @@ if (-not ($members | Where-Object { $_.id -eq $owner.id })) {
   } | Out-Null
 }
 
+$directoryUsers = Get-Collection "https://graph.microsoft.com/v1.0/users?`$select=id,displayName,userPrincipalName,accountEnabled,assignedLicenses,licenseAssignmentStates"
+$nonOwnerUsers = @($directoryUsers | Where-Object { $_.id -ne $owner.id })
+$skus = Get-Collection "https://graph.microsoft.com/v1.0/subscribedSkus"
+$intuneSkus = @($skus | Where-Object {
+  @($_.servicePlans | Where-Object { $_.servicePlanName -match '^INTUNE' }).Count -gt 0
+})
+$remediatedNonOwnerUsers = @()
+
+foreach ($directoryUser in $nonOwnerUsers) {
+  $activeIntunePlans = Get-ActiveIntunePlans -UserId $directoryUser.id
+  if ($activeIntunePlans.Count -eq 0) { continue }
+  if (-not $DisableNonOwnerIntuneServicePlans) {
+    throw "Non-owner user $($directoryUser.userPrincipalName) has an active Intune service plan. Rerun with -DisableNonOwnerIntuneServicePlans to preserve the user's other licensed services while disabling only Intune."
+  }
+
+  $groupAssignedIntuneSku = @($directoryUser.licenseAssignmentStates | Where-Object {
+    $assignment = $_
+    $assignment.assignedByGroup -and ($intuneSkus | Where-Object { $_.skuId -eq $assignment.skuId })
+  })
+  if ($groupAssignedIntuneSku.Count -gt 0) {
+    throw "Non-owner user $($directoryUser.userPrincipalName) receives an Intune-capable SKU through group licensing. Remove or re-scope that group assignment before continuing; this script will not mutate a shared license group."
+  }
+
+  foreach ($assignedLicense in @($directoryUser.assignedLicenses)) {
+    $sku = $intuneSkus | Where-Object { $_.skuId -eq $assignedLicense.skuId } | Select-Object -First 1
+    if (-not $sku) { continue }
+    $intunePlanIds = @($sku.servicePlans | Where-Object { $_.servicePlanName -match '^INTUNE' } | ForEach-Object { $_.servicePlanId })
+    $disabledPlans = @(@($assignedLicense.disabledPlans) + $intunePlanIds | Sort-Object -Unique)
+    Invoke-Graph -Method POST -Uri "https://graph.microsoft.com/v1.0/users/$($directoryUser.id)/assignLicense" -Body @{
+      addLicenses = @(@{ skuId = $assignedLicense.skuId; disabledPlans = $disabledPlans })
+      removeLicenses = @()
+    } | Out-Null
+  }
+
+  $remainingPlans = Get-ActiveIntunePlans -UserId $directoryUser.id
+  if ($remainingPlans.Count -gt 0) {
+    throw "Non-owner user $($directoryUser.userPrincipalName) still has an active Intune plan after remediation. Review Microsoft 365 license inheritance before continuing."
+  }
+  $remediatedNonOwnerUsers += $directoryUser.id
+}
+
 $licenseDetails = Get-Collection "https://graph.microsoft.com/v1.0/users/$($owner.id)/licenseDetails"
 $intuneLicensed = [bool]($licenseDetails.servicePlans | Where-Object {
   $_.servicePlanName -match '^INTUNE' -and $_.provisioningStatus -eq "Success"
 })
 $assignedSkuId = $null
 if (-not $intuneLicensed) {
-  $skus = Get-Collection "https://graph.microsoft.com/v1.0/subscribedSkus"
   $candidate = $skus | Where-Object {
     $_.capabilityStatus -eq "Enabled" -and
     $_.prepaidUnits.enabled -gt $_.consumedUnits -and
@@ -116,6 +165,16 @@ if (-not $intuneLicensed) {
   })
 }
 if (-not $intuneLicensed) { throw "The owner Intune license did not converge." }
+
+$intuneLicensedUserIds = @()
+foreach ($directoryUser in $directoryUsers) {
+  if ((Get-ActiveIntunePlans -UserId $directoryUser.id).Count -gt 0) {
+    $intuneLicensedUserIds += $directoryUser.id
+  }
+}
+if ($intuneLicensedUserIds.Count -ne 1 -or $intuneLicensedUserIds[0] -ne $owner.id) {
+  throw "Exact one-owner Intune licensing did not converge. Active Intune user count: $($intuneLicensedUserIds.Count)."
+}
 
 $policyName = "Obserra Owner Windows Production Compliance"
 $encodedPolicyFilter = [uri]::EscapeDataString("displayName eq '$policyName'")
@@ -225,6 +284,9 @@ $evidence = [ordered]@{
     intuneLicensed = $intuneLicensed
     newlyAssignedSkuId = $assignedSkuId
     assignedOwnerSeats = 1
+    exactIntuneLicensedUserCount = $intuneLicensedUserIds.Count
+    remediatedNonOwnerUserCount = $remediatedNonOwnerUsers.Count
+    otherDirectoryUserCount = $nonOwnerUsers.Count
   }
   compliancePolicy = [ordered]@{
     id = $policy.id
