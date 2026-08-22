@@ -511,3 +511,13 @@ All must be observed from the public canonical host:
 - **Release-control evidence:** rerun attempt 2 of canonical cutover workflow [32599875004](https://github.com/jblan2026-hub/obserra-website/actions/runs/32599875004), job `97097249698`, accepted the configured release credential and found production candidate `dpl_3TKmo9VZGoqVTr1RfeFdzbXzcgoy` for exact SHA `78bb0c25a8857ac6c8f851dd1d4c01b34aa3baab`, then failed at **Preflight exact canonical deployment health**. All alias/domain-mutation and rollback steps were skipped.
 - **Canonical status:** the latest recorded canonical proof remains the prior deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` / SHA `6c2cddd84503c7cb0af3ca976fd8308183379146`; no canonical cutover or commerce/LMS live result is claimed.
 - **Next safe action:** isolate the dependency PRs from the incident. Correct the failing preflight assertion with non-secret condition-level diagnostics, retain verified-commit and fail-closed controls, then rerun the guarded cutover and require canonical exact deployment/SHA plus independent operational commerce/readiness contracts.
+
+
+## 2026-08-22T22:01:20Z — PR #211 opened: guarded Academy preflight contract repair
+
+- **GitHub event:** PR [#211](https://github.com/jblan2026-hub/obserra-website/pull/211), `fix(cutover): preserve Academy identity contract through hydration failure`, opened at head `bb49987e759118ee1b4c5cdb50a144826337a202` against main `78bb0c25a8857ac6c8f851dd1d4c01b34aa3baab`.
+- **Changed work:** the Academy commerce-health route now retains its non-secret identity readiness fields when governed runtime-secret hydration fails, and a regression test covers that fail-closed response. The exact project/SHA/routing checks and the cutover jq gate are not weakened.
+- **Source evidence:** focused route tests (17/17), typecheck, diff check, and Academy Gate 35 completed successfully in the repair workspace; Gate 35 reports no production transaction action. These are source checks only.
+- **Branch deployment evidence:** the canonical Vercel project's PR deployment status is currently failure for this unmerged branch. That does not change canonical routing or establish a production deployment.
+- **Canonical status:** the last direct public probe remains deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` / SHA `6c2cddd84503c7cb0af3ca976fd8308183379146`; Applications and Academy commerce and Florida readiness remain fail-closed.
+- **Next safe action:** complete applicable PR gates and merge only through the verified-commit path. Then observe the new production candidate and rerun the guarded cutover; no canonical, payment, entitlement, or LMS live claim is permitted without exact public canonical proof.
