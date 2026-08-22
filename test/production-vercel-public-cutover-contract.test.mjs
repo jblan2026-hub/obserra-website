@@ -4,18 +4,37 @@ import test from "node:test";
 
 const workflow = fs.readFileSync(".github/workflows/production-vercel-public-cutover.yml", "utf8");
 
-test("public cutover accepts only ready or explicitly fail-closed regulated modules", () => {
-  assert.match(workflow, /if \[ "\$\{commerce_status\}" = "200" \]; then/);
-  assert.match(workflow, /elif \[ "\$\{commerce_status\}" = "503" \]; then/);
-  assert.match(workflow, /\.operational == false/);
-  assert.match(workflow, /\.identity == "available"/);
-  assert.match(workflow, /\.identityEnvironment == "live"/);
-  assert.match(workflow, /candidate_checkout_status/);
-  assert.match(workflow, /enrollment=licensing-pending/);
-  assert.match(workflow, /x-obserra-sales-license: pending/);
-  assert.match(workflow, /elif \[ "\$\{florida_ready_status\}" = "503" \]; then/);
-  assert.match(workflow, /status == "not_ready"/);
-  assert.match(workflow, /retry-after:/i);
+test("public cutover keeps candidate preflight read-only and verifies locked commerce after alias assignment", () => {
+  const preflightStart = workflow.indexOf("- name: Preflight exact canonical deployment health");
+  const moveStart = workflow.indexOf("- name: Move canonical domains to production project");
+  const smokeStart = workflow.indexOf("- name: Verify canonical LMS and prelicense commerce lock");
+  const quarantineStart = workflow.indexOf("- name: Quarantine duplicate project and verify canonical domain ownership");
+
+  assert.ok(preflightStart >= 0, "candidate preflight must exist");
+  assert.ok(moveStart > preflightStart, "domain movement must follow candidate preflight");
+  assert.ok(smokeStart > moveStart, "canonical smoke must follow alias assignment");
+  assert.ok(quarantineStart > smokeStart, "quarantine must follow canonical smoke");
+
+  const preflight = workflow.slice(preflightStart, moveStart);
+  const canonicalSmoke = workflow.slice(smokeStart, quarantineStart);
+
+  assert.match(preflight, /if \[ "\$\{commerce_status\}" = "200" \]; then/);
+  assert.match(preflight, /elif \[ "\$\{commerce_status\}" = "503" \]; then/);
+  assert.match(preflight, /\.operational == false/);
+  assert.match(preflight, /\.identity == "available"/);
+  assert.match(preflight, /\.identityEnvironment == "live"/);
+  assert.doesNotMatch(preflight, /candidate_checkout_status/);
+  assert.doesNotMatch(preflight, /\/api\/academy\/checkout/);
+  assert.doesNotMatch(preflight, /--request POST/);
+  assert.match(preflight, /elif \[ "\$\{florida_ready_status\}" = "503" \]; then/);
+  assert.match(preflight, /status == "not_ready"/);
+  assert.match(preflight, /retry-after:/i);
+
+  assert.ok(canonicalSmoke.includes("https://${PRIMARY_DOMAIN}/api/academy/checkout"));
+  assert.ok(canonicalSmoke.includes('test "${status}" = "307"'));
+  assert.ok(canonicalSmoke.includes("enrollment=licensing-pending"));
+  assert.ok(canonicalSmoke.includes("x-obserra-sales-license: pending"));
+  assert.ok(canonicalSmoke.includes("if: steps.alias.outcome == 'success'"));
 });
 
 test("domain move remains after exact deployment preflight and rollback remains mandatory", () => {
