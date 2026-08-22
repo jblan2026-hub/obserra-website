@@ -277,6 +277,7 @@ export default function OwnerValidationLmsConsole({ releaseCommitSha, runtime }:
   useEffect(() => {
     const sessionId = session?.id;
     if (!sessionId) return;
+    const peers = peersRef.current;
     const channel = supabase.channel(`owner-lms-webrtc:${sessionId}`, { config: { broadcast: { self: false } } });
     channel.on("broadcast", { event: "signal" }, ({ payload }) => {
       const signal = signalFrom(payload);
@@ -306,8 +307,8 @@ export default function OwnerValidationLmsConsole({ releaseCommitSha, runtime }:
       window.clearInterval(refreshTimer);
       if (channelRef.current === channel) channelRef.current = null;
       void supabase.removeChannel(channel);
-      for (const peer of peersRef.current.values()) peer.close();
-      peersRef.current.clear();
+      for (const peer of peers.values()) peer.close();
+      peers.clear();
       setRemoteStreams({});
     };
   }, [ensurePeer, offerToLearner, openActiveAsset, refreshWorkspace, session?.active_course_asset_id, session?.id, supabase]);

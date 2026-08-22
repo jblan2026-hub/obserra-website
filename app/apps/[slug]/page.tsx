@@ -6,6 +6,7 @@ import { ACADEMY_BRAND_NAME, APPLICATIONS_BRAND_NAME, CANONICAL_PUBLIC_ORIGIN, E
 import { ProductInfoSections } from "../AppsMarketplaceClient";
 import { findAppBySlug, marketplaceApps } from "../appsData";
 import "../apps.css";
+import "../commerce-actions.css";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -68,11 +69,11 @@ export default async function AppDetailPage({ params }: Props) {
 
     <ProductInfoSections entry={entry}/>
 
-    <section className="app-pricing"><h2>Subscription, deployment, and lifecycle management</h2><p>{entry.pricing}</p><p>Purchase through the website, manage billing in Stripe, launch SaaS applications, or download approved deployment packages. Access is revalidated against subscription status and automatically denied when a subscription is unpaid, canceled, incomplete, or expired.</p><div className="apps-actions">
-      {liveApplicationUrl ? <a className="apps-button" href={liveApplicationUrl} target="_blank" rel="noopener noreferrer">Subscribe &amp; Launch</a> : entry.status !== "Coming Soon" ? <Link className="apps-button" href={`/apps/${entry.slug}/subscribe`}>Choose subscription</Link> : <Link className="apps-button" href={`/contact?interest=application-preview&app=${entry.slug}`}>Request preview</Link>}
+    <section className="app-pricing"><h2>Subscription, deployment, and lifecycle management</h2><p>{entry.pricing}</p><p>Purchase through the governed website checkout, manage billing in Stripe, launch SaaS applications, or download approved deployment packages. Access is revalidated against the durable entitlement ledger and automatically denied when a subscription is unpaid, canceled, incomplete, disputed, or refunded.</p><div className="apps-actions">
+      {entry.status !== "Coming Soon" ? <Link className="apps-button" href={`/apps/${entry.slug}/subscribe`}>Choose subscription</Link> : <Link className="apps-button" href={`/contact?interest=application-preview&app=${entry.slug}`}>Request preview</Link>}
       {liveApplicationUrl ? <a className="apps-outline" href={liveApplicationUrl} target="_blank" rel="noopener noreferrer">Open live application</a> : <a className="apps-outline" href={`/api/apps/access?app=${entry.slug}`}>Launch SaaS</a>}
       <a className="apps-outline" href={`/api/apps/download?app=${entry.slug}`}>Download release</a>
-      <a className="apps-outline" href={`/api/apps/billing-portal?app=${entry.slug}`}>Manage subscription</a>
+      <form action="/api/apps/billing-portal" method="post"><input type="hidden" name="app" value={entry.slug}/><button className="apps-outline" type="submit">Manage subscription</button></form>
     </div></section>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}/>
   </main>;

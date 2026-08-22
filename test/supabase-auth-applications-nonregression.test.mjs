@@ -15,9 +15,12 @@ const APPLICATION_ROOTS = [
   "app/portal/orders",
   "app/portal/success",
   "lib/app-entitlements.ts",
+  "lib/app-license.ts",
+  "lib/applications-commerce.ts",
+  "lib/applications-stripe.ts",
   "lib/license-repository.ts",
 ];
-const APPLICATION_SOURCE_DIGEST = "4a38eeb7157e1f01a49e99a8c26ad49f927bcd3bfb2f7cc26b6bfc2edf79dc1c";
+const APPLICATION_SOURCE_DIGEST = "6859854400e0003ddafe262db73a37ad1f244592939b2bec1d6d923bd8301fce";
 const APPROVED_ROOT_RUNTIME_DIRECTIVES =
   'export const dynamic = "force-dynamic";\nexport const revalidate = 0;\n\n';
 
@@ -63,8 +66,8 @@ function routingModule() {
   return module.exports;
 }
 
-test("the Phase 2A Applications implementation surface is byte-for-byte unchanged apart from approved root runtime directives", () => {
-  assert.equal(APPLICATION_ROOTS.flatMap(walk).length, 27);
+test("the EPI durable Applications implementation surface is byte-for-byte governed apart from approved root runtime directives", () => {
+  assert.equal(APPLICATION_ROOTS.flatMap(walk).length, 32);
   assert.equal(applicationSourceDigest(), APPLICATION_SOURCE_DIGEST);
 });
 

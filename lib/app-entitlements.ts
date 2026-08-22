@@ -1,7 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { getStripe } from "./stripe";
-
-const ACCESSIBLE_SUBSCRIPTION_STATES = new Set(["active", "trialing"]);
+import { applicationsTenantId, durableApplicationEntitlement } from "./applications-commerce";
 
 export type AppEntitlement = {
   allowed: boolean;
@@ -10,35 +8,29 @@ export type AppEntitlement = {
   customerId?: string;
   deploymentModel?: string;
   plan?: string;
+  billingInterval?: string;
+  seatsPurchased?: number;
+  currentPeriodEnd?: string | null;
+  revision?: number;
+  authoritative: boolean;
+  source: "applications-commerce-ledger" | "unavailable";
 };
 
-export async function resolveAppEntitlement(clerkUserId: string, appSlug: string): Promise<AppEntitlement> {
-  if (!process.env.STRIPE_SECRET_KEY) return { allowed: false, status: "billing-not-configured" };
-
-  const stripe = getStripe();
-  const subscriptions = await stripe.subscriptions.search({
-    query: `metadata['clerkUserId']:'${clerkUserId}' AND metadata['obserraApp']:'${appSlug}'`,
-    limit: 20,
-    expand: ["data.customer"],
-  });
-
-  const eligible = subscriptions.data
-    .filter((subscription) => ACCESSIBLE_SUBSCRIPTION_STATES.has(subscription.status))
-    .sort((a, b) => b.created - a.created)[0];
-
-  if (!eligible) {
-    const latest = subscriptions.data.sort((a, b) => b.created - a.created)[0];
-    return { allowed: false, status: latest?.status ?? "not-subscribed", subscriptionId: latest?.id };
+export async function resolveAppEntitlement(clerkUserId: string, appSlug: string, organizationId?: string | null): Promise<AppEntitlement> {
+  try {
+    const entitlement = await durableApplicationEntitlement(
+      clerkUserId,
+      applicationsTenantId(clerkUserId, organizationId),
+      appSlug,
+    );
+    return { ...entitlement, authoritative: true, source: "applications-commerce-ledger" };
+  } catch (error) {
+    console.error("Applications durable entitlement unavailable", {
+      appSlug,
+      error: error instanceof Error ? error.name : "unknown",
+    });
+    return { allowed: false, status: "licensing-unavailable", authoritative: false, source: "unavailable" };
   }
-
-  return {
-    allowed: true,
-    status: eligible.status,
-    subscriptionId: eligible.id,
-    customerId: typeof eligible.customer === "string" ? eligible.customer : eligible.customer.id,
-    deploymentModel: eligible.metadata.deploymentModel,
-    plan: eligible.metadata.plan,
-  };
 }
 
 export async function primaryAccountEmail() {
