@@ -8,7 +8,7 @@ import "./florida-security-training.css";
 
 export const metadata: Metadata = {
   title: "Florida Class D Security Officer Training",
-  description: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC operates a live Florida Class D Security Officer Training LMS platform. Enrollment and payment remain unavailable until licensing and production activation are complete.",
+  description: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC has deployed a Florida Class D Security Officer Training LMS whose regulated learner operations remain readiness-gated. Enrollment and payment remain unavailable until licensing and production activation are complete.",
   alternates: { canonical: "/florida-security-training" },
   robots: { index: true, follow: true },
 };
@@ -19,11 +19,11 @@ export default function FloridaSecurityTrainingPage() {
     <main className="fl-classd">
       <section className="fl-classd__hero">
         <div className="fl-classd__eyebrow"><ShieldCheck size={18} /> Florida Security Training</div>
-        <span className="fl-classd__status">LMS PLATFORM LIVE · PRODUCTION SOFTWARE</span>
+        <span className="fl-classd__status">LMS PLATFORM DEPLOYED · READINESS GATED</span>
         <span className="fl-classd__status">ENROLLMENT & PAYMENT LOCKED · LICENSE ACTIVATION PENDING</span>
         <h1>{FLORIDA_CLASS_D_COURSE.title}</h1>
-        <p className="fl-classd__lead">The LMS platform is live on the OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC production website and is engineered for instructor-led delivery, identity controls, attendance evidence, student interaction, learning checks, examination controls, training records, and post-course administration. Enrollment and payment remain unavailable until licensing and production activation are complete, and regulated training credit remains disabled until every applicable FDACS activation requirement is satisfied.</p>
-        <div className="fl-classd__notice is-warning"><LockKeyhole size={20} /><div><strong>Platform live. Learner commerce locked pending licensure.</strong><span>Public visitors may review curriculum, readiness requirements, and the delivery model. Instructor LMS access is restricted and is not exposed through public navigation. Enrollment, payment, production student access, course credit, completion, certificates, and LIAS reporting remain fail closed until licensing and production activation are complete.</span></div></div>
+        <p className="fl-classd__lead">The LMS is deployed to the OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC production website with controls designed for instructor-led delivery, identity controls, attendance evidence, student interaction, learning checks, examination controls, training records, and post-course administration. Enrollment and payment remain unavailable until licensing and production activation are complete, and regulated training credit remains disabled until every applicable FDACS activation requirement is satisfied.</p>
+        <div className="fl-classd__notice is-warning"><LockKeyhole size={20} /><div><strong>Public curriculum and readiness information are available. Learner commerce remains locked pending licensure.</strong><span>Public visitors may review curriculum, readiness requirements, and the delivery model. Instructor LMS access is restricted and is not exposed through public navigation. Enrollment, payment, production student access, course credit, completion, certificates, and LIAS reporting remain fail closed until licensing and production activation are complete.</span></div></div>
         <div className="fl-classd__actions">
           <Link href="/florida-security-training/preflight">Check student ID requirements</Link>
           <Link className="secondary" href="/contact?interest=florida-class-d-training">Request a program launch notice</Link>
@@ -70,7 +70,7 @@ export default function FloridaSecurityTrainingPage() {
         <div className="fl-classd__actions"><Link href="/florida-security-training/preflight">Run pre-login ID readiness check</Link><GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access" lockedDescriptionId="fdacs-journey-student-access-locked" lockedLabel="Student access unavailable pending license activation">Student course access</GovernedFloridaClassDLink></div>
       </section>
 
-      <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>The LMS software may be live while regulated learner operations remain disabled. Completing prelicense validation activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied. Payment and production student access also remain disabled until licensing and production activation are complete.</p></div></section>
+      <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>The LMS deployment does not authorize regulated learner operations. Completing prelicense validation activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied. Payment and production student access also remain disabled until licensing and production activation are complete.</p></div></section>
     </main>
   );
 }

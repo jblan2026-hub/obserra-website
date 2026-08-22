@@ -524,8 +524,7 @@
 }
 
 .app-detail-grid article,
-.app-docs > div,
-.app-screenshot-placeholder {
+.app-docs > div {
   padding: 18px;
   border: 1px solid #80cae74f;
   border-radius: 11px;
@@ -533,8 +532,7 @@
 }
 
 .app-detail-grid h2,
-.app-docs h2,
-.app-screenshot-placeholder h2 {
+.app-docs h2 {
   margin: 0 0 12px;
   font-size: 20px;
   letter-spacing: -0.02em;
@@ -596,57 +594,6 @@
   color: #ffd27e;
 }
 
-.app-screenshot-placeholder {
-  margin: 0 max(5vw, 24px);
-}
-
-.app-screenshot-placeholder p {
-  color: #c4deee;
-}
-
-.app-visual-grid {
-  margin-top: 14px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.app-visual-card {
-  position: relative;
-  min-height: 190px;
-  margin: 0;
-  overflow: hidden;
-  border: 1px solid #86cde952;
-  border-radius: 10px;
-  background: #051a2d;
-  box-shadow: 0 16px 30px #0000003f;
-}
-
-.app-visual-card::before {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  content: "";
-  background: linear-gradient(180deg, #03101f10 0%, #03101fa8 90%);
-}
-
-.app-visual-card figcaption {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  z-index: 2;
-  padding: 6px 8px;
-  border: 1px solid #8fd7f457;
-  border-radius: 8px;
-  background: #04182bc7;
-  color: #daf0fc;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 .app-pricing {
   margin: 12px max(5vw, 24px) 80px;
   padding: 20px;
@@ -677,9 +624,6 @@
     grid-template-columns: 1fr;
   }
 
-  .app-visual-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 740px) {

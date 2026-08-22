@@ -122,7 +122,7 @@ required(instructorUi, "Course breaks", "Instructor console must display each st
 
 required(course, "liveLessonsPerDay: 4", "Course model must define four live lessons per day.");
 required(course, "trackedBreakMinutesPerDay: 45", "Course model must define 45 tracked break minutes per day.");
-required(publicPage, "LMS PLATFORM LIVE · PRODUCTION SOFTWARE", "Public Florida LMS must disclose that the platform software is live.");
+required(publicPage, "LMS PLATFORM DEPLOYED · READINESS GATED", "Public Florida LMS must disclose its deployed, readiness-gated state.");
 required(publicPage, "Break time is recorded but is never credited", "Public LMS must accurately disclose tracked break treatment.");
 required(publicPage, "Enrollment and payment remain unavailable until licensing and production activation are complete", "Public LMS must disclose the prelicense enrollment and payment control state.");
 required(governedPublicLink, "if (!enabled) {", "Unavailable public learner actions must enter the fail-closed visible-control branch.");
@@ -131,6 +131,6 @@ required(governedPublicLink, "<button", "Unavailable public learner actions must
 required(governedPublicLink, "disabled", "Unavailable public learner actions must not be interactive before activation.");
 required(productionActivation, "floridaClassDPublicLearnerControlsEnabled", "Public learner controls must use a governed production authorization function.");
 required(productionActivation, "OBSERRA_FDACS_PUBLIC_LEARNER_CONTROLS_ENABLED", "Public learner controls must require a distinct regulated feature flag.");
-required(course, 'status: "coming-soon"', "The regulated course must remain unavailable for learner enrollment before activation even while the LMS platform is live.");
+required(course, 'status: "coming-soon"', "The regulated course must remain unavailable for learner enrollment before activation while the public deployment is readiness-gated.");
 
-console.log("Florida Class D live instruction gate passed: LMS platform is live; source supports live teaching, single-device presence, cumulative student time, daily attendance certification, challenges, Q&A, tracked breaks, and fail-closed learner commerce and DS activation.");
+console.log("Florida Class D instructional-control gate passed: public deployment is readiness-gated; source supports controlled teaching, single-device presence, cumulative student time, daily attendance certification, challenges, Q&A, tracked breaks, and fail-closed learner commerce and DS activation.");

@@ -60,3 +60,57 @@ test("Academy LMS stays live while new enrollment and payment remain licensing-g
   assert.match(learnPage, /academyStateWithOwnerAccess/);
   assert.doesNotMatch(learnPage, /academyLicensedSalesEnabled/);
 });
+
+
+test("Marketplace URL permanently resolves to the real Applications marketplace", () => {
+  const marketplaceRoute = read("app/marketplace/page.tsx");
+  const applicationsPage = read("app/apps/page.tsx");
+
+  assert.match(marketplaceRoute, /import \{ permanentRedirect \} from "next\/navigation"/);
+  assert.match(marketplaceRoute, /permanentRedirect\("\/apps"\)/);
+  assert.match(applicationsPage, /alternates: \{ canonical: "\/apps" \}/);
+});
+
+
+test("Application product pages omit placeholder visuals and unverified runtime commerce claims", () => {
+  const marketplace = read("app/apps/AppsMarketplaceClient.tsx");
+  const styles = read("app/apps/apps.css");
+  const detail = read("app/apps/[slug]/page.tsx");
+
+  assert.doesNotMatch(marketplace, /app-screenshot-placeholder/);
+  assert.doesNotMatch(styles, /app-screenshot-placeholder/);
+  assert.doesNotMatch(detail, /liveApplicationUrls/);
+  assert.doesNotMatch(detail, /Subscribe & Launch/);
+  assert.doesNotMatch(detail, /manage billing in Stripe/);
+  assert.doesNotMatch(detail, /\/api\/apps\/(?:access|billing-portal|download)/);
+  assert.match(detail, /Request enterprise demo/);
+  assert.match(detail, /Request deployment assessment/);
+});
+
+
+test("Marketplace status labels do not imply unverified production readiness", () => {
+  const catalog = read("app/apps/appsData.ts");
+  const marketplace = read("app/apps/AppsMarketplaceClient.tsx");
+  const detail = read("app/apps/[slug]/page.tsx");
+
+  assert.match(catalog, /Available: "Enterprise assessment"/);
+  assert.match(catalog, /Pilot: "Pilot assessment"/);
+  assert.match(catalog, /"Coming Soon": "Pre-release"/);
+  assert.doesNotMatch(marketplace, /Available solutions can be evaluated now/);
+  assert.match(marketplace, /No product is presented as a live self-service/);
+  assert.match(marketplace, /marketplaceEngagementLabel\[entry\.status\]/);
+  assert.match(detail, /marketplaceEngagementLabel\[entry\.status\]/);
+});
+
+
+test("Homepage contains no illustrative preview, mockup, or unverified purchase language", () => {
+  const home = read("app/page.tsx");
+
+  assert.doesNotMatch(home, /Illustrative preview/);
+  assert.doesNotMatch(home, /Representative interface only/);
+  assert.doesNotMatch(home, /obserra-eios-intelligence-hero\.png/);
+  assert.doesNotMatch(home, /eios-overview-marketing\.png/);
+  assert.doesNotMatch(home, /Shop \{APPLICATIONS_BRAND_NAME\}/);
+  assert.match(home, /Explore \{APPLICATIONS_BRAND_NAME\}/);
+  assert.match(home, /product-specific engagement, deployment, and access controls/);
+});

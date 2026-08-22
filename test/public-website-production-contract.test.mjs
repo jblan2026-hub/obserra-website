@@ -42,7 +42,8 @@ test("search discovery includes only the public FDACS landing surface", () => {
 
 test("the public FDACS LMS preserves learner structure while prelicense actions are visibly locked", () => {
   const governedLink = fs.readFileSync("app/florida-security-training/GovernedFloridaClassDLink.tsx", "utf8");
-  assert.match(publicFdacs, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
+  assert.match(publicFdacs, /LMS PLATFORM DEPLOYED · READINESS GATED/);
+  assert.doesNotMatch(publicFdacs, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
   assert.match(publicFdacs, /ENROLLMENT & PAYMENT LOCKED · LICENSE ACTIVATION PENDING/);
   assert.match(publicFdacs, /Photo-ID controls before secure live video/);
   assert.match(publicFdacs, /not copied into the LMS/);
@@ -68,8 +69,10 @@ test("public conversion paths are functional and claims stay explicit", () => {
   assert.match(contact, /"florida-class-d-training": "Florida Class D program launch notice \(not enrollment or payment\)"/);
   assert.doesNotMatch(contactPage, /TRACKED DISTRIBUTION LINKS|lead-generation strategy session/);
   assert.match(contactPage, /ENGAGEMENT GOVERNANCE/);
-  assert.match(home, /Illustrative preview/);
-  assert.match(home, /not a live customer environment/);
+  assert.doesNotMatch(home, /Illustrative preview/);
+  assert.doesNotMatch(home, /not a live customer environment/);
+  assert.doesNotMatch(home, /Representative interface only/);
+  assert.match(home, /Explore \{APPLICATIONS_BRAND_NAME\}/);
   assert.match(smoke, /assert\.equal\(response\.status, 405/);
 });
 

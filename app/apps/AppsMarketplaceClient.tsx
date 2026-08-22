@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, BadgeCheck, BriefcaseBusiness, Building2, Cloud, Filter, Landmark, LockKeyhole, Search, Server, ShieldCheck, Sparkles } from "lucide-react";
 import { ACADEMY_BRAND_NAME, APPLICATIONS_BRAND_NAME, EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "../../lib/legal-identity";
 import type { AppCategory, AppStatus, MarketplaceApp } from "./appsData";
-import { appCategories, marketplaceApps } from "./appsData";
+import { appCategories, marketplaceApps, marketplaceEngagementLabel } from "./appsData";
 
 const statuses: (AppStatus | "All")[] = ["All", "Available", "Pilot", "Coming Soon"];
 
@@ -20,13 +20,6 @@ const statusToneClass: Record<AppStatus, string> = {
   Pilot: "status-pilot",
   "Coming Soon": "status-coming",
 };
-
-const enterpriseVisuals = [
-  { src: "/eios/eios-overview-marketing.png", alt: "Executive overview dashboard" },
-  { src: "/eios/eios-situation-room-marketing.png", alt: "Enterprise situation room dashboard" },
-  { src: "/eios/eios-asset-intelligence-marketing.png", alt: "Asset intelligence dashboard" },
-  { src: "/eios/eios-report-center-marketing.png", alt: "Evidence and reporting dashboard" },
-];
 
 const deploymentEditions = [
   {
@@ -113,8 +106,8 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
           <h1>Purpose-built applications for enterprise risk, governance, intelligence, and accountable execution.</h1>
           <p>
             Explore commercial solutions that help leaders convert fragmented information into defensible decisions,
-            governed workflows, measurable risk reduction, and executive-ready evidence. Available solutions can be
-            evaluated now; pilot and roadmap offerings are clearly identified before a buyer commits.
+            governed workflows, measurable risk reduction, and executive-ready evidence. Each offering has a clear enterprise engagement state. No product is presented as a live self-service
+            launch or purchase path.
           </p>
           <div className="apps-actions">
             <Link href="/contact?interest=application-demo" className="apps-button">Request enterprise demo</Link>
@@ -156,7 +149,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
           {flagshipApps.map((entry) => (
             <Link key={entry.slug} href={`/apps/${entry.slug}`} className="apps-card-link" aria-label={`View ${entry.name}`}>
               <article className="apps-spotlight-card">
-                <span className={`status-pill ${statusToneClass[entry.status]}`}>{entry.status}</span>
+                <span className={`status-pill ${statusToneClass[entry.status]}`}>{marketplaceEngagementLabel[entry.status]}</span>
                 <h3>{entry.name}</h3>
                 <p>{entry.value}</p>
                 <strong>Open product brief <ArrowRight size={15} /></strong>
@@ -216,11 +209,11 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
           </div>
         </div>
         <div className="apps-filters">
-          <p><Filter size={16} /> Status</p>
+          <p><Filter size={16} /> Engagement state</p>
           <div>
             {statuses.map((item) => (
               <button key={item} type="button" className={status === item ? "active" : ""} onClick={() => setStatus(item)}>
-                {item}
+                {item === "All" ? "All engagement states" : marketplaceEngagementLabel[item]}
               </button>
             ))}
           </div>
@@ -241,7 +234,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
               <Link href={`/apps/${entry.slug}`} className="apps-card-link" aria-label={`Open commercial product brief for ${entry.name}`}>
                 <article>
                   <header>
-                    <span className={`status-pill ${statusToneClass[entry.status]}`}>{entry.status}</span>
+                    <span className={`status-pill ${statusToneClass[entry.status]}`}>{marketplaceEngagementLabel[entry.status]}</span>
                     <small>{entry.category}</small>
                   </header>
                   <h2>{entry.name}</h2>
@@ -294,22 +287,7 @@ export function ProductInfoSections({ entry }: { entry: MarketplaceApp }) {
         <div><h2>FAQ</h2>{entry.faq.map((item) => <article key={item.q}><h3>{item.q}</h3><p>{item.a}</p></article>)}</div>
       </section>
 
-      <section className="app-screenshot-placeholder">
-        <h2>Product visuals and architecture narrative</h2>
-        <p>Qualified briefings connect product visuals, deployment models, security boundaries, and implementation planning to the buyer&apos;s active priorities.</p>
-        <div className="app-visual-grid">
-          {enterpriseVisuals.map((visual) => (
-            <figure key={visual.src} className="app-visual-card">
-              <Image src={visual.src} alt={visual.alt} fill sizes="(max-width: 900px) 100vw, 25vw" />
-              <figcaption>{visual.alt}</figcaption>
-            </figure>
-          ))}
-        </div>
-        <div className="apps-actions">
-          <Link href={`/contact?interest=application-demo&product=${encodeURIComponent(entry.name)}`} className="apps-button">Request a tailored demo</Link>
-          <Link href="/trust" className="apps-outline">Review Trust Center</Link>
-        </div>
-      </section>
     </>
   );
 }
+

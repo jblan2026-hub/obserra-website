@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ButtonLink } from "./components/ui/ObserraUI";
 import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "./components/enterprise/EnterpriseChrome";
@@ -49,30 +48,15 @@ export default function HomePage() {
               <span>Procurement ready</span>
             </div>
           </div>
-          <div className="saas-hero__visual-shell">
-            <Link href="/eios" className="saas-hero__visual" aria-label={`Explore ${EIOS_BRAND_NAME}`}>
-              <Image
-                src="/brand/visuals/obserra-eios-intelligence-hero.png"
-                alt={`${EIOS_BRAND_NAME} enterprise intelligence visualization`}
-                fill
-                priority
-                sizes="(max-width: 1040px) 100vw, 50vw"
-              />
-            </Link>
-            <div className="saas-hero__disclosure" aria-label="Preview disclosure">
-              <strong>Illustrative preview</strong>
-              <span>Representative interface only; this is not a live customer environment.</span>
-            </div>
-          </div>
         </section>
 
         <section className="saas-direct-sales" aria-labelledby="direct-sales-heading">
           <div className="saas-direct-sales__intro">
             <span>DIRECT FROM {LEGAL_ENTITY_NAME}</span>
             <h2 id="direct-sales-heading">Applications and Academy are direct website destinations.</h2>
-            <p>Move directly to secure applications or governed learning. Each destination preserves its own purchase, access, approval, and release controls.</p>
+            <p>Explore secure applications or governed learning. Each destination maintains its own engagement, approval, access, and release controls.</p>
             <div className="saas-actions">
-              <ButtonLink href="/apps">Shop {APPLICATIONS_BRAND_NAME}</ButtonLink>
+              <ButtonLink href="/apps">Explore {APPLICATIONS_BRAND_NAME}</ButtonLink>
               <ButtonLink href="/academy" variant="secondary">Browse {ACADEMY_BRAND_NAME}</ButtonLink>
             </div>
           </div>
@@ -81,7 +65,7 @@ export default function HomePage() {
               <span>{APPLICATIONS_BRAND_NAME.toUpperCase()}</span>
               <h3>Secure software for executive and operational use.</h3>
               <p>Review product capabilities and commercial options directly from the public marketplace.</p>
-              <strong>Shop Applications <span aria-hidden="true">→</span></strong>
+              <strong>Explore Applications <span aria-hidden="true">→</span></strong>
             </Link>
             <Link href="/academy" className="mission-direct-sales__card">
               <span>{ACADEMY_BRAND_NAME.toUpperCase()}</span>
@@ -143,15 +127,6 @@ export default function HomePage() {
                 <ButtonLink href="/contact?interest=eios-demo" variant="secondary">Request an EIOS briefing</ButtonLink>
               </div>
             </div>
-            <Link href="/eios" className="saas-platform__visual" aria-label={`View ${EIOS_BRAND_NAME} platform overview`}>
-              <Image
-                src="/eios/eios-overview-marketing.png"
-                width={1200}
-                height={675}
-                alt={`${EIOS_BRAND_NAME} executive intelligence dashboard`}
-                sizes="(max-width: 1040px) 100vw, 58vw"
-              />
-            </Link>
           </div>
         </section>
 
@@ -179,7 +154,7 @@ export default function HomePage() {
           <div className="saas-learning__routes">
             <Link href="/academy"><span><strong>{ACADEMY_BRAND_NAME}</strong><span>Self-paced and enterprise learning catalog.</span></span><b>Open →</b></Link>
             <Link href="/florida-security-training"><span><strong>Florida Class D LMS</strong><span>Dedicated regulated-training environment with live-instruction controls.</span></span><b>Open →</b></Link>
-            <Link href="/apps"><span><strong>{APPLICATIONS_BRAND_NAME}</strong><span>Commercial software with product-specific purchase and access controls.</span></span><b>Open →</b></Link>
+            <Link href="/apps"><span><strong>{APPLICATIONS_BRAND_NAME}</strong><span>Enterprise software with product-specific engagement, deployment, and access controls.</span></span><b>Open →</b></Link>
           </div>
         </section>
 

@@ -61,18 +61,27 @@ test("post-cutover verification rejects canonical domains on every noncanonical 
   assert.match(workflow, /Noncanonical Vercel project \$\{project_id\} still owns a canonical production domain after move/);
 });
 
-test("partial project-domain move or smoke failure restores each domain to its actual prior source", () => {
+test("partial project-domain move, alias assignment, or smoke failure restores each domain to its captured prior state", () => {
   assert.match(workflow, /id:\s*move/);
+  assert.match(workflow, /id:\s*alias/);
   assert.match(workflow, /continue-on-error:\s*true/);
   assert.match(workflow, /if:\s*steps\.move\.outcome == 'success'/);
+  assert.match(workflow, /if:\s*steps\.alias\.outcome == 'success'/);
   assert.match(
     workflow,
-    /always\(\) && steps\.rollback\.outcome == 'success' && steps\.rollback\.outputs\.primary != '' && steps\.rollback\.outputs\.apex != '' && \(steps\.move\.outcome == 'failure' \|\| steps\.smoke\.outcome == 'failure'\)/,
+    /always\(\) && steps\.rollback\.outcome == 'success' && steps\.rollback\.outputs\.primary != '' && steps\.rollback\.outputs\.apex != '' && \(steps\.move\.outcome == 'failure' \|\| steps\.alias\.outcome == 'failure' \|\| steps\.smoke\.outcome == 'failure'\)/,
   );
   assert.match(workflow, /ROLLBACK_PRIMARY_PROJECT:\s*\$\{\{ steps\.move\.outputs\.primary_source_project \}\}/);
   assert.match(workflow, /ROLLBACK_APEX_PROJECT:\s*\$\{\{ steps\.move\.outputs\.apex_source_project \}\}/);
+  assert.match(workflow, /restore_domain\(\)/);
   assert.match(workflow, /local source_project="\$3"/);
+  assert.match(workflow, /if \[ "\$\{moved\}" = "true" \]; then/);
   assert.match(workflow, /--data "\{\\"projectId\\":\\"\$\{source_project\}\\"\}"/);
+  assert.match(workflow, /--data "\{\\"alias\\":\\"\$\{domain\}\\"\}"/);
+  assert.match(
+    workflow,
+    /https:\/\/api\.vercel\.com\/v2\/deployments\/\$\{deployment\}\/aliases\?teamId=\$\{TEAM_ID\}/,
+  );
   assert.match(workflow, /if \[ -z "\$\{ROLLBACK_PRIMARY\}" \] \|\| \[ -z "\$\{ROLLBACK_APEX\}" \]/);
   assert.match(workflow, /Rollback deployment IDs were not captured/);
 });

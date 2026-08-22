@@ -42,12 +42,13 @@ test("Academy structured data identifies the legal entity as the course provider
   assert.match(certificate, /issued by \{LEGAL_NAME\}/);
 });
 
-test("the FDACS LMS is live while regulated learner commerce and credit remain disabled", () => {
+test("the FDACS LMS deployment is readiness-gated while regulated learner commerce and credit remain disabled", () => {
   const landing = read("app/florida-security-training/page.tsx");
   const controls = read("app/florida-security-training/GovernedFloridaClassDLink.tsx");
   const completionPage = read("app/florida-security-training/completion/page.tsx");
 
-  assert.match(landing, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
+  assert.match(landing, /LMS PLATFORM DEPLOYED · READINESS GATED/);
+  assert.doesNotMatch(landing, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
   assert.match(landing, /ENROLLMENT & PAYMENT LOCKED · LICENSE ACTIVATION PENDING/);
   assert.match(landing, /Enrollment and payment remain unavailable until licensing and production activation are complete/);
   assert.match(landing, /does not claim FDACS approval or production authorization/);
