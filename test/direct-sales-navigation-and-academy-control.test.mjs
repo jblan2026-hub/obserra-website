@@ -101,3 +101,16 @@ test("Marketplace status labels do not imply unverified production readiness", (
   assert.match(marketplace, /marketplaceEngagementLabel\[entry\.status\]/);
   assert.match(detail, /marketplaceEngagementLabel\[entry\.status\]/);
 });
+
+
+test("Homepage contains no illustrative preview, mockup, or unverified purchase language", () => {
+  const home = read("app/page.tsx");
+
+  assert.doesNotMatch(home, /Illustrative preview/);
+  assert.doesNotMatch(home, /Representative interface only/);
+  assert.doesNotMatch(home, /obserra-eios-intelligence-hero\.png/);
+  assert.doesNotMatch(home, /eios-overview-marketing\.png/);
+  assert.doesNotMatch(home, /Shop \{APPLICATIONS_BRAND_NAME\}/);
+  assert.match(home, /Explore \{APPLICATIONS_BRAND_NAME\}/);
+  assert.match(home, /product-specific engagement, deployment, and access controls/);
+});
