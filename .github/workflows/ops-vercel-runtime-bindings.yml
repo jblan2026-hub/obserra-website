@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - automation/vercel-runtime-binding-audit-20260822
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -15,6 +18,7 @@ concurrency:
 
 jobs:
   audit-and-converge:
+    if: github.event_name == 'push' || github.head_ref == 'automation/vercel-runtime-binding-audit-20260822'
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
