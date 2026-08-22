@@ -4,6 +4,7 @@ import { safeAcademyIdentity } from "../../../../lib/academy-identity";
 import { academyCommerceLivemode } from "../../../../lib/academy-payment";
 import { getAcademyStripe } from "../../../../lib/academy-stripe";
 import { retrieveVerifiedAcademyPaidSession } from "../../../../lib/academy-stripe-verification";
+import { ensureAcademyRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 
@@ -79,6 +80,12 @@ export async function POST(request: Request) {
     const signInUrl = new URL("/sign-in", requestUrl);
     signInUrl.searchParams.set("redirect_url", returnUrl.toString());
     return NextResponse.redirect(signInUrl, 303);
+  }
+
+  try {
+    await ensureAcademyRuntimeSecrets();
+  } catch {
+    return NextResponse.redirect(retryUrl(requestUrl, course.id, sessionId, "verification-unavailable"), 303);
   }
 
   const livemode = academyCommerceLivemode();

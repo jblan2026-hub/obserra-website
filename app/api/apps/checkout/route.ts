@@ -20,6 +20,7 @@ import {
   getApplicationsStripe,
 } from "../../../../lib/applications-stripe";
 import { primaryAccountEmail } from "../../../../lib/app-entitlements";
+import { ensureApplicationsRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -104,16 +105,16 @@ export async function POST(request: Request) {
     return NextResponse.redirect(signIn, 303);
   }
 
-  const priceId = applicationsStripePriceId(app.slug, plan.id, interval) ?? "";
-  if (!priceId || !applicationsCommerceConfigured()) {
-    const unavailable = new URL(`/apps/${app.slug}/subscribe`, requestUrl);
-    unavailable.searchParams.set("checkout", "configuration-required");
-    unavailable.searchParams.set("plan", plan.id);
-    unavailable.searchParams.set("deployment", deployment);
-    return NextResponse.redirect(unavailable, 303);
-  }
-
   try {
+    await ensureApplicationsRuntimeSecrets();
+    const priceId = applicationsStripePriceId(app.slug, plan.id, interval) ?? "";
+    if (!priceId || !applicationsCommerceConfigured()) {
+      const unavailable = new URL(`/apps/${app.slug}/subscribe`, requestUrl);
+      unavailable.searchParams.set("checkout", "configuration-required");
+      unavailable.searchParams.set("plan", plan.id);
+      unavailable.searchParams.set("deployment", deployment);
+      return NextResponse.redirect(unavailable, 303);
+    }
     await applicationsCommerceHealth();
     const stripe = getApplicationsStripe();
     const livemode = applicationsCommerceLivemode();

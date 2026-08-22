@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { applicationsTenantId, durableApplicationsCustomer } from "../../../lib/applications-commerce";
 import { applicationsCommerceConfigured, getApplicationsStripe } from "../../../lib/applications-stripe";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { ensureApplicationsRuntimeSecrets } from "../../../lib/production-runtime-secrets";
 
 export const metadata: Metadata = {
   title: `Orders and Billing | ${LEGAL_ENTITY_NAME} Customer Portal`,
@@ -53,7 +54,15 @@ export default async function OrdersPage() {
   const { userId, orgId } = await auth();
   if (!userId) redirect("/sign-in?redirect_url=/portal/orders");
 
-  const customer = applicationsCommerceConfigured()
+  let commerceConfigured = false;
+  try {
+    await ensureApplicationsRuntimeSecrets();
+    commerceConfigured = applicationsCommerceConfigured();
+  } catch {
+    commerceConfigured = false;
+  }
+
+  const customer = commerceConfigured
     ? await durableApplicationsCustomer(userId, applicationsTenantId(userId, orgId)).catch(() => null)
     : null;
   if (!customer) {

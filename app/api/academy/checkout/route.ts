@@ -31,6 +31,7 @@ import {
   createAcademyCheckoutAfterGovernedPriceValidation,
 } from "../../../../lib/academy-payment";
 import { getAcademyStripe } from "../../../../lib/academy-stripe";
+import { ensureAcademyRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -108,6 +109,12 @@ export async function POST(request: Request) {
     formData = await request.formData();
   } catch {
     return rejectedRequest(400, "Invalid request body");
+  }
+
+  try {
+    await ensureAcademyRuntimeSecrets();
+  } catch {
+    return unavailableRedirect(requestUrl, "configuration-required");
   }
 
   const courseValue = formData.get("course");

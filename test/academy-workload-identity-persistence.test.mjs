@@ -22,12 +22,19 @@ const REQUIRED_OPERATIONS = [
 
 test("Academy Vercel production persistence uses workload identity instead of a database admin secret", async () => {
   const client = await read("lib/academy-persistence.ts");
+  const runtimeSecrets = await read("lib/production-runtime-secrets.ts");
 
   assert.match(client, /process\.env\.OBSERRA_ACADEMY_SUPABASE_URL/);
   assert.match(client, /process\.env\.OBSERRA_ACADEMY_SUPABASE_PROJECT_REF/);
   assert.match(client, /requireSupabaseProjectOrigin\(rawUrl, rawProjectRef\)/);
   assert.doesNotMatch(client, /supabase\.co/);
-  assert.match(client, /process\.env\.VERCEL_OIDC_TOKEN/);
+  assert.match(client, /ensureAcademyRuntimeSecrets/);
+  assert.match(client, /const requestOidcToken = await ensureAcademyRuntimeSecrets\(\)/);
+  assert.match(client, /academySupabaseConfig\(requestOidcToken\)/);
+  assert.match(runtimeSecrets, /ACADEMY_GATEWAY_AUDIENCE = "https:\/\/vercel\.com\/obserra"/);
+  assert.match(runtimeSecrets, /getVercelOidcToken\(\{ audience: ACADEMY_GATEWAY_AUDIENCE \}\)/);
+  assert.doesNotMatch(client, /process\.env\.VERCEL_OIDC_TOKEN/);
+  assert.doesNotMatch(runtimeSecrets, /process\.env\.VERCEL_OIDC_TOKEN/);
   assert.match(client, /process\.env\.VERCEL === "1" && process\.env\.VERCEL_ENV === "production"/);
 
   const vercelStart = client.indexOf("if (vercelProduction) {");

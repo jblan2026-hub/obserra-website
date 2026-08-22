@@ -11,6 +11,7 @@ import {
 import { getAcademyStripe } from "../../../../lib/academy-stripe";
 import { academyStripeWebhookSecret } from "../../../../lib/academy-payment";
 import { isProductionRuntime } from "../../../../lib/runtime-environment";
+import { ensureAcademyRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,6 +20,19 @@ const CLAIM_POLICY = "purchaser-email-match-v1";
 const CONTRACT_VERSION = "academy-commerce-health-v1";
 
 export async function GET() {
+  try {
+    await ensureAcademyRuntimeSecrets();
+  } catch {
+    return NextResponse.json(
+      {
+        contract: CONTRACT_VERSION,
+        operational: false,
+        paymentProvider: "unavailable",
+        durableStorage: "unavailable",
+      },
+      { status: 503, headers: { "cache-control": "no-store", "x-obserra-commerce-contract": CONTRACT_VERSION } },
+    );
+  }
   const identityReady = academyIdentityRuntimeReady();
   const identityEnvironment = academyIdentityEnvironment();
   const stripeKey = process.env.ACADEMY_STRIPE_SECRET_KEY?.trim() ?? "";

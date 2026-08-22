@@ -6,6 +6,7 @@ import { availablePlansFor } from "../../commerce";
 import { findAppBySlug, marketplaceApps } from "../../appsData";
 import { applicationsPersistenceConfigured } from "../../../../lib/applications-commerce";
 import { applicationsCommerceConfigured, applicationsStripePriceId } from "../../../../lib/applications-stripe";
+import { ensureApplicationsRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 import "../../commerce.css";
 import "../../commerce-actions.css";
 
@@ -27,7 +28,13 @@ export default async function SubscribePage({ params, searchParams }: Props) {
   if (!app) notFound();
   const plans = availablePlansFor(app);
   const checkout = typeof query.checkout === "string" ? query.checkout : "";
-  const commerceReady = applicationsPersistenceConfigured() && applicationsCommerceConfigured();
+  let commerceReady = false;
+  try {
+    await ensureApplicationsRuntimeSecrets();
+    commerceReady = applicationsPersistenceConfigured() && applicationsCommerceConfigured();
+  } catch {
+    commerceReady = false;
+  }
 
   return <main className="commerce-page">
     <header className="commerce-nav">

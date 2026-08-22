@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { applicationsTenantId, durableApplicationsCustomer } from "../../../../lib/applications-commerce";
 import { getApplicationsStripe } from "../../../../lib/applications-stripe";
+import { ensureApplicationsRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 function sameOriginForm(request: Request) {
   const origin = request.headers.get("origin");
@@ -28,6 +29,7 @@ export async function POST(request: Request) {
   }
 
   try {
+    await ensureApplicationsRuntimeSecrets();
     const customer = await durableApplicationsCustomer(userId, applicationsTenantId(userId, orgId));
     if (!customer) return NextResponse.redirect(new URL("/portal/orders?billing=no-subscription", requestUrl), 303);
     const session = await getApplicationsStripe().billingPortal.sessions.create({

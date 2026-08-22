@@ -15,6 +15,7 @@ import {
 } from "../../../../lib/academy-stripe-verification";
 import { getAcademyStripe } from "../../../../lib/academy-stripe";
 import { readStripeWebhookBody, StripeWebhookBodyError } from "../../../../lib/stripe-webhook-body";
+import { ensureAcademyRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 
@@ -193,6 +194,11 @@ async function recordSignedPaymentReversal(
 }
 
 export async function POST(request: Request) {
+  try {
+    await ensureAcademyRuntimeSecrets();
+  } catch {
+    return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
+  }
   const signature = request.headers.get("stripe-signature");
   const webhookSecret = academyStripeWebhookSecret();
   if (!signature || !webhookSecret) {
