@@ -114,3 +114,10 @@ All must be observed from the public canonical host:
 - **Fresh canonical evidence:** `www.obserrallc.com/api/health` still returned `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`.
 - **Fresh commerce/LMS evidence:** Academy commerce remained HTTP `503`, `operational: false`; Florida liveness remained HTTP `200`; Florida readiness remained HTTP `503`, `not_ready`.
 - **Safe next action:** Do not merge or describe PR #201 as production-ready without reviewing its exact source, passing applicable gates, producing a verified merge candidate, and proving the public canonical endpoints afterward.
+
+
+### 2026-08-22T17:46:55.786Z — guarded cutover queue analysis
+
+- **Observed facts:** direct main commit `f21ade991bcc5473027fd88cf68e9af991b9b9c7` produced canceled Vercel deployment `dpl_Gow62JNvbk8piFKZLiMXT4uPdN5f`; signed main commit `278567f6a9c42c2f795a552714984d98f311e4d0` produced READY candidate `dpl_HyUZkePdAL8Rxtn29WC7FxbV5Vxt`; canonical aliases are still old.
+- **Inference, not proof:** the production cutover workflow uses a non-canceling concurrency group and waits up to 60 × 10 seconds for an exact READY deployment. The canceled direct-commit run may be holding the group until its bounded timeout, leaving the signed run queued. This explains the current delay without treating it as a success or guessing credential state.
+- **Next action:** allow the bounded run to fail closed, then re-probe canonical identity and record whether the signed cutover starts. If it does not, obtain the actual Actions failure evidence before changing alias logic.
