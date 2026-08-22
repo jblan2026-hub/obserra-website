@@ -130,3 +130,49 @@ jobs:
           requirement 'Academy email integrity secret' OBSERRA_ACADEMY_EMAIL_HASH_SECRET
 
           echo "::notice::Production binding-name inventory completed without logging values."
+
+      - name: Verify Vercel-managed Applications secret aliases
+        shell: bash
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ACCESS_TOKEN: ${{ secrets.VERCEL_ACCESS_TOKEN }}
+          VERCEL_TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+        run: |
+          set -euo pipefail
+
+          # This is read-only. It tests only pre-approved alias names; no secret
+          # value is requested, printed, copied, or attached to the project.
+          token="${VERCEL_TOKEN:-${VERCEL_ACCESS_TOKEN:-}}"
+          test -n "${token}" || {
+            echo "::error::No Vercel API credential is available for alias discovery."
+            exit 1
+          }
+
+          response_file="$(mktemp)"
+          trap 'rm -f "${response_file}"' EXIT
+          curl --silent --show-error --fail \
+            --header "Authorization: Bearer ${token}" \
+            --header "Accept: application/json" \
+            "https://api.vercel.com/v2/now/secrets?teamId=${VERCEL_TEAM_ID}" \
+            --output "${response_file}"
+
+          jq -e '(.secrets // []) | type == "array"' "${response_file}" >/dev/null
+
+          for alias in \
+            applications-supabase-service-role-key \
+            applications-commerce-hash-secret \
+            applications-stripe-secret-key \
+            applications-stripe-webhook-secret \
+            applications-stripe-price-catalog-json \
+            clerk-secret-key \
+            clerk-publishable-key; do
+            jq -e --arg alias "${alias}" \
+              '(.secrets // []) | any(.[]?; .name == $alias)' \
+              "${response_file}" >/dev/null || {
+                echo "::error::An approved Applications Vercel-managed secret alias is unavailable."
+                exit 1
+              }
+          done
+
+          echo "::notice::All required Applications Vercel-managed secret aliases are available."
+
