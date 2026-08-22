@@ -85,3 +85,36 @@ test("partial project-domain move, alias assignment, or smoke failure restores e
   assert.match(workflow, /if \[ -z "\$\{ROLLBACK_PRIMARY\}" \] \|\| \[ -z "\$\{ROLLBACK_APEX\}" \]/);
   assert.match(workflow, /Rollback deployment IDs were not captured/);
 });
+
+test("canonical smoke waits for stable alias propagation before exercising public routes", () => {
+  const smokeStart = workflow.indexOf("- name: Verify canonical LMS and prelicense commerce lock");
+  const quarantineStart = workflow.indexOf("- name: Quarantine duplicate project and verify canonical domain ownership");
+  const smoke = workflow.slice(smokeStart, quarantineStart);
+
+  assert.match(smoke, /stable_observations=0/);
+  assert.match(smoke, /stable_observations=\$\(\(stable_observations \+ 1\)\)/);
+  assert.match(smoke, /if \[ "\$\{stable_observations\}" -ge 2 \]; then/);
+  assert.match(smoke, /else\s+stable_observations=0/);
+  assert.match(smoke, /sleep 10/);
+  assert.match(smoke, /test "\$\{stable_observations\}" -ge 2/);
+});
+
+test("successful rollback is recorded separately from the final fail-closed job result", () => {
+  const recoveryStart = workflow.indexOf("- name: Roll back canonical domains on failed cutover");
+  const publishStart = workflow.indexOf("- name: Publish safe cutover control-plane outcome");
+  const finalStart = workflow.indexOf("- name: Require successful cutover");
+  const recovery = workflow.slice(recoveryStart, publishStart);
+  const final = workflow.slice(finalStart);
+
+  assert.match(workflow, /\$\{output_name\}_source_project=\$\{CANONICAL_PROJECT_ID\}/);
+  assert.match(recovery, /elif \[ "\$\{moved\}" = "false" \]; then/);
+  assert.match(recovery, /Rollback owner for an unmoved canonical domain is inconsistent/);
+  assert.match(recovery, /Rollback movement state was not captured/);
+  assert.match(recovery, /::warning::Production cutover failed; every canonical alias was restored/);
+  assert.doesNotMatch(recovery, /::error::Production cutover failed; every canonical alias was restored/);
+  assert.ok(finalStart > publishStart, "final fail-closed result must follow outcome publication");
+  assert.match(final, /RECOVERY_OUTCOME/);
+  assert.match(final, /canonical rollback completed/);
+  assert.match(final, /canonical rollback did not complete/);
+  assert.match(final, /exit 1/);
+});
