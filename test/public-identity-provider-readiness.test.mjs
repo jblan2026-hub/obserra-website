@@ -18,7 +18,7 @@ function routingModule() {
 
 test("public routes are explicitly identity-independent before provider readiness checks", () => {
   const { identityProviderForRequest } = routingModule();
-  for (const pathname of ["/", "/api/health", "/florida-security-training"]) {
+  for (const pathname of ["/", "/api/health", "/api/apps/commerce-health", "/florida-security-training"]) {
     const ownership = identityProviderForRequest({ pathname, method: "GET" });
     assert.equal(ownership.provider, "public", pathname);
     assert.equal(ownership.requiresAuthentication, false, pathname);
