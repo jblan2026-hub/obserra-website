@@ -1,0 +1,76 @@
+name: Vercel Domain Authority Diagnostic
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/vercel-domain-diagnostic.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
+      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+      CANONICAL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+      AUXILIARY_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme
+      PRIMARY_DOMAIN: www.obserrallc.com
+      APEX_DOMAIN: obserrallc.com
+    steps:
+      - name: Require Vercel credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${VERCEL_TOKEN}" ]; then
+            echo "::error::No Vercel credential is configured for GitHub Actions."
+            exit 1
+          fi
+
+      - name: Inspect aliases and project-domain ownership
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          inspect_alias() {
+            local domain="$1"
+            local body
+            local status
+            body="$(mktemp)"
+            status="$(curl --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${body}" \
+              --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v4/aliases/${domain}?teamId=${TEAM_ID}")"
+            echo "alias domain=${domain} status=${status} project=$(jq -r '.projectId // empty' "${body}" 2>/dev/null || true) deployment=$(jq -r '.deploymentId // .deployment.id // empty' "${body}" 2>/dev/null || true) error=$(jq -r '.error.code // empty' "${body}" 2>/dev/null || true)"
+            rm -f "${body}"
+          }
+
+          inspect_project_domain() {
+            local project="$1"
+            local label="$2"
+            local domain="$3"
+            local body
+            local status
+            body="$(mktemp)"
+            status="$(curl --silent --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${body}" \
+              --write-out '%{http_code}' \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v9/projects/${project}/domains/${domain}?teamId=${TEAM_ID}")"
+            echo "project_domain label=${label} domain=${domain} status=${status} project=$(jq -r '.projectId // empty' "${body}" 2>/dev/null || true) verified=$(jq -r '.verified // empty' "${body}" 2>/dev/null || true) error=$(jq -r '.error.code // empty' "${body}" 2>/dev/null || true)"
+            rm -f "${body}"
+          }
+
+          inspect_alias "${PRIMARY_DOMAIN}"
+          inspect_alias "${APEX_DOMAIN}"
+          inspect_project_domain "${CANONICAL_PROJECT_ID}" canonical "${PRIMARY_DOMAIN}"
+          inspect_project_domain "${CANONICAL_PROJECT_ID}" canonical "${APEX_DOMAIN}"
+          inspect_project_domain "${AUXILIARY_PROJECT_ID}" duplicate "${PRIMARY_DOMAIN}"
+          inspect_project_domain "${AUXILIARY_PROJECT_ID}" duplicate "${APEX_DOMAIN}"
