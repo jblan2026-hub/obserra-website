@@ -348,3 +348,13 @@ All must be observed from the public canonical host:
 - **Production candidate:** Vercel created target-production deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` for the exact merge SHA. At observation it was `BUILDING`; this is not a canonical deployment claim and no runtime result is attributed to it.
 - **Scope boundary:** this merge contains the narrow, one-shot configuration workflow only. It does not itself grant Stripe credentials, a service-role key, webhook evidence, customer access, Academy payment authorization, or Florida learner readiness.
 - **Next safe action:** wait for this exact production candidate to become READY. Then prove canonical `/api/health` returns exactly its deployment/SHA and re-probe the Applications commerce contract before making any availability claim.
+
+
+### 2026-08-22T18:57:29Z — PR #209 merged event; canonical deploy proved; URL-only repair did not restore Applications commerce
+
+- **Event:** PR [#209](https://github.com/jblan2026-hub/obserra-website/pull/209) closed as merged. The merged main SHA is `6c2cddd84503c7cb0af3ca976fd8308183379146`.
+- **Exact canonical public proof:** at `2026-08-22T18:57:24.012Z`, `https://www.obserrallc.com/api/health` returned HTTP `200`, verified Vercel/project routing authority, deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U`, and the exact merge SHA. This proves the canonical site is serving the URL-convergence release.
+- **Applications result after exact deployment:** at `2026-08-22T18:57:26Z`, canonical `/api/apps/commerce-health` remained HTTP `503`, `operational: false`, `eventLedger: "unavailable"`, `entitlementAuthority: "unavailable"`, and error `durable-commerce-unavailable`. The known public durable-store URL was insufficient by itself; commerce is not live.
+- **Other live probes:** Academy commerce remained HTTP `503` / `operational: false` at `18:57:27Z`; Florida readiness remained HTTP `503` / `not_ready` at `18:57:29Z`. These remain fail-closed and are not called live.
+- **Correction boundary:** no Stripe, service-role, webhook, identity, customer, or regulated-LMS configuration was invented or changed in response to the unchanged result.
+- **Next safe action:** inspect runtime logs for this exact deployment and trace the Applications health route’s external-configuration validation. Make the next change only after determining the concrete missing/misconfigured boundary, then repeat exact canonical proof.
