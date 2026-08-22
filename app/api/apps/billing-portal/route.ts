@@ -1,33 +1,46 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { findAppBySlug } from "../../../apps/appsData";
-import { resolveAppEntitlement } from "../../../../lib/app-entitlements";
-import { getStripe } from "../../../../lib/stripe";
+import { applicationsTenantId, durableApplicationsCustomer } from "../../../../lib/applications-commerce";
+import { getApplicationsStripe } from "../../../../lib/applications-stripe";
 
-export async function GET(request: Request) {
+function sameOriginForm(request: Request) {
+  const origin = request.headers.get("origin");
+  const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
+  try {
+    return Boolean(origin) && new URL(origin as string).origin === new URL(request.url).origin &&
+      (contentType.startsWith("application/x-www-form-urlencoded") || contentType.startsWith("multipart/form-data"));
+  } catch {
+    return false;
+  }
+}
+
+export async function POST(request: Request) {
   const requestUrl = new URL(request.url);
-  const slug = requestUrl.searchParams.get("app") ?? "";
-  const app = findAppBySlug(slug);
-  if (!app) return NextResponse.redirect(new URL("/portal?billing=invalid-app", requestUrl));
+  if (!sameOriginForm(request)) return NextResponse.json({ error: "Same-origin form required" }, { status: 403 });
+  const form = await request.formData();
+  const slug = String(form.get("app") ?? "");
 
-  const { userId } = await auth();
+  const { userId, orgId } = await auth();
   if (!userId) {
     const signIn = new URL("/sign-in", requestUrl);
-    signIn.searchParams.set("redirect_url", requestUrl.toString());
-    return NextResponse.redirect(signIn);
+    signIn.searchParams.set("redirect_url", new URL("/portal/orders", requestUrl).toString());
+    return NextResponse.redirect(signIn, 303);
   }
 
-  const entitlement = await resolveAppEntitlement(userId, app.slug);
-  if (!entitlement.customerId) return NextResponse.redirect(new URL(`/apps/${app.slug}/subscribe?billing=no-subscription`, requestUrl));
-
   try {
-    const session = await getStripe().billingPortal.sessions.create({
-      customer: entitlement.customerId,
-      return_url: new URL(`/portal?app=${app.slug}`, requestUrl).toString(),
+    const customer = await durableApplicationsCustomer(userId, applicationsTenantId(userId, orgId));
+    if (!customer) return NextResponse.redirect(new URL("/portal/orders?billing=no-subscription", requestUrl), 303);
+    const session = await getApplicationsStripe().billingPortal.sessions.create({
+      customer: customer.stripeCustomerId,
+      return_url: new URL(slug ? `/portal/applications?app=${encodeURIComponent(slug)}` : "/portal/orders", requestUrl).toString(),
     });
     return NextResponse.redirect(session.url, 303);
   } catch (error) {
-    console.error("billing portal session failed", error);
-    return NextResponse.redirect(new URL(`/portal?billing=unavailable&app=${app.slug}`, requestUrl));
+    console.error("billing portal session failed", { error: error instanceof Error ? error.name : "unknown" });
+    return NextResponse.redirect(new URL("/portal/orders?billing=unavailable", requestUrl), 303);
   }
+}
+
+export async function GET() {
+  return NextResponse.json({ error: "Billing portal requires POST" }, { status: 405, headers: { allow: "POST" } });
 }

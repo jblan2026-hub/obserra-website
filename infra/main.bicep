@@ -27,6 +27,7 @@ var supabaseIdentityProjectRef = 'ftkjhmtfyfkartfsnkjb'
 var supabaseIdentityPublishableKey = 'sb_publishable_mRE63bML7dsVY_YqaervqA_TUEWsxVB'
 var academySupabaseUrl = 'https://nwxnyqlyzyufgoadtqxs.supabase.co'
 var academySupabaseProjectRef = 'nwxnyqlyzyufgoadtqxs'
+var applicationsSupabaseUrl = 'https://ykmrlcfitsubqajgfnye.supabase.co'
 var fdacsSupabaseUrl = 'https://ggkxgjhsbgbifiqrhavr.supabase.co'
 var fdacsSupabaseProjectRef = 'ggkxgjhsbgbifiqrhavr'
 var fdacsDocumentsBucket = 'fdacs-class-d-completion-documents'
@@ -156,6 +157,10 @@ var commonAppSettings = [
     value: 'true'
   }
   {
+    name: 'OBSERRA_IDENTITY_RUNTIME_ENABLED'
+    value: 'true'
+  }
+  {
     name: 'NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_URL'
     value: supabaseIdentityUrl
   }
@@ -174,6 +179,10 @@ var commonAppSettings = [
   {
     name: 'OBSERRA_ACADEMY_SUPABASE_PROJECT_REF'
     value: academySupabaseProjectRef
+  }
+  {
+    name: 'OBSERRA_APPLICATIONS_SUPABASE_URL'
+    value: applicationsSupabaseUrl
   }
   {
     name: 'OBSERRA_FDACS_SUPABASE_URL'
@@ -218,6 +227,34 @@ var commonAppSettings = [
   {
     name: 'CLERK_SECRET_KEY'
     value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=clerk-secret-key)'
+  }
+  {
+    name: 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY'
+    value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=clerk-publishable-key)'
+  }
+  {
+    name: 'APPLICATIONS_STRIPE_SECRET_KEY'
+    value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=applications-stripe-secret-key)'
+  }
+  {
+    name: 'APPLICATIONS_STRIPE_WEBHOOK_SECRET'
+    value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=applications-stripe-webhook-secret)'
+  }
+  {
+    name: 'OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY'
+    value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=applications-supabase-service-role-key)'
+  }
+  {
+    name: 'OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET'
+    value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=applications-commerce-hash-secret)'
+  }
+  {
+    name: 'OBSERRA_APPLICATIONS_PRICE_CATALOG_JSON'
+    value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=applications-stripe-price-catalog-json)'
+  }
+  {
+    name: 'APP_LICENSE_SIGNING_SECRET'
+    value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=applications-license-signing-secret)'
   }
   {
     name: 'STRIPE_SECRET_KEY'

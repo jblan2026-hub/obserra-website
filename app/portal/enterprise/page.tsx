@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getStripe } from "../../../lib/stripe";
+import { applicationsTenantId, durableApplicationEntitlements, durableApplicationsCustomer } from "../../../lib/applications-commerce";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
@@ -13,8 +13,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
-
-const ACTIVE_STATES = new Set(["active", "trialing"]);
 
 const linkClass =
   "inline-flex items-center justify-center rounded-lg border border-cyan-300/30 bg-slate-900/70 px-4 py-3 text-sm font-extrabold text-slate-100 no-underline transition hover:border-obserra-gold hover:text-obserra-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
@@ -27,22 +25,26 @@ export default async function EnterpriseCustomerPage() {
   const email = user?.primaryEmailAddress?.emailAddress || "";
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || email || "Authenticated customer";
 
-  let subscriptions: Awaited<ReturnType<ReturnType<typeof getStripe>["subscriptions"]["list"]>>["data"] = [];
+  const tenantId = applicationsTenantId(session.userId, session.orgId);
+  let entitlements: Awaited<ReturnType<typeof durableApplicationEntitlements>> = [];
   let stripeCustomerCount = 0;
-
-  if (process.env.STRIPE_SECRET_KEY && email) {
-    const stripe = getStripe();
-    const customers = await stripe.customers.list({ email, limit: 10 });
-    stripeCustomerCount = customers.data.length;
-    const groups = await Promise.all(
-      customers.data.map((customer) => stripe.subscriptions.list({ customer: customer.id, status: "all", limit: 100 })),
-    );
-    subscriptions = groups.flatMap((group) => group.data).sort((a, b) => b.created - a.created);
+  let commerceAuthorityAvailable = true;
+  try {
+    const [durableEntitlements, customer] = await Promise.all([
+      durableApplicationEntitlements(session.userId, tenantId),
+      durableApplicationsCustomer(session.userId, tenantId),
+    ]);
+    entitlements = durableEntitlements;
+    stripeCustomerCount = customer ? 1 : 0;
+  } catch (error) {
+    commerceAuthorityAvailable = false;
+    console.error("enterprise portal commerce authority unavailable", {
+      error: error instanceof Error ? error.name : "unknown",
+    });
   }
-
-  const activeSubscriptions = subscriptions.filter((subscription) => ACTIVE_STATES.has(subscription.status));
+  const activeSubscriptions = entitlements.filter((entitlement) => entitlement.allowed);
   const licensedApplications = new Set(
-    activeSubscriptions.map((subscription) => subscription.metadata.obserraApp).filter(Boolean),
+    activeSubscriptions.map((entitlement) => entitlement.appSlug).filter(Boolean),
   );
   const organizationActive = Boolean(session.orgId);
   const organizationRole = session.orgRole || "No active organization role";
@@ -60,15 +62,19 @@ export default async function EnterpriseCustomerPage() {
       eyebrow: "Seat licensing",
       title: "Subscription-backed seats",
       body: "Seat allocation must be derived from purchased quantities and verified subscription metadata, not manually assumed.",
-      status: activeSubscriptions.length
+      status: !commerceAuthorityAvailable
+        ? "Commerce authority unavailable — subscription counts are not reported"
+        : activeSubscriptions.length
         ? `${activeSubscriptions.length} active subscription record(s) available for seat-policy mapping`
         : "No active subscription records available",
     },
     {
       eyebrow: "Application licensing",
       title: "Entitlements and activation",
-      body: "Application access remains bound to active or trialing Stripe subscriptions and server-issued license controls.",
-      status: licensedApplications.size
+      body: "Application access remains bound to active or trialing subscription snapshots in the signed-webhook ledger and server-issued license controls.",
+      status: !commerceAuthorityAvailable
+        ? "Commerce authority unavailable — entitlements remain fail closed"
+        : licensedApplications.size
         ? `${licensedApplications.size} application entitlement(s) verified`
         : "No active application entitlements found",
     },
@@ -82,7 +88,9 @@ export default async function EnterpriseCustomerPage() {
       eyebrow: "Enterprise billing",
       title: "Invoices and subscription changes",
       body: "Billing history, receipts, upgrades, and cancellation controls are provided through verified Stripe customer records.",
-      status: stripeCustomerCount
+      status: !commerceAuthorityAvailable
+        ? "Commerce authority unavailable — customer state is not reported"
+        : stripeCustomerCount
         ? `${stripeCustomerCount} Stripe customer record(s) matched`
         : "No Stripe customer record matched",
     },
@@ -122,8 +130,11 @@ export default async function EnterpriseCustomerPage() {
             Manage organization readiness, commercial entitlements, and enterprise deployment pathways.
           </h1>
           <p className="mt-6 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg">
-            This workspace reports only verified Clerk identity context and Stripe commerce records. It does not create simulated organizations, seats, licenses, users, or billing activity.
+            This workspace reports only verified Clerk identity context and durable signed-webhook commerce records. It does not create simulated organizations, seats, licenses, users, or billing activity.
           </p>
+          {!commerceAuthorityAvailable ? <p role="alert" className="mt-6 max-w-4xl rounded-xl border border-amber-300/40 bg-amber-950/50 p-4 font-bold text-amber-100">
+            The durable commerce authority is unavailable. Subscription, billing, and license counts are withheld, and application access remains fail closed until the authority recovers.
+          </p> : null}
         </div>
         <aside className="self-start rounded-2xl border border-cyan-300/25 bg-slate-900/75 p-6 shadow-2xl shadow-black/30">
           <small className="text-xs font-black tracking-[0.12em] text-obserra-gold">ACCOUNT</small>
@@ -136,8 +147,8 @@ export default async function EnterpriseCustomerPage() {
         {[
           ["ORGANIZATION", organizationActive ? "Active" : "Not selected", session.orgId || "No Clerk organization context"],
           ["ORGANIZATION ROLE", organizationRole, "Verified session role"],
-          ["ACTIVE SUBSCRIPTIONS", String(activeSubscriptions.length), "Active or trialing Stripe records"],
-          ["LICENSED APPLICATIONS", String(licensedApplications.size), "Verified application entitlements"],
+          ["ACTIVE SUBSCRIPTIONS", commerceAuthorityAvailable ? String(activeSubscriptions.length) : "Unavailable", commerceAuthorityAvailable ? "Active signed-webhook ledger records" : "Commerce authority outage — no inferred zero"],
+          ["LICENSED APPLICATIONS", commerceAuthorityAvailable ? String(licensedApplications.size) : "Unavailable", commerceAuthorityAvailable ? "Verified application entitlements" : "Entitlements remain fail closed"],
         ].map(([label, value, detail]) => (
           <article key={label} className="rounded-2xl border border-cyan-300/20 bg-slate-900/70 p-5">
             <small className="text-xs font-black tracking-[0.12em] text-obserra-gold">{label}</small>

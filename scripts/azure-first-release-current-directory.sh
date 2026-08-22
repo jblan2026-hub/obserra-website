@@ -143,6 +143,13 @@ jq -e '
 # ----- Secret delivery baseline: inventory names only; never retrieve or print values -----
 required_secret_names=(
   clerk-secret-key
+  clerk-publishable-key
+  applications-stripe-secret-key
+  applications-stripe-webhook-secret
+  applications-supabase-service-role-key
+  applications-commerce-hash-secret
+  applications-stripe-price-catalog-json
+  applications-license-signing-secret
   stripe-secret-key
   stripe-webhook-secret
   academy-stripe-secret-key
@@ -174,7 +181,7 @@ npm ci
 npm run typecheck
 npm run lint
 npm test
-OBSERRA_IDENTITY_RUNTIME_ENABLED=false npm run build
+OBSERRA_IDENTITY_RUNTIME_ENABLED=true npm run build
 
 test -f .next/standalone/server.js
 rm -rf release obserra-release.zip
@@ -252,10 +259,22 @@ curl --fail --silent --show-error --location --max-time 30 "${STAGING_URL}/" -o 
 grep -Eqi 'Obserra' /tmp/obserra-staging-home.html
 
 ACADEMY_STATUS="$(curl --silent --show-error --max-time 30 --output /tmp/obserra-academy-health.json --write-out '%{http_code}' "${STAGING_URL}/api/academy/commerce-health" || true)"
-if [[ "${ACADEMY_STATUS}" != "200" && "${ACADEMY_STATUS}" != "503" ]]; then
-  echo "Unexpected Academy commerce health HTTP ${ACADEMY_STATUS}; production was not changed." >&2
-  exit 1
-fi
+test "${ACADEMY_STATUS}" = "200"
+jq -e '.operational == true' /tmp/obserra-academy-health.json >/dev/null
+
+APPLICATIONS_COMMERCE_STATUS="$(curl --silent --show-error --max-time 30 --output /tmp/obserra-applications-commerce-health.json --write-out '%{http_code}' "${STAGING_URL}/api/apps/commerce-health" || true)"
+test "${APPLICATIONS_COMMERCE_STATUS}" = "200"
+jq -e '
+  .operational == true and
+  .schemaVersion == "applications-commerce-v1" and
+  .eventLedger == "append-only" and
+  .entitlementAuthority == "durable-subscription-snapshot-v1" and
+  .stripeConfigured == true and
+  .stripeLivemode == true and
+  .providerConnected == true and
+  .chargesEnabled == true and
+  .identityReady == true
+' /tmp/obserra-applications-commerce-health.json >/dev/null
 
 FLORIDA_LIVE_STATUS="$(curl --silent --show-error --max-time 30 --output /tmp/obserra-florida-live.json --write-out '%{http_code}' "${STAGING_URL}/api/florida-class-d/health/live" || true)"
 test "${FLORIDA_LIVE_STATUS}" = "200"
@@ -325,6 +344,7 @@ ARTIFACT_SHA256=${ARTIFACT_SHA256}
 AZURE_STAGING_URL=${STAGING_URL}
 AZURE_PRODUCTION_URL=${PRODUCTION_URL}
 ACADEMY_COMMERCE_HTTP=${ACADEMY_STATUS}
+APPLICATIONS_COMMERCE_HTTP=${APPLICATIONS_COMMERCE_STATUS}
 FLORIDA_LIVE_HTTP=${FLORIDA_LIVE_STATUS}
 FLORIDA_READY_HTTP=${FLORIDA_READY_STATUS}
 GITHUB_OIDC_VARIABLES_CONFIGURED=${GITHUB_VARIABLES_CONFIGURED}

@@ -80,7 +80,8 @@ jobs:
 
       - name: Build Azure standalone release
         env:
-          OBSERRA_IDENTITY_RUNTIME_ENABLED: "false"
+          OBSERRA_IDENTITY_RUNTIME_ENABLED: "true"
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
         run: npm run build
 
       - name: Package immutable standalone artifact
@@ -272,10 +273,25 @@ jobs:
             --output /tmp/staging-commerce.json \
             --write-out '%{http_code}' \
             "${staging_url}/api/academy/commerce-health")"
-          if [[ "${commerce_status}" != "200" && "${commerce_status}" != "503" ]]; then
-            echo "::error::Unexpected Academy commerce health HTTP ${commerce_status}."
-            exit 1
-          fi
+          test "${commerce_status}" = "200"
+          jq -e '.operational == true' /tmp/staging-commerce.json >/dev/null
+
+          applications_commerce_status="$(curl --silent --show-error --max-time 30 \
+            --output /tmp/staging-applications-commerce.json \
+            --write-out '%{http_code}' \
+            "${staging_url}/api/apps/commerce-health")"
+          test "${applications_commerce_status}" = "200"
+          jq -e '
+            .operational == true and
+            .schemaVersion == "applications-commerce-v1" and
+            .eventLedger == "append-only" and
+            .entitlementAuthority == "durable-subscription-snapshot-v1" and
+            .stripeConfigured == true and
+            .stripeLivemode == true and
+            .providerConnected == true and
+            .chargesEnabled == true and
+            .identityReady == true
+          ' /tmp/staging-applications-commerce.json >/dev/null
 
           florida_live_status="$(curl --silent --show-error --max-time 30 \
             --output /tmp/staging-florida-live.json \

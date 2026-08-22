@@ -106,16 +106,26 @@ test("operational Applications endpoints retain server-side authentication and e
 
   for (const route of [
     "app/api/apps/access/route.ts",
-    "app/api/apps/billing-portal/route.ts",
     "app/api/apps/download/route.ts",
     "app/api/apps/license/route.ts",
   ]) {
     assert.match(read(route), /resolve(?:Unified)?App?Entitlement|resolveUnifiedEntitlement/);
   }
+  assert.match(read("app/api/apps/billing-portal/route.ts"), /durableApplicationsCustomer/);
+  for (const route of ["app/api/apps/billing-portal/route.ts", "app/api/apps/checkout/route.ts"]) {
+    const redirectLines = read(route).split("\n").filter((line) => line.includes("NextResponse.redirect"));
+    assert.ok(redirectLines.length > 0, `${route} must contain governed redirects`);
+    for (const line of redirectLines) assert.match(line, /303/, `${route} POST redirects must use 303`);
+  }
 
   const portal = read("app/portal/applications/page.tsx");
   assert.match(portal, /await\s+auth\(\)/);
   assert.match(portal, /redirect\(["']\/sign-in\?redirect_url=\/portal\/applications["']\)/);
+
+  const enterprise = read("app/portal/enterprise/page.tsx");
+  assert.doesNotMatch(enterprise, /\.catch\(\(\) => \[\]\)|\.catch\(\(\) => 0\)/);
+  assert.match(enterprise, /commerceAuthorityAvailable \? String\(activeSubscriptions\.length\) : "Unavailable"/);
+  assert.match(enterprise, /entitlements remain fail closed/i);
 });
 
 test("Applications presentation remains governed by behavioral controls rather than a frozen source digest", () => {

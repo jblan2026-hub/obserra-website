@@ -13,10 +13,10 @@ export async function GET(request: Request) {
   const app = findStorefrontAppBySlug(slug);
   if (!app) return NextResponse.json({ error: "Unknown application" }, { status: 404 });
 
-  const { userId } = await auth();
+  const { userId, orgId } = await auth();
   if (!userId) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
-  const entitlement = await resolveAppEntitlement(userId, app.slug);
+  const entitlement = await resolveAppEntitlement(userId, app.slug, orgId);
   if (!entitlement.allowed) {
     return NextResponse.json({ error: "Active subscription required", status: entitlement.status }, { status: 403 });
   }

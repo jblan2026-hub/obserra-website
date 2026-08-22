@@ -28,7 +28,7 @@ export type LicenseRecord = {
   supportLevel?: string;
   deploymentModel?: string;
   maintenanceActive: boolean;
-  source: "stripe" | "contract" | "manual" | "trial";
+  source: "applications-commerce-ledger" | "stripe" | "contract" | "manual" | "trial";
   externalReference?: string;
 };
 
