@@ -8,7 +8,7 @@ import "./florida-security-training.css";
 
 export const metadata: Metadata = {
   title: "Florida Class D Security Officer Training",
-  description: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC operates a live Florida Class D Security Officer Training LMS platform. Enrollment and payment remain unavailable until licensing and production activation are complete.",
+  description: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC has deployed a Florida Class D Security Officer Training LMS whose regulated learner operations remain readiness-gated. Enrollment and payment remain unavailable until licensing and production activation are complete.",
   alternates: { canonical: "/florida-security-training" },
   robots: { index: true, follow: true },
 };
@@ -70,7 +70,7 @@ export default function FloridaSecurityTrainingPage() {
         <div className="fl-classd__actions"><Link href="/florida-security-training/preflight">Run pre-login ID readiness check</Link><GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access" lockedDescriptionId="fdacs-journey-student-access-locked" lockedLabel="Student access unavailable pending license activation">Student course access</GovernedFloridaClassDLink></div>
       </section>
 
-      <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>The LMS software may be live while regulated learner operations remain disabled. Completing prelicense validation activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied. Payment and production student access also remain disabled until licensing and production activation are complete.</p></div></section>
+      <section className="fl-classd__legal"><ShieldCheck /><div><strong>Important licensing and authorization distinction</strong><p>The LMS deployment does not authorize regulated learner operations. Completing prelicense validation activity does not complete the course. Completing training does not itself issue a Florida Class D Security Officer license. Students must satisfy applicable Florida licensing requirements and receive the license from the Florida Department of Agriculture and Consumer Services (FDACS). {FLORIDA_CLASS_D_COURSE.provider} does not claim FDACS approval or production authorization. Enrollment, course credit, completion, certificates, and Licensing Information and Alert System (LIAS) reporting remain disabled until every applicable authorization gate is satisfied. Payment and production student access also remain disabled until licensing and production activation are complete.</p></div></section>
     </main>
   );
 }
