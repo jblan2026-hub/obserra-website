@@ -58,29 +58,43 @@ test("automatic cutover discovers the actual noncanonical owner before moving to
   assert.match(cutover, /--data "\{\\"projectId\\":\\"\$\{CANONICAL_PROJECT_ID\}\\"\}"/);
 });
 
-test("automatic cutover is idempotent and rollback reverses only ownership changed by that run", () => {
+test("automatic cutover assigns both canonical aliases to the approved deployment", () => {
+  const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
+  const moveIndex = cutover.indexOf("Move canonical domains to production project");
+  const aliasIndex = cutover.indexOf("Assign canonical domains to exact candidate deployment");
+  const smokeIndex = cutover.indexOf("Verify canonical LMS and prelicense commerce lock");
+
+  assert.ok(aliasIndex > moveIndex, "candidate alias assignment must happen after ownership reconciliation");
+  assert.ok(smokeIndex > aliasIndex, "live smoke validation must use the newly assigned candidate aliases");
+  assert.match(cutover, /id: alias/);
+  assert.match(cutover, /if: steps\.move\.outcome == 'success'/);
+  assert.match(cutover, /CANDIDATE_DEPLOYMENT:\s*\$\{\{ steps\.candidate\.outputs\.deployment_id \}\}/);
+  assert.match(
+    cutover,
+    /https:\/\/api\.vercel\.com\/v2\/deployments\/\$\{CANDIDATE_DEPLOYMENT\}\/aliases\?teamId=\$\{TEAM_ID\}/,
+  );
+  assert.match(cutover, /assign_alias "\$\{PRIMARY_DOMAIN\}"/);
+  assert.match(cutover, /assign_alias "\$\{APEX_DOMAIN\}"/);
+  assert.match(cutover, /if: steps\.alias\.outcome == 'success'/);
+});
+
+test("automatic cutover restores aliases even when a domain was already canonical", () => {
   const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
 
   assert.match(
     cutover,
     /https:\/\/api\.vercel\.com\/v9\/projects\/\$\{project_id\}\/domains\/\$\{domain\}\?teamId=\$\{TEAM_ID\}/,
   );
-  assert.match(cutover, /if \[ "\$\{status\}" = "404" \]; then/);
-  assert.match(
-    cutover,
-    /https:\/\/api\.vercel\.com\/v9\/projects\/\$\{CANONICAL_PROJECT_ID\}\/domains\/\$\{domain\}\?teamId=\$\{TEAM_ID\}/,
-  );
   assert.match(cutover, /echo "\$\{output_name\}_moved=false" >> "\$\{GITHUB_OUTPUT\}"/);
   assert.match(cutover, /echo "\$\{output_name\}_moved=true" >> "\$\{GITHUB_OUTPUT\}"/);
-  assert.match(cutover, /echo "\$\{output_name\}_source_project=\$\{source_project\}" >> "\$\{GITHUB_OUTPUT\}"/);
-  assert.match(cutover, /ROLLBACK_PRIMARY_PROJECT:\s*\$\{\{ steps\.move\.outputs\.primary_source_project \}\}/);
-  assert.match(cutover, /ROLLBACK_APEX_PROJECT:\s*\$\{\{ steps\.move\.outputs\.apex_source_project \}\}/);
-  assert.match(cutover, /MOVED_PRIMARY:\s*\$\{\{ steps\.move\.outputs\.primary_moved \}\}/);
-  assert.match(cutover, /MOVED_APEX:\s*\$\{\{ steps\.move\.outputs\.apex_moved \}\}/);
-  assert.match(cutover, /move_back_if_moved\(\)/);
-  assert.match(cutover, /local source_project="\$3"/);
-  assert.match(cutover, /if \[ "\$\{moved\}" != "true" \]; then/);
+  assert.match(cutover, /restore_domain\(\)/);
+  assert.match(cutover, /if \[ "\$\{moved\}" = "true" \]; then/);
   assert.match(cutover, /--data "\{\\"projectId\\":\\"\$\{source_project\}\\"\}"/);
+  assert.match(cutover, /--data "\{\\"alias\\":\\"\$\{domain\}\\"\}"/);
+  assert.match(
+    cutover,
+    /steps\.move\.outcome == 'failure' \|\| steps\.alias\.outcome == 'failure' \|\| steps\.smoke\.outcome == 'failure'/,
+  );
 });
 
 test("automatic cutover quarantines only the proven duplicate and preserves legitimate projects", () => {
