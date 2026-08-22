@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { applicationsCommerceHealth } from "../../../../lib/applications-commerce";
 import { applicationsCommerceConfigured, applicationsCommerceLivemode, getApplicationsStripe } from "../../../../lib/applications-stripe";
 import { prepareClerkRuntime } from "../../../../lib/clerk-runtime-config";
+import { ensureApplicationsRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,6 +21,7 @@ const REQUIRED_WEBHOOK_EVENTS = [
 
 export async function GET() {
   try {
+    await ensureApplicationsRuntimeSecrets();
     const storage = await applicationsCommerceHealth();
     const providerConfigured = applicationsCommerceConfigured();
     const identity = prepareClerkRuntime();

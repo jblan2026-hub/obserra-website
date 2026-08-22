@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHmac } from "node:crypto";
 import { academyCommerceStorageReady } from "./academy-payment";
+import { ensureAcademyRuntimeSecrets } from "./production-runtime-secrets";
 import { requireSupabaseProjectOrigin } from "./supabase-project-origin";
 
 const COURSE_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -102,15 +103,26 @@ function validVercelOidcToken(value: string) {
   return parts.length === 3 && value.length >= 128 && value.length <= 16_384;
 }
 
-function academySupabaseConfig(): AcademySupabaseConfig {
+function academyStorageOrigin() {
   const rawUrl = process.env.OBSERRA_ACADEMY_SUPABASE_URL?.trim() ?? "";
   const rawProjectRef = process.env.OBSERRA_ACADEMY_SUPABASE_PROJECT_REF?.trim() ?? "";
+  try {
+    return requireSupabaseProjectOrigin(rawUrl, rawProjectRef).origin;
+  } catch {
+    throw new AcademyPersistenceError(
+      "Academy durable storage is not configured.",
+      "configuration-required",
+    );
+  }
+}
+
+function academySupabaseConfig(requestOidcToken?: string): AcademySupabaseConfig {
   const serviceRoleKey = process.env.OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
-  const oidcToken = process.env.VERCEL_OIDC_TOKEN?.trim() ?? "";
+  const oidcToken = requestOidcToken?.trim() ?? "";
   const vercelProduction = process.env.VERCEL === "1" && process.env.VERCEL_ENV === "production";
 
   try {
-    const { origin: url } = requireSupabaseProjectOrigin(rawUrl, rawProjectRef);
+    const url = academyStorageOrigin();
 
     // Vercel production must use short-lived workload identity. Do not silently
     // fall back to a long-lived database administrator credential in that trust zone.
@@ -141,7 +153,12 @@ function academySupabaseConfig(): AcademySupabaseConfig {
 
 export function academyPersistenceConfigured() {
   try {
-    academySupabaseConfig();
+    academyStorageOrigin();
+    const vercelProduction = process.env.VERCEL === "1" && process.env.VERCEL_ENV === "production";
+    if (!vercelProduction) {
+      const serviceRoleKey = process.env.OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
+      if (!validServiceRoleKey(serviceRoleKey)) throw new Error("service-key-unavailable");
+    }
     return true;
   } catch {
     return false;
@@ -149,7 +166,8 @@ export function academyPersistenceConfigured() {
 }
 
 async function rpc<ResponseBody>(name: string, body: Record<string, unknown>): Promise<ResponseBody> {
-  const config = academySupabaseConfig();
+  const requestOidcToken = await ensureAcademyRuntimeSecrets();
+  const config = academySupabaseConfig(requestOidcToken);
   const directHeaders: Record<string, string> = {
     "content-type": "application/json",
     accept: "application/json",

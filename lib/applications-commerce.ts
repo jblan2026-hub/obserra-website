@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createHmac, randomUUID } from "node:crypto";
+import { ensureApplicationsRuntimeSecrets } from "./production-runtime-secrets";
 
 const APPLICATIONS_PROJECT_REF = "ykmrlcfitsubqajgfnye";
 const APPLICATION_SLUG = /^obserra-[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -9,7 +10,11 @@ const TENANT_ID = /^(?:org_[A-Za-z0-9_-]{8,}|subject:user_[A-Za-z0-9_-]{8,})$/;
 const CUSTOMER_ID = /^cus_[A-Za-z0-9]+$/;
 const SESSION_ID = /^cs_(?:live|test)_[A-Za-z0-9_]+$/;
 
-type ApplicationsSupabaseConfig = { url: string; serviceRoleKey: string };
+type ApplicationsSupabaseConfig = {
+  url: string;
+  serviceRoleKey: string;
+  legacyJwt: boolean;
+};
 
 export type ApplicationsCommerceHealth = {
   schemaVersion: "applications-commerce-v1";
@@ -92,7 +97,11 @@ function applicationsSupabaseConfig(): ApplicationsSupabaseConfig {
       (url.pathname !== "/" && url.pathname !== "") ||
       !validServiceRoleKey(serviceRoleKey)
     ) throw new Error("invalid");
-    return { url: url.origin, serviceRoleKey };
+    return {
+      url: url.origin,
+      serviceRoleKey,
+      legacyJwt: legacyJwtIsServiceRole(serviceRoleKey),
+    };
   } catch {
     throw new ApplicationsCommerceError(
       "Applications durable commerce is not configured.",
@@ -111,17 +120,22 @@ export function applicationsPersistenceConfigured() {
 }
 
 async function rpc<ResponseBody>(name: string, body: Record<string, unknown>): Promise<ResponseBody> {
+  await ensureApplicationsRuntimeSecrets();
   const config = applicationsSupabaseConfig();
+  const headers: Record<string, string> = {
+    apikey: config.serviceRoleKey,
+    "content-type": "application/json",
+    accept: "application/json",
+  };
+  // Modern sb_secret_ keys authenticate through apikey. Only legacy service_role
+  // JWTs are valid Bearer credentials for the REST RPC endpoint.
+  if (config.legacyJwt) headers.authorization = `Bearer ${config.serviceRoleKey}`;
+
   const response = await fetch(`${config.url}/rest/v1/rpc/${name}`, {
     method: "POST",
     cache: "no-store",
     redirect: "error",
-    headers: {
-      apikey: config.serviceRoleKey,
-      authorization: `Bearer ${config.serviceRoleKey}`,
-      "content-type": "application/json",
-      accept: "application/json",
-    },
+    headers,
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(10_000),
   }).catch((error) => {
@@ -229,6 +243,7 @@ export async function reserveApplicationsCheckout(input: {
   billingInterval: "monthly" | "annual";
   deploymentModel: "SaaS" | "Private Cloud" | "Hybrid" | "On-Premises";
 }) {
+  await ensureApplicationsRuntimeSecrets();
   assertIdentity(input.subjectId, input.tenantId);
   if (!APPLICATION_SLUG.test(input.appSlug)) throw new ApplicationsCommerceError("Application identity is invalid.", "invalid-input", 400);
   const issuedAt = Math.floor(Date.now() / 1000);

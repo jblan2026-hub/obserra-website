@@ -11,6 +11,7 @@ import {
   applicationsStripeWebhookSecret,
   getApplicationsStripe,
 } from "../../../../lib/applications-stripe";
+import { ensureApplicationsRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 import { readStripeWebhookBody, StripeWebhookBodyError } from "../../../../lib/stripe-webhook-body";
 
 export const runtime = "nodejs";
@@ -185,6 +186,11 @@ async function recordReversal(event: Stripe.Event, payloadSha256: string, expect
 }
 
 export async function POST(request: Request) {
+  try {
+    await ensureApplicationsRuntimeSecrets();
+  } catch {
+    return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
+  }
   const signature = request.headers.get("stripe-signature");
   const webhookSecret = applicationsStripeWebhookSecret();
   if (!signature || !webhookSecret) return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
