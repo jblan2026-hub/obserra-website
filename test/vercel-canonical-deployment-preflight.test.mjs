@@ -17,6 +17,7 @@ test("approved production deployment hosts expose only read-only health routes b
 
   for (const path of [
     "/api/health",
+    "/api/apps/commerce-health",
     "/api/academy/commerce-health",
     "/api/florida-class-d/health/live",
     "/api/florida-class-d/health/ready",
@@ -89,7 +90,7 @@ test("candidate preflight stays read-only while canonical smoke verifies the che
   );
 });
 
-test("Vercel cutover preflights exact website, Academy commerce, and Florida LMS health before moving domains", () => {
+test("Vercel cutover preflights exact website, Applications commerce, Academy commerce, and Florida LMS health before moving domains", () => {
   const cutover = read(".github/workflows/production-vercel-public-cutover.yml");
   const preflightStep = "Preflight exact canonical deployment health";
   const moveStep = "Move canonical domains to production project";
@@ -102,6 +103,7 @@ test("Vercel cutover preflights exact website, Academy commerce, and Florida LMS
   assert.match(cutover, /deployment_url=/);
   assert.match(cutover, /CANDIDATE_URL/);
   assert.match(cutover, /\/api\/health/);
+  assert.match(cutover, /\/api\/apps\/commerce-health/);
   assert.match(cutover, /\/api\/academy\/commerce-health/);
   assert.match(cutover, /\/api\/florida-class-d\/health\/live/);
   assert.match(cutover, /\/api\/florida-class-d\/health\/ready/);
@@ -115,4 +117,8 @@ test("Vercel cutover preflights exact website, Academy commerce, and Florida LMS
   assert.match(cutover, /durableStorage/);
   assert.match(cutover, /identityEnvironment/);
   assert.match(cutover, /stripe-event-id/);
+  assert.match(cutover, /applications-commerce-health-v1/);
+  assert.match(cutover, /eventLedger == "append-only"/);
+  assert.match(cutover, /entitlementAuthority == "durable-subscription-snapshot-v1"/);
+  assert.match(cutover, /identityReady == true/);
 });
