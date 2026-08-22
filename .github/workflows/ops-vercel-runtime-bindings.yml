@@ -1,4 +1,4 @@
-name: Ops - Bind Academy Project Ref
+name: Ops - Diagnose Vercel OIDC Runtime
 
 on:
   push:
@@ -10,96 +10,67 @@ permissions:
   statuses: write
 
 concurrency:
-  group: ops-bind-academy-project-ref
-  cancel-in-progress: false
+  group: ops-diagnose-vercel-oidc-runtime
+  cancel-in-progress: true
 
 jobs:
-  bind:
+  diagnose:
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
       TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
       PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+      DEPLOYMENT_ID: dpl_3M1XorH66KxxZCH9N7Dxx7fLEjZg
     steps:
-      - name: Mark binding pending
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          SHA: ${{ github.sha }}
-        run: |
-          curl --fail-with-body --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Content-Type: application/json" \
-            --data '{"state":"pending","context":"Obserra Academy Project Ref","description":"Binding non-secret production project ref"}' \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${SHA}" >/dev/null
-
       - name: Require Vercel management credential
         shell: bash
         run: |
           set -euo pipefail
           [[ -n "${VERCEL_TOKEN:-}" ]]
 
-      - name: Upsert non-secret Academy project binding
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat >/tmp/env.json <<'JSON'
-          [{
-            "key":"OBSERRA_ACADEMY_SUPABASE_PROJECT_REF",
-            "value":"nwxnyqlyzyufgoadtqxs",
-            "type":"plain",
-            "target":["production"]
-          }]
-          JSON
-
-          curl --fail-with-body --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
-            -H "Content-Type: application/json" \
-            --data-binary @/tmp/env.json \
-            "https://api.vercel.com/v10/projects/${PROJECT_ID}/env?upsert=true&teamId=${TEAM_ID}" \
-            -o /tmp/upsert.json
-          jq -e '(.failed // []) | length == 0' /tmp/upsert.json >/dev/null
-
-      - name: Verify production binding by name and target only
+      - name: Read non-secret OIDC runtime settings
+        id: settings
         shell: bash
         run: |
           set -euo pipefail
           curl --fail-with-body --silent --show-error \
             -H "Authorization: Bearer ${VERCEL_TOKEN}" \
-            "https://api.vercel.com/v10/projects/${PROJECT_ID}/env?teamId=${TEAM_ID}" \
-            -o /tmp/envs.json
-          jq -e '.envs[] | select(.key == "OBSERRA_ACADEMY_SUPABASE_PROJECT_REF") | select((.target // []) | index("production"))' /tmp/envs.json >/dev/null
-          echo "OBSERRA_ACADEMY_SUPABASE_PROJECT_REF=present-production"
+            "https://api.vercel.com/v9/projects/${PROJECT_ID}?teamId=${TEAM_ID}" \
+            -o /tmp/project.json
+          curl --fail-with-body --silent --show-error \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v13/deployments/${DEPLOYMENT_ID}?teamId=${TEAM_ID}" \
+            -o /tmp/deployment.json
 
-      - name: Mark binding success
-        if: success()
+          expose="$(jq -r '.autoExposeSystemEnvs // false' /tmp/project.json)"
+          claims="absent"
+          if jq -e '.oidcTokenClaims // .projectSettings.oidcTokenClaims // empty' /tmp/deployment.json >/dev/null 2>&1; then
+            claims="present"
+          fi
+          echo "autoExposeSystemEnvs=${expose}"
+          echo "deploymentOidcClaims=${claims}"
+          echo "expose=${expose}" >> "$GITHUB_OUTPUT"
+          echo "claims=${claims}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish diagnostic status
+        if: always()
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           SHA: ${{ github.sha }}
+          EXPOSE: ${{ steps.settings.outputs.expose }}
+          CLAIMS: ${{ steps.settings.outputs.claims }}
         run: |
+          set -euo pipefail
+          state="success"
+          description="autoExposeSystemEnvs=${EXPOSE}; oidcClaims=${CLAIMS}"
+          if [[ "${EXPOSE}" != "true" ]]; then state="failure"; fi
+          jq -n --arg state "$state" --arg description "$description" \
+            '{state:$state,context:"Obserra Vercel OIDC Runtime",description:$description}' >/tmp/status.json
           curl --fail-with-body --silent --show-error \
             -X POST \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -H "Content-Type: application/json" \
-            --data '{"state":"success","context":"Obserra Academy Project Ref","description":"Production project ref present; values not exposed"}' \
+            --data-binary @/tmp/status.json \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${SHA}" >/dev/null
-
-      - name: Mark binding failure
-        if: failure()
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          SHA: ${{ github.sha }}
-        run: |
-          curl --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Content-Type: application/json" \
-            --data '{"state":"failure","context":"Obserra Academy Project Ref","description":"Production project-ref binding failed"}' \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${SHA}" >/dev/null || true
