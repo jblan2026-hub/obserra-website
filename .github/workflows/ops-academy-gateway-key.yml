@@ -1,0 +1,74 @@
+name: One-shot Academy internal gateway key provisioning
+
+on:
+  push:
+    branches:
+      - automation/academy-gateway-key-20260822
+    paths:
+      - .github/workflows/ops-academy-gateway-key.yml
+
+permissions:
+  contents: write
+  statuses: write
+
+jobs:
+  provision:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+      PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+      GATEWAY_URL: https://nwxnyqlyzyufgoadtqxs.supabase.co/functions/v1/academy-internal-rpc
+      BRANCH_NAME: automation/academy-gateway-key-20260822
+    steps:
+      - name: Generate and bind signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${VERCEL_TOKEN:-}" || { echo "::error::VERCEL_TOKEN is missing"; exit 1; }
+
+          set_status() {
+            local state="$1" description="$2"
+            payload="$(jq -nc --arg state "$state" --arg context "Obserra Academy Gateway Key" --arg description "$description" '{state:$state,context:$context,description:$description}')"
+            curl -fsS -X POST \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "Content-Type: application/json" \
+              --data "${payload}" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" >/dev/null
+          }
+
+          upsert_env() {
+            local key="$1" value="$2" type="$3"
+            body="$(jq -nc --arg key "$key" --arg value "$value" --arg type "$type" '[{key:$key,value:$value,type:$type,target:["production"]}]')"
+            curl -fsS -X POST \
+              -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data "${body}" \
+              "https://api.vercel.com/v10/projects/${PROJECT_ID}/env?upsert=true&teamId=${TEAM_ID}" >/dev/null
+          }
+
+          umask 077
+          openssl genpkey -algorithm ED25519 -out private.pem >/dev/null 2>&1
+          private_b64="$(base64 -w0 private.pem)"
+          public_b64="$(openssl pkey -in private.pem -pubout -outform DER 2>/dev/null | base64 -w0)"
+          test -n "$private_b64"; test -n "$public_b64"
+
+          upsert_env "OBSERRA_ACADEMY_GATEWAY_PRIVATE_KEY_B64" "$private_b64" "sensitive"
+          upsert_env "OBSERRA_ACADEMY_GATEWAY_URL" "$GATEWAY_URL" "plain"
+          unset private_b64
+          rm -f private.pem
+
+          content_b64="$(printf '%s\n' "$public_b64" | base64 -w0)"
+          request="$(jq -nc --arg message "ops: publish Academy gateway verification key" --arg content "$content_b64" --arg branch "$BRANCH_NAME" '{message:$message,content:$content,branch:$branch}')"
+          curl -fsS -X PUT \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Content-Type: application/json" \
+            --data "$request" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/.ops/academy-gateway-public-key-spki.b64" >/dev/null
+
+          unset public_b64 content_b64 request
+          set_status success "Private key bound to Vercel; public verification key published"
