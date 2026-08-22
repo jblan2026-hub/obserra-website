@@ -252,3 +252,19 @@ All must be observed from the public canonical host:
 - **Fresh canonical evidence (2026-08-22T18:13:27.259Z):** `https://www.obserrallc.com/api/health` still returns verified deployment `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / SHA `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`; it does not prove this PR's source is live.
 - **Blocker:** Website CI must complete successfully; then a merge-created exact Vercel candidate must pass guarded alias cutover and the canonical host must prove the exact deployment/SHA. Payments and regulated LMS readiness remain separately fail-closed.
 - **Next safe action:** inspect the completed Website CI result; if it fails, repair the concrete test/build failure. If it passes, merge PR #205 and continue only with canonical endpoint evidence.
+
+
+### 2026-08-22T18:15:26.880Z — PR #201 closed/merged event
+
+- **Event:** [PR #201](https://github.com/jblan2026-hub/obserra-website/pull/201) was closed as merged. The observed merged commit is `bff4fadffce4dd0313c5688cf08b2708e678dbba` (`Harden production commerce and prepare governed Azure cutover (#201)`).
+- **Evidence boundary:** this merge is source-control evidence only. No deployment identifier for this commit and no canonical public SHA match have been observed, so no commerce, Azure, Entra, Intune, payment, or LMS-live claim is accepted from it.
+- **Fresh canonical evidence (2026-08-22T18:15:26.880Z):** `/api/health` still exposes verified old `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`; Academy commerce and Florida readiness remain fail-closed `503`.
+- **Next safe action:** do not evaluate this merge independently; the later main merge below is the release target and must be proven as an exact canonical deployment.
+
+
+### 2026-08-22T18:15:26.880Z — PR #205 closed/merged event
+
+- **Event:** [PR #205](https://github.com/jblan2026-hub/obserra-website/pull/205) was closed as merged through SHA-protected merge commit `902bd58d00f83becf026e4b85b079a356d7428b7`.
+- **Source gate evidence only:** its corrected head completed Website CI (`32590034777`), CodeQL Advanced (`32590034776`), and Production Authority Contract (`32590034779`) successfully. The earlier stale contract failure was repaired before merge; this does not establish runtime state.
+- **Release-target decision:** `902bd58d00f83becf026e4b85b079a356d7428b7` is the newest observed merged main commit after #201 and is the only SHA that may be accepted for the next canonical candidate/cutover. The direct-host GET-only boundary and post-alias canonical checkout lock remain in that release path.
+- **Blocker / next safe action:** wait for a READY canonical Vercel candidate for exact SHA `902bd58d00f83becf026e4b85b079a356d7428b7`, inspect the guarded cutover phase result, then require `https://www.obserrallc.com/api/health` to return that exact deployment and SHA. Until then, the canonical public site remains old and payments/LMS readiness remain not live.
