@@ -225,3 +225,12 @@ All must be observed from the public canonical host:
 - **Fresh canonical public evidence:** at `2026-08-22T18:09:57.666Z`, `https://www.obserrallc.com/api/health` returned HTTP `200` with verified deployment `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` and SHA `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`. Academy commerce returned HTTP `503`, `operational: false`, payment provider unavailable, durable storage unavailable. Florida readiness returned HTTP `503`, `not_ready`.
 - **Current blocker:** Canonical public identity is still the old deployment; payments and regulated LMS readiness remain fail-closed. This PR event does not change those facts.
 - **Next safe action:** continue the separate exact cutover fix in [PR #205](https://github.com/jblan2026-hub/obserra-website/pull/205); for #201, require independent source-gate, provider, and canonical exact-SHA evidence before accepting any claimed cutover or commerce state.
+
+
+### 2026-08-22T18:11:07.751Z — PR #205 source-gate failure: stale contract assertion
+
+- **Gate results:** Production Authority Contract (run `32589884775`) and CodeQL Advanced (run `32589884833`) completed successfully. Website CI run `32589884815` failed in unit/contract testing; lint, build, and later steps were not run.
+- **Exact failing check:** job `97071923908`, test `test/production-vercel-public-cutover-contract.test.mjs:7`, still required the workflow to contain `candidate_checkout_status`. That assertion encoded the unsafe direct-candidate checkout POST which PR #205 intentionally removed after the traced HTTP `308` canonical redirect.
+- **Why this is a test-contract defect, not a bypass:** the corrected workflow has a new focused regression test that passed in the same run (`candidate preflight stays read-only while canonical smoke verifies the checkout lock`). The remaining older contract has not yet been updated to the same policy. No source gate is being ignored and PR #205 will not be merged while Website CI fails.
+- **No public/runtime change:** this was a feature-branch test failure only. Canonical health remains separately proven old `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`; payments and Florida readiness remain fail-closed.
+- **Next safe action:** update the stale workflow-contract test to prohibit a candidate checkout POST and require the canonical post-alias checkout-lock smoke, then rerun the complete source gates.
