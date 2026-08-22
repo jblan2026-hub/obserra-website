@@ -95,3 +95,10 @@ All must be observed from the public canonical host:
 - Continue probing the public canonical health endpoint and inspect the controlled cutover result without exposing credentials.
 - On alias movement, immediately record the exact observed deployment/SHA and route probes.
 - On failure or timeout, record the exact fail-closed evidence and the smallest authorized corrective action before changing source or infrastructure.
+
+
+### 2026-08-22T17:45:29.919Z — continuous-update controls enabled
+
+- Created the dedicated `ops/live-handoff` branch so operational updates do not alter production code or produce a production deployment.
+- Enabled the repository event watcher for pull-request openings, commit updates, reviews, comments, and merges. It is instructed to update this file with evidence only; it must not record secrets or turn CI/deployment status into a live claim.
+- Current in-session work continues to append material actions and public probes here.
