@@ -340,3 +340,11 @@ All must be observed from the public canonical host:
 - **Probe correction:** a generic browser fetch was rejected by its own safe-URL policy before reaching Obserra and produced no site result. The endpoint facts above were subsequently obtained through the authenticated Vercel URL verifier.
 - **Next safe action:** wait for the PR’s required source gates, merge only the verified head, then require a new canonical deployment/SHA proof and re-probe Applications commerce. If durable storage then becomes available, isolate the next actual provider/identity blocker; do not bypass or fabricate credentials.
 
+
+
+### 2026-08-22T18:55:55Z — PR #209 merged; exact production candidate building
+
+- **Gate and merge:** PR [#209](https://github.com/jblan2026-hub/obserra-website/pull/209) was marked ready after Website CI, CodeQL Advanced, and its branch-restricted URL-convergence job completed successfully. It was merged through GitHub as verified main commit `6c2cddd84503c7cb0af3ca976fd8308183379146`.
+- **Production candidate:** Vercel created target-production deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` for the exact merge SHA. At observation it was `BUILDING`; this is not a canonical deployment claim and no runtime result is attributed to it.
+- **Scope boundary:** this merge contains the narrow, one-shot configuration workflow only. It does not itself grant Stripe credentials, a service-role key, webhook evidence, customer access, Academy payment authorization, or Florida learner readiness.
+- **Next safe action:** wait for this exact production candidate to become READY. Then prove canonical `/api/health` returns exactly its deployment/SHA and re-probe the Applications commerce contract before making any availability claim.
