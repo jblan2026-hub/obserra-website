@@ -1,4 +1,4 @@
-name: Ops - GitHub Secret Source Discovery
+name: Ops - Team-wide Vercel Secret Source Sweep
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ops-github-secret-source-discovery
+  group: ops-vercel-team-secret-sweep
   cancel-in-progress: true
 
 jobs:
@@ -21,14 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN || secrets.VERCEL_ACCESS_TOKEN }}
-      GH_ACADEMY_SUPABASE_SERVICE: ${{ secrets.OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY }}
-      GH_ACADEMY_STRIPE_KEY: ${{ secrets.ACADEMY_STRIPE_SECRET_KEY }}
-      GH_ACADEMY_STRIPE_WEBHOOK: ${{ secrets.ACADEMY_STRIPE_WEBHOOK_SECRET }}
-      GH_STRIPE_IDENTITY_WEBHOOK: ${{ secrets.STRIPE_IDENTITY_WEBHOOK_SECRET }}
-      GH_FDACS_DI_LICENSE: ${{ secrets.OBSERRA_FDACS_DI_LICENSE_NUMBER }}
-      GH_FDACS_HA_MANIFEST: ${{ secrets.OBSERRA_FDACS_HA_EVIDENCE_MANIFEST }}
-      GH_FDACS_HA_DIGEST: ${{ secrets.OBSERRA_FDACS_HA_EVIDENCE_MANIFEST_SHA256 }}
+      TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+      TARGET_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
       TARGET_SHA: 1d9ad1f042f527552d1e65763b0bc1f26ba0f829
+      ACADEMY_URL: https://nwxnyqlyzyufgoadtqxs.supabase.co
     steps:
       - name: Confirm operations credential
         shell: bash
@@ -36,56 +32,92 @@ jobs:
           set -euo pipefail
           [[ -n "${VERCEL_TOKEN:-}" ]]
 
-      - name: Report compatible GitHub secret presence only
+      - name: Sweep every Obserra project without printing secret values
         shell: bash
         run: |
           set -euo pipefail
 
-          presence() {
-            local label="$1" value="$2"
-            if [[ -n "$value" ]]; then
-              echo "PRESENT ${label}"
-            else
-              echo "MISSING ${label}"
-            fi
+          curl --fail-with-body --silent --show-error \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v9/projects?teamId=${TEAM_ID}&limit=100" \
+            -o /tmp/projects.json
+
+          get_value() {
+            local file="$1" key="$2"
+            jq -r --arg key "$key" '[.envs[]? | select(.key == $key) | select((.target // []) | index("production"))][0].value // empty' "$file"
           }
 
-          presence OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY "${GH_ACADEMY_SUPABASE_SERVICE:-}"
-
-          if [[ "${GH_ACADEMY_STRIPE_KEY:-}" == rk_live_* ]]; then
-            echo "PRESENT_COMPATIBLE ACADEMY_STRIPE_SECRET_KEY"
-          elif [[ -n "${GH_ACADEMY_STRIPE_KEY:-}" ]]; then
-            echo "PRESENT_INCOMPATIBLE ACADEMY_STRIPE_SECRET_KEY"
-          else
-            echo "MISSING ACADEMY_STRIPE_SECRET_KEY"
-          fi
-
-          if [[ "${GH_ACADEMY_STRIPE_WEBHOOK:-}" == whsec_* ]]; then
-            echo "PRESENT_COMPATIBLE ACADEMY_STRIPE_WEBHOOK_SECRET"
-          elif [[ -n "${GH_ACADEMY_STRIPE_WEBHOOK:-}" ]]; then
-            echo "PRESENT_INCOMPATIBLE ACADEMY_STRIPE_WEBHOOK_SECRET"
-          else
-            echo "MISSING ACADEMY_STRIPE_WEBHOOK_SECRET"
-          fi
-
-          if [[ "${GH_STRIPE_IDENTITY_WEBHOOK:-}" == whsec_* ]]; then
-            echo "PRESENT_COMPATIBLE STRIPE_IDENTITY_WEBHOOK_SECRET"
-          elif [[ -n "${GH_STRIPE_IDENTITY_WEBHOOK:-}" ]]; then
-            echo "PRESENT_INCOMPATIBLE STRIPE_IDENTITY_WEBHOOK_SECRET"
-          else
-            echo "MISSING STRIPE_IDENTITY_WEBHOOK_SECRET"
-          fi
-
-          presence OBSERRA_FDACS_DI_LICENSE_NUMBER "${GH_FDACS_DI_LICENSE:-}"
-
-          ha_state="missing"
-          if [[ -n "${GH_FDACS_HA_MANIFEST:-}" && "${GH_FDACS_HA_DIGEST:-}" =~ ^[0-9a-fA-F]{64}$ ]]; then
-            candidate="$(jq -r '.releaseCandidateSha // empty' <<<"${GH_FDACS_HA_MANIFEST}" 2>/dev/null || true)"
-            calculated="$(jq -cS . <<<"${GH_FDACS_HA_MANIFEST}" 2>/dev/null | sha256sum | awk '{print $1}' || true)"
-            if [[ "$candidate" == "$TARGET_SHA" && "${calculated,,}" == "${GH_FDACS_HA_DIGEST,,}" ]]; then
-              ha_state="compatible"
-            else
-              ha_state="incompatible"
+          found=0
+          while IFS=$'\t' read -r project name; do
+            [[ "$project" == "$TARGET_PROJECT_ID" ]] && continue
+            file="/tmp/${project}.json"
+            if ! curl --fail-with-body --silent --show-error \
+              -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v10/projects/${project}/env?decrypt=true&teamId=${TEAM_ID}" \
+              -o "$file"; then
+              continue
             fi
-          fi
-          echo "FDACS_HA_EVIDENCE=${ha_state}"
+
+            academy_url="$(get_value "$file" OBSERRA_ACADEMY_SUPABASE_URL)"
+            academy_service="$(get_value "$file" OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY)"
+            academy_stripe="$(get_value "$file" ACADEMY_STRIPE_SECRET_KEY)"
+            academy_webhook="$(get_value "$file" ACADEMY_STRIPE_WEBHOOK_SECRET)"
+            identity_webhook="$(get_value "$file" STRIPE_IDENTITY_WEBHOOK_SECRET)"
+            di_license="$(get_value "$file" OBSERRA_FDACS_DI_LICENSE_NUMBER)"
+            ha_manifest="$(get_value "$file" OBSERRA_FDACS_HA_EVIDENCE_MANIFEST)"
+            ha_digest="$(get_value "$file" OBSERRA_FDACS_HA_EVIDENCE_MANIFEST_SHA256)"
+
+            if [[ -n "$academy_service" ]]; then
+              if [[ "$academy_url" == "$ACADEMY_URL" ]]; then
+                echo "FOUND ${name} OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY compatible"
+                found=$((found+1))
+              else
+                echo "FOUND ${name} OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY url_mismatch"
+              fi
+            fi
+
+            if [[ -n "$academy_stripe" ]]; then
+              if [[ "$academy_stripe" == rk_live_* ]]; then
+                echo "FOUND ${name} ACADEMY_STRIPE_SECRET_KEY compatible"
+                found=$((found+1))
+              else
+                echo "FOUND ${name} ACADEMY_STRIPE_SECRET_KEY incompatible_format"
+              fi
+            fi
+
+            if [[ -n "$academy_webhook" ]]; then
+              if [[ "$academy_webhook" == whsec_* ]]; then
+                echo "FOUND ${name} ACADEMY_STRIPE_WEBHOOK_SECRET compatible_format"
+                found=$((found+1))
+              else
+                echo "FOUND ${name} ACADEMY_STRIPE_WEBHOOK_SECRET incompatible_format"
+              fi
+            fi
+
+            if [[ -n "$identity_webhook" ]]; then
+              if [[ "$identity_webhook" == whsec_* ]]; then
+                echo "FOUND ${name} STRIPE_IDENTITY_WEBHOOK_SECRET compatible_format"
+                found=$((found+1))
+              else
+                echo "FOUND ${name} STRIPE_IDENTITY_WEBHOOK_SECRET incompatible_format"
+              fi
+            fi
+
+            if [[ -n "$di_license" ]]; then
+              echo "FOUND ${name} OBSERRA_FDACS_DI_LICENSE_NUMBER present"
+              found=$((found+1))
+            fi
+
+            if [[ -n "$ha_manifest" && "$ha_digest" =~ ^[0-9a-fA-F]{64}$ ]]; then
+              candidate="$(jq -r '.releaseCandidateSha // empty' <<<"$ha_manifest" 2>/dev/null || true)"
+              calculated="$(jq -cS . <<<"$ha_manifest" 2>/dev/null | sha256sum | awk '{print $1}' || true)"
+              if [[ "$candidate" == "$TARGET_SHA" && "${calculated,,}" == "${ha_digest,,}" ]]; then
+                echo "FOUND ${name} OBSERRA_FDACS_HA_EVIDENCE_MANIFEST candidate_digest_match"
+                found=$((found+1))
+              else
+                echo "FOUND ${name} OBSERRA_FDACS_HA_EVIDENCE_MANIFEST incompatible"
+              fi
+            fi
+          done < <(jq -r '.projects[] | [.id,.name] | @tsv' /tmp/projects.json)
+
+          echo "COMPATIBLE_SOURCE_MATCHES=${found}"
