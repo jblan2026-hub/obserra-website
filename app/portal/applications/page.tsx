@@ -22,12 +22,12 @@ const primaryActionClass =
   "inline-flex min-h-11 items-center justify-center rounded-lg border border-[#f4ba55] bg-[#f4ba55] px-4 py-3 text-center text-xs font-black text-[#08223a] no-underline transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
 export default async function CustomerApplicationsPage() {
-  const { userId } = await auth();
+  const { userId, orgId } = await auth();
   if (!userId) redirect("/sign-in?redirect_url=/portal/applications");
 
   const sellableApps = marketplaceApps.filter((app) => app.status !== "Coming Soon");
   const records = await Promise.all(
-    sellableApps.map(async (app) => ({ app, entitlement: await resolveAppEntitlement(userId, app.slug) })),
+    sellableApps.map(async (app) => ({ app, entitlement: await resolveAppEntitlement(userId, app.slug, orgId) })),
   );
   const activeCount = records.filter((record) => record.entitlement.allowed).length;
 
@@ -54,7 +54,7 @@ export default async function CustomerApplicationsPage() {
       <section className="mx-auto max-w-[1500px] px-[max(5vw,24px)] pb-9 pt-12 md:pt-[72px]">
         <p className="mb-3 text-[11px] font-black tracking-[.15em] text-[#f4ba55]">AUTHENTICATED DELIVERY CENTER</p>
         <h1 className="m-0 max-w-[1100px] text-[clamp(40px,6vw,78px)] font-black leading-[.98] tracking-[-.05em]">Your applications, subscriptions, license keys, and deployment actions.</h1>
-        <p className="max-w-[960px] text-[17px] leading-7 text-[#c9e1ef]">Every launch, key request, and download is revalidated against Stripe. Active and trialing subscriptions are permitted; delinquent, canceled, incomplete, expired, or paused subscriptions are denied automatically.</p>
+        <p className="max-w-[960px] text-[17px] leading-7 text-[#c9e1ef]">Every launch, key request, and download is revalidated against the signed-webhook Applications ledger. Active and trialing subscriptions are permitted; delinquent, canceled, incomplete, expired, disputed, or refunded subscriptions are denied automatically.</p>
         <div className="mt-7 grid gap-3 md:grid-cols-3">
           <article className={`${panelClass} p-[18px]`}><span className="block text-[10px] font-black tracking-[.12em] text-[#90bfd8]">ACTIVE ENTITLEMENTS</span><strong className="mt-2 block text-2xl">{activeCount}</strong></article>
           <article className={`${panelClass} p-[18px]`}><span className="block text-[10px] font-black tracking-[.12em] text-[#90bfd8]">SELLABLE APPLICATIONS</span><strong className="mt-2 block text-2xl">{records.length}</strong></article>
@@ -80,7 +80,7 @@ export default async function CustomerApplicationsPage() {
                   <a className={primaryActionClass} href={`/api/apps/access?app=${app.slug}`}>Launch SaaS</a>
                   <a className={secondaryActionClass} href={`/api/apps/license?app=${app.slug}`} target="_blank" rel="noreferrer">Get application key</a>
                   <a className={secondaryActionClass} href={`/api/apps/download?app=${app.slug}`}>Download release</a>
-                  <a className={secondaryActionClass} href="/api/apps/billing-portal">Manage billing</a>
+                  <form action="/api/apps/billing-portal" method="post"><input type="hidden" name="app" value={app.slug}/><button className={`${secondaryActionClass} w-full`} type="submit">Manage billing</button></form>
                 </>
               ) : (
                 <>

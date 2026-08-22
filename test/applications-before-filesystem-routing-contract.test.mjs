@@ -106,12 +106,12 @@ test("operational Applications endpoints retain server-side authentication and e
 
   for (const route of [
     "app/api/apps/access/route.ts",
-    "app/api/apps/billing-portal/route.ts",
     "app/api/apps/download/route.ts",
     "app/api/apps/license/route.ts",
   ]) {
     assert.match(read(route), /resolve(?:Unified)?App?Entitlement|resolveUnifiedEntitlement/);
   }
+  assert.match(read("app/api/apps/billing-portal/route.ts"), /durableApplicationsCustomer/);
 
   const portal = read("app/portal/applications/page.tsx");
   assert.match(portal, /await\s+auth\(\)/);

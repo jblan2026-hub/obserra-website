@@ -16,7 +16,7 @@ export type UnifiedEntitlementRequest = {
 
 export type UnifiedEntitlementResult = EntitlementDecision & {
   authoritative: boolean;
-  source: "stripe" | "contract" | "manual" | "unavailable";
+  source: "applications-commerce-ledger" | "contract" | "manual" | "unavailable";
   deploymentModel?: string;
   plan?: string;
 };

@@ -1,0 +1,27 @@
+.commerce-options form {
+  margin: 0;
+}
+
+.commerce-options button {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #f4ba55;
+  color: #09243a;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.app-pricing .apps-actions form {
+  display: flex;
+}
+
+.app-pricing .apps-actions button {
+  width: 100%;
+  font: inherit;
+  cursor: pointer;
+}

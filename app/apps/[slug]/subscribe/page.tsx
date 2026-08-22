@@ -4,7 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { availablePlansFor } from "../../commerce";
 import { findAppBySlug, marketplaceApps } from "../../appsData";
+import { applicationsPersistenceConfigured } from "../../../../lib/applications-commerce";
+import { applicationsCommerceConfigured, applicationsStripePriceId } from "../../../../lib/applications-stripe";
 import "../../commerce.css";
+import "../../commerce-actions.css";
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -24,6 +27,7 @@ export default async function SubscribePage({ params, searchParams }: Props) {
   if (!app) notFound();
   const plans = availablePlansFor(app);
   const checkout = typeof query.checkout === "string" ? query.checkout : "";
+  const commerceReady = applicationsPersistenceConfigured() && applicationsCommerceConfigured();
 
   return <main className="commerce-page">
     <header className="commerce-nav">
@@ -43,11 +47,19 @@ export default async function SubscribePage({ params, searchParams }: Props) {
         <small>{plan.id.toUpperCase()}</small><h2>{plan.name}</h2><p>{plan.description}</p>
         <ul>{plan.includes.map((item)=><li key={item}>{item}</li>)}</ul>
         <div className="commerce-options">
-          {plan.billing.map((interval)=>app.deployment.filter((model)=>plan.deployment.includes(model)).map((model)=>
-            <a key={`${interval}-${model}`} href={`/api/apps/checkout?app=${app.slug}&plan=${plan.id}&interval=${interval}&deployment=${encodeURIComponent(model)}`}>
-              {interval === "monthly" ? "Monthly" : "Annual"} · {model}
-            </a>
-          ))}
+          {plan.billing.map((interval)=>app.deployment.filter((model)=>plan.deployment.includes(model)).map((model)=> {
+            const configuredPrice = Boolean(applicationsStripePriceId(app.slug, plan.id, interval));
+            if (model !== "SaaS" || !commerceReady || !configuredPrice) return <Link key={`${interval}-${model}`} href={`/contact?interest=enterprise-deployment&app=${app.slug}`}>
+              Request {interval === "monthly" ? "monthly" : "annual"} {model} pricing
+            </Link>;
+            return <form key={`${interval}-${model}`} action="/api/apps/checkout" method="post">
+              <input type="hidden" name="app" value={app.slug}/>
+              <input type="hidden" name="plan" value={plan.id}/>
+              <input type="hidden" name="interval" value={interval}/>
+              <input type="hidden" name="deployment" value={model}/>
+              <button type="submit">{interval === "monthly" ? "Monthly" : "Annual"} · {model}</button>
+            </form>;
+          }))}
         </div>
       </article>)}
     </section> : <section className="commerce-coming"><h2>Commercial enrollment is not open yet.</h2><p>This application is marked Coming Soon. Join the release list or request a controlled preview.</p><Link href={`/contact?interest=application-preview&app=${app.slug}`}>Request preview</Link></section>}

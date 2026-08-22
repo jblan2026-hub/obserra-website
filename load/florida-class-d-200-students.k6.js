@@ -150,7 +150,7 @@ function refreshMedia(identity) {
   });
 }
 
-export default function () {
+export default function floridaClassDStudentLoad() {
   const identity = IDENTITIES[__VU - 1];
   const now = Date.now();
 

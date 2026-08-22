@@ -61,8 +61,8 @@ export default async function CommercialOperationsPage() {
 
   const publishedApps = storeCatalog.applications.length;
   const catalogApps = marketplaceApps.length;
-  const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY);
-  const stripeWebhookConfigured = Boolean(process.env.STRIPE_WEBHOOK_SECRET);
+  const stripeConfigured = Boolean(process.env.APPLICATIONS_STRIPE_SECRET_KEY);
+  const stripeWebhookConfigured = Boolean(process.env.APPLICATIONS_STRIPE_WEBHOOK_SECRET);
   const licenseConfigured = Boolean(process.env.APP_LICENSE_SIGNING_SECRET);
   const deliveryConfigured = Boolean(
     process.env.APP_RELEASE_CDN_URL &&
@@ -101,7 +101,7 @@ export default async function CommercialOperationsPage() {
       <section className="commercial-ops-section">
         <div className="commercial-ops-heading"><div><p className="commercial-ops-eyebrow">COMMERCE AND RELEASE READINESS</p><h2>Production configuration and operational pathways.</h2></div><p>Controls remain fail closed until required systems are configured.</p></div>
         <div className="commercial-ops-grid">
-          <article><span>Subscriptions</span><h3>Stripe commerce</h3><p>Monthly and annual subscriptions, billing portal, cancellation handling, and entitlement revalidation.</p><strong>{stripeConfigured ? "Ready" : "STRIPE_SECRET_KEY required"}</strong></article>
+          <article><span>Subscriptions</span><h3>Stripe commerce</h3><p>Monthly and annual subscriptions, billing portal, cancellation handling, and durable entitlement revalidation.</p><strong>{stripeConfigured ? "Ready" : "APPLICATIONS_STRIPE_SECRET_KEY required"}</strong></article>
           <article><span>Licensing</span><h3>Application keys</h3><p>Server-issued keys bound to verified subscription data and denied when billing is inactive.</p><strong>{licenseConfigured ? "Ready" : "APP_LICENSE_SIGNING_SECRET required"}</strong></article>
           <article><span>Publishing</span><h3>FINAL folder release sync</h3><p>Approved artifacts and release manifests publish from the designated OneDrive desktop folder.</p><strong>Local publisher configuration required</strong></article>
           <article><span>Delivery</span><h3>Signed customer downloads</h3><p>Authenticated customers receive short-lived signed release URLs after entitlement validation.</p><strong>{deliveryConfigured ? "Ready" : "CDN signing configuration required"}</strong></article>

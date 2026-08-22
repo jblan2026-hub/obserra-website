@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getStripe } from "../../../lib/stripe";
+import { applicationsTenantId, durableApplicationEntitlements, durableApplicationsCustomer } from "../../../lib/applications-commerce";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
@@ -13,8 +13,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
-
-const ACTIVE_STATES = new Set(["active", "trialing"]);
 
 const linkClass =
   "inline-flex items-center justify-center rounded-lg border border-cyan-300/30 bg-slate-900/70 px-4 py-3 text-sm font-extrabold text-slate-100 no-underline transition hover:border-obserra-gold hover:text-obserra-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
@@ -27,22 +25,12 @@ export default async function EnterpriseCustomerPage() {
   const email = user?.primaryEmailAddress?.emailAddress || "";
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || email || "Authenticated customer";
 
-  let subscriptions: Awaited<ReturnType<ReturnType<typeof getStripe>["subscriptions"]["list"]>>["data"] = [];
-  let stripeCustomerCount = 0;
-
-  if (process.env.STRIPE_SECRET_KEY && email) {
-    const stripe = getStripe();
-    const customers = await stripe.customers.list({ email, limit: 10 });
-    stripeCustomerCount = customers.data.length;
-    const groups = await Promise.all(
-      customers.data.map((customer) => stripe.subscriptions.list({ customer: customer.id, status: "all", limit: 100 })),
-    );
-    subscriptions = groups.flatMap((group) => group.data).sort((a, b) => b.created - a.created);
-  }
-
-  const activeSubscriptions = subscriptions.filter((subscription) => ACTIVE_STATES.has(subscription.status));
+  const tenantId = applicationsTenantId(session.userId, session.orgId);
+  const entitlements = await durableApplicationEntitlements(session.userId, tenantId).catch(() => []);
+  const stripeCustomerCount = await durableApplicationsCustomer(session.userId, tenantId).then((value) => value ? 1 : 0).catch(() => 0);
+  const activeSubscriptions = entitlements.filter((entitlement) => entitlement.allowed);
   const licensedApplications = new Set(
-    activeSubscriptions.map((subscription) => subscription.metadata.obserraApp).filter(Boolean),
+    activeSubscriptions.map((entitlement) => entitlement.appSlug).filter(Boolean),
   );
   const organizationActive = Boolean(session.orgId);
   const organizationRole = session.orgRole || "No active organization role";
@@ -67,7 +55,7 @@ export default async function EnterpriseCustomerPage() {
     {
       eyebrow: "Application licensing",
       title: "Entitlements and activation",
-      body: "Application access remains bound to active or trialing Stripe subscriptions and server-issued license controls.",
+      body: "Application access remains bound to active or trialing subscription snapshots in the signed-webhook ledger and server-issued license controls.",
       status: licensedApplications.size
         ? `${licensedApplications.size} application entitlement(s) verified`
         : "No active application entitlements found",
@@ -122,7 +110,7 @@ export default async function EnterpriseCustomerPage() {
             Manage organization readiness, commercial entitlements, and enterprise deployment pathways.
           </h1>
           <p className="mt-6 max-w-4xl text-base leading-7 text-slate-300 sm:text-lg">
-            This workspace reports only verified Clerk identity context and Stripe commerce records. It does not create simulated organizations, seats, licenses, users, or billing activity.
+            This workspace reports only verified Clerk identity context and durable signed-webhook commerce records. It does not create simulated organizations, seats, licenses, users, or billing activity.
           </p>
         </div>
         <aside className="self-start rounded-2xl border border-cyan-300/25 bg-slate-900/75 p-6 shadow-2xl shadow-black/30">
@@ -136,7 +124,7 @@ export default async function EnterpriseCustomerPage() {
         {[
           ["ORGANIZATION", organizationActive ? "Active" : "Not selected", session.orgId || "No Clerk organization context"],
           ["ORGANIZATION ROLE", organizationRole, "Verified session role"],
-          ["ACTIVE SUBSCRIPTIONS", String(activeSubscriptions.length), "Active or trialing Stripe records"],
+          ["ACTIVE SUBSCRIPTIONS", String(activeSubscriptions.length), "Active signed-webhook ledger records"],
           ["LICENSED APPLICATIONS", String(licensedApplications.size), "Verified application entitlements"],
         ].map(([label, value, detail]) => (
           <article key={label} className="rounded-2xl border border-cyan-300/20 bg-slate-900/70 p-5">

@@ -75,7 +75,10 @@ test("first Azure release independently proves the governed live baseline", asyn
   assert.match(release, /api\/health/);
   assert.match(release, /api\/academy\/commerce-health/);
   assert.match(release, /ACADEMY_STATUS.*200/);
-  assert.match(release, /ACADEMY_STATUS.*503/);
+  assert.doesNotMatch(release, /ACADEMY_STATUS.*503/);
+  assert.match(release, /api\/apps\/commerce-health/);
+  assert.match(release, /APPLICATIONS_COMMERCE_STATUS.*200/);
+  assert.match(release, /stripeLivemode.*true/);
   assert.match(release, /api\/florida-class-d\/health\/live/);
   assert.match(release, /api\/florida-class-d\/health\/ready/);
   assert.match(release, /FLORIDA_READY_STATUS.*503/);
