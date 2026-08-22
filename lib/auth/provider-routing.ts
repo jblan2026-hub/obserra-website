@@ -27,6 +27,7 @@ type IdentityProviderRequest = {
 };
 
 const CLERK_PUBLIC_PREFIXES = ["/__clerk", "/owner-access"] as const;
+const APPLICATIONS_PUBLIC_READ_PATHS = new Set(["/api/apps/commerce-health"]);
 const CLERK_PROTECTED_PREFIXES = [
   "/api/apps",
   "/command-center",
@@ -127,6 +128,7 @@ function route(provider: IdentityProvider, requiresAuthentication: boolean, acce
 }
 
 function ownedRoute(pathname: string, method?: string | null): IdentityRouteOwnership {
+  if (APPLICATIONS_PUBLIC_READ_PATHS.has(pathname) && readMethod(method)) return route("public", false, "public");
   if (CLERK_PROTECTED_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("clerk", true, "applications_clerk");
   if (CLERK_PUBLIC_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("clerk", false, "applications_clerk");
   if (FDACS_HEALTH_PREFIXES.some((prefix) => pathMatchesPrefix(pathname, prefix))) return route("public", false, "public");

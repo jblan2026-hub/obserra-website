@@ -3,6 +3,7 @@ import { isProductionRuntime } from "./runtime-environment";
 
 const DIRECT_DEPLOYMENT_HEALTH_PATHS = new Set([
   "/api/health",
+  "/api/apps/commerce-health",
   "/api/academy/commerce-health",
   "/api/florida-class-d/health/live",
   "/api/florida-class-d/health/ready",

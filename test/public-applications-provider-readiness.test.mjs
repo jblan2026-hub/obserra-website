@@ -48,3 +48,32 @@ test("Applications storefront routes are public while protected Applications ope
     assert.equal(ownership.accessPolicy, "applications_clerk", pathname);
   }
 });
+
+test("Applications commerce health is public only for exact read methods and keeps all other operations Clerk-owned", () => {
+  const { identityProviderForRequest } = routingModule();
+
+  for (const method of ["GET", "HEAD"]) {
+    const ownership = identityProviderForRequest({ pathname: "/api/apps/commerce-health", method });
+    assert.equal(ownership.provider, "public", method);
+    assert.equal(ownership.requiresAuthentication, false, method);
+    assert.equal(ownership.accessPolicy, "public", method);
+  }
+
+  for (const method of ["POST", "PUT", "PATCH", "DELETE", "OPTIONS"]) {
+    const ownership = identityProviderForRequest({ pathname: "/api/apps/commerce-health", method });
+    assert.equal(ownership.provider, "clerk", method);
+    assert.equal(ownership.requiresAuthentication, true, method);
+    assert.equal(ownership.accessPolicy, "applications_clerk", method);
+  }
+
+  for (const pathname of ["/api/apps/commerce-health/", "/api/apps/commerce-health/extra"]) {
+    const ownership = identityProviderForRequest({ pathname, method: "GET" });
+    assert.equal(ownership.provider, "clerk", pathname);
+    assert.equal(ownership.requiresAuthentication, true, pathname);
+  }
+
+  const healthRoute = fs.readFileSync("app/api/apps/commerce-health/route.ts", "utf8");
+  assert.match(healthRoute, /contract:\s*"applications-commerce-health-v1"/);
+  assert.match(healthRoute, /catch\s*\{\s*return NextResponse\.json\(\{\s*contract:\s*"applications-commerce-health-v1"/s);
+  assert.match(healthRoute, /"cache-control":\s*"no-store"/);
+});
