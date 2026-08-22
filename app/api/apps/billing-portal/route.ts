@@ -24,12 +24,12 @@ export async function POST(request: Request) {
   if (!userId) {
     const signIn = new URL("/sign-in", requestUrl);
     signIn.searchParams.set("redirect_url", new URL("/portal/orders", requestUrl).toString());
-    return NextResponse.redirect(signIn);
+    return NextResponse.redirect(signIn, 303);
   }
 
   try {
     const customer = await durableApplicationsCustomer(userId, applicationsTenantId(userId, orgId));
-    if (!customer) return NextResponse.redirect(new URL("/portal/orders?billing=no-subscription", requestUrl));
+    if (!customer) return NextResponse.redirect(new URL("/portal/orders?billing=no-subscription", requestUrl), 303);
     const session = await getApplicationsStripe().billingPortal.sessions.create({
       customer: customer.stripeCustomerId,
       return_url: new URL(slug ? `/portal/applications?app=${encodeURIComponent(slug)}` : "/portal/orders", requestUrl).toString(),
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     return NextResponse.redirect(session.url, 303);
   } catch (error) {
     console.error("billing portal session failed", { error: error instanceof Error ? error.name : "unknown" });
-    return NextResponse.redirect(new URL("/portal/orders?billing=unavailable", requestUrl));
+    return NextResponse.redirect(new URL("/portal/orders?billing=unavailable", requestUrl), 303);
   }
 }
 

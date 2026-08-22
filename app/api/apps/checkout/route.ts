@@ -88,10 +88,10 @@ export async function POST(request: Request) {
   const deployment = String(form.get("deployment") ?? "SaaS");
   const app = findStorefrontAppBySlug(slug);
 
-  if (!app) return NextResponse.redirect(new URL("/apps?checkout=invalid-app", requestUrl));
+  if (!app) return NextResponse.redirect(new URL("/apps?checkout=invalid-app", requestUrl), 303);
   const plan = availablePlansFor(app).find((entry) => entry.id === planId);
   if (!plan || !plan.billing.includes(interval) || !plan.deployment.includes(deployment as never) || !app.deployment.includes(deployment as never)) {
-    return NextResponse.redirect(new URL(`/apps/${app.slug}/subscribe?checkout=invalid-selection`, requestUrl));
+    return NextResponse.redirect(new URL(`/apps/${app.slug}/subscribe?checkout=invalid-selection`, requestUrl), 303);
   }
   if (deployment !== "SaaS") {
     return NextResponse.redirect(new URL(`/contact?interest=enterprise-deployment&app=${app.slug}`, requestUrl), 303);
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
   if (!userId) {
     const signIn = new URL("/sign-in", requestUrl);
     signIn.searchParams.set("redirect_url", new URL(`/apps/${app.slug}/subscribe`, requestUrl).toString());
-    return NextResponse.redirect(signIn);
+    return NextResponse.redirect(signIn, 303);
   }
 
   const priceId = applicationsStripePriceId(app.slug, plan.id, interval) ?? "";
@@ -110,7 +110,7 @@ export async function POST(request: Request) {
     unavailable.searchParams.set("checkout", "configuration-required");
     unavailable.searchParams.set("plan", plan.id);
     unavailable.searchParams.set("deployment", deployment);
-    return NextResponse.redirect(unavailable);
+    return NextResponse.redirect(unavailable, 303);
   }
 
   try {
@@ -203,7 +203,7 @@ export async function POST(request: Request) {
     return NextResponse.redirect(session.url, { status: 303 });
   } catch (error) {
     console.error("application subscription checkout failed", error);
-    return NextResponse.redirect(new URL(`/apps/${app.slug}/subscribe?checkout=unavailable`, requestUrl));
+    return NextResponse.redirect(new URL(`/apps/${app.slug}/subscribe?checkout=unavailable`, requestUrl), 303);
   }
 }
 
