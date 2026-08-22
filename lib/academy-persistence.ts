@@ -1,10 +1,19 @@
 import "server-only";
 
-import { createHmac } from "node:crypto";
+import {
+  createHash,
+  createHmac,
+  createPrivateKey,
+  randomUUID,
+  sign,
+  type KeyObject,
+} from "node:crypto";
 import { academyCommerceStorageReady } from "./academy-payment";
 
 const COURSE_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
+const ACADEMY_GATEWAY_KEY_ID = "academy-gateway-v1";
+const ACADEMY_GATEWAY_PATH = "/functions/v1/academy-internal-rpc";
 
 /**
  * Persistence compatibility boundary.
@@ -54,6 +63,7 @@ export type DurableAcademyAggregateMetrics = {
 };
 
 type AcademySupabaseConfig = { url: string; serviceRoleKey: string };
+type AcademyGatewayConfig = { url: string; keyId: string; privateKey: KeyObject };
 
 export class AcademyPersistenceError extends Error {
   constructor(
@@ -79,6 +89,57 @@ function legacyJwtIsServiceRole(value: string) {
 
 function validServiceRoleKey(value: string) {
   return (value.startsWith("sb_secret_") && value.length >= 32) || legacyJwtIsServiceRole(value);
+}
+
+function academyGatewayRequested() {
+  return Boolean(
+    process.env.OBSERRA_ACADEMY_GATEWAY_URL?.trim()
+    || process.env.OBSERRA_ACADEMY_GATEWAY_PRIVATE_KEY_B64?.trim(),
+  );
+}
+
+function academyGatewayConfig(): AcademyGatewayConfig {
+  const rawGatewayUrl = process.env.OBSERRA_ACADEMY_GATEWAY_URL?.trim() ?? "";
+  const rawSupabaseUrl = process.env.OBSERRA_ACADEMY_SUPABASE_URL?.trim() ?? "";
+  const privateKeyB64 = process.env.OBSERRA_ACADEMY_GATEWAY_PRIVATE_KEY_B64?.trim() ?? "";
+
+  try {
+    const gatewayUrl = new URL(rawGatewayUrl);
+    const supabaseUrl = new URL(rawSupabaseUrl);
+    if (
+      gatewayUrl.protocol !== "https:"
+      || gatewayUrl.username
+      || gatewayUrl.password
+      || gatewayUrl.search
+      || gatewayUrl.hash
+      || gatewayUrl.origin !== supabaseUrl.origin
+      || gatewayUrl.pathname.replace(/\/$/, "") !== ACADEMY_GATEWAY_PATH
+      || supabaseUrl.protocol !== "https:"
+      || supabaseUrl.username
+      || supabaseUrl.password
+      || supabaseUrl.search
+      || supabaseUrl.hash
+      || (supabaseUrl.pathname !== "/" && supabaseUrl.pathname !== "")
+      || !privateKeyB64
+    ) {
+      throw new Error("invalid");
+    }
+
+    const pem = Buffer.from(privateKeyB64, "base64").toString("utf8");
+    const privateKey = createPrivateKey(pem);
+    if (privateKey.asymmetricKeyType !== "ed25519") throw new Error("invalid-key-type");
+
+    return {
+      url: `${supabaseUrl.origin}${ACADEMY_GATEWAY_PATH}`,
+      keyId: ACADEMY_GATEWAY_KEY_ID,
+      privateKey,
+    };
+  } catch {
+    throw new AcademyPersistenceError(
+      "Academy durable storage gateway is not configured.",
+      "configuration-required",
+    );
+  }
 }
 
 function academySupabaseConfig(): AcademySupabaseConfig {
@@ -109,14 +170,75 @@ function academySupabaseConfig(): AcademySupabaseConfig {
 
 export function academyPersistenceConfigured() {
   try {
-    academySupabaseConfig();
+    if (academyGatewayRequested()) academyGatewayConfig();
+    else academySupabaseConfig();
     return true;
   } catch {
     return false;
   }
 }
 
-async function rpc<ResponseBody>(name: string, body: Record<string, unknown>): Promise<ResponseBody> {
+async function gatewayRpc<ResponseBody>(name: string, body: Record<string, unknown>): Promise<ResponseBody> {
+  const config = academyGatewayConfig();
+  const requestBody = JSON.stringify({ operation: name, payload: body });
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const nonce = randomUUID();
+  const bodyDigest = createHash("sha256").update(requestBody).digest("hex");
+  const canonical = `${timestamp}\n${nonce}\n${name}\n${bodyDigest}`;
+  const signature = sign(null, Buffer.from(canonical, "utf8"), config.privateKey).toString("base64url");
+
+  const response = await fetch(config.url, {
+    method: "POST",
+    cache: "no-store",
+    redirect: "error",
+    headers: {
+      "content-type": "application/json",
+      accept: "application/json",
+      "x-obserra-key-id": config.keyId,
+      "x-obserra-timestamp": timestamp,
+      "x-obserra-nonce": nonce,
+      "x-obserra-signature": signature,
+    },
+    body: requestBody,
+    signal: AbortSignal.timeout(10_000),
+  }).catch((error) => {
+    console.error("Academy signed gateway request unavailable", {
+      operation: name,
+      error: error instanceof Error ? error.name : "unknown",
+    });
+    throw new AcademyPersistenceError("Academy durable storage is unavailable.", "request-failed");
+  });
+
+  if (!response.ok) {
+    console.error("Academy signed gateway request rejected", { operation: name, status: response.status });
+    if (response.status === 401 || response.status === 403) {
+      throw new AcademyPersistenceError(
+        "Academy durable storage authorization is unavailable.",
+        "configuration-required",
+      );
+    }
+    throw new AcademyPersistenceError(
+      "Academy durable storage rejected the operation.",
+      "request-failed",
+      response.status >= 500 ? 503 : response.status,
+    );
+  }
+
+  if (response.headers.get("x-obserra-academy-gateway") !== "verified") {
+    throw new AcademyPersistenceError(
+      "Academy durable storage gateway returned an unverified response.",
+      "invalid-response",
+    );
+  }
+
+  try {
+    return await response.json() as ResponseBody;
+  } catch {
+    throw new AcademyPersistenceError("Academy durable storage returned an invalid response.", "invalid-response");
+  }
+}
+
+async function directRpc<ResponseBody>(name: string, body: Record<string, unknown>): Promise<ResponseBody> {
   const config = academySupabaseConfig();
   const response = await fetch(`${config.url}/rest/v1/rpc/${name}`, {
     method: "POST",
@@ -152,6 +274,11 @@ async function rpc<ResponseBody>(name: string, body: Record<string, unknown>): P
   } catch {
     throw new AcademyPersistenceError("Academy durable storage returned an invalid response.", "invalid-response");
   }
+}
+
+async function rpc<ResponseBody>(name: string, body: Record<string, unknown>): Promise<ResponseBody> {
+  if (academyGatewayRequested()) return gatewayRpc<ResponseBody>(name, body);
+  return directRpc<ResponseBody>(name, body);
 }
 
 function requireCourseVersion(courseId: string, courseVersion: string) {

@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.academy-owner-control]
 verify_jwt = true
+
+[functions.academy-internal-rpc]
+verify_jwt = false
