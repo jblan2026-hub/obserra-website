@@ -424,3 +424,12 @@ All must be observed from the public canonical host:
 - CI/CD and identity/automation packages in the uploaded workspace were inspected. They provide release-control instructions and metadata, not an executable Azure control-plane bridge or deploy credential.
 - Execution-environment evidence: `az`, `gh`, and `pwsh` are not installed; no Azure management connector or GitHub workflow-dispatch action is exposed. No secret was read, copied, or transferred; no deployment was triggered.
 - Next safe action: use an authorized Azure or GitHub Actions control-plane session to dispatch the existing exact-SHA Azure staging workflow after its Key Vault-backed runtime binding is confirmed, then require its public health and commerce gates before production cutover.
+
+
+## 2026-08-22T19:29:25.385Z — Current Vercel runtime log evidence
+
+- Vercel runtime logs for canonical deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` / branch `main` show repeated HTTP 503 responses from `GET /api/apps/commerce-health` between `2026-08-22T18:56Z` and `2026-08-22T19:22Z`.
+- The same deployment recorded HTTP 503 from `GET /api/academy/commerce-health` and `GET /api/florida-class-d/health/ready` during that interval.
+- This is direct runtime evidence that the canonical production deployment is not operational for Applications commerce, Academy commerce, or Florida Class D readiness. It does not expose or alter any configuration values.
+- The direct Applications authority database health result above remains operational, so no database migration or data repair was applied.
+- Next safe action remains: bind the required production runtime configuration through the approved Key Vault/Azure staging path, verify all three public health contracts on the staged exact SHA, then promote only if those gates pass.
