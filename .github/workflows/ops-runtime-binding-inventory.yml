@@ -137,6 +137,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ACCESS_TOKEN: ${{ secrets.VERCEL_ACCESS_TOKEN }}
           VERCEL_TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+          VERCEL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
         run: |
           set -euo pipefail
 
@@ -153,10 +154,10 @@ jobs:
           curl --silent --show-error --fail \
             --header "Authorization: Bearer ${token}" \
             --header "Accept: application/json" \
-            "https://api.vercel.com/v2/now/secrets?teamId=${VERCEL_TEAM_ID}" \
+            "https://api.vercel.com/v1/env?projectId=${VERCEL_PROJECT_ID}&teamId=${VERCEL_TEAM_ID}" \
             --output "${response_file}"
 
-          jq -e '(.secrets // []) | type == "array"' "${response_file}" >/dev/null
+          jq -e '(.data // []) | type == "array"' "${response_file}" >/dev/null
 
           for alias in \
             applications-supabase-service-role-key \
@@ -167,12 +168,12 @@ jobs:
             clerk-secret-key \
             clerk-publishable-key; do
             jq -e --arg alias "${alias}" \
-              '(.secrets // []) | any(.[]?; .name == $alias)' \
+              '(.data // []) | any(.[]?; .key == $alias)' \
               "${response_file}" >/dev/null || {
-                echo "::error::An approved Applications Vercel-managed secret alias is unavailable."
+                echo "::error::An approved Applications Vercel-managed shared environment alias is not linked to the canonical project."
                 exit 1
               }
           done
 
-          echo "::notice::All required Applications Vercel-managed secret aliases are available."
+          echo "::notice::All required Applications Vercel-managed shared environment aliases are linked to the canonical project."
 
