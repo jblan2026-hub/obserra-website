@@ -179,3 +179,11 @@ All must be observed from the public canonical host:
 - **Conclusion:** This is not a one-time candidate warm-up. The exact failed assertion is not emitted by the current preflight script, so no alias bypass, preflight weakening, or speculative provider change is authorized.
 - **Audit correction:** An initial job-status lookup used the GitHub owner rather than the full repository path and returned HTTP `404`. It performed no write or deployment action. The corrected lookup returned the rerun result above.
 - **Next safe action:** add safe, phase-granular preflight diagnostics (HTTP code / contract / required-header / checkout-lock / LMS assertion labels only) and rerun from a verified main merge. Do not log request bodies, credentials, or customer information.
+
+
+### 2026-08-22T18:00:07Z — PR #204 opened for safe preflight trace
+
+- **PR:** [#204](https://github.com/jblan2026-hub/obserra-website/pull/204), head `f96a58e72f55774bd42f04dcd19b6b4ad777b476`, open and unmerged.
+- **Scope:** one workflow file, +3/−0. Adds a credential-free `ERR` trace to the candidate preflight block so the exact failed public-contract command and exit code are observable. It does not alter expected HTTP codes, contract fields, header checks, checkout lock, LMS checks, alias ownership, rollback, payments, or public pages.
+- **Reason:** The prior exact candidate was READY and direct public-contract probes were healthy, but the guarded preflight failed twice without emitting its specific assertion. Mutation steps did not run.
+- **Next safe action:** require source-gate evidence, merge only if satisfactory, then read the safe trace from a verified main-head run. Keep the public canonical host as the sole authority for live cutover.
