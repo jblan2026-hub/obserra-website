@@ -53,9 +53,10 @@ gate("provider identity is canonical", () => {
   assert.match(courseSource, /provider: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC"/);
 });
 
-gate("LMS is live while regulated learner commerce remains fail closed", () => {
+gate("LMS deployment is readiness-gated while regulated learner commerce remains fail closed", () => {
   assert.match(courseSource, /status: "coming-soon"/);
-  assert.match(publicPage, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
+  assert.match(publicPage, /LMS PLATFORM DEPLOYED · READINESS GATED/);
+  assert.doesNotMatch(publicPage, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
   assert.match(publicPage, /ENROLLMENT & PAYMENT LOCKED · LICENSE ACTIVATION PENDING/);
   assert.match(publicPage, /Enrollment and payment remain unavailable until licensing and production activation are complete/);
   assert.match(publicPage, /robots: \{ index: true, follow: true \}/);
