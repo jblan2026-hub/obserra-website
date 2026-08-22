@@ -1,0 +1,104 @@
+name: One-shot patch Academy gateway origin
+
+on:
+  push:
+    branches:
+      - fix/academy-signed-gateway-20260822
+    paths:
+      - .github/workflows/ops-patch-academy-gateway-origin.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/academy-signed-gateway-20260822
+      - name: Patch gateway origin contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('lib/academy-persistence.ts')
+          text = path.read_text()
+          old = '''const ACADEMY_GATEWAY_KEY_ID = "academy-gateway-v1";
+          const ACADEMY_GATEWAY_URL =
+            "https://nwxnyqlyzyufgoadtqxs.supabase.co/functions/v1/academy-internal-rpc";'''
+          new = '''const ACADEMY_GATEWAY_KEY_ID = "academy-gateway-v1";
+          const ACADEMY_GATEWAY_PATH = "/functions/v1/academy-internal-rpc";'''
+          if old not in text:
+              raise SystemExit('expected gateway constant block not found')
+          text = text.replace(old, new, 1)
+
+          start = text.index('function academyGatewayConfig(): AcademyGatewayConfig {')
+          end = text.index('\nfunction academySupabaseConfig(): AcademySupabaseConfig {', start)
+          replacement = '''function academyGatewayConfig(): AcademyGatewayConfig {
+            const rawGatewayUrl = process.env.OBSERRA_ACADEMY_GATEWAY_URL?.trim() ?? "";
+            const rawSupabaseUrl = process.env.OBSERRA_ACADEMY_SUPABASE_URL?.trim() ?? "";
+            const privateKeyB64 = process.env.OBSERRA_ACADEMY_GATEWAY_PRIVATE_KEY_B64?.trim() ?? "";
+
+            try {
+              const gatewayUrl = new URL(rawGatewayUrl);
+              const supabaseUrl = new URL(rawSupabaseUrl);
+              if (
+                gatewayUrl.protocol !== "https:"
+                || gatewayUrl.username
+                || gatewayUrl.password
+                || gatewayUrl.search
+                || gatewayUrl.hash
+                || gatewayUrl.origin !== supabaseUrl.origin
+                || gatewayUrl.pathname.replace(/\\/$/, "") !== ACADEMY_GATEWAY_PATH
+                || supabaseUrl.protocol !== "https:"
+                || supabaseUrl.username
+                || supabaseUrl.password
+                || supabaseUrl.search
+                || supabaseUrl.hash
+                || (supabaseUrl.pathname !== "/" && supabaseUrl.pathname !== "")
+                || !privateKeyB64
+              ) {
+                throw new Error("invalid");
+              }
+
+              const pem = Buffer.from(privateKeyB64, "base64").toString("utf8");
+              const privateKey = createPrivateKey(pem);
+              if (privateKey.asymmetricKeyType !== "ed25519") throw new Error("invalid-key-type");
+
+              return {
+                url: `${supabaseUrl.origin}${ACADEMY_GATEWAY_PATH}`,
+                keyId: ACADEMY_GATEWAY_KEY_ID,
+                privateKey,
+              };
+            } catch {
+              throw new AcademyPersistenceError(
+                "Academy durable storage gateway is not configured.",
+                "configuration-required",
+              );
+            }
+          }
+          '''
+          text = text[:start] + replacement + text[end:]
+          if 'supabase.co' in text:
+              raise SystemExit('hard-coded Supabase host remains in academy-persistence.ts')
+          path.write_text(text)
+
+          test_path = Path('test/academy-signed-gateway-contract.test.mjs')
+          test_text = test_path.read_text()
+          test_text = test_text.replace(
+              '  assert.match(source, /https:\\\/\\\/nwxnyqlyzyufgoadtqxs\\.supabase\\.co\\/functions\\/v1\\/academy-internal-rpc/);\n',
+              '  assert.match(source, /ACADEMY_GATEWAY_PATH = "\\/functions\\/v1\\/academy-internal-rpc"/);\n  assert.match(source, /gatewayUrl\\.origin !== supabaseUrl\\.origin/);\n  assert.doesNotMatch(source, /supabase\\.co/);\n',
+              1,
+          )
+          test_path.write_text(test_text)
+          PY
+          git rm .github/workflows/ops-patch-academy-gateway-origin.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lib/academy-persistence.ts test/academy-signed-gateway-contract.test.mjs
+          git diff --cached --check
+          git commit -m "fix(academy): derive gateway from configured storage origin"
+          git push origin HEAD:fix/academy-signed-gateway-20260822
