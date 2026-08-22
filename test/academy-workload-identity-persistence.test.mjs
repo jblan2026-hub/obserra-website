@@ -23,7 +23,10 @@ const REQUIRED_OPERATIONS = [
 test("Academy Vercel production persistence uses workload identity instead of a database admin secret", async () => {
   const client = await read("lib/academy-persistence.ts");
 
-  assert.match(client, /EXPECTED_ACADEMY_SUPABASE_ORIGIN = "https:\/\/nwxnyqlyzyufgoadtqxs\.supabase\.co"/);
+  assert.match(client, /process\.env\.OBSERRA_ACADEMY_SUPABASE_URL/);
+  assert.match(client, /process\.env\.OBSERRA_ACADEMY_SUPABASE_PROJECT_REF/);
+  assert.match(client, /requireSupabaseProjectOrigin\(rawUrl, rawProjectRef\)/);
+  assert.doesNotMatch(client, /supabase\.co/);
   assert.match(client, /process\.env\.VERCEL_OIDC_TOKEN/);
   assert.match(client, /process\.env\.VERCEL === "1" && process\.env\.VERCEL_ENV === "production"/);
 
@@ -41,6 +44,20 @@ test("Academy Vercel production persistence uses workload identity instead of a 
   assert.match(client, /\/functions\/v1\/academy-persistence-gateway/);
   assert.match(client, /requestBody = \{ operation: name, body \}/);
   assert.match(client, /authorization = `Bearer \$\{config\.oidcToken\}`/);
+});
+
+test("generic Supabase project-origin validation binds a configured ref to an HTTPS provider hostname", async () => {
+  const validator = await read("lib/supabase-project-origin.ts");
+
+  assert.match(validator, /PROJECT_REF_PATTERN = \/\^\[a-z0-9\]\{20\}\$\//);
+  assert.match(validator, /SUPABASE_PROJECT_HOST_SUFFIX = "\.supabase\.co"/);
+  assert.match(validator, /url\.protocol !== "https:"/);
+  assert.match(validator, /url\.hostname !== `\$\{projectRef\}\$\{SUPABASE_PROJECT_HOST_SUFFIX\}`/);
+  assert.match(validator, /url\.username/);
+  assert.match(validator, /url\.password/);
+  assert.match(validator, /url\.port/);
+  assert.match(validator, /url\.search/);
+  assert.match(validator, /url\.hash/);
 });
 
 test("Academy self-hosted direct mode treats modern Supabase secret keys as API keys, not JWTs", async () => {
