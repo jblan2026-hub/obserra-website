@@ -287,3 +287,12 @@ All must be observed from the public canonical host:
 - **Observed root cause for Applications health:** `lib/auth/provider-routing.ts` classifies the entire `/api/apps` prefix as Clerk-protected before the intended public GET health route can execute. The active narrow correction will exempt only exact GET/HEAD `/api/apps/commerce-health`; purchase, download, billing, license, access, and all other Applications API paths remain Clerk-protected.
 - **Probe note:** a later page-header batch ended in a transient network disconnect before results were returned. It created no repository, deployment, or provider change; no conclusion is drawn from the unreturned requests.
 - **Next safe action:** review PR #206 independently before any merge. Separately implement and test the exact read-only Applications commerce-health exception, add it to future cutover preflight, then require canonical public evidence from the resulting release.
+
+
+### 2026-08-22T18:24:49Z — PR #206 merged; Applications fix rebased; replay event reconciled
+
+- **Merged source:** PR [#206](https://github.com/jblan2026-hub/obserra-website/pull/206) merged as `0695f63d37836d759ad98c1102133169d2ded4b7` (`Pin Azure deployment to the approved main SHA`). This is source-control evidence only. No exact READY deployment or canonical public SHA match for that merge has been observed, so no Azure, payment, LMS, or public-site runtime result is attributed to it.
+- **Active correction branch:** created `fix/public-applications-commerce-health-20260822` from the verified canonical release and fast-forwarded it to exact current main `0695f63d37836d759ad98c1102133169d2ded4b7` before any source change. This prevents the Applications fix from being based on stale main.
+- **Canonical evidence boundary:** the latest fresh canonical health proof remains HTTP `200` at `2026-08-22T18:21:12.870Z` for `dpl_jMgbmP4i4KacdJratNCsaMZJK6xu` / `902bd58d00f83becf026e4b85b079a356d7428b7`; it does not prove #206 is live.
+- **Replay reconciliation:** received an already-recorded PR #204 opened event with delivery `4f870940-9e53-11f1-8fff-93af88b11cf7`. Its original source and cutover trace are already preserved above; this replay adds no new source, deployment, alias, provider, or public-runtime fact.
+- **Next safe action:** make the narrow read-only Applications commerce-health routing and contract correction on the rebased branch, then require source gates and canonical public deployment/SHA proof.
