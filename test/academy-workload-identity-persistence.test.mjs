@@ -26,8 +26,18 @@ test("Academy Vercel production persistence uses workload identity instead of a 
   assert.match(client, /EXPECTED_ACADEMY_SUPABASE_ORIGIN = "https:\/\/nwxnyqlyzyufgoadtqxs\.supabase\.co"/);
   assert.match(client, /process\.env\.VERCEL_OIDC_TOKEN/);
   assert.match(client, /process\.env\.VERCEL === "1" && process\.env\.VERCEL_ENV === "production"/);
-  assert.match(client, /if \(vercelProduction\) \{[\s\S]*mode: "workload"[\s\S]*oidcToken/s);
-  assert.doesNotMatch(client, /if \(vercelProduction\) \{[\s\S]*mode: "direct"/s);
+
+  const vercelStart = client.indexOf("if (vercelProduction) {");
+  const serviceKeyCheck = client.indexOf("if (!validServiceRoleKey(serviceRoleKey))", vercelStart);
+  assert.ok(vercelStart >= 0, "Vercel production branch must exist");
+  assert.ok(serviceKeyCheck > vercelStart, "direct service-key path must follow the Vercel workload branch");
+
+  const vercelBlock = client.slice(vercelStart, serviceKeyCheck);
+  assert.match(vercelBlock, /mode: "workload"/);
+  assert.match(vercelBlock, /oidcToken/);
+  assert.doesNotMatch(vercelBlock, /mode: "direct"/);
+  assert.doesNotMatch(vercelBlock, /serviceRoleKey/);
+
   assert.match(client, /\/functions\/v1\/academy-persistence-gateway/);
   assert.match(client, /requestBody = \{ operation: name, body \}/);
   assert.match(client, /authorization = `Bearer \$\{config\.oidcToken\}`/);
