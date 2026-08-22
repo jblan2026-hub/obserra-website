@@ -171,3 +171,11 @@ All must be observed from the public canonical host:
 - **Candidate endpoint evidence:** Direct candidate probes returned health HTTP `200`, exact deployment/SHA, verified routing authority, `cache-control: no-store`, and the required routing header; commerce HTTP `503` with its fail-closed contract; Florida liveness HTTP `200/live`; Florida readiness HTTP `503/not_ready` with `Retry-After: 60`. These candidate results do not prove canonical cutover and do not establish the specific preflight assertion that failed.
 - **Canonical state:** No new canonical public proof was produced; the last canonical probe remains old deployment `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`.
 - **Safe next action:** rerun the failed cutover job once against the now-READY candidate. If preflight fails again, add phase-granular preflight diagnostics before any alias mutation; do not bypass or weaken preflight.
+
+
+### 2026-08-22T17:58:xxZ — persistent preflight failure; no mutation performed
+
+- **Rerun:** The failed cutover job was rerun once through GitHub. The rerun job `97070508579` again accepted the Vercel credential, found the exact READY candidate, and failed only at **Preflight exact canonical deployment health**. Every alias/domain mutation and rollback-related step remained skipped.
+- **Conclusion:** This is not a one-time candidate warm-up. The exact failed assertion is not emitted by the current preflight script, so no alias bypass, preflight weakening, or speculative provider change is authorized.
+- **Audit correction:** An initial job-status lookup used the GitHub owner rather than the full repository path and returned HTTP `404`. It performed no write or deployment action. The corrected lookup returned the rerun result above.
+- **Next safe action:** add safe, phase-granular preflight diagnostics (HTTP code / contract / required-header / checkout-lock / LMS assertion labels only) and rerun from a verified main merge. Do not log request bodies, credentials, or customer information.
