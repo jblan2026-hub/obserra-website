@@ -130,3 +130,16 @@ All must be observed from the public canonical host:
 - **Commerce:** `/api/academy/commerce-health` remained fail-closed: `operational: false`, payment provider unavailable, durable storage unavailable. Payment is not live.
 - **Florida LMS:** `/api/florida-class-d/health/ready` remained `status: "not_ready"`. Regulated learner operation is not live.
 - **Safe next action:** no source or alias change was made from this probe. Inspect the Vercel production deployment/cutover state and obtain direct failure evidence if the signed candidate remains unassigned.
+
+
+### 2026-08-22T17:53:53Z — canonical cutover observability corrective action
+
+- **Vercel deployment evidence:** Signed production candidate `dpl_HyUZkePdAL8Rxtn29WC7FxbV5Vxt` remains `READY` for exact verified SHA `278567f6a9c42c2f795a552714984d98f311e4d0`; its alias list contains only `obserra-website-live-obserra.vercel.app` and `obserra-website-live-git-main-obserra.vercel.app`.
+- **Project ownership evidence:** The canonical Vercel project returned only those generated domains; neither canonical public alias appears on the candidate or project response. The public canonical host still proves old deployment `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / SHA `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`.
+- **Diagnostic discrepancy:** GitHub’s Vercel commit-status context for the signed candidate is `failure`, while Vercel reports the deployment `READY`; error-only Vercel build logs report only “Build Completed,” and Vercel reports no runtime errors for the project in the selected one-hour window. This does not prove a cutover or a cause.
+- **Workflow inspection:** The cutover workflow correctly guards candidate identity, fail-closed preflight, alias capture, domain ownership, alias assignment, smoke, duplicate-project quarantine, and rollback, but it did not publish a readable phase outcome. The current GitHub connector cannot enumerate push-triggered Actions runs directly.
+- **Corrective source action:** Opened [PR #203](https://github.com/jblan2026-hub/obserra-website/pull/203) from `fix/cutover-evidence-status-20260822` at `d33276938200ebe38b04f9e6d9efad130014748f`.
+  - Scope: workflow-only; grants `statuses: write`, identifies each guarded phase, and publishes a non-secret commit-status description after every cutover outcome.
+  - The status is diagnostic only. It cannot be used as a live-production claim; the canonical public endpoint remains the acceptance authority.
+  - No credentials, private-library content, payment settings, LMS settings, aliases, or public application behavior were changed.
+- **Next safe action:** wait for PR #203 source gates. If it is safely merged as a verified main commit, read its safe phase status, then re-probe the canonical public endpoints before any claim.
