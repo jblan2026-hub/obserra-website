@@ -143,3 +143,14 @@ All must be observed from the public canonical host:
   - The status is diagnostic only. It cannot be used as a live-production claim; the canonical public endpoint remains the acceptance authority.
   - No credentials, private-library content, payment settings, LMS settings, aliases, or public application behavior were changed.
 - **Next safe action:** wait for PR #203 source gates. If it is safely merged as a verified main commit, read its safe phase status, then re-probe the canonical public endpoints before any claim.
+
+
+### 2026-08-22T17:54:34.709Z — PR #203 opened event
+
+- **Event:** Pull request [#203](https://github.com/jblan2026-hub/obserra-website/pull/203) opened.
+- **Source state:** open, mergeable, unmerged; head `d33276938200ebe38b04f9e6d9efad130014748f`; one modified workflow file (+55/−1). The source change adds safe cutover-phase reporting only. It has no public runtime effect until a verified merge is deployed and the canonical host proves it.
+- **PR Vercel record:** Preview deployment `dpl_HqJK8WkzbVD4yPLUpFUpauc3dAJZ` was `CANCELED`; it is an unverified branch commit and not production evidence.
+- **Fresh canonical identity:** `https://www.obserrallc.com/api/health` returned `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`, authority verified, at `2026-08-22T17:54:34.709Z`. It does not match the signed candidate or PR #203.
+- **Fresh public routes:** `/marketplace` still rendered the old deployment’s not-found response; Academy commerce remained `operational: false` with payment provider and durable storage unavailable; Florida readiness remained `not_ready`.
+- **Blocker:** canonical alias movement remains unproven and therefore not complete. Payments and regulated LMS operation remain fail-closed.
+- **Next safe action:** await PR #203 source-gate evidence, merge only if those gates are satisfactory, then read its non-secret cutover phase status and verify the canonical public host’s exact deployment/SHA.
