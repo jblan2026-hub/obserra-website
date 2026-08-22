@@ -4,7 +4,7 @@ import test from "node:test";
 
 const read = (path) => fs.readFileSync(path, "utf8");
 
-test("the public Florida training route is a live LMS surface while instructor access remains private", () => {
+test("the public Florida training route is readiness-gated while instructor access remains private", () => {
   const home = read("app/page.tsx");
   const header = read("app/HomeHeader.tsx");
   const enterpriseChrome = read("app/components/enterprise/EnterpriseChrome.tsx");
@@ -20,7 +20,8 @@ test("the public Florida training route is a live LMS surface while instructor a
   assert.match(enterpriseChrome, /href="\/florida-security-training"/);
   assert.match(academy, /href="\/florida-security-training"/);
   assert.match(sitemap, /\$\{siteUrl\}\/florida-security-training/);
-  assert.match(page, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
+  assert.match(page, /LMS PLATFORM DEPLOYED · READINESS GATED/);
+  assert.doesNotMatch(page, /LMS PLATFORM LIVE · PRODUCTION SOFTWARE/);
   assert.match(page, /ENROLLMENT & PAYMENT LOCKED · LICENSE ACTIVATION PENDING/);
   assert.match(page, /CONTROLLED CURRICULUM ARCHITECTURE/);
   assert.match(page, /REGULATED LMS PRODUCTION VALIDATION/);
@@ -41,7 +42,7 @@ test("prelicense enrollment and payment remain visibly locked and non-navigable"
   const controls = read("app/florida-security-training/GovernedFloridaClassDLink.tsx");
   const enrollmentApi = read("app/api/florida-class-d/enrollment/route.ts");
 
-  assert.match(page, /The LMS platform is live/);
+  assert.match(page, /The LMS is deployed to the OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC production website/);
   assert.match(page, /Enrollment and payment remain unavailable until licensing and production activation are complete/);
   assert.match(page, /enabled=\{publicLearnerControlsEnabled\}/);
   assert.match(controls, /if \(!enabled\)/);
