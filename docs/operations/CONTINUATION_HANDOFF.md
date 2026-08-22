@@ -385,3 +385,9 @@ All must be observed from the public canonical host:
 - Result: HTTP 503; `operational:false`, `eventLedger:"unavailable"`, `entitlementAuthority:"unavailable"`, `stripeConfigured:false`, `providerConnected:false`, `chargesEnabled:false`, `identityReady:false`, error `durable-commerce-unavailable`.
 - Interpretation: no public evidence supports live Applications checkout, purchase, download, entitlement, or payment claims.
 - Next safe action remains: set the validated project-scoped Applications server credential in the Vercel production environment, or explicitly authorize its one-way transfer from the approved secret store; then redeploy and repeat this canonical probe.
+
+## 2026-08-22T19:12:55.395Z — Canonical routing identity reconfirmed
+
+- `GET https://www.obserrallc.com/api/health` returned HTTP 200 at `2026-08-22T19:12:46.431Z`.
+- Canonical endpoint reported verified Vercel authority for project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`, deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U`, commit `6c2cddd84503c7cb0af3ca976fd8308183379146`.
+- This proves the public site routing target only; it does not change the immediately preceding canonical commerce HTTP 503 result.
