@@ -18,6 +18,10 @@ test("public cutover keeps candidate preflight read-only and verifies locked com
   const preflight = workflow.slice(preflightStart, moveStart);
   const canonicalSmoke = workflow.slice(smokeStart, quarantineStart);
 
+  assert.match(preflight, /if \[ "\$\{applications_status\}" = "200" \]; then/);
+  assert.match(preflight, /elif \[ "\$\{applications_status\}" = "503" \]; then/);
+  assert.match(preflight, /\/api\/apps\/commerce-health/);
+  assert.match(preflight, /applications-commerce-health-v1/);
   assert.match(preflight, /if \[ "\$\{commerce_status\}" = "200" \]; then/);
   assert.match(preflight, /elif \[ "\$\{commerce_status\}" = "503" \]; then/);
   assert.match(preflight, /\.operational == false/);
@@ -30,6 +34,8 @@ test("public cutover keeps candidate preflight read-only and verifies locked com
   assert.match(preflight, /status == "not_ready"/);
   assert.match(preflight, /retry-after:/i);
 
+  assert.match(canonicalSmoke, /\/api\/apps\/commerce-health/);
+  assert.match(canonicalSmoke, /applications-commerce-health-v1/);
   assert.ok(canonicalSmoke.includes("https://${PRIMARY_DOMAIN}/api/academy/checkout"));
   assert.ok(canonicalSmoke.includes('test "${status}" = "307"'));
   assert.ok(canonicalSmoke.includes("enrollment=licensing-pending"));
