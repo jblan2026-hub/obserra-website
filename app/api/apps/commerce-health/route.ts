@@ -6,6 +6,18 @@ import { prepareClerkRuntime } from "../../../../lib/clerk-runtime-config";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const REQUIRED_WEBHOOK_EVENTS = [
+  "checkout.session.completed",
+  "customer.subscription.created",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
+  "invoice.paid",
+  "invoice.payment_failed",
+  "charge.refunded",
+  "charge.dispute.created",
+  "charge.dispute.closed",
+] as const;
+
 export async function GET() {
   try {
     const storage = await applicationsCommerceHealth();
@@ -36,24 +48,23 @@ export async function GET() {
       providerConnected,
       chargesEnabled,
       identityReady: identity.ready,
-      requiredWebhookEvents: [
-        "checkout.session.completed",
-        "customer.subscription.created",
-        "customer.subscription.updated",
-        "customer.subscription.deleted",
-        "invoice.paid",
-        "invoice.payment_failed",
-        "charge.refunded",
-        "charge.dispute.created",
-        "charge.dispute.closed",
-      ],
+      requiredWebhookEvents: REQUIRED_WEBHOOK_EVENTS,
     }, { status: operational ? 200 : 503 });
     response.headers.set("cache-control", "no-store");
     return response;
   } catch {
     return NextResponse.json({
+      contract: "applications-commerce-health-v1",
       operational: false,
       schemaVersion: "applications-commerce-v1",
+      eventLedger: "unavailable",
+      entitlementAuthority: "unavailable",
+      stripeConfigured: false,
+      stripeLivemode: false,
+      providerConnected: false,
+      chargesEnabled: false,
+      identityReady: false,
+      requiredWebhookEvents: REQUIRED_WEBHOOK_EVENTS,
       error: "durable-commerce-unavailable",
     }, { status: 503, headers: { "cache-control": "no-store" } });
   }
