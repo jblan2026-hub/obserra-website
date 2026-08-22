@@ -26,6 +26,7 @@ var supabaseIdentityUrl = 'https://ftkjhmtfyfkartfsnkjb.supabase.co'
 var supabaseIdentityProjectRef = 'ftkjhmtfyfkartfsnkjb'
 var supabaseIdentityPublishableKey = 'sb_publishable_mRE63bML7dsVY_YqaervqA_TUEWsxVB'
 var academySupabaseUrl = 'https://nwxnyqlyzyufgoadtqxs.supabase.co'
+var academySupabaseProjectRef = 'nwxnyqlyzyufgoadtqxs'
 var fdacsSupabaseUrl = 'https://ggkxgjhsbgbifiqrhavr.supabase.co'
 var fdacsSupabaseProjectRef = 'ggkxgjhsbgbifiqrhavr'
 var fdacsDocumentsBucket = 'fdacs-class-d-completion-documents'
@@ -169,6 +170,10 @@ var commonAppSettings = [
   {
     name: 'OBSERRA_ACADEMY_SUPABASE_URL'
     value: academySupabaseUrl
+  }
+  {
+    name: 'OBSERRA_ACADEMY_SUPABASE_PROJECT_REF'
+    value: academySupabaseProjectRef
   }
   {
     name: 'OBSERRA_FDACS_SUPABASE_URL'

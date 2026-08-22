@@ -2,9 +2,11 @@ import "server-only";
 
 import { createHmac } from "node:crypto";
 import { academyCommerceStorageReady } from "./academy-payment";
+import { requireSupabaseProjectOrigin } from "./supabase-project-origin";
 
 const COURSE_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
+const ACADEMY_PERSISTENCE_GATEWAY_PATH = "/functions/v1/academy-persistence-gateway";
 
 /**
  * Persistence compatibility boundary.
@@ -53,7 +55,21 @@ export type DurableAcademyAggregateMetrics = {
   coursesByCertificate: Record<string, number>;
 };
 
-type AcademySupabaseConfig = { url: string; serviceRoleKey: string };
+type AcademyDirectSupabaseConfig = {
+  mode: "direct";
+  url: string;
+  serviceRoleKey: string;
+  legacyJwt: boolean;
+};
+
+type AcademyWorkloadSupabaseConfig = {
+  mode: "workload";
+  url: string;
+  gatewayUrl: string;
+  oidcToken: string;
+};
+
+type AcademySupabaseConfig = AcademyDirectSupabaseConfig | AcademyWorkloadSupabaseConfig;
 
 export class AcademyPersistenceError extends Error {
   constructor(
@@ -81,24 +97,40 @@ function validServiceRoleKey(value: string) {
   return (value.startsWith("sb_secret_") && value.length >= 32) || legacyJwtIsServiceRole(value);
 }
 
+function validVercelOidcToken(value: string) {
+  const parts = value.split(".");
+  return parts.length === 3 && value.length >= 128 && value.length <= 16_384;
+}
+
 function academySupabaseConfig(): AcademySupabaseConfig {
   const rawUrl = process.env.OBSERRA_ACADEMY_SUPABASE_URL?.trim() ?? "";
+  const rawProjectRef = process.env.OBSERRA_ACADEMY_SUPABASE_PROJECT_REF?.trim() ?? "";
   const serviceRoleKey = process.env.OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
+  const oidcToken = process.env.VERCEL_OIDC_TOKEN?.trim() ?? "";
+  const vercelProduction = process.env.VERCEL === "1" && process.env.VERCEL_ENV === "production";
 
   try {
-    const url = new URL(rawUrl);
-    if (
-      url.protocol !== "https:" ||
-      url.username ||
-      url.password ||
-      url.search ||
-      url.hash ||
-      (url.pathname !== "/" && url.pathname !== "") ||
-      !validServiceRoleKey(serviceRoleKey)
-    ) {
-      throw new Error("invalid");
+    const { origin: url } = requireSupabaseProjectOrigin(rawUrl, rawProjectRef);
+
+    // Vercel production must use short-lived workload identity. Do not silently
+    // fall back to a long-lived database administrator credential in that trust zone.
+    if (vercelProduction) {
+      if (!validVercelOidcToken(oidcToken)) throw new Error("oidc-unavailable");
+      return {
+        mode: "workload",
+        url,
+        gatewayUrl: `${url}${ACADEMY_PERSISTENCE_GATEWAY_PATH}`,
+        oidcToken,
+      };
     }
-    return { url: url.origin, serviceRoleKey };
+
+    if (!validServiceRoleKey(serviceRoleKey)) throw new Error("service-key-unavailable");
+    return {
+      mode: "direct",
+      url,
+      serviceRoleKey,
+      legacyJwt: legacyJwtIsServiceRole(serviceRoleKey),
+    };
   } catch {
     throw new AcademyPersistenceError(
       "Academy durable storage is not configured.",
@@ -118,28 +150,48 @@ export function academyPersistenceConfigured() {
 
 async function rpc<ResponseBody>(name: string, body: Record<string, unknown>): Promise<ResponseBody> {
   const config = academySupabaseConfig();
-  const response = await fetch(`${config.url}/rest/v1/rpc/${name}`, {
+  const directHeaders: Record<string, string> = {
+    "content-type": "application/json",
+    accept: "application/json",
+  };
+  let endpoint: string;
+  let requestBody: Record<string, unknown>;
+
+  if (config.mode === "workload") {
+    endpoint = config.gatewayUrl;
+    requestBody = { operation: name, body };
+    directHeaders.authorization = `Bearer ${config.oidcToken}`;
+  } else {
+    endpoint = `${config.url}/rest/v1/rpc/${name}`;
+    requestBody = body;
+    directHeaders.apikey = config.serviceRoleKey;
+    // Modern sb_secret_ keys are API keys, not JWTs. Only legacy service_role
+    // credentials belong in Authorization: Bearer.
+    if (config.legacyJwt) directHeaders.authorization = `Bearer ${config.serviceRoleKey}`;
+  }
+
+  const response = await fetch(endpoint, {
     method: "POST",
     cache: "no-store",
     redirect: "error",
-    headers: {
-      apikey: config.serviceRoleKey,
-      authorization: `Bearer ${config.serviceRoleKey}`,
-      "content-type": "application/json",
-      accept: "application/json",
-    },
-    body: JSON.stringify(body),
+    headers: directHeaders,
+    body: JSON.stringify(requestBody),
     signal: AbortSignal.timeout(10_000),
   }).catch((error) => {
     console.error("Academy durable storage request unavailable", {
       operation: name,
+      transport: config.mode,
       error: error instanceof Error ? error.name : "unknown",
     });
     throw new AcademyPersistenceError("Academy durable storage is unavailable.", "request-failed");
   });
 
   if (!response.ok) {
-    console.error("Academy durable storage request rejected", { operation: name, status: response.status });
+    console.error("Academy durable storage request rejected", {
+      operation: name,
+      transport: config.mode,
+      status: response.status,
+    });
     throw new AcademyPersistenceError(
       "Academy durable storage rejected the operation.",
       "request-failed",

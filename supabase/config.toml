@@ -23,3 +23,10 @@ verify_jwt = false
 
 [functions.academy-owner-control]
 verify_jwt = true
+
+# The Academy persistence gateway accepts Vercel workload identity, not a
+# Supabase user JWT. Its handler verifies the Vercel RS256 signature plus exact
+# issuer, audience, owner, project, environment, subject, and token lifetime
+# before accessing service-role-only Academy RPCs.
+[functions.academy-persistence-gateway]
+verify_jwt = false
