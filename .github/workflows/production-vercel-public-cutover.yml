@@ -1,4 +1,5 @@
 name: Production Vercel public cutover
+run-name: Canonical Vercel public cutover — ${{ github.sha }}
 
 on:
   push:
