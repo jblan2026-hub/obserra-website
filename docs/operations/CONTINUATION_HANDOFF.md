@@ -378,3 +378,10 @@ All must be observed from the public canonical host:
 - Current public state remains unproven for commerce: `https://www.obserrallc.com/api/apps/commerce-health` was last observed as HTTP 503 on canonical deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` / commit `6c2cddd84503c7cb0af3ca976fd8308183379146`.
 - Blocker: a valid project-scoped Applications server credential must be set in the Vercel production environment, or an explicit authorization must permit its one-way transfer from the approved GitHub secret store to that Vercel project.
 - Next safe action: after the credential is set or the exact transfer is authorized, redeploy from `main` and re-run the canonical health endpoint before enabling or claiming checkout, purchase, download, or entitlement functionality.
+
+## 2026-08-22T19:12:28.688Z — Canonical post-stop commerce probe
+
+- Public endpoint: `GET https://www.obserrallc.com/api/apps/commerce-health`.
+- Result: HTTP 503; `operational:false`, `eventLedger:"unavailable"`, `entitlementAuthority:"unavailable"`, `stripeConfigured:false`, `providerConnected:false`, `chargesEnabled:false`, `identityReady:false`, error `durable-commerce-unavailable`.
+- Interpretation: no public evidence supports live Applications checkout, purchase, download, entitlement, or payment claims.
+- Next safe action remains: set the validated project-scoped Applications server credential in the Vercel production environment, or explicitly authorize its one-way transfer from the approved secret store; then redeploy and repeat this canonical probe.
