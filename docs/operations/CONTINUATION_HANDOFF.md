@@ -102,3 +102,15 @@ All must be observed from the public canonical host:
 - Created the dedicated `ops/live-handoff` branch so operational updates do not alter production code or produce a production deployment.
 - Enabled the repository event watcher for pull-request openings, commit updates, reviews, comments, and merges. It is instructed to update this file with evidence only; it must not record secrets or turn CI/deployment status into a live claim.
 - Current in-session work continues to append material actions and public probes here.
+
+
+### 2026-08-22T17:46:18.850Z — PR #201 synchronized (unmerged)
+
+- **Event:** Pull request [#201](https://github.com/jblan2026-hub/obserra-website/pull/201) received new commits.
+- **PR state:** open, mergeable, unmerged.
+- **Head commit:** `466a4af86d866efff1608a4add54378771da2934`.
+- **Scope reported by the PR:** Applications commerce authority, payment/storage controls, and guarded Azure/Entra/Intune preparation. These are source changes under review; none are recorded as live.
+- **Vercel preview evidence:** `dpl_Buf7ZP2UXndPYsXQwDXYrvcsoWF4` for the PR head was `CANCELED` because the branch commit is unverified. This is not a production deployment and does not establish a build, provider, or commerce result.
+- **Fresh canonical evidence:** `www.obserrallc.com/api/health` still returned `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` / `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`.
+- **Fresh commerce/LMS evidence:** Academy commerce remained HTTP `503`, `operational: false`; Florida liveness remained HTTP `200`; Florida readiness remained HTTP `503`, `not_ready`.
+- **Safe next action:** Do not merge or describe PR #201 as production-ready without reviewing its exact source, passing applicable gates, producing a verified merge candidate, and proving the public canonical endpoints afterward.
