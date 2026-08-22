@@ -69,3 +69,29 @@ All must be observed from the public canonical host:
 
 - Persisted the current public evidence, verified-commit deployment rejection, and next acceptance criteria in the repository.
 - Next action: complete the signed merge, wait for the exact Vercel candidate, then re-probe the canonical public host and append the result here.
+
+
+## Continuous operational record
+
+**This branch is the current audit record:** `ops/live-handoff`. The same file on `main` is the signed baseline snapshot. Update this branch after every material action, evidence probe, deployment, alias attempt, blocker, rollback decision, or scope change. Never record secret values.
+
+### 2026-08-22T17:44:51.168Z — active cutover chronology
+
+| Time / order | Action or evidence | Result |
+| --- | --- | --- |
+| Baseline | Probed canonical website identity. | `www.obserrallc.com/api/health` returned `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa` at `1d9ad1f042f527552d1e65763b0bc1f26ba0f829`. |
+| Baseline | Probed public marketplace. | `/marketplace` returned HTTP `404`. |
+| Baseline | Probed public commerce and LMS readiness. | Academy commerce returned HTTP `503`, `operational: false`; Florida liveness returned HTTP `200`; Florida readiness returned HTTP `503`, `not_ready`. |
+| Cutover attempt 1 | Added an auditable cutover run name directly on `main`. | Vercel canceled `dpl_Gow62JNvbk8piFKZLiMXT4uPdN5f` before build because its verified-commit policy rejected unverified commit `f21ade991bcc5473027fd88cf68e9af991b9b9c7`. No public alias was changed. |
+| Corrective path | Created and validated PR [#202](https://github.com/jblan2026-hub/obserra-website/pull/202). | Production Authority Contract, Website CI, and CodeQL passed. These are source gates only, not live acceptance. |
+| Signed merge | Merged PR #202 through GitHub. | Verified merge commit: `278567f6a9c42c2f795a552714984d98f311e4d0`. |
+| Candidate proof | Vercel built the signed production candidate. | `dpl_HyUZkePdAL8Rxtn29WC7FxbV5Vxt` is READY, tied to exact signed commit `278567f6a9c42c2f795a552714984d98f311e4d0`, and its `/api/health` returns the same deployment ID/SHA with verified authority. |
+| Canonical probe | Probed `www.obserrallc.com/api/health` after the signed candidate became READY. | Still returned old `dpl_EepyEpkiRkhzbyrPKzY9EAFG72Fa / 1d9ad1f042f527552d1e65763b0bc1f26ba0f829`. No cutover success is claimed. |
+| Alias evidence | Inspected the candidate Vercel deployment and project record. | Candidate lists only Vercel-generated aliases; the public canonical aliases are not attached to the candidate. |
+| Current task | Continue guarded cutover observation and record every result here. | Pending. Do not call marketplace, payments, or LMS enrollment live until public endpoints independently satisfy the acceptance evidence. |
+
+### Next recorded action
+
+- Continue probing the public canonical health endpoint and inspect the controlled cutover result without exposing credentials.
+- On alias movement, immediately record the exact observed deployment/SHA and route probes.
+- On failure or timeout, record the exact fail-closed evidence and the smallest authorized corrective action before changing source or infrastructure.
