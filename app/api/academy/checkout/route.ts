@@ -111,12 +111,6 @@ export async function POST(request: Request) {
     return rejectedRequest(400, "Invalid request body");
   }
 
-  try {
-    await ensureAcademyRuntimeSecrets();
-  } catch {
-    return unavailableRedirect(requestUrl, "configuration-required");
-  }
-
   const courseValue = formData.get("course");
   const baseCourse = courseForId(typeof courseValue === "string" ? courseValue : "");
   const checkoutAttempt = academyCheckoutAttempt(
@@ -131,6 +125,12 @@ export async function POST(request: Request) {
     response.headers.set("x-obserra-sales-license", "pending");
     response.headers.set("x-obserra-existing-entitlements", "preserved");
     return response;
+  }
+
+  try {
+    await ensureAcademyRuntimeSecrets();
+  } catch {
+    return unavailableRedirect(requestUrl, "configuration-required");
   }
 
   const commerceLivemode = academyCommerceLivemode();

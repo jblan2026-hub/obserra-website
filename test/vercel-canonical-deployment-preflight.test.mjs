@@ -77,12 +77,16 @@ test("candidate preflight stays read-only while canonical smoke verifies the che
     "checkout lock must be tested on the canonical host",
   );
   assert.ok(
-    canonicalSmoke.includes('test "${status}" = "307"'),
+    canonicalSmoke.includes('if [ "${status}" != "307" ]; then'),
     "canonical checkout lock must retain its intentional redirect assertion",
   );
   assert.ok(
-    canonicalSmoke.includes("x-obserra-sales-license: pending"),
+    canonicalSmoke.includes('if [ "${checkout_license}" != "pending" ]; then'),
     "canonical checkout lock must retain the licensing-pending response header",
+  );
+  assert.ok(
+    canonicalSmoke.includes("title=Canonical checkout lock redirect"),
+    "canonical checkout failures must identify the response-contract assertion safely",
   );
   assert.ok(
     canonicalSmoke.includes("if: steps.alias.outcome == 'success'"),

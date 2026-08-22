@@ -43,6 +43,28 @@ test("Academy webhook readiness and verification share one normalized secret", (
   assert.match(checkout, /academyCommerceWebhookConfigured\(\)/);
 });
 
+test("Academy licensing blocks checkout before runtime secret hydration", () => {
+  const licensingGate = checkout.indexOf("if (!academyLicensedSalesEnabled())");
+  const runtimeHydration = checkout.indexOf("await ensureAcademyRuntimeSecrets()");
+  const paymentModeCheck = checkout.indexOf("const commerceLivemode = academyCommerceLivemode()");
+  const stripeAccess = checkout.indexOf("getAcademyStripe()");
+
+  assert.ok(licensingGate >= 0, "checkout must retain the Academy licensing gate");
+  assert.ok(
+    runtimeHydration > licensingGate,
+    "unlicensed checkout must return before hydrating payment runtime secrets",
+  );
+  assert.ok(
+    paymentModeCheck > runtimeHydration && stripeAccess > runtimeHydration,
+    "licensed checkout must still hydrate runtime secrets before payment configuration or Stripe access",
+  );
+
+  const licensingResponse = checkout.slice(licensingGate, runtimeHydration);
+  assert.match(licensingResponse, /unavailableRedirect\(requestUrl, "licensing-pending"\)/);
+  assert.match(licensingResponse, /x-obserra-sales-license", "pending"/);
+  assert.match(licensingResponse, /x-obserra-existing-entitlements", "preserved"/);
+});
+
 test("checkout binds the published amount, currency, course, purchaser, and attempt", () => {
   for (const marker of [
     "paymentContractVersion",

@@ -559,9 +559,39 @@ jobs:
             --data-urlencode "checkoutAttemptId=${attempt_id}" \
             --data-urlencode "checkoutAttemptIssuedAt=${issued_at}" \
             "https://${PRIMARY_DOMAIN}/api/academy/checkout")"
-          test "${status}" = "307"
-          grep -i '^location: .*enrollment=licensing-pending' "${checkout_headers}" >/dev/null
-          grep -i '^x-obserra-sales-license: pending' "${checkout_headers}" >/dev/null
+          header_value() {
+            local requested="$1"
+            awk -v requested="${requested}" '
+              {
+                sub(/\r$/, "")
+                separator = index($0, ":")
+                if (separator < 1) next
+                name = tolower(substr($0, 1, separator - 1))
+                if (name != tolower(requested)) next
+                value = substr($0, separator + 1)
+                sub(/^[[:space:]]*/, "", value)
+                observed = value
+              }
+              END { print observed }
+            ' "${checkout_headers}"
+          }
+
+          checkout_location="$(header_value location)"
+          checkout_license="$(header_value x-obserra-sales-license)"
+          expected_location="https://${PRIMARY_DOMAIN}/academy?enrollment=licensing-pending"
+          if [ "${status}" != "307" ]; then
+            echo "::error title=Canonical checkout lock status::Expected the fail-closed HTTP 307 response."
+            exit 1
+          fi
+          if [ "${checkout_location}" != "${expected_location}" ]; then
+            echo "::error title=Canonical checkout lock redirect::Expected the licensing-pending canonical redirect."
+            exit 1
+          fi
+          if [ "${checkout_license}" != "pending" ]; then
+            echo "::error title=Canonical checkout sales license::Expected the pending sales-license lock."
+            exit 1
+          fi
+          echo "::notice title=Canonical checkout lock verified::HTTP 307, licensing-pending redirect, and pending sales-license lock verified."
 
       - name: Quarantine duplicate project and verify canonical domain ownership
         id: quarantine
