@@ -193,6 +193,8 @@ jobs:
             printf '| %s | %s | %s |\n' "${linked}" "${unlinked}" "${absent_or_nonproduction}"
           } >> "${GITHUB_STEP_SUMMARY}"
 
+          echo "::notice::Applications shared-env metadata counts: linked=${linked}; existing-but-unlinked=${unlinked}; absent-or-not-production-scoped=${absent_or_nonproduction}."
+
           if (( absent_or_nonproduction > 0 )); then
             echo "::error::At least one required shared environment alias is absent or not production-scoped."
             exit 1
