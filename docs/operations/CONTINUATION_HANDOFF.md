@@ -187,3 +187,11 @@ All must be observed from the public canonical host:
 - **Scope:** one workflow file, +3/−0. Adds a credential-free `ERR` trace to the candidate preflight block so the exact failed public-contract command and exit code are observable. It does not alter expected HTTP codes, contract fields, header checks, checkout lock, LMS checks, alias ownership, rollback, payments, or public pages.
 - **Reason:** The prior exact candidate was READY and direct public-contract probes were healthy, but the guarded preflight failed twice without emitting its specific assertion. Mutation steps did not run.
 - **Next safe action:** require source-gate evidence, merge only if satisfactory, then read the safe trace from a verified main-head run. Keep the public canonical host as the sole authority for live cutover.
+
+
+### 2026-08-22T18:02:xxZ — PR #204 gated merge
+
+- **Source gates:** PR #204 head `f96a58e72f55774bd42f04dcd19b6b4ad777b476` completed Production Authority Contract (run `32589428374`), CodeQL Advanced (run `32589428352`), and Website CI (run `32589428346`) successfully. These source results do not establish public production state.
+- **Merge:** PR #204 was merged through GitHub as `48d4d73ed0587277625b2631d8d8075d7a45233b`.
+- **Scope retained:** trace-only workflow change; no credential, payment, LMS, domain alias, or public-site behavior was changed by the merge itself.
+- **Next safe action:** wait for exact verified Vercel candidate `48d4d73ed0587277625b2631d8d8075d7a45233b`, read the guarded preflight trace, and use canonical public identity—not workflow status—to establish any live cutover result.
