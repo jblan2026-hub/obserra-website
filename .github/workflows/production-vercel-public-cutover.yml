@@ -369,7 +369,7 @@ jobs:
                 return 1
               fi
               echo "${output_name}_moved=false" >> "${GITHUB_OUTPUT}"
-              echo "${output_name}_source_project=" >> "${GITHUB_OUTPUT}"
+              echo "${output_name}_source_project=${CANONICAL_PROJECT_ID}" >> "${GITHUB_OUTPUT}"
               return 0
             fi
 
@@ -457,6 +457,7 @@ jobs:
           observed_deployment=""
           observed_sha=""
           observed_project=""
+          stable_observations=0
           for attempt in $(seq 1 12); do
             health="$(curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/api/health" || true)"
             observed_deployment="$(jq -r '.routing.deploymentId // empty' <<<"${health}" 2>/dev/null || true)"
@@ -465,10 +466,16 @@ jobs:
             if [ "${observed_deployment}" = "${CANDIDATE_DEPLOYMENT}" ] \
               && [ "${observed_sha}" = "${GITHUB_SHA}" ] \
               && [ "${observed_project}" = "${CANONICAL_PROJECT_ID}" ]; then
-              break
+              stable_observations=$((stable_observations + 1))
+              if [ "${stable_observations}" -ge 2 ]; then
+                break
+              fi
+            else
+              stable_observations=0
             fi
             sleep 10
           done
+          test "${stable_observations}" -ge 2
           test "${observed_deployment}" = "${CANDIDATE_DEPLOYMENT}"
           test "${observed_sha}" = "${GITHUB_SHA}"
           test "${observed_project}" = "${CANONICAL_PROJECT_ID}"
@@ -609,6 +616,14 @@ jobs:
                 return 1
               fi
               rm -f "${body}"
+            elif [ "${moved}" = "false" ]; then
+              if [ "${source_project}" != "${CANONICAL_PROJECT_ID}" ]; then
+                echo "::error::Rollback owner for an unmoved canonical domain is inconsistent: ${domain}."
+                return 1
+              fi
+            else
+              echo "::error::Rollback movement state was not captured for ${domain}."
+              return 1
             fi
 
             curl --silent --show-error --fail-with-body \
@@ -624,8 +639,7 @@ jobs:
 
           restore_domain "${PRIMARY_DOMAIN}" "${MOVED_PRIMARY}" "${ROLLBACK_PRIMARY_PROJECT}" "${ROLLBACK_PRIMARY}"
           restore_domain "${APEX_DOMAIN}" "${MOVED_APEX}" "${ROLLBACK_APEX_PROJECT}" "${ROLLBACK_APEX}"
-          echo "::error::Production cutover failed; every canonical alias was restored and every moved domain was returned to its captured prior project."
-          exit 1
+          echo "::warning::Production cutover failed; every canonical alias was restored and every moved domain was returned to its captured prior project."
 
       - name: Publish safe cutover control-plane outcome
         if: always()
@@ -675,3 +689,46 @@ jobs:
           payload="$(jq -nc             --arg state "${state}"             --arg context "${context}"             --arg description "${description}"             --arg target_url "${target_url}"             '{state: $state, context: $context, description: $description, target_url: $target_url}')"
 
           curl --silent --show-error --fail-with-body             --request POST             --header "Authorization: Bearer ${GITHUB_TOKEN}"             --header "Accept: application/vnd.github+json"             --header "Content-Type: application/json"             --data "${payload}"             "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}"             >/dev/null
+
+      - name: Require successful cutover
+        if: always()
+        shell: bash
+        env:
+          CREDENTIAL_OUTCOME: ${{ steps.credential.outcome }}
+          CANDIDATE_OUTCOME: ${{ steps.candidate.outcome }}
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          ROLLBACK_CAPTURE_OUTCOME: ${{ steps.rollback.outcome }}
+          MOVE_OUTCOME: ${{ steps.move.outcome }}
+          ALIAS_OUTCOME: ${{ steps.alias.outcome }}
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+          QUARANTINE_OUTCOME: ${{ steps.quarantine.outcome }}
+          RECOVERY_OUTCOME: ${{ steps.recovery.outcome }}
+        run: |
+          set -euo pipefail
+          if [ "${CREDENTIAL_OUTCOME}" = "success" ] \
+            && [ "${CANDIDATE_OUTCOME}" = "success" ] \
+            && [ "${PREFLIGHT_OUTCOME}" = "success" ] \
+            && [ "${ROLLBACK_CAPTURE_OUTCOME}" = "success" ] \
+            && [ "${MOVE_OUTCOME}" = "success" ] \
+            && [ "${ALIAS_OUTCOME}" = "success" ] \
+            && [ "${SMOKE_OUTCOME}" = "success" ] \
+            && [ "${QUARANTINE_OUTCOME}" = "success" ]; then
+            exit 0
+          fi
+
+          rollback_required=false
+          if [ "${ROLLBACK_CAPTURE_OUTCOME}" = "success" ] \
+            && { [ "${MOVE_OUTCOME}" = "failure" ] \
+              || [ "${ALIAS_OUTCOME}" = "failure" ] \
+              || [ "${SMOKE_OUTCOME}" = "failure" ]; }; then
+            rollback_required=true
+          fi
+
+          if [ "${rollback_required}" = "true" ] && [ "${RECOVERY_OUTCOME}" != "success" ]; then
+            echo "::error::Production cutover failed and canonical rollback did not complete."
+          elif [ "${rollback_required}" = "true" ]; then
+            echo "::error::Production cutover failed after mutation; canonical rollback completed."
+          else
+            echo "::error::Production cutover did not complete all required verification phases."
+          fi
+          exit 1
