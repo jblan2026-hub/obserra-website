@@ -118,12 +118,14 @@ test("operational Applications endpoints retain server-side authentication and e
   assert.match(portal, /redirect\(["']\/sign-in\?redirect_url=\/portal\/applications["']\)/);
 });
 
-test("Applications implementation source digest remains governed", () => {
-  const legacyNonRegression = read("test/supabase-auth-applications-nonregression.test.mjs");
-  assert.match(
-    legacyNonRegression,
-    /Phase 2A Applications implementation surface is byte-for-byte unchanged apart from approved root runtime directives/,
-  );
-  assert.match(legacyNonRegression, /APPLICATION_SOURCE_DIGEST/);
-  assert.match(legacyNonRegression, /APPROVED_ROOT_RUNTIME_DIRECTIVES/);
+test("Applications presentation remains governed by behavioral controls rather than a frozen source digest", () => {
+  const appSourceControl = read("test/supabase-auth-applications-nonregression.test.mjs");
+  const detail = read("app/apps/[slug]/page.tsx");
+
+  assert.doesNotMatch(appSourceControl, /APPLICATION_SOURCE_DIGEST/);
+  assert.match(appSourceControl, /unverified runtime commerce claims|without a frozen source digest/);
+  assert.doesNotMatch(detail, /liveApplicationUrls/);
+  assert.doesNotMatch(detail, /Subscribe & Launch/);
+  assert.match(detail, /Request enterprise demo/);
+  assert.match(detail, /Request deployment assessment/);
 });
