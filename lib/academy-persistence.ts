@@ -2,10 +2,10 @@ import "server-only";
 
 import { createHmac } from "node:crypto";
 import { academyCommerceStorageReady } from "./academy-payment";
+import { requireSupabaseProjectOrigin } from "./supabase-project-origin";
 
 const COURSE_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
-const EXPECTED_ACADEMY_SUPABASE_ORIGIN = "https://nwxnyqlyzyufgoadtqxs.supabase.co";
 const ACADEMY_PERSISTENCE_GATEWAY_PATH = "/functions/v1/academy-persistence-gateway";
 
 /**
@@ -102,30 +102,15 @@ function validVercelOidcToken(value: string) {
   return parts.length === 3 && value.length >= 128 && value.length <= 16_384;
 }
 
-function academySupabaseOrigin(rawUrl: string) {
-  const url = new URL(rawUrl);
-  if (
-    url.protocol !== "https:" ||
-    url.username ||
-    url.password ||
-    url.search ||
-    url.hash ||
-    (url.pathname !== "/" && url.pathname !== "") ||
-    url.origin !== EXPECTED_ACADEMY_SUPABASE_ORIGIN
-  ) {
-    throw new Error("invalid-academy-origin");
-  }
-  return url.origin;
-}
-
 function academySupabaseConfig(): AcademySupabaseConfig {
   const rawUrl = process.env.OBSERRA_ACADEMY_SUPABASE_URL?.trim() ?? "";
+  const rawProjectRef = process.env.OBSERRA_ACADEMY_SUPABASE_PROJECT_REF?.trim() ?? "";
   const serviceRoleKey = process.env.OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
   const oidcToken = process.env.VERCEL_OIDC_TOKEN?.trim() ?? "";
   const vercelProduction = process.env.VERCEL === "1" && process.env.VERCEL_ENV === "production";
 
   try {
-    const url = academySupabaseOrigin(rawUrl);
+    const { origin: url } = requireSupabaseProjectOrigin(rawUrl, rawProjectRef);
 
     // Vercel production must use short-lived workload identity. Do not silently
     // fall back to a long-lived database administrator credential in that trust zone.
