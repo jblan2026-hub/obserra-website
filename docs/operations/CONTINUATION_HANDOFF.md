@@ -370,3 +370,11 @@ All must be observed from the public canonical host:
 - **No secret operation occurred:** no credentials were read, printed, copied, rotated, invented, or written; no private skill/package content was accessed for publication.
 - **Next safe action:** provision the real, project-scoped Applications service-role credential through the approved deployment-secret path (without disclosure), redeploy, then require canonical `/api/apps/commerce-health` HTTP 200 with all storage/provider/identity checks true before enabling or claiming checkout, entitlement, or downloads. In parallel, align storefront purchase copy with that measured state.
 
+## 2026-08-22T19:11:58.481Z — Production commerce credential convergence stopped before mutation
+
+- Trigger context: continued production repair after the canonical Applications commerce health endpoint remained unavailable.
+- Evidence: the attempted guarded workflow write was rejected before creation because it would transfer a production server credential between authorized providers.
+- Result: no workflow file was created, no credential was read or disclosed, no provider configuration changed, and no deployment was initiated.
+- Current public state remains unproven for commerce: `https://www.obserrallc.com/api/apps/commerce-health` was last observed as HTTP 503 on canonical deployment `dpl_3u2DG49g2Ev3s2tV4rHy98gWdu7U` / commit `6c2cddd84503c7cb0af3ca976fd8308183379146`.
+- Blocker: a valid project-scoped Applications server credential must be set in the Vercel production environment, or an explicit authorization must permit its one-way transfer from the approved GitHub secret store to that Vercel project.
+- Next safe action: after the credential is set or the exact transfer is authorized, redeploy from `main` and re-run the canonical health endpoint before enabling or claiming checkout, purchase, download, or entitlement functionality.
