@@ -30,7 +30,10 @@ test("Academy persistence prefers the signed gateway and fails closed on malform
   assert.match(source, /academy-gateway-v1/);
   assert.match(source, /ACADEMY_GATEWAY_PATH = "\/functions\/v1\/academy-internal-rpc"/);
   assert.match(source, /gatewayUrl\.origin !== supabaseUrl\.origin/);
-  assert.match(source, /gatewayUrl\.pathname\.replace\(\/\\\/$\/, ""\) !== ACADEMY_GATEWAY_PATH/);
+  assert.equal(
+    source.includes('gatewayUrl.pathname.replace(/\\/$/, "") !== ACADEMY_GATEWAY_PATH'),
+    true,
+  );
   assert.doesNotMatch(source, /supabase\.co/);
   assert.match(source, /asymmetricKeyType !== "ed25519"/);
   assert.match(source, /if \(academyGatewayRequested\(\)\) return gatewayRpc/);
