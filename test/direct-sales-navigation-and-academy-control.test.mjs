@@ -86,3 +86,18 @@ test("Application product pages omit placeholder visuals and unverified runtime 
   assert.match(detail, /Request enterprise demo/);
   assert.match(detail, /Request deployment assessment/);
 });
+
+
+test("Marketplace status labels do not imply unverified production readiness", () => {
+  const catalog = read("app/apps/appsData.ts");
+  const marketplace = read("app/apps/AppsMarketplaceClient.tsx");
+  const detail = read("app/apps/[slug]/page.tsx");
+
+  assert.match(catalog, /Available: "Enterprise assessment"/);
+  assert.match(catalog, /Pilot: "Pilot assessment"/);
+  assert.match(catalog, /"Coming Soon": "Pre-release"/);
+  assert.doesNotMatch(marketplace, /Available solutions can be evaluated now/);
+  assert.match(marketplace, /No product is presented as a live self-service/);
+  assert.match(marketplace, /marketplaceEngagementLabel\[entry\.status\]/);
+  assert.match(detail, /marketplaceEngagementLabel\[entry\.status\]/);
+});
