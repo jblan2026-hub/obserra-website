@@ -34,7 +34,7 @@ test("Vercel runtime bootstrap binds one production workload and proves the resu
 
   assert.match(workflow, /KEY_VAULT_SECRETS_USER_ROLE_ID: 4633458b-17de-408a-b874-0445c86b69e6/);
   assert.match(workflow, /roleDefinitionId/);
-  assert.match(workflow, /networkAcls\.defaultAction == "Allow"/);
+  assert.match(workflow, /networkAcls\.defaultAction \/\/ "Allow"/);
   assert.match(workflow, /The deployment identity intentionally has no Key Vault data-plane role/);
   assert.doesNotMatch(workflow, /az keyvault secret list/);
   assert.doesNotMatch(workflow, /az keyvault secret show/);

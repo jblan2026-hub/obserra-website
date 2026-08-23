@@ -168,7 +168,9 @@ jobs:
           # The runtime contract requires an internet-reachable, RBAC-enabled vault.
           # Do not alter RBAC or public-network policy here; fail closed if either
           # differs from the Bicep declaration. Converge only the explicitly
-          # governed network ACL default action when it is not Allow.
+          # governed network ACL default action when it is not Allow. Azure
+          # represents the firewall-disabled default as null; that is the
+          # documented allow-all network posture, not a deny or unknown state.
           if ! jq -e '
             .properties.enableRbacAuthorization == true and
             .properties.publicNetworkAccess == "Enabled"
@@ -176,7 +178,7 @@ jobs:
             echo "::error::The canonical Key Vault differs from the Bicep RBAC/public-network contract."
             exit 1
           fi
-          if ! jq -e '.properties.networkAcls.defaultAction == "Allow"' <<<"${key_vault}" >/dev/null; then
+          if ! jq -e '(.properties.networkAcls.defaultAction // "Allow") == "Allow"' <<<"${key_vault}" >/dev/null; then
             az keyvault update \
               --resource-group "${AZURE_RESOURCE_GROUP}" \
               --name "${KEY_VAULT_NAME}" \
@@ -195,7 +197,7 @@ jobs:
             if jq -e '
               .properties.enableRbacAuthorization == true and
               .properties.publicNetworkAccess == "Enabled" and
-              .properties.networkAcls.defaultAction == "Allow"
+              (.properties.networkAcls.defaultAction // "Allow") == "Allow"
             ' <<<"${key_vault}" >/dev/null; then
               key_vault_ready=true
               break
