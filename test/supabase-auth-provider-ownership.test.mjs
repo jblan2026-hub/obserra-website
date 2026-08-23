@@ -43,6 +43,7 @@ test("public Applications storefront is public while Clerk infrastructure and pr
     "/api/apps/checkout",
     "/api/apps/download",
     "/api/apps/license",
+    "/ai-marketplace/hangar",
     "/portal/applications",
     "/portal/enterprise",
     "/portal/licenses",
@@ -235,6 +236,10 @@ test("provider ownership is segment-safe and shared sign-in follows only a safe 
   );
   assert.equal(
     identityProviderForRequest({ pathname: "/sign-up", redirectTarget: "/portal/applications" }).provider,
+    "clerk",
+  );
+  assert.equal(
+    identityProviderForRequest({ pathname: "/sign-in", redirectTarget: "/ai-marketplace/hangar" }).provider,
     "clerk",
   );
   assert.equal(
