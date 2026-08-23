@@ -12,8 +12,6 @@ permissions:
   contents: write
   id-token: write
 
-environment: production
-
 concurrency:
   group: marketplace-v12-stripe-authority-migration
   cancel-in-progress: false
@@ -32,6 +30,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    environment: production
     steps:
       - name: Wait for canonical production migration endpoint
         shell: bash
