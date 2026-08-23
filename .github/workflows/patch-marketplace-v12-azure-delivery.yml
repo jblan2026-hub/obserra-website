@@ -46,7 +46,7 @@ jobs:
           node --check scripts/marketplace-v12-artifact-ingest-azure.mjs
           node --check scripts/marketplace-v12-runtime-evidence.mjs
 
-      - name: Commit provider cutover
+      - name: Commit runtime provider cutover
         shell: bash
         run: |
           set -euo pipefail
@@ -63,18 +63,16 @@ jobs:
             app/api/ai-marketplace/download/route.ts \
             app/api/ai-marketplace/install-grant/exchange/route.ts \
             scripts/marketplace-v12-runtime-evidence.mjs \
-            .github/workflows/bootstrap-marketplace-v12-azure-source.yml \
-            .github/workflows/marketplace-v12-protected-delivery.yml \
             test/marketplace-runtime-key-vault.test.mjs \
             test/marketplace-v12-production-commerce-hardening.test.mjs \
             test/marketplace-runtime-protected-delivery.test.mjs
           git diff --cached --check
           if git diff --cached --quiet; then
-            echo "No provider cutover changes required."
+            echo "No runtime provider cutover changes required."
             exit 0
           fi
-          git commit -m "fix: move Marketplace protected delivery to Azure Blob OAuth"
+          git commit -m "fix: move Marketplace protected delivery runtime to Azure Blob OAuth"
           git pull --rebase origin fix/marketplace-v12-azure-protected-delivery-20260823
           git push origin HEAD:fix/marketplace-v12-azure-protected-delivery-20260823
 
-# rerun on current branch head
+# workflow-file changes are applied separately through the authenticated repository control plane
