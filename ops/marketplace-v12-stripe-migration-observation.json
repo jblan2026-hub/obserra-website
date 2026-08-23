@@ -2,6 +2,34 @@
   "workflow": "migrate-marketplace-v12-stripe-authority.yml",
   "runs": [
     {
+      "id": 32671349765,
+      "name": "Migrate Marketplace v1.2 Stripe authority",
+      "display_title": "Merge pull request #275 from jblan2026-hub/fix/marketplace-v12-migrat\u2026",
+      "event": "push",
+      "status": "in_progress",
+      "conclusion": null,
+      "head_branch": "main",
+      "head_sha": "7db2cf78d65c63d35e7db2d848317bb004746c94",
+      "run_number": 4,
+      "created_at": "2026-08-23T22:41:19Z",
+      "updated_at": "2026-08-23T22:41:23Z",
+      "html_url": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32671349765"
+    },
+    {
+      "id": 32670441028,
+      "name": "Migrate Marketplace v1.2 Stripe authority",
+      "display_title": "Migrate Marketplace v1.2 Stripe authority",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "failure",
+      "head_branch": "main",
+      "head_sha": "adc8a658ab733d69352a75d1abbef6d5c5639e52",
+      "run_number": 3,
+      "created_at": "2026-08-23T22:23:37Z",
+      "updated_at": "2026-08-23T22:23:45Z",
+      "html_url": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32670441028"
+    },
+    {
       "id": 32670297966,
       "name": "Migrate Marketplace v1.2 Stripe authority",
       "display_title": "Merge pull request #271 from jblan2026-hub/fix/marketplace-v12-stripe\u2026",
