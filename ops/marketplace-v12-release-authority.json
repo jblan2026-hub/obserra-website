@@ -1,0 +1,20 @@
+{
+  "contract": "obserra-marketplace-v12-release-authority-migration-v1",
+  "migrated": false,
+  "httpStatus": "503",
+  "states": {
+    "ai-marketplace-v12-release-evidence-hmac-key": "created"
+  },
+  "sources": {
+    "ai-marketplace-v12-release-evidence-hmac-key": "generated-first-party-hmac"
+  },
+  "missing": [
+    "ai-marketplace-release-aws-access-key-id",
+    "ai-marketplace-release-aws-secret-access-key",
+    "ai-marketplace-release-bucket",
+    "ai-marketplace-release-kms-key-id",
+    "ai-marketplace-release-cdn-url",
+    "ai-marketplace-cloudfront-key-pair-id",
+    "ai-marketplace-cloudfront-private-key"
+  ]
+}
