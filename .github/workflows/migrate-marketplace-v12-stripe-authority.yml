@@ -1,0 +1,188 @@
+name: Migrate Marketplace v1.2 Stripe authority
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/api/admin/ai-marketplace-v12/legacy-stripe-migration/route.ts"
+      - ".github/workflows/migrate-marketplace-v12-stripe-authority.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+environment: production
+
+concurrency:
+  group: marketplace-v12-stripe-authority-migration
+  cancel-in-progress: false
+
+env:
+  AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
+  AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
+  AZURE_DELIVERY_CLIENT_ID: b8da232a-713f-4c25-a61e-4fb34d13e229
+  AZURE_KEY_VAULT_NAME: kv-obserra-prod-38d660
+  MIGRATION_ENDPOINT: https://www.obserrallc.com/api/admin/ai-marketplace-v12/legacy-stripe-migration
+  MARKETPLACE_WEBHOOK_URL: https://www.obserrallc.com/api/webhook/stripe-ai-marketplace
+  OBSERVATION_BRANCH: ops/marketplace-v12-ingest-dispatch-20260823
+
+jobs:
+  migrate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Wait for canonical production migration endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          ready=false
+          for attempt in $(seq 1 90); do
+            status="$(curl -sS --max-time 15 -o "${RUNNER_TEMP}/migration-probe.json" -w '%{http_code}' -X POST "${MIGRATION_ENDPOINT}" || true)"
+            if [ "${status}" = "403" ]; then ready=true; break; fi
+            if [ "${status}" != "404" ] && [ "${status}" != "000" ] && [ "${status}" != "502" ] && [ "${status}" != "503" ]; then
+              echo "::error::Unexpected migration endpoint readiness status: ${status}."
+              cat "${RUNNER_TEMP}/migration-probe.json" 2>/dev/null || true
+              exit 1
+            fi
+            sleep 10
+          done
+          [ "${ready}" = true ] || { echo "::error::Canonical production migration endpoint did not become ready."; exit 1; }
+
+      - name: Migrate legacy server authority directly into Key Vault
+        shell: bash
+        run: |
+          set -euo pipefail
+          request_url="${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=api%3A%2F%2FAzureADTokenExchange"
+          oidc="$(curl -sS --fail-with-body -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${request_url}" | jq -er '.value')"
+          test -n "${oidc}"
+          echo "::add-mask::${oidc}"
+          status="$(curl -sS --max-time 30 -o "${RUNNER_TEMP}/migration-result.json" -w '%{http_code}' -X POST -H "Authorization: Bearer ${oidc}" "${MIGRATION_ENDPOINT}")"
+          unset oidc
+          if [ "${status}" != "200" ]; then
+            code="$(jq -r '.code // "unknown"' "${RUNNER_TEMP}/migration-result.json" 2>/dev/null || echo unknown)"
+            echo "::error::Marketplace legacy authority migration failed with ${status}/${code}."
+            exit 1
+          fi
+          jq -e '.migrated == true and .contract == "obserra-marketplace-v12-legacy-authority-migration-v1" and .webhookSecretMigrated == false' "${RUNNER_TEMP}/migration-result.json" >/dev/null
+
+      - name: Authenticate dedicated Marketplace delivery identity
+        uses: azure/login@v3.0.1
+        with:
+          client-id: ${{ env.AZURE_DELIVERY_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify migrated Key Vault authority metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(az account show --query id -o tsv)" = "${AZURE_SUBSCRIPTION_ID}"
+          test "$(az account show --query tenantId -o tsv)" = "${AZURE_TENANT_ID}"
+          for secret_name in applications-supabase-service-role-key applications-commerce-hash-secret applications-stripe-secret-key; do
+            secret_id="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${secret_name}" --query id -o tsv --only-show-errors)"
+            test -n "${secret_id}" || { echo "::error::Migrated Key Vault metadata unavailable: ${secret_name}."; exit 1; }
+            unset secret_id
+          done
+
+      - name: Converge dedicated Marketplace Stripe webhook
+        shell: bash
+        run: |
+          set -euo pipefail
+          stripe_key="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name applications-stripe-secret-key --query value -o tsv --only-show-errors)"
+          test -n "${stripe_key}"
+          echo "::add-mask::${stripe_key}"
+          account="$(curl -sS --fail-with-body --max-time 30 -u "${stripe_key}:" https://api.stripe.com/v1/account)"
+          account_id="$(jq -er '.id | select(test("^acct_[A-Za-z0-9]+$"))' <<<"${account}")"
+          charges_enabled="$(jq -r '.charges_enabled == true' <<<"${account}")"
+          [ "${charges_enabled}" = true ] || { echo "::error::Stripe account charges are not enabled."; exit 1; }
+
+          required_events=(
+            checkout.session.completed
+            checkout.session.async_payment_succeeded
+            checkout.session.async_payment_failed
+            checkout.session.expired
+            customer.subscription.deleted
+            invoice.payment_failed
+            invoice.paid
+            payment_intent.payment_failed
+            charge.refunded
+            charge.dispute.created
+            charge.dispute.closed
+          )
+
+          endpoints="$(curl -sS --fail-with-body --max-time 30 -u "${stripe_key}:" 'https://api.stripe.com/v1/webhook_endpoints?limit=100')"
+          mapfile -t exact_ids < <(jq -r --arg url "${MARKETPLACE_WEBHOOK_URL}" '.data[] | select(.url==$url and .status=="enabled") | .id' <<<"${endpoints}")
+          webhook_secret_present=false
+          if az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name applications-stripe-webhook-secret --query id -o tsv --only-show-errors >/dev/null 2>&1; then
+            webhook_secret_present=true
+          fi
+
+          usable_id=""
+          if [ "${webhook_secret_present}" = true ] && [ "${#exact_ids[@]}" -eq 1 ]; then
+            candidate="$(jq -c --arg id "${exact_ids[0]}" '.data[] | select(.id==$id)' <<<"${endpoints}")"
+            complete=true
+            for event in "${required_events[@]}"; do
+              if ! jq -e --arg event "${event}" '.enabled_events | index($event) != null' <<<"${candidate}" >/dev/null; then complete=false; break; fi
+            done
+            if [ "${complete}" = true ]; then usable_id="${exact_ids[0]}"; fi
+          fi
+
+          replaced=false
+          if [ -z "${usable_id}" ]; then
+            args=(--data-urlencode "url=${MARKETPLACE_WEBHOOK_URL}" --data-urlencode 'description=Obserra EPI AI Marketplace v1.2 governed commerce')
+            for event in "${required_events[@]}"; do args+=(--data-urlencode "enabled_events[]=${event}"); done
+            created="$(curl -sS --fail-with-body --max-time 30 -u "${stripe_key}:" -X POST https://api.stripe.com/v1/webhook_endpoints "${args[@]}")"
+            usable_id="$(jq -er '.id | select(test("^we_[A-Za-z0-9]+$"))' <<<"${created}")"
+            webhook_secret="$(jq -er '.secret | select(test("^whsec_[A-Za-z0-9_]+$"))' <<<"${created}")"
+            echo "::add-mask::${webhook_secret}"
+            az keyvault secret set --vault-name "${AZURE_KEY_VAULT_NAME}" --name applications-stripe-webhook-secret --value "${webhook_secret}" --output none
+            unset webhook_secret
+            replaced=true
+            for old_id in "${exact_ids[@]}"; do
+              [ "${old_id}" = "${usable_id}" ] && continue
+              deleted="$(curl -sS --fail-with-body --max-time 30 -u "${stripe_key}:" -X DELETE "https://api.stripe.com/v1/webhook_endpoints/${old_id}")"
+              jq -e '.deleted == true' <<<"${deleted}" >/dev/null
+            done
+          fi
+
+          secret_id="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name applications-stripe-webhook-secret --query id -o tsv --only-show-errors)"
+          test -n "${secret_id}"
+          jq -cn \
+            --arg contract "obserra-marketplace-v12-stripe-authority-bootstrap-v1" \
+            --arg accountId "${account_id}" \
+            --arg webhookEndpointId "${usable_id}" \
+            --argjson chargesEnabled true \
+            --argjson webhookReplaced "${replaced}" \
+            --argjson requiredEventCount "${#required_events[@]}" \
+            '{contract:$contract,accountId:$accountId,chargesEnabled:$chargesEnabled,webhookEndpointId:$webhookEndpointId,webhookReplaced:$webhookReplaced,requiredEventCount:$requiredEventCount,keyVaultAuthorityReady:true}' >"${RUNNER_TEMP}/stripe-authority-receipt.json"
+          unset stripe_key account
+
+      - name: Publish non-sensitive Stripe authority receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, json, os, urllib.error, urllib.parse, urllib.request
+          source=os.path.join(os.environ['RUNNER_TEMP'],'stripe-authority-receipt.json')
+          migration=os.path.join(os.environ['RUNNER_TEMP'],'migration-result.json')
+          receipt=json.load(open(source)); migration_result=json.load(open(migration))
+          receipt['legacySources']=migration_result.get('sources',{})
+          content=(json.dumps(receipt,indent=2)+'\n').encode()
+          repo='jblan2026-hub/obserra-website'; path='ops/marketplace-v12-stripe-authority.json'; branch=os.environ['OBSERVATION_BRANCH']; token=os.environ['GH_TOKEN']
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','X-GitHub-Api-Version':'2022-11-28','User-Agent':'obserra-marketplace-stripe-authority','Content-Type':'application/json'}
+          encoded=urllib.parse.quote(path,safe='/')
+          get=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}?ref={urllib.parse.quote(branch,safe="")}',headers=headers); sha=None
+          try:
+            with urllib.request.urlopen(get,timeout=30) as response: sha=json.load(response).get('sha')
+          except urllib.error.HTTPError as error:
+            if error.code != 404: raise
+          body={'message':'ops: record Marketplace Stripe authority bootstrap','content':base64.b64encode(content).decode(),'branch':branch}
+          if sha: body['sha']=sha
+          put=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}',data=json.dumps(body).encode(),method='PUT',headers=headers)
+          with urllib.request.urlopen(put,timeout=30) as response:
+            if response.status not in (200,201): raise SystemExit(response.status)
+          PY
