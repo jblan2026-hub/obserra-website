@@ -1,0 +1,10 @@
+{
+  "contract": "obserra-marketplace-v12-stripe-reconcile-request-v1",
+  "catalogRevision": "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2",
+  "mode": "review-only",
+  "allowCheckoutActivation": false,
+  "allowCharges": false,
+  "allowSubscriptions": false,
+  "allowEntitlements": false,
+  "requestedAt": "2026-08-23T23:49:00Z"
+}
