@@ -860,3 +860,12 @@ All must be observed from the public canonical host:
 - **Vercel context interpretation:** its Vercel project preview context remains failed because the branch commit is unverified/canceled; it is not a production deployment and not a Node 24 runtime regression.
 - **Merge discipline:** the passing source-only PR remains unmerged so `main` stays at the owner-authorized recovery SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2` until runtime identity recovery and its exact bootstrap rerun are independently proven.
 - **Mutation state:** no production identity, Key Vault role, Vercel binding, deployment, canonical alias, payment, enrollment, or LMS state changed by these PR checks.
+
+
+<!-- ops-checkpoint:2026-08-23-runtime-identity-recovery-validated -->
+### 2026-08-23T12:49:09.300Z — runtime identity recovery contract independently validated
+
+- **Root cause confirmed:** bootstrap run #6 authenticated the GitHub deployment identity and failed only because governed runtime identity `id-obserra-runtime-prod` is absent from `rg-obserra-prod-eastus`.
+- **Authorized recovery contract:** in Azure Cloud Shell PowerShell, create that user-assigned identity only if it remains absent; verify the governed subscription/tenant and Key Vault RBAC prerequisite; grant the exact `Key Vault Secrets User` role definition `4633458b-17de-408a-b874-0445c86b69e6` only at canonical vault `kv-obserra-prod-38d660` scope if it remains absent; then read both back.
+- **Data boundary:** this recovery creates no secret, reads no Key Vault secret value, and performs no Vercel mutation. The workflow can resume only after the non-secret identity/role verification marker is emitted.
+- **Exact continuation:** choose `Re-run failed jobs` for Actions bootstrap run #6. That retains authorized `main` SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2`; do not substitute the unmerged Node 24 PR.
