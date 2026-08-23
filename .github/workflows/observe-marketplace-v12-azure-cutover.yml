@@ -27,33 +27,20 @@ jobs:
           repo='jblan2026-hub/obserra-website'; workflow='patch-marketplace-v12-azure-delivery.yml'; branch='fix/marketplace-v12-azure-protected-delivery-20260823'; out_branch='ops/marketplace-v12-ingest-dispatch-20260823'; token=os.environ['GH_TOKEN']
           headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','X-GitHub-Api-Version':'2022-11-28','User-Agent':'obserra-azure-cutover-observer','Content-Type':'application/json'}
           def req(url): return urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=30)
-          with req(f'https://api.github.com/repos/{repo}/actions/workflows/{workflow}/runs?branch={urllib.parse.quote(branch,safe="")}&per_page=5') as r: runs=json.load(r).get('workflow_runs',[])
-          if not runs: raise SystemExit('No Azure cutover workflow run found')
-          run=runs[0]; jobs=[]; blocker=None
-          with req(run['jobs_url']+'?per_page=100') as r: raw_jobs=json.load(r).get('jobs',[])
-          for job in raw_jobs:
-            steps=[{'name':s.get('name'),'status':s.get('status'),'conclusion':s.get('conclusion')} for s in job.get('steps',[])]
-            jobs.append({'id':job.get('id'),'name':job.get('name'),'status':job.get('status'),'conclusion':job.get('conclusion'),'steps':steps})
-            if run.get('conclusion')=='failure':
-              try:
-                with req(f'https://api.github.com/repos/{repo}/actions/jobs/{job["id"]}/logs') as lr: text=lr.read().decode('utf-8',errors='replace')
-              except Exception: text=''
-              safe=[]
-              for line in text.splitlines():
-                if any(marker in line for marker in ['expected 1 occurrence','expected 1 regex occurrence','Process completed with exit code','npm error','SyntaxError','No provider cutover changes required']):
-                  safe.append(line[-500:])
-              if safe: blocker=safe[-1]
-          receipt={'contract':'obserra-marketplace-v12-azure-cutover-observation-v1','runId':run.get('id'),'runUrl':run.get('html_url'),'status':run.get('status'),'conclusion':run.get('conclusion'),'headSha':run.get('head_sha'),'jobs':jobs,'blocker':blocker}
-          content=(json.dumps(receipt,indent=2)+'\n').encode(); path='ops/marketplace-v12-azure-cutover-observation.json'; encoded=urllib.parse.quote(path,safe='/'); sha=None
+          with req(f'https://api.github.com/repos/{repo}/actions/workflows/{workflow}/runs?branch={urllib.parse.quote(branch,safe="")}&per_page=10') as r: data=json.load(r)
+          runs=[]
+          for item in data.get('workflow_runs',[]):
+            runs.append({k:item.get(k) for k in ['id','name','display_title','event','status','conclusion','head_branch','head_sha','run_number','created_at','updated_at','html_url']})
+          content=(json.dumps({'workflow':workflow,'runs':runs},indent=2)+'\n').encode(); path='ops/marketplace-v12-azure-cutover-observation.json'; encoded=urllib.parse.quote(path,safe='/'); sha=None
           try:
             with req(f'https://api.github.com/repos/{repo}/contents/{encoded}?ref={urllib.parse.quote(out_branch,safe="")}') as r: sha=json.load(r).get('sha')
           except urllib.error.HTTPError as e:
             if e.code!=404: raise
-          body={'message':'ops: record Marketplace Azure cutover patch state','content':base64.b64encode(content).decode(),'branch':out_branch}
+          body={'message':'ops: record Marketplace Azure cutover run list','content':base64.b64encode(content).decode(),'branch':out_branch}
           if sha: body['sha']=sha
           put=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}',data=json.dumps(body).encode(),method='PUT',headers=headers)
           with urllib.request.urlopen(put,timeout=30) as r:
             if r.status not in (200,201): raise SystemExit(r.status)
           PY
 
-# refresh at feature head 48bc716
+# refresh after split-write fix
