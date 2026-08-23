@@ -258,3 +258,15 @@ test("Vercel runtime bootstrap converges only the missing Bicep-defined Key Vaul
   assert.match(workflow, /Could not read the canonical Key Vault; only an Azure ResourceNotFound result permits creation/);
   assert.doesNotMatch(workflow, /az keyvault secret (show|set|list|download)/);
 });
+
+
+test("Key Vault network reachability is declared and converged without secret access", async () => {
+  const workflow = await read(".github/workflows/enable-vercel-key-vault-runtime.yml");
+  const bicep = await read("infra/main.bicep");
+
+  assert.match(bicep, /networkAcls:\s*\{\s*defaultAction: 'Allow'/);
+  assert.match(workflow, /--default-action Allow/);
+  assert.match(workflow, /az keyvault update[\s\S]*--default-action Allow/);
+  assert.match(workflow, /The canonical Key Vault differs from the Bicep RBAC\/public-network contract/);
+  assert.doesNotMatch(workflow, /az keyvault secret (show|set|list|download)/);
+});
