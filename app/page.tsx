@@ -38,6 +38,7 @@ export default function HomePage() {
               evidence-disciplined operating model.
             </p>
             <div className="saas-hero__actions">
+              <ButtonLink href="/ai-marketplace" className="saas-hero__marketplace-cta">Shop AI Skills Marketplace</ButtonLink>
               <ButtonLink href="/eios">Explore {EIOS_BRAND_NAME}</ButtonLink>
               <ButtonLink href="/contact?interest=enterprise-consultation" variant="secondary">Request executive briefing</ButtonLink>
             </div>
