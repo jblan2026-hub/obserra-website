@@ -74,6 +74,7 @@ jobs:
             exit 0
           fi
           git commit -m "fix: move Marketplace protected delivery to Azure Blob OAuth"
+          git pull --rebase origin fix/marketplace-v12-azure-protected-delivery-20260823
           git push origin HEAD:fix/marketplace-v12-azure-protected-delivery-20260823
 
-# execute 2026-08-23T19:05:00-04:00
+# rerun on current branch head
