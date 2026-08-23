@@ -90,6 +90,46 @@ test("post-cutover verification rejects canonical domains on every noncanonical 
   assert.match(workflow, /Noncanonical Vercel project \$\{project_id\} still owns a canonical production domain after move/);
 });
 
+test("failed Clerk DNS check is re-requested only after exact canonical proof without weakening release controls", () => {
+  const quarantineStart = workflow.indexOf("- name: Quarantine duplicate project and verify canonical domain ownership");
+  const reconcileStart = workflow.indexOf("- name: Reconcile exact Clerk DNS check after canonical proof");
+  const rollbackStart = workflow.indexOf("- name: Roll back canonical domains on failed cutover");
+  assert.ok(quarantineStart >= 0, "canonical ownership verification must exist");
+  assert.ok(reconcileStart > quarantineStart, "Clerk reconciliation must follow exact canonical proof");
+  assert.ok(rollbackStart > reconcileStart, "rollback control must remain after reconciliation");
+
+  const reconcile = workflow.slice(reconcileStart, rollbackStart);
+  assert.match(reconcile, /if: steps\.quarantine\.outcome == 'success'/);
+  assert.match(reconcile, /continue-on-error:\s*true/);
+  assert.match(reconcile, /verify_cname "clerk\.obserrallc\.com" "frontend-api\.clerk\.services\."/);
+  assert.match(reconcile, /verify_cname "accounts\.obserrallc\.com" "accounts\.clerk\.services\."/);
+  assert.ok(reconcile.includes('"https://${PRIMARY_DOMAIN}/sign-in"'));
+  assert.match(reconcile, /pk_live_/);
+  assert.match(reconcile, /clerk\\\.accounts\\\.dev/);
+  assert.ok(
+    reconcile.includes(
+      "https://api.vercel.com/v2/deployments/${CANDIDATE_DEPLOYMENT}/check-runs?teamId=${TEAM_ID}",
+    ),
+    "Clerk reconciliation must inspect only the exact candidate",
+  );
+  assert.match(reconcile, /\.name == "Clerk DNS Configuration"/);
+  assert.match(reconcile, /\.conclusion == "failed"/);
+  assert.match(reconcile, /\.blocks == "deployment-alias"/);
+  assert.match(reconcile, /\.requires == "deployment-url"/);
+  assert.match(reconcile, /\.source\.kind == "integration"/);
+  assert.match(reconcile, /\.isRerequestable == true/);
+  assert.ok(
+    reconcile.includes(
+      "https://api.vercel.com/v1/deployments/${CANDIDATE_DEPLOYMENT}/checks/${check_id}/rerequest?autoUpdate=true&teamId=${TEAM_ID}",
+    ),
+    "only the exact proven check may be re-requested",
+  );
+  assert.match(reconcile, /for attempt in \$\(seq 1 12\)/);
+  assert.doesNotMatch(reconcile, /--request DELETE|project checks remove|conclusionText|externalUrl|\.output\b|\bcat\b/);
+  assert.doesNotMatch(workflow, /ACADEMY_SALES_LICENSED\s*=\s*true/);
+  assert.doesNotMatch(workflow, /OBSERRA_FDACS_LIVE_READY\s*=\s*true/);
+});
+
 test("alias assignment verifies both canonical aliases converge to the exact candidate before smoke", () => {
   const aliasStart = workflow.indexOf("- name: Assign canonical domains to exact candidate deployment");
   const smokeStart = workflow.indexOf("- name: Verify canonical LMS and prelicense commerce lock");
