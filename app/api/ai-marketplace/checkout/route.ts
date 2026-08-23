@@ -70,14 +70,14 @@ async function requireCustomer(subjectId: string, tenantId: string, source: stri
   return bindAiMarketplaceCustomer(subjectId, tenantId, created.id);
 }
 
-async function v12Checkout(request: Request, input: { productId: string; revision: string; option: string }) {
+async function v12Checkout(request: Request, input: { productId: string; option: string }) {
   const product = marketplaceV12Product(input.productId);
   const expectedRevision = marketplaceV12Summary().revision;
   const option = input.option as MarketplaceV12PurchaseOption;
   const subject = product && marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
   const offer = product && marketplaceV12Offer(product, option);
   const priceId = product && boundMarketplaceV12Price(product, option);
-  if (input.revision !== expectedRevision || !product || !subject || !offer || !priceId || !marketplaceV12BindingCoverage().complete) return redirect(request, "catalog-v12-configuration-required", input.productId);
+  if (!product || !subject || !offer || !priceId || !marketplaceV12BindingCoverage().complete) return redirect(request, "catalog-v12-configuration-required", input.productId);
 
   const { userId, orgId } = await auth();
   if (!userId) {
@@ -164,14 +164,14 @@ export async function POST(request: Request) {
   if (!(request.headers.get("content-type") ?? "").toLowerCase().startsWith("application/x-www-form-urlencoded")) return redirect(request, "unsupported-request");
   const form = await request.formData();
   const productId = String(form.get("product") ?? "");
-  const catalogRevision = String(form.get("catalogRevision") ?? "");
+  const v12Product = marketplaceV12Product(productId);
   try {
     await ensureApplicationsRuntimeSecrets();
-    if (catalogRevision) return await v12Checkout(request, { productId, revision: catalogRevision, option: String(form.get("purchaseOption") ?? "") });
+    if (v12Product) return await v12Checkout(request, { productId, option: String(form.get("purchaseOption") ?? "") });
     return await legacyCheckout(request, { productId, interval: String(form.get("interval") ?? "") });
   } catch (error) {
-    console.error("AI marketplace checkout unavailable", { name: error instanceof Error ? error.name : "unknown", productId, generation: catalogRevision ? "v12" : "legacy" });
-    return redirect(request, catalogRevision ? "catalog-v12-unavailable" : "unavailable", productId);
+    console.error("AI marketplace checkout unavailable", { name: error instanceof Error ? error.name : "unknown", productId, generation: v12Product ? "v12" : "legacy" });
+    return redirect(request, v12Product ? "catalog-v12-unavailable" : "unavailable", productId);
   }
 }
 
