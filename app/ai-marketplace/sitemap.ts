@@ -9,5 +9,5 @@ export async function generateSitemaps() {
 }
 
 export default async function sitemap({ id }: { id: Promise<number> }): Promise<MetadataRoute.Sitemap> {
-  return marketplaceV12SitemapPage(await id, pageSize).entries.map(({ slug }) => ({ url: `${siteUrl}/ai-marketplace/${encodeURIComponent(slug)}`, changeFrequency: "monthly", priority: 0.55 }));
+  return marketplaceV12SitemapPage(await id, pageSize).entries.map(({ slug, product_type }) => ({ url: product_type === "collection" || product_type === "bundle" ? `${siteUrl}/ai-marketplace/collections/${encodeURIComponent(slug)}` : `${siteUrl}/ai-marketplace/${encodeURIComponent(slug)}`, changeFrequency: "monthly", priority: product_type === "collection" || product_type === "bundle" ? 0.65 : 0.55 }));
 }
