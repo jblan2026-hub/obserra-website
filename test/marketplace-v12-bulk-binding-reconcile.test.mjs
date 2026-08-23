@@ -8,8 +8,10 @@ const REVISION = "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47fa
 
 test("bulk reconciler is exact-catalog, shardable, idempotent, and review-only", () => {
   const source = readFileSync(SCRIPT, "utf8");
-  assert.match(source, new RegExp(REVISION));
+  assert.match(source, /EXPECTED_CATALOG_REVISION/);
+  assert.match(source, /catalog\.catalog_revision\s*!==\s*EXPECTED_CATALOG_REVISION/);
   assert.match(source, /subjects\.length\s*!==\s*11_390|subjects\.length\s*!==\s*11390/);
+  assert.match(source, /subjects\.length\s*!==\s*EXPECTED_PRODUCT_COUNT/);
   assert.match(source, /--shard-index/);
   assert.match(source, /--shard-count/);
   assert.match(source, /--concurrency/);
