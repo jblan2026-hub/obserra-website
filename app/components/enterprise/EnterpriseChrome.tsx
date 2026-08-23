@@ -70,7 +70,8 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
             <Link
               key={href}
               href={href}
-              className={prominence === "sales" ? "ent-header__academy" : undefined}
+              className={prominence === "sales" ? "ent-header__sales-link" : undefined}
+              data-navigation="ent-header__academy"
               style={prominence === "sales" ? { justifyContent: "center", padding: "0 16px", border: "1px solid #eeb756", borderRadius: 10, background: "linear-gradient(135deg,#ffd978,#e5a62e)", color: "#071a2b", boxShadow: "0 9px 26px #0006" } : undefined}
               onClick={close}
               aria-current={pathname === href || pathname.startsWith(`${href}/`) ? "page" : undefined}
