@@ -38,7 +38,7 @@ jobs:
           test "$(az account show --query tenantId -o tsv)" = "${AZURE_TENANT_ID}"
 
           identities="$(az identity list --resource-group "${AZURE_RESOURCE_GROUP}" --query '[].{name:name,clientId:clientId,principalId:principalId,tenantId:tenantId,id:id}' -o json)"
-          storage="$(az storage account list --resource-group "${AZURE_RESOURCE_GROUP}" --query '[].{name:name,kind:kind,location:primaryLocation,id:id}' -o json)"
+          storage="$(az storage account list --query '[].{name:name,kind:kind,location:primaryLocation,resourceGroup:resourceGroup,id:id}' -o json)"
           tmp="${RUNNER_TEMP}/marketplace-azure-authority.json"
           python - <<'PY' "${identities}" "${storage}" >"${tmp}"
           import json, sys
