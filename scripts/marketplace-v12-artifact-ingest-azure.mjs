@@ -95,9 +95,9 @@ function exactRemote(value, record, revision) {
   return value?.contentLength === record.byteLength
     && value?.serverEncrypted === true
     && value?.contentType === "application/zip"
-    && value?.metadata?.["artifact-sha256"] === record.artifactSha256
-    && value?.metadata?.["catalog-revision"] === revision
-    && value?.metadata?.["product-id"] === record.productId;
+    && value?.metadata?.artifact_sha256 === record.artifactSha256
+    && value?.metadata?.catalog_revision === revision
+    && value?.metadata?.product_id === record.productId;
 }
 
 const { catalog } = readCatalog({ catalogPath: resolve(options.catalog), summaryPath: resolve(options.summary) });
@@ -137,9 +137,9 @@ for (const record of records) {
     "--content-cache-control", "private,no-store",
     "--content-disposition", `attachment; filename=\"${record.artifactFile}\"`,
     "--metadata",
-    `artifact-sha256=${record.artifactSha256}`,
-    `catalog-revision=${EXPECTED_CATALOG_REVISION}`,
-    `product-id=${record.productId}`,
+    `artifact_sha256=${record.artifactSha256}`,
+    `catalog_revision=${EXPECTED_CATALOG_REVISION}`,
+    `product_id=${record.productId}`,
     "--output", "none",
   ]);
   const verified = head(record.objectKey);
