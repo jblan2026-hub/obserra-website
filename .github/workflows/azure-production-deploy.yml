@@ -119,7 +119,7 @@ jobs:
           test -s obserra-release.zip
 
       - name: Authenticate to Azure with GitHub OIDC
-        uses: azure/login@v2
+        uses: azure/login@v3.0.1
         with:
           client-id: ${{ env.AZURE_CLIENT_ID }}
           tenant-id: ${{ env.AZURE_TENANT_ID }}
