@@ -55,3 +55,5 @@ jobs:
           with urllib.request.urlopen(put,timeout=30) as r:
             if r.status not in (200,201): raise SystemExit(r.status)
           PY
+
+# refresh after workflow simplification
