@@ -6,6 +6,7 @@ test("Homepage directs visitors to the dedicated AI Skills Marketplace", async (
   const home = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(home, /href="\/ai-marketplace"/);
   assert.match(home, /Shop AI Skills Marketplace/);
+  assert.match(home, /Florida Class D Training/);
 });
 
 test("enterprise header exposes a yellow AI Skills Marketplace destination", async () => {
@@ -13,6 +14,25 @@ test("enterprise header exposes a yellow AI Skills Marketplace destination", asy
   assert.match(header, /href="\/ai-marketplace"/);
   assert.match(header, /AI Skills Marketplace/);
   assert.match(header, /ent-header__marketplace/);
+});
+
+test("enterprise header exposes yellow Academy and Florida Training destinations", async () => {
+  const header = await readFile(new URL("../app/components/enterprise/EnterpriseChrome.tsx", import.meta.url), "utf8");
+  assert.match(header, /ent-header__academy/);
+  assert.match(header, /Florida Class D Training/);
+  assert.match(header, /href="\/florida-security-training"/);
+  assert.doesNotMatch(header, />Florida training</);
+  assert.match(header, /ent-header__applications/);
+  assert.match(header, /href="\/apps"/);
+  assert.match(header, /#ffd978/);
+});
+
+test("yellow header destinations are pinned to their actual pages", async () => {
+  const header = await readFile(new URL("../app/components/enterprise/EnterpriseChrome.tsx", import.meta.url), "utf8");
+  assert.match(header, /\[ACADEMY_BRAND_NAME, "\/academy", "sales"\]/);
+  assert.match(header, /href="\/ai-marketplace"/);
+  assert.match(header, /href="\/florida-security-training"/);
+  assert.match(header, /href="\/apps"/);
 });
 
 test("AI Skills Marketplace uses its real product catalog and does not route to Applications", async () => {

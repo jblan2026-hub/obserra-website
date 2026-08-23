@@ -80,7 +80,7 @@ export default function HomePage() {
         <nav className="saas-product-nav" aria-label={`Primary destinations from ${LEGAL_ENTITY_NAME}`}>
           <Link href="/apps"><strong>{APPLICATIONS_BRAND_NAME}</strong><span>Secure software built for executive and operational use.</span></Link>
           <Link href="/academy"><strong>{ACADEMY_BRAND_NAME}</strong><span>Professional learning, enterprise programs, and controlled training.</span></Link>
-          <Link href="/florida-security-training"><strong>Florida training</strong><span>Dedicated regulated-training LMS and student readiness experience.</span></Link>
+          <Link href="/florida-security-training"><strong>Florida Class D Training</strong><span>Dedicated regulated-training LMS and student readiness experience.</span></Link>
           <Link href="/eios"><strong>{EIOS_BRAND_NAME}</strong><span>Executive intelligence, governance, risk, and decision support.</span></Link>
           <Link href="/trust"><strong>Trust Center</strong><span>Security, privacy, governance, and procurement assurance.</span></Link>
         </nav>

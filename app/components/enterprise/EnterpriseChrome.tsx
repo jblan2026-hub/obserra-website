@@ -52,7 +52,7 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
     <header className="ent-header">
       <div className="ent-header__utility">
         <span>Executive advisory · Cybersecurity · Protective intelligence · Secure technology</span>
-        <div><Link href="/florida-security-training">Florida training</Link><Link href="/resources">Resources</Link><Link href="/contact">Contact</Link></div>
+        <div><Link href="/florida-security-training">Florida Class D Training</Link><Link href="/resources">Resources</Link><Link href="/contact">Contact</Link></div>
       </div>
       <div className="ent-header__main">
         <Link className="ent-header__brand" href="/" aria-label={`${LEGAL_ENTITY_NAME} home`} onClick={close}>
@@ -71,6 +71,8 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
               key={href}
               href={href}
               className={prominence === "sales" ? "ent-header__sales-link" : undefined}
+              data-navigation="ent-header__academy"
+              style={prominence === "sales" ? { justifyContent: "center", padding: "0 16px", border: "1px solid #eeb756", borderRadius: 10, background: "linear-gradient(135deg,#ffd978,#e5a62e)", color: "#071a2b", boxShadow: "0 9px 26px #0006" } : undefined}
               onClick={close}
               aria-current={pathname === href || pathname.startsWith(`${href}/`) ? "page" : undefined}
             >
@@ -78,6 +80,8 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
             </Link>
           ))}
           <Link href="/ai-marketplace" className="ent-header__marketplace" style={{ justifyContent: "center", padding: "0 16px", border: "1px solid #eeb756", borderRadius: 10, background: "linear-gradient(135deg,#ffd978,#e5a62e)", color: "#071a2b", boxShadow: "0 9px 26px #0006" }} onClick={close} aria-current={pathname === "/ai-marketplace" || pathname.startsWith("/ai-marketplace/") ? "page" : undefined}>AI Skills Marketplace</Link>
+          <Link href="/florida-security-training" className="ent-header__florida" style={{ justifyContent: "center", padding: "0 16px", border: "1px solid #eeb756", borderRadius: 10, background: "linear-gradient(135deg,#ffd978,#e5a62e)", color: "#071a2b", boxShadow: "0 9px 26px #0006" }} onClick={close} aria-current={pathname === "/florida-security-training" || pathname.startsWith("/florida-security-training/") ? "page" : undefined}>Florida Class D Training</Link>
+          <Link href="/apps" className="ent-header__applications" style={{ justifyContent: "center", padding: "0 16px", border: "1px solid #eeb756", borderRadius: 10, background: "linear-gradient(135deg,#ffd978,#e5a62e)", color: "#071a2b", boxShadow: "0 9px 26px #0006" }} onClick={close} aria-current={pathname === "/apps" || pathname.startsWith("/apps/") ? "page" : undefined}>Applications</Link>
           <Link href="/contact?interest=enterprise-consultation" className="ent-header__cta" onClick={close}>Request consultation</Link>
         </nav>
       </div>
