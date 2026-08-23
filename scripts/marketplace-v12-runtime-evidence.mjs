@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { createHash, createHmac, createPrivateKey } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
@@ -11,7 +11,6 @@ import {
 } from "./marketplace-v12-artifact-lib.mjs";
 
 const ACCOUNT = /^acct_[A-Za-z0-9]+$/;
-const KEY_PAIR = /^[A-Za-z0-9_-]{8,128}$/;
 const SHA256 = /^[a-f0-9]{64}$/;
 const ISO_INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
 
@@ -69,9 +68,8 @@ const allowed = new Set([
   "--stripe-evidence",
   "--ingest-evidence",
   "--ledger-evidence",
-  "--cdn-url-file",
-  "--cloudfront-key-pair-id-file",
-  "--cloudfront-private-key-file",
+  "--azure-storage-account",
+  "--azure-release-container",
   "--hmac-key-file",
   "--receipt-output",
   "--evidence-output",
@@ -86,9 +84,8 @@ for (const key of [
   "stripe-evidence",
   "ingest-evidence",
   "ledger-evidence",
-  "cdn-url-file",
-  "cloudfront-key-pair-id-file",
-  "cloudfront-private-key-file",
+  "azure-storage-account",
+  "azure-release-container",
   "hmac-key-file",
   "receipt-output",
   "evidence-output",
@@ -148,6 +145,9 @@ if (
   || ingestEvidence.requiredProducts !== EXPECTED_PRODUCT_COUNT
   || ingestEvidence.deliveryCatalogSha256 !== deliveryCatalogSha256
   || ingestEvidence.protectedArtifactSetComplete !== true
+  || ingestEvidence.provider !== "azure-blob-oauth"
+  || ingestEvidence.storageAccount !== "stobserramktv1238d660"
+  || ingestEvidence.releaseContainer !== "marketplace-v12-release"
 ) fail("protected artifact ingest evidence is incomplete or mismatched");
 
 if (
@@ -156,18 +156,10 @@ if (
   || ledgerEvidence.entitlementAuthority !== "ai-marketplace-commerce-ledger-v1"
 ) fail("durable ledger evidence is incomplete");
 
-const rawCdnUrl = readFileSync(resolve(options["cdn-url-file"]), "utf8").trim().replace(/\/$/, "");
-const keyPairId = readFileSync(resolve(options["cloudfront-key-pair-id-file"]), "utf8").trim();
-const privateKeyPem = readFileSync(resolve(options["cloudfront-private-key-file"]), "utf8").replace(/\\n/g, "\n").trim();
+const storageAccount = options["azure-storage-account"]?.trim() ?? "";
+const releaseContainer = options["azure-release-container"]?.trim() ?? "";
 const hmacKey = readFileSync(resolve(options["hmac-key-file"]), "utf8").trim();
-try {
-  const cdnUrl = new URL(rawCdnUrl);
-  const privateKey = createPrivateKey(privateKeyPem);
-  if (cdnUrl.protocol !== "https:" || cdnUrl.origin !== rawCdnUrl || cdnUrl.pathname !== "/" || cdnUrl.username || cdnUrl.password || cdnUrl.search || cdnUrl.hash || !cdnUrl.hostname.includes(".") || !KEY_PAIR.test(keyPairId) || privateKey.asymmetricKeyType !== "rsa") fail("CloudFront delivery signing configuration is invalid; values suppressed");
-} catch (error) {
-  if (error instanceof Error && error.message.startsWith("Marketplace v1.2 runtime evidence:")) throw error;
-  fail("CloudFront delivery signing configuration is invalid; values suppressed");
-}
+if (storageAccount !== "stobserramktv1238d660" || releaseContainer !== "marketplace-v12-release") fail("Azure protected delivery configuration is invalid; values suppressed");
 if (hmacKey.length < 32) fail("release evidence signing authority is unavailable; value suppressed");
 
 const now = new Date();
@@ -200,6 +192,7 @@ const evidence = {
     charges_enabled: true,
     protected_delivery_verified: true,
     durable_ledger_verified: true,
+    delivery_provider: "azure-blob-oauth",
   },
 };
 const evidencePayload = canonical(evidence);

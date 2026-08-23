@@ -3,7 +3,8 @@ import "server-only";
 import { createPrivateKey, createPublicKey, sign, verify } from "node:crypto";
 
 import { marketplaceV12BridgeEnrollment } from "./ai-marketplace-commerce";
-import { marketplaceV12ProtectedDeliveryConfigured, signedAiMarketplaceReleaseUrl, type MarketplaceV12Release } from "./ai-marketplace-delivery";
+import { marketplaceV12ProtectedDeliveryConfigured, type MarketplaceV12Release } from "./ai-marketplace-delivery";
+import { marketplaceV12SignedAzureReleaseUrl } from "./marketplace-v12-azure-delivery";
 
 const BRIDGE = /^bridge_[A-Za-z0-9_-]{16,128}$/;
 const KEY_ID = /^obserra-[a-z0-9][a-z0-9._-]{2,63}$/;
@@ -83,6 +84,6 @@ export function marketplaceV12InstallManifest(grant: MarketplaceV12BridgeGrant, 
   return { manifest, signature: sign(null, Buffer.from(payload), config.key).toString("base64url"), protocol: config.protocol };
 }
 
-export function marketplaceV12BridgeArtifactUrl(release: MarketplaceV12Release) {
-  return signedAiMarketplaceReleaseUrl(release, 300);
+export async function marketplaceV12BridgeArtifactUrl(release: MarketplaceV12Release, productId: string, revision: string) {
+  return marketplaceV12SignedAzureReleaseUrl({ release, productId, revision });
 }
