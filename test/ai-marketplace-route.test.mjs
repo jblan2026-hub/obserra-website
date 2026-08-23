@@ -117,10 +117,14 @@ test("every marketplace offering requires an exact governed payment binding", as
   assert.match(v12Bindings, /marketplaceV12CommerceSubjects/);
   assert.match(v12Bindings, /artifactSha256 !== subject\.artifactSha256/);
   assert.match(v12Bindings, /requiredProductCards/);
-  assert.match(v12Bindings, /expectedOfferKeys/);
+  assert.match(v12Bindings, /requiredOfferBindingCount/);
+  assert.match(v12Bindings, /marketplaceV12ProductBindingAuthority/);
+  assert.match(v12Bindings, /marketplaceV12BindingEvidenceKeyMatches/);
+  assert.doesNotMatch(v12Bindings, /OBSERRA_AI_MARKETPLACE_V12_BINDINGS_JSON/);
   assert.match(health, /marketplaceV12BindingCoverage/);
   assert.match(health, /activationBlocked: true/);
   assert.match(checkout, /catalog-v12-configuration-required/);
+  assert.match(checkout, /await Promise\.all\(\[boundMarketplaceV12Price/);
   assert.match(checkout, /revision: expectedRevision/);
   assert.doesNotMatch(checkout, /form\.get\("catalogRevision"\)/);
   assert.match(webhook, /obserra-ai-marketplace-v12/);

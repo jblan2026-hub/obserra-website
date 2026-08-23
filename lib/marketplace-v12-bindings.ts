@@ -1,13 +1,17 @@
 import "server-only";
 
+import {
+  marketplaceV12BindingAuthorityReceipt,
+  marketplaceV12BindingEvidenceKeyMatches,
+  marketplaceV12ProductBindingAuthority,
+  type MarketplaceV12BindingAuthorityReceipt,
+} from "./marketplace-v12-binding-import";
 import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary, type MarketplaceV12Card } from "./marketplace-v12-catalog";
 import { marketplaceV12ReleaseEvidence } from "./marketplace-v12-release-evidence";
 
-type Binding = Readonly<{ prices: Record<string, string>; artifactSha256: string }>;
-type BindingManifest = Readonly<{ revision?: string; products?: Record<string, Binding> }>;
-
-const PRICE_ID = /^price_[A-Za-z0-9]+$/;
+const RECEIPT_CONTRACT = "obserra-marketplace-v12-runtime-binding-receipt-v1";
 const SHA256 = /^[a-f0-9]{64}$/;
+const RECEIPT_FIELDS = ["bindingSetSha256", "contract", "liveReviewedOfferBindings", "requiredOfferBindings", "requiredProducts", "reviewedProductCards", "revision", "verifiedAt"];
 
 export type MarketplaceV12PurchaseOption = "recurring:month" | "recurring:year" | "one_time:once" | "team_license:once" | "activation:once";
 
@@ -35,72 +39,104 @@ export function marketplaceV12Offer(product: MarketplaceV12Card, option: Marketp
   return matches.length === 1 ? matches[0] : null;
 }
 
-function requiredOfferKeys(product: MarketplaceV12Card) {
-  return product.pricing.offers.filter((offer) => offer.currency === "USD" && Number.isSafeInteger(offer.amount_minor) && offer.amount_minor > 0).map(offerKey);
+let expectedOfferBindings: number | null = null;
+function requiredOfferBindingCount() {
+  if (expectedOfferBindings !== null) return expectedOfferBindings;
+  expectedOfferBindings = marketplaceV12CommerceSubjects().reduce((total, subject) => {
+    const product = marketplaceV12Product(subject.productId);
+    return total + (product ? marketplaceV12PurchaseOptions(product).length : 0);
+  }, 0);
+  return expectedOfferBindings;
 }
 
-/**
- * This is an evidence manifest, not a checkout configuration. A syntactically
- * complete manifest still requires an out-of-band Stripe verification run
- * before the catalog may be published or checkout enabled.
- */
-export function marketplaceV12Bindings() {
+function runtimeBindingReceipt(): MarketplaceV12BindingAuthorityReceipt | null {
   try {
-    const value = JSON.parse(process.env.OBSERRA_AI_MARKETPLACE_V12_BINDINGS_JSON ?? "") as BindingManifest;
-    if (value.revision !== marketplaceV12Summary().revision || !value.products || Array.isArray(value.products)) return null;
-    return value.products;
+    const value = JSON.parse(process.env.OBSERRA_AI_MARKETPLACE_V12_BINDING_RECEIPT_JSON ?? "") as Record<string, unknown>;
+    const subjects = marketplaceV12CommerceSubjects();
+    const offers = requiredOfferBindingCount();
+    if (Object.keys(value).sort().join("\n") !== RECEIPT_FIELDS.join("\n")
+      || value.contract !== RECEIPT_CONTRACT
+      || value.revision !== marketplaceV12Summary().revision
+      || value.requiredProducts !== subjects.length
+      || value.reviewedProductCards !== subjects.length
+      || value.requiredOfferBindings !== offers
+      || value.liveReviewedOfferBindings !== offers
+      || typeof value.bindingSetSha256 !== "string" || !SHA256.test(value.bindingSetSha256)
+      || typeof value.verifiedAt !== "string" || !Number.isFinite(Date.parse(value.verifiedAt))
+      || Date.parse(value.verifiedAt) > Date.now() + 5 * 60 * 1000) return null;
+    return value as MarketplaceV12BindingAuthorityReceipt;
   } catch {
     return null;
   }
 }
 
-export function boundMarketplaceV12Price(product: MarketplaceV12Card, option: MarketplaceV12PurchaseOption) {
-  const subject = marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
-  const offer = marketplaceV12Offer(product, option);
-  const binding = marketplaceV12Bindings()?.[product.product_id];
-  const priceId = offer && binding?.prices?.[offerKey(offer)];
-  return subject && binding?.artifactSha256 === subject.artifactSha256 && typeof priceId === "string" && PRICE_ID.test(priceId) ? priceId : null;
+function sameReceipt(left: MarketplaceV12BindingAuthorityReceipt, right: MarketplaceV12BindingAuthorityReceipt) {
+  return left.contract === right.contract
+    && left.revision === right.revision
+    && left.requiredProducts === right.requiredProducts
+    && left.requiredOfferBindings === right.requiredOfferBindings
+    && left.reviewedProductCards === right.reviewedProductCards
+    && left.liveReviewedOfferBindings === right.liveReviewedOfferBindings
+    && left.bindingSetSha256 === right.bindingSetSha256
+    && Date.parse(left.verifiedAt) === Date.parse(right.verifiedAt);
 }
 
-export function marketplaceV12BindingCoverage() {
+export async function boundMarketplaceV12Price(product: MarketplaceV12Card, option: MarketplaceV12PurchaseOption) {
+  const subject = marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
+  const expectedOptions = marketplaceV12PurchaseOptions(product);
+  const receipt = runtimeBindingReceipt();
+  if (!subject || !receipt || expectedOptions.length !== product.pricing.offers.length || !expectedOptions.some((entry) => entry.option === option)) return null;
+  try {
+    const authority = await marketplaceV12ProductBindingAuthority(receipt.revision, product.product_id);
+    if (authority.bindingSetSha256 !== receipt.bindingSetSha256 || Date.parse(authority.verifiedAt) !== Date.parse(receipt.verifiedAt)
+      || authority.bindings.length !== expectedOptions.length) return null;
+    const options = new Set<MarketplaceV12PurchaseOption>();
+    for (const binding of authority.bindings) {
+      if (!expectedOptions.some((entry) => entry.option === binding.purchaseOption) || options.has(binding.purchaseOption as MarketplaceV12PurchaseOption)
+        || binding.artifactSha256 !== subject.artifactSha256 || binding.stripeLivemode !== true
+        || Date.parse(binding.reviewedAt) > Date.parse(receipt.verifiedAt)
+        || !marketplaceV12BindingEvidenceKeyMatches({
+          catalogRevision: receipt.revision,
+          productId: product.product_id,
+          purchaseOption: binding.purchaseOption,
+          artifactSha256: binding.artifactSha256,
+          stripeProductId: binding.stripeProductId,
+          stripePriceId: binding.stripePriceId,
+          stripeLivemode: binding.stripeLivemode,
+          evidenceKey: binding.evidenceKey,
+        })) return null;
+      options.add(binding.purchaseOption as MarketplaceV12PurchaseOption);
+    }
+    return authority.bindings.find((binding) => binding.purchaseOption === option)?.stripePriceId ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function marketplaceV12BindingCoverage() {
   const subjects = marketplaceV12CommerceSubjects();
-  const bindings = marketplaceV12Bindings();
-  const declared = Number(process.env.OBSERRA_AI_MARKETPLACE_V12_VERIFIED_BINDING_COUNT ?? 0);
-  const declaredBoundCards = Number.isSafeInteger(declared) && declared >= 0 ? declared : 0;
-  const boundIds = bindings ? Object.keys(bindings) : [];
-  const subjectById = new Map(subjects.map((subject) => [subject.productId, subject]));
-  const unexpectedProductIds = boundIds.filter((productId) => !subjectById.has(productId));
-  const invalidProductIds = boundIds.filter((productId) => {
-    const binding = bindings?.[productId];
-    const subject = subjectById.get(productId);
-    const product = marketplaceV12Product(productId);
-    const expectedOfferKeys = product ? requiredOfferKeys(product) : [];
-    const boundOfferKeys = binding?.prices && !Array.isArray(binding.prices) ? Object.keys(binding.prices) : [];
-    return !binding || !subject || !product || !SHA256.test(binding.artifactSha256) || binding.artifactSha256 !== subject.artifactSha256
-      || expectedOfferKeys.length !== boundOfferKeys.length
-      || expectedOfferKeys.some((key) => !PRICE_ID.test(binding.prices?.[key] ?? ""))
-      || boundOfferKeys.some((key) => !expectedOfferKeys.includes(key));
-  });
-  const missingProductIds = subjects.filter((subject) => !bindings?.[subject.productId]).map((subject) => subject.productId);
-  const structurallyComplete = Boolean(bindings)
-    && declaredBoundCards === subjects.length
-    && boundIds.length === subjects.length
-    && missingProductIds.length === 0
-    && unexpectedProductIds.length === 0
-    && invalidProductIds.length === 0;
+  const receipt = runtimeBindingReceipt();
+  let authority: MarketplaceV12BindingAuthorityReceipt | null = null;
+  if (receipt) {
+    try { authority = await marketplaceV12BindingAuthorityReceipt(receipt.revision); } catch { authority = null; }
+  }
+  const structurallyComplete = Boolean(receipt && authority && sameReceipt(receipt, authority));
   const releaseEvidence = marketplaceV12ReleaseEvidence({ revision: marketplaceV12Summary().revision, requiredSubjects: subjects.length });
+  const declaredBoundCards = receipt?.reviewedProductCards ?? 0;
+  const missingProductCards = Math.max(0, subjects.length - declaredBoundCards);
 
   return {
     revision: marketplaceV12Summary().revision,
     requiredProductCards: subjects.length,
+    requiredOfferBindings: requiredOfferBindingCount(),
     declaredBoundCards,
-    manifestEntries: boundIds.length,
-    missingProductCards: missingProductIds.length,
-    unexpectedProductCards: unexpectedProductIds.length,
-    invalidBindings: invalidProductIds.length,
+    reviewedOfferBindings: receipt?.liveReviewedOfferBindings ?? 0,
+    bindingSetSha256: receipt?.bindingSetSha256 ?? null,
+    manifestEntries: declaredBoundCards,
+    missingProductCards,
+    unexpectedProductCards: declaredBoundCards > subjects.length ? declaredBoundCards - subjects.length : 0,
+    invalidBindings: structurallyComplete ? 0 : 1,
     structurallyComplete,
-    // This requires a separately HMAC-signed full verification snapshot whose
-    // canonical digests are recomputed above; a claimed count cannot satisfy it.
     stripeVerified: structurallyComplete && releaseEvidence.verified,
     complete: structurallyComplete && releaseEvidence.verified,
   };

@@ -139,11 +139,14 @@ jobs:
           read_secret applications-supabase-service-role-key supabase-service-role-key
           read_secret applications-stripe-secret-key stripe-secret-key
           read_secret applications-stripe-webhook-secret stripe-webhook-secret
-          read_secret ai-marketplace-v12-bindings-json stripe-bindings-json
           read_secret ai-marketplace-release-aws-access-key-id aws-access-key-id
           read_secret ai-marketplace-release-aws-secret-access-key aws-secret-access-key
           read_secret ai-marketplace-release-bucket release-bucket
           read_secret ai-marketplace-release-kms-key-id release-kms-key-id
+          read_secret ai-marketplace-release-cdn-url release-cdn-url
+          read_secret ai-marketplace-cloudfront-key-pair-id cloudfront-key-pair-id
+          read_secret ai-marketplace-cloudfront-private-key cloudfront-private-key
+          read_secret ai-marketplace-v12-release-evidence-hmac-key release-evidence-hmac-key
 
       - name: Verify live Stripe authority and ingest protected artifacts
         if: inputs.mode == 'ingest'
@@ -155,7 +158,6 @@ jobs:
           export OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY="$(<"${secret_dir}/supabase-service-role-key")"
           export APPLICATIONS_STRIPE_SECRET_KEY="$(<"${secret_dir}/stripe-secret-key")"
           export APPLICATIONS_STRIPE_WEBHOOK_SECRET="$(<"${secret_dir}/stripe-webhook-secret")"
-          export OBSERRA_AI_MARKETPLACE_V12_BINDINGS_JSON="$(<"${secret_dir}/stripe-bindings-json")"
           export OBSERRA_AI_MARKETPLACE_V12_EVIDENCE_RUN=review
           export OBSERRA_ALLOW_LIVE_STRIPE_OUTSIDE_PRODUCTION=true
           export AWS_ACCESS_KEY_ID="$(<"${secret_dir}/aws-access-key-id")"
@@ -163,7 +165,11 @@ jobs:
           export AWS_REGION="${{ vars.OBSERRA_MARKETPLACE_RELEASE_AWS_REGION }}"
           test -n "${AWS_REGION:-}" || { echo "::error::Protected release region is not configured."; exit 1; }
           node scripts/verify-marketplace-v12-stripe-evidence.mjs >"${evidence_dir}/stripe-evidence.json"
-          jq -e '.verified == true and .failureCount == 0 and .requiredProductCards == 11390 and .stripeAccountChargesEnabled == true' "${evidence_dir}/stripe-evidence.json" >/dev/null
+          jq -e '.verified == true and .failureCount == 0 and .requiredProductCards == 11390 and .verifiedOfferBindings == .requiredOfferBindings and .bindingReceipt.contract == "obserra-marketplace-v12-runtime-binding-receipt-v1" and .bindingReceipt.requiredProducts == 11390 and .bindingReceipt.reviewedProductCards == 11390 and .bindingReceipt.liveReviewedOfferBindings == .bindingReceipt.requiredOfferBindings and .stripeAccountChargesEnabled == true and (.stripeAccountId | test("^acct_[A-Za-z0-9]+$"))' "${evidence_dir}/stripe-evidence.json" >/dev/null
+          jq -c '.bindingReceipt' "${evidence_dir}/stripe-evidence.json" >"${evidence_dir}/runtime-binding-receipt.json"
+          chmod 0600 "${evidence_dir}/runtime-binding-receipt.json"
+          node scripts/verify-marketplace-v12-ledger-evidence.mjs >"${evidence_dir}/ledger-evidence.json"
+          jq -e '.durableLedgerVerified == true and .entitlementAuthority == "ai-marketplace-commerce-ledger-v1"' "${evidence_dir}/ledger-evidence.json" >/dev/null
           node scripts/marketplace-v12-artifact-ingest.mjs \
             --catalog data/marketplace/obserra-marketplace-card-catalog.json.gz \
             --summary data/marketplace/obserra-marketplace-card-catalog.summary.json \
@@ -176,7 +182,53 @@ jobs:
             --region "${AWS_REGION}" \
             --activate >"${evidence_dir}/ingest-result.json"
           jq -e '.protectedArtifactSetComplete == true and .requiredProducts == 11390' "${evidence_dir}/ingest-result.json" >/dev/null
-          unset OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY APPLICATIONS_STRIPE_SECRET_KEY APPLICATIONS_STRIPE_WEBHOOK_SECRET OBSERRA_AI_MARKETPLACE_V12_BINDINGS_JSON AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+          node scripts/marketplace-v12-runtime-evidence.mjs \
+            --binding-receipt "${evidence_dir}/runtime-binding-receipt.json" \
+            --delivery-catalog "${evidence_dir}/delivery-catalog.json" \
+            --stripe-evidence "${evidence_dir}/stripe-evidence.json" \
+            --ingest-evidence "${evidence_dir}/ingest-result.json" \
+            --ledger-evidence "${evidence_dir}/ledger-evidence.json" \
+            --cdn-url-file "${secret_dir}/release-cdn-url" \
+            --cloudfront-key-pair-id-file "${secret_dir}/cloudfront-key-pair-id" \
+            --cloudfront-private-key-file "${secret_dir}/cloudfront-private-key" \
+            --hmac-key-file "${secret_dir}/release-evidence-hmac-key" \
+            --receipt-output "${evidence_dir}/runtime-delivery-receipt.json" \
+            --evidence-output "${evidence_dir}/runtime-release-evidence.json" \
+            --signature-output "${evidence_dir}/runtime-release-evidence-signature" \
+            >"${evidence_dir}/runtime-evidence-build.json"
+          jq -e '.complete == true and .activationChanged == false and .requiredProducts == 11390 and .durableLedgerVerified == true and .protectedDeliveryVerified == true' "${evidence_dir}/runtime-evidence-build.json" >/dev/null
+          unset OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY APPLICATIONS_STRIPE_SECRET_KEY APPLICATIONS_STRIPE_WEBHOOK_SECRET AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+
+      - name: Publish exact runtime activation evidence to Key Vault
+        if: inputs.mode == 'ingest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence_dir="${RUNNER_TEMP}/marketplace-v12-evidence"
+          set_secret_file() {
+            local secret_name="$1" source_file="$2"
+            test -s "${source_file}" || { echo "::error::Runtime evidence file is unavailable for ${secret_name}."; exit 1; }
+            az keyvault secret set \
+              --vault-name "${AZURE_KEY_VAULT_NAME}" \
+              --name "${secret_name}" \
+              --file "${source_file}" \
+              --output none
+          }
+          set_secret_value() {
+            local secret_name="$1" value="$2"
+            az keyvault secret set \
+              --vault-name "${AZURE_KEY_VAULT_NAME}" \
+              --name "${secret_name}" \
+              --value "${value}" \
+              --output none
+          }
+          set_secret_file ai-marketplace-v12-binding-receipt-json "${evidence_dir}/runtime-binding-receipt.json"
+          set_secret_file ai-marketplace-v12-delivery-catalog-json "${evidence_dir}/runtime-delivery-receipt.json"
+          set_secret_file ai-marketplace-v12-release-evidence-json "${evidence_dir}/runtime-release-evidence.json"
+          set_secret_file ai-marketplace-v12-release-evidence-signature "${evidence_dir}/runtime-release-evidence-signature"
+          # Approval is written last. Any interrupted earlier write therefore
+          # remains digest-mismatched and runtime checkout stays fail-closed.
+          set_secret_value ai-marketplace-v12-activation-approved-revision "${EXPECTED_CATALOG_REVISION}"
 
       - name: Retain non-sensitive release evidence
         if: always()
@@ -186,7 +238,12 @@ jobs:
           path: |
             ${{ runner.temp }}/marketplace-v12-evidence/materialization-result.json
             ${{ runner.temp }}/marketplace-v12-evidence/stripe-evidence.json
+            ${{ runner.temp }}/marketplace-v12-evidence/ledger-evidence.json
             ${{ runner.temp }}/marketplace-v12-evidence/ingest-result.json
+            ${{ runner.temp }}/marketplace-v12-evidence/runtime-binding-receipt.json
+            ${{ runner.temp }}/marketplace-v12-evidence/runtime-delivery-receipt.json
+            ${{ runner.temp }}/marketplace-v12-evidence/runtime-release-evidence.json
+            ${{ runner.temp }}/marketplace-v12-evidence/runtime-evidence-build.json
           if-no-files-found: ignore
           retention-days: 30
 

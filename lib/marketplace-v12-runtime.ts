@@ -7,7 +7,7 @@ import { marketplaceV12ActivationGate } from "./marketplace-v12-activation";
 import { marketplaceV12BindingCoverage } from "./marketplace-v12-bindings";
 import { marketplaceV12CommerceSubjects, marketplaceV12Summary, type MarketplaceV12Card } from "./marketplace-v12-catalog";
 import { marketplaceV12ReleaseEvidence } from "./marketplace-v12-release-evidence";
-import { ensureApplicationsRuntimeSecrets } from "./production-runtime-secrets";
+import { ensureMarketplaceV12RuntimeSecrets } from "./production-runtime-secrets";
 
 export type MarketplaceV12RuntimeCommerce = Readonly<{
   operational: boolean;
@@ -21,9 +21,9 @@ export type MarketplaceV12RuntimeCommerce = Readonly<{
  * checkout, and health reporting. It does not make a provider mutation.
  */
 export async function marketplaceV12RuntimeCommerce(): Promise<MarketplaceV12RuntimeCommerce> {
-  const coverage = marketplaceV12BindingCoverage();
   try {
-    await ensureApplicationsRuntimeSecrets();
+    await ensureMarketplaceV12RuntimeSecrets();
+    const coverage = await marketplaceV12BindingCoverage();
     const configured = applicationsCommerceConfigured();
     const live = applicationsCommerceLivemode();
     if (!configured || live !== true) return { operational: false, reason: "configuration_unavailable", checkoutEnabled: false, installEnabled: false };

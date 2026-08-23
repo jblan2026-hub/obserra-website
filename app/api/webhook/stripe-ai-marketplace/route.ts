@@ -8,7 +8,7 @@ import { recordAiMarketplacePayment, recordMarketplaceV12Lifecycle, recordMarket
 import { applicationsCommerceLivemode, applicationsStripeWebhookSecret, getApplicationsStripe } from "../../../../lib/applications-stripe";
 import { boundMarketplaceV12Price, marketplaceV12BindingCoverage, marketplaceV12Offer, type MarketplaceV12PurchaseOption } from "../../../../lib/marketplace-v12-bindings";
 import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
-import { ensureApplicationsRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
+import { ensureApplicationsRuntimeSecrets, ensureMarketplaceV12RuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 import { readStripeWebhookBody } from "../../../../lib/stripe-webhook-body";
 
 export const runtime = "nodejs";
@@ -38,11 +38,10 @@ function v12Metadata(metadata: Stripe.Metadata | null | undefined) {
 
 async function fulfillV12(event: Stripe.Event, session: Stripe.Checkout.Session, raw: string, live: boolean) {
   const metadata = v12Metadata(session.metadata);
-  const coverage = marketplaceV12BindingCoverage();
   const offer = metadata && marketplaceV12Offer(metadata.product, metadata.option);
-  const priceId = metadata && boundMarketplaceV12Price(metadata.product, metadata.option);
+  const [coverage, priceId] = metadata ? await Promise.all([marketplaceV12BindingCoverage(), boundMarketplaceV12Price(metadata.product, metadata.option)]) : [null, null];
   const customer = sid(session.customer);
-  if (session.livemode !== event.livemode || session.status !== "complete" || session.payment_status !== "paid" || !metadata || !offer || !priceId || !customer || !coverage.structurallyComplete || !coverage.stripeVerified || session.client_reference_id !== metadata.subjectId) throw new Error("v12 binding evidence unavailable");
+  if (session.livemode !== event.livemode || session.status !== "complete" || session.payment_status !== "paid" || !metadata || !offer || !priceId || !customer || !coverage?.structurallyComplete || !coverage.stripeVerified || session.client_reference_id !== metadata.subjectId) throw new Error("v12 binding evidence unavailable");
   const lines = await getApplicationsStripe().checkout.sessions.listLineItems(session.id, { limit: 2, expand: ["data.price.product"] });
   const price = lines.data[0]?.price;
   const bindingKey = `${offer.kind}:${offer.cadence ?? "once"}:${offer.amount_minor}`;
@@ -157,6 +156,7 @@ export async function POST(request: Request) {
     if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.metadata?.commerceSource === V12_SOURCE) {
+        await ensureMarketplaceV12RuntimeSecrets();
         await fulfillV12(event, session, raw, live);
         return NextResponse.json({ received: true });
       }

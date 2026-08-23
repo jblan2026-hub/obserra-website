@@ -35,6 +35,25 @@ export type MarketplaceV12BindingReviewProgress = Readonly<{
   productEvidence: readonly MarketplaceV12BindingReviewEvidence[];
 }>;
 
+export type MarketplaceV12BindingAuthorityReceipt = Readonly<{
+  contract: "obserra-marketplace-v12-runtime-binding-receipt-v1";
+  revision: string;
+  requiredProducts: number;
+  requiredOfferBindings: number;
+  reviewedProductCards: number;
+  liveReviewedOfferBindings: number;
+  bindingSetSha256: string;
+  verifiedAt: string;
+}>;
+
+export type MarketplaceV12ProductBindingAuthority = Readonly<{
+  revision: string;
+  bindingSetSha256: string;
+  verifiedAt: string;
+  productId: string;
+  bindings: readonly MarketplaceV12BindingReviewEvidence[];
+}>;
+
 const SHA256 = /^[a-f0-9]{64}$/;
 const PRODUCT = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,191}$/;
 const PRICE = /^price_[A-Za-z0-9]+$/;
@@ -52,6 +71,29 @@ function evidenceKey(review: BindingReview) {
   const key = process.env.OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET?.trim() ?? "";
   if (key.length < 32) throw new Error("Marketplace binding review integrity key is unavailable.");
   return createHmac("sha256", key).update(JSON.stringify([review.catalogRevision, review.productId, review.purchaseOption, review.artifactSha256, review.stripeProductId, review.stripePriceId, review.stripeLivemode])).digest("hex");
+}
+
+function bindingEvidence(value: unknown): MarketplaceV12BindingReviewEvidence {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Marketplace binding authority evidence is invalid.");
+  const row = value as Record<string, unknown>;
+  if (typeof row.purchaseOption !== "string" || typeof row.artifactSha256 !== "string" || !SHA256.test(row.artifactSha256)
+    || typeof row.stripeProductId !== "string" || !STRIPE_PRODUCT.test(row.stripeProductId)
+    || typeof row.stripePriceId !== "string" || !PRICE.test(row.stripePriceId)
+    || typeof row.stripeLivemode !== "boolean" || typeof row.evidenceKey !== "string" || !SHA256.test(row.evidenceKey)
+    || typeof row.reviewedAt !== "string" || !Number.isFinite(Date.parse(row.reviewedAt))) throw new Error("Marketplace binding authority evidence is invalid.");
+  return { purchaseOption: row.purchaseOption, artifactSha256: row.artifactSha256, stripeProductId: row.stripeProductId, stripePriceId: row.stripePriceId, stripeLivemode: row.stripeLivemode, evidenceKey: row.evidenceKey, reviewedAt: row.reviewedAt };
+}
+
+function bindingReceipt(value: unknown): MarketplaceV12BindingAuthorityReceipt {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Marketplace binding authority receipt is invalid.");
+  const receipt = value as Record<string, unknown>;
+  const counts = [receipt.requiredProducts, receipt.requiredOfferBindings, receipt.reviewedProductCards, receipt.liveReviewedOfferBindings];
+  if (receipt.contract !== "obserra-marketplace-v12-runtime-binding-receipt-v1"
+    || typeof receipt.revision !== "string" || !SHA256.test(receipt.revision)
+    || typeof receipt.bindingSetSha256 !== "string" || !SHA256.test(receipt.bindingSetSha256)
+    || !counts.every((count) => Number.isSafeInteger(count) && (count as number) > 0)
+    || typeof receipt.verifiedAt !== "string" || !Number.isFinite(Date.parse(receipt.verifiedAt))) throw new Error("Marketplace binding authority receipt is invalid.");
+  return receipt as MarketplaceV12BindingAuthorityReceipt;
 }
 
 async function bindingRpc<T>(name: string, body: Record<string, unknown>) {
@@ -96,16 +138,7 @@ export async function marketplaceV12BindingReviewProgress(catalogRevision: strin
   const evidence = progress.productEvidence;
   const counts = [progress.reviewedOfferBindings, progress.liveReviewedOfferBindings, progress.reviewedProductCards, progress.productReviewedOfferBindings];
   if (progress.catalogRevision !== catalogRevision || progress.productId !== productId || !counts.every((count) => Number.isSafeInteger(count) && (count as number) >= 0) || !Array.isArray(evidence) || evidence.length > 10) throw new Error("Marketplace binding progress is invalid.");
-  const productEvidence = evidence.map((entry): MarketplaceV12BindingReviewEvidence => {
-    if (!entry || typeof entry !== "object" || Array.isArray(entry)) throw new Error("Marketplace binding progress evidence is invalid.");
-    const row = entry as Record<string, unknown>;
-    if (typeof row.purchaseOption !== "string" || typeof row.artifactSha256 !== "string" || !SHA256.test(row.artifactSha256)
-      || typeof row.stripeProductId !== "string" || !STRIPE_PRODUCT.test(row.stripeProductId)
-      || typeof row.stripePriceId !== "string" || !PRICE.test(row.stripePriceId)
-      || typeof row.stripeLivemode !== "boolean" || typeof row.evidenceKey !== "string" || !SHA256.test(row.evidenceKey)
-      || typeof row.reviewedAt !== "string" || !Number.isFinite(Date.parse(row.reviewedAt))) throw new Error("Marketplace binding progress evidence is invalid.");
-    return { purchaseOption: row.purchaseOption, artifactSha256: row.artifactSha256, stripeProductId: row.stripeProductId, stripePriceId: row.stripePriceId, stripeLivemode: row.stripeLivemode, evidenceKey: row.evidenceKey, reviewedAt: row.reviewedAt };
-  });
+  const productEvidence = evidence.map(bindingEvidence);
   return {
     catalogRevision, productId,
     reviewedOfferBindings: progress.reviewedOfferBindings as number,
@@ -114,4 +147,32 @@ export async function marketplaceV12BindingReviewProgress(catalogRevision: strin
     productReviewedOfferBindings: progress.productReviewedOfferBindings as number,
     productEvidence,
   } satisfies MarketplaceV12BindingReviewProgress;
+}
+
+export async function marketplaceV12BindingAuthorityReceipt(catalogRevision: string) {
+  if (!SHA256.test(catalogRevision)) throw new Error("Marketplace binding authority identity is invalid.");
+  const value = await bindingRpc<unknown>("obserra_ai_marketplace_v12_binding_authority_receipt", { p_catalog_revision: catalogRevision });
+  return bindingReceipt(value);
+}
+
+export async function marketplaceV12ProductBindingAuthority(catalogRevision: string, productId: string) {
+  if (!SHA256.test(catalogRevision) || !PRODUCT.test(productId)) throw new Error("Marketplace product binding authority identity is invalid.");
+  const value = await bindingRpc<unknown>("obserra_ai_marketplace_v12_product_binding_authority", { p_catalog_revision: catalogRevision, p_product_id: productId });
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Marketplace product binding authority is invalid.");
+  const authority = value as Record<string, unknown>;
+  if (authority.revision !== catalogRevision || authority.productId !== productId
+    || typeof authority.bindingSetSha256 !== "string" || !SHA256.test(authority.bindingSetSha256)
+    || typeof authority.verifiedAt !== "string" || !Number.isFinite(Date.parse(authority.verifiedAt))
+    || !Array.isArray(authority.bindings) || authority.bindings.length > 10) throw new Error("Marketplace product binding authority is invalid.");
+  return {
+    revision: catalogRevision,
+    productId,
+    bindingSetSha256: authority.bindingSetSha256,
+    verifiedAt: authority.verifiedAt,
+    bindings: authority.bindings.map(bindingEvidence),
+  } satisfies MarketplaceV12ProductBindingAuthority;
+}
+
+export function marketplaceV12BindingEvidenceKeyMatches(review: Omit<BindingReview, "principalId" | "correlationId"> & { evidenceKey: string }) {
+  return SHA256.test(review.evidenceKey) && evidenceKey({ ...review, principalId: "runtime", correlationId: "runtime" }) === review.evidenceKey;
 }

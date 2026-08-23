@@ -6,6 +6,7 @@ import { findAiMarketplaceProduct } from "../../../../lib/ai-marketplace-catalog
 import { aiMarketplaceEntitlement, aiMarketplaceTenantId, marketplaceV12DeliveryEntitlement, recordMarketplaceV12Download } from "../../../../lib/ai-marketplace-commerce";
 import { aiMarketplaceRelease, marketplaceV12Release, signedAiMarketplaceReleaseUrl } from "../../../../lib/ai-marketplace-delivery";
 import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
+import { ensureMarketplaceV12RuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,6 +23,7 @@ export async function GET(request: Request) {
   if (!userId) return NextResponse.json({ error: "Authentication required" }, { status: 401, headers: { "cache-control": "no-store", "x-robots-tag": "noindex, nofollow" } });
   try {
     if (catalog && subject) {
+      await ensureMarketplaceV12RuntimeSecrets();
       const revision = marketplaceV12Summary().revision;
       const tenantId = aiMarketplaceTenantId(userId, orgId);
       const entitled = await marketplaceV12DeliveryEntitlement(userId, tenantId, catalog.product_id, revision, subject.artifactSha256);

@@ -45,6 +45,45 @@ const APPLICATION_BINDINGS: readonly Binding[] = [
   },
 ];
 
+const MARKETPLACE_V12_BINDINGS: readonly Binding[] = [
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_V12_BINDING_RECEIPT_JSON",
+    keyVaultSecretName: "ai-marketplace-v12-binding-receipt-json",
+  },
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_V12_DELIVERY_CATALOG_JSON",
+    keyVaultSecretName: "ai-marketplace-v12-delivery-catalog-json",
+  },
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_V12_RELEASE_EVIDENCE_JSON",
+    keyVaultSecretName: "ai-marketplace-v12-release-evidence-json",
+  },
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_V12_RELEASE_EVIDENCE_SIGNATURE",
+    keyVaultSecretName: "ai-marketplace-v12-release-evidence-signature",
+  },
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_V12_RELEASE_EVIDENCE_HMAC_KEY",
+    keyVaultSecretName: "ai-marketplace-v12-release-evidence-hmac-key",
+  },
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_V12_ACTIVATION_APPROVED_REVISION",
+    keyVaultSecretName: "ai-marketplace-v12-activation-approved-revision",
+  },
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_RELEASE_CDN_URL",
+    keyVaultSecretName: "ai-marketplace-release-cdn-url",
+  },
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_CLOUDFRONT_KEY_PAIR_ID",
+    keyVaultSecretName: "ai-marketplace-cloudfront-key-pair-id",
+  },
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_CLOUDFRONT_PRIVATE_KEY",
+    keyVaultSecretName: "ai-marketplace-cloudfront-private-key",
+  },
+];
+
 const ACADEMY_BINDINGS: readonly Binding[] = [
   {
     environmentKey: "ACADEMY_STRIPE_SECRET_KEY",
@@ -101,7 +140,7 @@ type CacheEntry = Readonly<{
 }>;
 
 const secretCache = new Map<string, CacheEntry>();
-const hydrationPromises = new Map<"applications" | "academy", Promise<ProductionRuntimeSecretsEvidence>>();
+const hydrationPromises = new Map<"applications" | "academy" | "marketplace-v12", Promise<ProductionRuntimeSecretsEvidence>>();
 let azureAccessToken: CacheEntry | null = null;
 
 function vercelProductionRuntime() {
@@ -276,7 +315,7 @@ async function hydrate(bindings: readonly Binding[]) {
   return bindings.length;
 }
 
-async function ensureBindings(scope: "applications" | "academy", bindings: readonly Binding[]): Promise<ProductionRuntimeSecretsEvidence> {
+async function ensureBindings(scope: "applications" | "academy" | "marketplace-v12", bindings: readonly Binding[]): Promise<ProductionRuntimeSecretsEvidence> {
   if (!vercelProductionRuntime()) return { required: false, state: "not-required", stage: "environment", bindingCount: 0 };
   const existing = hydrationPromises.get(scope);
   if (existing) return existing;
@@ -296,6 +335,16 @@ async function ensureBindings(scope: "applications" | "academy", bindings: reado
  */
 export async function ensureApplicationsRuntimeSecrets(): Promise<ProductionRuntimeSecretsEvidence> {
   return ensureBindings("applications", APPLICATION_BINDINGS);
+}
+
+/**
+ * Hydrates the shared Applications commerce authority and every marketplace
+ * v1.2 activation/delivery binding as one all-or-nothing environment update.
+ * Keeping a separate scope prevents an unavailable marketplace release from
+ * taking unrelated Applications commerce offline.
+ */
+export async function ensureMarketplaceV12RuntimeSecrets(): Promise<ProductionRuntimeSecretsEvidence> {
+  return ensureBindings("marketplace-v12", [...APPLICATION_BINDINGS, ...MARKETPLACE_V12_BINDINGS]);
 }
 
 /**
