@@ -70,7 +70,8 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
             <Link
               key={href}
               href={href}
-              className={prominence === "sales" ? "ent-header__sales-link" : undefined}
+              className={prominence === "sales" ? "ent-header__academy" : undefined}
+              style={prominence === "sales" ? { justifyContent: "center", padding: "0 16px", border: "1px solid #eeb756", borderRadius: 10, background: "linear-gradient(135deg,#ffd978,#e5a62e)", color: "#071a2b", boxShadow: "0 9px 26px #0006" } : undefined}
               onClick={close}
               aria-current={pathname === href || pathname.startsWith(`${href}/`) ? "page" : undefined}
             >
@@ -78,6 +79,7 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
             </Link>
           ))}
           <Link href="/ai-marketplace" className="ent-header__marketplace" style={{ justifyContent: "center", padding: "0 16px", border: "1px solid #eeb756", borderRadius: 10, background: "linear-gradient(135deg,#ffd978,#e5a62e)", color: "#071a2b", boxShadow: "0 9px 26px #0006" }} onClick={close} aria-current={pathname === "/ai-marketplace" || pathname.startsWith("/ai-marketplace/") ? "page" : undefined}>AI Skills Marketplace</Link>
+          <Link href="/florida-security-training" className="ent-header__florida" style={{ justifyContent: "center", padding: "0 16px", border: "1px solid #eeb756", borderRadius: 10, background: "linear-gradient(135deg,#ffd978,#e5a62e)", color: "#071a2b", boxShadow: "0 9px 26px #0006" }} onClick={close} aria-current={pathname === "/florida-security-training" || pathname.startsWith("/florida-security-training/") ? "page" : undefined}>Florida Class D Training</Link>
           <Link href="/contact?interest=enterprise-consultation" className="ent-header__cta" onClick={close}>Request consultation</Link>
         </nav>
       </div>
