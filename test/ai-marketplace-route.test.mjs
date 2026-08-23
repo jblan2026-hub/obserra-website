@@ -20,6 +20,8 @@ test("enterprise header exposes yellow Academy and Florida Training destinations
   assert.match(header, /ent-header__academy/);
   assert.match(header, /Florida Class D Training/);
   assert.match(header, /href="\/florida-security-training"/);
+  assert.match(header, /ent-header__applications/);
+  assert.match(header, /href="\/apps"/);
   assert.match(header, /#ffd978/);
 });
 
