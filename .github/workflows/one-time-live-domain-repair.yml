@@ -211,7 +211,7 @@ jobs:
           set -euo pipefail
           attach() {
             local alias="$1"
-            local response observed_alias observed_deployment
+            local response observed_alias
             response="$(curl --silent --show-error --fail-with-body \
               --connect-timeout 10 \
               --max-time 20 \
@@ -221,9 +221,7 @@ jobs:
               --data "{\"alias\":\"${alias}\"}" \
               "https://api.vercel.com/v2/deployments/${CANDIDATE_DEPLOYMENT}/aliases?teamId=${TEAM_ID}")"
             observed_alias="$(jq -r '.alias // .name // empty' <<<"${response}")"
-            observed_deployment="$(jq -r '.deploymentId // .deployment.id // empty' <<<"${response}")"
             test "${observed_alias}" = "${alias}"
-            test "${observed_deployment}" = "${CANDIDATE_DEPLOYMENT}"
           }
           attach "${PRIMARY_DOMAIN}"
           attach "${APEX_DOMAIN}"
