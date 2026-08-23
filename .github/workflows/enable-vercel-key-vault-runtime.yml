@@ -78,7 +78,56 @@ jobs:
           test "$(az account show --query id -o tsv)" = "${AZURE_SUBSCRIPTION_ID}"
           test "$(az account show --query tenantId -o tsv)" = "${AZURE_TENANT_ID}"
 
-          runtime_identity="$(az identity show --resource-group "${AZURE_RESOURCE_GROUP}" --name "${AZURE_RUNTIME_IDENTITY}" --output json)"
+          resource_group="$(az group show --name "${AZURE_RESOURCE_GROUP}" --output json)"
+          resource_group_location="$(jq -er '.location | strings' <<<"${resource_group}")"
+
+          # Create exactly the governed user-assigned identity only when Azure
+          # confirms it is absent. Permission, transport, and all other errors
+          # remain fail-closed rather than being treated as absence.
+          runtime_identity_file="$(mktemp)"
+          runtime_identity_error_file="$(mktemp)"
+          if az identity show \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --name "${AZURE_RUNTIME_IDENTITY}" \
+            --output json >"${runtime_identity_file}" 2>"${runtime_identity_error_file}"; then
+            :
+          else
+            runtime_identity_error="$(<"${runtime_identity_error_file}")"
+            if grep -Eqi '(ResourceNotFound|was not found|could not be found)' <<<"${runtime_identity_error}"; then
+              az identity create \
+                --resource-group "${AZURE_RESOURCE_GROUP}" \
+                --name "${AZURE_RUNTIME_IDENTITY}" \
+                --location "${resource_group_location}" \
+                --output json >"${runtime_identity_file}"
+            else
+              rm -f "${runtime_identity_file}" "${runtime_identity_error_file}"
+              echo "::error::Could not read the governed runtime identity; only an Azure ResourceNotFound result permits creation."
+              exit 1
+            fi
+          fi
+          runtime_identity="$(<"${runtime_identity_file}")"
+          rm -f "${runtime_identity_file}" "${runtime_identity_error_file}"
+          unset runtime_identity_error
+
+          # Managed-identity principal propagation is asynchronous. Require a
+          # tenant-matched client and principal ID before any RBAC mutation.
+          runtime_identity_ready=false
+          for attempt in $(seq 1 12); do
+            runtime_identity="$(az identity show --resource-group "${AZURE_RESOURCE_GROUP}" --name "${AZURE_RUNTIME_IDENTITY}" --output json)"
+            if jq -e --arg tenant "${AZURE_TENANT_ID}" '
+              .tenantId == $tenant and
+              (.clientId | type == "string" and length > 0) and
+              (.principalId | type == "string" and length > 0)
+            ' <<<"${runtime_identity}" >/dev/null; then
+              runtime_identity_ready=true
+              break
+            fi
+            sleep 5
+          done
+          [ "${runtime_identity_ready}" = true ] || {
+            echo "::error::The governed runtime identity did not return a tenant-matched client and principal ID."
+            exit 1
+          }
           runtime_client_id="$(jq -er '.clientId | strings' <<<"${runtime_identity}")"
           runtime_principal_id="$(jq -er '.principalId | strings' <<<"${runtime_identity}")"
 
@@ -93,18 +142,58 @@ jobs:
             exit 1
           }
 
-          role_assignments="$(az role assignment list --assignee-object-id "${runtime_principal_id}" --scope "${key_vault_id}" --output json)"
-          normalized_key_vault_id="$(tr '[:upper:]' '[:lower:]' <<<"${key_vault_id}")"
-          jq -e --arg scope "${normalized_key_vault_id}" --arg role "${KEY_VAULT_SECRETS_USER_ROLE_ID}" '
-            any(.[];
-              ((.scope // "") | ascii_downcase) == $scope and
-              (((.roleDefinitionId // "") | ascii_downcase) | endswith($role))
-            )
-          ' <<<"${role_assignments}" >/dev/null || {
-            echo "::error::The existing runtime identity lacks the exact Key Vault Secrets User role at the canonical vault."
-            exit 1
+          normalized_key_vault_id="$(tr '[:upper:]' '[:lower:]' <<<"${key_vault_id%/}")"
+          has_exact_key_vault_role() {
+            jq -e --arg scope "${normalized_key_vault_id}" --arg role "${KEY_VAULT_SECRETS_USER_ROLE_ID}" '
+              any(.[];
+                ((.scope // "") | sub("/+$"; "") | ascii_downcase) == $scope and
+                (((.roleDefinitionId // "") | split("/") | last | ascii_downcase) == $role)
+              )
+            ' >/dev/null
           }
 
+          role_assignments="$(az role assignment list \
+            --assignee-object-id "${runtime_principal_id}" \
+            --scope "${key_vault_id}" \
+            --all \
+            --output json)"
+          if ! has_exact_key_vault_role <<<"${role_assignments}"; then
+            role_assignment_error_file="$(mktemp)"
+            if az role assignment create \
+              --assignee-object-id "${runtime_principal_id}" \
+              --assignee-principal-type ServicePrincipal \
+              --role "${KEY_VAULT_SECRETS_USER_ROLE_ID}" \
+              --scope "${key_vault_id}" \
+              --output none 2>"${role_assignment_error_file}"; then
+              :
+            elif grep -Eqi 'RoleAssignmentExists' "${role_assignment_error_file}"; then
+              :
+            else
+              rm -f "${role_assignment_error_file}"
+              echo "::error::Could not assign the exact Key Vault Secrets User role to the governed runtime identity."
+              exit 1
+            fi
+            rm -f "${role_assignment_error_file}"
+          fi
+
+          role_ready=false
+          for attempt in $(seq 1 12); do
+            role_assignments="$(az role assignment list \
+              --assignee-object-id "${runtime_principal_id}" \
+              --scope "${key_vault_id}" \
+              --all \
+              --output json)"
+            if has_exact_key_vault_role <<<"${role_assignments}"; then
+              role_ready=true
+              break
+            fi
+            sleep 5
+          done
+          [ "${role_ready}" = true ] || {
+            echo "::error::The exact Key Vault Secrets User role was not visible at the canonical vault after readback."
+            exit 1
+          }
+          unset role_assignments role_ready runtime_identity_ready resource_group resource_group_location
           # The deployment identity intentionally has no Key Vault data-plane role.
           # Runtime commerce probes below prove that only the production workload
           # identity can read the required bindings without exposing their values.
@@ -234,7 +323,7 @@ jobs:
                 value: $client_id,
                 type: "sensitive",
                 target: ["production"],
-                comment: "Existing Azure runtime managed identity for canonical Vercel Key Vault access"
+                comment: "Canonical Azure runtime managed identity for Vercel Key Vault access"
               },
               {
                 key: "OBSERRA_APPLICATIONS_SUPABASE_URL",
