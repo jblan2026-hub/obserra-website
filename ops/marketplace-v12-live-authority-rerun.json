@@ -1,0 +1,104 @@
+{
+  "contract": "obserra-marketplace-live-authority-rerun-observation-v1",
+  "workflows": {
+    "converge-marketplace-production-variables.yml": {
+      "runId": 32670439942,
+      "status": "completed",
+      "conclusion": "failure",
+      "htmlUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32670439942",
+      "headSha": "adc8a658ab733d69352a75d1abbef6d5c5639e52",
+      "jobs": [
+        {
+          "id": 97270387290,
+          "name": "converge",
+          "status": "completed",
+          "conclusion": "failure",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Converge authoritative non-secret environment variables",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "name": "Verify variable names and expected values",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Publish non-sensitive convergence receipt",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    },
+    "migrate-marketplace-v12-stripe-authority.yml": {
+      "runId": 32670441028,
+      "status": "completed",
+      "conclusion": "failure",
+      "htmlUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32670441028",
+      "headSha": "adc8a658ab733d69352a75d1abbef6d5c5639e52",
+      "jobs": [
+        {
+          "id": 97270389558,
+          "name": "migrate",
+          "status": "completed",
+          "conclusion": "failure",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Wait for canonical production migration endpoint",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "name": "Migrate legacy server authority directly into Key Vault",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "name": "Authenticate dedicated Marketplace delivery identity",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Verify migrated Key Vault authority metadata",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Converge dedicated Marketplace Stripe webhook",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Publish non-sensitive Stripe authority receipt",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

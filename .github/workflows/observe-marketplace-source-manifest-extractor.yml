@@ -1,0 +1,52 @@
+name: Observe Marketplace source manifest extractor
+# refresh: corrected canonical-loader run
+
+on:
+  push:
+    branches: [ops/marketplace-v12-ingest-dispatch-20260823]
+    paths:
+      - ".github/workflows/observe-marketplace-source-manifest-extractor.yml"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  observe:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Read extractor run metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, json, os, urllib.error, urllib.parse, urllib.request
+          repo='jblan2026-hub/obserra-website'
+          workflow='extract-marketplace-source-archive-manifest.yml'
+          branch='ops/marketplace-v12-ingest-dispatch-20260823'
+          token=os.environ['GH_TOKEN']
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','X-GitHub-Api-Version':'2022-11-28','User-Agent':'obserra-marketplace-source-manifest-observer','Content-Type':'application/json'}
+          req=urllib.request.Request(f'https://api.github.com/repos/{repo}/actions/workflows/{workflow}/runs?per_page=5',headers=headers)
+          with urllib.request.urlopen(req,timeout=30) as response:
+              payload=json.load(response)
+          runs=[]
+          for item in payload.get('workflow_runs',[]):
+              runs.append({key:item.get(key) for key in ('id','name','display_title','event','status','conclusion','head_branch','head_sha','run_number','created_at','updated_at','html_url')})
+          content=(json.dumps({'workflow':workflow,'runs':runs},indent=2)+'\n').encode()
+          path='ops/marketplace-v12-source-manifest-observation.json'
+          encoded=urllib.parse.quote(path,safe='/')
+          get=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}?ref={urllib.parse.quote(branch,safe="")}',headers=headers)
+          sha=None
+          try:
+              with urllib.request.urlopen(get,timeout=30) as response:
+                  sha=json.load(response).get('sha')
+          except urllib.error.HTTPError as error:
+              if error.code != 404: raise
+          body={'message':'ops: record Marketplace source manifest extractor state','content':base64.b64encode(content).decode(),'branch':branch}
+          if sha: body['sha']=sha
+          put=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}',data=json.dumps(body).encode(),method='PUT',headers=headers)
+          with urllib.request.urlopen(put,timeout=30) as response:
+              if response.status not in (200,201): raise SystemExit(response.status)
+          PY

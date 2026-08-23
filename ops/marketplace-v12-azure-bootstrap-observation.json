@@ -1,0 +1,15 @@
+{
+  "workflow": "bootstrap-marketplace-v12-azure-source.yml",
+  "runs": [
+    {
+      "id": 32669623004,
+      "status": "in_progress",
+      "conclusion": null,
+      "head_sha": "d8e06014cb8228f4cec7a0e0b496d83c5bb44925",
+      "run_number": 1,
+      "created_at": "2026-08-23T22:07:26Z",
+      "updated_at": "2026-08-23T22:07:29Z",
+      "html_url": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32669623004"
+    }
+  ]
+}

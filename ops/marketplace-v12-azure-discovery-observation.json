@@ -1,0 +1,13 @@
+{
+  "workflow": "discover-marketplace-v12-azure-metadata-once.yml",
+  "runs": [
+    {
+      "id": 32668321306,
+      "status": "completed",
+      "conclusion": "failure",
+      "head_sha": "a9975a920ae59beaacb246f5ca033df583341d57",
+      "created_at": "2026-08-23T21:42:07Z",
+      "html_url": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32668321306"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "contract": "obserra-marketplace-v12-protected-delivery-observation-v1",
+  "runId": 32670594056,
+  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32670594056",
+  "targetSha": "adc8a658ab733d69352a75d1abbef6d5c5639e52",
+  "catalogRevision": "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2",
+  "status": "completed",
+  "conclusion": "failure",
+  "failureStep": "Pin the governed release identity",
+  "blocker": null,
+  "observedAt": "2026-08-23T22:26:54.096187Z"
+}

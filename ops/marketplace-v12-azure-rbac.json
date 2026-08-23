@@ -1,0 +1,39 @@
+{
+  "contract": "obserra-marketplace-azure-rbac-observation-v1",
+  "deployRoles": [
+    {
+      "role": "Contributor",
+      "scope": "/subscriptions/38d660ff-611e-4f6c-ad29-70f5cf118f52/resourceGroups/rg-obserra-prod-eastus"
+    },
+    {
+      "role": "User Access Administrator",
+      "scope": "/subscriptions/38d660ff-611e-4f6c-ad29-70f5cf118f52/resourceGroups/rg-obserra-prod-eastus"
+    }
+  ],
+  "runtimeRoles": [
+    {
+      "role": "Key Vault Secrets User",
+      "scope": "/subscriptions/38d660ff-611e-4f6c-ad29-70f5cf118f52/resourceGroups/rg-obserra-prod-eastus/providers/Microsoft.KeyVault/vaults/kv-obserra-prod-38d660"
+    }
+  ],
+  "keyVault": {
+    "enableRbacAuthorization": true,
+    "id": "/subscriptions/38d660ff-611e-4f6c-ad29-70f5cf118f52/resourceGroups/rg-obserra-prod-eastus/providers/Microsoft.KeyVault/vaults/kv-obserra-prod-38d660",
+    "location": "eastus",
+    "name": "kv-obserra-prod-38d660",
+    "networkDefaultAction": null,
+    "publicNetworkAccess": "Enabled"
+  },
+  "identities": [
+    {
+      "clientId": "dc3ff3e1-ea35-4879-afa9-fa3eee49df85",
+      "name": "id-obserra-github-prod",
+      "principalId": "f87823b9-4fc5-4c3e-b8ac-63c91c3f15aa"
+    },
+    {
+      "clientId": "807bc5fa-32ca-4410-ab8d-79e461b64e82",
+      "name": "id-obserra-runtime-prod",
+      "principalId": "11ee06b7-bad6-4e30-a48b-469fec011fe3"
+    }
+  ]
+}

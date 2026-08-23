@@ -1,0 +1,82 @@
+{
+  "contract": "obserra-marketplace-v12-source-archive-manifest-v1",
+  "catalogRevision": "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2",
+  "archiveCount": 15,
+  "archives": [
+    {
+      "filename": "Obserra_EPI_Agent_Inventory_Generator_v1.0.0(1).zip",
+      "bytes": 325980,
+      "sha256": "4fd1384bf6ac10e94fdf617bbb782a63f5092f9fdcce03472bbb0ab8e6914c83"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Agent_Capability_Skills_Repository_Set_2_Addons_v1.0.0(2).zip",
+      "bytes": 37082309,
+      "sha256": "54aa4257f901b421d4746dd34c66c9e736fecfa592a2c2a7b13bfafce849cdf4"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Agent_Capability_Skills_Repository_Set_3_Final_5000_v1.0.0(2).zip",
+      "bytes": 67081573,
+      "sha256": "56254d63f0589e37eef37d1cd4669ca29968b571e927de77d0ee61f68079e049"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Agent_Capability_Skills_Repository_Set_4_Advanced_2000_v1.0.0(2).zip",
+      "bytes": 29266792,
+      "sha256": "b38e0f65034ec44bdab747f580188eb353928eb435b3fa68bf5ad102d655666c"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Agent_Capability_Skills_Repository_v1.0.0(2).zip",
+      "bytes": 36065188,
+      "sha256": "aed67e7e3d268a6e08d25b9f64db3fd8b7a562f3da475eb1d7c72aa837db0cb2"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Marketplace_Suite_v1.0.0 (1).zip",
+      "bytes": 42414211,
+      "sha256": "7c53a9f79b8a956b5399ed292c8456576979761ebf760efaaf3e4ffe83a49c01"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Marketplace_Suite_v1.0.0 (2)(1).zip",
+      "bytes": 42285741,
+      "sha256": "1a4c3fe2b6113753d346649c5e74786e3be23d34701f0c21398a1e7f316f49e3"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Marketplace_Suite_v1.0.0(1).zip",
+      "bytes": 42283052,
+      "sha256": "17c44d27f0a09463b113fa40afc3c3d806fc909ea287c5e2126fb21170b26108"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Skill_Repository_Validator_v1.0.0(1).zip",
+      "bytes": 325397,
+      "sha256": "490d65449b5be2c4a06b6a2305886952dbbb404a2e45b8aa5869441ac25b9a76"
+    },
+    {
+      "filename": "Obserra_EPI_Evidence_and_Checksum_Builder_v1.0.0(1).zip",
+      "bytes": 325824,
+      "sha256": "fb01dd2a65e879ba0495ca8886ddff6d7ab8baf2adf777ceac52880728c76721"
+    },
+    {
+      "filename": "Obserra_EPI_Marketplace_Builder_and_Assurance_Toolkit_v1.0.0(1).zip",
+      "bytes": 4138494,
+      "sha256": "f12aa3250f0882ef35b8ed88e13207f43b5f7e9db18ec459b19744701443e7c0"
+    },
+    {
+      "filename": "Obserra_EPI_Marketplace_Builder_and_Assurance_Toolkit_v1.0.1(2).zip",
+      "bytes": 6344213,
+      "sha256": "49bea45f6bd38f72e389d1273ecc188f93b5766cc6759563cc7a4768a4fd7450"
+    },
+    {
+      "filename": "Obserra_EPI_Marketplace_Upload_Preflight_Validator_v1.0.0(1).zip",
+      "bytes": 327542,
+      "sha256": "ba51dc6c8c162aff52ba203c9d893c955baec5cbe5af2a5e571b7ef787d77fde"
+    },
+    {
+      "filename": "Obserra_EPI_MCP_Security_Scanner_v1.0.0(1).zip",
+      "bytes": 326101,
+      "sha256": "5875914ac1b0b1096624a26b8631231b43c0fbe8b693f0ecba585355dad1898d"
+    },
+    {
+      "filename": "Obserra_EPI_Plugin_Package_Builder_v1.0.0(1).zip",
+      "bytes": 325956,
+      "sha256": "6169d9681f100f67fb54096a4d969c28568060c36f93347c5541202d0a313a34"
+    }
+  ]
+}
