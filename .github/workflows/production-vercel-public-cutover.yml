@@ -7,6 +7,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      expected_deployment_id:
+        description: Exact preflighted Vercel deployment ID to cut over
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -28,6 +33,7 @@ jobs:
       NON_CANONICAL_DOMAIN_PROJECT_IDS: "prj_FfAnssVJU8pcJydGNJHmCliP6Yme prj_v6Hb7FkpkUoLKlHkjzKJ5HVgYDaL"
       PRIMARY_DOMAIN: www.obserrallc.com
       APEX_DOMAIN: obserrallc.com
+      EXPECTED_DEPLOYMENT_ID: ${{ inputs.expected_deployment_id || '' }}
     steps:
       - name: Require configured Vercel credential
         id: credential
@@ -56,10 +62,11 @@ jobs:
               sleep 10
               continue
             fi
-            if ! candidate="$(jq -r --arg sha "${GITHUB_SHA}" '
+            if ! candidate="$(jq -r --arg sha "${GITHUB_SHA}" --arg expected "${EXPECTED_DEPLOYMENT_ID}" '
               [.deployments[]
                 | select((.meta.githubCommitSha // "") == $sha)
                 | select((.readyState // .state // "") == "READY")
+                | select(($expected == "") or ((.uid // .id // "") == $expected))
                 | (.uid // .id // empty)][0] // empty
             ' <<<"${response}" 2>/dev/null)"; then
               candidate=""
@@ -86,6 +93,10 @@ jobs:
           deployment_url="$(jq -r '.url // empty' <<<"${details}")"
           if [ "${project}" != "${CANONICAL_PROJECT_ID}" ] || [ "${sha}" != "${GITHUB_SHA}" ] || [ "${ready}" != "READY" ]; then
             echo "::error::Canonical deployment identity verification failed."
+            exit 1
+          fi
+          if [ -n "${EXPECTED_DEPLOYMENT_ID}" ] && [ "${candidate}" != "${EXPECTED_DEPLOYMENT_ID}" ]; then
+            echo "::error::Canonical candidate does not match the exact preflighted deployment."
             exit 1
           fi
           if [ -z "${deployment_url}" ] || [[ ! "${deployment_url}" =~ ^[A-Za-z0-9.-]+\.vercel\.app$ ]]; then

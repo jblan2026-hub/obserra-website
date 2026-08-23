@@ -23,6 +23,11 @@ test("Vercel runtime bootstrap binds one production workload and proves the resu
   assert.match(workflow, /--issuer "\$\{issuer\}"/);
   assert.match(workflow, /--subject "\$\{subject\}"/);
   assert.match(workflow, /--audiences "\$\{audience\}"/);
+  assert.match(
+    workflow,
+    /az identity federated-credential update[\s\S]*--issuer "\$\{issuer\}"[\s\S]*--subject "\$\{subject\}"[\s\S]*--audiences "\$\{audience\}"/,
+  );
+  assert.match(workflow, /federated-credential show/);
   assert.doesNotMatch(workflow, /--parameters/);
   assert.doesNotMatch(workflow, /projects\/\$\{VERCEL_PROJECT_ID\}\/token/);
   assert.doesNotMatch(workflow, /oidc\.vercel\.com\/~token/);
@@ -40,6 +45,12 @@ test("Vercel runtime bootstrap binds one production workload and proves the resu
   assert.match(workflow, /OBSERRA_KEY_VAULT_CLIENT_ID/);
   assert.match(workflow, /CLERK_SECRET_KEY/);
   assert.match(workflow, /NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY/);
+  assert.match(workflow, /OBSERRA_APPLICATIONS_SUPABASE_URL: https:\/\/ykmrlcfitsubqajgfnye\.supabase\.co/);
+  assert.match(workflow, /OBSERRA_ACADEMY_SUPABASE_URL: https:\/\/nwxnyqlyzyufgoadtqxs\.supabase\.co/);
+  assert.match(workflow, /OBSERRA_ACADEMY_SUPABASE_PROJECT_REF: nwxnyqlyzyufgoadtqxs/);
+  assert.match(workflow, /OBSERRA_IDENTITY_RUNTIME_ENABLED: "true"/);
+  assert.match(workflow, /\.key == \$binding\.key and \.value == \$binding\.value/);
+  assert.match(workflow, /production_target and \.type == "plain"/);
   assert.match(workflow, /\.link\.type == "github"/);
   assert.match(workflow, /\.link\.productionBranch == "main"/);
 
@@ -56,4 +67,16 @@ test("Vercel runtime bootstrap binds one production workload and proves the resu
   assert.match(workflow, /\/api\/academy\/commerce-health/);
   assert.match(workflow, /\.routing\.deploymentId == \$deployment/);
   assert.match(workflow, /\.routing\.gitCommitSha == \$sha/);
+  assert.match(workflow, /actions: write/);
+  assert.match(
+    workflow,
+    /actions\/workflows\/production-vercel-public-cutover\.yml\/dispatches/,
+  );
+  assert.match(
+    workflow,
+    /\{ref: "main", inputs: \{expected_deployment_id: \$deployment\}\}/,
+  );
+  assert.match(workflow, /if \[ "\$\{cutover_status\}" != "204" \]/);
+  assert.doesNotMatch(workflow, /v2\/deployments\/\$\{replacement_id\}\/aliases/);
 });
+
