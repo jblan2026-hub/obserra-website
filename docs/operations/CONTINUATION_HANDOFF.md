@@ -913,3 +913,13 @@ All must be observed from the public canonical host:
 - **Fresh canonical proof:** `GET https://www.obserrallc.com/api/health` returned HTTP `200` at `2026-08-23T13:01:55.090Z` with exact deployment `dpl_AJPPKARXHGqo3QACFwpdmng3KQXV`, exact SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2`, and verified hosting/routing authority. PR #223 is not canonical.
 - **Fresh subsystem results:** Applications commerce HTTP `503`, `operational: false`; Academy commerce HTTP `503`, `operational: false`; Florida LMS liveness HTTP `200` / `live`; Florida LMS readiness HTTP `503` / `not_ready`.
 - **Blocker and next safe action:** no production mutation occurred. The prior checkpoint's boundary remains: use an explicitly authorized signed-main merge for exact PR #223, re-pin bootstrap authorization to the resulting main SHA, then require Azure identity/role readback, replacement-deployment proof, direct operational commerce results, and canonical exact deployment/SHA proof.
+
+
+<!-- ops-checkpoint:2026-08-23-pr-223-merged-runtime-bootstrap-triggered -->
+### 2026-08-23T13:02:27.751Z — PR #223 merged; guarded runtime bootstrap triggered from new main
+
+- **Merge proof:** GitHub merged [PR #223](https://github.com/jblan2026-hub/obserra-website/pull/223) at `2026-08-23T13:01:49Z`; canonical `main` merge commit is [`75accf80bfa68dbc6633689b5525840462f064d3`](https://github.com/jblan2026-hub/obserra-website/commit/75accf80bfa68dbc6633689b5525840462f064d3).
+- **Trigger proof:** that commit changes the runtime-bootstrap workflow itself, matching its `main` path trigger. GitHub now reports canonical Vercel project status and deployment context as **pending** for exactly this SHA.
+- **Runtime state:** pending Vercel status is not identity, RBAC, binding, deployment, cutover, or public-health success. The Azure identity create/readback, exact role readback, Vercel production binding, replacement deployment, direct Applications/Academy proofs, guarded cutover, and canonical endpoint proof remain mandatory.
+- **No premature live claim:** no new READY bootstrap deployment or confirmation of sensitive production binding has been observed at this checkpoint. Payments, enrollment, Applications, Academy, and Florida LMS readiness retain their prior fail-closed state pending fresh evidence.
+- **Next action:** observe the GitHub workflow and Vercel deployment through completion; append the first concrete runtime phase result and stop immediately on any exact Azure/Vercel/probe failure.
