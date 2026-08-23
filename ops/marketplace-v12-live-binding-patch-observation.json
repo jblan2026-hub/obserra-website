@@ -1,0 +1,12 @@
+{
+  "contract": "obserra-marketplace-v12-live-binding-patch-observation-v1",
+  "runId": 32670723120,
+  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32670723120",
+  "status": "completed",
+  "conclusion": "failure",
+  "headSha": "ea5b5d48df614ba6b5a981796c592c4a09db9bc8",
+  "failedSteps": [
+    "Replace stale variable references with verified non-secret Azure authority"
+  ],
+  "blocker": null
+}
