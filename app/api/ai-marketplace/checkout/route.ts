@@ -56,8 +56,8 @@ function validV12Price(price: Stripe.Price, input: { productId: string; option: 
     && product.metadata.obserraMarketplaceProduct === input.productId
     && product.metadata.catalogRevision === input.revision
     && product.metadata.artifactSha256 === input.artifactSha256
-    && product.metadata.bindingKey === input.bindingKey
-    && product.metadata.commerceSource === V12_SOURCE;
+    && product.metadata.commerceSource === V12_SOURCE
+    && price.metadata.bindingKey === input.bindingKey;
 }
 
 async function requireCustomer(subjectId: string, tenantId: string, source: string) {
