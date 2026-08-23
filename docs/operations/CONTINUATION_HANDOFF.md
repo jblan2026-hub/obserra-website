@@ -851,3 +851,12 @@ All must be observed from the public canonical host:
 - **Public subsystem results:** Applications commerce returned HTTP `503`, `operational: false`, `durable-commerce-unavailable`; Academy commerce returned HTTP `503`, `operational: false`, with payment and durable storage unavailable; Florida LMS liveness returned HTTP `200` / `live`; Florida LMS readiness returned HTTP `503` / `not_ready`.
 - **Blocker:** the Node 24 action upgrade is source-valid, but it does not create the missing Azure user-assigned managed identity `id-obserra-runtime-prod` or prove its required Key Vault role. The already-authorized runtime bootstrap remains blocked at that Azure infrastructure boundary.
 - **Next safe action:** keep PR #223 unmerged until the chosen signed-main release path explicitly proceeds; independently converge and read back `id-obserra-runtime-prod` and its required Key Vault role, rerun the authorized bootstrap against exact authorized main, and require replacement-deployment plus canonical commerce/SHA proof before any live claim.
+
+
+<!-- ops-checkpoint:2026-08-23-node24-pr-223-source-gates-passed -->
+### 2026-08-23T12:47:59.787Z — PR #223 Node 24 upgrade source gates passed
+
+- **Fresh source evidence:** PR #223 head `ad9a00119229eb06f0fd67ca426b17cb226dd0ed` completed Azure IaC Validation run `32640292253`, CodeQL Advanced run `32640292252`, and Website CI run `32640292246` successfully.
+- **Vercel context interpretation:** its Vercel project preview context remains failed because the branch commit is unverified/canceled; it is not a production deployment and not a Node 24 runtime regression.
+- **Merge discipline:** the passing source-only PR remains unmerged so `main` stays at the owner-authorized recovery SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2` until runtime identity recovery and its exact bootstrap rerun are independently proven.
+- **Mutation state:** no production identity, Key Vault role, Vercel binding, deployment, canonical alias, payment, enrollment, or LMS state changed by these PR checks.
