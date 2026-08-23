@@ -6,6 +6,7 @@ import { marketplaceV12Product, marketplaceV12PublicPath } from "../../../lib/ma
 import MarketplaceCheckout from "../MarketplaceCheckout";
 import { marketplaceV12ProductCommerce } from "../../../lib/marketplace-v12-runtime";
 import { marketplaceV12PedestalDetail } from "../../../lib/marketplace-v12-product-pedestal";
+import { marketplacePublicProductDetail } from "../../../lib/marketplace-public-product";
 import MarketplaceDimensionalPedestal from "../MarketplaceDimensionalPedestal";
 import MarketplaceProductFacts from "../MarketplaceProductFacts";
 import "../marketplace.css";
@@ -47,6 +48,7 @@ export default async function MarketplaceProductPage({ params }: PageProps) {
     if (catalogProduct.product_type === "collection" || catalogProduct.product_type === "bundle") permanentRedirect(marketplaceV12PublicPath(catalogProduct));
     const commerce = await marketplaceV12ProductCommerce(catalogProduct);
     const detail = marketplaceV12PedestalDetail(catalogProduct);
+    const publicDetail = marketplacePublicProductDetail(detail);
     const canonicalPath = marketplaceV12PublicPath(catalogProduct);
     const canonicalUrl = "https://www.obserrallc.com" + canonicalPath;
     const breadcrumbItems = [
@@ -75,8 +77,8 @@ export default async function MarketplaceProductPage({ params }: PageProps) {
         <Link href="/ai-marketplace">OBSERRA EPI</Link>
         <nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/skill-libraries">Skills</Link><Link href="/academy">Academy</Link><Link href="/contact?interest=ai-marketplace">Talk to an expert</Link></nav>
       </header>
-      <MarketplaceProductFacts detail={detail} />
-      <MarketplaceDimensionalPedestal detail={detail} checkoutEnabled={commerce.checkoutEnabled} />
+      <MarketplaceProductFacts detail={publicDetail} />
+      <MarketplaceDimensionalPedestal detail={publicDetail} checkoutEnabled={commerce.checkoutEnabled} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
     </main>;
   }

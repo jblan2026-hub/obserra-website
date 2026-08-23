@@ -5,7 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows, Edges, Html, OrbitControls } from "@react-three/drei";
 import { Suspense, useEffect, useMemo, useRef, useState, type ElementRef } from "react";
 import type { Group } from "three";
-import type { MarketplacePedestalDetail } from "../../lib/marketplace-v12-product-pedestal";
+import type { MarketplacePublicProductDetail } from "../../lib/marketplace-public-product";
 import styles from "./MarketplaceDimensionalPedestal.module.css";
 
 function hash(value: string) { let output = 2166136261; for (let index = 0; index < value.length; index += 1) output = Math.imul(output ^ value.charCodeAt(index), 16777619); return output >>> 0; }
@@ -19,7 +19,7 @@ const palettes = [
   { primary: "#ff6680", secondary: "#ffb2be", accent: "#39d8ff" },
 ] as const;
 
-function sceneKind(detail: MarketplacePedestalDetail): SceneKind {
+function sceneKind(detail: MarketplacePublicProductDetail): SceneKind {
   const identity = `${detail.productType} ${detail.family} ${detail.objectArchetype ?? ""}`.toLowerCase();
   if (/collection|bundle|suite|repository/.test(identity)) return "collection";
   if (/assurance|validator|guard|governance|evidence|security/.test(identity)) return "assurance";
@@ -33,7 +33,7 @@ function sceneLabel(kind: SceneKind) {
   return ({ capability: "Capability engine", agent: "Agent command core", workflow: "Workflow engine", bridge: "Integration bridge", assurance: "Assurance shield", collection: "Capability constellation" })[kind];
 }
 
-function CapabilityAssembly({ detail, kind, reducedMotion }: { detail: MarketplacePedestalDetail; kind: SceneKind; reducedMotion: boolean }) {
+function CapabilityAssembly({ detail, kind, reducedMotion }: { detail: MarketplacePublicProductDetail; kind: SceneKind; reducedMotion: boolean }) {
   const group = useRef<Group>(null);
   const palette = palettes[hash(`${detail.family}:${detail.positionSeed}`) % palettes.length];
   useFrame(({ clock }, delta) => {
@@ -80,14 +80,14 @@ function CapabilityAssembly({ detail, kind, reducedMotion }: { detail: Marketpla
   </group>;
 }
 
-function SemanticCapabilityObject({ detail, kind, loading = false }: { detail: MarketplacePedestalDetail; kind: SceneKind; loading?: boolean }) {
+function SemanticCapabilityObject({ detail, kind, loading = false }: { detail: MarketplacePublicProductDetail; kind: SceneKind; loading?: boolean }) {
   return <article className={styles.semanticObject} aria-label={`${sceneLabel(kind)} for ${detail.name}`}>
     <div className={styles.semanticGlyph} data-kind={kind} aria-hidden="true"><i /><i /><b>{detail.productType.slice(0, 2).toUpperCase()}</b></div>
     <div><span>{loading ? "Preparing interactive view" : "Interactive capability view"}</span><strong>{detail.name}</strong><small>{detail.family}</small></div>
   </article>;
 }
 
-function ProductScene({ detail, kind, reducedMotion }: { detail: MarketplacePedestalDetail; kind: SceneKind; reducedMotion: boolean }) {
+function ProductScene({ detail, kind, reducedMotion }: { detail: MarketplacePublicProductDetail; kind: SceneKind; reducedMotion: boolean }) {
   return <>
     <ambientLight intensity={0.72} />
     <hemisphereLight color="#d9f7ff" groundColor="#03131f" intensity={1.3} />
@@ -101,7 +101,7 @@ function ProductScene({ detail, kind, reducedMotion }: { detail: MarketplacePede
 function money(amount: number, currency: string) { return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount / 100); }
 function fact(value: string | null) { return value ? value.replace(/[-_]/g, " ") : "Not recorded"; }
 
-function ProductObject({ detail }: { detail: MarketplacePedestalDetail }) {
+function ProductObject({ detail }: { detail: MarketplacePublicProductDetail }) {
   const controls = useRef<ElementRef<typeof OrbitControls>>(null);
   const stage = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<"checking" | "loading" | "ready" | "fallback">("checking");
@@ -143,10 +143,10 @@ function ProductObject({ detail }: { detail: MarketplacePedestalDetail }) {
   </div>;
 }
 
-export default function MarketplaceDimensionalPedestal({ detail, checkoutEnabled }: { detail: MarketplacePedestalDetail; checkoutEnabled: boolean }) {
+export default function MarketplaceDimensionalPedestal({ detail, checkoutEnabled }: { detail: MarketplacePublicProductDetail; checkoutEnabled: boolean }) {
   const [selectedOffer, setSelectedOffer] = useState(0);
   const offer = detail.pricing.offers[selectedOffer] ?? null;
-  const hasOnlineCheckout = checkoutEnabled && detail.action.enabled;
+  const hasOnlineCheckout = checkoutEnabled;
   const isSkill = /skill/i.test(`${detail.name} ${detail.family} ${detail.productType}`);
   const isAcademy = /academy|course|training/i.test(`${detail.name} ${detail.family} ${detail.productType}`);
 
@@ -166,7 +166,7 @@ export default function MarketplaceDimensionalPedestal({ detail, checkoutEnabled
     </div>
 
     <section className={styles.commercial} aria-labelledby="commercial-title">
-      <div><p className={styles.eyebrow}>Purchase options</p><h2 id="commercial-title">Choose how you want to get started.</h2><p>{detail.pricingBasis ?? "Choose an option or contact us for tailored licensing."}</p></div>
+      <div><p className={styles.eyebrow}>Purchase options</p><h2 id="commercial-title">Choose how you want to get started.</h2><p>Choose an available option or contact us for tailored licensing.</p></div>
       {detail.pricing.offers.length ? <fieldset><legend>Available options</legend><div>{detail.pricing.offers.map((entry, index) => <label key={`${entry.kind}-${entry.amount_minor}-${entry.cadence ?? "once"}`}><input type="radio" name={`pedestal-offer-${detail.productId}`} checked={selectedOffer === index} onChange={() => setSelectedOffer(index)} /><span><strong>{money(entry.amount_minor, entry.currency)}{entry.cadence ? ` / ${entry.cadence}` : " one-time"}</strong><small>{fact(entry.kind)}</small></span></label>)}</div><output aria-live="polite">Selected option: {offer ? `${money(offer.amount_minor, offer.currency)}${offer.cadence ? ` / ${offer.cadence}` : " one-time"}` : "No option selected"}</output></fieldset> : <p className={styles.notice}>Contact us for availability and licensing options.</p>}
       <div className={styles.actionRow}>
         <span className={styles.unavailable} aria-live="polite">{hasOnlineCheckout ? "Secure checkout is available for this product." : "Online checkout is coming soon for this product."}</span>

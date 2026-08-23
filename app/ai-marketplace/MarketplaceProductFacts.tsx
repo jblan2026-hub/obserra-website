@@ -1,12 +1,12 @@
 import Link from "next/link";
-import type { MarketplacePedestalDetail } from "../../lib/marketplace-v12-product-pedestal";
+import type { MarketplacePublicProductDetail } from "../../lib/marketplace-public-product";
 import styles from "./MarketplaceProductFacts.module.css";
 
 function plain(value: string | null) {
   return value ? value.replace(/[-_]/g, " ") : "Not recorded";
 }
 
-export default function MarketplaceProductFacts({ detail }: { detail: MarketplacePedestalDetail }) {
+export default function MarketplaceProductFacts({ detail }: { detail: MarketplacePublicProductDetail }) {
   const collectionPath = detail.collection ? `/ai-marketplace/collections/${encodeURIComponent(detail.collection.slug)}` : null;
 
   return (
