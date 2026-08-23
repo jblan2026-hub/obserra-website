@@ -66,3 +66,5 @@ jobs:
               result = json.load(response)
           print(json.dumps({'commit': result['commit']['sha'], 'path': path}))
           PY
+
+# One-shot retrigger: 2026-08-23T22:29Z
