@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/patch-marketplace-v12-azure-delivery.yml
       - .github/scripts/patch-marketplace-v12-azure-delivery.py
+      - .github/scripts/fix-marketplace-v12-azure-ingest-metadata.py
 
 permissions:
   contents: write
@@ -33,6 +34,9 @@ jobs:
 
       - name: Apply provider cutover
         run: python .github/scripts/patch-marketplace-v12-azure-delivery.py
+
+      - name: Correct Azure metadata syntax
+        run: python .github/scripts/fix-marketplace-v12-azure-ingest-metadata.py
 
       - name: Validate generated changes
         shell: bash
