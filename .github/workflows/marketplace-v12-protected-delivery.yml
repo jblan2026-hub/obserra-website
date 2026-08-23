@@ -230,6 +230,39 @@ jobs:
           # remains digest-mismatched and runtime checkout stays fail-closed.
           set_secret_value ai-marketplace-v12-activation-approved-revision "${EXPECTED_CATALOG_REVISION}"
 
+      - name: Read back exact marketplace v1.2 runtime binding metadata
+        if: inputs.mode == 'ingest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_binding_metadata() {
+            local secret_name="$1" secret_id
+            secret_id="$(az keyvault secret show \\
+              --vault-name "${AZURE_KEY_VAULT_NAME}" \\
+              --name "${secret_name}" \\
+              --query id \\
+              --output tsv \\
+              --only-show-errors)"
+            test -n "${secret_id:-}" || { echo "::error::Published marketplace runtime binding metadata is unavailable: ${secret_name}."; exit 1; }
+            unset secret_id
+          }
+          for secret_name in \\
+            applications-supabase-service-role-key \\
+            applications-stripe-secret-key \\
+            applications-stripe-webhook-secret \\
+            ai-marketplace-v12-binding-receipt-json \\
+            ai-marketplace-v12-delivery-catalog-json \\
+            ai-marketplace-v12-release-evidence-json \\
+            ai-marketplace-v12-release-evidence-signature \\
+            ai-marketplace-v12-release-evidence-hmac-key \\
+            ai-marketplace-v12-activation-approved-revision \\
+            ai-marketplace-release-cdn-url \\
+            ai-marketplace-cloudfront-key-pair-id \\
+            ai-marketplace-cloudfront-private-key; do
+            require_binding_metadata "${secret_name}"
+          done
+          echo "::notice::Verified metadata for all 12 exact Marketplace v1.2 runtime bindings."
+
       - name: Retain non-sensitive release evidence
         if: always()
         uses: actions/upload-artifact@v6
