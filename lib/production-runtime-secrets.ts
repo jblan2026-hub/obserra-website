@@ -45,6 +45,21 @@ const APPLICATION_BINDINGS: readonly Binding[] = [
   },
 ];
 
+const MARKETPLACE_V12_COMMERCE_BINDINGS: readonly Binding[] = [
+  {
+    environmentKey: "OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY",
+    keyVaultSecretName: "applications-supabase-service-role-key",
+  },
+  {
+    environmentKey: "APPLICATIONS_STRIPE_SECRET_KEY",
+    keyVaultSecretName: "applications-stripe-secret-key",
+  },
+  {
+    environmentKey: "APPLICATIONS_STRIPE_WEBHOOK_SECRET",
+    keyVaultSecretName: "applications-stripe-webhook-secret",
+  },
+];
+
 const MARKETPLACE_V12_BINDINGS: readonly Binding[] = [
   {
     environmentKey: "OBSERRA_AI_MARKETPLACE_V12_BINDING_RECEIPT_JSON",
@@ -344,7 +359,7 @@ export async function ensureApplicationsRuntimeSecrets(): Promise<ProductionRunt
  * taking unrelated Applications commerce offline.
  */
 export async function ensureMarketplaceV12RuntimeSecrets(): Promise<ProductionRuntimeSecretsEvidence> {
-  return ensureBindings("marketplace-v12", [...APPLICATION_BINDINGS, ...MARKETPLACE_V12_BINDINGS]);
+  return ensureBindings("marketplace-v12", [...MARKETPLACE_V12_COMMERCE_BINDINGS, ...MARKETPLACE_V12_BINDINGS]);
 }
 
 /**
