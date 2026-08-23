@@ -1,75 +1,154 @@
 "use client";
 
+import { Html, Instance, Instances, Line, OrbitControls } from "@react-three/drei";
+import { Canvas, useThree } from "@react-three/fiber";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Component, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 export type MarketplaceCard = { product_id: string; slug: string; name: string; description: string; family: string; product_type: string; version: string; publication_state: string; pricing: { currency: string; model: string; offers: { amount_minor: number; cadence: string; currency: string; kind: string }[] }; visualization: { position_seed: number; scene_cluster: string; relationship_product_ids: string[] }; proficiency?: string };
 type SearchResult = { total: number; results: MarketplaceCard[]; nextCursor: string | null };
-type SceneNode = Pick<MarketplaceCard, "product_id" | "slug" | "family" | "product_type" | "name"> & { position_seed: number; scene_cluster: string; relationship_product_ids: string[] };
+type SceneNode = Pick<MarketplaceCard, "product_id" | "slug" | "family" | "product_type" | "name" | "proficiency"> & { position_seed: number; scene_cluster: string; relationship_product_ids: string[]; object_archetype?: string };
 type SceneResult = { total: number; nodes: SceneNode[]; clusters: { id: string; count: number }[]; nextCursor: string | null; error?: string };
 function price(card: MarketplaceCard) { const offer = card.pricing.offers[0]; if (!offer) return "Commercial terms available on request"; const amount = new Intl.NumberFormat("en-US", { style: "currency", currency: offer.currency }).format(offer.amount_minor / 100); return `${amount}${offer.cadence === "one-time" ? " one-time" : ` / ${offer.cadence}`}`; }
 function hash(value: string) { let result = 2166136261; for (let i = 0; i < value.length; i += 1) result = Math.imul(result ^ value.charCodeAt(i), 16777619); return result >>> 0; }
-function color(value: string) { const palette = [[.18, .84, .96], [.96, .73, .31], [.56, .52, 1], [.32, .91, .67], [1, .45, .58]]; return palette[hash(value) % palette.length]; }
-function scenePosition(node: SceneNode) { const seed = Math.abs(node.position_seed) || hash(node.product_id), cluster = hash(node.scene_cluster), clusterAngle = (cluster % 628) / 100, clusterRadius = .32 + ((Math.floor(cluster / 628) % 3) * .13), localAngle = (seed % 628) / 100, localRadius = .04 + ((Math.floor(seed / 628) % 100) / 1000); return [Math.cos(clusterAngle) * clusterRadius + Math.cos(localAngle) * localRadius, Math.sin(clusterAngle) * clusterRadius + Math.sin(localAngle) * localRadius, ((Math.floor(seed / 97) % 100) / 100) - .5] as const; }
-function sceneFromCards(cards: MarketplaceCard[]): SceneResult { const nodes = cards.map((card) => ({ product_id: card.product_id, slug: card.slug, name: card.name, family: card.family, product_type: card.product_type, ...card.visualization })), counts = new Map<string, number>(); for (const node of nodes) counts.set(node.scene_cluster, (counts.get(node.scene_cluster) ?? 0) + 1); return { total: cards.length, nodes, clusters: [...counts].sort(([a], [b]) => a.localeCompare(b)).map(([id, count]) => ({ id, count })), nextCursor: null }; }
+function color(value: string) { const palette = ["#2ed8f6", "#f5bd53", "#9186ff", "#52e8ab", "#ff7e94", "#76c9ff"]; return palette[hash(value) % palette.length]; }
+function sceneFromCards(cards: MarketplaceCard[]): SceneResult { const nodes = cards.map((card) => ({ product_id: card.product_id, slug: card.slug, name: card.name, family: card.family, product_type: card.product_type, proficiency: card.proficiency, ...card.visualization })), counts = new Map<string, number>(); for (const node of nodes) counts.set(node.scene_cluster, (counts.get(node.scene_cluster) ?? 0) + 1); return { total: cards.length, nodes, clusters: [...counts].sort(([a], [b]) => a.localeCompare(b)).map(([id, count]) => ({ id, count })), nextCursor: null }; }
 
-function nodeMonogram(name: string) { return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase(); }
+type Vector3 = [number, number, number];
+type SpatialNode = { node: SceneNode; position: Vector3; color: string };
+type SpatialCluster = { id: string; count: number; position: Vector3; radius: number; color: string };
+type SpatialEdge = { id: string; from: Vector3; to: Vector3; color: string };
 
-function StaticCapabilityMap({ nodes, selected, onSelect }: { nodes: SceneNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
-  // A semantic, data-derived 3D deck for real WebGL failures. Every control
-  // maps to a record in the bounded scene; edges are declared catalog edges.
-  const visible = nodes.slice(0, 48), visibleIds = new Set(visible.map((node) => node.product_id));
-  const points = new Map(visible.map((node) => {
-    const [x, y, z] = scenePosition(node);
-    return [node.product_id, { x: (x + 1) * 50, y: (y + 1) * 50, z }];
-  }));
-  return <div className="ai-marketplace__universe-static" role="group" aria-label="Interactive spatial catalog deck of catalog records and declared relationships">
-    <div className="ai-marketplace__static-architecture" aria-hidden="true"><i /><i /><i /><b>OBSERRA<br />EPI</b></div>
-    <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-      {visible.flatMap((node) => node.relationship_product_ids.filter((targetId) => visibleIds.has(targetId) && node.product_id < targetId).map((targetId) => {
-        const source = points.get(node.product_id)!, target = points.get(targetId)!;
-        return <line key={`${node.product_id}-${targetId}`} x1={source.x} y1={source.y} x2={target.x} y2={target.y} />;
-      }))}
-    </svg>
-    {visible.map((node, index) => { const point = points.get(node.product_id)!, active = selected === node.product_id; return <button type="button" className={active ? "is-active" : undefined} key={node.product_id} aria-pressed={active} aria-label={`Select ${node.name}`} style={{ "--node-x": `${point.x}%`, "--node-y": `${point.y}%`, "--node-z": `${point.z * 170}px`, "--node-delay": `${(index % 8) * -0.6}s` } as React.CSSProperties} onClick={() => onSelect(node)}><strong>{nodeMonogram(node.name)}</strong><span>{node.family}</span></button>; })}
-    <p>Interactive spatial deck · {visible.length} live catalog records selected from the current {nodes.length}-record scene.</p>
-  </div>;
+/**
+ * Builds the scene only from catalog-provided clusters, position seeds and
+ * declared relationships. The 48-record cap is intentional: it preserves a
+ * responsive, inspectable WebGL view while the server-side catalog/search
+ * remains the complete discovery surface.
+ */
+function catalogSpatialGraph(nodes: SceneNode[]) {
+  const grouped = new Map<string, SceneNode[]>();
+  for (const node of nodes) grouped.set(node.scene_cluster, [...(grouped.get(node.scene_cluster) ?? []), node]);
+  const entries = [...grouped.entries()].sort(([left], [right]) => left.localeCompare(right));
+  const clusters: SpatialCluster[] = entries.map(([id, members], index) => {
+    const band = Math.floor(index / 12), angle = ((index % 12) / 12) * Math.PI * 2 + band * 0.31;
+    const distance = 4.2 + band * 2.45, position: Vector3 = [Math.cos(angle) * distance, ((index % 3) - 1) * 0.9, Math.sin(angle) * distance];
+    return { id, count: members.length, position, radius: Math.min(1.6, 0.56 + Math.sqrt(members.length) * 0.17), color: color(id) };
+  });
+  const clusterById = new Map(clusters.map((cluster) => [cluster.id, cluster]));
+  const spatialNodes: SpatialNode[] = entries.flatMap(([clusterId, members]) => {
+    const cluster = clusterById.get(clusterId)!;
+    return members.sort((left, right) => left.product_id.localeCompare(right.product_id)).map((node, index) => {
+      const seed = Math.abs(node.position_seed) || hash(node.product_id), angle = ((seed % 360) / 360) * Math.PI * 2 + index * 0.17;
+      const radius = 0.2 + ((Math.floor(seed / 23) % 100) / 100) * cluster.radius * 0.74;
+      const position: Vector3 = [cluster.position[0] + Math.cos(angle) * radius, cluster.position[1] + ((Math.floor(seed / 97) % 100) / 100 - 0.5) * cluster.radius, cluster.position[2] + Math.sin(angle) * radius];
+      return { node, position, color: color(node.family) };
+    });
+  });
+  const nodeById = new Map(spatialNodes.map((node) => [node.node.product_id, node]));
+  const seen = new Set<string>(), edges: SpatialEdge[] = [];
+  for (const source of spatialNodes) for (const targetId of source.node.relationship_product_ids) {
+    const target = nodeById.get(targetId); if (!target) continue;
+    const id = [source.node.product_id, targetId].sort().join("::"); if (seen.has(id)) continue;
+    seen.add(id); edges.push({ id, from: source.position, to: target.position, color: source.color });
+  }
+  return { clusters, nodes: spatialNodes, edges };
+}
+
+type NodeArchetype = "box" | "cylinder" | "octahedron" | "icosahedron";
+function nodeArchetype(value?: string): NodeArchetype { const kind = value?.toLocaleLowerCase() ?? ""; if (/(cube|box|module)/.test(kind)) return "box"; if (/(pyramid|agent|octa)/.test(kind)) return "octahedron"; if (/(cylinder|workflow|pipeline)/.test(kind)) return "cylinder"; return "icosahedron"; }
+
+function ArchetypeGeometry({ archetype }: { archetype: NodeArchetype }) {
+  if (archetype === "box") return <boxGeometry args={[0.29, 0.29, 0.29]} />;
+  if (archetype === "octahedron") return <octahedronGeometry args={[0.27, 1]} />;
+  if (archetype === "cylinder") return <cylinderGeometry args={[0.16, 0.16, 0.43, 12]} />;
+  return <icosahedronGeometry args={[0.25, 2]} />;
+}
+
+/**
+ * Repeated catalog objects use GPU instancing. An Instance is still raycast
+ * selectable, so we retain a direct selection path from every rendered object
+ * to its real catalog record while bounding the scene to 48 source nodes.
+ */
+function CatalogNodeInstances({ points, selected, onSelect }: { points: SpatialNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
+  const [hovered, setHovered] = useState<string | null>(null);
+  const groups = useMemo(() => { const grouped = new Map<NodeArchetype, SpatialNode[]>(); for (const point of points) { const type = nodeArchetype(point.node.object_archetype); grouped.set(type, [...(grouped.get(type) ?? []), point]); } return [...grouped.entries()]; }, [points]);
+  return <>{groups.map(([archetype, members]) => <Instances key={archetype} limit={members.length} range={members.length} castShadow receiveShadow>
+    <ArchetypeGeometry archetype={archetype} /><meshStandardMaterial metalness={0.7} roughness={0.19} vertexColors />
+    {members.map((point) => { const isSelected = selected === point.node.product_id, isHovered = hovered === point.node.product_id, emphasis = isSelected ? 1.72 : isHovered ? 1.3 : 1; return <Instance key={point.node.product_id} position={point.position} scale={emphasis} color={isSelected ? "#f5bd53" : point.color} onClick={(event) => { event.stopPropagation(); onSelect(point.node); }} onPointerOver={(event) => { event.stopPropagation(); setHovered(point.node.product_id); }} onPointerOut={() => setHovered(null)} />; })}
+  </Instances>)}</>;
+}
+
+function CatalogNodeLabels({ points, selected, onSelect }: { points: SpatialNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
+  return <>{points.map((point) => <Html key={`label-${point.node.product_id}`} position={[point.position[0], point.position[1] + 0.38, point.position[2]]} center sprite distanceFactor={9.6} zIndexRange={[3, 0]}>
+    <a className={`ai-marketplace__scene-label${selected === point.node.product_id ? " is-selected" : ""}`} href={`/ai-marketplace/${encodeURIComponent(point.node.slug)}`} onClick={() => onSelect(point.node)} aria-label={`Open ${point.node.name} catalog record`}>
+      <strong>{point.node.name}</strong><span>{point.node.family}</span><small>{point.node.proficiency ?? point.node.product_type}</small>
+    </a>
+  </Html>)}</>;
+}
+
+function CatalogClusters({ clusters }: { clusters: SpatialCluster[] }) {
+  return <>{clusters.map((cluster) => <group key={cluster.id} position={cluster.position} rotation={[Math.PI / 2, 0, hash(cluster.id) % Math.PI]}>
+    <mesh><torusGeometry args={[cluster.radius, 0.014, 6, 56]} /><meshBasicMaterial color={cluster.color} transparent opacity={0.52} /></mesh>
+    <mesh rotation={[Math.PI / 2, 0.31, 0]}><torusGeometry args={[Math.max(0.22, cluster.radius * 0.56), 0.008, 5, 40]} /><meshBasicMaterial color="#dff9ff" transparent opacity={0.26} /></mesh>
+  </group>)}</>;
+}
+
+function CatalogCore() {
+  return <group><mesh rotation={[Math.PI / 3, 0.42, 0]}><torusGeometry args={[1.16, 0.028, 8, 72]} /><meshBasicMaterial color="#f5bd53" transparent opacity={0.76} /></mesh><mesh rotation={[-Math.PI / 5, 0.72, 0.2]}><torusGeometry args={[0.76, 0.018, 8, 64]} /><meshBasicMaterial color="#2ed8f6" transparent opacity={0.68} /></mesh><mesh><icosahedronGeometry args={[0.31, 2]} /><meshStandardMaterial color="#f5bd53" emissive="#f5bd53" emissiveIntensity={1.45} metalness={0.82} roughness={0.13} /></mesh></group>;
+}
+
+/** Only used after an actual renderer error/context failure; never the primary experience. */
+function SemanticSpatialFallback({ nodes, selected, onSelect }: { nodes: SceneNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
+  const points = useMemo(() => new Map(nodes.map((node, index) => { const clusterAngle = (hash(node.scene_cluster) % 628) / 100, localAngle = ((Math.abs(node.position_seed) || hash(node.product_id)) % 628) / 100 + index * 0.11, clusterRadius = 20 + (hash(node.scene_cluster) % 13), localRadius = 4 + ((hash(node.product_id) % 10) / 2); return [node.product_id, { x: 50 + Math.cos(clusterAngle) * clusterRadius + Math.cos(localAngle) * localRadius, y: 50 + Math.sin(clusterAngle) * clusterRadius * 0.68 + Math.sin(localAngle) * localRadius * 0.72, z: hash(node.product_id) % 9 }]; })), [nodes]);
+  const visibleIds = new Set(nodes.map((node) => node.product_id));
+  return <div className="ai-marketplace__universe-fallback" role="status"><div className="ai-marketplace__fallback-copy"><strong>3D renderer unavailable on this device.</strong><span>This semantic 2.5D catalog map preserves the same bounded records, clusters, relationships, labels, and product routes.</span></div><div className="ai-marketplace__fallback-map" aria-label="Semantic spatial catalog map">
+    <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">{nodes.flatMap((node) => node.relationship_product_ids.filter((targetId) => visibleIds.has(targetId) && node.product_id < targetId).map((targetId) => { const source = points.get(node.product_id)!, target = points.get(targetId)!; return <line key={`${node.product_id}-${targetId}`} x1={source.x} y1={source.y} x2={target.x} y2={target.y} />; }))}</svg>
+    {nodes.map((node) => { const point = points.get(node.product_id)!; return <Link key={node.product_id} className={`ai-marketplace__fallback-node${selected === node.product_id ? " is-selected" : ""}`} href={`/ai-marketplace/${encodeURIComponent(node.slug)}`} style={{ left: `${point.x}%`, top: `${point.y}%`, zIndex: point.z }} onClick={() => onSelect(node)}><strong>{node.name}</strong><span>{node.family}</span><small>{node.proficiency ?? node.product_type}</small></Link>; })}
+  </div></div>;
+}
+
+function WebglContextMonitor({ onLost, onRestored }: { onLost: () => void; onRestored: () => void }) {
+  const gl = useThree((state) => state.gl);
+  useEffect(() => { const canvas = gl.domElement, lost = (event: Event) => { event.preventDefault(); onLost(); }, restored = () => onRestored(); canvas.addEventListener("webglcontextlost", lost); canvas.addEventListener("webglcontextrestored", restored); return () => { canvas.removeEventListener("webglcontextlost", lost); canvas.removeEventListener("webglcontextrestored", restored); }; }, [gl, onLost, onRestored]);
+  return null;
+}
+
+function SpatialCatalogScene({ nodes, selected, onSelect, onContextLost, onContextRestored, reducedMotion }: { nodes: SceneNode[]; selected: string | null; onSelect: (node: SceneNode) => void; onContextLost: () => void; onContextRestored: () => void; reducedMotion: boolean }) {
+  const graph = useMemo(() => catalogSpatialGraph(nodes), [nodes]);
+  return <>
+    <color attach="background" args={["#03111e"]} /><fog attach="fog" args={["#03111e", 11, 32]} />
+    <ambientLight intensity={0.52} /><directionalLight position={[6, 8, 5]} intensity={1.7} color="#dff9ff" castShadow /><pointLight position={[-5, 2, -5]} intensity={4.2} color="#2ed8f6" distance={18} /><pointLight position={[3, -2, 5]} intensity={3.4} color="#f5bd53" distance={15} />
+    <CatalogCore /><CatalogClusters clusters={graph.clusters} />
+    {graph.edges.map((edge) => <Line key={edge.id} points={[edge.from, edge.to]} color={edge.color} lineWidth={0.72} transparent opacity={0.55} />)}
+    <CatalogNodeInstances points={graph.nodes} selected={selected} onSelect={onSelect} /><CatalogNodeLabels points={graph.nodes} selected={selected} onSelect={onSelect} />
+    <OrbitControls enableDamping dampingFactor={0.08} enablePan enableZoom minDistance={4.8} maxDistance={30} minPolarAngle={0.28} maxPolarAngle={Math.PI * 0.85} autoRotate={!reducedMotion} autoRotateSpeed={0.18} />
+    <WebglContextMonitor onLost={onContextLost} onRestored={onContextRestored} />
+  </>;
+}
+
+class CapabilitySceneBoundary extends Component<{ children: ReactNode; onFailure: () => void }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onFailure(); }
+  render() { return this.state.failed ? null : this.props.children; }
 }
 
 function CapabilityUniverse({ nodes, selected, onSelect }: { nodes: SceneNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
-  const canvas = useRef<HTMLCanvasElement>(null), geometry = useRef<{ node: SceneNode; x: number; y: number; radius: number }[]>([]), redraw = useRef<(() => void) | null>(null), view = useRef({ yaw: -0.36, pitch: 0.2, zoom: 1, panX: 0, panY: 0 }), drag = useRef<{ x: number; y: number; moved: boolean } | null>(null); const [available, setAvailable] = useState<boolean | null>(null);
-  useEffect(() => {
-    let fallbackFrame: number | undefined;
-    const showFallback = () => { fallbackFrame = window.requestAnimationFrame(() => setAvailable(false)); };
-    const canvasNode = canvas.current; if (!canvasNode) return;
-    // Reduced-motion changes animation only. It must never replace a usable
-    // spatial scene with an empty fallback, particularly on desktop systems
-    // where the OS preference is inherited from an accessibility profile.
-    const gl = canvasNode.getContext("webgl2", { alpha: true, antialias: true }) ?? canvasNode.getContext("webgl", { alpha: true, antialias: true }); if (!gl) { showFallback(); return () => { if (fallbackFrame) window.cancelAnimationFrame(fallbackFrame); }; }
-    const vertex = gl.createShader(gl.VERTEX_SHADER)!, fragment = gl.createShader(gl.FRAGMENT_SHADER)!;
-    gl.shaderSource(vertex, "attribute vec3 p;attribute vec3 c;attribute float s;varying vec3 v;void main(){float d=1.0+p.z*.28;gl_Position=vec4(p.xy*d,p.z,1.0);gl_PointSize=s*d;v=c;}"); gl.compileShader(vertex);
-    gl.shaderSource(fragment, "precision mediump float;varying vec3 v;void main(){vec2 d=gl_PointCoord-vec2(.5);if(dot(d,d)>.25)discard;gl_FragColor=vec4(v,1.0-dot(d,d)*2.0);}"); gl.compileShader(fragment);
-    const program = gl.createProgram()!; gl.attachShader(program, vertex); gl.attachShader(program, fragment); gl.linkProgram(program);
-    const lineVertex = gl.createShader(gl.VERTEX_SHADER)!, lineFragment = gl.createShader(gl.FRAGMENT_SHADER)!; gl.shaderSource(lineVertex, "attribute vec3 p;void main(){float d=1.0+p.z*.28;gl_Position=vec4(p.xy*d,p.z,1.0);}"); gl.compileShader(lineVertex); gl.shaderSource(lineFragment, "precision mediump float;void main(){gl_FragColor=vec4(.20,.72,.85,.48);}"); gl.compileShader(lineFragment); const lineProgram = gl.createProgram()!; gl.attachShader(lineProgram, lineVertex); gl.attachShader(lineProgram, lineFragment); gl.linkProgram(lineProgram);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS) || !gl.getProgramParameter(lineProgram, gl.LINK_STATUS) || !gl.getShaderParameter(vertex, gl.COMPILE_STATUS) || !gl.getShaderParameter(fragment, gl.COMPILE_STATUS) || !gl.getShaderParameter(lineVertex, gl.COMPILE_STATUS) || !gl.getShaderParameter(lineFragment, gl.COMPILE_STATUS)) { showFallback(); return () => { if (fallbackFrame) window.cancelAnimationFrame(fallbackFrame); }; }
-    const draw = () => { const ratio = Math.min(window.devicePixelRatio || 1, 2), width = Math.max(1, Math.floor(canvasNode.clientWidth * ratio)), height = Math.max(1, Math.floor(canvasNode.clientHeight * ratio)); if (canvasNode.width !== width || canvasNode.height !== height) { canvasNode.width = width; canvasNode.height = height; }
-      const camera = view.current, cosineYaw = Math.cos(camera.yaw), sineYaw = Math.sin(camera.yaw), cosinePitch = Math.cos(camera.pitch), sinePitch = Math.sin(camera.pitch);
-      const positions = nodes.map((node) => { const [x, y, z] = scenePosition(node), yawX = x * cosineYaw - z * sineYaw, yawZ = x * sineYaw + z * cosineYaw, pitchY = y * cosinePitch - yawZ * sinePitch, pitchZ = y * sinePitch + yawZ * cosinePitch; return [yawX * camera.zoom + camera.panX, pitchY * camera.zoom + camera.panY, pitchZ] as const; }), indexes = new Map(nodes.map((node, i) => [node.product_id, i])), points: number[] = [], lines: number[] = [];
-      nodes.forEach((node, i) => { const [x, y, z] = positions[i], c = color(node.family); points.push(x, y, z, ...c, (8 + (hash(node.product_id) % 5)) * (node.product_id === selected ? 1.55 : 1)); node.relationship_product_ids.forEach((targetId) => { const target = indexes.get(targetId); if (target !== undefined && i < target) lines.push(...positions[i], ...positions[target]); }); });
-      gl.viewport(0, 0, width, height); gl.clearColor(.012, .055, .09, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); const p = gl.getAttribLocation(program, "p"), c = gl.getAttribLocation(program, "c"), s = gl.getAttribLocation(program, "s");
-      if (lines.length) { const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lines), gl.STATIC_DRAW); gl.useProgram(lineProgram); const linePosition = gl.getAttribLocation(lineProgram, "p"); gl.enableVertexAttribArray(linePosition); gl.vertexAttribPointer(linePosition, 3, gl.FLOAT, false, 12, 0); gl.drawArrays(gl.LINES, 0, lines.length / 3); gl.deleteBuffer(buffer); }
-      gl.useProgram(program);
-      const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW); gl.enableVertexAttribArray(p); gl.enableVertexAttribArray(c); gl.enableVertexAttribArray(s); gl.vertexAttribPointer(p, 3, gl.FLOAT, false, 28, 0); gl.vertexAttribPointer(c, 3, gl.FLOAT, false, 28, 12); gl.vertexAttribPointer(s, 1, gl.FLOAT, false, 28, 24); gl.drawArrays(gl.POINTS, 0, nodes.length); gl.deleteBuffer(buffer);
-      geometry.current = nodes.map((node, i) => { const [x, y, z] = positions[i], d = 1 + z * .28; return { node, x: ((x * d) + 1) * .5 * canvasNode.clientWidth, y: (1 - ((y * d) + 1) * .5) * canvasNode.clientHeight, radius: 12 }; }); setAvailable(true); };
-    redraw.current = draw;
-    const observer = new ResizeObserver(draw); observer.observe(canvasNode); draw(); return () => { observer.disconnect(); gl.deleteProgram(program); gl.deleteProgram(lineProgram); gl.deleteShader(vertex); gl.deleteShader(fragment); gl.deleteShader(lineVertex); gl.deleteShader(lineFragment); };
-  }, [nodes, selected]);
-  const pick = (event: React.PointerEvent<HTMLCanvasElement>) => { const box = event.currentTarget.getBoundingClientRect(), x = event.clientX - box.left, y = event.clientY - box.top; const hit = geometry.current.reduce<{ item: typeof geometry.current[number]; distance: number } | null>((nearest, item) => { const distance = Math.hypot(item.x - x, item.y - y); return distance <= item.radius && (!nearest || distance < nearest.distance) ? { item, distance } : nearest; }, null); if (hit) onSelect(hit.item.node); };
-  const pointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => { drag.current = { x: event.clientX, y: event.clientY, moved: false }; event.currentTarget.setPointerCapture(event.pointerId); };
-  const pointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => { if (!drag.current) return; const dx = event.clientX - drag.current.x, dy = event.clientY - drag.current.y; if (Math.abs(dx) + Math.abs(dy) > 2) drag.current.moved = true; view.current.yaw += dx * .009; view.current.pitch = Math.max(-1.1, Math.min(1.1, view.current.pitch + dy * .009)); drag.current.x = event.clientX; drag.current.y = event.clientY; redraw.current?.(); };
-  const pointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => { const moved = drag.current?.moved; drag.current = null; if (!moved) pick(event); };
-  const wheel = (event: React.WheelEvent<HTMLCanvasElement>) => { event.preventDefault(); view.current.zoom = Math.max(.65, Math.min(1.9, view.current.zoom * (event.deltaY > 0 ? .9 : 1.1))); redraw.current?.(); };
-  return <div className="ai-marketplace__universe" data-webgl={available ? "ready" : "fallback"}><canvas ref={canvas} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onWheel={wheel} aria-label="Interactive 3D catalog capability universe. Drag to orbit, use mouse wheel to zoom, and select a plotted catalog record." role="application" tabIndex={0} /><StaticCapabilityMap nodes={nodes} selected={selected} onSelect={onSelect} /><p>{available ? "Drag to orbit · scroll to zoom · select a node. Lines are catalog-declared relationships only when both records are present in this bounded scene." : "WebGL is unavailable on this device; the interactive spatial deck and complete keyboard scene index remain available."}</p></div>;
+  const [renderer, setRenderer] = useState<"loading" | "ready" | "recovering" | "unavailable">("loading"), [reducedMotion, setReducedMotion] = useState(false), [cluster, setCluster] = useState("");
+  const router = useRouter();
+  useEffect(() => { const media = window.matchMedia("(prefers-reduced-motion: reduce)"), update = () => setReducedMotion(media.matches); update(); media.addEventListener("change", update); return () => media.removeEventListener("change", update); }, []);
+  const clusters = useMemo(() => [...new Set(nodes.map((node) => node.scene_cluster))].sort((left, right) => left.localeCompare(right)), [nodes]), visibleNodes = useMemo(() => cluster ? nodes.filter((node) => node.scene_cluster === cluster) : nodes, [cluster, nodes]);
+  const keyboardNode = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => { if (visibleNodes.length === 0) return; const current = Math.max(0, visibleNodes.findIndex((node) => node.product_id === selected)); let next = current; if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (current + 1) % visibleNodes.length; else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (current - 1 + visibleNodes.length) % visibleNodes.length; else if (event.key === "Home") next = 0; else if (event.key === "End") next = Math.max(0, visibleNodes.length - 1); else if (event.key === "Enter" && selected) { const node = visibleNodes.find((item) => item.product_id === selected); if (node) router.push(`/ai-marketplace/${encodeURIComponent(node.slug)}`); return; } else return; event.preventDefault(); if (visibleNodes[next]) onSelect(visibleNodes[next]); }, [onSelect, router, selected, visibleNodes]);
+  const unavailable = renderer === "unavailable";
+  return <div className="ai-marketplace__universe" data-webgl={renderer} role="application" tabIndex={0} onKeyDown={keyboardNode} aria-label="Interactive 3D catalog capability universe. Arrow keys select nodes; Enter opens the selected catalog record.">
+    {!unavailable && <CapabilitySceneBoundary onFailure={() => setRenderer("unavailable")}><Canvas style={{ height: "440px", width: "100%" }} dpr={reducedMotion ? 1 : [1, 1.75]} camera={{ position: [0, 5.2, 17], fov: 47, near: 0.1, far: 80 }} gl={{ alpha: false, antialias: true, powerPreference: "high-performance", preserveDrawingBuffer: false }} onCreated={() => setRenderer("ready")} aria-label="Interactive 3D catalog capability universe. Drag to orbit, right-drag to pan, scroll or pinch to zoom, and select a plotted catalog record." role="application" tabIndex={0}>
+      <SpatialCatalogScene nodes={visibleNodes} selected={selected} onSelect={onSelect} onContextLost={() => setRenderer("recovering")} onContextRestored={() => setRenderer("ready")} reducedMotion={reducedMotion} />
+    </Canvas></CapabilitySceneBoundary>}
+    {unavailable && <SemanticSpatialFallback nodes={visibleNodes} selected={selected} onSelect={onSelect} />}
+    <div className="ai-marketplace__scene-controls"><label htmlFor="marketplace-scene-cluster">3D cluster <select id="marketplace-scene-cluster" value={cluster} onChange={(event) => setCluster(event.target.value)}><option value="">All catalog clusters</option>{clusters.map((item) => <option key={item} value={item}>{item}</option>)}</select></label><span>{visibleNodes.length} rendered object{visibleNodes.length === 1 ? "" : "s"}</span></div>
+    <p>{renderer === "ready" ? "Real catalog scene · drag to orbit · right-drag to pan · scroll or pinch to zoom · select a node to open its catalog record." : renderer === "loading" ? "Starting the catalog WebGL renderer…" : renderer === "recovering" ? "Restoring the WebGL renderer after a graphics-context interruption…" : "Use the keyboard-accessible scene index below to select and open each catalog record."}</p>
+  </div>;
 }
 
 export default function MarketplaceExperience({ initialCatalog, initialTotal, initialNextCursor, initialQuery = "", familyEntries, revision }: { initialCatalog: MarketplaceCard[]; initialTotal: number; initialNextCursor: string | null; initialQuery?: string; familyEntries: [string, number][]; revision: string }) {
