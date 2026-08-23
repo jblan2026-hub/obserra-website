@@ -9,7 +9,7 @@ STORAGE_ACCOUNT="stobserraprod38d660"
 AUTOSCALE_NAME="autoscale-obserra-prod"
 DEPLOY_IDENTITY="id-obserra-github-prod"
 FEDERATED_CREDENTIAL="github-main"
-GITHUB_SUBJECT="repo:jblan2026-hub/obserra-website:ref:refs/heads/main"
+GITHUB_SUBJECT="repo:jblan2026-hub@309821056/obserra-website@1321156321:ref:refs/heads/main"
 OIDC_ISSUER="https://token.actions.githubusercontent.com"
 OIDC_AUDIENCE="api://AzureADTokenExchange"
 KEY_VAULT_NAME="kv-obserra-prod-38d660"
@@ -59,7 +59,7 @@ FEDERATED_JSON="$(az identity federated-credential show \
   --name "${FEDERATED_CREDENTIAL}" -o json)"
 test "$(jq -r '.issuer' <<<"${FEDERATED_JSON}")" = "${OIDC_ISSUER}"
 test "$(jq -r '.subject' <<<"${FEDERATED_JSON}")" = "${GITHUB_SUBJECT}"
-jq -e --arg audience "${OIDC_AUDIENCE}" '.audiences | index($audience) != null' <<<"${FEDERATED_JSON}" >/dev/null
+jq -e --arg audience "${OIDC_AUDIENCE}" '(.audiences | length) == 1 and .audiences[0] == $audience' <<<"${FEDERATED_JSON}" >/dev/null
 
 DEPLOY_ROLE_JSON="$(az role assignment list --assignee-object-id "${DEPLOY_PRINCIPAL_ID}" --scope "${RG_ID}" -o json)"
 jq -e 'any(.[]; .roleDefinitionName == "Contributor")' <<<"${DEPLOY_ROLE_JSON}" >/dev/null
