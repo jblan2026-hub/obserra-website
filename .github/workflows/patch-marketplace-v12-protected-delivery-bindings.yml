@@ -1,0 +1,55 @@
+name: Patch Marketplace v1.2 protected-delivery bindings
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/patch-marketplace-v12-protected-delivery-bindings.yml"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  patch:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Patch only verified non-secret Azure bindings
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/marketplace-v12-protected-delivery.yml')
+          s=p.read_text()
+          replacements={
+            'AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}':'AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607',
+            'AZURE_DELIVERY_CLIENT_ID: ${{ vars.OBSERRA_MARKETPLACE_DELIVERY_CLIENT_ID }}':'AZURE_DELIVERY_CLIENT_ID: b8da232a-713f-4c25-a61e-4fb34d13e229',
+            'AZURE_SOURCE_STORAGE_ACCOUNT: ${{ vars.OBSERRA_MARKETPLACE_SOURCE_STORAGE_ACCOUNT }}':'AZURE_SOURCE_STORAGE_ACCOUNT: stobserramktv1238d660',
+            'AZURE_SOURCE_CONTAINER: ${{ vars.OBSERRA_MARKETPLACE_SOURCE_CONTAINER }}':'AZURE_SOURCE_CONTAINER: marketplace-v12-source',
+          }
+          for old,new in replacements.items():
+              if s.count(old)!=1:
+                  raise SystemExit(f'expected exactly one binding to replace: {old}')
+              s=s.replace(old,new)
+          p.write_text(s)
+          PY
+          git diff --check
+      - name: Open bounded repair PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch=fix/marketplace-v12-protected-delivery-bound-20260823
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "${branch}"
+          git add .github/workflows/marketplace-v12-protected-delivery.yml
+          git commit -m "fix: bind marketplace protected delivery to verified Azure authority"
+          git push --set-upstream origin "${branch}"
+          gh pr create --base main --head "${branch}" --title "fix: bind Marketplace protected delivery to verified Azure authority" --body "Replaces only the four stale non-secret GitHub Actions variable references in the existing Marketplace v1.2 protected-delivery workflow with the Azure tenant, dedicated delivery client ID, source storage account, and private source container that were created and verified by the governed bootstrap. No secrets, product bytes, Stripe charges, checkout activation, entitlements, or customer-facing behavior are changed."
