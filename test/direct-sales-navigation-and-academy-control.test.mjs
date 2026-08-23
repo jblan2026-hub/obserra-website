@@ -74,12 +74,14 @@ test("Academy LMS stays live while new enrollment and payment remain licensing-g
 });
 
 
-test("Marketplace URL permanently resolves to the real Applications marketplace", () => {
+test("Marketplace is a public, accessible Applications marketplace with one canonical product authority", () => {
   const marketplaceRoute = read("app/marketplace/page.tsx");
   const applicationsPage = read("app/apps/page.tsx");
 
-  assert.match(marketplaceRoute, /import \{ permanentRedirect \} from "next\/navigation"/);
-  assert.match(marketplaceRoute, /permanentRedirect\("\/apps"\)/);
+  assert.match(marketplaceRoute, /import AppsMarketplaceClient from "\.\.\/apps\/AppsMarketplaceClient"/);
+  assert.match(marketplaceRoute, /return <AppsMarketplaceClient \/>;/);
+  assert.match(marketplaceRoute, /alternates: \{ canonical: "\/apps" \}/);
+  assert.doesNotMatch(marketplaceRoute, /permanentRedirect/);
   assert.match(applicationsPage, /alternates: \{ canonical: "\/apps" \}/);
 });
 
