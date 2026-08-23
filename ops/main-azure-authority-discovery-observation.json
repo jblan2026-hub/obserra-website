@@ -1,0 +1,14 @@
+{
+  "workflow": "discover-marketplace-azure-authority-on-main.yml",
+  "runs": [
+    {
+      "id": 32668495681,
+      "status": "in_progress",
+      "conclusion": null,
+      "head_sha": "a32450e4eec1a6b4c9f08ec54dbd87cd2ac3f7ae",
+      "created_at": "2026-08-23T21:45:29Z",
+      "updated_at": "2026-08-23T21:45:32Z",
+      "html_url": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32668495681"
+    }
+  ]
+}
