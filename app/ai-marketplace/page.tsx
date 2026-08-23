@@ -1,22 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import products from "./marketplace-products.json";
+import MarketplaceExperience, { type MarketplaceProduct } from "./MarketplaceExperience";
 import "./marketplace.css";
 
-type Product = {
-  product_id: string;
-  product_name: string;
-  family: string;
-  version: string;
-  mission: string;
-  deliverable: string;
-  billing_model: string;
-  monthly_usd: string;
-  annual_usd: string;
-  one_time_usd: string;
-};
-
-const catalog = products as Product[];
+const catalog = products as MarketplaceProduct[];
 const families = [...new Set(catalog.map((product) => product.family))].sort();
 
 export const metadata: Metadata = {
@@ -24,11 +12,6 @@ export const metadata: Metadata = {
   description: "Browse governed Obserra EPI AI skills, agent teams, workflows, assurance, connectors, certifications, and industry editions.",
   alternates: { canonical: "/ai-marketplace" },
 };
-
-function price(product: Product) {
-  if (product.billing_model === "one-time") return `$${product.one_time_usd} one-time`;
-  return `$${product.monthly_usd}/month · $${product.annual_usd}/year`;
-}
 
 export default function AiMarketplacePage() {
   return (
@@ -44,37 +27,18 @@ export default function AiMarketplacePage() {
         </nav>
       </header>
       <section className="ai-marketplace__hero">
-        <p>OBSERRA EPI AI SKILLS MARKETPLACE</p>
-        <h1>Governed AI capabilities, packaged for real operational work.</h1>
+        <p>OBSERRA EPI AI CAPABILITY MARKETPLACE</p>
+        <h1>AI capability, made operational.</h1>
+        <p className="ai-marketplace__hero-lede">A spatial marketplace for governed agent teams, workflows, connectors, assurance, industry editions, and advanced skill libraries.</p>
         <div>
           <span>{catalog.length} versioned products</span>
           <span>{families.length} product families</span>
           <span>Integrity and entitlement controlled</span>
         </div>
-        <p className="ai-marketplace__notice">Prices and product scope are published below. Secure purchase and protected delivery activate only when the live payment, durable ledger, identity, and entitlement checks are operational.</p>
+        <p className="ai-marketplace__notice">Every offer has a version, commercial model, and protected fulfillment boundary. Purchase and delivery are intentionally fail-closed until the live payment, identity, ledger, and entitlement checks prove ready.</p>
         <Link href="/ai-marketplace/skill-libraries" style={{ display: "inline-flex", marginTop: 22, padding: "13px 17px", borderRadius: 10, background: "#f4ba55", color: "#071d2f", fontWeight: 900, textDecoration: "none" }}>Browse Beginner, Intermediate, Expert &amp; Advanced skill packages →</Link>
       </section>
-      <section className="ai-marketplace__families" aria-label="Marketplace product families">
-        {families.map((family) => <a key={family} href={`#${family}`}>{family.replace(/-/g, " ")}</a>)}
-      </section>
-      <section className="ai-marketplace__catalog" aria-label="AI Skills product catalog">
-        {families.map((family) => (
-          <section id={family} key={family}>
-            <header><p>{family.replace(/-/g, " ")}</p><h2>{catalog.filter((product) => product.family === family).length} governed products</h2></header>
-            <div className="ai-marketplace__grid">
-              {catalog.filter((product) => product.family === family).map((product) => (
-                <article key={product.product_id}>
-                  <span>v{product.version}</span>
-                  <h3>{product.product_name.replace("OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC — ", "")}</h3>
-                  <p>{product.mission}</p>
-                  <small><b>Deliverable:</b> {product.deliverable}</small>
-                  <footer><strong>{price(product)}</strong><Link href={`/contact?interest=ai-marketplace&product=${encodeURIComponent(product.product_id)}`}>Request purchase access →</Link></footer>
-                </article>
-              ))}
-            </div>
-          </section>
-        ))}
-      </section>
+      <MarketplaceExperience catalog={catalog} families={families} />
     </main>
   );
 }
