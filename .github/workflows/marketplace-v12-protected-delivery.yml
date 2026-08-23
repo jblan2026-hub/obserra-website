@@ -71,6 +71,42 @@ jobs:
           tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Preflight protected-delivery Key Vault prerequisites
+        if: inputs.mode == 'ingest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_binding_metadata() {
+            local secret_name="$1" secret_id
+            if ! secret_id="$(az keyvault secret show \
+              --vault-name "${AZURE_KEY_VAULT_NAME}" \
+              --name "${secret_name}" \
+              --query id \
+              --output tsv \
+              --only-show-errors)"; then
+              echo "::error::Required protected-delivery binding metadata is unavailable: ${secret_name}."
+              exit 1
+            fi
+            test -n "${secret_id:-}" || { echo "::error::Required protected-delivery binding metadata is unavailable: ${secret_name}."; exit 1; }
+            unset secret_id
+          }
+          for secret_name in \
+            applications-supabase-service-role-key \
+            applications-stripe-secret-key \
+            applications-stripe-webhook-secret \
+            applications-commerce-hash-secret \
+            ai-marketplace-release-aws-access-key-id \
+            ai-marketplace-release-aws-secret-access-key \
+            ai-marketplace-release-bucket \
+            ai-marketplace-release-kms-key-id \
+            ai-marketplace-release-cdn-url \
+            ai-marketplace-cloudfront-key-pair-id \
+            ai-marketplace-cloudfront-private-key \
+            ai-marketplace-v12-release-evidence-hmac-key; do
+            require_binding_metadata "${secret_name}"
+          done
+          echo "::notice::Verified metadata for all 12 protected-delivery prerequisites."
+
       - name: Download and verify the exact supplied archive set
         shell: bash
         run: |
@@ -229,6 +265,40 @@ jobs:
           # Approval is written last. Any interrupted earlier write therefore
           # remains digest-mismatched and runtime checkout stays fail-closed.
           set_secret_value ai-marketplace-v12-activation-approved-revision "${EXPECTED_CATALOG_REVISION}"
+
+      - name: Read back exact marketplace v1.2 runtime binding metadata
+        if: inputs.mode == 'ingest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          require_binding_metadata() {
+            local secret_name="$1" secret_id
+            secret_id="$(az keyvault secret show \
+              --vault-name "${AZURE_KEY_VAULT_NAME}" \
+              --name "${secret_name}" \
+              --query id \
+              --output tsv \
+              --only-show-errors)"
+            test -n "${secret_id:-}" || { echo "::error::Published marketplace runtime binding metadata is unavailable: ${secret_name}."; exit 1; }
+            unset secret_id
+          }
+          for secret_name in \
+            applications-supabase-service-role-key \
+            applications-stripe-secret-key \
+            applications-stripe-webhook-secret \
+            applications-commerce-hash-secret \
+            ai-marketplace-v12-binding-receipt-json \
+            ai-marketplace-v12-delivery-catalog-json \
+            ai-marketplace-v12-release-evidence-json \
+            ai-marketplace-v12-release-evidence-signature \
+            ai-marketplace-v12-release-evidence-hmac-key \
+            ai-marketplace-v12-activation-approved-revision \
+            ai-marketplace-release-cdn-url \
+            ai-marketplace-cloudfront-key-pair-id \
+            ai-marketplace-cloudfront-private-key; do
+            require_binding_metadata "${secret_name}"
+          done
+          echo "::notice::Verified metadata for all 13 exact Marketplace v1.2 runtime bindings."
 
       - name: Retain non-sensitive release evidence
         if: always()
