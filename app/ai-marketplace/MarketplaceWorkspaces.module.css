@@ -1,0 +1,80 @@
+.root { min-height: 100vh; padding-bottom: 84px; background: #020b12; color: #eaf8ff; }
+.nav { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 19px clamp(18px, 5vw, 86px); border-bottom: 1px solid rgba(105, 192, 222, .24); background: rgba(3, 17, 29, .94); }
+.nav > a { color: #f8c052; font-weight: 900; letter-spacing: .15em; text-decoration: none; }
+.nav nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 11px 18px; }
+.nav nav a { color: #c4e5f3; font-size: .82rem; font-weight: 700; text-decoration: none; }
+.nav nav a:hover, .nav nav a:focus-visible { color: #ffd77f; outline: none; }
+.intro, .stageLayout, .selectorSection, .comparisonTable, .composerFacts, .hangarSurface { width: min(1420px, calc(100% - clamp(32px, 9vw, 176px))); margin: 0 auto; }
+.intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(250px, .34fr); gap: clamp(24px, 7vw, 90px); padding: clamp(54px, 9vw, 126px) 0 34px; }
+.eyebrow { margin: 0 0 13px; color: #f8c052; font-size: .73rem; font-weight: 900; letter-spacing: .17em; text-transform: uppercase; }
+.intro h1, .intro h2, .stageCopy h2, .selectorSection h2, .comparisonTable h2, .composerFacts h2, .hangarSurface h1, .hangarSurface h2 { margin: 0; color: #f3fbff; letter-spacing: -.045em; }
+.intro h1 { max-width: 15ch; font-size: clamp(2.45rem, 5vw, 5.6rem); line-height: .94; }
+.intro p, .stageCopy p, .selectorSection p, .comparisonTable p, .composerFacts p, .hangarSurface p { color: #b9d8e5; line-height: 1.65; }
+.intro > div > p:last-child { max-width: 68ch; font-size: 1.03rem; }
+.intro aside { align-self: end; padding: 25px; border: 1px solid rgba(89, 187, 223, .4); border-radius: 20px; background: linear-gradient(145deg, rgba(8, 45, 66, .92), rgba(4, 20, 33, .92)); }
+.intro aside span, .intro aside strong { display: block; }
+.intro aside span { color: #8fbfd4; font-size: .7rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.intro aside strong { margin-top: 10px; color: #ffd16f; font-size: 1.65rem; }
+.intro aside p { margin-bottom: 0; font-size: .88rem; }
+.alert { width: min(1420px, calc(100% - clamp(32px, 9vw, 176px))); margin: 0 auto 26px; padding: 14px 16px; border: 1px solid rgba(249, 183, 75, .65); border-radius: 12px; color: #ffe0a5; background: rgba(101, 60, 9, .26); }
+.stageLayout { display: grid; grid-template-columns: minmax(260px, .45fr) minmax(0, 1fr); align-items: center; gap: clamp(26px, 5vw, 70px); padding: 32px 0 65px; }
+.stageCopy h2, .selectorSection h2, .comparisonTable h2, .composerFacts h2 { font-size: clamp(1.75rem, 3vw, 3.1rem); line-height: 1.01; }
+.stageCopy p { max-width: 38ch; }
+.primaryAction, .secondaryAction { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 12px; font-weight: 850; text-decoration: none; }
+.primaryAction { border: 1px solid #f5ba4c; background: #f5ba4c; color: #03111c; }
+.secondaryAction { border: 1px solid rgba(114, 199, 229, .55); color: #d7f3ff; background: rgba(6, 41, 60, .68); }
+.primaryAction:hover, .primaryAction:focus-visible { background: #ffd06f; outline: 3px solid rgba(255, 214, 127, .28); }
+.secondaryAction:hover, .secondaryAction:focus-visible { border-color: #f5ba4c; color: #ffe0a1; outline: 3px solid rgba(245, 186, 76, .18); }
+.selectorSection, .comparisonTable, .composerFacts, .hangarSurface { padding: clamp(28px, 5vw, 68px); border: 1px solid rgba(91, 182, 216, .3); border-radius: 30px; background: linear-gradient(135deg, rgba(7, 35, 52, .8), rgba(3, 14, 24, .96)); }
+.selectorSection { margin-bottom: 36px; }
+.selectorOrbit { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 30px; }
+.selectorOrbit button { position: relative; display: grid; min-height: 140px; overflow: hidden; padding: 18px; border: 1px solid rgba(88, 181, 215, .32); border-radius: 18px; background: radial-gradient(circle at 82% 18%, rgba(54, 173, 213, .19), transparent 30%), rgba(4, 27, 43, .85); color: #eefaff; text-align: left; cursor: pointer; }
+.selectorOrbit button:hover, .selectorOrbit button:focus-visible, .selectorOrbit button.selected { border-color: #f6bc4c; background: radial-gradient(circle at 80% 18%, rgba(245, 188, 76, .22), transparent 32%), rgba(26, 29, 29, .9); outline: none; }
+.selectorOrbit button:disabled { opacity: .48; cursor: not-allowed; }
+.selectorOrbit i { position: absolute; top: -61px; right: -48px; width: 144px; height: 144px; border: 1px solid rgba(116, 210, 240, .48); border-radius: 50%; transform: rotate(var(--orbit)) scaleX(1.45); }
+.selectorOrbit span, .selectorOrbit strong, .selectorOrbit small { position: relative; z-index: 1; display: block; }
+.selectorOrbit span { color: #9ecbdd; font-size: .7rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.selectorOrbit strong { margin: 8px 0; font-size: .97rem; line-height: 1.22; }
+.selectorOrbit small { color: #e5c77d; font-weight: 700; }
+.comparisonTable, .composerFacts { margin-top: 36px; }
+.tableScroll { overflow-x: auto; margin-top: 28px; border: 1px solid rgba(92, 184, 217, .26); border-radius: 16px; }
+.comparisonTable table { width: 100%; min-width: 750px; border-collapse: collapse; text-align: left; }
+.comparisonTable th, .comparisonTable td { padding: 15px; border-bottom: 1px solid rgba(113, 192, 220, .18); vertical-align: top; }
+.comparisonTable thead th { background: rgba(5, 39, 58, .94); color: #ffd571; }
+.comparisonTable tbody th { width: 155px; color: #95c5d8; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+.comparisonTable td { color: #e6f6fd; line-height: 1.5; }
+.comparisonTable td small { color: #abcbd9; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.factMatrix { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 24px 0; }
+.factMatrix > div { padding: 17px; border: 1px solid rgba(99, 191, 221, .3); border-radius: 16px; background: rgba(2, 19, 31, .58); }
+.factMatrix dt { color: #91c2d4; font-size: .69rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.factMatrix dd { margin: 8px 0 0; color: #eefaff; line-height: 1.5; }
+.selectionList { display: grid; gap: 10px; margin: 24px 0; }
+.selectionList > div { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 13px 14px; border-left: 2px solid #5ac1df; background: rgba(7, 38, 56, .58); }
+.selectionList > div b { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid rgba(245, 187, 75, .6); border-radius: 50%; color: #ffd372; }
+.selectionList strong, .selectionList small { display: block; }
+.selectionList small { color: #a2c8d8; }
+.selectionList a { color: #ffd473; font-size: .82rem; font-weight: 800; text-decoration: none; }
+.emptyState { padding: 24px; border: 1px dashed rgba(108, 193, 222, .45); color: #b9d8e5; }
+.hangarSurface { margin-top: clamp(44px, 8vw, 96px); }
+.hangarHeader { display: flex; justify-content: space-between; gap: 24px; align-items: end; }
+.hangarHeader > div { max-width: 75ch; }
+.hangarStatus { min-width: 220px; padding: 15px; border: 1px solid rgba(245, 188, 75, .38); border-radius: 14px; color: #ffe0a0; background: rgba(78, 54, 10, .25); }
+.hangarStatus strong, .hangarStatus span { display: block; }
+.hangarStatus span { margin-top: 4px; color: #bfdce8; font-size: .8rem; }
+.hangarGrid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 28px; margin-top: 30px; }
+.hangarList { display: grid; gap: 10px; align-content: start; }
+.hangarList button { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px; border: 1px solid rgba(92, 185, 219, .31); border-radius: 14px; background: rgba(3, 25, 40, .7); color: #effaff; text-align: left; cursor: pointer; }
+.hangarList button:hover, .hangarList button:focus-visible, .hangarList button[aria-pressed="true"] { border-color: #f5bb4b; outline: none; }
+.hangarList b { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid rgba(91, 204, 239, .56); border-radius: 50%; color: #a9eaff; }
+.hangarList strong, .hangarList small { display: block; }
+.hangarList small { color: #a7c8d6; }
+.hangarList em { color: #ffd371; font-size: .76rem; font-style: normal; font-weight: 800; text-transform: capitalize; }
+.hangarDetail { padding: 20px; border: 1px solid rgba(100, 191, 222, .3); border-radius: 18px; background: rgba(2, 18, 30, .82); }
+.hangarDetail h2 { font-size: 1.5rem; }
+.hangarDetail dl { margin: 20px 0; }
+.hangarDetail dl > div { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(109, 193, 222, .14); }
+.hangarDetail dt { color: #91bed1; }
+.hangarDetail dd { margin: 0; color: #eaf8ff; overflow-wrap: anywhere; }
+@media (max-width: 940px) { .nav { align-items: flex-start; flex-direction: column; } .nav nav { justify-content: flex-start; } .intro, .stageLayout, .hangarGrid { grid-template-columns: 1fr; } .intro h1 { max-width: 18ch; } .selectorOrbit { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hangarHeader { align-items: flex-start; flex-direction: column; } }
+@media (max-width: 600px) { .intro, .stageLayout, .selectorSection, .comparisonTable, .composerFacts, .hangarSurface { width: min(100% - 28px, 1420px); } .selectorSection, .comparisonTable, .composerFacts, .hangarSurface { padding: 22px; border-radius: 22px; } .selectorOrbit, .factMatrix { grid-template-columns: 1fr; } .selectionList > div { grid-template-columns: 34px minmax(0, 1fr); } .selectionList a { grid-column: 2; } }

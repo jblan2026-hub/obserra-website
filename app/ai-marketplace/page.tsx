@@ -34,7 +34,7 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
     <main className="ai-marketplace">
       <header className="ai-marketplace__nav">
         <Link href="/" aria-label="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC home">OBSERRA EPI</Link>
-        <nav aria-label="AI Marketplace navigation"><Link href="/">Home</Link><Link href="/ai-marketplace/skill-libraries">Skill libraries</Link><Link href="/apps">Applications</Link><Link href="/academy">Academy</Link><Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link></nav>
+        <nav aria-label="AI Marketplace navigation"><Link href="/">Home</Link><Link href="/ai-marketplace/compare">Compare</Link><Link href="/ai-marketplace/configure">Configure</Link><Link href="/ai-marketplace/hangar">Customer Hangar</Link><Link href="/ai-marketplace/skill-libraries">Skill libraries</Link><Link href="/apps">Applications</Link><Link href="/academy">Academy</Link><Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link></nav>
       </header>
       <section className="ai-marketplace__hero" aria-labelledby="marketplace-heading">
         <p>OBSERRA EPI AI CAPABILITY MARKETPLACE · CATALOG v1.2.0</p><h1 id="marketplace-heading">AI capability, made operational.</h1>

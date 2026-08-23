@@ -1,15 +1,31 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
-import { marketplaceV12ProtectedDeliveryConfigured } from "../../../lib/ai-marketplace-delivery";
-import "../marketplace.css";
+import { aiMarketplaceTenantId, marketplaceV12CustomerInventory } from "../../../lib/ai-marketplace-commerce";
+import { marketplaceV12ProtectedDeliveryConfigured, marketplaceV12Release } from "../../../lib/ai-marketplace-delivery";
+import { marketplaceV12Summary } from "../../../lib/marketplace-v12-catalog";
+import { marketplaceV12WorkspaceRecord } from "../../../lib/marketplace-v12-workspaces";
+import MarketplaceHangarInventory, { type HangarRecord } from "../MarketplaceHangarInventory";
+import styles from "../MarketplaceWorkspaces.module.css";
 
-export const metadata: Metadata = { title: "Customer Hangar Status | Obserra EPI", description: "Protected AI Marketplace delivery and installation availability." };
+export const metadata: Metadata = { title: "Customer Capability Hangar | Obserra EPI", description: "Server-authoritative Obserra EPI marketplace customer capability inventory.", robots: { index: false, follow: false } };
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export default async function MarketplaceHangarPage() {
-  const { userId } = await auth();
-  const deliveryConfigured = marketplaceV12ProtectedDeliveryConfigured();
-  return <main className="ai-marketplace"><header className="ai-marketplace__nav"><Link href="/ai-marketplace">OBSERRA EPI</Link><nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/portal">Customer portal</Link></nav></header><section className="ai-marketplace__hangar"><p className="ai-marketplace__eyebrow">Customer hangar</p><h1>Protected delivery status</h1><p>The hangar never treats a catalog record, offer selection, or sign-in as a delivery entitlement.</p><div><article><span>Protected delivery configuration</span><strong>{deliveryConfigured ? "Configured, but entitlement validation is still required" : "Unavailable — protected delivery controls are not configured"}</strong><p>{deliveryConfigured ? "A signed-release path may be configured. Access remains denied unless an authenticated customer has a verified product entitlement and a governed release is available." : "No customer download or release URL is available from this environment."}</p></article><article><span>Installation bridge</span><strong>Unavailable</strong><p>Installation destinations and grants are not published by this catalog. No installation is initiated from the hangar.</p></article><article><span>Customer access</span><strong>{userId ? "Authenticated; product-specific entitlement still required" : "Sign in required before product access can be checked"}</strong><p>Product access checks are server-scoped to the authenticated customer and current organization tenant. No subject or tenant identifier is exposed to the page.</p></article></div><Link className="ai-marketplace__contact-cta" href={userId ? "/portal" : "/sign-in?redirect_url=/ai-marketplace/hangar"}>{userId ? "Open customer portal" : "Sign in to check access"}</Link></section></main>;
+  const { userId, orgId } = await auth();
+  if (!userId) return <main className={styles.root}><header className={styles.nav}><Link href="/ai-marketplace">OBSERRA EPI</Link><nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Capability universe</Link><Link href="/ai-marketplace/compare">Comparison stage</Link><Link href="/ai-marketplace/configure">Bundle composer</Link></nav></header><section className={styles.hangarSurface}><p className={styles.eyebrow}>Customer capability hangar</p><h1>Sign in to retrieve your authoritative capability inventory.</h1><p>The Hangar does not render a catalog record as an owned product. Authentication is required before the server can resolve the customer and organization entitlement boundary.</p><Link className={styles.primaryAction} href="/sign-in?redirect_url=/ai-marketplace/hangar">Sign in to your Hangar</Link></section></main>;
+  const revision = marketplaceV12Summary().revision, deliveryConfigured = marketplaceV12ProtectedDeliveryConfigured();
+  let authorityAvailable = true, records: HangarRecord[] = [];
+  try {
+    const inventory = await marketplaceV12CustomerInventory(userId, aiMarketplaceTenantId(userId, orgId));
+    records = inventory.flatMap((entry) => {
+      const record = marketplaceV12WorkspaceRecord(entry.productId);
+      if (!record) return [];
+      const currentRevision = entry.catalogRevision === revision && entry.artifactSha256 === record.artifactSha256;
+      const release = currentRevision && entry.accessStatus === "active" ? marketplaceV12Release(record.productId, revision, entry.artifactSha256) : null;
+      return [{ record, accessStatus: entry.accessStatus, purchaseOption: entry.purchaseOption, updatedAt: entry.updatedAt, currentRevision, downloadAvailable: Boolean(release && deliveryConfigured) }];
+    });
+  } catch { authorityAvailable = false; }
+  return <main className={styles.root}><header className={styles.nav}><Link href="/ai-marketplace">OBSERRA EPI</Link><nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Capability universe</Link><Link href="/ai-marketplace/compare">Comparison stage</Link><Link href="/ai-marketplace/configure">Bundle composer</Link><Link href="/portal">Customer portal</Link></nav></header><MarketplaceHangarInventory records={records} authorityAvailable={authorityAvailable} deliveryConfigured={deliveryConfigured} /></main>;
 }
