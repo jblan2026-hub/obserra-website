@@ -1,0 +1,3 @@
+import { NextResponse } from "next/server"; import { marketplaceV12Search } from "../../../../lib/marketplace-v12-catalog";
+export const runtime="nodejs"; export const dynamic="force-dynamic";
+export async function GET(r:Request){const p=new URL(r.url).searchParams;try{const result=marketplaceV12Search({q:p.get("q")??undefined,family:p.get("family")??undefined,type:p.get("type")??undefined,cursor:p.get("cursor")??undefined,limit:Number(p.get("limit")??24)});return NextResponse.json(result,{status:"error"in result?400:200,headers:{"cache-control":"public, max-age=60"}});}catch{return NextResponse.json({operational:false,reason:"catalog-unavailable"},{status:503,headers:{"cache-control":"no-store"}});}}

@@ -45,6 +45,9 @@ jobs:
       - name: Verify lockfile remains immutable
         run: git diff --exit-code -- package-lock.json
 
+      - name: Verify marketplace catalog delivery contract
+        run: npm run verify:marketplace-catalog-delivery
+
       - name: Run unit and governed contract tests
         run: npm test
 
@@ -53,6 +56,9 @@ jobs:
 
       - name: Build production application
         run: npm run build
+
+      - name: Verify marketplace catalog is traced into the production build
+        run: npm run verify:marketplace-catalog-delivery -- --build-output .next
 
       - name: Verify public site excludes private owner content
         if: ${{ env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY != '' && env.CLERK_SECRET_KEY != '' }}

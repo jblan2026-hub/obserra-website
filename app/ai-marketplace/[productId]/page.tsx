@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { aiMarketplaceCatalog, findAiMarketplaceProduct } from "../../../lib/ai-marketplace-catalog";
+import { findAiMarketplaceProduct } from "../../../lib/ai-marketplace-catalog";
+import { marketplaceV12Product } from "../../../lib/marketplace-v12-catalog";
+import MarketplaceCheckout from "../MarketplaceCheckout";
+import MarketplacePedestal from "../MarketplacePedestal";
+import MarketplaceV12Checkout from "../MarketplaceV12Checkout";
+import { marketplaceV12Summary } from "../../../lib/marketplace-v12-catalog";
 import "../marketplace.css";
 
 type PageProps = { params: Promise<{ productId: string }> };
@@ -16,18 +21,30 @@ function price(product: NonNullable<ReturnType<typeof findAiMarketplaceProduct>>
   return `$${product.monthly_usd}/month · $${product.annual_usd}/year`;
 }
 
-export function generateStaticParams() {
-  return aiMarketplaceCatalog().map((product) => ({ productId: product.product_id }));
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const product = findAiMarketplaceProduct((await params).productId);
-  if (!product) return {};
-  return { title: `${title(product.product_name)} | Obserra EPI AI Marketplace`, description: product.mission, alternates: { canonical: `/ai-marketplace/${product.product_id}` } };
+  const productId = (await params).productId;
+  const catalogProduct = marketplaceV12Product(productId);
+  if (catalogProduct) return { title: `${catalogProduct.name} | Obserra EPI AI Marketplace`, description: catalogProduct.description, alternates: { canonical: `/ai-marketplace/${catalogProduct.slug}` }, robots: { index: true, follow: true } };
+  const product = findAiMarketplaceProduct(productId);
+  return product ? { title: `${title(product.product_name)} | Obserra EPI AI Marketplace`, description: product.mission, alternates: { canonical: `/ai-marketplace/${product.product_id}` } } : {};
 }
 
 export default async function MarketplaceProductPage({ params }: PageProps) {
-  const product = findAiMarketplaceProduct((await params).productId);
+  const productId = (await params).productId;
+  const catalogProduct = marketplaceV12Product(productId);
+  const product = catalogProduct ? null : findAiMarketplaceProduct(productId);
+  if (!product && !catalogProduct) notFound();
+  if (catalogProduct) return <main className="ai-marketplace ai-marketplace--detail">
+    <header className="ai-marketplace__nav"><Link href="/ai-marketplace">OBSERRA EPI</Link><nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/skill-libraries">Skill libraries</Link><Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link></nav></header>
+    <section className="ai-marketplace__detail-hero">
+      <Link className="ai-marketplace__back" href="/ai-marketplace">← All marketplace capabilities</Link>
+      <p className="ai-marketplace__eyebrow">{catalogProduct.family} · {catalogProduct.product_type} · v{catalogProduct.version}</p>
+      <h1>{catalogProduct.name}</h1><p>{catalogProduct.description}</p>
+      <div className="ai-marketplace__detail-grid"><div><span>Publisher</span><strong>{String(catalogProduct.publisher ?? "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC")}</strong></div><div><span>Commercial model</span><strong>{catalogProduct.pricing.model === "quote" ? "Enterprise quote required" : "Server price binding required before publication"}</strong></div><div><span>Availability</span><strong>Unavailable — publication, Stripe binding, entitlement, and protected delivery evidence are required.</strong></div></div>
+      <MarketplaceV12Checkout product={catalogProduct} revision={marketplaceV12Summary().revision} />
+      <Link className="ai-marketplace__contact-cta" href={`/contact?interest=ai-marketplace&product=${encodeURIComponent(catalogProduct.product_id)}`}>Discuss enterprise licensing</Link>
+    </section><MarketplacePedestal product={catalogProduct} />
+  </main>;
   if (!product) notFound();
   return <main className="ai-marketplace ai-marketplace--detail">
     <header className="ai-marketplace__nav"><Link href="/ai-marketplace">OBSERRA EPI</Link><nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/skill-libraries">Skill libraries</Link><Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link></nav></header>
@@ -37,6 +54,7 @@ export default async function MarketplaceProductPage({ params }: PageProps) {
       <h1>{title(product.product_name)}</h1>
       <p>{product.mission}</p>
       <div className="ai-marketplace__detail-grid"><div><span>Delivery</span><strong>{product.deliverable}</strong></div><div><span>Commercial model</span><strong>{price(product)}</strong></div><div><span>Availability</span><strong>Protected checkout is enabled only after live payment, identity, ledger, and entitlement verification.</strong></div></div>
+      <MarketplaceCheckout product={product} />
       <Link className="ai-marketplace__contact-cta" href={`/contact?interest=ai-marketplace&product=${encodeURIComponent(product.product_id)}`}>Discuss enterprise licensing</Link>
     </section>
   </main>;
