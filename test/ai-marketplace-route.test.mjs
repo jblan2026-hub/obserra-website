@@ -8,6 +8,13 @@ test("Homepage directs visitors to the dedicated AI Skills Marketplace", async (
   assert.match(home, /Shop AI Skills Marketplace/);
 });
 
+test("enterprise header exposes a yellow AI Skills Marketplace destination", async () => {
+  const header = await readFile(new URL("../app/components/enterprise/EnterpriseChrome.tsx", import.meta.url), "utf8");
+  assert.match(header, /href="\/ai-marketplace"/);
+  assert.match(header, /AI Skills Marketplace/);
+  assert.match(header, /ent-header__marketplace/);
+});
+
 test("AI Skills Marketplace uses its real product catalog and does not route to Applications", async () => {
   const page = await readFile(new URL("../app/ai-marketplace/page.tsx", import.meta.url), "utf8");
   const catalog = JSON.parse(await readFile(new URL("../app/ai-marketplace/marketplace-products.json", import.meta.url), "utf8"));
@@ -15,4 +22,11 @@ test("AI Skills Marketplace uses its real product catalog and does not route to 
   assert.equal(catalog.length, 64);
   assert.ok(catalog.every((product) => product.product_id && product.product_name && product.family));
   assert.doesNotMatch(page, /href="\/apps" className=".*marketplace/);
+});
+
+test("skill library route presents the four capability levels and source packages", async () => {
+  const page = await readFile(new URL("../app/ai-marketplace/skill-libraries/page.tsx", import.meta.url), "utf8");
+  for (const level of ["Beginner", "Intermediate", "Expert", "Advanced"]) assert.match(page, new RegExp(level));
+  assert.match(page, /11,320 capability skills/);
+  assert.match(page, /Set 4 Advanced/);
 });
