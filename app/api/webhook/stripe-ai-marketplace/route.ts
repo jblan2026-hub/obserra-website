@@ -23,7 +23,7 @@ function validV12Price(price: Stripe.Price, productId: string, option: Marketpla
   const product = typeof price.product === "string" ? null : price.product;
   return price.active && price.livemode === live && price.currency === "usd" && price.unit_amount === amount
     && (option === "recurring:month" ? price.type === "recurring" && price.recurring?.interval === "month" && price.recurring.interval_count === 1 : option === "recurring:year" ? price.type === "recurring" && price.recurring?.interval === "year" && price.recurring.interval_count === 1 : price.type === "one_time")
-    && !!product && !product.deleted && product.active && product.metadata.obserraMarketplaceProduct === productId && product.metadata.catalogRevision === revision && product.metadata.artifactSha256 === artifactSha256 && product.metadata.bindingKey === bindingKey && product.metadata.commerceSource === V12_SOURCE;
+    && !!product && !product.deleted && product.active && product.metadata.obserraMarketplaceProduct === productId && product.metadata.catalogRevision === revision && product.metadata.artifactSha256 === artifactSha256 && product.metadata.commerceSource === V12_SOURCE && price.metadata.bindingKey === bindingKey;
 }
 
 function v12Metadata(metadata: Stripe.Metadata | null | undefined) {
