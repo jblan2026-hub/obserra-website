@@ -1,10 +1,69 @@
 {
   "contract": "obserra-marketplace-v12-azure-cutover-observation-v1",
-  "runId": 32672099462,
-  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32672099462",
+  "runId": 32672295211,
+  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32672295211",
   "status": "completed",
   "conclusion": "failure",
-  "headSha": "c325f78e36d48113f756f81063345fd60ff47273",
-  "jobs": [],
+  "headSha": "9348acdfcc84d5803ffc53a32f359f7f14314014",
+  "jobs": [
+    {
+      "id": 97274833351,
+      "name": "patch",
+      "status": "completed",
+      "conclusion": "failure",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Checkout feature branch",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Configure Node.js",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Pin Azure Blob SDK",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Apply provider cutover",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Validate generated changes",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "name": "Commit provider cutover",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Configure Node.js",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Post Checkout feature branch",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
   "blocker": null
 }
