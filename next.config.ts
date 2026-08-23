@@ -103,7 +103,7 @@ const nextConfig: NextConfig = {
   // verified copy out of /public while explicitly tracing it into every route
   // bundle that can load the catalog at runtime.
   outputFileTracingIncludes: {
-    "/*": ["./data/marketplace/obserra-marketplace-card-catalog.json.gz", "./data/marketplace/obserra-marketplace-card-catalog.summary.json"],
+    "/*": ["./data/marketplace/obserra-marketplace-card-catalog.json.gz", "./data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part-000", "./data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part-001", "./data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part-002", "./data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part-003", "./data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part-004", "./data/marketplace/obserra-marketplace-card-catalog.summary.json"],
   },
   poweredByHeader: false,
   images: {

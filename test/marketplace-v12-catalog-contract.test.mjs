@@ -18,7 +18,23 @@ test("marketplace v1.2 catalog retains its verified document wrapper and exact c
 test("v1.2 delivery gate pins the signed catalog and rejects duplicate tracked copies", () => {
   const output = execFileSync(process.execPath, ["scripts/marketplace-catalog-delivery-gate.mjs"], { cwd: new URL("..", import.meta.url), encoding: "utf8" });
   assert.match(output, /Verified 2527985 byte gzip/);
-  assert.match(output, /one canonical tracked source/);
+  assert.match(output, /raw-or-chunked canonical source/);
+});
+
+test("transport-safe base64 catalog chunks reconstruct the exact verified gzip", () => {
+  const chunks = ["000", "001", "002", "003", "004"].map((suffix) => readFileSync(new URL(`data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part-${suffix}`, root), "utf8"));
+  assert.equal(chunks.length, 5);
+  for (const chunk of chunks.slice(0, -1)) assert.equal(chunk.length, 800000);
+  const encoded = chunks.join("");
+  const raw = readFileSync(new URL("data/marketplace/obserra-marketplace-card-catalog.json.gz", root));
+  assert.match(encoded, /^[A-Za-z0-9+/]+={0,2}$/);
+  assert.deepEqual(Buffer.from(encoded, "base64"), raw);
+  const loader = readFileSync(new URL("lib/marketplace-v12-catalog.ts", root), "utf8");
+  assert.match(loader, /catalogChunkSuffixes/);
+  assert.match(loader, /encodedCatalogBytes/);
+  assert.match(loader, /bytes\.toString\("base64"\)!==value/);
+  assert.match(loader, /catalog source does not match its verified digest/);
+  assert.match(loader, /catalog uncompressed digest mismatch/);
 });
 
 test("v1.2 server loader indexes wrapped cards and exposes bounded discovery endpoints", () => {
