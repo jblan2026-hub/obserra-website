@@ -95,6 +95,61 @@ jobs:
           echo "deployment_id=${candidate}" >> "${GITHUB_OUTPUT}"
           echo "deployment_url=https://${deployment_url}" >> "${GITHUB_OUTPUT}"
 
+      - name: Record exact Vercel deployment-check evidence
+        id: deployment_checks
+        shell: bash
+        env:
+          CANDIDATE_DEPLOYMENT: ${{ steps.candidate.outputs.deployment_id }}
+        run: |
+          set -euo pipefail
+          check_runs="$(mktemp)"
+          trap 'rm -f "${check_runs}"' EXIT
+
+          # This evidence is diagnostic only. It cannot approve, block, or mutate a
+          # deployment; the exact public preflight and guarded cutover remain the
+          # release authority. Never print the raw provider response.
+          if ! curl --silent --show-error --fail \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --output "${check_runs}" \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v2/deployments/${CANDIDATE_DEPLOYMENT}/check-runs?teamId=${TEAM_ID}"; then
+            echo "Vercel Check-v2 evidence was unavailable for the exact candidate."
+            exit 0
+          fi
+
+          if ! jq -e --arg deployment "${CANDIDATE_DEPLOYMENT}" '
+            (.runs | type) == "array" and
+            all(.runs[]; .deploymentId == $deployment)
+          ' "${check_runs}" >/dev/null; then
+            echo "Vercel Check-v2 evidence was unreadable or did not belong exclusively to the exact candidate."
+            exit 0
+          fi
+
+          summary="$(jq -c --arg deployment "${CANDIDATE_DEPLOYMENT}" '
+            {
+              deploymentId: $deployment,
+              runs: [
+                .runs[]
+                | {
+                    id,
+                    checkId: (.checkId // null),
+                    name,
+                    status,
+                    conclusion: (.conclusion // "pending"),
+                    blocks: (.blocks // "none"),
+                    requires: (.requires // "none"),
+                    source: {
+                      kind: (.source.kind // .source.subKind // "unknown"),
+                      origin: (.source.origin // null),
+                      externalCheckName: (.source.externalCheckName // null)
+                    }
+                  }
+              ]
+            }
+          ' "${check_runs}")"
+          printf 'VERCEL_DEPLOYMENT_CHECK_RUNS %s\n' "${summary}"
+
       - name: Preflight exact canonical deployment health
         id: preflight
         shell: bash

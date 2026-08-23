@@ -18,6 +18,35 @@ test("deployment polling retries bounded transport and response failures", () =>
   assert.match(workflow, /No exact READY canonical deployment appeared/);
 });
 
+test("cutover records redacted Check-v2 evidence only for the exact candidate without changing release authority", () => {
+  const candidateStart = workflow.indexOf("- name: Wait for exact canonical READY deployment");
+  const evidenceStart = workflow.indexOf("- name: Record exact Vercel deployment-check evidence");
+  const preflightStart = workflow.indexOf("- name: Preflight exact canonical deployment health");
+
+  assert.ok(candidateStart >= 0, "exact candidate selection must exist");
+  assert.ok(evidenceStart > candidateStart, "check evidence must follow exact candidate selection");
+  assert.ok(preflightStart > evidenceStart, "public preflight must remain the next release-authority phase");
+
+  const evidence = workflow.slice(evidenceStart, preflightStart);
+  assert.ok(
+    evidence.includes(
+      "https://api.vercel.com/v2/deployments/${CANDIDATE_DEPLOYMENT}/check-runs?teamId=${TEAM_ID}",
+    ),
+    "Check-v2 query must be scoped to the exact candidate deployment",
+  );
+  assert.match(evidence, /all\(\.runs\[\]; \.deploymentId == \$deployment\)/);
+  assert.match(evidence, /deploymentId:\s*\$deployment/);
+  assert.match(evidence, /checkId:/);
+  assert.match(evidence, /name,/);
+  assert.match(evidence, /status,/);
+  assert.match(evidence, /conclusion:/);
+  assert.match(evidence, /blocks:/);
+  assert.match(evidence, /source:/);
+  assert.match(evidence, /exit 0/);
+  assert.doesNotMatch(evidence, /conclusionText|externalUrl|\.output\b|\bcat\b/);
+  assert.doesNotMatch(workflow, /steps\.deployment_checks/);
+});
+
 test("rollback alias capture fails closed and distinguishes missing aliases from other API failures", () => {
   assert.match(workflow, /--write-out '%\{http_code\}'/);
   assert.match(workflow, /if \[ "\$\{status\}" = "404" \]/);
