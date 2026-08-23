@@ -746,3 +746,14 @@ All must be observed from the public canonical host:
 - **Result:** no separate continuation handoff or checkpoint file exists in the inspected branch roots or `docs` trees. No competing runtime authority was found.
 - **Operational authority:** this website `ops/live-handoff` record remains the single rolling record for canonical website, Applications commerce, Academy/Production Studio integration, payment, and Florida LMS runtime evidence.
 - **Mutation state:** repository readback only; no Production Studio source, branch, deployment, payment, or LMS setting was changed.
+
+
+<!-- ops-checkpoint:2026-08-23-owner-authorization-bash-shell-mismatch -->
+### 2026-08-23T12:21:32Z — owner authorization received; tenant command failed before mutation
+
+- **Explicit authorization:** the owner explicitly authorized the approved production Key Vault runtime bindings into canonical Vercel Production project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC` and the guarded bootstrap from exact main `5de3910bc104db9f41de48f816dde5bdf82dd6e2`.
+- **Submitted evidence review:** the Azure Cloud Shell screenshot shows a Bash prompt, but the supplied tenant-convergence block used PowerShell assignment, object-conversion, continuation, and condition syntax. Bash rejected those constructs, variables remained empty, and Azure CLI reported missing required arguments.
+- **Verification correction:** the submitted `OBSERRA_GITHUB_MAIN_FEDERATION=verified` text is not accepted as tenant proof because the screenshot demonstrates the convergence/readback commands did not execute successfully.
+- **Mutation state:** no tenant federated-credential, Vercel environment, deployment, alias, payment, enrollment, or LMS readiness mutation is evidenced from this attempt. No sensitive value was exposed or transferred.
+- **Authorization state:** owner authorization remains recorded and does not need to be repeated. The production bootstrap remains blocked only until the exact Bash tenant convergence returns its terminal verified marker.
+- **Next safe action:** run the Bash-compatible idempotent `github-main` convergence/readback in the active Cloud Shell. On exact verification, trigger the authorized signed-main bootstrap and automatically append all results here.
