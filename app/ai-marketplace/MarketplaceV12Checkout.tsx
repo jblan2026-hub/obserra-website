@@ -10,7 +10,7 @@ function label(option: ReturnType<typeof marketplaceV12PurchaseOptions>[number])
   return `One-time purchase · ${amount}`;
 }
 
-export default function MarketplaceV12Checkout({ product, revision }: { product: MarketplaceV12Card; revision: string }) {
+export default function MarketplaceV12Checkout({ product, revision, checkoutEnabled }: { product: MarketplaceV12Card; revision: string; checkoutEnabled: boolean }) {
   const options = marketplaceV12PurchaseOptions(product);
   if (options.length === 0) return <section className="ai-marketplace__checkout" aria-label="Purchase availability"><p role="status">This catalog record requires an enterprise quote. Online checkout is unavailable.</p></section>;
   return <form className="ai-marketplace__checkout" action="/api/ai-marketplace/checkout" method="post">
@@ -18,7 +18,7 @@ export default function MarketplaceV12Checkout({ product, revision }: { product:
     <input type="hidden" name="catalogRevision" value={revision} />
     <label htmlFor={`purchase-${product.product_id}`}>Purchase option</label>
     <select id={`purchase-${product.product_id}`} name="purchaseOption" aria-describedby={`purchase-status-${product.product_id}`}>{options.map((option) => <option key={option.option} value={option.option}>{label(option)}</option>)}</select>
-    <button type="submit" disabled>Checkout unavailable</button>
-    <p id={`purchase-status-${product.product_id}`} role="status">You can review catalog purchase options. Protected checkout remains unavailable until every exact catalog offer has a verified Stripe Price and fulfillment evidence.</p>
+    <button type="submit" disabled={!checkoutEnabled}>{checkoutEnabled ? "Purchase securely" : "Checkout unavailable"}</button>
+    <p id={`purchase-status-${product.product_id}`} role="status">{checkoutEnabled ? "Secure checkout uses the server-resolved Stripe Price. Access begins only after verified webhook fulfillment." : "You can review catalog purchase options. Protected checkout remains unavailable until every exact catalog offer has a verified Stripe Price and fulfillment evidence."}</p>
   </form>;
 }

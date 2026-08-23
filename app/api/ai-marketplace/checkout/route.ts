@@ -1,18 +1,178 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
+
 import { aiMarketplaceAmountCents, findAiMarketplaceProduct, validAiMarketplaceProduct } from "../../../../lib/ai-marketplace-catalog";
 import { aiMarketplaceBindingCoverage, boundAiMarketplacePrice, requiredBillingIntervals, type AiMarketplaceBillingInterval } from "../../../../lib/ai-marketplace-payment-bindings";
-import { aiMarketplaceCustomer,aiMarketplaceCustomerKey,aiMarketplaceTenantId,bindAiMarketplaceCustomer,recordAiMarketplaceCheckout,reserveAiMarketplaceCheckout } from "../../../../lib/ai-marketplace-commerce";
-import { applicationsCommerceConfigured,applicationsCommerceLivemode,getApplicationsStripe } from "../../../../lib/applications-stripe";
+import {
+  aiMarketplaceCustomer,
+  aiMarketplaceCustomerKey,
+  aiMarketplaceTenantId,
+  bindAiMarketplaceCustomer,
+  recordAiMarketplaceCheckout,
+  recordMarketplaceV12Checkout,
+  reserveAiMarketplaceCheckout,
+  reserveMarketplaceV12Checkout,
+} from "../../../../lib/ai-marketplace-commerce";
+import { applicationsCommerceConfigured, applicationsCommerceLivemode, getApplicationsStripe } from "../../../../lib/applications-stripe";
 import { primaryAccountEmail } from "../../../../lib/app-entitlements";
-import { ensureApplicationsRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
-import { marketplaceV12Product, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
 import { boundMarketplaceV12Price, marketplaceV12BindingCoverage, marketplaceV12Offer, type MarketplaceV12PurchaseOption } from "../../../../lib/marketplace-v12-bindings";
-export const runtime="nodejs"; export const maxDuration=60; const SOURCE="obserra-ai-marketplace-v1";
-function go(r:Request,code:string,p=""){const u=new URL("/ai-marketplace",r.url);u.searchParams.set("checkout",code);if(p)u.searchParams.set("product",p);return NextResponse.redirect(u,303);} function same(r:Request){try{return new URL(r.headers.get("origin")??"invalid").origin===new URL(r.url).origin;}catch{return false;}} function sid(x:string|{id:string}|null|undefined){return typeof x==="string"?x:x?.id;}
-function valid(price:Stripe.Price,p:string,i:AiMarketplaceBillingInterval,amount:number,live:boolean){const x=typeof price.product==="string"?null:price.product;return price.active&&price.livemode===live&&price.currency==="usd"&&price.unit_amount===amount&&(i==="one-time"?price.type==="one_time":price.type==="recurring"&&price.recurring?.interval===(i==="monthly"?"month":"year")&&price.recurring.interval_count===1)&&!!x&&!x.deleted&&x.active&&x.metadata.obserraMarketplaceProduct===p&&x.metadata.billingInterval===i&&x.metadata.commerceSource===SOURCE;}
-export async function POST(request:Request){if(!same(request))return go(request,"same-origin-required");if(!(request.headers.get("content-type")??"").toLowerCase().startsWith("application/x-www-form-urlencoded"))return go(request,"unsupported-request");const f=await request.formData(),productId=String(f.get("product")??""),catalogRevision=String(f.get("catalogRevision")??""),purchaseOption=String(f.get("purchaseOption")??""),interval=String(f.get("interval")??"");
-if(catalogRevision){const catalog=marketplaceV12Product(productId),expected=marketplaceV12Summary().revision,offer=catalog&&marketplaceV12Offer(catalog,purchaseOption as MarketplaceV12PurchaseOption),price=catalog&&boundMarketplaceV12Price(catalog,purchaseOption as MarketplaceV12PurchaseOption),coverage=marketplaceV12BindingCoverage();if(catalogRevision!==expected||!catalog||!offer||!price||!coverage.structurallyComplete||!coverage.stripeVerified)return go(request,"catalog-v12-configuration-required",productId);return go(request,"catalog-v12-activation-blocked",productId);}
-const legacyInterval=interval as AiMarketplaceBillingInterval,product=findAiMarketplaceProduct(productId);if(!validAiMarketplaceProduct(product)||!requiredBillingIntervals(product).includes(legacyInterval))return go(request,"invalid-product",productId);const {userId,orgId}=await auth();if(!userId){const u=new URL("/sign-in",request.url);u.searchParams.set("redirect_url",new URL(`/ai-marketplace?product=${encodeURIComponent(productId)}`,request.url).toString());return NextResponse.redirect(u,303);}try{await ensureApplicationsRuntimeSecrets();const priceId=boundAiMarketplacePrice(product,legacyInterval),amount=aiMarketplaceAmountCents(product,legacyInterval),live=applicationsCommerceLivemode();if(!priceId||!amount||!aiMarketplaceBindingCoverage().complete||!applicationsCommerceConfigured()||live===null)return go(request,"configuration-required",productId);const tenantId=aiMarketplaceTenantId(userId,orgId),reservation=await reserveAiMarketplaceCheckout({subjectId:userId,tenantId,productId,interval:legacyInterval}),stripe=getApplicationsStripe();if(reservation.stripeSessionId){const s=await stripe.checkout.sessions.retrieve(reservation.stripeSessionId);if(s.metadata?.checkoutAttemptId===reservation.attemptId&&s.metadata?.productId===productId&&s.url)return NextResponse.redirect(s.url,303);throw new Error("checkout replay mismatch");}const price=await stripe.prices.retrieve(priceId,{expand:["product"]});if(!valid(price,productId,legacyInterval,amount,live))return go(request,"price-governance-failed",productId);let customer=await aiMarketplaceCustomer(userId,tenantId);if(!customer){const created=await stripe.customers.create({email:await primaryAccountEmail(),metadata:{clerkUserId:userId,tenantId,commerceSource:SOURCE}},{idempotencyKey:aiMarketplaceCustomerKey(userId,tenantId)});customer=await bindAiMarketplaceCustomer(userId,tenantId,created.id);}const success=new URL("/ai-marketplace",request.url);success.searchParams.set("purchase","pending-fulfillment");success.searchParams.set("product",productId);const metadata={commerceSource:SOURCE,checkoutAttemptId:reservation.attemptId,productId,billingInterval:legacyInterval,clerkUserId:userId,tenantId,catalogVersion:product.version};const session=await stripe.checkout.sessions.create({mode:legacyInterval==="one-time"?"payment":"subscription",line_items:[{price:priceId,quantity:1}],customer:customer.stripeCustomerId,client_reference_id:userId,metadata,subscription_data:legacyInterval==="one-time"?undefined:{metadata},success_url:success.toString(),cancel_url:new URL(`/ai-marketplace?checkout=cancelled&product=${encodeURIComponent(productId)}`,request.url).toString(),billing_address_collection:"required",consent_collection:{terms_of_service:"required"}},{idempotencyKey:`ai-marketplace-checkout-v1-${reservation.attemptId}`});if(!session.url||sid(session.customer)!==customer.stripeCustomerId)throw new Error("Stripe checkout identity mismatch");await recordAiMarketplaceCheckout(reservation.attemptId,customer.stripeCustomerId,session.id);return NextResponse.redirect(session.url,303);}catch(e){console.error("AI marketplace checkout unavailable",{name:e instanceof Error?e.name:"unknown",productId});return go(request,"unavailable",productId);}}
-export async function GET(request:Request){return go(request,"post-required");}
+import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
+import { marketplaceV12ProductCommerce } from "../../../../lib/marketplace-v12-runtime";
+import { ensureApplicationsRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+const LEGACY_SOURCE = "obserra-ai-marketplace-v1";
+const V12_SOURCE = "obserra-ai-marketplace-v12";
+const sid = (value: string | { id: string } | null | undefined) => typeof value === "string" ? value : value?.id;
+
+function redirect(request: Request, code: string, product = "") {
+  const url = new URL("/ai-marketplace", request.url);
+  url.searchParams.set("checkout", code);
+  if (product) url.searchParams.set("product", product);
+  return NextResponse.redirect(url, 303);
+}
+
+function sameOrigin(request: Request) {
+  try { return new URL(request.headers.get("origin") ?? "invalid").origin === new URL(request.url).origin; } catch { return false; }
+}
+
+function validLegacyPrice(price: Stripe.Price, productId: string, interval: AiMarketplaceBillingInterval, amount: number, live: boolean) {
+  const product = typeof price.product === "string" ? null : price.product;
+  return price.active && price.livemode === live && price.currency === "usd" && price.unit_amount === amount
+    && (interval === "one-time" ? price.type === "one_time" : price.type === "recurring" && price.recurring?.interval === (interval === "monthly" ? "month" : "year") && price.recurring.interval_count === 1)
+    && !!product && !product.deleted && product.active && product.metadata.obserraMarketplaceProduct === productId && product.metadata.billingInterval === interval && product.metadata.commerceSource === LEGACY_SOURCE;
+}
+
+function validV12Price(price: Stripe.Price, input: { productId: string; option: MarketplaceV12PurchaseOption; amountMinor: number; live: boolean; revision: string; artifactSha256: string; bindingKey: string }) {
+  const product = typeof price.product === "string" ? null : price.product;
+  const recurring = input.option === "recurring:month" || input.option === "recurring:year";
+  const interval = input.option === "recurring:month" ? "month" : "year";
+  return price.active && price.livemode === input.live && price.currency === "usd" && price.unit_amount === input.amountMinor
+    && (recurring ? price.type === "recurring" && price.recurring?.interval === interval && price.recurring.interval_count === 1 : price.type === "one_time")
+    && !!product && !product.deleted && product.active
+    && product.metadata.obserraMarketplaceProduct === input.productId
+    && product.metadata.catalogRevision === input.revision
+    && product.metadata.artifactSha256 === input.artifactSha256
+    && product.metadata.bindingKey === input.bindingKey
+    && product.metadata.commerceSource === V12_SOURCE;
+}
+
+async function requireCustomer(subjectId: string, tenantId: string, source: string) {
+  const existing = await aiMarketplaceCustomer(subjectId, tenantId);
+  if (existing) return existing;
+  const created = await getApplicationsStripe().customers.create({
+    email: await primaryAccountEmail(),
+    metadata: { clerkUserId: subjectId, tenantId, commerceSource: source },
+  }, { idempotencyKey: aiMarketplaceCustomerKey(subjectId, tenantId) });
+  return bindAiMarketplaceCustomer(subjectId, tenantId, created.id);
+}
+
+async function v12Checkout(request: Request, input: { productId: string; revision: string; option: string }) {
+  const product = marketplaceV12Product(input.productId);
+  const expectedRevision = marketplaceV12Summary().revision;
+  const option = input.option as MarketplaceV12PurchaseOption;
+  const subject = product && marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
+  const offer = product && marketplaceV12Offer(product, option);
+  const priceId = product && boundMarketplaceV12Price(product, option);
+  if (input.revision !== expectedRevision || !product || !subject || !offer || !priceId || !marketplaceV12BindingCoverage().complete) return redirect(request, "catalog-v12-configuration-required", input.productId);
+
+  const { userId, orgId } = await auth();
+  if (!userId) {
+    const signIn = new URL("/sign-in", request.url);
+    signIn.searchParams.set("redirect_url", new URL(`/ai-marketplace/${encodeURIComponent(product.slug)}`, request.url).toString());
+    return NextResponse.redirect(signIn, 303);
+  }
+  if (!(await marketplaceV12ProductCommerce(product)).checkoutEnabled) return redirect(request, "catalog-v12-activation-blocked", input.productId);
+  const live = applicationsCommerceLivemode();
+  if (live !== true || !applicationsCommerceConfigured()) return redirect(request, "catalog-v12-configuration-required", input.productId);
+
+  const tenantId = aiMarketplaceTenantId(userId, orgId);
+  const reservation = await reserveMarketplaceV12Checkout({ subjectId: userId, tenantId, productId: product.product_id, option, revision: expectedRevision, artifactSha256: subject.artifactSha256 });
+  const stripe = getApplicationsStripe();
+  if (reservation.stripeSessionId) {
+    const existing = await stripe.checkout.sessions.retrieve(reservation.stripeSessionId);
+    if (existing.metadata?.commerceSource === V12_SOURCE && existing.metadata.checkoutAttemptId === reservation.attemptId && existing.metadata.productId === product.product_id && existing.metadata.purchaseOption === option && existing.metadata.catalogRevision === expectedRevision && existing.metadata.artifactSha256 === subject.artifactSha256 && existing.url) return NextResponse.redirect(existing.url, 303);
+    throw new Error("Marketplace checkout replay mismatch");
+  }
+
+  const price = await stripe.prices.retrieve(priceId, { expand: ["product"] });
+  const bindingKey = `${offer.kind}:${offer.cadence ?? "once"}:${offer.amount_minor}`;
+  if (!validV12Price(price, { productId: product.product_id, option, amountMinor: offer.amount_minor, live, revision: expectedRevision, artifactSha256: subject.artifactSha256, bindingKey })) return redirect(request, "catalog-v12-price-governance-failed", input.productId);
+
+  const customer = await requireCustomer(userId, tenantId, V12_SOURCE);
+  const metadata = { commerceSource: V12_SOURCE, checkoutAttemptId: reservation.attemptId, productId: product.product_id, purchaseOption: option, catalogRevision: expectedRevision, artifactSha256: subject.artifactSha256, bindingKey, clerkUserId: userId, tenantId };
+  const success = new URL(`/ai-marketplace/${encodeURIComponent(product.slug)}`, request.url);
+  success.searchParams.set("purchase", "pending-fulfillment");
+  const session = await stripe.checkout.sessions.create({
+    mode: offer.kind === "recurring" ? "subscription" : "payment",
+    line_items: [{ price: priceId, quantity: 1 }],
+    customer: customer.stripeCustomerId,
+    client_reference_id: userId,
+    metadata,
+    ...(offer.kind === "recurring" ? { subscription_data: { metadata } } : { payment_intent_data: { metadata } }),
+    success_url: success.toString(),
+    cancel_url: new URL(`/ai-marketplace/${encodeURIComponent(product.slug)}?checkout=cancelled`, request.url).toString(),
+    expires_at: reservation.expiresAt,
+    billing_address_collection: "required",
+    consent_collection: { terms_of_service: "required" },
+  }, { idempotencyKey: `ai-marketplace-v12-checkout-${reservation.attemptId}` });
+  if (!session.url || session.livemode !== live || sid(session.customer) !== customer.stripeCustomerId || session.metadata?.checkoutAttemptId !== reservation.attemptId) throw new Error("Marketplace checkout creation mismatch");
+  await recordMarketplaceV12Checkout({ attemptId: reservation.attemptId, customerId: customer.stripeCustomerId, sessionId: session.id, subscriptionId: sid(session.subscription), paymentIntentId: sid(session.payment_intent) });
+  return NextResponse.redirect(session.url, 303);
+}
+
+async function legacyCheckout(request: Request, input: { productId: string; interval: string }) {
+  const interval = input.interval as AiMarketplaceBillingInterval;
+  const product = findAiMarketplaceProduct(input.productId);
+  if (!validAiMarketplaceProduct(product) || !requiredBillingIntervals(product).includes(interval)) return redirect(request, "invalid-product", input.productId);
+  const { userId, orgId } = await auth();
+  if (!userId) {
+    const signIn = new URL("/sign-in", request.url);
+    signIn.searchParams.set("redirect_url", new URL(`/ai-marketplace?product=${encodeURIComponent(input.productId)}`, request.url).toString());
+    return NextResponse.redirect(signIn, 303);
+  }
+  const priceId = boundAiMarketplacePrice(product, interval);
+  const amount = aiMarketplaceAmountCents(product, interval);
+  const live = applicationsCommerceLivemode();
+  if (!priceId || !amount || !aiMarketplaceBindingCoverage().complete || !applicationsCommerceConfigured() || live === null) return redirect(request, "configuration-required", input.productId);
+  const tenantId = aiMarketplaceTenantId(userId, orgId);
+  const reservation = await reserveAiMarketplaceCheckout({ subjectId: userId, tenantId, productId: input.productId, interval });
+  const stripe = getApplicationsStripe();
+  if (reservation.stripeSessionId) {
+    const existing = await stripe.checkout.sessions.retrieve(reservation.stripeSessionId);
+    if (existing.metadata?.checkoutAttemptId === reservation.attemptId && existing.metadata?.productId === input.productId && existing.url) return NextResponse.redirect(existing.url, 303);
+    throw new Error("Marketplace checkout replay mismatch");
+  }
+  const price = await stripe.prices.retrieve(priceId, { expand: ["product"] });
+  if (!validLegacyPrice(price, input.productId, interval, amount, live)) return redirect(request, "price-governance-failed", input.productId);
+  const customer = await requireCustomer(userId, tenantId, LEGACY_SOURCE);
+  const success = new URL("/ai-marketplace", request.url);
+  success.searchParams.set("purchase", "pending-fulfillment");
+  success.searchParams.set("product", input.productId);
+  const metadata = { commerceSource: LEGACY_SOURCE, checkoutAttemptId: reservation.attemptId, productId: input.productId, billingInterval: interval, clerkUserId: userId, tenantId, catalogVersion: product.version };
+  const session = await stripe.checkout.sessions.create({ mode: interval === "one-time" ? "payment" : "subscription", line_items: [{ price: priceId, quantity: 1 }], customer: customer.stripeCustomerId, client_reference_id: userId, metadata, subscription_data: interval === "one-time" ? undefined : { metadata }, success_url: success.toString(), cancel_url: new URL(`/ai-marketplace?checkout=cancelled&product=${encodeURIComponent(input.productId)}`, request.url).toString(), billing_address_collection: "required", consent_collection: { terms_of_service: "required" } }, { idempotencyKey: `ai-marketplace-checkout-v1-${reservation.attemptId}` });
+  if (!session.url || sid(session.customer) !== customer.stripeCustomerId) throw new Error("Stripe checkout identity mismatch");
+  await recordAiMarketplaceCheckout(reservation.attemptId, customer.stripeCustomerId, session.id);
+  return NextResponse.redirect(session.url, 303);
+}
+
+export async function POST(request: Request) {
+  if (!sameOrigin(request)) return redirect(request, "same-origin-required");
+  if (!(request.headers.get("content-type") ?? "").toLowerCase().startsWith("application/x-www-form-urlencoded")) return redirect(request, "unsupported-request");
+  const form = await request.formData();
+  const productId = String(form.get("product") ?? "");
+  const catalogRevision = String(form.get("catalogRevision") ?? "");
+  try {
+    await ensureApplicationsRuntimeSecrets();
+    if (catalogRevision) return await v12Checkout(request, { productId, revision: catalogRevision, option: String(form.get("purchaseOption") ?? "") });
+    return await legacyCheckout(request, { productId, interval: String(form.get("interval") ?? "") });
+  } catch (error) {
+    console.error("AI marketplace checkout unavailable", { name: error instanceof Error ? error.name : "unknown", productId, generation: catalogRevision ? "v12" : "legacy" });
+    return redirect(request, catalogRevision ? "catalog-v12-unavailable" : "unavailable", productId);
+  }
+}
+
+export async function GET(request: Request) { return redirect(request, "post-required"); }

@@ -72,7 +72,7 @@ test("v1.2 product pedestal and customer hangar present catalog guidance without
   assert.match(hangar, /marketplaceV12ProtectedDeliveryConfigured/);
   assert.match(hangar, /dynamic = "force-dynamic"/);
   assert.match(hangar, /runtime = "nodejs"/);
-  assert.match(hangar, /entitlement validation is still required/);
+  assert.match(hangar, /marketplaceV12CustomerInventory/);
   assert.match(hangar, /Installation bridge/);
   assert.match(hangar, /auth\(\)/);
   assert.match(access, /Authentication required/);
@@ -80,7 +80,9 @@ test("v1.2 product pedestal and customer hangar present catalog guidance without
   assert.match(access, /marketplaceV12DeliveryEntitlement/);
   assert.doesNotMatch(access, /stripe\.customers\.create/);
   assert.match(install, /sameOrigin/);
-  assert.match(install, /marketplaceV12DeliveryEntitlement/);
+  assert.match(install, /createMarketplaceV12InstallGrant/);
+  assert.match(install, /marketplaceV12InstallBridgeConfigured/);
+  assert.match(install, /obserra:\/\/install\?grant=/);
   assert.match(install, /Install bridge unavailable/);
   assert.match(v12Checkout, /You can review catalog purchase options/);
   assert.match(v12Checkout, /enterprise quote/);
@@ -105,7 +107,7 @@ test("every marketplace offering requires an exact governed payment binding", as
   assert.match(health, /marketplaceV12BindingCoverage/);
   assert.match(health, /activationBlocked: true/);
   assert.match(checkout, /catalog-v12-configuration-required/);
-  assert.match(checkout, /catalogRevision!==expected/);
+  assert.match(checkout, /input\.revision !== expectedRevision/);
   assert.match(webhook, /obserra-ai-marketplace-v12/);
   assert.match(webhook, /v12 binding evidence unavailable/);
   assert.match(webhook, /session\.payment_status !== "paid"/);
