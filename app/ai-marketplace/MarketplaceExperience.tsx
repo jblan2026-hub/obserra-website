@@ -13,31 +13,63 @@ function color(value: string) { const palette = [[.18, .84, .96], [.96, .73, .31
 function scenePosition(node: SceneNode) { const seed = Math.abs(node.position_seed) || hash(node.product_id), cluster = hash(node.scene_cluster), clusterAngle = (cluster % 628) / 100, clusterRadius = .32 + ((Math.floor(cluster / 628) % 3) * .13), localAngle = (seed % 628) / 100, localRadius = .04 + ((Math.floor(seed / 628) % 100) / 1000); return [Math.cos(clusterAngle) * clusterRadius + Math.cos(localAngle) * localRadius, Math.sin(clusterAngle) * clusterRadius + Math.sin(localAngle) * localRadius, ((Math.floor(seed / 97) % 100) / 100) - .5] as const; }
 function sceneFromCards(cards: MarketplaceCard[]): SceneResult { const nodes = cards.map((card) => ({ product_id: card.product_id, slug: card.slug, name: card.name, family: card.family, product_type: card.product_type, ...card.visualization })), counts = new Map<string, number>(); for (const node of nodes) counts.set(node.scene_cluster, (counts.get(node.scene_cluster) ?? 0) + 1); return { total: cards.length, nodes, clusters: [...counts].sort(([a], [b]) => a.localeCompare(b)).map(([id, count]) => ({ id, count })), nextCursor: null }; }
 
+function nodeMonogram(name: string) { return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase(); }
+
+function StaticCapabilityMap({ nodes, selected, onSelect }: { nodes: SceneNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
+  // A semantic, data-derived 3D deck for real WebGL failures. Every control
+  // maps to a record in the bounded scene; edges are declared catalog edges.
+  const visible = nodes.slice(0, 48), visibleIds = new Set(visible.map((node) => node.product_id));
+  const points = new Map(visible.map((node) => {
+    const [x, y, z] = scenePosition(node);
+    return [node.product_id, { x: (x + 1) * 50, y: (y + 1) * 50, z }];
+  }));
+  return <div className="ai-marketplace__universe-static" role="group" aria-label="Interactive spatial catalog deck of catalog records and declared relationships">
+    <div className="ai-marketplace__static-architecture" aria-hidden="true"><i /><i /><i /><b>OBSERRA<br />EPI</b></div>
+    <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+      {visible.flatMap((node) => node.relationship_product_ids.filter((targetId) => visibleIds.has(targetId) && node.product_id < targetId).map((targetId) => {
+        const source = points.get(node.product_id)!, target = points.get(targetId)!;
+        return <line key={`${node.product_id}-${targetId}`} x1={source.x} y1={source.y} x2={target.x} y2={target.y} />;
+      }))}
+    </svg>
+    {visible.map((node, index) => { const point = points.get(node.product_id)!, active = selected === node.product_id; return <button type="button" className={active ? "is-active" : undefined} key={node.product_id} aria-pressed={active} aria-label={`Select ${node.name}`} style={{ "--node-x": `${point.x}%`, "--node-y": `${point.y}%`, "--node-z": `${point.z * 170}px`, "--node-delay": `${(index % 8) * -0.6}s` } as React.CSSProperties} onClick={() => onSelect(node)}><strong>{nodeMonogram(node.name)}</strong><span>{node.family}</span></button>; })}
+    <p>Interactive spatial deck · {visible.length} live catalog records selected from the current {nodes.length}-record scene.</p>
+  </div>;
+}
+
 function CapabilityUniverse({ nodes, selected, onSelect }: { nodes: SceneNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
-  const canvas = useRef<HTMLCanvasElement>(null), geometry = useRef<{ node: SceneNode; x: number; y: number; radius: number }[]>([]); const [available, setAvailable] = useState<boolean | null>(null);
+  const canvas = useRef<HTMLCanvasElement>(null), geometry = useRef<{ node: SceneNode; x: number; y: number; radius: number }[]>([]), redraw = useRef<(() => void) | null>(null), view = useRef({ yaw: -0.36, pitch: 0.2, zoom: 1, panX: 0, panY: 0 }), drag = useRef<{ x: number; y: number; moved: boolean } | null>(null); const [available, setAvailable] = useState<boolean | null>(null);
   useEffect(() => {
     let fallbackFrame: number | undefined;
     const showFallback = () => { fallbackFrame = window.requestAnimationFrame(() => setAvailable(false)); };
-    const canvasNode = canvas.current; if (!canvasNode) return; if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { showFallback(); return () => { if (fallbackFrame) window.cancelAnimationFrame(fallbackFrame); }; }
-    const gl = canvasNode.getContext("webgl", { alpha: true, antialias: true }); if (!gl) { showFallback(); return () => { if (fallbackFrame) window.cancelAnimationFrame(fallbackFrame); }; }
+    const canvasNode = canvas.current; if (!canvasNode) return;
+    // Reduced-motion changes animation only. It must never replace a usable
+    // spatial scene with an empty fallback, particularly on desktop systems
+    // where the OS preference is inherited from an accessibility profile.
+    const gl = canvasNode.getContext("webgl2", { alpha: true, antialias: true }) ?? canvasNode.getContext("webgl", { alpha: true, antialias: true }); if (!gl) { showFallback(); return () => { if (fallbackFrame) window.cancelAnimationFrame(fallbackFrame); }; }
     const vertex = gl.createShader(gl.VERTEX_SHADER)!, fragment = gl.createShader(gl.FRAGMENT_SHADER)!;
     gl.shaderSource(vertex, "attribute vec3 p;attribute vec3 c;attribute float s;varying vec3 v;void main(){float d=1.0+p.z*.28;gl_Position=vec4(p.xy*d,p.z,1.0);gl_PointSize=s*d;v=c;}"); gl.compileShader(vertex);
     gl.shaderSource(fragment, "precision mediump float;varying vec3 v;void main(){vec2 d=gl_PointCoord-vec2(.5);if(dot(d,d)>.25)discard;gl_FragColor=vec4(v,1.0-dot(d,d)*2.0);}"); gl.compileShader(fragment);
     const program = gl.createProgram()!; gl.attachShader(program, vertex); gl.attachShader(program, fragment); gl.linkProgram(program);
     const lineVertex = gl.createShader(gl.VERTEX_SHADER)!, lineFragment = gl.createShader(gl.FRAGMENT_SHADER)!; gl.shaderSource(lineVertex, "attribute vec3 p;void main(){float d=1.0+p.z*.28;gl_Position=vec4(p.xy*d,p.z,1.0);}"); gl.compileShader(lineVertex); gl.shaderSource(lineFragment, "precision mediump float;void main(){gl_FragColor=vec4(.20,.72,.85,.48);}"); gl.compileShader(lineFragment); const lineProgram = gl.createProgram()!; gl.attachShader(lineProgram, lineVertex); gl.attachShader(lineProgram, lineFragment); gl.linkProgram(lineProgram);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS) || !gl.getProgramParameter(lineProgram, gl.LINK_STATUS) || !gl.getShaderParameter(vertex, gl.COMPILE_STATUS) || !gl.getShaderParameter(fragment, gl.COMPILE_STATUS)) { showFallback(); return () => { if (fallbackFrame) window.cancelAnimationFrame(fallbackFrame); }; }
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS) || !gl.getProgramParameter(lineProgram, gl.LINK_STATUS) || !gl.getShaderParameter(vertex, gl.COMPILE_STATUS) || !gl.getShaderParameter(fragment, gl.COMPILE_STATUS) || !gl.getShaderParameter(lineVertex, gl.COMPILE_STATUS) || !gl.getShaderParameter(lineFragment, gl.COMPILE_STATUS)) { showFallback(); return () => { if (fallbackFrame) window.cancelAnimationFrame(fallbackFrame); }; }
     const draw = () => { const ratio = Math.min(window.devicePixelRatio || 1, 2), width = Math.max(1, Math.floor(canvasNode.clientWidth * ratio)), height = Math.max(1, Math.floor(canvasNode.clientHeight * ratio)); if (canvasNode.width !== width || canvasNode.height !== height) { canvasNode.width = width; canvasNode.height = height; }
-      const positions = nodes.map(scenePosition), indexes = new Map(nodes.map((node, i) => [node.product_id, i])), points: number[] = [], lines: number[] = [];
+      const camera = view.current, cosineYaw = Math.cos(camera.yaw), sineYaw = Math.sin(camera.yaw), cosinePitch = Math.cos(camera.pitch), sinePitch = Math.sin(camera.pitch);
+      const positions = nodes.map((node) => { const [x, y, z] = scenePosition(node), yawX = x * cosineYaw - z * sineYaw, yawZ = x * sineYaw + z * cosineYaw, pitchY = y * cosinePitch - yawZ * sinePitch, pitchZ = y * sinePitch + yawZ * cosinePitch; return [yawX * camera.zoom + camera.panX, pitchY * camera.zoom + camera.panY, pitchZ] as const; }), indexes = new Map(nodes.map((node, i) => [node.product_id, i])), points: number[] = [], lines: number[] = [];
       nodes.forEach((node, i) => { const [x, y, z] = positions[i], c = color(node.family); points.push(x, y, z, ...c, (8 + (hash(node.product_id) % 5)) * (node.product_id === selected ? 1.55 : 1)); node.relationship_product_ids.forEach((targetId) => { const target = indexes.get(targetId); if (target !== undefined && i < target) lines.push(...positions[i], ...positions[target]); }); });
       gl.viewport(0, 0, width, height); gl.clearColor(.012, .055, .09, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); const p = gl.getAttribLocation(program, "p"), c = gl.getAttribLocation(program, "c"), s = gl.getAttribLocation(program, "s");
       if (lines.length) { const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lines), gl.STATIC_DRAW); gl.useProgram(lineProgram); const linePosition = gl.getAttribLocation(lineProgram, "p"); gl.enableVertexAttribArray(linePosition); gl.vertexAttribPointer(linePosition, 3, gl.FLOAT, false, 12, 0); gl.drawArrays(gl.LINES, 0, lines.length / 3); gl.deleteBuffer(buffer); }
       gl.useProgram(program);
       const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW); gl.enableVertexAttribArray(p); gl.enableVertexAttribArray(c); gl.enableVertexAttribArray(s); gl.vertexAttribPointer(p, 3, gl.FLOAT, false, 28, 0); gl.vertexAttribPointer(c, 3, gl.FLOAT, false, 28, 12); gl.vertexAttribPointer(s, 1, gl.FLOAT, false, 28, 24); gl.drawArrays(gl.POINTS, 0, nodes.length); gl.deleteBuffer(buffer);
       geometry.current = nodes.map((node, i) => { const [x, y, z] = positions[i], d = 1 + z * .28; return { node, x: ((x * d) + 1) * .5 * canvasNode.clientWidth, y: (1 - ((y * d) + 1) * .5) * canvasNode.clientHeight, radius: 12 }; }); setAvailable(true); };
+    redraw.current = draw;
     const observer = new ResizeObserver(draw); observer.observe(canvasNode); draw(); return () => { observer.disconnect(); gl.deleteProgram(program); gl.deleteProgram(lineProgram); gl.deleteShader(vertex); gl.deleteShader(fragment); gl.deleteShader(lineVertex); gl.deleteShader(lineFragment); };
   }, [nodes, selected]);
   const pick = (event: React.PointerEvent<HTMLCanvasElement>) => { const box = event.currentTarget.getBoundingClientRect(), x = event.clientX - box.left, y = event.clientY - box.top; const hit = geometry.current.reduce<{ item: typeof geometry.current[number]; distance: number } | null>((nearest, item) => { const distance = Math.hypot(item.x - x, item.y - y); return distance <= item.radius && (!nearest || distance < nearest.distance) ? { item, distance } : nearest; }, null); if (hit) onSelect(hit.item.node); };
-  return <div className="ai-marketplace__universe" data-webgl={available ? "ready" : "fallback"}><canvas ref={canvas} onPointerUp={pick} aria-hidden="true" /><p>{available ? "Lines are catalog-declared relationships only when both records are present in this bounded scene." : "WebGL or motion is unavailable. The keyboard-accessible scene index provides the same selected records and deep links."}</p></div>;
+  const pointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => { drag.current = { x: event.clientX, y: event.clientY, moved: false }; event.currentTarget.setPointerCapture(event.pointerId); };
+  const pointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => { if (!drag.current) return; const dx = event.clientX - drag.current.x, dy = event.clientY - drag.current.y; if (Math.abs(dx) + Math.abs(dy) > 2) drag.current.moved = true; view.current.yaw += dx * .009; view.current.pitch = Math.max(-1.1, Math.min(1.1, view.current.pitch + dy * .009)); drag.current.x = event.clientX; drag.current.y = event.clientY; redraw.current?.(); };
+  const pointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => { const moved = drag.current?.moved; drag.current = null; if (!moved) pick(event); };
+  const wheel = (event: React.WheelEvent<HTMLCanvasElement>) => { event.preventDefault(); view.current.zoom = Math.max(.65, Math.min(1.9, view.current.zoom * (event.deltaY > 0 ? .9 : 1.1))); redraw.current?.(); };
+  return <div className="ai-marketplace__universe" data-webgl={available ? "ready" : "fallback"}><canvas ref={canvas} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onWheel={wheel} aria-label="Interactive 3D catalog capability universe. Drag to orbit, use mouse wheel to zoom, and select a plotted catalog record." role="application" tabIndex={0} /><StaticCapabilityMap nodes={nodes} selected={selected} onSelect={onSelect} /><p>{available ? "Drag to orbit · scroll to zoom · select a node. Lines are catalog-declared relationships only when both records are present in this bounded scene." : "WebGL is unavailable on this device; the interactive spatial deck and complete keyboard scene index remain available."}</p></div>;
 }
 
 export default function MarketplaceExperience({ initialCatalog, initialTotal, initialNextCursor, initialQuery = "", familyEntries, revision }: { initialCatalog: MarketplaceCard[]; initialTotal: number; initialNextCursor: string | null; initialQuery?: string; familyEntries: [string, number][]; revision: string }) {
