@@ -61,7 +61,7 @@ jobs:
 
     steps:
       - name: Authenticate the governed deployment identity
-        uses: azure/login@v2
+        uses: azure/login@v3.0.1
         with:
           client-id: ${{ env.AZURE_DEPLOY_CLIENT_ID }}
           tenant-id: ${{ env.AZURE_TENANT_ID }}
