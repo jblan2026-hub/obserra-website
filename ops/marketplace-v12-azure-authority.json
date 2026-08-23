@@ -1,0 +1,19 @@
+{
+  "identities": [
+    {
+      "clientId": "dc3ff3e1-ea35-4879-afa9-fa3eee49df85",
+      "id": "/subscriptions/38d660ff-611e-4f6c-ad29-70f5cf118f52/resourcegroups/rg-obserra-prod-eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-obserra-github-prod",
+      "name": "id-obserra-github-prod",
+      "principalId": "f87823b9-4fc5-4c3e-b8ac-63c91c3f15aa",
+      "tenantId": "7d8b7b64-c80c-4c8a-a514-66f6b1cf8607"
+    },
+    {
+      "clientId": "807bc5fa-32ca-4410-ab8d-79e461b64e82",
+      "id": "/subscriptions/38d660ff-611e-4f6c-ad29-70f5cf118f52/resourcegroups/rg-obserra-prod-eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-obserra-runtime-prod",
+      "name": "id-obserra-runtime-prod",
+      "principalId": "11ee06b7-bad6-4e30-a48b-469fec011fe3",
+      "tenantId": "7d8b7b64-c80c-4c8a-a514-66f6b1cf8607"
+    }
+  ],
+  "storageAccounts": []
+}
