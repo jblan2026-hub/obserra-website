@@ -64,3 +64,5 @@ jobs:
           with urllib.request.urlopen(req,timeout=30) as response:
             if response.status not in (200,201): raise SystemExit(response.status)
           PY
+
+# retrigger after production deployment 97593aa
