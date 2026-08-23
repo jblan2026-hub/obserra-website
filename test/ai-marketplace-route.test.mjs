@@ -6,6 +6,7 @@ test("Homepage directs visitors to the dedicated AI Skills Marketplace", async (
   const home = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(home, /href="\/ai-marketplace"/);
   assert.match(home, /Shop AI Skills Marketplace/);
+  assert.match(home, /Florida Class D Training/);
 });
 
 test("enterprise header exposes a yellow AI Skills Marketplace destination", async () => {
