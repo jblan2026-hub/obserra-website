@@ -40,8 +40,8 @@ jobs:
               except Exception: text=''
               safe=[]
               for line in text.splitlines():
-                if 'expected 1 occurrence' in line or 'expected 1 regex occurrence' in line or 'Process completed with exit code' in line or 'npm error' in line or 'SyntaxError' in line:
-                  safe.append(line[-400:])
+                if any(marker in line for marker in ['expected 1 occurrence','expected 1 regex occurrence','Process completed with exit code','npm error','SyntaxError','No provider cutover changes required']):
+                  safe.append(line[-500:])
               if safe: blocker=safe[-1]
           receipt={'contract':'obserra-marketplace-v12-azure-cutover-observation-v1','runId':run.get('id'),'runUrl':run.get('html_url'),'status':run.get('status'),'conclusion':run.get('conclusion'),'headSha':run.get('head_sha'),'jobs':jobs,'blocker':blocker}
           content=(json.dumps(receipt,indent=2)+'\n').encode(); path='ops/marketplace-v12-azure-cutover-observation.json'; encoded=urllib.parse.quote(path,safe='/'); sha=None
@@ -56,4 +56,4 @@ jobs:
             if r.status not in (200,201): raise SystemExit(r.status)
           PY
 
-# refresh after Azure metadata syntax correction
+# refresh at feature head 48bc716
