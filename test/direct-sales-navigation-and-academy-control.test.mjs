@@ -38,6 +38,18 @@ test("Academy catalog exposes checkout only for explicitly activated courses", (
   assert.match(client, /0 are currently open for purchase|purchasableCourseCount/);
 });
 
+test("production Academy gate accepts governed POST checkout or the explicit licensing lock", () => {
+  const gate = read(".github/workflows/production-e2e-operational-gate.yml");
+
+  assert.match(gate, /<form\[\^>\]\*\(action="\/api\/academy\/checkout"/);
+  assert.match(gate, /method="post"/);
+  assert.match(gate, /Academy LMS is live; new enrollment is not yet open/);
+  assert.match(gate, /0\[\^0-9\]\+are currently open for purchase/);
+  assert.match(gate, /New enrollment and payment stay disabled until the required licensing is complete/);
+  assert.match(gate, /Academy checkout action is present without a governed POST form/);
+  assert.doesNotMatch(gate, /^\s+grep -Eqi 'action="\/api\/academy\/checkout"'/m);
+});
+
 test("Academy LMS stays live while new enrollment and payment remain licensing-gated", () => {
   const licensing = read("lib/academy-licensing.ts");
   const catalogPage = read("app/academy/page.tsx");
