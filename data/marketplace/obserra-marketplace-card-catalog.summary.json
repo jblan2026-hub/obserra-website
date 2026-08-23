@@ -1,0 +1,72 @@
+{
+  "catalog_gzip_bytes": 2527985,
+  "catalog_gzip_sha256": "6d844273375a3fd000430aeaecd19ece4b2cd41d276ef287602c8407b2b94f39",
+  "catalog_revision": "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2",
+  "catalog_uncompressed_bytes": 48094493,
+  "catalog_uncompressed_sha256": "510826ac9871a42840e077c483916695297509053cbead4ac58506af5b998f2b",
+  "counts": {
+    "collection_cards": 6,
+    "product_cards": 11390,
+    "source_archives": 15,
+    "total_cards": 11396
+  },
+  "expansion_counts": {
+    "ai-agent-capability-skills-repository-set-1": 2160,
+    "ai-agent-capability-skills-repository-set-2": 2160,
+    "ai-agent-capability-skills-repository-set-3": 5000,
+    "ai-agent-capability-skills-repository-set-4-advanced": 2000,
+    "ai-marketplace-suite": 64,
+    "marketplace-builder-and-assurance-toolkit": 6
+  },
+  "family_counts": {
+    "AI Marketplace Suites": 1,
+    "AI Skill Collections": 3,
+    "AI Skills": 11320,
+    "Academy": 5,
+    "Advanced AI Skill Collections": 1,
+    "Agent Teams": 12,
+    "Assurance": 6,
+    "Connectors": 7,
+    "Governance": 7,
+    "Guardrails": 6,
+    "Industry Editions": 8,
+    "Marketplace Toolkits": 1,
+    "Marketplace Tools": 6,
+    "Operations": 1,
+    "Workflow Packs": 12
+  },
+  "materialized_artifacts_written": 0,
+  "output_filename": "obserra-marketplace-card-catalog.json.gz",
+  "product_type_counts": {
+    "academy": 5,
+    "agent-team": 12,
+    "ai-skill": 11320,
+    "assurance": 6,
+    "bundle": 2,
+    "collection": 4,
+    "connector": 7,
+    "governance": 7,
+    "guardrail": 6,
+    "industry-edition": 8,
+    "marketplace-tool": 6,
+    "operation": 1,
+    "workflow-pack": 12
+  },
+  "proficiency_counts": {
+    "Advanced": 2000,
+    "Beginner": 3140,
+    "Expert": 3090,
+    "Intermediate": 3090
+  },
+  "publication_state": "artifact-verified-unpublished",
+  "schema_version": "1.0",
+  "source_index_sha256": "7cb0746b4712bf5471dea53853c9d58d5c03e6e8aa97a7bb5a1eefc0639e2d30",
+  "validation": {
+    "expected_counts": "passed",
+    "one_click_install": "disabled-until-entitlement-and-bridge-live",
+    "outer_archive_size_sha256_paths_crc": "passed",
+    "selected_nested_archive_sha256_paths_crc": "passed",
+    "stripe_before_entitlement": "required-not-live",
+    "unique_product_ids": "passed"
+  }
+}

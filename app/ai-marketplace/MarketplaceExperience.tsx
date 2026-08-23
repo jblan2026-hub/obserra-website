@@ -1,98 +1,50 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-export type MarketplaceProduct = {
-  product_id: string;
-  product_name: string;
-  family: string;
-  version: string;
-  mission: string;
-  deliverable: string;
-  billing_model: "subscription" | "one-time" | "hybrid";
-  monthly_usd: string;
-  annual_usd: string;
-  one_time_usd: string;
-};
+export type MarketplaceCard = { product_id: string; slug: string; name: string; description: string; family: string; product_type: string; version: string; publication_state: string; pricing: { currency: string; model: string; offers: { amount_minor: number; cadence: string; currency: string; kind: string }[] }; visualization: { position_seed: number; scene_cluster: string; relationship_product_ids: string[] }; proficiency?: string };
+type SearchResult = { total: number; results: MarketplaceCard[]; nextCursor: string | null };
+type SceneNode = Pick<MarketplaceCard, "product_id" | "slug" | "family" | "product_type" | "name"> & { position_seed: number; scene_cluster: string; relationship_product_ids: string[] };
+type SceneResult = { total: number; nodes: SceneNode[]; clusters: { id: string; count: number }[]; nextCursor: string | null; error?: string };
+function price(card: MarketplaceCard) { const offer = card.pricing.offers[0]; if (!offer) return "Commercial terms available on request"; const amount = new Intl.NumberFormat("en-US", { style: "currency", currency: offer.currency }).format(offer.amount_minor / 100); return `${amount}${offer.cadence === "one-time" ? " one-time" : ` / ${offer.cadence}`}`; }
+function hash(value: string) { let result = 2166136261; for (let i = 0; i < value.length; i += 1) result = Math.imul(result ^ value.charCodeAt(i), 16777619); return result >>> 0; }
+function color(value: string) { const palette = [[.18, .84, .96], [.96, .73, .31], [.56, .52, 1], [.32, .91, .67], [1, .45, .58]]; return palette[hash(value) % palette.length]; }
+function scenePosition(node: SceneNode) { const seed = Math.abs(node.position_seed) || hash(node.product_id), cluster = hash(node.scene_cluster), clusterAngle = (cluster % 628) / 100, clusterRadius = .32 + ((Math.floor(cluster / 628) % 3) * .13), localAngle = (seed % 628) / 100, localRadius = .04 + ((Math.floor(seed / 628) % 100) / 1000); return [Math.cos(clusterAngle) * clusterRadius + Math.cos(localAngle) * localRadius, Math.sin(clusterAngle) * clusterRadius + Math.sin(localAngle) * localRadius, ((Math.floor(seed / 97) % 100) / 100) - .5] as const; }
 
-type CommerceHealth = {
-  operational: boolean;
-  productBindings?: { totalProducts: number; boundProducts: number; complete: boolean };
-};
-
-function displayName(product: MarketplaceProduct) {
-  return product.product_name.replace("OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC — ", "");
-}
-
-function price(product: MarketplaceProduct) {
-  if (product.billing_model === "one-time") return `$${product.one_time_usd} one-time`;
-  if (product.billing_model === "hybrid") return `$${product.one_time_usd} one-time · or $${product.monthly_usd}/month`;
-  return `$${product.monthly_usd}/month · $${product.annual_usd}/year`;
-}
-
-export default function MarketplaceExperience({ catalog, families }: { catalog: MarketplaceProduct[]; families: string[] }) {
-  const [family, setFamily] = useState("all");
-  const [query, setQuery] = useState("");
-  const [health, setHealth] = useState<CommerceHealth | null>(null);
-
+function CapabilityUniverse({ nodes, selected, onSelect }: { nodes: SceneNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
+  const canvas = useRef<HTMLCanvasElement>(null), geometry = useRef<{ node: SceneNode; x: number; y: number; radius: number }[]>([]); const [available, setAvailable] = useState<boolean | null>(null);
   useEffect(() => {
-    let active = true;
-    fetch("/api/ai-marketplace/commerce-health", { cache: "no-store" })
-      .then(async (response) => ({ response, body: await response.json() as CommerceHealth }))
-      .then(({ body }) => { if (active) setHealth(body); })
-      .catch(() => { if (active) setHealth({ operational: false }); });
-    return () => { active = false; };
-  }, []);
+    let fallbackFrame: number | undefined;
+    const showFallback = () => { fallbackFrame = window.requestAnimationFrame(() => setAvailable(false)); };
+    const canvasNode = canvas.current; if (!canvasNode) return; if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { showFallback(); return () => { if (fallbackFrame) window.cancelAnimationFrame(fallbackFrame); }; }
+    const gl = canvasNode.getContext("webgl", { alpha: true, antialias: true }); if (!gl) { showFallback(); return () => { if (fallbackFrame) window.cancelAnimationFrame(fallbackFrame); }; }
+    const vertex = gl.createShader(gl.VERTEX_SHADER)!, fragment = gl.createShader(gl.FRAGMENT_SHADER)!;
+    gl.shaderSource(vertex, "attribute vec3 p;attribute vec3 c;attribute float s;varying vec3 v;void main(){float d=1.0+p.z*.28;gl_Position=vec4(p.xy*d,p.z,1.0);gl_PointSize=s*d;v=c;}"); gl.compileShader(vertex);
+    gl.shaderSource(fragment, "precision mediump float;varying vec3 v;void main(){vec2 d=gl_PointCoord-vec2(.5);if(dot(d,d)>.25)discard;gl_FragColor=vec4(v,1.0-dot(d,d)*2.0);}"); gl.compileShader(fragment);
+    const program = gl.createProgram()!; gl.attachShader(program, vertex); gl.attachShader(program, fragment); gl.linkProgram(program);
+    const lineVertex = gl.createShader(gl.VERTEX_SHADER)!, lineFragment = gl.createShader(gl.FRAGMENT_SHADER)!; gl.shaderSource(lineVertex, "attribute vec3 p;void main(){float d=1.0+p.z*.28;gl_Position=vec4(p.xy*d,p.z,1.0);}"); gl.compileShader(lineVertex); gl.shaderSource(lineFragment, "precision mediump float;void main(){gl_FragColor=vec4(.20,.72,.85,.48);}"); gl.compileShader(lineFragment); const lineProgram = gl.createProgram()!; gl.attachShader(lineProgram, lineVertex); gl.attachShader(lineProgram, lineFragment); gl.linkProgram(lineProgram);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS) || !gl.getProgramParameter(lineProgram, gl.LINK_STATUS) || !gl.getShaderParameter(vertex, gl.COMPILE_STATUS) || !gl.getShaderParameter(fragment, gl.COMPILE_STATUS)) { showFallback(); return () => { if (fallbackFrame) window.cancelAnimationFrame(fallbackFrame); }; }
+    const draw = () => { const ratio = Math.min(window.devicePixelRatio || 1, 2), width = Math.max(1, Math.floor(canvasNode.clientWidth * ratio)), height = Math.max(1, Math.floor(canvasNode.clientHeight * ratio)); if (canvasNode.width !== width || canvasNode.height !== height) { canvasNode.width = width; canvasNode.height = height; }
+      const positions = nodes.map(scenePosition), indexes = new Map(nodes.map((node, i) => [node.product_id, i])), points: number[] = [], lines: number[] = [];
+      nodes.forEach((node, i) => { const [x, y, z] = positions[i], c = color(node.family); points.push(x, y, z, ...c, (8 + (hash(node.product_id) % 5)) * (node.product_id === selected ? 1.55 : 1)); node.relationship_product_ids.forEach((targetId) => { const target = indexes.get(targetId); if (target !== undefined && i < target) lines.push(...positions[i], ...positions[target]); }); });
+      gl.viewport(0, 0, width, height); gl.clearColor(.012, .055, .09, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); const p = gl.getAttribLocation(program, "p"), c = gl.getAttribLocation(program, "c"), s = gl.getAttribLocation(program, "s");
+      if (lines.length) { const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lines), gl.STATIC_DRAW); gl.useProgram(lineProgram); const linePosition = gl.getAttribLocation(lineProgram, "p"); gl.enableVertexAttribArray(linePosition); gl.vertexAttribPointer(linePosition, 3, gl.FLOAT, false, 12, 0); gl.drawArrays(gl.LINES, 0, lines.length / 3); gl.deleteBuffer(buffer); }
+      gl.useProgram(program);
+      const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW); gl.enableVertexAttribArray(p); gl.enableVertexAttribArray(c); gl.enableVertexAttribArray(s); gl.vertexAttribPointer(p, 3, gl.FLOAT, false, 28, 0); gl.vertexAttribPointer(c, 3, gl.FLOAT, false, 28, 12); gl.vertexAttribPointer(s, 1, gl.FLOAT, false, 28, 24); gl.drawArrays(gl.POINTS, 0, nodes.length); gl.deleteBuffer(buffer);
+      geometry.current = nodes.map((node, i) => { const [x, y, z] = positions[i], d = 1 + z * .28; return { node, x: ((x * d) + 1) * .5 * canvasNode.clientWidth, y: (1 - ((y * d) + 1) * .5) * canvasNode.clientHeight, radius: 12 }; }); setAvailable(true); };
+    const observer = new ResizeObserver(draw); observer.observe(canvasNode); draw(); return () => { observer.disconnect(); gl.deleteProgram(program); gl.deleteProgram(lineProgram); gl.deleteShader(vertex); gl.deleteShader(fragment); gl.deleteShader(lineVertex); gl.deleteShader(lineFragment); };
+  }, [nodes, selected]);
+  const pick = (event: React.PointerEvent<HTMLCanvasElement>) => { const box = event.currentTarget.getBoundingClientRect(), x = event.clientX - box.left, y = event.clientY - box.top; const hit = geometry.current.reduce<{ item: typeof geometry.current[number]; distance: number } | null>((nearest, item) => { const distance = Math.hypot(item.x - x, item.y - y); return distance <= item.radius && (!nearest || distance < nearest.distance) ? { item, distance } : nearest; }, null); if (hit) onSelect(hit.item.node); };
+  return <div className="ai-marketplace__universe" data-webgl={available ? "ready" : "fallback"}><canvas ref={canvas} onPointerUp={pick} aria-hidden="true" /><p>{available ? "Lines are catalog-declared relationships only when both records are present in this bounded scene." : "WebGL or motion is unavailable. The keyboard-accessible scene index provides the same selected records and deep links."}</p></div>;
+}
 
-  const visible = useMemo(() => catalog.filter((product) => {
-    const inFamily = family === "all" || product.family === family;
-    const haystack = `${product.product_name} ${product.mission} ${product.deliverable}`.toLowerCase();
-    return inFamily && haystack.includes(query.trim().toLowerCase());
-  }), [catalog, family, query]);
-
-  const bindingText = health?.operational
-    ? "Secure checkout available"
-    : health?.productBindings
-      ? `${health.productBindings.boundProducts}/${health.productBindings.totalProducts} exact payment bindings verified — checkout unavailable`
-      : "Checking protected checkout availability";
-
-  return <>
-    <section className="ai-marketplace__constellation" aria-labelledby="capability-map-heading">
-      <div className="ai-marketplace__constellation-copy">
-        <p className="ai-marketplace__eyebrow">Capability constellation</p>
-        <h2 id="capability-map-heading">Explore the operating system behind the catalog.</h2>
-        <p>Each orbit is a governed product family. The visual layer enhances discovery; the complete catalog, controls, and checkout state remain available in ordinary HTML.</p>
-        <div className="ai-marketplace__commerce-status" role="status" aria-live="polite">{bindingText}</div>
-      </div>
-      <div className="ai-marketplace__orbit-stage" aria-hidden="true">
-        <div className="ai-marketplace__orbit ai-marketplace__orbit--one" />
-        <div className="ai-marketplace__orbit ai-marketplace__orbit--two" />
-        <div className="ai-marketplace__core">{catalog.length}<small>offers</small></div>
-        {families.map((item, index) => <span className={`ai-marketplace__node ai-marketplace__node--${index + 1}`} key={item}>{catalog.filter((product) => product.family === item).length}</span>)}
-      </div>
-    </section>
-    <section className="ai-marketplace__discovery" aria-label="Catalog discovery controls">
-      <label>
-        <span>Search all 64 offerings</span>
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search capability, deliverable, or product" type="search" />
-      </label>
-      <div className="ai-marketplace__filters" aria-label="Filter by product family">
-        <button type="button" aria-pressed={family === "all"} onClick={() => setFamily("all")}>All <span>{catalog.length}</span></button>
-        {families.map((item) => <button type="button" aria-pressed={family === item} onClick={() => setFamily(item)} key={item}>{item.replace(/-/g, " ")} <span>{catalog.filter((product) => product.family === item).length}</span></button>)}
-      </div>
-    </section>
-    <section className="ai-marketplace__results" aria-live="polite" aria-label="AI marketplace products">
-      <p className="ai-marketplace__result-count">{visible.length} of {catalog.length} governed offerings</p>
-      <div className="ai-marketplace__grid">
-        {visible.map((product) => <article key={product.product_id} className="ai-marketplace__product-card">
-          <div className="ai-marketplace__card-top"><span>{product.family.replace(/-/g, " ")}</span><span>v{product.version}</span></div>
-          <h3>{displayName(product)}</h3>
-          <p>{product.mission}</p>
-          <dl><div><dt>Deliverable</dt><dd>{product.deliverable}</dd></div><div><dt>Commercial model</dt><dd>{price(product)}</dd></div></dl>
-          <footer><Link href={`/ai-marketplace/${encodeURIComponent(product.product_id)}`}>View capability <span aria-hidden="true">→</span></Link></footer>
-        </article>)}
-      </div>
-    </section>
-  </>;
+export default function MarketplaceExperience({ initialCatalog, initialTotal, initialNextCursor, initialQuery = "", familyEntries, revision }: { initialCatalog: MarketplaceCard[]; initialTotal: number; initialNextCursor: string | null; initialQuery?: string; familyEntries: [string, number][]; revision: string }) {
+  const initialized = useRef(false); const [family, setFamily] = useState(""), [query, setQuery] = useState(initialQuery), [cards, setCards] = useState(initialCatalog), [total, setTotal] = useState(initialTotal), [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor), [scene, setScene] = useState<SceneResult>({ total: initialCatalog.length, nodes: initialCatalog.map((card) => ({ product_id: card.product_id, slug: card.slug, name: card.name, family: card.family, product_type: card.product_type, ...card.visualization })), clusters: [], nextCursor: null }), [selected, setSelected] = useState<string | null>(null), [loading, setLoading] = useState(false), [error, setError] = useState<string | null>(null);
+  const request = useCallback(async (append = false, cursor = "") => { setLoading(true); setError(null); try { const params = new URLSearchParams({ limit: "24" }); if (query.trim()) params.set("q", query.trim()); if (family) params.set("family", family); if (cursor) params.set("cursor", cursor); const sceneParams = new URLSearchParams(params); sceneParams.set("limit", "48"); const [searchResponse, sceneResponse] = await Promise.all([fetch(`/api/ai-marketplace/search?${params}`), fetch(`/api/ai-marketplace/scene?${sceneParams}`)]); if (!searchResponse.ok || !sceneResponse.ok) throw new Error("Catalog scene unavailable"); const result = await searchResponse.json() as SearchResult, nextScene = await sceneResponse.json() as SceneResult; setCards((current) => append ? [...current, ...result.results] : result.results); setTotal(result.total); setNextCursor(result.nextCursor); setScene(nextScene); setSelected((current) => nextScene.nodes.some((node) => node.product_id === current) ? current : null); } catch { setError("Catalog updates are temporarily unavailable. The last verified records remain available; retry when ready."); } finally { setLoading(false); } }, [family, query]);
+  useEffect(() => { if (!initialized.current) { initialized.current = true; return; } const timer = window.setTimeout(() => { void request(); }, 180); return () => window.clearTimeout(timer); }, [request]);
+  const selectedNode = scene.nodes.find((node) => node.product_id === selected) ?? null, summary = useMemo(() => `${total.toLocaleString()} result${total === 1 ? "" : "s"}${query ? ` for “${query}”` : ""}`, [total, query]);
+  return <><section className="ai-marketplace__constellation" aria-labelledby="capability-map-heading"><div className="ai-marketplace__constellation-copy"><p className="ai-marketplace__eyebrow">Catalog capability universe</p><h2 id="capability-map-heading">A navigable universe built from catalog clusters and relationships.</h2><p>Every node uses its catalog cluster and position seed. This bounded view never invents records or relationships; the semantic scene index offers an equivalent keyboard path.</p><p className="ai-marketplace__revision">Catalog revision {revision.slice(0, 12)} · {scene.clusters.length} clusters · {scene.nodes.length} scene nodes</p></div><CapabilityUniverse nodes={scene.nodes} selected={selected} onSelect={(node) => setSelected(node.product_id)} /><div className="ai-marketplace__scene-index" aria-label="Capability universe scene index"><h3>Scene index</h3><p>Use these keyboard controls to select any plotted record.</p><div>{scene.nodes.map((node) => <button type="button" key={node.product_id} aria-pressed={selected === node.product_id} onClick={() => setSelected(node.product_id)}>{node.name}</button>)}</div>{selectedNode && <aside aria-live="polite"><strong>{selectedNode.name}</strong><span>{selectedNode.family} · {selectedNode.relationship_product_ids.length} declared relationships</span><Link href={`/ai-marketplace/${encodeURIComponent(selectedNode.slug)}`}>Open catalog record →</Link></aside>}</div></section>
+    <section className="ai-marketplace__discovery" aria-labelledby="catalog-controls-heading"><h2 id="catalog-controls-heading">Browse the catalog</h2><label htmlFor="marketplace-search"><span>Search capabilities, descriptions, families, and product types</span><input id="marketplace-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search the catalog" type="search" /></label><div className="ai-marketplace__filters" aria-label="Filter by product family"><button type="button" aria-pressed={!family} onClick={() => setFamily("")}>All <span>{initialTotal.toLocaleString()}</span></button>{familyEntries.map(([item, count]) => <button type="button" aria-pressed={family === item} onClick={() => setFamily(item)} key={item}>{item} <span>{count.toLocaleString()}</span></button>)}</div></section>
+    <section className="ai-marketplace__results" aria-labelledby="catalog-results-heading" aria-busy={loading}><div className="ai-marketplace__results-head"><h2 id="catalog-results-heading">Catalog results</h2><p className="ai-marketplace__result-count" role="status" aria-live="polite">{loading ? "Updating results…" : summary}</p></div>{error && <div className="ai-marketplace__recovery" role="alert"><span>{error}</span><button type="button" onClick={() => void request()}>Retry catalog update</button></div>}<div className="ai-marketplace__grid">{cards.map((card) => <article key={card.product_id} className="ai-marketplace__product-card"><div className="ai-marketplace__card-top"><span>{card.family}</span><span>v{card.version}</span></div><h3>{card.name}</h3><p>{card.description}</p><dl><div><dt>Product type</dt><dd>{card.product_type.replace(/-/g, " ")}{card.proficiency ? ` · ${card.proficiency}` : ""}</dd></div><div><dt>Commercial guidance</dt><dd>{price(card)}</dd></div><div><dt>Fulfillment state</dt><dd>{card.publication_state.replace(/-/g, " ")}</dd></div></dl><footer><Link href={`/ai-marketplace/${encodeURIComponent(card.slug)}`}>View catalog record <span aria-hidden="true">→</span></Link></footer></article>)}</div>{!loading && cards.length === 0 && <p className="ai-marketplace__empty">No catalog records match this search. Clear the search or select All.</p>}{nextCursor && <button className="ai-marketplace__more" type="button" onClick={() => void request(true, nextCursor)} disabled={loading}>Load 24 more records</button>}</section></>;
 }

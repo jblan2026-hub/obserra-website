@@ -31,7 +31,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://www.obserrallc.com/sitemap.xml",
+    sitemap: ["https://www.obserrallc.com/sitemap.xml", "https://www.obserrallc.com/ai-marketplace/sitemap.xml"],
     host: "www.obserrallc.com",
   };
 }

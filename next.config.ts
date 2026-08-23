@@ -99,6 +99,12 @@ const transactionalRouteHeaders = [
 
 const nextConfig: NextConfig = {
   ...(standaloneAppServiceBuild ? { output: "standalone" as const } : {}),
+  // The marketplace catalog is intentionally server-only. Keep its single,
+  // verified copy out of /public while explicitly tracing it into every route
+  // bundle that can load the catalog at runtime.
+  outputFileTracingIncludes: {
+    "/*": ["./data/marketplace/obserra-marketplace-card-catalog.json.gz", "./data/marketplace/obserra-marketplace-card-catalog.summary.json"],
+  },
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
