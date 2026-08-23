@@ -63,6 +63,7 @@ test("v1.2 product pedestal and customer hangar present catalog guidance without
   const hangar = await readFile(new URL("../app/ai-marketplace/hangar/page.tsx", import.meta.url), "utf8");
   const access = await readFile(new URL("../app/api/ai-marketplace/access/route.ts", import.meta.url), "utf8");
   const install = await readFile(new URL("../app/api/ai-marketplace/install-grant/route.ts", import.meta.url), "utf8");
+  const v12Checkout = await readFile(new URL("../app/ai-marketplace/MarketplaceV12Checkout.tsx", import.meta.url), "utf8");
   assert.match(detail, /MarketplacePedestal/);
   assert.match(pedestal, /Catalog-supplied offer comparison/);
   assert.match(pedestal, /does not create a checkout, entitlement, installation, or reservation/);
@@ -81,6 +82,10 @@ test("v1.2 product pedestal and customer hangar present catalog guidance without
   assert.match(install, /sameOrigin/);
   assert.match(install, /marketplaceV12DeliveryEntitlement/);
   assert.match(install, /Install bridge unavailable/);
+  assert.match(v12Checkout, /You can review catalog purchase options/);
+  assert.match(v12Checkout, /enterprise quote/);
+  assert.match(v12Checkout, /button type="submit" disabled/);
+  assert.doesNotMatch(v12Checkout, /name="purchaseOption" disabled/);
 });
 
 test("every marketplace offering requires an exact governed payment binding", async () => {

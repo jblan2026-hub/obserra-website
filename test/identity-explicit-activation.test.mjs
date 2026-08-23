@@ -32,3 +32,10 @@ test("protected identity paths remain fail closed while public traffic can degra
   assert.match(proxy, /await auth\(\)/);
   assert.match(proxy, /return regulatedMutationBoundary\(request\);/);
 });
+
+test("the protected marketplace hangar is Clerk-owned before its server page calls auth", () => {
+  assert.match(proxy, /"\/ai-marketplace\/hangar"/);
+  assert.match(config, /OBSERRA_IDENTITY_RUNTIME_ENABLED/);
+  const routing = fs.readFileSync("lib\/auth\/provider-routing.ts", "utf8");
+  assert.match(routing, /"\/ai-marketplace\/hangar"/);
+});
