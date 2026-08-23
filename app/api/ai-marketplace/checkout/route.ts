@@ -61,13 +61,14 @@ function validV12Price(price: Stripe.Price, input: { productId: string; option: 
 }
 
 async function requireCustomer(subjectId: string, tenantId: string, source: string) {
-  const existing = await aiMarketplaceCustomer(subjectId, tenantId);
+  const scope = source === V12_SOURCE ? "marketplace-v12" : "applications" as const;
+  const existing = await aiMarketplaceCustomer(subjectId, tenantId, scope);
   if (existing) return existing;
   const created = await getApplicationsStripe().customers.create({
     email: await primaryAccountEmail(),
     metadata: { clerkUserId: subjectId, tenantId, commerceSource: source },
   }, { idempotencyKey: aiMarketplaceCustomerKey(subjectId, tenantId) });
-  return bindAiMarketplaceCustomer(subjectId, tenantId, created.id);
+  return bindAiMarketplaceCustomer(subjectId, tenantId, created.id, scope);
 }
 
 async function v12Checkout(request: Request, input: { productId: string; option: string }) {
