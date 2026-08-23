@@ -24,6 +24,8 @@ env:
   AZURE_KEY_VAULT_NAME: kv-obserra-prod-38d660
   SOURCE_STORAGE_ACCOUNT: stobserramktv1238d660
   SOURCE_CONTAINER: marketplace-v12-source
+  RELEASE_CONTAINER: marketplace-v12-release
+  RUNTIME_PRINCIPAL_ID: 11ee06b7-bad6-4e30-a48b-469fec011fe3
   DELIVERY_IDENTITY: id-obserra-marketplace-delivery-prod
   FEDERATED_CREDENTIAL: github-production-protected-delivery
   GITHUB_ENVIRONMENT_SUBJECT: repo:jblan2026-hub@309821056/obserra-website@1321156321:environment:production
@@ -65,6 +67,9 @@ jobs:
           container_body='{"properties":{"publicAccess":"None"}}'
           az rest --method put --url "https://management.azure.com${container_id}?api-version=2023-05-01" --body "${container_body}" --output none
 
+          release_container_id="${blob_service_id}/containers/${RELEASE_CONTAINER}"
+          az rest --method put --url "https://management.azure.com${release_container_id}?api-version=2023-05-01" --body "${container_body}" --output none
+
           if ! az identity show --resource-group "${AZURE_RESOURCE_GROUP}" --name "${DELIVERY_IDENTITY}" --output none 2>/dev/null; then
             az identity create --resource-group "${AZURE_RESOURCE_GROUP}" --name "${DELIVERY_IDENTITY}" --location "${AZURE_LOCATION}" --tags workload=obserra-ai-marketplace-v12 environment=production purpose=protected-delivery --output none
           fi
@@ -93,11 +98,16 @@ jobs:
           ensure_role "${delivery_principal_id}" "Storage Blob Data Reader" "${container_id}"
           ensure_role "${delivery_principal_id}" "Key Vault Secrets Officer" "${key_vault_id}"
           ensure_role "f87823b9-4fc5-4c3e-b8ac-63c91c3f15aa" "Storage Blob Data Contributor" "${container_id}"
+          ensure_role "${delivery_principal_id}" "Storage Blob Data Contributor" "${release_container_id}"
+          ensure_role "${RUNTIME_PRINCIPAL_ID}" "Storage Blob Data Reader" "${release_container_id}"
+          ensure_role "${RUNTIME_PRINCIPAL_ID}" "Storage Blob Delegator" "${storage_id}"
 
           storage="$(az storage account show --resource-group "${AZURE_RESOURCE_GROUP}" --name "${SOURCE_STORAGE_ACCOUNT}" --output json)"
           jq -e '.kind=="StorageV2" and .sku.name=="Standard_GRS" and .allowBlobPublicAccess==false and .allowSharedKeyAccess==false and .defaultToOAuthAuthentication==true and .minimumTlsVersion=="TLS1_2" and .enableHttpsTrafficOnly==true and .publicNetworkAccess=="Enabled" and .networkRuleSet.defaultAction=="Allow"' <<<"${storage}" >/dev/null
           container="$(az rest --method get --url "https://management.azure.com${container_id}?api-version=2023-05-01")"
           jq -e '(.properties.publicAccess // "None") == "None"' <<<"${container}" >/dev/null
+          release_container="$(az rest --method get --url "https://management.azure.com${release_container_id}?api-version=2023-05-01")"
+          jq -e '(.properties.publicAccess // "None") == "None"' <<<"${release_container}" >/dev/null
           federation="$(az identity federated-credential show --resource-group "${AZURE_RESOURCE_GROUP}" --identity-name "${DELIVERY_IDENTITY}" --name "${FEDERATED_CREDENTIAL}" --output json)"
           jq -e --arg issuer "${OIDC_ISSUER}" --arg subject "${GITHUB_ENVIRONMENT_SUBJECT}" --arg audience "${OIDC_AUDIENCE}" '.issuer==$issuer and .subject==$subject and (.audiences|length)==1 and .audiences[0]==$audience' <<<"${federation}" >/dev/null
 
@@ -106,7 +116,10 @@ jobs:
             source_role="$(az role assignment list --assignee-object-id "${delivery_principal_id}" --scope "${container_id}" --query "[?roleDefinitionName=='Storage Blob Data Reader'] | [0].id" -o tsv)"
             vault_role="$(az role assignment list --assignee-object-id "${delivery_principal_id}" --scope "${key_vault_id}" --query "[?roleDefinitionName=='Key Vault Secrets Officer'] | [0].id" -o tsv)"
             upload_role="$(az role assignment list --assignee-object-id "f87823b9-4fc5-4c3e-b8ac-63c91c3f15aa" --scope "${container_id}" --query "[?roleDefinitionName=='Storage Blob Data Contributor'] | [0].id" -o tsv)"
-            if [ -n "${source_role}" ] && [ -n "${vault_role}" ] && [ -n "${upload_role}" ]; then role_ready=true; break; fi
+            release_write_role="$(az role assignment list --assignee-object-id "${delivery_principal_id}" --scope "${release_container_id}" --query "[?roleDefinitionName=='Storage Blob Data Contributor'] | [0].id" -o tsv)"
+            runtime_read_role="$(az role assignment list --assignee-object-id "${RUNTIME_PRINCIPAL_ID}" --scope "${release_container_id}" --query "[?roleDefinitionName=='Storage Blob Data Reader'] | [0].id" -o tsv)"
+            runtime_delegate_role="$(az role assignment list --assignee-object-id "${RUNTIME_PRINCIPAL_ID}" --scope "${storage_id}" --query "[?roleDefinitionName=='Storage Blob Delegator'] | [0].id" -o tsv)"
+            if [ -n "${source_role}" ] && [ -n "${vault_role}" ] && [ -n "${upload_role}" ] && [ -n "${release_write_role}" ] && [ -n "${runtime_read_role}" ] && [ -n "${runtime_delegate_role}" ]; then role_ready=true; break; fi
             sleep 5
           done
           [ "${role_ready}" = true ] || { echo "::error::Marketplace source/delivery role assignments did not converge."; exit 1; }
