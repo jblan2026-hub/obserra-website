@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { aiMarketplaceBindingCoverage } from "../../../../../lib/ai-marketplace-payment-bindings";
-import { applicationsCommerceConfigured, getApplicationsStripe } from "../../../../../lib/applications-stripe";
-import { ensureApplicationsRuntimeSecrets } from "../../../../../lib/production-runtime-secrets";
+import { aiMarketplaceBindingCoverage } from "@/lib/ai-marketplace-payment-bindings";
+import { applicationsCommerceConfigured, getApplicationsStripe } from "@/lib/applications-stripe";
+import { ensureApplicationsRuntimeSecrets } from "@/lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
