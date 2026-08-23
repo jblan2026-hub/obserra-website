@@ -806,3 +806,13 @@ All must be observed from the public canonical host:
 - **Fail-closed effect:** the production-binding, replacement-deployment, direct Applications/Academy commerce proof, guarded cutover, and canonical verification steps were skipped. No Vercel Production binding, sensitive transfer, deployment, alias, payment activation, enrollment, or LMS readiness change is evidenced.
 - **Separate maintenance warning:** GitHub reported the current `azure/login@v2` action runtime as Node.js 20 being forced to Node.js 24. The warning did not cause this failure; a separate source-only upgrade to Azure Login v3 / Node 24 is required and must not replace the exact authorized recovery run.
 - **Next safe action:** tenant administrator converges the missing runtime identity with the exact Key Vault Secrets User role, read backs the identity and role, then reruns only this failed bootstrap job at the same authorized SHA.
+
+
+<!-- ops-checkpoint:2026-08-23-node24-upgrade-pr-223-opened -->
+### 2026-08-23T12:44:08.318Z — Node 24 Azure Login upgrade isolated in PR #223
+
+- **Source-only change:** opened [PR #223](https://github.com/jblan2026-hub/obserra-website/pull/223), `ci: upgrade Azure Login actions to Node 24`, from `fix/azure-login-node24-20260823`.
+- **Exact scope:** two one-line substitutions: `azure/login@v2` to released `azure/login@v3.0.1` in `.github/workflows/enable-vercel-key-vault-runtime.yml` and `.github/workflows/azure-production-deploy.yml`. Azure Login v3 declares Node.js 24; all OIDC, RBAC, deployment, and fail-closed checks remain unchanged.
+- **Source proof:** the branch is two commits ahead of and zero commits behind exact `main` SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2`; comparison reports only the two expected one-line file changes.
+- **Release isolation:** PR #223 is not merged and must not supersede the existing authorized recovery run. Runtime identity creation/role readback followed by a rerun of bootstrap run #6 remains the shortest path to Vercel binding and canonical verification.
+- **Mutation state:** no Production environment binding, deployment, alias, payment, enrollment, or LMS state changed by opening this source-review PR.
