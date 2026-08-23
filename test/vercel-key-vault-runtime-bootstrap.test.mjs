@@ -8,6 +8,15 @@ test("Vercel runtime bootstrap binds one production workload and proves the resu
     "utf8",
   );
 
+  assert.match(
+    workflow,
+    /vars\.AZURE_CLIENT_ID \|\| 'dc3ff3e1-ea35-4879-afa9-fa3eee49df85'/,
+  );
+  assert.match(
+    workflow,
+    /vars\.AZURE_TENANT_ID \|\| '7d8b7b64-c80c-4c8a-a514-66f6b1cf8607'/,
+  );
+  assert.doesNotMatch(workflow, /5a08a33a-d2b5-491d-ac6d-32f325138143/);
   assert.match(workflow, /oidcTokenConfig:\{enabled:true,issuerMode:"team"\}/);
   assert.match(workflow, /https:\/\/oidc\.vercel\.com\/\$\{VERCEL_TEAM_SLUG\}/);
   assert.match(workflow, /owner:\$\{VERCEL_TEAM_SLUG\}:project:\$\{VERCEL_PROJECT_NAME\}:environment:production/);
