@@ -69,6 +69,9 @@ test("Vercel runtime bootstrap binds one production workload and proves the resu
   assert.doesNotMatch(workflow, /vercel@latest/);
   assert.match(workflow, /\.id == \$deployment/);
   assert.match(workflow, /\.gitSource\.sha == \$sha/);
+  assert.match(workflow, /\.projectId \/\/ \.project\.id/);
+  assert.match(workflow, /\.meta\.githubCommitVerification == "verified"/);
+  assert.match(workflow, /\.meta\.githubCommitSha == \$sha/);
   assert.match(workflow, /exact_deployment_origin/);
   assert.match(workflow, /\/api\/apps\/commerce-health/);
   assert.match(workflow, /\/api\/academy\/commerce-health/);
