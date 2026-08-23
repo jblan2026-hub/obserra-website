@@ -22,18 +22,22 @@
 .categoryTiles small { display: -webkit-box; overflow: hidden; color: #a9c8d3; font-size: .62rem; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .skillPicker { display: grid; gap: 8px; margin-top: 15px; padding-top: 14px; border-top: 1px solid rgba(102, 195, 224, .17); }
 .skillPicker ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; padding: 0; border-top: 1px solid rgba(103, 193, 221, .2); border-left: 1px solid rgba(103, 193, 221, .2); list-style: none; }
-.skillPicker li { display: flex; min-width: 0; min-height: 190px; flex-direction: column; padding: 14px; border-right: 1px solid rgba(103, 193, 221, .2); border-bottom: 1px solid rgba(103, 193, 221, .2); background: rgba(4, 23, 36, .76); }
+.skillPicker li { position: relative; display: flex; min-width: 0; min-height: 190px; flex-direction: column; padding: 14px; border-right: 1px solid rgba(103, 193, 221, .2); border-bottom: 1px solid rgba(103, 193, 221, .2); background: rgba(4, 23, 36, .76); cursor: pointer; transition: background .18s ease, box-shadow .18s ease; }
 .skillPicker li[data-selected="true"] { background: rgba(22, 49, 52, .9); box-shadow: inset 3px 0 #f4ba55; }
+.skillPicker li:hover { background: rgba(13, 47, 64, .96); box-shadow: inset 0 0 0 1px rgba(75, 211, 238, .52); }
+.skillCardLink { position: absolute; z-index: 1; inset: 0; border-radius: 2px; }
+.skillCardLink:focus-visible { outline: 3px solid #f4ba55; outline-offset: -4px; }
 .skillPicker li > div:first-child { display: flex; align-items: start; justify-content: space-between; gap: 9px; }
 .skillName { overflow: hidden; color: #f0faff; font-size: .78rem; font-weight: 850; line-height: 1.25; text-overflow: ellipsis; text-decoration: none; white-space: nowrap; }
-.skillName:hover, .skillName:focus-visible { color: #ffdc96; outline: none; text-decoration: underline; }
+.skillPicker li:hover .skillName { color: #ffdc96; }
 .skillPicker li > div:first-child small { flex: 0 0 auto; color: #f5cf81; font-size: .54rem; font-weight: 850; text-transform: capitalize; }
 .skillPicker li > p { display: -webkit-box; min-height: 2.7em; overflow: hidden; margin: 10px 0; color: #a9c8d3; font-size: .65rem; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .skillTags { display: flex; flex-wrap: wrap; gap: 5px; }
 .skillTags span { padding: 3px 5px; border: 1px solid rgba(101, 190, 218, .22); background: rgba(13, 46, 61, .62); color: #a5d5e5; font-size: .5rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 .skillPicker footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 11px; border-top: 1px solid rgba(103, 193, 221, .15); }
 .skillPicker footer > strong { color: #ffdda0; font-size: .72rem; }
-.skillPicker footer button { padding: 6px 8px; border: 1px solid rgba(244, 186, 85, .62); border-radius: 7px; background: transparent; color: #ffd987; font: inherit; font-size: .58rem; font-weight: 900; cursor: pointer; }
+.openProduct { margin-left: auto; color: #d9f4ff; font-size: .58rem; font-weight: 850; }
+.skillPicker footer button { position: relative; z-index: 2; padding: 6px 8px; border: 1px solid rgba(244, 186, 85, .62); border-radius: 7px; background: #061829; color: #ffd987; font: inherit; font-size: .58rem; font-weight: 900; cursor: pointer; }
 .skillPicker footer button:hover, .skillPicker footer button:focus-visible, .skillPicker footer button[aria-pressed="true"] { background: #f4ba55; color: #061829; outline: none; }
 .stage { position: relative; min-width: 0; min-height: 590px; overflow: hidden; background: radial-gradient(circle at 50% 48%, rgba(26, 119, 151, .25), transparent 43%), #020b14; outline: none; }
 .stage:focus-visible { outline: 3px solid #fff; outline-offset: -5px; }
