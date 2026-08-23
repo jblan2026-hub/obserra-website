@@ -101,6 +101,13 @@ test("capability universe is sourced from the bounded scene endpoint with an equ
   assert.match(experience, /Open catalog record/);
   assert.match(experience, /sceneFromCards/);
   assert.match(experience, /scene_cluster/);
+  assert.match(experience, /StaticCapabilityMap/);
+  assert.match(experience, /Static catalog map/);
+  assert.doesNotMatch(experience, /prefers-reduced-motion: reduce\)\.matches/);
+  const marketplaceCss = readFileSync(new URL("app/ai-marketplace/marketplace.css", root), "utf8");
+  assert.match(marketplaceCss, /ai-marketplace__universe-static/);
+  assert.match(marketplaceCss, /data-webgl=fallback/);
+  assert.match(marketplaceCss, /prefers-reduced-motion:reduce/);
   assert.match(sceneRoute, /limit: Number\(params\.get\("limit"\) \?\? 48\)/);
 });
 

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { marketplaceV12SalesDock, marketplaceV12Search, marketplaceV12Summary } from "../../lib/marketplace-v12-catalog";
 import MarketplaceExperience, { type MarketplaceCard } from "./MarketplaceExperience";
+import MarketplaceSalesDock from "./MarketplaceSalesDock";
+import type { MarketplaceV12Card } from "../../lib/marketplace-v12-catalog";
 import "./marketplace.css";
 
 type PageProps = { searchParams: Promise<{ cursor?: string | string[]; q?: string | string[] }> };
@@ -16,6 +18,7 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
   const catalog = initial.results as MarketplaceCard[];
   const familyEntries = Object.entries(summary.family_counts).sort(([a], [b]) => a.localeCompare(b));
   const salesDock = marketplaceV12SalesDock();
+  const dockRecords = [...salesDock.packages, ...catalog] as MarketplaceV12Card[];
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -39,7 +42,7 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
         <div><span>{summary.total_cards.toLocaleString()} catalog records</span><span>{familyEntries.length} product families</span><span>Artifact-verified, not yet published</span></div>
         <p className="ai-marketplace__notice">Catalog records describe verified artifacts. Protected fulfillment, payment, entitlement, and installation remain unavailable until their required controls are configured and verified.</p>
       </section>
-      <section className="ai-marketplace__sales-dock" aria-labelledby="sales-dock-heading"><p className="ai-marketplace__eyebrow">Sales dock</p><h2 id="sales-dock-heading">Browse the verified catalog by operating need.</h2><p>Catalog browsing is available. Checkout, entitlement, protected delivery, and installation remain unavailable until their independent controls are verified.</p><div className="ai-marketplace__dock-groups"><section><h3>Families</h3><div>{salesDock.families.map((item) => <Link key={item.id} href={`/ai-marketplace?q=${encodeURIComponent(item.id)}`}>{item.id} <span>{item.count.toLocaleString()}</span></Link>)}</div></section><section><h3>Capability level</h3><div>{salesDock.proficiencies.map((item) => <Link key={item.id} href={`/ai-marketplace?q=${encodeURIComponent(item.id)}`}>{item.id} <span>{item.count.toLocaleString()}</span></Link>)}</div></section><section><h3>Operating category</h3><div>{salesDock.categories.map((item) => <Link key={item.id} href={`/ai-marketplace?q=${encodeURIComponent(item.id)}`}>{item.id} <span>{item.count.toLocaleString()}</span></Link>)}</div></section></div><section className="ai-marketplace__dock-packages" aria-labelledby="dock-packages-heading"><h3 id="dock-packages-heading">Collections and bundles</h3><div>{salesDock.packages.map((item) => <article key={item.product_id}><span>{item.product_type}</span><h4>{item.name}</h4><p>{item.pricing.offers.length ? "Catalog commercial guidance is available; checkout remains unavailable." : "Enterprise licensing discussion required; no catalog checkout offer is published."}</p><Link href={`/ai-marketplace/${encodeURIComponent(item.slug)}`}>{item.pricing.offers.length > 1 ? "Compare catalog offers" : "Inspect catalog record"} →</Link></article>)}</div></section></section>
+      <MarketplaceSalesDock products={dockRecords} />
       <nav className="ai-marketplace__crawl-pagination" aria-label="Catalog page navigation"><Link href="/ai-marketplace" aria-current={!cursor && !query ? "page" : undefined}>First catalog page</Link>{cursor && <Link href={`/ai-marketplace?${query ? `q=${encodeURIComponent(query)}&` : ""}cursor=${Math.max(0, Number(cursor) - 24)}`}>Previous catalog page</Link>}{initial.nextCursor && <Link href={`/ai-marketplace?${query ? `q=${encodeURIComponent(query)}&` : ""}cursor=${initial.nextCursor}`}>Next catalog page</Link>}</nav>
       <MarketplaceExperience initialCatalog={catalog} initialTotal={initial.total} initialNextCursor={initial.nextCursor} initialQuery={query} familyEntries={familyEntries} revision={summary.revision} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
