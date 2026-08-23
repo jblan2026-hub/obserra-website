@@ -79,13 +79,19 @@ test("materialization verifies nested bytes and resumes from exact output", asyn
   }
 });
 
-test("activation source suppresses credentials and requires exact payment evidence", () => {
-  const ingest = readFileSync(join(root, "scripts/marketplace-v12-artifact-ingest.mjs"), "utf8");
+test("activation source suppresses credentials and requires exact payment and Azure storage evidence", () => {
+  const ingest = readFileSync(join(root, "scripts/marketplace-v12-artifact-ingest-azure.mjs"), "utf8");
   assert.match(ingest, /OBSERRA_MARKETPLACE_V12_PROTECTED_DELIVERY_APPROVED_REVISION/);
   assert.match(ingest, /stripeAccountChargesEnabled/);
   assert.match(ingest, /verifiedOfferBindings/);
-  assert.match(ingest, /ServerSideEncryption === "aws:kms"/);
+  assert.match(ingest, /serverEncrypted === true/);
+  assert.match(ingest, /stobserramktv1238d660/);
+  assert.match(ingest, /marketplace-v12-release/);
+  assert.match(ingest, /artifact_sha256/);
+  assert.match(ingest, /catalog_revision/);
+  assert.match(ingest, /product_id/);
   assert.match(ingest, /provider output suppressed/);
+  assert.doesNotMatch(ingest, /AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|ServerSideEncryption === "aws:kms"/);
   assert.doesNotMatch(ingest, /console\.log\([^)]*(?:supabaseKey|stripeKey|stripeWebhook)/);
 });
 
@@ -105,6 +111,7 @@ test("the production workflow is manual, exact-revision guarded, and Key Vault s
   assert.match(workflow, /::add-mask::/);
   assert.match(workflow, /verify-marketplace-v12-stripe-evidence\.mjs/);
   assert.match(workflow, /marketplace-v12-artifact-ingest-azure\.mjs/);
+  assert.match(workflow, /AZURE_RELEASE_CONTAINER: marketplace-v12-release/);
   assert.doesNotMatch(workflow, /AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|ai-marketplace-release-aws-/);
   assert.match(workflow, /protectedArtifactSetComplete == true/);
 });
