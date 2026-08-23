@@ -46,7 +46,7 @@ jobs:
           manifest_present="$(jq 'any(.[]; .name == "obserra-supplied-archives.json")' <<<"${listing}")"
           object_count="$(jq 'length' <<<"${listing}")"
           total_bytes="$(jq '[.[].bytes] | add // 0' <<<"${listing}")"
-          receipt="$(jq -cn \
+          RECEIPT="$(jq -cn \
             --arg contract 'obserra-marketplace-v12-source-inventory-v1' \
             --arg storageAccount "${STORAGE_ACCOUNT}" \
             --arg sourceContainer "${SOURCE_CONTAINER}" \
@@ -55,6 +55,7 @@ jobs:
             --argjson manifestPresent "${manifest_present}" \
             --argjson totalBytes "${total_bytes}" \
             '{contract:$contract,storageAccount:$storageAccount,sourceContainer:$sourceContainer,objectCount:$objectCount,zipCount:$zipCount,manifestPresent:$manifestPresent,totalBytes:$totalBytes,anonymousAccess:false,sharedKeyAccess:false}')"
+          export RECEIPT
           python - <<'PY'
           import base64, json, os, urllib.error, urllib.parse, urllib.request
           repo='jblan2026-hub/obserra-website'; branch=os.environ['OBSERVATION_BRANCH']; path='ops/marketplace-v12-source-inventory.json'; token=os.environ['GH_TOKEN']
@@ -71,6 +72,3 @@ jobs:
           with urllib.request.urlopen(put,timeout=30) as response:
             if response.status not in (200,201): raise SystemExit(response.status)
           PY
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RECEIPT: ${{ steps.inventory.outputs.receipt }}
