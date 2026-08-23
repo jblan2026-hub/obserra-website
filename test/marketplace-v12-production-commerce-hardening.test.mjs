@@ -105,3 +105,39 @@ test("protected delivery readbacks every exact runtime binding after ingest publ
   ]) assert.match(workflow, new RegExp(secret));
   assert.doesNotMatch(workflow.slice(readback, retention), /--query value/);
 });
+
+
+test("protected-delivery preflight verifies every existing ingest prerequisite before artifacts are read", () => {
+  const workflow = read(".github/workflows/marketplace-v12-protected-delivery.yml");
+  const login = workflow.indexOf("Authenticate the dedicated protected-delivery identity");
+  const preflight = workflow.indexOf("Preflight protected-delivery Key Vault prerequisites");
+  const download = workflow.indexOf("Download and verify the exact supplied archive set");
+  const preflightBlock = workflow.slice(preflight, download);
+
+  assert.ok(preflight > login);
+  assert.ok(download > preflight);
+  assert.match(preflightBlock, /if: inputs\.mode == 'ingest'/);
+  assert.match(preflightBlock, /--query id/);
+  assert.match(preflightBlock, /--only-show-errors/);
+  assert.doesNotMatch(preflightBlock, /--query value/);
+  for (const secret of [
+    "applications-supabase-service-role-key",
+    "applications-stripe-secret-key",
+    "applications-stripe-webhook-secret",
+    "ai-marketplace-release-aws-access-key-id",
+    "ai-marketplace-release-aws-secret-access-key",
+    "ai-marketplace-release-bucket",
+    "ai-marketplace-release-kms-key-id",
+    "ai-marketplace-release-cdn-url",
+    "ai-marketplace-cloudfront-key-pair-id",
+    "ai-marketplace-cloudfront-private-key",
+    "ai-marketplace-v12-release-evidence-hmac-key",
+  ]) assert.match(preflightBlock, new RegExp(secret));
+  for (const generatedBinding of [
+    "ai-marketplace-v12-binding-receipt-json",
+    "ai-marketplace-v12-delivery-catalog-json",
+    "ai-marketplace-v12-release-evidence-json",
+    "ai-marketplace-v12-release-evidence-signature",
+    "ai-marketplace-v12-activation-approved-revision",
+  ]) assert.doesNotMatch(preflightBlock, new RegExp(generatedBinding));
+});
