@@ -6,6 +6,9 @@ import { gunzipSync } from "node:zlib";
 
 const root = resolve(import.meta.dirname, "..");
 const catalogRelativePath = "data/marketplace/obserra-marketplace-card-catalog.json.gz";
+const encodedCatalogRelativePath = `${catalogRelativePath}.b64`;
+const catalogChunkSuffixes = ["000", "001", "002", "003", "004"];
+const encodedCatalogChunkRelativePaths = catalogChunkSuffixes.map((suffix) => `${encodedCatalogRelativePath}.part-${suffix}`);
 const summaryRelativePath = "data/marketplace/obserra-marketplace-card-catalog.summary.json";
 const catalogPath = join(root, catalogRelativePath);
 const summaryPath = join(root, summaryRelativePath);
@@ -18,6 +21,14 @@ function fail(message) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function decodeCanonicalBase64(paths) {
+  const encoded = paths.map((path) => readFileSync(path, "utf8")).join("");
+  if (!/^[A-Za-z0-9+/]*={0,2}$/.test(encoded) || encoded.length % 4 !== 0) fail("encoded catalog is not canonical base64");
+  const decoded = Buffer.from(encoded, "base64");
+  if (decoded.toString("base64") !== encoded) fail("encoded catalog does not round-trip canonically");
+  return decoded;
 }
 
 function trackedFiles() {
@@ -37,10 +48,15 @@ function filesWithin(directory) {
   return found;
 }
 
-if (!existsSync(catalogPath) || !existsSync(summaryPath)) fail("the canonical catalog or its summary is missing");
-const catalogBytes = readFileSync(catalogPath);
+if (!existsSync(summaryPath)) fail("the catalog summary is missing");
 const summaryBytes = readFileSync(summaryPath);
 const summary = JSON.parse(summaryBytes.toString("utf8"));
+const rawCatalogBytes = existsSync(catalogPath) ? readFileSync(catalogPath) : null;
+const encodedCatalogBytes = encodedCatalogChunkRelativePaths.every((path) => existsSync(join(root, path))) ? decodeCanonicalBase64(encodedCatalogChunkRelativePaths.map((path) => join(root, path))) : null;
+const rawMatches = Boolean(rawCatalogBytes && sha256(rawCatalogBytes) === summary.catalog_gzip_sha256);
+const encodedMatches = Boolean(encodedCatalogBytes && sha256(encodedCatalogBytes) === summary.catalog_gzip_sha256);
+if (!rawMatches && !encodedMatches) fail("no raw or encoded catalog source matches the verified summary");
+const catalogBytes = rawMatches ? rawCatalogBytes : encodedCatalogBytes;
 const document = JSON.parse(gunzipSync(catalogBytes).toString("utf8"));
 
 if (summary.output_filename !== "obserra-marketplace-card-catalog.json.gz") fail("summary output filename is not canonical");
@@ -53,10 +69,10 @@ if (!Array.isArray(document.cards) || document.cards.length !== summary.counts?.
 if (document.publication_state !== summary.publication_state) fail("catalog publication state differs from the verified summary");
 
 const tracked = trackedFiles();
-if (!tracked.includes(catalogRelativePath) || !tracked.includes(summaryRelativePath)) fail("canonical catalog files must be tracked");
+if (!encodedCatalogChunkRelativePaths.every((path) => tracked.includes(path)) || !tracked.includes(summaryRelativePath)) fail("encoded catalog chunks and summary must be tracked");
 const duplicatePaths = tracked.filter((path) => {
   const candidate = join(root, path);
-  return path !== catalogRelativePath && existsSync(candidate) && statSync(candidate).isFile() && statSync(candidate).size === catalogBytes.length && sha256(readFileSync(candidate)) === summary.catalog_gzip_sha256;
+  return path !== catalogRelativePath && !encodedCatalogChunkRelativePaths.includes(path) && existsSync(candidate) && statSync(candidate).isFile() && statSync(candidate).size === catalogBytes.length && sha256(readFileSync(candidate)) === summary.catalog_gzip_sha256;
 });
 if (duplicatePaths.length) fail(`verified catalog has duplicate tracked copies: ${duplicatePaths.join(", ")}`);
 
@@ -77,4 +93,4 @@ if (buildOutput) {
   if (!traceReferences.length) fail("production build does not trace the canonical catalog into any runtime bundle");
 }
 
-console.log(`[Marketplace Catalog] Verified ${summary.catalog_gzip_bytes} byte gzip, revision ${summary.catalog_revision.slice(0, 12)}, ${summary.counts.total_cards} cards, and one canonical tracked source${buildOutput ? " plus traced production metadata" : ""}.`);
+console.log(`[Marketplace Catalog] Verified ${summary.catalog_gzip_bytes} byte gzip, revision ${summary.catalog_revision.slice(0, 12)}, ${summary.counts.total_cards} cards, and raw-or-chunked canonical source${buildOutput ? " plus traced production metadata" : ""}.`);
