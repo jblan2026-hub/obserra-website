@@ -705,3 +705,15 @@ All must be observed from the public canonical host:
 - **Blockers:** the production runtime bootstrap was not dispatched. The exact Azure tenant-side `github-main` federated identity record still must be converged before `azure/login` can pass. The runtime bootstrap transfers production-sensitive Key Vault bindings into the approved Vercel Production project and requires explicit authorization before dispatch.
 - **Next safe action:** converge and read back the exact Azure tenant federation, then—after explicit authorization for the production-sensitive transfer—dispatch the runtime bootstrap from exact current main `5de3910bc104db9f41de48f816dde5bdf82dd6e2`. Require direct Applications and Academy HTTP `200` with `operational: true`, exact replacement deployment/cutover, canonical deployment/SHA proof, and retained Florida readiness/licensing gates before enabling governed operations.
 
+
+
+<!-- ops-checkpoint:2026-08-23-runtime-bootstrap-recovery -->
+### 2026-08-23T12:13:58Z — continuation recovered; exact external gate loaded
+
+- **Authoritative record:** reloaded this rolling `ops/live-handoff` record and the signed baseline on `chore/verified-canonical-cutover-trigger-20260822`. The signed baseline is historical; this branch remains the active operational record.
+- **Exact merged source:** the release input remains signed `main` commit `5de3910bc104db9f41de48f816dde5bdf82dd6e2`; the existing PR #221 release entry was not duplicated.
+- **Tenant-side prerequisite resolved from exact source:** managed identity `id-obserra-github-prod` in `rg-obserra-prod-eastus`, federated credential `github-main`, issuer `https://token.actions.githubusercontent.com`, subject `repo:jblan2026-hub@309821056/obserra-website@1321156321:ref:refs/heads/main`, and sole audience `api://AzureADTokenExchange`.
+- **Production Studio linkage:** `jblan2026-hub/obserra-academy-production-studio` was inspected for a separate continuation handoff; none is present under its current `docs` tree. Academy runtime convergence remains governed by the website repository's merged bootstrap and canonical health contract.
+- **Mutation state:** no Azure tenant record, Vercel Production environment, deployment, alias, payment, enrollment, or LMS readiness setting was changed during recovery. No sensitive value was read, printed, or transferred.
+- **Authorization gate:** production-sensitive Key Vault-to-Vercel bootstrap dispatch remains unexecuted pending explicit owner authorization. This rolling record will be appended automatically after each material probe, mutation, deployment, rollback, or blocker.
+- **Next safe action:** have an Azure tenant administrator converge and read back the exact `github-main` record. After explicit production-transfer authorization, dispatch the current-main runtime bootstrap and require direct Applications and Academy HTTP `200` with `operational: true`, exact replacement deployment/cutover, canonical deployment/SHA proof, and retained Florida licensing/readiness gates.
