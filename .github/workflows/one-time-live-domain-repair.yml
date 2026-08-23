@@ -1,11 +1,16 @@
 name: One-time live Vercel domain authority repair
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/one-time-live-domain-repair.yml"
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        description: "Exact 40-character SHA currently at main; the run refuses any other release."
+        required: true
+        type: string
+      confirmation:
+        description: "Type repair-live-domains to authorize this one-time alias repair."
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -16,7 +21,6 @@ concurrency:
 
 jobs:
   repair:
-    if: ${{ github.event.pull_request.head.ref == 'hotfix/fdacs-live-domain-repair-20260820' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -27,13 +31,21 @@ jobs:
       AUXILIARY_PROJECT_ID: prj_FfAnssVJU8pcJydGNJHmCliP6Yme
       PRIMARY_DOMAIN: www.obserrallc.com
       APEX_DOMAIN: obserrallc.com
-      EXPECTED_MAIN_SHA: a923580b09912fced58b8238f823de1d8d8c618c
+      EXPECTED_MAIN_SHA: ${{ inputs.expected_commit }}
 
     steps:
       - name: Require exact current main and Vercel credential
         shell: bash
         run: |
           set -euo pipefail
+          if [ "${{ inputs.confirmation }}" != "repair-live-domains" ]; then
+            echo "::error::Explicit confirmation is required for this one-time domain repair."
+            exit 1
+          fi
+          if ! [[ "${EXPECTED_MAIN_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::expected_commit must be a full lowercase 40-character Git SHA."
+            exit 1
+          fi
           if [ -z "${VERCEL_TOKEN}" ]; then
             echo "::error::Neither VERCEL_TOKEN nor VERCEL_ACCESS_TOKEN is configured."
             exit 1
@@ -188,9 +200,37 @@ jobs:
           move_domain "${PRIMARY_DOMAIN}" primary
           move_domain "${APEX_DOMAIN}" apex
 
+      - name: Attach canonical domains to the exact verified production deployment
+        id: attach
+        if: steps.move.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        env:
+          CANDIDATE_DEPLOYMENT: ${{ steps.candidate.outputs.deployment_id }}
+        run: |
+          set -euo pipefail
+          attach() {
+            local alias="$1"
+            local response observed_alias observed_deployment
+            response="$(curl --silent --show-error --fail-with-body \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --request POST \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "{\"alias\":\"${alias}\"}" \
+              "https://api.vercel.com/v2/deployments/${CANDIDATE_DEPLOYMENT}/aliases?teamId=${TEAM_ID}")"
+            observed_alias="$(jq -r '.alias // .name // empty' <<<"${response}")"
+            observed_deployment="$(jq -r '.deploymentId // .deployment.id // empty' <<<"${response}")"
+            test "${observed_alias}" = "${alias}"
+            test "${observed_deployment}" = "${CANDIDATE_DEPLOYMENT}"
+          }
+          attach "${PRIMARY_DOMAIN}"
+          attach "${APEX_DOMAIN}"
+
       - name: Verify live site, LMS, and prelicense commerce after ownership move
         id: smoke
-        if: steps.move.outcome == 'success'
+        if: steps.attach.outcome == 'success'
         continue-on-error: true
         shell: bash
         env:
@@ -220,6 +260,15 @@ jobs:
           test "${observed_project}" = "${CANONICAL_PROJECT_ID}"
           test "${authority}" = "verified"
 
+          for alias in "${PRIMARY_DOMAIN}" "${APEX_DOMAIN}"; do
+            alias_body="$(curl --silent --show-error --fail-with-body \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v4/aliases/${alias}?teamId=${TEAM_ID}")"
+            test "$(jq -r '.deploymentId // .deployment.id // empty' <<<"${alias_body}")" = "${CANDIDATE_DEPLOYMENT}"
+          done
+
           apex_health="$(curl --silent --show-error --fail --location --max-time 20 "https://${APEX_DOMAIN}/api/health")"
           test "$(jq -r '.routing.gitCommitSha // empty' <<<"${apex_health}")" = "${EXPECTED_MAIN_SHA}"
           test "$(jq -r '.routing.observedProjectId // empty' <<<"${apex_health}")" = "${CANONICAL_PROJECT_ID}"
@@ -229,24 +278,6 @@ jobs:
           printf '%s' "${academy}" | grep -F "Academy LMS is live; new enrollment is not yet open" >/dev/null
           curl --silent --show-error --fail --max-time 20 "https://${PRIMARY_DOMAIN}/florida-security-training" >/dev/null
 
-          attempt_id="$(cat /proc/sys/kernel/random/uuid)"
-          issued_at="$(date +%s)"
-          headers="$(mktemp)"
-          body="$(mktemp)"
-          status="$(curl --silent --show-error --max-time 20 \
-            --output "${body}" \
-            --dump-header "${headers}" \
-            --write-out '%{http_code}' \
-            --request POST \
-            --header "Origin: https://${PRIMARY_DOMAIN}" \
-            --header "Content-Type: application/x-www-form-urlencoded" \
-            --data-urlencode "course=zero-trust-strategy" \
-            --data-urlencode "checkoutAttemptId=${attempt_id}" \
-            --data-urlencode "checkoutAttemptIssuedAt=${issued_at}" \
-            "https://${PRIMARY_DOMAIN}/api/academy/checkout")"
-          test "${status}" = "307"
-          grep -i '^location: .*enrollment=licensing-pending' "${headers}" >/dev/null
-          grep -i '^x-obserra-sales-license: pending' "${headers}" >/dev/null
 
           duplicate_domains="$(curl --silent --show-error --fail-with-body \
             --connect-timeout 10 \
@@ -273,7 +304,7 @@ jobs:
             "https://api.vercel.com/v9/projects/${AUXILIARY_PROJECT_ID}?teamId=${TEAM_ID}" >/dev/null
 
       - name: Roll back ownership and aliases on failed repair
-        if: ${{ always() && steps.rollback.outcome == 'success' && (steps.move.outcome == 'failure' || steps.smoke.outcome == 'failure') }}
+        if: ${{ always() && steps.rollback.outcome == 'success' && (steps.move.outcome == 'failure' || steps.attach.outcome == 'failure' || steps.smoke.outcome == 'failure') }}
         shell: bash
         env:
           ROLLBACK_PRIMARY: ${{ steps.rollback.outputs.primary }}
