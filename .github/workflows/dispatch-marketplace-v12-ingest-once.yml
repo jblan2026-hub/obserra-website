@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
-      TARGET_SHA: adc8a658ab733d69352a75d1abbef6d5c5639e52
+      TARGET_SHA: c7bc09ee0a7af93c255b3b42c8a7d7b47bfb2791
       CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
       OBSERVATION_BRANCH: ops/marketplace-v12-ingest-dispatch-20260823
     steps:
