@@ -75,6 +75,8 @@ test("Vercel runtime bootstrap binds one production workload and proves the resu
   assert.match(workflow, /exact_deployment_origin/);
   assert.match(workflow, /\/api\/apps\/commerce-health/);
   assert.match(workflow, /\/api\/academy\/commerce-health/);
+  assert.match(workflow, /\/api\/ai-marketplace\/commerce-health/);
+  assert.match(workflow, /ai-marketplace-commerce-health-v1/);
   assert.match(workflow, /\.routing\.deploymentId == \$deployment/);
   assert.match(workflow, /\.routing\.gitCommitSha == \$sha/);
   assert.match(workflow, /actions: write/);
@@ -89,4 +91,3 @@ test("Vercel runtime bootstrap binds one production workload and proves the resu
   assert.match(workflow, /if \[ "\$\{cutover_status\}" != "204" \]/);
   assert.doesNotMatch(workflow, /v2\/deployments\/\$\{replacement_id\}\/aliases/);
 });
-

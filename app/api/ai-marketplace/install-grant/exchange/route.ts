@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { consumeMarketplaceV12InstallGrant, lookupMarketplaceV12InstallGrant } from "../../../../../lib/ai-marketplace-commerce";
 import { marketplaceV12Release } from "../../../../../lib/ai-marketplace-delivery";
 import { marketplaceV12BridgeArtifactUrl, marketplaceV12InstallBridgeConfigured, marketplaceV12InstallManifest, verifyMarketplaceV12BridgeRequest } from "../../../../../lib/marketplace-v12-install-bridge";
+import { ensureMarketplaceV12RuntimeSecrets } from "../../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,11 +14,12 @@ function failure(status: 400 | 401 | 403 | 409 | 503) {
 }
 
 export async function POST(request: Request) {
-  if (!marketplaceV12InstallBridgeConfigured()) return failure(503);
   let body: { grantId?: unknown };
   try { body = await request.json() as typeof body; } catch { return failure(400); }
   if (typeof body.grantId !== "string") return failure(400);
   try {
+    await ensureMarketplaceV12RuntimeSecrets();
+    if (!marketplaceV12InstallBridgeConfigured()) return failure(503);
     const bridge = await verifyMarketplaceV12BridgeRequest(request.headers, body.grantId, "exchange");
     if (!bridge) return failure(401);
     const grant = await lookupMarketplaceV12InstallGrant({ grantId: body.grantId, bridgeId: bridge.bridgeId });

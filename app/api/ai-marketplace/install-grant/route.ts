@@ -6,6 +6,7 @@ import { aiMarketplaceTenantId, createMarketplaceV12InstallGrant } from "../../.
 import { marketplaceV12Release } from "../../../../lib/ai-marketplace-delivery";
 import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
 import { marketplaceV12InstallBridgeConfigured } from "../../../../lib/marketplace-v12-install-bridge";
+import { ensureMarketplaceV12RuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,9 +31,10 @@ export async function POST(request: Request) {
   const subject = product && marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
   if (!product || !subject || product.product_type === "collection" || product.product_type === "bundle") return error("Invalid installation request", 400);
   const revision = marketplaceV12Summary().revision;
-  const release = marketplaceV12Release(product.product_id, revision, subject.artifactSha256);
-  if (!release || !marketplaceV12InstallBridgeConfigured()) return error("Install bridge unavailable", 503);
   try {
+    await ensureMarketplaceV12RuntimeSecrets();
+    const release = marketplaceV12Release(product.product_id, revision, subject.artifactSha256);
+    if (!release || !marketplaceV12InstallBridgeConfigured()) return error("Install bridge unavailable", 503);
     const grant = await createMarketplaceV12InstallGrant({
       subjectId: userId, tenantId: aiMarketplaceTenantId(userId, orgId), productId: product.product_id, revision,
       artifactSha256: subject.artifactSha256, bridgeId, platform, installProfile: release.installProfile, correlationId: randomUUID(),

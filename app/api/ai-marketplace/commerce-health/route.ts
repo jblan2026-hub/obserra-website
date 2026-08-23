@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { applicationsCommerceConfigured, getApplicationsStripe } from "@/lib/applications-stripe";
 import {
-  ensureApplicationsRuntimeSecrets,
+  ensureMarketplaceV12RuntimeSecrets,
   productionRuntimeSecretsEvidence,
   type ProductionRuntimeSecretsEvidence,
 } from "@/lib/production-runtime-secrets";
@@ -28,18 +28,18 @@ export async function GET() {
   const catalog = marketplaceV12Summary();
   let stage: CommerceHealthStage = "runtime-secrets";
   let runtimeSecrets: ProductionRuntimeSecretsEvidence | null = null;
-  let coverage: ReturnType<typeof marketplaceV12BindingCoverage> | null = null;
+  let coverage: Awaited<ReturnType<typeof marketplaceV12BindingCoverage>> | null = null;
   let catalogBindingsReady = false;
   let paymentProviderConfigured: boolean | null = null;
   let paymentProviderReady = false;
   let commerceAuthorityReady = false;
   try {
-    runtimeSecrets = await ensureApplicationsRuntimeSecrets();
+    runtimeSecrets = await ensureMarketplaceV12RuntimeSecrets();
 
     // Binding coverage depends on values hydrated above. Computing it before
     // production hydration turns a healthy Key Vault path into a stale failure.
     stage = "catalog-bindings";
-    coverage = marketplaceV12BindingCoverage();
+    coverage = await marketplaceV12BindingCoverage();
     catalogBindingsReady = true;
 
     stage = "payment-provider";

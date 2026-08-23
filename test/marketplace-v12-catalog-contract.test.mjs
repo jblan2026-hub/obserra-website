@@ -84,7 +84,7 @@ test("v1.2 delivery requires a durable entitlement bound to the exact artifact h
   const download = readFileSync(new URL("app/api/ai-marketplace/download/route.ts", root), "utf8");
   const migration = readFileSync(new URL("supabase/release-authority/migrations/20260823120000_ai_marketplace_v12_protected_delivery.sql", root), "utf8");
   assert.match(delivery, /OBSERRA_AI_MARKETPLACE_V12_DELIVERY_CATALOG_JSON/);
-  assert.match(delivery, /release\.artifactSha256\s*===\s*artifactSha256/);
+  assert.match(delivery, /release\?\.artifactSha256\s*===\s*artifactSha256/);
   assert.match(download, /marketplaceV12DeliveryEntitlement/);
   assert.match(download, /marketplaceV12Release/);
   assert.match(download, /Protected delivery unavailable/);
@@ -170,6 +170,7 @@ test("marketplace retains verified results and exposes semantic recovery when in
 
 test("v1.2 activation is evidence-derived and remains fail-closed for insufficient evidence", () => {
   const gate = readFileSync(new URL("lib/marketplace-v12-activation.ts", root), "utf8");
+  const bindings = readFileSync(new URL("lib/marketplace-v12-bindings.ts", root), "utf8");
   const health = readFileSync(new URL("app/api/ai-marketplace/commerce-health/route.ts", root), "utf8");
   assert.match(gate, /facts\.coverage\.structurallyComplete/);
   assert.match(gate, /facts\.approvedRevision === facts\.coverage\.revision/);
@@ -177,9 +178,10 @@ test("v1.2 activation is evidence-derived and remains fail-closed for insufficie
   assert.match(gate, /facts\.pricesVerified/);
   assert.match(gate, /facts\.durableLedger === "ai-marketplace-commerce-ledger-v1"/);
   assert.match(gate, /facts\.protectedDeliveryConfigured/);
-  assert.match(gate, /stripe\.prices\.retrieve/);
-  assert.match(gate, /artifactSha256/);
-  assert.match(gate, /catalogRevision/);
+  assert.match(bindings, /marketplaceV12BindingAuthorityReceipt/);
+  assert.match(bindings, /marketplaceV12ProductBindingAuthority/);
+  assert.match(bindings, /binding\.artifactSha256 !== subject\.artifactSha256/);
+  assert.match(bindings, /catalogRevision: receipt\.revision/);
   assert.match(health, /OBSERRA_AI_MARKETPLACE_V12_ACTIVATION_APPROVED_REVISION/);
   assert.match(health, /controlled verifier signature/);
   assert.doesNotMatch(health, /const operational = false/);
@@ -190,7 +192,8 @@ test("v1.2 Stripe evidence is signed, digest-bound, account-bound, and expiring"
   const bindings = readFileSync(new URL("lib/marketplace-v12-bindings.ts", root), "utf8");
   assert.match(evidence, /createHmac\("sha256"/);
   assert.match(evidence, /timingSafeEqual/);
-  assert.match(evidence, /binding_manifest_sha256/);
+  assert.match(evidence, /binding_receipt_sha256/);
+  assert.match(evidence, /OBSERRA_AI_MARKETPLACE_V12_BINDING_RECEIPT_JSON/);
   assert.match(evidence, /delivery_manifest_sha256/);
   assert.match(evidence, /stripe_account_id/);
   assert.match(evidence, /expires_at/);

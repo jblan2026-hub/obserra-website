@@ -4,7 +4,7 @@ import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 
 type Evidence = Readonly<{
   catalog_revision?: string;
-  binding_manifest_sha256?: string;
+  binding_receipt_sha256?: string;
   delivery_manifest_sha256?: string;
   stripe_account_id?: string;
   subject_count?: number;
@@ -34,14 +34,15 @@ function validSignature(payload: string, signature: string, key: string) {
 
 /**
  * A release verifier signs an exact, canonical snapshot after resolving the
- * full catalog's Stripe Prices. Runtime recomputes both manifest digests and
- * rejects stale, unsigned, mismatched, or count-only evidence.
+ * full catalog's durable bindings and live Stripe Prices. Runtime recomputes
+ * the compact authority digests and rejects stale, unsigned, or mismatched
+ * evidence.
  */
 export function marketplaceV12ReleaseEvidence(input: { revision: string; requiredSubjects: number; stripeAccountId?: string | null }) {
   const raw = process.env.OBSERRA_AI_MARKETPLACE_V12_RELEASE_EVIDENCE_JSON;
   const signature = process.env.OBSERRA_AI_MARKETPLACE_V12_RELEASE_EVIDENCE_SIGNATURE ?? "";
   const key = process.env.OBSERRA_AI_MARKETPLACE_V12_RELEASE_EVIDENCE_HMAC_KEY ?? "";
-  const bindingDigest = parsedDigest(process.env.OBSERRA_AI_MARKETPLACE_V12_BINDINGS_JSON);
+  const bindingDigest = parsedDigest(process.env.OBSERRA_AI_MARKETPLACE_V12_BINDING_RECEIPT_JSON);
   const deliveryDigest = parsedDigest(process.env.OBSERRA_AI_MARKETPLACE_V12_DELIVERY_CATALOG_JSON);
   try {
     const evidence = JSON.parse(raw ?? "") as Evidence;
@@ -50,7 +51,7 @@ export function marketplaceV12ReleaseEvidence(input: { revision: string; require
     const fresh = Number.isFinite(verifiedAt) && Number.isFinite(expiresAt) && verifiedAt <= now && now < expiresAt && expiresAt - verifiedAt <= 7 * 24 * 60 * 60 * 1000;
     const verified = Boolean(payload && bindingDigest && deliveryDigest && validSignature(payload, signature, key)
       && evidence.catalog_revision === input.revision
-      && evidence.binding_manifest_sha256 === bindingDigest
+      && evidence.binding_receipt_sha256 === bindingDigest
       && evidence.delivery_manifest_sha256 === deliveryDigest
       && evidence.subject_count === input.requiredSubjects
       && evidence.controls?.charges_enabled === true

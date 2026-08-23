@@ -19,7 +19,7 @@ import { primaryAccountEmail } from "../../../../lib/app-entitlements";
 import { boundMarketplaceV12Price, marketplaceV12BindingCoverage, marketplaceV12Offer, type MarketplaceV12PurchaseOption } from "../../../../lib/marketplace-v12-bindings";
 import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
 import { marketplaceV12ProductCommerce } from "../../../../lib/marketplace-v12-runtime";
-import { ensureApplicationsRuntimeSecrets } from "../../../../lib/production-runtime-secrets";
+import { ensureApplicationsRuntimeSecrets, ensureMarketplaceV12RuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -76,8 +76,7 @@ async function v12Checkout(request: Request, input: { productId: string; option:
   const option = input.option as MarketplaceV12PurchaseOption;
   const subject = product && marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
   const offer = product && marketplaceV12Offer(product, option);
-  const priceId = product && boundMarketplaceV12Price(product, option);
-  if (!product || !subject || !offer || !priceId || !marketplaceV12BindingCoverage().complete) return redirect(request, "catalog-v12-configuration-required", input.productId);
+  if (!product || !subject || !offer) return redirect(request, "catalog-v12-configuration-required", input.productId);
 
   const { userId, orgId } = await auth();
   if (!userId) {
@@ -85,6 +84,9 @@ async function v12Checkout(request: Request, input: { productId: string; option:
     signIn.searchParams.set("redirect_url", new URL(`/ai-marketplace/${encodeURIComponent(product.slug)}`, request.url).toString());
     return NextResponse.redirect(signIn, 303);
   }
+  await ensureMarketplaceV12RuntimeSecrets();
+  const [priceId, coverage] = await Promise.all([boundMarketplaceV12Price(product, option), marketplaceV12BindingCoverage()]);
+  if (!priceId || !coverage.complete) return redirect(request, "catalog-v12-configuration-required", input.productId);
   if (!(await marketplaceV12ProductCommerce(product)).checkoutEnabled) return redirect(request, "catalog-v12-activation-blocked", input.productId);
   const live = applicationsCommerceLivemode();
   if (live !== true || !applicationsCommerceConfigured()) return redirect(request, "catalog-v12-configuration-required", input.productId);
@@ -166,8 +168,8 @@ export async function POST(request: Request) {
   const productId = String(form.get("product") ?? "");
   const v12Product = marketplaceV12Product(productId);
   try {
-    await ensureApplicationsRuntimeSecrets();
     if (v12Product) return await v12Checkout(request, { productId, option: String(form.get("purchaseOption") ?? "") });
+    await ensureApplicationsRuntimeSecrets();
     return await legacyCheckout(request, { productId, interval: String(form.get("interval") ?? "") });
   } catch (error) {
     console.error("AI marketplace checkout unavailable", { name: error instanceof Error ? error.name : "unknown", productId, generation: v12Product ? "v12" : "legacy" });

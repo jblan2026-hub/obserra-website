@@ -8,9 +8,12 @@ on:
       - ".github/workflows/enable-vercel-key-vault-runtime.yml"
       - "lib/production-runtime-secrets.ts"
       - "lib/applications-commerce.ts"
+      - "lib/ai-marketplace-*.ts"
+      - "lib/marketplace-v12-*.ts"
       - "lib/academy-persistence.ts"
       - "app/api/apps/**"
       - "app/api/academy/**"
+      - "app/api/ai-marketplace/**"
       - "app/api/webhook/**"
       - "app/apps/**"
       - "app/portal/orders/page.tsx"
@@ -616,14 +619,15 @@ jobs:
           direct_health_ready=false
           for attempt in $(seq 1 30); do
             if health_is_operational "${exact_deployment_origin}" "/api/apps/commerce-health" "applications-commerce-health-v1" && \
-              health_is_operational "${exact_deployment_origin}" "/api/academy/commerce-health" "academy-commerce-health-v1"; then
+              health_is_operational "${exact_deployment_origin}" "/api/academy/commerce-health" "academy-commerce-health-v1" && \
+              health_is_operational "${exact_deployment_origin}" "/api/ai-marketplace/commerce-health" "ai-marketplace-commerce-health-v1"; then
               direct_health_ready=true
               break
             fi
             sleep 10
           done
           [ "${direct_health_ready}" = true ] || {
-            echo "::error::The exact READY deployment did not make both commerce health contracts operational."
+            echo "::error::The exact READY deployment did not make every commerce health contract operational."
             exit 1
           }
 
@@ -661,15 +665,15 @@ jobs:
           for attempt in $(seq 1 90); do
             if canonical_release_proven "${replacement_id}" && \
               health_is_operational "${VERCEL_CANONICAL_ORIGIN}" "/api/apps/commerce-health" "applications-commerce-health-v1" && \
-              health_is_operational "${VERCEL_CANONICAL_ORIGIN}" "/api/academy/commerce-health" "academy-commerce-health-v1"; then
+              health_is_operational "${VERCEL_CANONICAL_ORIGIN}" "/api/academy/commerce-health" "academy-commerce-health-v1" && \
+              health_is_operational "${VERCEL_CANONICAL_ORIGIN}" "/api/ai-marketplace/commerce-health" "ai-marketplace-commerce-health-v1"; then
               canonical_ready=true
               break
             fi
             sleep 10
           done
           [ "${canonical_ready}" = true ] || {
-            echo "::error::The canonical public endpoint did not prove the exact deployment and both operational commerce contracts."
+            echo "::error::The canonical public endpoint did not prove the exact deployment and every operational commerce contract."
             exit 1
           }
-          echo "::notice::Canonical public endpoint proves the exact deployment and both commerce health contracts."
-
+          echo "::notice::Canonical public endpoint proves the exact deployment and every commerce health contract."
