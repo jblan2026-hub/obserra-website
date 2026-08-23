@@ -968,3 +968,13 @@ All must be observed from the public canonical host:
 - **Fresh subsystem results:** Applications commerce returned HTTP `503`, `operational: false`, `durable-commerce-unavailable`; Academy commerce returned HTTP `503`, `operational: false`, with payment and durable storage unavailable; Florida LMS liveness returned HTTP `200` / `live`; Florida LMS readiness returned HTTP `503` / `not_ready`.
 - **Blocker:** the Key Vault remains absent in the production resource group, and this unmerged PR has not created it, assigned a role, written a Vercel Production binding, deployed a replacement, moved the canonical alias, or enabled commerce, enrollment, or regulated-LMS readiness.
 - **Next safe action:** merge this exact source only through the authorized signed-main path, then run the guarded bootstrap from the resulting exact main SHA. Require Azure vault/identity/role readbacks, Vercel Production-binding readback, replacement-deployment proof, direct Applications and Academy HTTP `200` with `operational: true`, Florida readiness HTTP `200`, and canonical exact deployment/SHA proof before any live claim.
+
+
+<!-- ops-checkpoint:2026-08-23T13-17-27-882Z-pr-224-gates -->
+### 2026-08-23T13:17:27.882Z — PR #224 required recovery gates passed
+
+- **Exact source:** [PR #224](https://github.com/jblan2026-hub/obserra-website/pull/224) is open, mergeable, and unmerged at exact head `d20adc63caf58ffdf2a21de25f0ea794e889b005`, based on canonical main `75accf80bfa68dbc6633689b5525840462f064d3`.
+- **Required source evidence:** Website CI [32641774675](https://github.com/jblan2026-hub/obserra-website/actions/runs/32641774675), CodeQL Advanced [32641774666](https://github.com/jblan2026-hub/obserra-website/actions/runs/32641774666), and Azure IaC Validation [32641774698](https://github.com/jblan2026-hub/obserra-website/actions/runs/32641774698) each completed successfully on that exact head. Ops Applications Storage URL Convergence was skipped.
+- **Non-production Vercel context:** the PR-linked `obserra-website-live` deployment was canceled and is not production evidence.
+- **Safe action now authorized:** merge this exact guarded source; its main-path runtime workflow may create the empty Bicep-defined Key Vault only after Azure not-found, then must complete identity/role/Vercel/deployment gates before any readiness claim.
+- **Fail-closed state:** no runtime Key Vault, role, Vercel-binding, payment, enrollment, Applications/Academy commerce, or Florida LMS readiness success is inferred from these source checks.
