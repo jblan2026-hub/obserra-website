@@ -100,9 +100,15 @@ test("v1.2 binding authority, ledger, and reservation never hydrate legacy Appli
   assert.equal(calls.marketplace, 3);
 });
 
-test("full-catalog verifier binds a multi-offer key to Stripe Price, never Stripe Product", () => {
-  const verifier = readFileSync("scripts/verify-marketplace-v12-stripe-evidence.mjs", "utf8");
-  assert.match(verifier, /price\.metadata\.bindingKey === binding\.bindingKey/);
-  assert.doesNotMatch(verifier, /product\.metadata\.bindingKey/);
-  assert.match(verifier, /A Product can legitimately carry multiple governed Price bindings/);
+test("each v1.2 Price authority validates a multi-offer key on Stripe Price, never Stripe Product", () => {
+  const sources = [
+    [readFileSync("scripts/verify-marketplace-v12-stripe-evidence.mjs", "utf8"), /price\.metadata\.bindingKey === binding\.bindingKey/],
+    [readFileSync("app/api/ai-marketplace/checkout/route.ts", "utf8"), /price\.metadata\.bindingKey === input\.bindingKey/],
+    [readFileSync("app/api/webhook/stripe-ai-marketplace/route.ts", "utf8"), /price\.metadata\.bindingKey === bindingKey/],
+  ];
+  for (const [source, exactPriceBinding] of sources) {
+    assert.match(source, exactPriceBinding);
+    assert.doesNotMatch(source, /product\.metadata\.bindingKey/);
+  }
+  assert.match(sources[0][0], /A Product can legitimately carry multiple governed Price bindings/);
 });

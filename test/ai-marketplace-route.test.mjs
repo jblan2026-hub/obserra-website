@@ -132,7 +132,8 @@ test("every marketplace offering requires an exact governed payment binding", as
   assert.match(webhook, /session\.payment_status !== "paid"/);
   assert.match(webhook, /price\.livemode !== live/);
   assert.match(webhook, /product\.metadata\.artifactSha256 === artifactSha256/);
-  assert.match(webhook, /product\.metadata\.bindingKey === bindingKey/);
+  assert.match(webhook, /price\.metadata\.bindingKey === bindingKey/);
+  assert.doesNotMatch(webhook, /product\.metadata\.bindingKey/);
 });
 
 test("skill library route presents the four capability levels and source packages", async () => {
