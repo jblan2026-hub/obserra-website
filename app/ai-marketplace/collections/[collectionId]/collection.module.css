@@ -34,7 +34,7 @@
 .resultsHeader > span { color: #9fc8d7; font-size: .78rem; }
 .results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: package-results; }
 .results > li { min-width: 0; counter-increment: package-results; }
-.results article { display: flex; flex-direction: column; min-height: 280px; height: 100%; padding: 17px; border: 1px solid rgba(92, 186, 218, .27); border-radius: 15px; background: linear-gradient(145deg, rgba(6, 37, 55, .86), rgba(2, 18, 30, .94)); transition: border-color .18s ease, background .18s ease; }
+.results article { position: relative; display: flex; flex-direction: column; min-height: 280px; height: 100%; padding: 17px; border: 1px solid rgba(92, 186, 218, .27); border-radius: 15px; background: linear-gradient(145deg, rgba(6, 37, 55, .86), rgba(2, 18, 30, .94)); cursor: pointer; transition: border-color .18s ease, background .18s ease; }
 .results article:hover { border-color: rgba(244, 189, 81, .7); background: linear-gradient(145deg, rgba(10, 51, 72, .9), rgba(4, 22, 34, .97)); }
 .cardTop { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
 .tags { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -45,11 +45,12 @@
 .results h3 { margin: 15px 0 8px; color: #effaff; font-size: 1.04rem; line-height: 1.25; }
 .results h3 a { color: inherit; text-decoration: none; }
 .results h3 a::before { content: counter(package-results, decimal-leading-zero) "  "; color: #6296aa; font-size: .68rem; letter-spacing: .04em; }
+.results h3 a::after { position: absolute; inset: 0; content: ""; }
 .results h3 a:hover, .results h3 a:focus-visible { color: #ffe0a0; outline: none; text-decoration: underline; }
 .results article > p { display: -webkit-box; margin: 0; overflow: hidden; color: #b7d8e4; font-size: .82rem; line-height: 1.52; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
 .results article > footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; align-items: center; margin-top: auto; padding-top: 17px; }
 .results footer > span { color: #83b2c4; font-size: .65rem; font-weight: 800; }
-.results footer a { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 11px; border-radius: 9px; background: #f4bc50; color: #071a28; font-size: .72rem; font-weight: 950; text-decoration: none; }
+.results footer a { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 11px; border-radius: 9px; background: #f4bc50; color: #071a28; font-size: .72rem; font-weight: 950; text-decoration: none; }
 .results footer a:hover, .results footer a:focus-visible { background: #ffd578; outline: 3px solid rgba(244, 189, 81, .18); }
 .empty { padding: clamp(28px, 7vw, 70px); border: 1px dashed rgba(102, 194, 223, .4); border-radius: 16px; text-align: center; }
 .empty h3 { margin: 0; color: #effaff; }

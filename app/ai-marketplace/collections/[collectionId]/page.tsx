@@ -29,6 +29,22 @@ function plain(value: string | undefined) {
   return value ? value.replace(/[-_]/g, " ") : "General";
 }
 
+function offeringLabel(value: string) {
+  if (value === "ai-skill") return "AI skill";
+  if (value === "agent-team") return "Agent team";
+  if (value === "workflow-pack") return "Workflow pack";
+  if (value === "industry-edition") return "Industry edition";
+  if (value === "marketplace-tool") return "Marketplace tool";
+  if (value === "collection" || value === "bundle") return "Capability package";
+  return plain(value);
+}
+
+function buyerText(value: string | null | undefined, fallback: string) {
+  const copy = value?.trim();
+  if (!copy || /\b(?:artifact|checksum|file ?name|manifest|sha(?:256)?|hash|verification|verified|validation|catalog record|execution evidence)\b/i.test(copy) || /\.(?:json|ya?ml|zip|tar|gz|md|txt|csv)\b/i.test(copy)) return fallback;
+  return copy;
+}
+
 function labelCadence(value: string) {
   if (value === "quote") return "Custom quote";
   if (value === "one-time") return "One-time";
@@ -99,7 +115,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const collection = marketplaceV12Product((await params).collectionId);
   if (!collection || (collection.product_type !== "collection" && collection.product_type !== "bundle")) return {};
   const path = marketplaceV12PublicPath(collection);
-  return { title: `${collection.name} | Obserra EPI AI Marketplace`, description: collection.description, alternates: { canonical: path }, robots: { index: true, follow: true }, openGraph: { title: collection.name, description: collection.description, url: path, type: "website" } };
+  const description = buyerText(collection.description, `Explore the individual capabilities included in ${collection.name}.`);
+  return { title: `${collection.name} | Obserra EPI AI Marketplace`, description, alternates: { canonical: path }, robots: { index: true, follow: true }, openGraph: { title: collection.name, description, url: path, type: "website" } };
 }
 
 export default async function MarketplaceCollectionPage({ params, searchParams }: Props) {
@@ -137,13 +154,14 @@ export default async function MarketplaceCollectionPage({ params, searchParams }
   const typeFacets = countBy(members, (member) => member.product_type);
   const cadenceFacets = cadenceCounts(members);
   const activeFilterCount = [state.q, state.category, state.level, state.cadence, state.type].filter(Boolean).length;
-  const structuredData = [{ "@context": "https://schema.org", "@type": "CollectionPage", "@id": `https://www.obserrallc.com${path}#collection`, url: `https://www.obserrallc.com${path}`, name: collection.name, description: collection.description, isPartOf: { "@id": "https://www.obserrallc.com/ai-marketplace#catalog" }, mainEntity: { "@type": "ItemList", numberOfItems: filtered.length, itemListElement: results.map((entry, index) => ({ "@type": "ListItem", position: offset + index + 1, name: entry.name, url: `https://www.obserrallc.com${marketplaceV12PublicPath(entry)}` })) } }, { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "AI Marketplace", item: "https://www.obserrallc.com/ai-marketplace" }, { "@type": "ListItem", position: 2, name: collection.name, item: `https://www.obserrallc.com${path}` }] }];
+  const collectionDescription = buyerText(collection.description, `Explore ${members.length.toLocaleString()} individual capabilities included in ${collection.name}.`);
+  const structuredData = [{ "@context": "https://schema.org", "@type": "CollectionPage", "@id": `https://www.obserrallc.com${path}#collection`, url: `https://www.obserrallc.com${path}`, name: collection.name, description: collectionDescription, isPartOf: { "@id": "https://www.obserrallc.com/ai-marketplace#catalog" }, mainEntity: { "@type": "ItemList", numberOfItems: filtered.length, itemListElement: results.map((entry, index) => ({ "@type": "ListItem", position: offset + index + 1, name: entry.name, url: `https://www.obserrallc.com${marketplaceV12PublicPath(entry)}` })) } }, { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "AI Marketplace", item: "https://www.obserrallc.com/ai-marketplace" }, { "@type": "ListItem", position: 2, name: collection.name, item: `https://www.obserrallc.com${path}` }] }];
 
   return <main className="ai-marketplace ai-marketplace--detail">
-    <header className="ai-marketplace__nav"><Link href="/ai-marketplace">OBSERRA EPI</Link><nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/compare">Compare</Link><Link href="/ai-marketplace/configure">Build a bundle</Link><Link href="/ai-marketplace/hangar">Customer Hangar</Link></nav></header>
+    <header className="ai-marketplace__nav"><Link href="/ai-marketplace">OBSERRA EPI</Link><nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/compare">Compare</Link><Link href="/ai-marketplace/configure">Build a bundle</Link><Link href="/ai-marketplace/hangar">My products</Link></nav></header>
     <section className={styles.packageHeader} aria-labelledby="package-title">
-      <nav aria-label="Breadcrumb"><Link href="/ai-marketplace">AI Marketplace</Link><span aria-hidden="true">/</span><span>{plain(collection.product_type)}</span></nav>
-      <div><p>{collection.family}</p><h1 id="package-title">{collection.name}</h1><span>{collection.description}</span></div>
+      <nav aria-label="Breadcrumb"><Link href="/ai-marketplace">AI Marketplace</Link><span aria-hidden="true">/</span><span>Capability package</span></nav>
+      <div><p>{collection.family}</p><h1 id="package-title">{collection.name}</h1><span>{collectionDescription}</span></div>
       <dl><div><dt>Included offerings</dt><dd>{members.length.toLocaleString()}</dd></div><div><dt>Experience levels</dt><dd>{levelFacets.map(([level]) => level).join(" · ") || "All levels"}</dd></div><div><dt>Ways to buy</dt><dd>{cadenceFacets.map(([cadence]) => labelCadence(cadence)).join(" · ")}</dd></div></dl>
     </section>
     <section className={styles.storefront} aria-labelledby="package-products-title">
@@ -157,14 +175,15 @@ export default async function MarketplaceCollectionPage({ params, searchParams }
           {state.category ? <input type="hidden" name="category" value={state.category}/> : null}
           <label><span>Level</span><select name="level" defaultValue={state.level}><option value="">All levels</option>{levelFacets.map(([level, count]) => <option value={level} key={level}>{level} ({count.toLocaleString()})</option>)}</select></label>
           <label><span>Purchase type</span><select name="cadence" defaultValue={state.cadence}><option value="">All purchase types</option>{cadenceFacets.map(([cadence, count]) => <option value={cadence} key={cadence}>{labelCadence(cadence)} ({count.toLocaleString()})</option>)}</select></label>
-          <label><span>Offering type</span><select name="type" defaultValue={state.type}><option value="">All offering types</option>{typeFacets.map(([type, count]) => <option value={type} key={type}>{plain(type)} ({count.toLocaleString()})</option>)}</select></label>
+          <label><span>Offering type</span><select name="type" defaultValue={state.type}><option value="">All offering types</option>{typeFacets.map(([type, count]) => <option value={type} key={type}>{offeringLabel(type)} ({count.toLocaleString()})</option>)}</select></label>
           <button type="submit">Show matching offerings</button>
           {activeFilterCount > 0 ? <Link href={path}>Clear {activeFilterCount} filter{activeFilterCount === 1 ? "" : "s"}</Link> : null}
         </form>
         <header className={styles.resultsHeader}><div><p>Individual products and skills</p><h2 id="package-products-title">{filtered.length.toLocaleString()} matching offering{filtered.length === 1 ? "" : "s"}</h2></div><span>{filtered.length ? `Showing ${offset + 1}–${offset + results.length}` : "Change or clear a filter to continue."}</span></header>
         {results.length ? <ol className={styles.results} start={offset + 1}>{results.map((member) => {
           const offers = priceOffers(member);
-          return <li key={member.product_id}><article><div className={styles.cardTop}><div className={styles.tags}>{member.proficiency ? <span>{member.proficiency}</span> : null}<span>{member.category || member.family}</span><span>{plain(member.product_type)}</span></div><div className={styles.price}>{offers.map((offer) => <strong key={offer}>{offer}</strong>)}</div></div><h3><Link href={marketplaceV12PublicPath(member)}>{member.name}</Link></h3><p>{member.description}</p><footer><span>{member.mission ? "Outcome-focused offering" : "Individual marketplace offering"}</span><Link href={marketplaceV12PublicPath(member)}>View product details <b aria-hidden="true">→</b></Link></footer></article></li>;
+          const outcome = buyerText(member.mission || member.description, `${member.name} helps move ${member.category || member.family} work from a clear request to a usable outcome.`);
+          return <li key={member.product_id}><article><div className={styles.cardTop}><div className={styles.tags}>{member.proficiency ? <span>{member.proficiency}</span> : null}<span>{member.category || member.family}</span><span>{offeringLabel(member.product_type)}</span></div><div className={styles.price}>{offers.map((offer) => <strong key={offer}>{offer}</strong>)}</div></div><h3><Link href={marketplaceV12PublicPath(member)}>{member.name}</Link></h3><p>{outcome}</p><footer><span>Individual capability</span><Link href={marketplaceV12PublicPath(member)}>View price &amp; details <b aria-hidden="true">→</b></Link></footer></article></li>;
         })}</ol> : <div className={styles.empty}><h3>No offerings match those filters.</h3><p>Clear one or more filters to see the individual products and skills included in this package.</p><Link href={path}>View all package offerings</Link></div>}
         <nav className={styles.pagination} aria-label="Package result pages">{offset > 0 ? <Link href={href(path, state, { cursor: Math.max(0, offset - PAGE_SIZE) })}>Previous {PAGE_SIZE}</Link> : <span aria-disabled="true">Previous</span>}<strong>{filtered.length ? `${offset + 1}–${offset + results.length} of ${filtered.length.toLocaleString()}` : "0 results"}</strong>{offset + results.length < filtered.length ? <Link href={href(path, state, { cursor: offset + PAGE_SIZE })}>Next {Math.min(PAGE_SIZE, filtered.length - offset - results.length)}</Link> : <span aria-disabled="true">Next</span>}</nav>
       </div>

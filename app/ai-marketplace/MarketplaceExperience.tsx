@@ -46,6 +46,24 @@ function productPath(card: Pick<MarketplaceCard, "product_type" | "slug">) {
     : `/ai-marketplace/${segment}`;
 }
 
+function offeringLabel(productType: string) {
+  if (productType === "collection" || productType === "bundle") return "Capability package";
+  if (productType === "ai-skill") return "AI skill";
+  if (productType === "agent-team") return "Agent team";
+  if (productType === "workflow-pack") return "Workflow pack";
+  if (productType === "industry-edition") return "Industry edition";
+  if (productType === "marketplace-tool") return "Marketplace tool";
+  return readable(productType);
+}
+
+function buyerOutcome(card: MarketplaceCard) {
+  const copy = (card.mission || card.description).trim();
+  if (!copy || /\b(?:artifact|checksum|file ?name|manifest|sha(?:256)?|hash|verification|verified|validation|catalog record|execution evidence)\b/i.test(copy) || /\.(?:json|ya?ml|zip|tar|gz|md|txt|csv)\b/i.test(copy)) {
+    return `${card.name} helps move ${readable(card.category || card.family)} work from a clear request to a usable outcome.`;
+  }
+  return copy;
+}
+
 function price(card: MarketplaceCard) {
   const offers = card.pricing.offers.filter(
     (offer) => Number.isSafeInteger(offer.amount_minor) && offer.amount_minor >= 0 && Boolean(offer.currency),
@@ -75,26 +93,30 @@ function CatalogCard({ card }: { card: MarketplaceCard }) {
   const href = productPath(card);
   const category = card.category || card.family;
   const level = card.proficiency;
-  const outcome = card.mission || card.description;
+  const outcome = buyerOutcome(card);
 
   return (
     <article className="ai-marketplace__product-card">
-      <div className="ai-marketplace__card-top">
-        <span>{readable(category)}</span>
-        {level && <span>{readable(level)}</span>}
-      </div>
-      <h3><Link href={href}>{card.name}</Link></h3>
-      <p>{outcome}</p>
-      <div className="ai-marketplace__card-meta" aria-label={`${card.name} details`}>
-        <span>{readable(card.product_type)}</span>
-        <strong>{price(card)}</strong>
-      </div>
-      <footer>
-        <Link href={href} aria-label={`View ${card.name}`}>
-          {card.product_type === "collection" || card.product_type === "bundle" ? "Open package" : "View skill"}
+      <Link className="ai-marketplace__product-card-link" href={href} aria-label={`View ${card.name}`}>
+        <div className="ai-marketplace__card-top">
+          <span>{readable(category)}</span>
+          {level && <span>{readable(level)}</span>}
+        </div>
+        <h3>{card.name}</h3>
+        <p>{outcome}</p>
+        <div className="ai-marketplace__card-meta" aria-label={`${card.name} details`}>
+          <span>{offeringLabel(card.product_type)}</span>
+          <strong>{price(card)}</strong>
+        </div>
+        <footer>
+          {card.product_type === "collection" || card.product_type === "bundle"
+            ? "Open package"
+            : card.product_type === "ai-skill"
+              ? "View skill"
+              : "View product"}
           <span aria-hidden="true"> →</span>
-        </Link>
-      </footer>
+        </footer>
+      </Link>
     </article>
   );
 }

@@ -16,7 +16,19 @@ function words(value: string | null | undefined) { return value?.trim().replace(
 function unique(products: MarketplaceV12Card[]) { return [...new Map(products.map((product) => [product.product_id, product])).values()]; }
 function level(product: MarketplaceV12Card) { return words(product.proficiency || product.product_type); }
 function category(product: MarketplaceV12Card) { return words(product.category || product.family); }
-function outcome(product: MarketplaceV12Card) { return product.mission?.trim() || product.description; }
+function buyerText(product: MarketplaceV12Card, value: string | null | undefined) {
+  const copy = value?.trim();
+  if (!copy || /\b(?:artifact|checksum|file ?name|manifest|sha(?:256)?|hash|verification|verified|validation|catalog record|execution evidence)\b/i.test(copy) || /\.(?:json|ya?ml|zip|tar|gz|md|txt|csv)\b/i.test(copy)) return `${product.name} helps move ${category(product)} work from a clear request to a usable outcome.`;
+  return copy;
+}
+function outcome(product: MarketplaceV12Card) { return buyerText(product, product.mission || product.description); }
+function offeringLabel(product: MarketplaceV12Card) {
+  if (product.product_type === "ai-skill") return "AI skill";
+  if (product.product_type === "agent-team") return "Agent team";
+  if (product.product_type === "workflow-pack") return "Workflow pack";
+  if (product.product_type === "industry-edition") return "Industry edition";
+  return words(product.product_type);
+}
 function form(product: MarketplaceV12Card): ProductForm {
   const value = `${product.product_type} ${product.family} ${product.visualization.object_archetype ?? ""}`.toLowerCase();
   if (/collection|bundle|suite|repository/.test(value)) return "collection";
@@ -46,15 +58,15 @@ function offer(product: MarketplaceV12Card) {
   const lowest = [...offers].sort((left, right) => left.amount_minor - right.amount_minor)[0];
   const amount = new Intl.NumberFormat("en-US", { style: "currency", currency: lowest.currency }).format(lowest.amount_minor / 100);
   const cadence = lowest.cadence && lowest.cadence !== "one-time" ? ` / ${words(lowest.cadence)}` : " one-time";
-  return { price: `${amount}${cadence}`, note: offers.length > 1 ? `${offers.length} ways to purchase` : "Clear product pricing", href: `/ai-marketplace/${encodeURIComponent(product.slug)}`, action: "See details & buy" };
+  return { price: `${amount}${cadence}`, note: offers.length > 1 ? `${offers.length} ways to purchase` : "Clear product pricing", href: `/ai-marketplace/${encodeURIComponent(product.slug)}`, action: "View price & purchase options" };
 }
 
 function inputLabel(kind: ProductForm) { return ({ agent: "Your objective", workflow: "Starting request", connector: "Your tools", protection: "Work to review", collection: "Your mission", capability: "Your need" })[kind]; }
-function resultText(product: MarketplaceV12Card) { return product.mission?.trim() || `A ready-to-use ${words(product.product_type)} for ${category(product)} work.`; }
+function resultText(product: MarketplaceV12Card) { return outcome(product); }
 function demoSteps(product: MarketplaceV12Card) {
   return [
     { label: "Step 1 · Input", title: inputLabel(form(product)), body: `Bring the goal, context, and requirements for your ${category(product)} work.`, tags: [category(product), level(product)] },
-    { label: "Step 2 · Capability in use", title: product.name, body: product.description, tags: [product.family, words(product.product_type)] },
+    { label: "Step 2 · Capability in use", title: product.name, body: buyerText(product, product.description), tags: [product.family, offeringLabel(product)] },
     { label: "Step 3 · Outcome", title: "Work ready to move forward", body: resultText(product), tags: ["Buyer outcome", level(product)] },
   ] as const;
 }
@@ -126,7 +138,7 @@ export default function MarketplaceSalesDock({ products }: Props) {
     <div className={styles.storefront}>
       <SpatialStage products={visibleRecords.length ? visibleRecords : records} selected={selected} onSelect={select} />
       <article className={styles.focus} aria-live="polite"><p>Focused capability</p><span className={styles.focusMeta}>{level(selected)} · {category(selected)}</span><h3>{selected.name}</h3><p className={styles.outcome}>{outcome(selected)}</p><dl><div><dt>Best fit</dt><dd>{category(selected)}</dd></div><div><dt>Experience level</dt><dd>{level(selected)}</dd></div><div><dt>Price</dt><dd>{selectedOffer.price}</dd><small>{selectedOffer.note}</small></div></dl><Link href={selectedOffer.href}>{selectedOffer.action}<span aria-hidden="true">→</span></Link></article>
-      <nav className={styles.navigator} aria-label="Featured products by level and category"><header><div><span>Explore by fit</span><strong>Levels and categories</strong></div><div className={styles.levelChips}>{["All", ...availableLevels].map((name) => <button type="button" key={name} aria-pressed={activeLevel === name} onClick={() => chooseLevel(name)}>{name}</button>)}</div></header><div className={styles.categoryTiles}><button type="button" className={activeCategory === "All" ? styles.categorySelected : undefined} onClick={() => chooseCategory("All", levelRecords)}><i><Boxes size={19} strokeWidth={1.8} aria-hidden="true" /></i><span><strong>All categories</strong><small>{levelRecords.length} individual capabilities</small></span></button>{categories.map(([name, entries]) => <button type="button" className={activeCategory === name ? styles.categorySelected : undefined} key={name} onClick={() => chooseCategory(name, entries)}><i><CategoryIcon name={name} /></i><span><strong>{name}</strong><small>{outcome(entries[0])}</small></span></button>)}</div><div className={styles.skillPicker}><span>Individual capabilities</span><ul>{(visibleRecords.length ? visibleRecords : levelRecords).map((product) => { const productOffer = offer(product); return <li key={product.product_id} data-selected={product.product_id === selected.product_id ? "true" : "false"}><div><strong>{product.name}</strong><small>{level(product)}</small></div><p>{outcome(product)}</p><div className={styles.skillTags}><span>{category(product)}</span><span>{words(product.product_type)}</span></div><footer><strong>{productOffer.price}</strong><button type="button" aria-pressed={product.product_id === selected.product_id} onClick={() => select(product)}>{product.product_id === selected.product_id ? "Focused" : "Preview"}</button></footer></li>; })}</ul></div></nav>
+      <nav className={styles.navigator} aria-label="Featured products by level and category"><header><div><span>Explore by fit</span><strong>Levels and categories</strong></div><div className={styles.levelChips}>{["All", ...availableLevels].map((name) => <button type="button" key={name} aria-pressed={activeLevel === name} onClick={() => chooseLevel(name)}>{name}</button>)}</div></header><div className={styles.categoryTiles}><button type="button" className={activeCategory === "All" ? styles.categorySelected : undefined} onClick={() => chooseCategory("All", levelRecords)}><i><Boxes size={19} strokeWidth={1.8} aria-hidden="true" /></i><span><strong>All categories</strong><small>{levelRecords.length} individual capabilities</small></span></button>{categories.map(([name, entries]) => <button type="button" className={activeCategory === name ? styles.categorySelected : undefined} key={name} onClick={() => chooseCategory(name, entries)}><i><CategoryIcon name={name} /></i><span><strong>{name}</strong><small>{outcome(entries[0])}</small></span></button>)}</div><div className={styles.skillPicker}><span>Individual capabilities</span><ul>{(visibleRecords.length ? visibleRecords : levelRecords).map((product) => { const productOffer = offer(product); return <li key={product.product_id} data-selected={product.product_id === selected.product_id ? "true" : "false"}><div><Link className={styles.skillName} href={`/ai-marketplace/${encodeURIComponent(product.slug)}`}>{product.name}</Link><small>{level(product)}</small></div><p>{outcome(product)}</p><div className={styles.skillTags}><span>{category(product)}</span><span>{offeringLabel(product)}</span></div><footer><strong>{productOffer.price}</strong><button type="button" aria-pressed={product.product_id === selected.product_id} onClick={() => select(product)}>{product.product_id === selected.product_id ? "Focused" : "Preview"}</button></footer></li>; })}</ul></div></nav>
     </div>
   </section>;
 }
