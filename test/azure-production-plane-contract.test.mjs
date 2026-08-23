@@ -276,6 +276,7 @@ test("Key Vault ACL convergence uses bounded fresh readback with non-secret post
   const workflow = await read(".github/workflows/enable-vercel-key-vault-runtime.yml");
 
   assert.match(workflow, /for attempt in \$\(seq 1 12\); do[\s\S]*az keyvault show/);
+  assert.match(workflow, /\.properties\.networkAcls\.defaultAction \/\/ "Allow"/);
   assert.match(workflow, /Canonical Key Vault non-secret posture/);
   assert.match(workflow, /did not converge to the reachable RBAC contract after bounded readback/);
   assert.doesNotMatch(workflow, /az keyvault secret (show|set|list|download)/);
