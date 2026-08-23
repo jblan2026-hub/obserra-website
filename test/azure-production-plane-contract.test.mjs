@@ -243,18 +243,27 @@ test("Vercel runtime bootstrap converges only a missing governed identity and ex
   assert.doesNotMatch(workflow, /az keyvault secret (show|set|list|download)/);
 });
 
-test("Vercel runtime bootstrap converges only the missing Bicep-defined Key Vault", async () => {
-  const workflow = await read(".github/workflows/enable-vercel-key-vault-runtime.yml");
+test("Vercel runtime bootstrap converges the canonical Key Vault reachability contract", async () => {
+  const [workflow, bicep] = await Promise.all([
+    read(".github/workflows/enable-vercel-key-vault-runtime.yml"),
+    read("infra/main.bicep"),
+  ]);
 
   assert.match(
     workflow,
     /az keyvault create[\s\S]*--resource-group "\$\{AZURE_RESOURCE_GROUP\}"[\s\S]*--name "\$\{KEY_VAULT_NAME\}"[\s\S]*--location "\$\{resource_group_location\}"/,
+  );
+  assert.match(
+    workflow,
+    /az keyvault update[\s\S]*--resource-group "\$\{AZURE_RESOURCE_GROUP\}"[\s\S]*--name "\$\{KEY_VAULT_NAME\}"/,
   );
   assert.match(workflow, /--sku standard/);
   assert.match(workflow, /--enable-rbac-authorization true/);
   assert.match(workflow, /--enable-purge-protection true/);
   assert.match(workflow, /--retention-days 90/);
   assert.match(workflow, /--public-network-access Enabled/);
+  assert.match(workflow, /--default-action Allow/);
+  assert.match(bicep, /networkAcls:\s*\{\s*defaultAction: 'Allow'/);
   assert.match(workflow, /Could not read the canonical Key Vault; only an Azure ResourceNotFound result permits creation/);
   assert.doesNotMatch(workflow, /az keyvault secret (show|set|list|download)/);
 });
