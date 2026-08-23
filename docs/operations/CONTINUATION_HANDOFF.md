@@ -869,3 +869,14 @@ All must be observed from the public canonical host:
 - **Authorized recovery contract:** in Azure Cloud Shell PowerShell, create that user-assigned identity only if it remains absent; verify the governed subscription/tenant and Key Vault RBAC prerequisite; grant the exact `Key Vault Secrets User` role definition `4633458b-17de-408a-b874-0445c86b69e6` only at canonical vault `kv-obserra-prod-38d660` scope if it remains absent; then read both back.
 - **Data boundary:** this recovery creates no secret, reads no Key Vault secret value, and performs no Vercel mutation. The workflow can resume only after the non-secret identity/role verification marker is emitted.
 - **Exact continuation:** choose `Re-run failed jobs` for Actions bootstrap run #6. That retains authorized `main` SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2`; do not substitute the unmerged Node 24 PR.
+
+
+<!-- ops-checkpoint:2026-08-23-pr-223-guarded-runtime-convergence-source -->
+### 2026-08-23T12:58:51.585Z — PR #223 now carries the guarded runtime-identity convergence controller
+
+- **Owner-directed execution:** the owner directed the team to perform the recovery directly. PR [#223](https://github.com/jblan2026-hub/obserra-website/pull/223) is open, mergeable, and unmerged at exact head `707e8f63934cb8818636e1ff4b2c4dad049d1513`, based on current authorized `main` `5de3910bc104db9f41de48f816dde5bdf82dd6e2`.
+- **Node maintenance:** both affected Azure workflows now use released `azure/login@v3.0.1`; the matching contract continues to reject `azure/login@v2`.
+- **Narrow recovery behavior:** before any Vercel mutation, the runtime-bootstrap workflow may create only governed user-assigned identity `id-obserra-runtime-prod` and only after Azure returns a not-found result. It then waits for a tenant-matched client/principal ID, grants only role definition `4633458b-17de-408a-b874-0445c86b69e6` at canonical Key Vault `kv-obserra-prod-38d660` scope if absent, and requires readback. All non-not-found and authorization errors remain fail-closed.
+- **Data and deployment boundary:** the source does not read or emit a Key Vault secret. No production Azure identity, Key Vault role, Vercel production binding, replacement deployment, alias, payment, enrollment, or LMS readiness mutation has occurred from the PR source update.
+- **Current deployment observation:** no bootstrap-labelled Vercel deployment was returned during this source-only checkpoint.
+- **Next safe action:** require fresh PR source gates on this exact head; if they pass, merge the owner-authorized guarded change to `main`. Its existing path trigger will then issue a new GitHub OIDC assertion and execute the real Azure/Vercel bootstrap, retaining every deployment and direct-commerce/canonical proof gate.
