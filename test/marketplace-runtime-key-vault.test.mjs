@@ -22,6 +22,12 @@ const APPLICATION_KEYS = [
   "APPLICATIONS_STRIPE_WEBHOOK_SECRET",
   "OBSERRA_APPLICATIONS_PRICE_CATALOG_JSON",
 ];
+const MARKETPLACE_APPLICATION_KEYS = [
+  "OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY",
+  "APPLICATIONS_STRIPE_SECRET_KEY",
+  "APPLICATIONS_STRIPE_WEBHOOK_SECRET",
+];
+
 const MARKETPLACE_V12_SECRET_BINDINGS = {
   OBSERRA_AI_MARKETPLACE_V12_BINDING_RECEIPT_JSON: "ai-marketplace-v12-binding-receipt-json",
   OBSERRA_AI_MARKETPLACE_V12_DELIVERY_CATALOG_JSON: "ai-marketplace-v12-delivery-catalog-json",
@@ -160,17 +166,16 @@ test("marketplace v1.2 hydration atomically loads every exact runtime binding wi
 
   const evidence = await runtime.ensureMarketplaceV12RuntimeSecrets();
 
-  assert.deepEqual({ ...evidence }, { required: true, state: "ready", stage: "environment", bindingCount: 14 });
+  assert.deepEqual({ ...evidence }, { required: true, state: "ready", stage: "environment", bindingCount: 12 });
   const requestedSecretNames = secretRequests.map((path) => decodeURIComponent(path.split("/").at(-1))).sort();
   assert.deepEqual(requestedSecretNames, [
-    "applications-commerce-hash-secret",
-    "applications-stripe-price-catalog-json",
     "applications-stripe-secret-key",
     "applications-stripe-webhook-secret",
     "applications-supabase-service-role-key",
     ...Object.values(MARKETPLACE_V12_SECRET_BINDINGS),
   ].sort());
-  for (const key of [...APPLICATION_KEYS, ...MARKETPLACE_V12_KEYS]) assert.match(process.env[key], /^test-runtime-binding-/);
+  for (const key of [...MARKETPLACE_APPLICATION_KEYS, ...MARKETPLACE_V12_KEYS]) assert.match(process.env[key], /^test-runtime-binding-/);
+  for (const key of ["OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET", "OBSERRA_APPLICATIONS_PRICE_CATALOG_JSON"]) assert.equal(process.env[key], undefined);
 });
 
 test("a missing marketplace v1.2 binding leaves the combined runtime environment untouched", async (t) => {
@@ -200,7 +205,7 @@ test("a missing marketplace v1.2 binding leaves the combined runtime environment
     { ...runtime.productionRuntimeSecretsEvidence(failure) },
     { required: true, state: "failed", stage: "key-vault", code: "KEY_VAULT_SECRET_UNAVAILABLE", retryable: false, bindingCount: 0 },
   );
-  for (const key of [...APPLICATION_KEYS, ...MARKETPLACE_V12_KEYS]) assert.equal(process.env[key], undefined);
+  for (const key of [...MARKETPLACE_APPLICATION_KEYS, ...MARKETPLACE_V12_KEYS]) assert.equal(process.env[key], undefined);
 });
 
 test("OIDC claim mismatch fails before Azure or Key Vault and returns sanitized stage evidence", async (t) => {
