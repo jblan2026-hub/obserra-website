@@ -18,7 +18,7 @@ jobs:
       - name: Dispatch governed protected-delivery ingest on main
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_SHA: a2a105526cc0aea729db6dc879fb11731258fdc9
+          TARGET_SHA: adc8a658ab733d69352a75d1abbef6d5c5639e52
           CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
         shell: bash
         run: |
