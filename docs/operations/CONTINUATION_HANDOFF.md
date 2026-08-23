@@ -956,3 +956,13 @@ All must be observed from the public canonical host:
 - **Infrastructure record:** `infra/main.bicep` declares the same canonical Key Vault name with Standard SKU, RBAC authorization, purge protection, public network access, and a 90-day soft-delete retention period; the resource has not been provisioned.
 - **No sensitive transfer:** the failed run read no Key Vault secret value and did not write Vercel runtime bindings. Applications/Academy commerce, payment, enrollment, and Florida LMS readiness remain fail-closed.
 - **Next safe action:** add an idempotent, not-found-gated creation of only this empty, canonical Key Vault with its Bicep-defined security settings; then rerun the existing identity/role/Vercel/bootstrap gates. Any other Azure error remains fail-closed.
+
+<!-- ops-checkpoint:2026-08-23-pr-224-key-vault-convergence-source -->
+### 2026-08-23T13:15:30.311Z — PR #224 adds the fail-closed canonical Key Vault convergence
+
+- **Source-only release candidate:** [PR #224](https://github.com/jblan2026-hub/obserra-website/pull/224) is open at exact head `d20adc63caf58ffdf2a21de25f0ea794e889b005`, based on canonical main `75accf80bfa68dbc6633689b5525840462f064d3`.
+- **Root-cause fix:** the bootstrap now creates only `kv-obserra-prod-38d660` in `rg-obserra-prod-eastus` if and only if Azure returns not-found. Its configuration matches `infra/main.bicep`: Standard SKU, RBAC authorization, purge protection, 90-day retention, public network access, and production ownership tags.
+- **Guardrails preserved:** any other Key Vault error stops the workflow; the runtime identity/role readbacks, Vercel binding checks, direct Applications/Academy checks, and guarded canonical cutover remain unchanged. The new contract test rejects Key Vault secret commands.
+- **Current source-gate state:** Ops Applications Storage URL Convergence (completed/skipped), Website CI (in_progress), CodeQL Advanced (in_progress), Azure IaC Validation (in_progress).
+- **Mutation state:** opening the PR has not created a Key Vault, granted a role, written a Vercel binding, deployed a replacement, moved an alias, or enabled payment, enrollment, Academy, Applications, or Florida LMS readiness.
+- **Next safe action:** require fresh source checks, merge the owner-authorized guarded recovery, then inspect the exact bootstrap job and public endpoints. Do not infer runtime completion from the PR.
