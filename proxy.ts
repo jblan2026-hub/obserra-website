@@ -28,6 +28,7 @@ const PROTECTED_PATH_PREFIXES = [
   "/api/apps",
   "/admin",
   "/portal",
+  "/ai-marketplace/hangar",
   "/academy/admin",
   "/academy/learn",
   "/academy/certificate",

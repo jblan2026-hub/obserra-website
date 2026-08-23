@@ -30,6 +30,7 @@ const CLERK_PUBLIC_PREFIXES = ["/__clerk", "/owner-access"] as const;
 const APPLICATIONS_PUBLIC_READ_PATHS = new Set(["/api/apps/commerce-health"]);
 const CLERK_PROTECTED_PREFIXES = [
   "/api/apps",
+  "/ai-marketplace/hangar",
   "/command-center",
   "/api/owner",
   "/portal/applications",

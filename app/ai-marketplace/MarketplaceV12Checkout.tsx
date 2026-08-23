@@ -12,12 +12,13 @@ function label(option: ReturnType<typeof marketplaceV12PurchaseOptions>[number])
 
 export default function MarketplaceV12Checkout({ product, revision }: { product: MarketplaceV12Card; revision: string }) {
   const options = marketplaceV12PurchaseOptions(product);
+  if (options.length === 0) return <section className="ai-marketplace__checkout" aria-label="Purchase availability"><p role="status">This catalog record requires an enterprise quote. Online checkout is unavailable.</p></section>;
   return <form className="ai-marketplace__checkout" action="/api/ai-marketplace/checkout" method="post">
     <input type="hidden" name="product" value={product.product_id} />
     <input type="hidden" name="catalogRevision" value={revision} />
     <label htmlFor={`purchase-${product.product_id}`}>Purchase option</label>
-    <select id={`purchase-${product.product_id}`} name="purchaseOption" disabled>{options.map((option) => <option key={option.option} value={option.option}>{label(option)}</option>)}</select>
+    <select id={`purchase-${product.product_id}`} name="purchaseOption" aria-describedby={`purchase-status-${product.product_id}`}>{options.map((option) => <option key={option.option} value={option.option}>{label(option)}</option>)}</select>
     <button type="submit" disabled>Checkout unavailable</button>
-    <p role="status">Protected checkout remains unavailable until every exact catalog offer has a verified Stripe Price and fulfillment evidence.</p>
+    <p id={`purchase-status-${product.product_id}`} role="status">You can review catalog purchase options. Protected checkout remains unavailable until every exact catalog offer has a verified Stripe Price and fulfillment evidence.</p>
   </form>;
 }
