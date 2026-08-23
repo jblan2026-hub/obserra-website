@@ -4,12 +4,13 @@ import { notFound } from "next/navigation";
 import { findAiMarketplaceProduct } from "../../../lib/ai-marketplace-catalog";
 import { marketplaceV12Product } from "../../../lib/marketplace-v12-catalog";
 import MarketplaceCheckout from "../MarketplaceCheckout";
-import MarketplacePedestal from "../MarketplacePedestal";
-import MarketplaceV12Checkout from "../MarketplaceV12Checkout";
-import { marketplaceV12Summary } from "../../../lib/marketplace-v12-catalog";
+import { marketplaceV12ProductCommerce } from "../../../lib/marketplace-v12-runtime";
+import { marketplaceV12PedestalDetail } from "../../../lib/marketplace-v12-product-pedestal";
+import MarketplaceDimensionalPedestal from "../MarketplaceDimensionalPedestal";
 import "../marketplace.css";
 
 type PageProps = { params: Promise<{ productId: string }> };
+export const dynamic = "force-dynamic";
 
 function title(productName: string) {
   return productName.replace("OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC — ", "");
@@ -34,17 +35,16 @@ export default async function MarketplaceProductPage({ params }: PageProps) {
   const catalogProduct = marketplaceV12Product(productId);
   const product = catalogProduct ? null : findAiMarketplaceProduct(productId);
   if (!product && !catalogProduct) notFound();
-  if (catalogProduct) return <main className="ai-marketplace ai-marketplace--detail">
-    <header className="ai-marketplace__nav"><Link href="/ai-marketplace">OBSERRA EPI</Link><nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/skill-libraries">Skill libraries</Link><Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link></nav></header>
-    <section className="ai-marketplace__detail-hero">
-      <Link className="ai-marketplace__back" href="/ai-marketplace">← All marketplace capabilities</Link>
-      <p className="ai-marketplace__eyebrow">{catalogProduct.family} · {catalogProduct.product_type} · v{catalogProduct.version}</p>
-      <h1>{catalogProduct.name}</h1><p>{catalogProduct.description}</p>
-      <div className="ai-marketplace__detail-grid"><div><span>Publisher</span><strong>{String(catalogProduct.publisher ?? "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC")}</strong></div><div><span>Commercial model</span><strong>{catalogProduct.pricing.model === "quote" ? "Enterprise quote required" : "Server price binding required before publication"}</strong></div><div><span>Availability</span><strong>Unavailable — publication, Stripe binding, entitlement, and protected delivery evidence are required.</strong></div></div>
-      <MarketplaceV12Checkout product={catalogProduct} revision={marketplaceV12Summary().revision} />
-      <Link className="ai-marketplace__contact-cta" href={`/contact?interest=ai-marketplace&product=${encodeURIComponent(catalogProduct.product_id)}`}>Discuss enterprise licensing</Link>
-    </section><MarketplacePedestal product={catalogProduct} />
-  </main>;
+  if (catalogProduct) {
+    const commerce = await marketplaceV12ProductCommerce(catalogProduct);
+    const detail = marketplaceV12PedestalDetail(catalogProduct);
+    const structuredData = { "@context": "https://schema.org", "@type": "Product", "@id": `https://www.obserrallc.com/ai-marketplace/${detail.slug}#product`, name: detail.name, description: detail.description, sku: detail.productId, brand: { "@type": "Brand", name: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" }, manufacturer: { "@type": "Organization", name: detail.publisher }, category: detail.category ?? detail.family };
+    return <main className="ai-marketplace ai-marketplace--detail">
+      <header className="ai-marketplace__nav"><Link href="/ai-marketplace">OBSERRA EPI</Link><nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Capability universe</Link><Link href={`/ai-marketplace/compare?items=${encodeURIComponent(detail.slug)}`}>Compare</Link><Link href={`/ai-marketplace/configure?mission=${encodeURIComponent(detail.mission ? detail.slug : "")}&items=${encodeURIComponent(detail.slug)}`}>Configure</Link><Link href="/ai-marketplace/hangar">Customer Hangar</Link><Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link></nav></header>
+      <MarketplaceDimensionalPedestal detail={detail} checkoutEnabled={commerce.checkoutEnabled} runtimeReason={commerce.reason} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+    </main>;
+  }
   if (!product) notFound();
   return <main className="ai-marketplace ai-marketplace--detail">
     <header className="ai-marketplace__nav"><Link href="/ai-marketplace">OBSERRA EPI</Link><nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/skill-libraries">Skill libraries</Link><Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link></nav></header>

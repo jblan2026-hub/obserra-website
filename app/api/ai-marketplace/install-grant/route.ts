@@ -1,2 +1,48 @@
-import { auth } from "@clerk/nextjs/server"; import { NextResponse } from "next/server"; import { marketplaceV12CommerceSubjects,marketplaceV12Product,marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog"; import { aiMarketplaceTenantId,marketplaceV12DeliveryEntitlement } from "../../../../lib/ai-marketplace-commerce";
-export const runtime="nodejs"; function sameOrigin(r:Request){try{return new URL(r.headers.get("origin")??"invalid").origin===new URL(r.url).origin;}catch{return false;}} export async function POST(r:Request){if(!sameOrigin(r))return NextResponse.json({error:"Same-origin request required"},{status:403,headers:{"cache-control":"no-store"}});const {userId,orgId}=await auth();if(!userId)return NextResponse.json({error:"Authentication required"},{status:401,headers:{"cache-control":"no-store"}});const f=await r.formData(),slug=String(f.get("product")??""),destination=String(f.get("destination")??""),p=marketplaceV12Product(slug),subject=p&&marketplaceV12CommerceSubjects().find((x)=>x.productId===p.product_id);if(!p||!subject||!destination)return NextResponse.json({error:"Invalid installation request"},{status:400,headers:{"cache-control":"no-store"}});try{const revision=marketplaceV12Summary().revision,e=await marketplaceV12DeliveryEntitlement(userId,aiMarketplaceTenantId(userId,orgId),p.product_id,revision,subject.artifactSha256);if(!e.allowed)return NextResponse.json({error:"Entitlement required"},{status:403,headers:{"cache-control":"no-store"}});return NextResponse.json({error:"Install bridge unavailable"},{status:503,headers:{"cache-control":"no-store"}});}catch{return NextResponse.json({error:"Install bridge unavailable"},{status:503,headers:{"cache-control":"no-store"}});}}
+import { randomUUID } from "node:crypto";
+import { auth } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+
+import { aiMarketplaceTenantId, createMarketplaceV12InstallGrant } from "../../../../lib/ai-marketplace-commerce";
+import { marketplaceV12Release } from "../../../../lib/ai-marketplace-delivery";
+import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
+import { marketplaceV12InstallBridgeConfigured } from "../../../../lib/marketplace-v12-install-bridge";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+function sameOrigin(request: Request) {
+  try { return new URL(request.headers.get("origin") ?? "invalid").origin === new URL(request.url).origin; } catch { return false; }
+}
+
+function error(message: string, status: 400 | 401 | 403 | 409 | 503) {
+  return NextResponse.json({ error: message }, { status, headers: { "cache-control": "no-store", "x-robots-tag": "noindex, nofollow" } });
+}
+
+export async function POST(request: Request) {
+  if (!sameOrigin(request)) return error("Same-origin request required", 403);
+  const { userId, orgId } = await auth();
+  if (!userId) return error("Authentication required", 401);
+  const form = await request.formData();
+  const productId = String(form.get("product") ?? "");
+  const bridgeId = String(form.get("bridgeId") ?? "");
+  const platform = String(form.get("platform") ?? "");
+  const product = marketplaceV12Product(productId);
+  const subject = product && marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
+  if (!product || !subject || product.product_type === "collection" || product.product_type === "bundle") return error("Invalid installation request", 400);
+  const revision = marketplaceV12Summary().revision;
+  const release = marketplaceV12Release(product.product_id, revision, subject.artifactSha256);
+  if (!release || !marketplaceV12InstallBridgeConfigured()) return error("Install bridge unavailable", 503);
+  try {
+    const grant = await createMarketplaceV12InstallGrant({
+      subjectId: userId, tenantId: aiMarketplaceTenantId(userId, orgId), productId: product.product_id, revision,
+      artifactSha256: subject.artifactSha256, bridgeId, platform, installProfile: release.installProfile, correlationId: randomUUID(),
+    });
+    return NextResponse.json({
+      contract: "obserra-marketplace-install-grant-v1",
+      protocolUrl: `obserra://install?grant=${encodeURIComponent(grant.grantId)}`,
+      expiresAt: grant.expiresAt,
+    }, { headers: { "cache-control": "no-store", "x-robots-tag": "noindex, nofollow" } });
+  } catch {
+    return error("Install bridge unavailable", 503);
+  }
+}
