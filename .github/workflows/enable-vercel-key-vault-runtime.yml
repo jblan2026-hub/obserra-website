@@ -491,15 +491,26 @@ jobs:
               --arg ref "${GITHUB_REF_NAME}" \
               --arg sha "${GITHUB_SHA}" '
                 .id == $deployment and
-                .projectId == $project and
-                .name == $name and
+                ((.projectId // .project.id // "") == $project) and
+                ((.name // .project.name // "") == $name) and
                 (.target // "") == "production" and
                 ((.readyState // .state // "") == "READY") and
-                (.gitSource.type == "github") and
-                (.gitSource.org == $org) and
-                (.gitSource.repo == $repo) and
-                (.gitSource.ref == $ref) and
-                (.gitSource.sha == $sha)
+                (
+                  (
+                    (.gitSource.type == "github") and
+                    (.gitSource.org == $org) and
+                    (.gitSource.repo == $repo) and
+                    (.gitSource.ref == $ref) and
+                    (.gitSource.sha == $sha)
+                  ) or
+                  (
+                    (.meta.githubCommitVerification == "verified") and
+                    (.meta.githubCommitOrg == $org) and
+                    (.meta.githubCommitRepo == $repo) and
+                    (.meta.githubCommitRef == $ref) and
+                    (.meta.githubCommitSha == $sha)
+                  )
+                )
               ' "${deployment_file}" >/dev/null
           }
 
