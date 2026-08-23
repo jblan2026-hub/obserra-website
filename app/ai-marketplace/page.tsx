@@ -37,6 +37,7 @@ export default function AiMarketplacePage() {
         <Link href="/" aria-label="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC home">OBSERRA EPI</Link>
         <nav aria-label="AI Skills Marketplace navigation">
           <Link href="/">Home</Link>
+          <Link href="/ai-marketplace/skill-libraries">Skill libraries</Link>
           <Link href="/apps">Applications</Link>
           <Link href="/academy">Academy</Link>
           <Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link>
@@ -51,6 +52,7 @@ export default function AiMarketplacePage() {
           <span>Integrity and entitlement controlled</span>
         </div>
         <p className="ai-marketplace__notice">Prices and product scope are published below. Secure purchase and protected delivery activate only when the live payment, durable ledger, identity, and entitlement checks are operational.</p>
+        <Link href="/ai-marketplace/skill-libraries" style={{ display: "inline-flex", marginTop: 22, padding: "13px 17px", borderRadius: 10, background: "#f4ba55", color: "#071d2f", fontWeight: 900, textDecoration: "none" }}>Browse Beginner, Intermediate, Expert &amp; Advanced skill packages →</Link>
       </section>
       <section className="ai-marketplace__families" aria-label="Marketplace product families">
         {families.map((family) => <a key={family} href={`#${family}`}>{family.replace(/-/g, " ")}</a>)}
