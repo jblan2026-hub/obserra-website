@@ -93,6 +93,7 @@ test("protected delivery readbacks every exact runtime binding after ingest publ
     "applications-supabase-service-role-key",
     "applications-stripe-secret-key",
     "applications-stripe-webhook-secret",
+    "applications-commerce-hash-secret",
     "ai-marketplace-v12-binding-receipt-json",
     "ai-marketplace-v12-delivery-catalog-json",
     "ai-marketplace-v12-release-evidence-json",
@@ -103,7 +104,9 @@ test("protected delivery readbacks every exact runtime binding after ingest publ
     "ai-marketplace-cloudfront-key-pair-id",
     "ai-marketplace-cloudfront-private-key",
   ]) assert.match(workflow, new RegExp(secret));
-  assert.doesNotMatch(workflow.slice(readback, retention), /--query value/);
+  const readbackBlock = workflow.slice(readback, retention);
+  assert.doesNotMatch(readbackBlock, /--query value/);
+  assert.doesNotMatch(readbackBlock, /\\\\\\\\\n/);
 });
 
 
@@ -124,6 +127,7 @@ test("protected-delivery preflight verifies every existing ingest prerequisite b
     "applications-supabase-service-role-key",
     "applications-stripe-secret-key",
     "applications-stripe-webhook-secret",
+    "applications-commerce-hash-secret",
     "ai-marketplace-release-aws-access-key-id",
     "ai-marketplace-release-aws-secret-access-key",
     "ai-marketplace-release-bucket",
