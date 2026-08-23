@@ -8,6 +8,8 @@ import {
   marketplaceV12Summary,
   type MarketplaceV12Card,
 } from "../../lib/marketplace-v12-catalog";
+import { marketplaceV12WorkspaceCandidates } from "../../lib/marketplace-v12-workspaces";
+import MarketplaceCapabilityUniverse from "./MarketplaceCapabilityUniverse";
 import MarketplaceEditorialCatalog, { type EditorialCatalogCard } from "./MarketplaceEditorialCatalogStyled";
 import MarketplaceSalesDock from "./MarketplaceSalesDock";
 import "./MarketplaceEditorialCatalog.css";
@@ -48,6 +50,7 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
   const cursor = cursorValue(params.cursor);
   const query = queryValue(params.q);
   const initial = marketplaceV12Search({ cursor, q: query || undefined, limit: 24 });
+  const universeRecords = marketplaceV12WorkspaceCandidates(query || undefined);
   const catalog = initial.results as EditorialCatalogCard[];
   const familyEntries = Object.entries(summary.family_counts).sort(([left], [right]) => left.localeCompare(right));
   const featuredLevels = ["Beginner", "Intermediate", "Expert", "Advanced"];
@@ -89,11 +92,12 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
     </header>
     <section className="ai-marketplace__hero" aria-labelledby="marketplace-heading">
       <p>OBSERRA EPI AI CAPABILITY MARKETPLACE</p>
-      <h1 id="marketplace-heading">Package-backed AI capability for real-world work.</h1>
-      <p className="ai-marketplace__hero-lede">Choose a verified package, inspect its exact individual skills, then open the product route that describes its governed purchase and delivery state.</p>
-      <div><span>{summary.total_cards.toLocaleString()} capabilities</span><span>{featuredPackages.length} skill packages</span><span>{familyEntries.length} categories</span></div>
-      <p className="ai-marketplace__notice">Package contents, individual skill routes, and pricing are derived from the canonical marketplace catalog. Online purchase remains unavailable until the guarded commerce evidence is complete.</p>
+      <h1 id="marketplace-heading">Navigate a governed AI capability universe.</h1>
+      <p className="ai-marketplace__hero-lede">Explore the catalog as a connected spatial system, move from capability families to individual products, and open the same stable product routes used by search, comparison, pricing, and protected fulfillment.</p>
+      <div><span>{summary.total_cards.toLocaleString()} capabilities</span><span>{featuredPackages.length} governed collections</span><span>{familyEntries.length} capability families</span></div>
+      <p className="ai-marketplace__notice">Every visible capability comes from the canonical marketplace catalog. Purchase remains unavailable until the guarded Stripe, entitlement, and protected-delivery evidence is complete.</p>
     </section>
+    <MarketplaceCapabilityUniverse records={universeRecords} totalCards={summary.total_cards} familyCount={familyEntries.length} />
     <MarketplaceSalesDock products={dockRecords} />
     <nav className="ai-marketplace__crawl-pagination" aria-label="Marketplace result pages">
       <Link href="/ai-marketplace" aria-current={!cursor && !query ? "page" : undefined}>First results page</Link>
