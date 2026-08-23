@@ -717,3 +717,14 @@ All must be observed from the public canonical host:
 - **Mutation state:** no Azure tenant record, Vercel Production environment, deployment, alias, payment, enrollment, or LMS readiness setting was changed during recovery. No sensitive value was read, printed, or transferred.
 - **Authorization gate:** production-sensitive Key Vault-to-Vercel bootstrap dispatch remains unexecuted pending explicit owner authorization. This rolling record will be appended automatically after each material probe, mutation, deployment, rollback, or blocker.
 - **Next safe action:** have an Azure tenant administrator converge and read back the exact `github-main` record. After explicit production-transfer authorization, dispatch the current-main runtime bootstrap and require direct Applications and Academy HTTP `200` with `operational: true`, exact replacement deployment/cutover, canonical deployment/SHA proof, and retained Florida licensing/readiness gates.
+
+
+<!-- ops-checkpoint:2026-08-23T12-14-canonical-reprobe -->
+### 2026-08-23T12:14:35Z — fresh canonical and subsystem re-probe
+
+- **Canonical identity:** authenticated Vercel fetch of `https://www.obserrallc.com/api/health` returned HTTP `200` and exact deployment `dpl_AJPPKARXHGqo3QACFwpdmng3KQXV`, exact SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2`, expected/observed project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`, and verified hosting/routing authority.
+- **Applications commerce:** HTTP `503`, contract `applications-commerce-health-v1`, `operational: false`, identity/storage/provider/Stripe readiness unavailable, error `durable-commerce-unavailable`.
+- **Academy commerce:** HTTP `503`, contract `academy-commerce-health-v1`, `operational: false`; identity is available/live while payment and durable storage remain unavailable.
+- **Florida LMS:** liveness returned HTTP `200` / `live`; readiness returned HTTP `503` / `not_ready` with `Retry-After: 60`.
+- **Interpretation:** the website release remains canonical and verified; Applications, Academy payment, and regulated Florida LMS readiness remain fail-closed. No production mutation or sensitive transfer occurred.
+- **Next safe action:** inspect the exact current-main runtime-bootstrap run evidence, then converge/read back the tenant-side `github-main` federated identity before any authorized production bootstrap dispatch.
