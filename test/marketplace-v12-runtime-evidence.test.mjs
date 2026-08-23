@@ -130,7 +130,16 @@ test("protected delivery workflow writes only compact runtime evidence after all
   assert.match(workflow, /ai-marketplace-v12-release-evidence-json/);
   assert.match(workflow, /ai-marketplace-v12-release-evidence-signature/);
   assert.match(workflow, /ai-marketplace-v12-activation-approved-revision/);
-  assert.match(workflow, /Approval is written last/);
+  const approvalWrite = workflow.indexOf("set_secret_value ai-marketplace-v12-activation-approved-revision");
+  const evidenceWrites = [
+    workflow.indexOf("set_secret_file ai-marketplace-v12-binding-receipt-json"),
+    workflow.indexOf("set_secret_file ai-marketplace-v12-delivery-catalog-json"),
+    workflow.indexOf("set_secret_file ai-marketplace-v12-release-evidence-json"),
+    workflow.indexOf("set_secret_file ai-marketplace-v12-release-evidence-signature"),
+  ];
+  assert.ok(approvalWrite > 0);
+  assert.ok(evidenceWrites.every((position) => position > 0 && position < approvalWrite));
+  assert.doesNotMatch(workflow.slice(approvalWrite + 1), /set_secret_(?:file|value) /);
   assert.doesNotMatch(workflow, /set_secret_value ai-marketplace-v12-verified-binding-count/);
   assert.doesNotMatch(workflow, /set_secret_file ai-marketplace-v12-delivery-catalog-json "\$\{evidence_dir\}\/delivery-catalog\.json"/);
   assert.match(ledger, /obserra_ai_marketplace_commerce_health/);
