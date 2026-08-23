@@ -32,8 +32,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
-      AZURE_DEPLOY_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      # Client and tenant IDs are public identity metadata, not credentials.
+      # Keep repository overrides, but fall back to the exact governed identity
+      # already pinned by the Azure production bootstrap and architecture record.
+      AZURE_DEPLOY_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID || 'dc3ff3e1-ea35-4879-afa9-fa3eee49df85' }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID || '7d8b7b64-c80c-4c8a-a514-66f6b1cf8607' }}
       AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
       AZURE_RESOURCE_GROUP: rg-obserra-prod-eastus
       AZURE_RUNTIME_IDENTITY: id-obserra-runtime-prod
