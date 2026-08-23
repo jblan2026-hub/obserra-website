@@ -680,6 +680,8 @@ All must be observed from the public canonical host:
 
 ### 2026-08-23T12:02:40Z — PR #221 rebased onto the PR #222 canonical release
 
+- **Event:** pull request [#221](https://github.com/jblan2026-hub/obserra-website/pull/221) was synchronized to exact head `0774270310b52459563caf83bc7008b46cdb73b7`.
+
 - **Exact source identity:** pull request [#221](https://github.com/jblan2026-hub/obserra-website/pull/221) remains open and mergeable at exact head `0774270310b52459563caf83bc7008b46cdb73b7`, based on exact signed `main` `6d689357fac094a7dd4c0a74b34c1b0ea40ed114`.
 - **Reconciliation result:** the runtime-bootstrap changes preserve PR #220 Check-v2 evidence and PR #222 post-canonical Clerk reconciliation. The exact four non-secret Production bindings and readback, exact deployment-ID cutover dispatch, guarded alias ownership/rollback, and fail-closed commerce/LMS controls remain. No production bootstrap, alias mutation, or secret transfer occurred during the rebase.
 - **Exact-head validation:** Production Authority Contract run [`32638169563`](https://github.com/jblan2026-hub/obserra-website/actions/runs/32638169563) succeeded; CodeQL Advanced run [`32638169546`](https://github.com/jblan2026-hub/obserra-website/actions/runs/32638169546) succeeded; Website CI run [`32638169578`](https://github.com/jblan2026-hub/obserra-website/actions/runs/32638169578) succeeded. Focused local validation reports 17/17 tests, valid YAML, and 15/15 workflow shell blocks.
