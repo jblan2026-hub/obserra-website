@@ -52,7 +52,7 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
     <header className="ent-header">
       <div className="ent-header__utility">
         <span>Executive advisory · Cybersecurity · Protective intelligence · Secure technology</span>
-        <div><Link href="/florida-security-training">Florida training</Link><Link href="/resources">Resources</Link><Link href="/contact">Contact</Link></div>
+        <div><Link href="/florida-security-training">Florida Class D Training</Link><Link href="/resources">Resources</Link><Link href="/contact">Contact</Link></div>
       </div>
       <div className="ent-header__main">
         <Link className="ent-header__brand" href="/" aria-label={`${LEGAL_ENTITY_NAME} home`} onClick={close}>
