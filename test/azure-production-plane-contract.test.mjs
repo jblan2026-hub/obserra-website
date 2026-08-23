@@ -103,12 +103,16 @@ test("Azure production capacity keeps failure headroom and controlled autoscale"
 
 test("GitHub deployment uses current-directory OIDC, immutable artifact, staged verification, promotion, and rollback", async () => {
   const workflow = await read(".github/workflows/azure-production-deploy.yml");
+  const runtimeBootstrap = await read(".github/workflows/enable-vercel-key-vault-runtime.yml");
 
   assert.match(workflow, /id-token:\s*write/);
   assert.match(workflow, /vars\.AZURE_CLIENT_ID/);
   assert.match(workflow, /vars\.AZURE_TENANT_ID/);
   assert.doesNotMatch(workflow, /5a08a33a-d2b5-491d-ac6d-32f325138143/);
-  assert.match(workflow, /azure\/login@v2/);
+  assert.match(workflow, /azure\/login@v3\.0\.1/);
+  assert.match(runtimeBootstrap, /azure\/login@v3\.0\.1/);
+  assert.doesNotMatch(workflow, /azure\/login@v2/);
+  assert.doesNotMatch(runtimeBootstrap, /azure\/login@v2/);
   assert.match(workflow, /npm ci/);
   assert.match(workflow, /npm run typecheck/);
   assert.match(workflow, /npm run lint/);
@@ -217,4 +221,24 @@ test("Next.js uses Vercel-native output and preserves Azure App Service standalo
   assert.match(workflow, /OBSERRA_HOSTING_PROVIDER:\s*azure-app-service/);
   assert.match(workflow, /test -f \.next\/standalone\/server\.js/);
   assert.match(config, /isProductionRuntime/);
+});
+
+test("Vercel runtime bootstrap converges only a missing governed identity and exact Key Vault role", async () => {
+  const workflow = await read(".github/workflows/enable-vercel-key-vault-runtime.yml");
+
+  assert.match(workflow, /az group show --name "\$\{AZURE_RESOURCE_GROUP\}" --output json/);
+  assert.match(
+    workflow,
+    /az identity create[\s\S]*--resource-group "\$\{AZURE_RESOURCE_GROUP\}"[\s\S]*--name "\$\{AZURE_RUNTIME_IDENTITY\}"[\s\S]*--location "\$\{resource_group_location\}"/,
+  );
+  assert.match(workflow, /ResourceNotFound\|was not found\|could not be found/);
+  assert.match(workflow, /--assignee-principal-type ServicePrincipal/);
+  assert.match(workflow, /--role "\$\{KEY_VAULT_SECRETS_USER_ROLE_ID\}"/);
+  assert.match(workflow, /--scope "\$\{key_vault_id\}"/);
+  assert.match(workflow, /RoleAssignmentExists/);
+  assert.match(
+    workflow,
+    /az role assignment list[\s\S]*--assignee-object-id "\$\{runtime_principal_id\}"[\s\S]*--scope "\$\{key_vault_id\}"/,
+  );
+  assert.doesNotMatch(workflow, /az keyvault secret (show|set|list|download)/);
 });
