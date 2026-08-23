@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import { execFileSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
+import { BlobServiceClient } from "@azure/storage-blob";
 import {
   EXPECTED_CATALOG_REVISION,
   inside,
@@ -16,6 +17,9 @@ import {
 
 const EXPECTED_STORAGE_ACCOUNT = "stobserramktv1238d660";
 const EXPECTED_RELEASE_CONTAINER = "marketplace-v12-release";
+const STORAGE_SCOPE = "https://storage.azure.com/";
+const MAX_CONCURRENCY = 32;
+const TOKEN_REFRESH_SKEW_MS = 2 * 60 * 1000;
 const options = parseArguments(process.argv.slice(2), new Set([
   "--catalog",
   "--summary",
@@ -63,32 +67,57 @@ function requireProductionAuthority() {
   ) throw new Error("Marketplace v1.2 Azure protected artifact gate: Stripe evidence is incomplete or failed");
 }
 
-function az(args, { optionalNotFound = false } = {}) {
-  try {
-    return execFileSync("az", [...args, "--only-show-errors"], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-      maxBuffer: 8 * 1024 * 1024,
-    });
-  } catch (error) {
-    const stderr = String(error?.stderr ?? "");
-    if (optionalNotFound && /(?:BlobNotFound|ResourceNotFound|not found|404)/i.test(stderr)) return null;
-    throw new Error("Marketplace v1.2 Azure protected artifact gate: protected object storage request failed; provider output suppressed");
-  }
+let tokenCache = null;
+function tokenExpiry(payload) {
+  const epoch = Number(payload?.expires_on);
+  if (Number.isFinite(epoch) && epoch > 0) return epoch * 1000;
+  const parsed = Date.parse(String(payload?.expiresOn ?? ""));
+  return Number.isFinite(parsed) ? parsed : Date.now() + 10 * 60 * 1000;
 }
 
-function head(name) {
-  const value = az([
-    "storage", "blob", "show",
-    "--auth-mode", "login",
-    "--account-name", options["account-name"],
-    "--container-name", options.container,
-    "--name", name,
-    "--query", "{contentLength:properties.contentLength,serverEncrypted:properties.serverEncrypted,contentType:properties.contentSettings.contentType,metadata:metadata}",
-    "-o", "json",
-  ], { optionalNotFound: true });
-  if (!value) return null;
-  try { return JSON.parse(value); } catch { throw new Error("Marketplace v1.2 Azure protected artifact gate: protected object readback is invalid"); }
+function azureStorageAccessToken() {
+  if (tokenCache && tokenCache.expiresOnTimestamp > Date.now() + TOKEN_REFRESH_SKEW_MS) return tokenCache;
+  const result = spawnSync("az", [
+    "account", "get-access-token",
+    "--resource", STORAGE_SCOPE,
+    "--output", "json",
+    "--only-show-errors",
+  ], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+    maxBuffer: 1024 * 1024,
+  });
+  if (result.error || result.status !== 0) {
+    throw new Error("Marketplace v1.2 Azure protected artifact gate: Azure Storage OAuth token is unavailable; provider output suppressed");
+  }
+  let payload;
+  try {
+    payload = JSON.parse(result.stdout);
+  } catch {
+    throw new Error("Marketplace v1.2 Azure protected artifact gate: Azure Storage OAuth token response is invalid; provider output suppressed");
+  }
+  const token = typeof payload?.accessToken === "string" ? payload.accessToken.trim() : "";
+  const expiresOnTimestamp = tokenExpiry(payload);
+  if (token.length < 128 || expiresOnTimestamp <= Date.now() + 60_000) {
+    throw new Error("Marketplace v1.2 Azure protected artifact gate: Azure Storage OAuth token response is invalid; provider output suppressed");
+  }
+  tokenCache = { token, expiresOnTimestamp };
+  return tokenCache;
+}
+
+const tokenCredential = {
+  async getToken() {
+    return azureStorageAccessToken();
+  },
+};
+
+function remoteShape(properties, metadata = properties?.metadata ?? {}) {
+  return {
+    contentLength: Number(properties?.contentLength),
+    serverEncrypted: properties?.serverEncrypted === true || properties?.isServerEncrypted === true,
+    contentType: properties?.contentType,
+    metadata: metadata ?? {},
+  };
 }
 
 function exactRemote(value, record, revision) {
@@ -98,6 +127,39 @@ function exactRemote(value, record, revision) {
     && value?.metadata?.artifact_sha256 === record.artifactSha256
     && value?.metadata?.catalog_revision === revision
     && value?.metadata?.product_id === record.productId;
+}
+
+function safeAttachmentName(value) {
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*\.zip$/i.test(value)) {
+    throw new Error("Marketplace v1.2 Azure protected artifact gate: artifact filename is unsafe");
+  }
+  return value;
+}
+
+async function inventory(containerClient, expectedNames) {
+  const found = new Map();
+  try {
+    for await (const item of containerClient.listBlobsFlat({ includeMetadata: true })) {
+      if (!expectedNames.has(item.name)) continue;
+      found.set(item.name, remoteShape(item.properties, item.metadata));
+    }
+  } catch {
+    throw new Error("Marketplace v1.2 Azure protected artifact gate: protected object inventory failed; provider output suppressed");
+  }
+  return found;
+}
+
+async function runBounded(items, worker) {
+  let next = 0;
+  const workerCount = Math.min(MAX_CONCURRENCY, items.length);
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (true) {
+      const index = next;
+      next += 1;
+      if (index >= items.length) return;
+      await worker(items[index]);
+    }
+  }));
 }
 
 const { catalog } = readCatalog({ catalogPath: resolve(options.catalog), summaryPath: resolve(options.summary) });
@@ -112,44 +174,58 @@ for (const record of records) {
   if (!existsSync(path) || !statSync(path).isFile() || statSync(path).size !== record.byteLength || await sha256File(path) !== record.artifactSha256) {
     throw new Error(`Marketplace v1.2 Azure protected artifact gate: local artifact integrity failed for ${record.productId}`);
   }
+  safeAttachmentName(record.artifactFile);
 }
 
 if (options.activate) requireProductionAuthority();
-let reused = 0;
+
+const service = new BlobServiceClient(
+  `https://${EXPECTED_STORAGE_ACCOUNT}.blob.core.windows.net`,
+  tokenCredential,
+  { retryOptions: { maxTries: 5, retryDelayInMs: 500, maxRetryDelayInMs: 4_000, tryTimeoutInMs: 60_000 } },
+);
+const containerClient = service.getContainerClient(EXPECTED_RELEASE_CONTAINER);
+const expectedNames = new Set(records.map((record) => record.objectKey));
+const initialInventory = await inventory(containerClient, expectedNames);
+const pending = records.filter((record) => !exactRemote(initialInventory.get(record.objectKey), record, EXPECTED_CATALOG_REVISION));
+const reused = records.length - pending.length;
 let uploaded = 0;
-for (const record of records) {
-  const existing = head(record.objectKey);
-  if (exactRemote(existing, record, EXPECTED_CATALOG_REVISION)) {
-    reused += 1;
-    continue;
-  }
-  if (!options.activate) continue;
-  const path = inside(artifactRoot, record.objectKey, "artifact ingest path");
-  az([
-    "storage", "blob", "upload",
-    "--auth-mode", "login",
-    "--account-name", options["account-name"],
-    "--container-name", options.container,
-    "--name", record.objectKey,
-    "--file", path,
-    "--overwrite", "true",
-    "--content-type", "application/zip",
-    "--content-cache-control", "private,no-store",
-    "--content-disposition", `attachment; filename=\"${record.artifactFile}\"`,
-    "--metadata",
-    `artifact_sha256=${record.artifactSha256}`,
-    `catalog_revision=${EXPECTED_CATALOG_REVISION}`,
-    `product_id=${record.productId}`,
-    "--output", "none",
-  ]);
-  const verified = head(record.objectKey);
-  if (!exactRemote(verified, record, EXPECTED_CATALOG_REVISION)) {
-    throw new Error(`Marketplace v1.2 Azure protected artifact gate: protected readback failed for ${record.productId}`);
-  }
-  uploaded += 1;
+
+if (options.activate && pending.length > 0) {
+  await runBounded(pending, async (record) => {
+    const path = inside(artifactRoot, record.objectKey, "artifact ingest path");
+    const blob = containerClient.getBlockBlobClient(record.objectKey);
+    try {
+      await blob.uploadFile(path, {
+        concurrency: 4,
+        blobHTTPHeaders: {
+          blobContentType: "application/zip",
+          blobCacheControl: "private,no-store",
+          blobContentDisposition: `attachment; filename=\"${safeAttachmentName(record.artifactFile)}\"`,
+        },
+        metadata: {
+          artifact_sha256: record.artifactSha256,
+          catalog_revision: EXPECTED_CATALOG_REVISION,
+          product_id: record.productId,
+        },
+      });
+      const properties = await blob.getProperties();
+      if (!exactRemote(remoteShape(properties), record, EXPECTED_CATALOG_REVISION)) {
+        throw new Error("readback mismatch");
+      }
+      uploaded += 1;
+    } catch {
+      throw new Error(`Marketplace v1.2 Azure protected artifact gate: protected readback failed for ${record.productId}; provider output suppressed`);
+    }
+  });
 }
 
-const complete = options.activate && reused + uploaded === records.length;
+let complete = false;
+if (options.activate) {
+  const finalInventory = await inventory(containerClient, expectedNames);
+  complete = records.every((record) => exactRemote(finalInventory.get(record.objectKey), record, EXPECTED_CATALOG_REVISION));
+}
+
 process.stdout.write(`${JSON.stringify({
   contract: "obserra-marketplace-v12-protected-artifact-ingest-v1",
   provider: "azure-blob-oauth",
