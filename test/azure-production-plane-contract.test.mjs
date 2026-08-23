@@ -133,8 +133,23 @@ test("governed bootstrap discovers the subscription tenant and converges least p
   assert.match(bootstrap, /az account show --subscription "\$\{SUBSCRIPTION_ID\}"/);
   assert.match(bootstrap, /TENANT_ID="\$\(jq -r '\.tenantId'/);
   assert.match(bootstrap, /Using subscription current directory tenant/);
-  assert.match(bootstrap, /repo:jblan2026-hub\/obserra-website:ref:refs\/heads\/main/);
+  assert.match(
+    bootstrap,
+    /repo:jblan2026-hub@309821056\/obserra-website@1321156321:ref:refs\/heads\/main/,
+  );
+  assert.doesNotMatch(
+    bootstrap,
+    /repo:jblan2026-hub\/obserra-website:ref:refs\/heads\/main/,
+  );
   assert.match(bootstrap, /id-obserra-github-prod/);
+  assert.match(bootstrap, /FEDERATED_CREDENTIAL="github-main"/);
+  assert.match(
+    bootstrap,
+    /az identity federated-credential update[\s\S]*?--name "\$\{FEDERATED_CREDENTIAL\}"[\s\S]*?--issuer "\$\{OIDC_ISSUER\}"[\s\S]*?--subject "\$\{GITHUB_SUBJECT\}"[\s\S]*?--audiences "\$\{OIDC_AUDIENCE\}"/,
+  );
+  assert.match(bootstrap, /\.issuer == \$issuer/);
+  assert.match(bootstrap, /\.subject == \$subject/);
+  assert.match(bootstrap, /\(\.audiences \| length\) == 1/);
   assert.match(bootstrap, /--role "Contributor"/);
   assert.match(bootstrap, /User Access Administrator/);
   assert.match(bootstrap, /az role assignment delete/);
@@ -153,6 +168,17 @@ test("governed bootstrap discovers the subscription tenant and converges least p
   assert.match(compatibilityBootstrap, /azure-bootstrap-current-directory\.sh/);
   assert.doesNotMatch(compatibilityBootstrap, /5a08a33a-d2b5-491d-ac6d-32f325138143/);
   assert.doesNotMatch(compatibilityBootstrap, /User Access Administrator/);
+
+  const release = await read("scripts/azure-first-release-current-directory.sh");
+  assert.match(
+    release,
+    /repo:jblan2026-hub@309821056\/obserra-website@1321156321:ref:refs\/heads\/main/,
+  );
+  assert.doesNotMatch(
+    release,
+    /repo:jblan2026-hub\/obserra-website:ref:refs\/heads\/main/,
+  );
+  assert.match(release, /\(\.audiences \| length\) == 1/);
 });
 
 test("Azure secret delivery remains Key Vault referenced and does not embed secret values in IaC", async () => {
