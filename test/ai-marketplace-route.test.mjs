@@ -16,15 +16,15 @@ test("enterprise header exposes a yellow AI Skills Marketplace destination", asy
   assert.match(header, /ent-header__marketplace/);
 });
 
-test("enterprise header exposes yellow Academy and Florida Training destinations", async () => {
+test("enterprise header keeps Academy and Florida Training destinations without redundant utility navigation", async () => {
   const header = await readFile(new URL("../app/components/enterprise/EnterpriseChrome.tsx", import.meta.url), "utf8");
-  assert.match(header, /ent-header__academy/);
+  assert.match(header, /data-navigation=\{prominence === "sales" \? "academy" : undefined\}/);
   assert.match(header, /Florida Class D Training/);
   assert.match(header, /href="\/florida-security-training"/);
   assert.doesNotMatch(header, />Florida training</);
   assert.match(header, /ent-header__applications/);
   assert.match(header, /href="\/apps"/);
-  assert.match(header, /#ffd978/);
+  assert.doesNotMatch(header, /ent-header__utility/);
 });
 
 test("yellow header destinations are pinned to their actual pages", async () => {
