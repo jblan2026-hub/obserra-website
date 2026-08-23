@@ -15,6 +15,14 @@ test("enterprise header exposes a yellow AI Skills Marketplace destination", asy
   assert.match(header, /ent-header__marketplace/);
 });
 
+test("enterprise header exposes yellow Academy and Florida Training destinations", async () => {
+  const header = await readFile(new URL("../app/components/enterprise/EnterpriseChrome.tsx", import.meta.url), "utf8");
+  assert.match(header, /ent-header__academy/);
+  assert.match(header, /Florida Class D Training/);
+  assert.match(header, /href="\/florida-security-training"/);
+  assert.match(header, /#ffd978/);
+});
+
 test("AI Skills Marketplace uses its real product catalog and does not route to Applications", async () => {
   const page = await readFile(new URL("../app/ai-marketplace/page.tsx", import.meta.url), "utf8");
   const catalog = JSON.parse(await readFile(new URL("../app/ai-marketplace/marketplace-products.json", import.meta.url), "utf8"));
