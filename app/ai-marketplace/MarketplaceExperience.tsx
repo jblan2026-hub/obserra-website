@@ -1,163 +1,255 @@
 "use client";
 
-import { Html, Instance, Instances, Line, OrbitControls } from "@react-three/drei";
-import { Canvas, useThree } from "@react-three/fiber";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Component, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-export type MarketplaceCard = { product_id: string; slug: string; name: string; description: string; family: string; product_type: string; pricing: { currency: string; model: string; offers: { amount_minor: number; cadence?: string; currency: string; kind: string }[] }; visualization: { position_seed: number; scene_cluster: string; relationship_product_ids: string[] }; proficiency?: string };
-type SearchResult = { total: number; results: MarketplaceCard[]; nextCursor: string | null };
-type SceneNode = Pick<MarketplaceCard, "product_id" | "slug" | "family" | "product_type" | "name" | "proficiency"> & { position_seed: number; scene_cluster: string; relationship_product_ids: string[]; object_archetype?: string };
-type SceneResult = { total: number; nodes: SceneNode[]; clusters: { id: string; count: number }[]; nextCursor: string | null; error?: string };
-function price(card: MarketplaceCard) { const offer = card.pricing.offers[0]; if (!offer) return "Pricing available on request"; const amount = new Intl.NumberFormat("en-US", { style: "currency", currency: offer.currency }).format(offer.amount_minor / 100); return `${amount}${offer.cadence === "one-time" || !offer.cadence ? " one-time" : ` / ${offer.cadence}`}`; }
-function hash(value: string) { let result = 2166136261; for (let i = 0; i < value.length; i += 1) result = Math.imul(result ^ value.charCodeAt(i), 16777619); return result >>> 0; }
-function color(value: string) { const palette = ["#2ed8f6", "#f5bd53", "#9186ff", "#52e8ab", "#ff7e94", "#76c9ff"]; return palette[hash(value) % palette.length]; }
-function sceneFromCards(cards: MarketplaceCard[]): SceneResult { const nodes = cards.map((card) => ({ product_id: card.product_id, slug: card.slug, name: card.name, family: card.family, product_type: card.product_type, proficiency: card.proficiency, ...card.visualization })), counts = new Map<string, number>(); for (const node of nodes) counts.set(node.scene_cluster, (counts.get(node.scene_cluster) ?? 0) + 1); return { total: cards.length, nodes, clusters: [...counts].sort(([a], [b]) => a.localeCompare(b)).map(([id, count]) => ({ id, count })), nextCursor: null }; }
+type MarketplaceOffer = {
+  amount_minor: number;
+  cadence?: string;
+  currency: string;
+  kind: string;
+};
 
-type Vector3 = [number, number, number];
-type SpatialNode = { node: SceneNode; position: Vector3; color: string };
-type SpatialCluster = { id: string; count: number; position: Vector3; radius: number; color: string };
-type SpatialEdge = { id: string; from: Vector3; to: Vector3; color: string };
+export type MarketplaceCard = {
+  product_id: string;
+  slug: string;
+  name: string;
+  description: string;
+  mission?: string;
+  family: string;
+  category?: string;
+  product_type: string;
+  proficiency?: string;
+  pricing: {
+    currency: string;
+    model: string;
+    offers: MarketplaceOffer[];
+  };
+};
 
-/**
- * Builds the scene only from catalog-provided clusters, position seeds and
- * declared relationships. The 48-record cap is intentional: it preserves a
- * responsive, inspectable WebGL view while the server-side catalog/search
- * remains the complete discovery surface.
- */
-function catalogSpatialGraph(nodes: SceneNode[]) {
-  const grouped = new Map<string, SceneNode[]>();
-  for (const node of nodes) grouped.set(node.scene_cluster, [...(grouped.get(node.scene_cluster) ?? []), node]);
-  const entries = [...grouped.entries()].sort(([left], [right]) => left.localeCompare(right));
-  const clusters: SpatialCluster[] = entries.map(([id, members], index) => {
-    const band = Math.floor(index / 12), angle = ((index % 12) / 12) * Math.PI * 2 + band * 0.31;
-    const distance = 4.2 + band * 2.45, position: Vector3 = [Math.cos(angle) * distance, ((index % 3) - 1) * 0.9, Math.sin(angle) * distance];
-    return { id, count: members.length, position, radius: Math.min(1.6, 0.56 + Math.sqrt(members.length) * 0.17), color: color(id) };
-  });
-  const clusterById = new Map(clusters.map((cluster) => [cluster.id, cluster]));
-  const spatialNodes: SpatialNode[] = entries.flatMap(([clusterId, members]) => {
-    const cluster = clusterById.get(clusterId)!;
-    return members.sort((left, right) => left.product_id.localeCompare(right.product_id)).map((node, index) => {
-      const seed = Math.abs(node.position_seed) || hash(node.product_id), angle = ((seed % 360) / 360) * Math.PI * 2 + index * 0.17;
-      const radius = 0.2 + ((Math.floor(seed / 23) % 100) / 100) * cluster.radius * 0.74;
-      const position: Vector3 = [cluster.position[0] + Math.cos(angle) * radius, cluster.position[1] + ((Math.floor(seed / 97) % 100) / 100 - 0.5) * cluster.radius, cluster.position[2] + Math.sin(angle) * radius];
-      return { node, position, color: color(node.family) };
-    });
-  });
-  const nodeById = new Map(spatialNodes.map((node) => [node.node.product_id, node]));
-  const seen = new Set<string>(), edges: SpatialEdge[] = [];
-  for (const source of spatialNodes) for (const targetId of source.node.relationship_product_ids) {
-    const target = nodeById.get(targetId); if (!target) continue;
-    const id = [source.node.product_id, targetId].sort().join("::"); if (seen.has(id)) continue;
-    seen.add(id); edges.push({ id, from: source.position, to: target.position, color: source.color });
-  }
-  return { clusters, nodes: spatialNodes, edges };
+type SearchResult = {
+  total: number;
+  results: MarketplaceCard[];
+  nextCursor: string | null;
+};
+
+function readable(value: string) {
+  return value
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-type NodeArchetype = "box" | "cylinder" | "octahedron" | "icosahedron";
-function nodeArchetype(value?: string): NodeArchetype { const kind = value?.toLocaleLowerCase() ?? ""; if (/(cube|box|module)/.test(kind)) return "box"; if (/(pyramid|agent|octa)/.test(kind)) return "octahedron"; if (/(cylinder|workflow|pipeline)/.test(kind)) return "cylinder"; return "icosahedron"; }
-
-function ArchetypeGeometry({ archetype }: { archetype: NodeArchetype }) {
-  if (archetype === "box") return <boxGeometry args={[0.29, 0.29, 0.29]} />;
-  if (archetype === "octahedron") return <octahedronGeometry args={[0.27, 1]} />;
-  if (archetype === "cylinder") return <cylinderGeometry args={[0.16, 0.16, 0.43, 12]} />;
-  return <icosahedronGeometry args={[0.25, 2]} />;
+function productPath(card: Pick<MarketplaceCard, "product_type" | "slug">) {
+  const segment = encodeURIComponent(card.slug);
+  return card.product_type === "collection" || card.product_type === "bundle"
+    ? `/ai-marketplace/collections/${segment}`
+    : `/ai-marketplace/${segment}`;
 }
 
-/**
- * Repeated catalog objects use GPU instancing. An Instance is still raycast
- * selectable, so we retain a direct selection path from every rendered object
- * to its real catalog record while bounding the scene to 48 source nodes.
- */
-function CatalogNodeInstances({ points, selected, onSelect }: { points: SpatialNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
-  const [hovered, setHovered] = useState<string | null>(null);
-  const groups = useMemo(() => { const grouped = new Map<NodeArchetype, SpatialNode[]>(); for (const point of points) { const type = nodeArchetype(point.node.object_archetype); grouped.set(type, [...(grouped.get(type) ?? []), point]); } return [...grouped.entries()]; }, [points]);
-  return <>{groups.map(([archetype, members]) => <Instances key={archetype} limit={members.length} range={members.length} castShadow receiveShadow>
-    <ArchetypeGeometry archetype={archetype} /><meshStandardMaterial metalness={0.7} roughness={0.19} vertexColors />
-    {members.map((point) => { const isSelected = selected === point.node.product_id, isHovered = hovered === point.node.product_id, emphasis = isSelected ? 1.72 : isHovered ? 1.3 : 1; return <Instance key={point.node.product_id} position={point.position} scale={emphasis} color={isSelected ? "#f5bd53" : point.color} onClick={(event) => { event.stopPropagation(); onSelect(point.node); }} onPointerOver={(event) => { event.stopPropagation(); setHovered(point.node.product_id); }} onPointerOut={() => setHovered(null)} />; })}
-  </Instances>)}</>;
+function price(card: MarketplaceCard) {
+  const offers = card.pricing.offers.filter(
+    (offer) => Number.isSafeInteger(offer.amount_minor) && offer.amount_minor >= 0 && Boolean(offer.currency),
+  );
+
+  if (card.pricing.model === "quote" || offers.length === 0) return "Contact for pricing";
+
+  const offer = [...offers].sort((left, right) => left.amount_minor - right.amount_minor)[0];
+  const amount = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: offer.currency,
+    maximumFractionDigits: offer.amount_minor % 100 === 0 ? 0 : 2,
+  }).format(offer.amount_minor / 100);
+  const cadence = offer.cadence?.toLocaleLowerCase();
+  const cadenceLabel = !cadence || cadence === "one-time"
+    ? " one-time"
+    : cadence === "monthly"
+      ? " / month"
+      : cadence === "annual" || cadence === "yearly"
+        ? " / year"
+        : ` / ${readable(cadence).toLocaleLowerCase()}`;
+
+  return `${offers.length > 1 ? "From " : ""}${amount}${cadenceLabel}`;
 }
 
-function CatalogNodeLabels({ points, selected, onSelect }: { points: SpatialNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
-  return <>{points.map((point) => <Html key={`label-${point.node.product_id}`} position={[point.position[0], point.position[1] + 0.38, point.position[2]]} center sprite distanceFactor={12} zIndexRange={[3, 0]}>
-    <a className={`ai-marketplace__scene-label${selected === point.node.product_id ? " is-selected" : ""}`} href={`/ai-marketplace/${encodeURIComponent(point.node.slug)}`} onClick={() => onSelect(point.node)} aria-label={`View ${point.node.name}`}>
-      <strong>{point.node.name}</strong><span>{point.node.family}</span><small>{point.node.proficiency ?? point.node.product_type.replace(/-/g, " ")}</small>
-    </a>
-  </Html>)}</>;
+function CatalogCard({ card }: { card: MarketplaceCard }) {
+  const href = productPath(card);
+  const category = card.category || card.family;
+  const level = card.proficiency;
+  const outcome = card.mission || card.description;
+
+  return (
+    <article className="ai-marketplace__product-card">
+      <div className="ai-marketplace__card-top">
+        <span>{readable(category)}</span>
+        {level && <span>{readable(level)}</span>}
+      </div>
+      <h3><Link href={href}>{card.name}</Link></h3>
+      <p>{outcome}</p>
+      <div className="ai-marketplace__card-meta" aria-label={`${card.name} details`}>
+        <span>{readable(card.product_type)}</span>
+        <strong>{price(card)}</strong>
+      </div>
+      <footer>
+        <Link href={href} aria-label={`View ${card.name}`}>
+          {card.product_type === "collection" || card.product_type === "bundle" ? "Open package" : "View skill"}
+          <span aria-hidden="true"> →</span>
+        </Link>
+      </footer>
+    </article>
+  );
 }
 
-function CatalogClusters({ clusters }: { clusters: SpatialCluster[] }) {
-  return <>{clusters.map((cluster) => <group key={cluster.id} position={cluster.position} rotation={[Math.PI / 2, 0, hash(cluster.id) % Math.PI]}>
-    <mesh><torusGeometry args={[cluster.radius, 0.014, 6, 56]} /><meshBasicMaterial color={cluster.color} transparent opacity={0.52} /></mesh>
-    <mesh rotation={[Math.PI / 2, 0.31, 0]}><torusGeometry args={[Math.max(0.22, cluster.radius * 0.56), 0.008, 5, 40]} /><meshBasicMaterial color="#dff9ff" transparent opacity={0.26} /></mesh>
-  </group>)}</>;
-}
+export default function MarketplaceExperience({
+  initialCatalog,
+  initialTotal,
+  initialNextCursor,
+  initialQuery = "",
+  familyEntries,
+}: {
+  initialCatalog: MarketplaceCard[];
+  initialTotal: number;
+  initialNextCursor: string | null;
+  initialQuery?: string;
+  familyEntries: [string, number][];
+}) {
+  const initialized = useRef(false);
+  const requestSequence = useRef(0);
+  const [family, setFamily] = useState("");
+  const [query, setQuery] = useState(initialQuery);
+  const [cards, setCards] = useState(initialCatalog);
+  const [total, setTotal] = useState(initialTotal);
+  const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-function CatalogCore() {
-  return <group><mesh rotation={[Math.PI / 3, 0.42, 0]}><torusGeometry args={[1.16, 0.028, 8, 72]} /><meshBasicMaterial color="#f5bd53" transparent opacity={0.76} /></mesh><mesh rotation={[-Math.PI / 5, 0.72, 0.2]}><torusGeometry args={[0.76, 0.018, 8, 64]} /><meshBasicMaterial color="#2ed8f6" transparent opacity={0.68} /></mesh><mesh><icosahedronGeometry args={[0.31, 2]} /><meshStandardMaterial color="#f5bd53" emissive="#f5bd53" emissiveIntensity={1.45} metalness={0.82} roughness={0.13} /></mesh></group>;
-}
+  const request = useCallback(async (append = false, cursor = "") => {
+    const sequence = requestSequence.current + 1;
+    requestSequence.current = sequence;
+    setLoading(true);
+    setError(null);
 
-/** Only used after an actual renderer error/context failure; never the primary experience. */
-function SemanticSpatialFallback({ nodes, selected, onSelect }: { nodes: SceneNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
-  const points = useMemo(() => new Map(nodes.map((node, index) => { const clusterAngle = (hash(node.scene_cluster) % 628) / 100, localAngle = ((Math.abs(node.position_seed) || hash(node.product_id)) % 628) / 100 + index * 0.11, clusterRadius = 20 + (hash(node.scene_cluster) % 13), localRadius = 4 + ((hash(node.product_id) % 10) / 2); return [node.product_id, { x: 50 + Math.cos(clusterAngle) * clusterRadius + Math.cos(localAngle) * localRadius, y: 50 + Math.sin(clusterAngle) * clusterRadius * 0.68 + Math.sin(localAngle) * localRadius * 0.72, z: hash(node.product_id) % 9 }]; })), [nodes]);
-  const visibleIds = new Set(nodes.map((node) => node.product_id));
-  return <div className="ai-marketplace__universe-fallback" role="status"><div className="ai-marketplace__fallback-copy"><strong>The interactive view isn&apos;t available on this device.</strong><span>Use this accessible map to explore the same capabilities.</span></div><div className="ai-marketplace__fallback-map" aria-label="Accessible capability map">
-    <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">{nodes.flatMap((node) => node.relationship_product_ids.filter((targetId) => visibleIds.has(targetId) && node.product_id < targetId).map((targetId) => { const source = points.get(node.product_id)!, target = points.get(targetId)!; return <line key={`${node.product_id}-${targetId}`} x1={source.x} y1={source.y} x2={target.x} y2={target.y} />; }))}</svg>
-    {nodes.map((node) => { const point = points.get(node.product_id)!; return <Link key={node.product_id} className={`ai-marketplace__fallback-node${selected === node.product_id ? " is-selected" : ""}`} href={`/ai-marketplace/${encodeURIComponent(node.slug)}`} style={{ left: `${point.x}%`, top: `${point.y}%`, zIndex: point.z }} onClick={() => onSelect(node)}><strong>{node.name}</strong><span>{node.family}</span><small>{node.proficiency ?? node.product_type.replace(/-/g, " ")}</small></Link>; })}
-  </div></div>;
-}
+    try {
+      const params = new URLSearchParams({ limit: "24" });
+      if (query.trim()) params.set("q", query.trim());
+      if (family) params.set("family", family);
+      if (cursor) params.set("cursor", cursor);
+      const response = await fetch(`/api/ai-marketplace/search?${params}`);
+      if (!response.ok) throw new Error("Marketplace unavailable");
 
-function WebglContextMonitor({ onLost, onRestored }: { onLost: () => void; onRestored: () => void }) {
-  const gl = useThree((state) => state.gl);
-  useEffect(() => { const canvas = gl.domElement, lost = (event: Event) => { event.preventDefault(); onLost(); }, restored = () => onRestored(); canvas.addEventListener("webglcontextlost", lost); canvas.addEventListener("webglcontextrestored", restored); return () => { canvas.removeEventListener("webglcontextlost", lost); canvas.removeEventListener("webglcontextrestored", restored); }; }, [gl, onLost, onRestored]);
-  return null;
-}
+      const result = await response.json() as SearchResult;
+      if (sequence !== requestSequence.current) return;
+      setCards((current) => append ? [...current, ...result.results] : result.results);
+      setTotal(result.total);
+      setNextCursor(result.nextCursor);
+    } catch {
+      if (sequence === requestSequence.current) {
+        setError("Marketplace results are temporarily unavailable. Please try again.");
+      }
+    } finally {
+      if (sequence === requestSequence.current) setLoading(false);
+    }
+  }, [family, query]);
 
-function SpatialCatalogScene({ nodes, selected, onSelect, onContextLost, onContextRestored, reducedMotion }: { nodes: SceneNode[]; selected: string | null; onSelect: (node: SceneNode) => void; onContextLost: () => void; onContextRestored: () => void; reducedMotion: boolean }) {
-  const graph = useMemo(() => catalogSpatialGraph(nodes), [nodes]);
-  return <>
-    <color attach="background" args={["#03111e"]} /><fog attach="fog" args={["#03111e", 11, 32]} />
-    <ambientLight intensity={0.52} /><directionalLight position={[6, 8, 5]} intensity={1.7} color="#dff9ff" castShadow /><pointLight position={[-5, 2, -5]} intensity={4.2} color="#2ed8f6" distance={18} /><pointLight position={[3, -2, 5]} intensity={3.4} color="#f5bd53" distance={15} />
-    <CatalogCore /><CatalogClusters clusters={graph.clusters} />
-    {graph.edges.map((edge) => <Line key={edge.id} points={[edge.from, edge.to]} color={edge.color} lineWidth={0.72} transparent opacity={0.55} />)}
-    <CatalogNodeInstances points={graph.nodes} selected={selected} onSelect={onSelect} /><CatalogNodeLabels points={graph.nodes} selected={selected} onSelect={onSelect} />
-    <OrbitControls enableDamping dampingFactor={0.08} enablePan enableZoom minDistance={4.8} maxDistance={30} minPolarAngle={0.28} maxPolarAngle={Math.PI * 0.85} autoRotate={!reducedMotion} autoRotateSpeed={0.18} />
-    <WebglContextMonitor onLost={onContextLost} onRestored={onContextRestored} />
-  </>;
-}
+  useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true;
+      return;
+    }
+    const timer = window.setTimeout(() => void request(), 220);
+    return () => window.clearTimeout(timer);
+  }, [request]);
 
-class CapabilitySceneBoundary extends Component<{ children: ReactNode; onFailure: () => void }, { failed: boolean }> {
-  state = { failed: false };
-  static getDerivedStateFromError() { return { failed: true }; }
-  componentDidCatch() { this.props.onFailure(); }
-  render() { return this.state.failed ? null : this.props.children; }
-}
+  const catalogTotal = useMemo(
+    () => familyEntries.reduce((count, [, familyCount]) => count + familyCount, 0),
+    [familyEntries],
+  );
+  const categoryName = family ? readable(family) : "All categories";
+  const resultSummary = useMemo(() => {
+    const queryText = query.trim() ? ` matching “${query.trim()}”` : "";
+    return `${total.toLocaleString()} ${total === 1 ? "result" : "results"}${queryText} in ${categoryName}`;
+  }, [categoryName, query, total]);
 
-function CapabilityUniverse({ nodes, selected, onSelect }: { nodes: SceneNode[]; selected: string | null; onSelect: (node: SceneNode) => void }) {
-  const [renderer, setRenderer] = useState<"loading" | "ready" | "recovering" | "unavailable">("loading"), [reducedMotion, setReducedMotion] = useState(false), [sceneFamily, setSceneFamily] = useState("");
-  const router = useRouter();
-  useEffect(() => { const media = window.matchMedia("(prefers-reduced-motion: reduce)"), update = () => setReducedMotion(media.matches); update(); media.addEventListener("change", update); return () => media.removeEventListener("change", update); }, []);
-  const families = useMemo(() => [...new Set(nodes.map((node) => node.family))].sort((left, right) => left.localeCompare(right)), [nodes]), visibleNodes = useMemo(() => nodes.filter((node) => !sceneFamily || node.family === sceneFamily), [nodes, sceneFamily]), selectedNode = nodes.find((node) => node.product_id === selected) ?? null;
-  const keyboardNode = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => { if (visibleNodes.length === 0) return; const current = Math.max(0, visibleNodes.findIndex((node) => node.product_id === selected)); let next = current; if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (current + 1) % visibleNodes.length; else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (current - 1 + visibleNodes.length) % visibleNodes.length; else if (event.key === "Home") next = 0; else if (event.key === "End") next = Math.max(0, visibleNodes.length - 1); else if (event.key === "Enter" && selected) { const node = visibleNodes.find((item) => item.product_id === selected); if (node) router.push(`/ai-marketplace/${encodeURIComponent(node.slug)}`); return; } else return; event.preventDefault(); if (visibleNodes[next]) onSelect(visibleNodes[next]); }, [onSelect, router, selected, visibleNodes]);
-  const unavailable = renderer === "unavailable";
-  return <div className="ai-marketplace__universe" data-webgl={renderer} role="application" tabIndex={0} onKeyDown={keyboardNode} aria-label="Interactive capability view. Arrow keys select capabilities; Enter opens the selected capability.">
-    {!unavailable && <CapabilitySceneBoundary onFailure={() => setRenderer("unavailable")}><Canvas style={{ height: "440px", width: "100%" }} dpr={reducedMotion ? 1 : [1, 1.75]} camera={{ position: [0, 5.2, 17], fov: 47, near: 0.1, far: 80 }} gl={{ alpha: false, antialias: true, powerPreference: "high-performance", preserveDrawingBuffer: false }} onCreated={() => setRenderer("ready")} aria-label="Interactive capability view. Drag to explore, scroll or pinch to zoom, and select a capability." role="application" tabIndex={0}>
-      <SpatialCatalogScene nodes={visibleNodes} selected={selected} onSelect={onSelect} onContextLost={() => setRenderer("recovering")} onContextRestored={() => setRenderer("ready")} reducedMotion={reducedMotion} />
-    </Canvas></CapabilitySceneBoundary>}
-    {unavailable && <SemanticSpatialFallback nodes={visibleNodes} selected={selected} onSelect={onSelect} />}
-    <div className="ai-marketplace__scene-controls" aria-label="Capability filters"><label htmlFor="marketplace-scene-family">Family <select id="marketplace-scene-family" value={sceneFamily} onChange={(event) => setSceneFamily(event.target.value)}><option value="">All families</option>{families.map((item) => <option key={item} value={item}>{item}</option>)}</select></label><button type="button" onClick={() => setSceneFamily("")}>Reset</button><span>{visibleNodes.length} capabilit{visibleNodes.length === 1 ? "y" : "ies"}</span></div>
-    <aside className="ai-marketplace__scene-selection" aria-live="polite">{selectedNode ? <><span>Selected capability</span><strong>{selectedNode.name}</strong><small>{selectedNode.family} · {selectedNode.proficiency ?? selectedNode.product_type.replace(/-/g, " ")}</small><Link href={`/ai-marketplace/${encodeURIComponent(selectedNode.slug)}`}>View capability <span aria-hidden="true">→</span></Link></> : <><span>Capability selection</span><strong>Choose a labelled capability.</strong><small>Filter by family to narrow the view.</small></>}</aside>
-    <p>{renderer === "ready" ? "Drag to explore · scroll or pinch to zoom · select a capability to view details." : renderer === "loading" ? "Loading the interactive view…" : renderer === "recovering" ? "Restoring the interactive view…" : "Use the accessible capability list below to explore each option."}</p>
-  </div>;
-}
+  return (
+    <section className="ai-marketplace__browser" aria-labelledby="marketplace-browser-heading">
+      <header className="ai-marketplace__browser-intro">
+        <p className="ai-marketplace__eyebrow">Find your capability</p>
+        <h2 id="marketplace-browser-heading">Browse every skill and package.</h2>
+        <p>Choose a category or search by the outcome you need. Every result opens its own page with level, pricing, and purchase availability.</p>
+      </header>
 
-export default function MarketplaceExperience({ initialCatalog, initialTotal, initialNextCursor, initialQuery = "", familyEntries }: { initialCatalog: MarketplaceCard[]; initialTotal: number; initialNextCursor: string | null; initialQuery?: string; familyEntries: [string, number][] }) {
-  const initialized = useRef(false); const [family, setFamily] = useState(""), [query, setQuery] = useState(initialQuery), [cards, setCards] = useState(initialCatalog), [total, setTotal] = useState(initialTotal), [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor), [scene, setScene] = useState<SceneResult>(() => sceneFromCards(initialCatalog)), [selected, setSelected] = useState<string | null>(null), [loading, setLoading] = useState(false), [error, setError] = useState<string | null>(null);
-  const request = useCallback(async (append = false, cursor = "") => { setLoading(true); setError(null); try { const params = new URLSearchParams({ limit: "24" }); if (query.trim()) params.set("q", query.trim()); if (family) params.set("family", family); if (cursor) params.set("cursor", cursor); const sceneParams = new URLSearchParams(params); sceneParams.set("limit", "48"); const [searchResponse, sceneResponse] = await Promise.all([fetch(`/api/ai-marketplace/search?${params}`), fetch(`/api/ai-marketplace/scene?${sceneParams}`)]); if (!searchResponse.ok || !sceneResponse.ok) throw new Error("Marketplace unavailable"); const result = await searchResponse.json() as SearchResult, nextScene = await sceneResponse.json() as SceneResult; setCards((current) => append ? [...current, ...result.results] : result.results); setTotal(result.total); setNextCursor(result.nextCursor); setScene(nextScene); setSelected((current) => nextScene.nodes.some((node) => node.product_id === current) ? current : null); } catch { setError("Marketplace results are temporarily unavailable. Please try again."); } finally { setLoading(false); } }, [family, query]);
-  useEffect(() => { if (!initialized.current) { initialized.current = true; return; } const timer = window.setTimeout(() => { void request(); }, 180); return () => window.clearTimeout(timer); }, [request]);
-  const selectedNode = scene.nodes.find((node) => node.product_id === selected) ?? null, summary = useMemo(() => `${total.toLocaleString()} result${total === 1 ? "" : "s"}${query ? ` for “${query}”` : ""}`, [total, query]);
-  return <><section className="ai-marketplace__constellation" aria-labelledby="capability-map-heading"><div className="ai-marketplace__constellation-copy"><p className="ai-marketplace__eyebrow">Explore visually</p><h2 id="capability-map-heading">Discover capabilities in an interactive view.</h2><p>Select any labelled capability to see its family and level, then open the product page for pricing and details.</p></div><CapabilityUniverse nodes={scene.nodes} selected={selected} onSelect={(node) => setSelected(node.product_id)} /><div className="ai-marketplace__scene-index" aria-label="Capability list"><h3>Capability list</h3><p>Select a capability to view it in the interactive map.</p><div>{scene.nodes.map((node) => <button type="button" key={node.product_id} aria-pressed={selected === node.product_id} onClick={() => setSelected(node.product_id)}>{node.name}</button>)}</div>{selectedNode && <aside aria-live="polite"><strong>{selectedNode.name}</strong><span>{selectedNode.family} · {selectedNode.proficiency ?? selectedNode.product_type.replace(/-/g, " ")}</span><Link href={`/ai-marketplace/${encodeURIComponent(selectedNode.slug)}`}>View capability →</Link></aside>}</div></section>
-    <section className="ai-marketplace__discovery" aria-labelledby="catalog-controls-heading"><h2 id="catalog-controls-heading">Browse the marketplace</h2><label htmlFor="marketplace-search"><span>Search capabilities by name, description, family, or category</span><input id="marketplace-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search capabilities" type="search" /></label><div className="ai-marketplace__filters" aria-label="Filter by product family"><button type="button" aria-pressed={!family} onClick={() => setFamily("")}>All <span>{initialTotal.toLocaleString()}</span></button>{familyEntries.map(([item, count]) => <button type="button" aria-pressed={family === item} onClick={() => setFamily(item)} key={item}>{item} <span>{count.toLocaleString()}</span></button>)}</div></section>
-    <section className="ai-marketplace__results" aria-labelledby="catalog-results-heading" aria-busy={loading}><div className="ai-marketplace__results-head"><h2 id="catalog-results-heading">Capabilities</h2><p className="ai-marketplace__result-count" role="status" aria-live="polite">{loading ? "Updating results…" : summary}</p></div>{error && <div className="ai-marketplace__recovery" role="alert"><span>{error}</span><button type="button" onClick={() => void request()}>Try again</button></div>}<div className="ai-marketplace__grid">{cards.map((card) => <article key={card.product_id} className="ai-marketplace__product-card"><div className="ai-marketplace__card-top"><span>{card.family}</span><span>{card.proficiency ?? card.product_type.replace(/-/g, " ")}</span></div><h3>{card.name}</h3><p>{card.description}</p><dl><div><dt>Category</dt><dd>{card.product_type.replace(/-/g, " ")}</dd></div>{card.proficiency && <div><dt>Level</dt><dd>{card.proficiency}</dd></div>}<div><dt>Price</dt><dd>{price(card)}</dd></div></dl><footer><Link href={`/ai-marketplace/${encodeURIComponent(card.slug)}`}>View details <span aria-hidden="true">→</span></Link></footer></article>)}</div>{!loading && cards.length === 0 && <p className="ai-marketplace__empty">No capabilities match this search. Clear the search or select All.</p>}{nextCursor && <button className="ai-marketplace__more" type="button" onClick={() => void request(true, nextCursor)} disabled={loading}>Show more</button>}</section></>;
+      <div className="ai-marketplace__browser-layout">
+        <aside className="ai-marketplace__category-panel" aria-labelledby="marketplace-categories-heading">
+          <div className="ai-marketplace__category-heading">
+            <h3 id="marketplace-categories-heading">Categories</h3>
+            {family && <button type="button" onClick={() => setFamily("")}>Clear</button>}
+          </div>
+          <nav className="ai-marketplace__category-list" aria-label="Filter skills by category">
+            <button type="button" aria-pressed={!family} onClick={() => setFamily("")}>
+              <span>All categories</span><strong>{catalogTotal.toLocaleString()}</strong>
+            </button>
+            {familyEntries.map(([item, count]) => (
+              <button type="button" aria-pressed={family === item} onClick={() => setFamily(item)} key={item}>
+                <span>{readable(item)}</span><strong>{count.toLocaleString()}</strong>
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        <div className="ai-marketplace__catalog">
+          <form className="ai-marketplace__search" role="search" onSubmit={(event) => { event.preventDefault(); void request(); }}>
+            <label htmlFor="marketplace-search">Search skills and packages</label>
+            <div>
+              <input
+                id="marketplace-search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Try automation, leadership, security…"
+                type="search"
+                autoComplete="off"
+              />
+              {query && <button type="button" className="ai-marketplace__search-clear" onClick={() => setQuery("")} aria-label="Clear marketplace search">Clear</button>}
+              <button type="submit" className="ai-marketplace__search-submit">Search</button>
+            </div>
+          </form>
+
+          <div className="ai-marketplace__mobile-filters" aria-label="Popular category filters">
+            <button type="button" aria-pressed={!family} onClick={() => setFamily("")}>All</button>
+            {familyEntries.slice(0, 8).map(([item]) => (
+              <button type="button" aria-pressed={family === item} onClick={() => setFamily(item)} key={item}>{readable(item)}</button>
+            ))}
+          </div>
+
+          <div className="ai-marketplace__results-head">
+            <div><h3>Available capabilities</h3><p>{categoryName}</p></div>
+            <p className="ai-marketplace__result-count" role="status" aria-live="polite">
+              {loading ? "Updating results…" : resultSummary}
+            </p>
+          </div>
+
+          {error && (
+            <div className="ai-marketplace__recovery" role="alert">
+              <span>{error}</span>
+              <button type="button" onClick={() => void request()}>Try again</button>
+            </div>
+          )}
+
+          <div className="ai-marketplace__grid" aria-busy={loading}>
+            {cards.map((card) => <CatalogCard key={card.product_id} card={card} />)}
+          </div>
+          {!loading && cards.length === 0 && (
+            <div className="ai-marketplace__empty">
+              <h3>No matching capabilities</h3>
+              <p>Try a broader search or choose another category.</p>
+              <button type="button" onClick={() => { setQuery(""); setFamily(""); }}>Show all capabilities</button>
+            </div>
+          )}
+          {nextCursor && (
+            <button className="ai-marketplace__more" type="button" onClick={() => void request(true, nextCursor)} disabled={loading}>
+              {loading ? "Loading…" : "Show more capabilities"}
+            </button>
+          )}
+        </div>
+      </div>
+    </section>
+  );
 }

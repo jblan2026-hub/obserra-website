@@ -4,6 +4,12 @@ import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import test from "node:test";
 
+function marketplaceCatalogBytes() {
+  const suffixes = ["000", "001", "002", "003", "004"];
+  const encoded = suffixes.map((suffix) => readFileSync(new URL(`../data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part-${suffix}`, import.meta.url), "utf8")).join("");
+  return Buffer.from(encoded, "base64");
+}
+
 test("Homepage directs visitors to the dedicated AI Skills Marketplace", async () => {
   const home = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(home, /href="\/ai-marketplace"/);
@@ -42,7 +48,7 @@ test("AI Skills Marketplace is backed by the verified v1.2 catalog, bounded serv
   const loader = await readFile(new URL("../lib/marketplace-v12-catalog.ts", import.meta.url), "utf8");
   const search = await readFile(new URL("../app/api/ai-marketplace/search/route.ts", import.meta.url), "utf8");
   const detail = await readFile(new URL("../app/ai-marketplace/[productId]/page.tsx", import.meta.url), "utf8");
-  const catalog = JSON.parse(gunzipSync(readFileSync(new URL("../data/marketplace/obserra-marketplace-card-catalog.json.gz", import.meta.url))).toString("utf8"));
+  const catalog = JSON.parse(gunzipSync(marketplaceCatalogBytes()).toString("utf8"));
   assert.equal(catalog.cards.length, 11396);
   assert.equal(catalog.counts.total_cards, 11396);
   assert.match(page, /marketplaceV12Summary/);
@@ -53,27 +59,34 @@ test("AI Skills Marketplace is backed by the verified v1.2 catalog, bounded serv
   assert.match(search, /marketplaceV12Search/);
   assert.match(search, /cursor/);
   assert.match(detail, /marketplaceV12Product/);
-  assert.match(detail, /\/ai-marketplace\/\$\{catalogProduct\.slug\}/);
+  assert.match(detail, /marketplaceV12PublicPath\(catalogProduct\)/);
+  assert.match(detail, /permanentRedirect\(marketplaceV12PublicPath\(catalogProduct\)\)/);
   assert.doesNotMatch(page, /href="\/apps" className=".*marketplace/);
 });
 
-test("v1.2 product pedestal and customer hangar present catalog guidance without implying fulfillment", async () => {
+test("v1.2 product page presents buyer outcomes and fail-closed purchase options", async () => {
   const detail = await readFile(new URL("../app/ai-marketplace/[productId]/page.tsx", import.meta.url), "utf8");
-  const pedestal = await readFile(new URL("../app/ai-marketplace/MarketplacePedestal.tsx", import.meta.url), "utf8");
+  const hero = await readFile(new URL("../app/ai-marketplace/MarketplaceProductSalesHero.tsx", import.meta.url), "utf8");
+  const pedestal = await readFile(new URL("../app/ai-marketplace/MarketplaceDimensionalPedestal.tsx", import.meta.url), "utf8");
   const hangar = await readFile(new URL("../app/ai-marketplace/hangar/page.tsx", import.meta.url), "utf8");
   const access = await readFile(new URL("../app/api/ai-marketplace/access/route.ts", import.meta.url), "utf8");
   const install = await readFile(new URL("../app/api/ai-marketplace/install-grant/route.ts", import.meta.url), "utf8");
   const v12Checkout = await readFile(new URL("../app/ai-marketplace/MarketplaceV12Checkout.tsx", import.meta.url), "utf8");
-  assert.match(detail, /MarketplacePedestal/);
-  assert.match(pedestal, /Catalog-supplied offer comparison/);
-  assert.match(pedestal, /does not create a checkout, entitlement, installation, or reservation/);
-  assert.match(pedestal, /Protected delivery unavailable until entitlement and release controls are verified/);
+  assert.match(detail, /<MarketplaceProductSalesHero[\s\S]*<MarketplaceDimensionalPedestal/);
+  assert.match(detail, /const salesDetail = buyerDetail\(publicDetail\)/);
+  assert.match(hero, /Who it&apos;s for/);
+  assert.match(hero, /What&apos;s included/);
+  assert.match(hero, /<MarketplaceV12Checkout productId=\{detail\.productId\} options=\{options\} checkoutEnabled=\{checkoutEnabled\}/);
+  assert.match(pedestal, /From your starting point to a usable outcome\./);
+  assert.match(pedestal, /What you receive/);
+  assert.match(pedestal, /Review pricing and purchase/);
   assert.match(pedestal, /\/ai-marketplace\/hangar/);
   assert.match(hangar, /marketplaceV12ProtectedDeliveryConfigured/);
   assert.match(hangar, /dynamic = "force-dynamic"/);
   assert.match(hangar, /runtime = "nodejs"/);
   assert.match(hangar, /marketplaceV12CustomerInventory/);
-  assert.match(hangar, /Installation bridge/);
+  assert.match(hangar, /downloadAvailable: Boolean\(release && deliveryConfigured\)/);
+  assert.match(hangar, /<MarketplaceHangarInventory records=\{records\}/);
   assert.match(hangar, /auth\(\)/);
   assert.match(access, /Authentication required/);
   assert.match(access, /aiMarketplaceTenantId\(userId, orgId\)/);
@@ -84,10 +97,11 @@ test("v1.2 product pedestal and customer hangar present catalog guidance without
   assert.match(install, /marketplaceV12InstallBridgeConfigured/);
   assert.match(install, /obserra:\/\/install\?grant=/);
   assert.match(install, /Install bridge unavailable/);
-  assert.match(v12Checkout, /You can review catalog purchase options/);
-  assert.match(v12Checkout, /enterprise quote/);
-  assert.match(v12Checkout, /button type="submit" disabled/);
-  assert.doesNotMatch(v12Checkout, /name="purchaseOption" disabled/);
+  assert.match(v12Checkout, /Continue to secure checkout/);
+  assert.match(v12Checkout, /Checkout unavailable/);
+  assert.match(v12Checkout, /Online checkout is not available for this capability right now\./);
+  assert.match(v12Checkout, /Contact sales for purchase options/);
+  assert.match(v12Checkout, /disabled=\{!checkoutEnabled\}/);
 });
 
 test("every marketplace offering requires an exact governed payment binding", async () => {
@@ -107,7 +121,8 @@ test("every marketplace offering requires an exact governed payment binding", as
   assert.match(health, /marketplaceV12BindingCoverage/);
   assert.match(health, /activationBlocked: true/);
   assert.match(checkout, /catalog-v12-configuration-required/);
-  assert.match(checkout, /input\.revision !== expectedRevision/);
+  assert.match(checkout, /revision: expectedRevision/);
+  assert.doesNotMatch(checkout, /form\.get\("catalogRevision"\)/);
   assert.match(webhook, /obserra-ai-marketplace-v12/);
   assert.match(webhook, /v12 binding evidence unavailable/);
   assert.match(webhook, /session\.payment_status !== "paid"/);

@@ -1,122 +1,99 @@
 "use client";
 
+import { Html, Line, OrbitControls } from "@react-three/drei";
+import { Canvas, useThree } from "@react-three/fiber";
 import Link from "next/link";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Edges, Html, Line, OrbitControls } from "@react-three/drei";
-import { Component, Suspense, useEffect, useMemo, useRef, useState, type ElementRef, type ReactNode } from "react";
-import type { Group } from "three";
+import { Component, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { MarketplacePublicProductDetail } from "../../lib/marketplace-public-product";
 import styles from "./MarketplaceDimensionalPedestal.module.css";
 
-function hash(value: string) { let output = 2166136261; for (let index = 0; index < value.length; index += 1) output = Math.imul(output ^ value.charCodeAt(index), 16777619); return output >>> 0; }
-type SceneKind = "capability" | "agent" | "workflow" | "bridge" | "assurance" | "collection";
+type MarketplaceBuyerProductDetail = Omit<MarketplacePublicProductDetail, "publisher" | "productType" | "tags" | "positionSeed" | "objectArchetype">;
+type DemoStep = Readonly<{ label: string; title: string; body: string; tags: readonly string[] }>;
 
-const palettes = [
-  { primary: "#30d7ff", secondary: "#8bf0ff", accent: "#f6bd4c" },
-  { primary: "#8b7cff", secondary: "#c9c2ff", accent: "#33d9ff" },
-  { primary: "#35de9e", secondary: "#a1f6d2", accent: "#f7bd4d" },
-  { primary: "#f9bd4b", secondary: "#ffe3a1", accent: "#33d4f4" },
-  { primary: "#ff6680", secondary: "#ffb2be", accent: "#39d8ff" },
-] as const;
-
-function sceneKind(detail: MarketplacePublicProductDetail): SceneKind {
-  const identity = `${detail.productType} ${detail.family} ${detail.objectArchetype ?? ""}`.toLowerCase();
-  if (/collection|bundle|suite|repository/.test(identity)) return "collection";
-  if (/assurance|validator|guard|governance|evidence|security/.test(identity)) return "assurance";
-  if (/connector|plugin|integration|bridge|mcp/.test(identity)) return "bridge";
-  if (/workflow|playbook|automation|orchestration/.test(identity)) return "workflow";
-  if (/agent|team/.test(identity)) return "agent";
-  return "capability";
+function plain(value: string | null | undefined, fallback = "All levels") {
+  return value?.trim().replace(/[-_]+/g, " ") || fallback;
 }
 
-function sceneLabel(kind: SceneKind) {
-  return ({ capability: "Ready-to-use capability", agent: "AI agent at work", workflow: "Connected workflow", bridge: "Works with your tools", assurance: "Protection and assurance", collection: "Complete capability set" })[kind];
+function productFocus(detail: MarketplaceBuyerProductDetail) {
+  return plain(detail.capability ?? detail.domain ?? detail.category ?? detail.family, "your work");
 }
 
-function levelLabel(detail: MarketplacePublicProductDetail) { return fact(detail.proficiency ?? detail.category ?? detail.productType); }
-function journey(kind: SceneKind) {
-  return ({ capability: ["Your need", "Ready capability"], agent: ["Your goal", "Action ready"], workflow: ["Work begins", "Work completed"], bridge: ["Your tools", "Connected"], assurance: ["Your work", "Confidence added"], collection: ["Your goal", "Complete set"] })[kind];
+function buyerText(value: string | null | undefined, fallback: string) {
+  const copy = value?.trim();
+  if (!copy || /\b(?:artifact|checksum|file ?name|manifest|sha(?:256)?|hash|verification|verified|validation|catalog record|execution evidence)\b/i.test(copy) || /\.(?:json|ya?ml|zip|tar|gz|md|txt|csv)\b/i.test(copy)) return fallback;
+  return copy;
 }
 
-function CapabilityAssembly({ detail, kind, reducedMotion, onActivate }: { detail: MarketplacePublicProductDetail; kind: SceneKind; reducedMotion: boolean; onActivate: () => void }) {
-  const group = useRef<Group>(null);
-  const palette = palettes[hash(`${detail.family}:${detail.positionSeed}`) % palettes.length];
-  useFrame(({ clock }, delta) => {
-    if (!group.current || reducedMotion) return;
-    group.current.rotation.y += delta * 0.12;
-    group.current.position.y = Math.sin(clock.elapsedTime * 0.7) * 0.08;
-  });
-  const bodyMaterial = { color: palette.primary, emissive: palette.primary, emissiveIntensity: 0.32, metalness: 0.72, roughness: 0.22 };
-  const accentMaterial = { color: palette.accent, emissive: palette.accent, emissiveIntensity: 0.46, metalness: 0.68, roughness: 0.18 };
-
-  return <group ref={group} rotation={[0.16, -0.45, 0]} onClick={(event) => { event.stopPropagation(); onActivate(); }} onPointerOver={() => { document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = "default"; }}>
-    {kind === "agent" && <>
-      <mesh><icosahedronGeometry args={[1.12, 2]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} threshold={18} /></mesh>
-      <mesh rotation={[Math.PI / 2.6, 0.15, 0]}><torusGeometry args={[1.48, 0.055, 12, 96]} /><meshStandardMaterial {...accentMaterial} /></mesh>
-      {[-1, 1].map((side) => <mesh key={side} position={[side * 1.52, side * 0.2, side * 0.18]} scale={0.24}><octahedronGeometry args={[1, 0]} /><meshStandardMaterial {...accentMaterial} /></mesh>)}
-    </>}
-    {kind === "workflow" && <>
-      {[-0.78, 0, 0.78].map((y, index) => <mesh key={y} position={[(index - 1) * 0.22, y, 0]} rotation={[0, index * 0.28, 0]}><boxGeometry args={[1.85 - Math.abs(index - 1) * 0.25, 0.42, 0.9]} /><meshStandardMaterial {...(index === 1 ? accentMaterial : bodyMaterial)} /><Edges color={palette.secondary} /></mesh>)}
-      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[1.52, 0.055, 10, 80]} /><meshStandardMaterial {...accentMaterial} /></mesh>
-    </>}
-    {kind === "bridge" && <>
-      <mesh position={[-0.86, 0, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.72, 0.22, 20, 72]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} /></mesh>
-      <mesh position={[0.86, 0, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.72, 0.22, 20, 72]} /><meshStandardMaterial {...accentMaterial} /><Edges color={palette.secondary} /></mesh>
-      <mesh rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.16, 0.16, 1.75, 24]} /><meshStandardMaterial color={palette.secondary} emissive={palette.primary} emissiveIntensity={0.22} metalness={0.8} roughness={0.18} /></mesh>
-    </>}
-    {kind === "assurance" && <>
-      <mesh scale={[1.05, 1.25, 0.58]}><dodecahedronGeometry args={[1.05, 1]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} threshold={15} /></mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[1.48, 0.065, 12, 96]} /><meshStandardMaterial {...accentMaterial} /></mesh>
-      <mesh position={[0, 0, 0.68]} scale={0.38}><octahedronGeometry args={[1, 0]} /><meshStandardMaterial {...accentMaterial} /></mesh>
-    </>}
-    {kind === "collection" && <>
-      <mesh><icosahedronGeometry args={[0.7, 2]} /><meshStandardMaterial {...accentMaterial} /><Edges color={palette.secondary} /></mesh>
-      {[[1.28, .35, .1], [-1.15, .5, -.3], [.38, -1.08, .25], [-.42, 1.16, -.22]].map((position, index) => <group key={position.join(":")} position={position as [number, number, number]}>
-        <mesh scale={0.38 + index * 0.035}><dodecahedronGeometry args={[1, 1]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} /></mesh>
-        <mesh rotation={[Math.PI / 2, index * 0.4, 0]}><torusGeometry args={[0.58, 0.025, 8, 48]} /><meshBasicMaterial color={palette.accent} /></mesh>
-      </group>)}
-    </>}
-    {kind === "capability" && <>
-      <mesh><icosahedronGeometry args={[1.18, 3]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} threshold={14} /></mesh>
-      <mesh rotation={[Math.PI / 2.7, 0.1, 0.4]}><torusGeometry args={[1.5, 0.06, 12, 96]} /><meshStandardMaterial {...accentMaterial} /></mesh>
-      <mesh rotation={[-Math.PI / 3.2, 0.2, -0.5]}><torusGeometry args={[1.32, 0.035, 10, 80]} /><meshBasicMaterial color={palette.secondary} /></mesh>
-    </>}
-    <mesh position={[0, -1.75, 0]} rotation={[-Math.PI / 2, 0, 0]}><torusGeometry args={[1.72, 0.035, 10, 96]} /><meshBasicMaterial color={palette.primary} transparent opacity={0.55} /></mesh>
-  </group>;
+function demoSteps(detail: MarketplaceBuyerProductDetail): readonly DemoStep[] {
+  const focus = productFocus(detail);
+  const level = plain(detail.proficiency);
+  return [
+    {
+      label: "Step 1 · Input",
+      title: `Your ${focus} goal`,
+      body: `Bring the goal, context, and requirements you want to move forward.`,
+      tags: [focus, level],
+    },
+    {
+      label: "Step 2 · Capability in use",
+      title: detail.name,
+      body: buyerText(detail.description, `${detail.name} applies a focused capability to your ${focus} work.`),
+      tags: [plain(detail.category ?? detail.family, "Practical capability"), level],
+    },
+    {
+      label: "Step 3 · Outcome",
+      title: "Work ready to move forward",
+      body: buyerText(detail.mission ?? detail.deliverable, `A practical outcome for your ${focus} work.`),
+      tags: ["Buyer outcome", level],
+    },
+  ];
 }
 
-function SemanticCapabilityObject({ detail, kind, loading = false, onRetry }: { detail: MarketplacePublicProductDetail; kind: SceneKind; loading?: boolean; onRetry?: () => void }) {
-  return <article className={styles.semanticObject} aria-label={`${sceneLabel(kind)} for ${detail.name}`}>
-    <div className={styles.semanticGlyph} data-kind={kind} aria-hidden="true"><i /><i /><b>{detail.productType.slice(0, 2).toUpperCase()}</b></div>
-    <div><span>{loading ? "Preparing your preview" : sceneLabel(kind)}</span><strong>{detail.name}</strong><small>{detail.family} · {levelLabel(detail)}</small><p>{detail.capability ?? detail.mission ?? detail.description}</p><a href="#capability-details">See what this delivers</a>{!loading && onRetry && <button type="button" onClick={onRetry}>Try interactive view</button>}</div>
-  </article>;
+function ContextMonitor({ onLost }: { onLost: () => void }) {
+  const gl = useThree((state) => state.gl);
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const lost = (event: Event) => { event.preventDefault(); onLost(); };
+    canvas.addEventListener("webglcontextlost", lost);
+    return () => canvas.removeEventListener("webglcontextlost", lost);
+  }, [gl, onLost]);
+  return null;
 }
 
-function CapabilityJourney({ kind }: { kind: SceneKind }) {
-  const [start, finish] = journey(kind);
-  return <group position={[0, -0.15, 0]}>
-    <Line points={[[-2.55, 0, 0], [-1.18, 0, 0]]} color="#71dff7" lineWidth={1.2} transparent opacity={0.55} />
-    <Line points={[[1.18, 0, 0], [2.55, 0, 0]]} color="#f6bd4c" lineWidth={1.2} transparent opacity={0.65} />
-    <mesh position={[-2.66, 0, 0]}><sphereGeometry args={[0.18, 20, 20]} /><meshStandardMaterial color="#71dff7" emissive="#30d7ff" emissiveIntensity={0.55} /></mesh>
-    <mesh position={[2.66, 0, 0]} rotation={[0, 0, Math.PI / 4]}><octahedronGeometry args={[0.25, 0]} /><meshStandardMaterial color="#f6bd4c" emissive="#f6bd4c" emissiveIntensity={0.62} /></mesh>
-    <Html position={[-2.66, 0.48, 0]} center sprite distanceFactor={8}><span className={styles.journeyLabel}>{start}</span></Html>
-    <Html position={[2.66, 0.48, 0]} center sprite distanceFactor={8}><span className={`${styles.journeyLabel} ${styles.journeyLabelOutcome}`}>{finish}</span></Html>
-  </group>;
-}
+function CapabilityDemoScene({ detail, onLost }: { detail: MarketplaceBuyerProductDetail; onLost: () => void }) {
+  const steps = useMemo(() => demoSteps(detail), [detail]);
+  const positions: [number, number, number][] = [[-2.4, .62, -.38], [0, -.42, .62], [2.4, .62, -.22]];
+  const rotations: [number, number, number][] = [[.02, .14, -.012], [-.025, 0, 0], [.02, -.14, .012]];
 
-function ProductScene({ detail, kind, reducedMotion, onActivate }: { detail: MarketplacePublicProductDetail; kind: SceneKind; reducedMotion: boolean; onActivate: () => void }) {
   return <>
-    <ambientLight intensity={0.72} />
-    <hemisphereLight color="#d9f7ff" groundColor="#03131f" intensity={1.3} />
-    <spotLight position={[4.5, 5.5, 5]} angle={0.5} penumbra={0.9} intensity={110} color="#62dcff" />
-    <spotLight position={[-4, 1, 3]} angle={0.6} penumbra={1} intensity={80} color="#f7bd4d" />
-    <CapabilityJourney kind={kind} />
-    <CapabilityAssembly detail={detail} kind={kind} reducedMotion={reducedMotion} onActivate={onActivate} />
-    <ContactShadows position={[0, -1.82, 0]} opacity={0.55} scale={7} blur={2.8} far={4} />
+    <color attach="background" args={["#020b14"]} />
+    <fog attach="fog" args={["#020b14", 9, 18]} />
+    <Line points={positions} color="#43d5ef" lineWidth={1.25} transparent opacity={.58} />
+    {steps.map((step, index) => <Html key={step.label} transform position={positions[index]} rotation={rotations[index]} distanceFactor={5.15} zIndexRange={[6 - index, 0]}>
+      <article className={styles.demoPanel} data-step={index + 1}>
+        <header><span>{step.label}</span><b>{String(index + 1).padStart(2, "0")}</b></header>
+        <h3>{step.title}</h3>
+        <p>{step.body}</p>
+        <div>{step.tags.slice(0, 2).map((tag) => <small key={tag}>{tag}</small>)}</div>
+        {index === 1 ? <footer><i /><span>Applying this capability</span></footer> : null}
+      </article>
+    </Html>)}
+    <OrbitControls makeDefault enableDamping dampingFactor={.08} enablePan={false} minDistance={7.4} maxDistance={10.4} minPolarAngle={1.03} maxPolarAngle={1.48} minAzimuthAngle={-.34} maxAzimuthAngle={.34} target={[0, .08, 0]} />
+    <ContextMonitor onLost={onLost} />
   </>;
 }
 
-function fact(value: string | null) { return value ? value.replace(/[-_]/g, " ") : "Not recorded"; }
+function SemanticDemo({ detail, loading = false }: { detail: MarketplaceBuyerProductDetail; loading?: boolean }) {
+  return <div className={styles.semanticDemo} aria-label={`How ${detail.name} works`}>
+    {demoSteps(detail).map((step, index) => <article key={step.label} data-step={index + 1}>
+      <header><span>{step.label}</span><b>{String(index + 1).padStart(2, "0")}</b></header>
+      <h3>{step.title}</h3>
+      <p>{step.body}</p>
+      <div>{step.tags.slice(0, 2).map((tag) => <small key={tag}>{tag}</small>)}</div>
+    </article>)}
+    {loading ? <p className={styles.loadingNote} role="status">Preparing the dimensional view…</p> : null}
+  </div>;
+}
 
 class SceneBoundary extends Component<{ children: ReactNode; onFailure: () => void }, { failed: boolean }> {
   state = { failed: false };
@@ -125,77 +102,79 @@ class SceneBoundary extends Component<{ children: ReactNode; onFailure: () => vo
   render() { return this.state.failed ? null : this.props.children; }
 }
 
-function ProductObject({ detail }: { detail: MarketplacePublicProductDetail }) {
-  const controls = useRef<ElementRef<typeof OrbitControls>>(null);
-  const stage = useRef<HTMLDivElement>(null);
+function CapabilityDemo({ detail }: { detail: MarketplaceBuyerProductDetail }) {
   const [mode, setMode] = useState<"checking" | "loading" | "ready" | "fallback">("checking");
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [compact, setCompact] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const kind = useMemo(() => sceneKind(detail), [detail]);
-  const openDetails = () => document.getElementById("capability-details")?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
-  const retry = () => { setAttempt((value) => value + 1); setMode("loading"); };
 
   useEffect(() => {
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updateMotion = () => setReducedMotion(motion.matches);
-    motion.addEventListener("change", updateMotion);
-    const probe = document.createElement("canvas");
-    const supported = Boolean(probe.getContext("webgl2") ?? probe.getContext("webgl"));
-    const frame = window.requestAnimationFrame(() => { updateMotion(); setMode(supported ? "loading" : "fallback"); });
-    return () => { window.cancelAnimationFrame(frame); motion.removeEventListener("change", updateMotion); };
+    const mobile = window.matchMedia("(max-width: 720px)");
+    const update = () => setCompact(mobile.matches);
+    mobile.addEventListener("change", update);
+    let supported = false;
+    try {
+      const probe = document.createElement("canvas");
+      supported = Boolean(probe.getContext("webgl2") ?? probe.getContext("webgl"));
+    } catch {
+      supported = false;
+    }
+    const frame = window.requestAnimationFrame(() => { update(); setMode(supported ? "loading" : "fallback"); });
+    return () => { window.cancelAnimationFrame(frame); mobile.removeEventListener("change", update); };
   }, []);
 
-  useEffect(() => {
-    if (mode !== "ready") return;
-    const canvas = stage.current?.querySelector("canvas");
-    if (!canvas) return;
-    const lost = (event: Event) => { event.preventDefault(); setMode("fallback"); };
-    canvas.addEventListener("webglcontextlost", lost);
-    return () => canvas.removeEventListener("webglcontextlost", lost);
-  }, [mode]);
-
-  return <div className={styles.object}>
-    <div ref={stage} className={styles.objectStage} data-mode={mode}>
-      {mode !== "ready" && <SemanticCapabilityObject detail={detail} kind={kind} loading={mode !== "fallback"} onRetry={retry} />}
-      {(mode === "loading" || mode === "ready") && <>
-        <SceneBoundary key={attempt} onFailure={() => setMode("fallback")}><Canvas dpr={[1, 1.5]} camera={{ position: [0, 0.15, 7.2], fov: 42, near: 0.1, far: 60 }} performance={{ min: 0.6 }} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }} onCreated={() => setMode("ready")} role="img" aria-label={`${sceneLabel(kind)} for ${detail.name}. Drag to orbit, scroll to zoom, or select the object for product details.`}>
-          <Suspense fallback={<Html center><span className={styles.sceneLoader}>Preparing your preview</span></Html>}><ProductScene detail={detail} kind={kind} reducedMotion={reducedMotion} onActivate={openDetails} /></Suspense>
-          <OrbitControls ref={controls} makeDefault enableDamping dampingFactor={0.08} enablePan={false} minDistance={5.2} maxDistance={10} minPolarAngle={0.52} maxPolarAngle={Math.PI - 0.65} />
-        </Canvas></SceneBoundary>
-        <a className={styles.objectIdentity} href="#capability-details"><span>{sceneLabel(kind)}</span><strong>{detail.name}</strong><small>{detail.family} · {levelLabel(detail)}</small><em>{detail.capability ?? detail.deliverable ?? "Explore what this capability delivers"}</em></a>
-      </>}
-      <span>{mode === "ready" ? "Drag to explore · scroll to zoom · select the object for details" : "Product details remain available while the preview loads."}</span>
-    </div>
-    <button type="button" onClick={() => controls.current?.reset()} disabled={mode !== "ready"}>Reset view</button>
+  const fallback = compact || mode === "fallback" || mode === "checking";
+  const retry = () => { setAttempt((value) => value + 1); setMode("loading"); };
+  return <div className={styles.demo} tabIndex={0} aria-label={`Capability demonstration for ${detail.name}. Input, capability in use, and outcome.`}>
+    {fallback ? <SemanticDemo detail={detail} loading={mode === "checking"} /> : <>
+      {mode === "loading" ? <SemanticDemo detail={detail} loading /> : null}
+      <SceneBoundary key={attempt} onFailure={() => setMode("fallback")}>
+        <Canvas dpr={[1, 1.5]} camera={{ position: [0, 1.05, 9], fov: 46, near: .1, far: 40 }} performance={{ min: .6 }} frameloop="demand" gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }} onCreated={() => setMode("ready")} role="img" aria-label={`Layered demonstration of ${detail.name}: input, capability in use, and buyer outcome.`}>
+          <CapabilityDemoScene detail={detail} onLost={() => setMode("fallback")} />
+        </Canvas>
+      </SceneBoundary>
+    </>}
+    <p className={styles.demoHint}>{fallback ? "Input → capability in use → outcome" : "Drag gently to inspect each layer · scroll to zoom"}</p>
+    {!compact && mode === "fallback" ? <button className={styles.retry} type="button" onClick={retry}>Try dimensional view</button> : null}
   </div>;
 }
 
-export default function MarketplaceDimensionalPedestal({ detail }: { detail: MarketplacePublicProductDetail; checkoutEnabled: boolean }) {
-  const isSkill = /skill/i.test(`${detail.name} ${detail.family} ${detail.productType}`);
-  const isAcademy = /academy|course|training/i.test(`${detail.name} ${detail.family} ${detail.productType}`);
+export default function MarketplaceDimensionalPedestal({ detail }: { detail: MarketplaceBuyerProductDetail; checkoutEnabled: boolean }) {
+  const focus = productFocus(detail);
+  const isSkill = /skill/i.test(`${detail.name} ${detail.family}`);
+  const isAcademy = /academy|course|training/i.test(`${detail.name} ${detail.family}`);
 
-  return <section className={styles.pedestal} aria-labelledby="dimensional-product-title">
-    <header className={styles.header}><div><p>Capability preview</p><h1 id="dimensional-product-title">See {detail.name} in action.</h1><span>{detail.family} · {levelLabel(detail)}</span></div></header>
+  return <section className={styles.pedestal} aria-labelledby="capability-demo-title">
+    <header className={styles.header}>
+      <div><p>See the capability in use</p><h2 id="capability-demo-title">From your starting point to a usable outcome.</h2></div>
+      <p>This demonstration uses the selected product&apos;s actual purpose and deliverable so you can understand the fit before you buy.</p>
+    </header>
 
     <div className={styles.layout}>
-      <ProductObject detail={detail} />
+      <CapabilityDemo detail={detail} />
       <article className={styles.inspector} id="capability-details">
-        <p className={styles.eyebrow}>What it does for you</p><h2>Built for a practical outcome.</h2><p>{detail.description}</p>
-        {detail.mission && <blockquote><span>Purpose</span>{detail.mission}</blockquote>}
-        <dl><div><dt>Created by</dt><dd>{detail.publisher}</dd></div><div><dt>Best for</dt><dd>{fact(detail.domain ?? detail.category ?? detail.family)}</dd></div><div><dt>Experience level</dt><dd>{levelLabel(detail)}</dd></div><div><dt>What you receive</dt><dd>{detail.deliverable ?? "A ready-to-use Obserra capability."}</dd></div></dl>
+        <p className={styles.eyebrow}>What it does for you</p>
+        <h2>{detail.name}</h2>
+        <p>{buyerText(detail.description, `${detail.name} applies a focused capability to your ${focus} work.`)}</p>
+        {detail.mission ? <blockquote><span>Designed outcome</span>{buyerText(detail.mission, `A practical outcome for your ${focus} work.`)}</blockquote> : null}
+        <dl>
+          <div><dt>Best for</dt><dd>{focus}</dd></div>
+          <div><dt>Experience level</dt><dd>{plain(detail.proficiency)}</dd></div>
+          <div><dt>What you receive</dt><dd>{buyerText(detail.deliverable, "A ready-to-use capability with clear setup and usage guidance.")}</dd></div>
+        </dl>
+        <a className={styles.purchaseLink} href="#purchase-options">Review pricing and purchase <span aria-hidden="true">→</span></a>
       </article>
     </div>
 
     <section className={styles.relationships} aria-labelledby="relationship-title">
-      <div><p className={styles.eyebrow}>Explore more</p><h2 id="relationship-title">Related capabilities.</h2><p>Continue exploring the capabilities that complement this product.</p></div>
-      {detail.relationships.length ? <ul>{detail.relationships.map((entry) => <li key={entry.productId}><span>{entry.family}</span><strong>{entry.name}</strong><small>{fact(entry.productType)}</small><Link href={`/ai-marketplace/${encodeURIComponent(entry.slug)}`}>View capability</Link></li>)}</ul> : <p className={styles.notice}>Explore the marketplace to discover related capabilities.</p>}
+      <div><p className={styles.eyebrow}>Explore more</p><h2 id="relationship-title">Capabilities that work well alongside this one.</h2></div>
+      {detail.relationships.length ? <ul>{detail.relationships.map((entry) => <li key={entry.productId}><span>{entry.family}</span><strong>{entry.name}</strong><Link href={`/ai-marketplace/${encodeURIComponent(entry.slug)}`}>View capability <b aria-hidden="true">→</b></Link></li>)}</ul> : <p className={styles.notice}>Explore the marketplace to discover related capabilities.</p>}
     </section>
 
     <nav className={styles.footerNav} aria-label="Product next steps">
       <Link href={`/ai-marketplace/compare?items=${encodeURIComponent(detail.slug)}`}>Compare capabilities</Link>
       <Link href={`/ai-marketplace/configure?mission=${encodeURIComponent(detail.mission ? detail.slug : "")}&items=${encodeURIComponent(detail.slug)}`}>Plan your solution</Link>
-      {isSkill && <Link href="/ai-marketplace/skill-libraries">Explore skills</Link>}
-      {isAcademy && <Link href="/academy">Explore Academy courses</Link>}
+      {isSkill ? <Link href="/ai-marketplace/skill-libraries">Explore skills</Link> : null}
+      {isAcademy ? <Link href="/academy">Explore Academy courses</Link> : null}
       <Link href="/ai-marketplace/hangar">My library</Link>
     </nav>
   </section>;

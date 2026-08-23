@@ -1,12 +1,30 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { gunzipSync } from "node:zlib";
 import test from "node:test";
 
 const root = new URL("..", import.meta.url);
-const catalog = JSON.parse(gunzipSync(readFileSync(new URL("data/marketplace/obserra-marketplace-card-catalog.json.gz", root))).toString("utf8"));
 const summary = JSON.parse(readFileSync(new URL("data/marketplace/obserra-marketplace-card-catalog.summary.json", root), "utf8"));
+const chunkSuffixes = ["000", "001", "002", "003", "004"];
+
+function digest(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function verifiedCatalogBytes() {
+  const rawUrl = new URL("data/marketplace/obserra-marketplace-card-catalog.json.gz", root);
+  const raw = existsSync(rawUrl) ? readFileSync(rawUrl) : null;
+  if (raw?.length === summary.catalog_gzip_bytes && digest(raw) === summary.catalog_gzip_sha256) return raw;
+  const encoded = chunkSuffixes.map((suffix) => readFileSync(new URL(`data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part-${suffix}`, root), "utf8")).join("");
+  const reconstructed = Buffer.from(encoded, "base64");
+  assert.equal(reconstructed.length, summary.catalog_gzip_bytes);
+  assert.equal(digest(reconstructed), summary.catalog_gzip_sha256);
+  return reconstructed;
+}
+
+const catalog = JSON.parse(gunzipSync(verifiedCatalogBytes()).toString("utf8"));
 
 test("marketplace v1.2 catalog retains its verified document wrapper and exact card count", () => {
   assert.ok(Array.isArray(catalog.cards));
@@ -22,13 +40,14 @@ test("v1.2 delivery gate pins the signed catalog and rejects duplicate tracked c
 });
 
 test("transport-safe base64 catalog chunks reconstruct the exact verified gzip", () => {
-  const chunks = ["000", "001", "002", "003", "004"].map((suffix) => readFileSync(new URL(`data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part-${suffix}`, root), "utf8"));
+  const chunks = chunkSuffixes.map((suffix) => readFileSync(new URL(`data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part-${suffix}`, root), "utf8"));
   assert.equal(chunks.length, 5);
   for (const chunk of chunks.slice(0, -1)) assert.equal(chunk.length, 800000);
   const encoded = chunks.join("");
-  const raw = readFileSync(new URL("data/marketplace/obserra-marketplace-card-catalog.json.gz", root));
+  const reconstructed = Buffer.from(encoded, "base64");
   assert.match(encoded, /^[A-Za-z0-9+/]+={0,2}$/);
-  assert.deepEqual(Buffer.from(encoded, "base64"), raw);
+  assert.equal(reconstructed.length, summary.catalog_gzip_bytes);
+  assert.equal(digest(reconstructed), summary.catalog_gzip_sha256);
   const loader = readFileSync(new URL("lib/marketplace-v12-catalog.ts", root), "utf8");
   assert.match(loader, /catalogChunkSuffixes/);
   assert.match(loader, /encodedCatalogBytes/);
@@ -43,7 +62,8 @@ test("v1.2 server loader indexes wrapped cards and exposes bounded discovery end
   assert.match(loader, /Array\.isArray\(parsed\.cards\)/);
   assert.match(loader, /Math\.min\(60/);
   assert.match(loader, /marketplaceV12Facets/);
-  assert.match(loader, /marketplaceV12Scene/);
+  assert.match(loader, /marketplaceV12CollectionMembers/);
+  assert.match(loader, /marketplaceV12PublicPath/);
   assert.match(searchRoute, /catalog-unavailable/);
 });
 
@@ -64,12 +84,12 @@ test("v1.2 delivery requires a durable entitlement bound to the exact artifact h
   const download = readFileSync(new URL("app/api/ai-marketplace/download/route.ts", root), "utf8");
   const migration = readFileSync(new URL("supabase/release-authority/migrations/20260823120000_ai_marketplace_v12_protected_delivery.sql", root), "utf8");
   assert.match(delivery, /OBSERRA_AI_MARKETPLACE_V12_DELIVERY_CATALOG_JSON/);
-  assert.match(delivery, /release\.artifactSha256===artifactSha256/);
+  assert.match(delivery, /release\.artifactSha256\s*===\s*artifactSha256/);
   assert.match(download, /marketplaceV12DeliveryEntitlement/);
   assert.match(download, /marketplaceV12Release/);
   assert.match(download, /Protected delivery unavailable/);
   assert.match(download, /referrer-policy/);
-  assert.match(delivery, /part!=="\."&&part!=="\.\."/);
+  assert.match(delivery, /part\s*!==\s*"\."\s*&&\s*part\s*!==\s*"\.\."/);
   assert.match(commerce, /obserra_ai_marketplace_v12_delivery_entitlement/);
   assert.match(migration, /v12_artifact_entitlements/);
   assert.match(migration, /p_catalog_revision/);
@@ -90,25 +110,17 @@ test("Stripe evidence review is explicit, non-production, aggregate-only, and ca
   assert.doesNotMatch(script, /process\.env\.[A-Z_]+\s*=(?!=)/);
 });
 
-test("capability universe is sourced from the bounded scene endpoint with an equivalent accessible index", () => {
+test("buyer catalog is category-filtered, searchable, accessible, and collection-aware", () => {
   const experience = readFileSync(new URL("app/ai-marketplace/MarketplaceExperience.tsx", root), "utf8");
-  const sceneRoute = readFileSync(new URL("app/api/ai-marketplace/scene/route.ts", root), "utf8");
-  assert.match(experience, /\/api\/ai-marketplace\/scene/);
-  assert.match(experience, /relationship_product_ids/);
-  assert.match(experience, /onPointerUp=\{pick\}/);
-  assert.match(experience, /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/);
-  assert.match(experience, /Capability universe scene index/);
-  assert.match(experience, /Open catalog record/);
-  assert.match(experience, /sceneFromCards/);
-  assert.match(experience, /scene_cluster/);
-  assert.match(experience, /StaticCapabilityMap/);
-  assert.match(experience, /Static catalog map/);
-  assert.doesNotMatch(experience, /prefers-reduced-motion: reduce\)\.matches/);
-  const marketplaceCss = readFileSync(new URL("app/ai-marketplace/marketplace.css", root), "utf8");
-  assert.match(marketplaceCss, /ai-marketplace__universe-static/);
-  assert.match(marketplaceCss, /data-webgl=fallback/);
-  assert.match(marketplaceCss, /prefers-reduced-motion:reduce/);
-  assert.match(sceneRoute, /limit: Number\(params\.get\("limit"\) \?\? 48\)/);
+  assert.match(experience, /\/api\/ai-marketplace\/search/);
+  assert.match(experience, /params\.set\("family", family\)/);
+  assert.match(experience, /role="search"/);
+  assert.match(experience, /aria-label="Filter skills by category"/);
+  assert.match(experience, /role="status" aria-live="polite"/);
+  assert.match(experience, /card\.product_type === "collection" \|\| card\.product_type === "bundle"/);
+  assert.match(experience, /`\/ai-marketplace\/collections\/\$\{segment\}`/);
+  assert.match(experience, /"Open package" : "View skill"/);
+  assert.doesNotMatch(experience, /\/api\/ai-marketplace\/scene|relationship_product_ids|StaticCapabilityMap/);
 });
 
 test("catalog discovery uses bounded crawl pages and sharded product sitemaps", () => {
@@ -127,29 +139,30 @@ test("catalog discovery uses bounded crawl pages and sharded product sitemaps", 
   assert.match(loader, /marketplaceV12SitemapPage/);
 });
 
-test("sales dock derives family, level, category, and package browse paths from the v1.2 catalog", () => {
+test("featured sales dock lets buyers choose by level and category before opening a product", () => {
   const page = readFileSync(new URL("app/ai-marketplace/page.tsx", root), "utf8");
-  const loader = readFileSync(new URL("lib/marketplace-v12-catalog.ts", root), "utf8");
-  assert.match(page, /Sales dock/);
-  assert.match(page, /salesDock\.families/);
-  assert.match(page, /salesDock\.proficiencies/);
-  assert.match(page, /salesDock\.categories/);
-  assert.match(page, /Collections and bundles/);
-  assert.match(page, /checkout remains unavailable/);
-  assert.match(loader, /marketplaceV12SalesDock/);
-  assert.match(loader, /card\.proficiency/);
-  assert.match(loader, /card\.category/);
+  const dock = readFileSync(new URL("app/ai-marketplace/MarketplaceSalesDock.tsx", root), "utf8");
+  assert.match(page, /const featuredLevels = \["Beginner", "Intermediate", "Expert", "Advanced"\]/);
+  assert.match(page, /<MarketplaceSalesDock products=\{dockRecords\}/);
+  assert.match(dock, /Choose by outcome, level, and fit\./);
+  assert.match(dock, /aria-label="Featured products by level and category"/);
+  assert.match(dock, /aria-pressed=\{activeLevel === name\}/);
+  assert.match(dock, /setActiveCategory\("All"\)/);
+  assert.match(dock, /href: `\/ai-marketplace\/\$\{encodeURIComponent\(product\.slug\)\}`/);
+  assert.match(dock, /href: `\/contact\?interest=ai-marketplace&product=\$\{encodeURIComponent\(product\.product_id\)\}`/);
 });
 
 test("marketplace retains verified results and exposes semantic recovery when interactive or route rendering fails", () => {
   const experience = readFileSync(new URL("app/ai-marketplace/MarketplaceExperience.tsx", root), "utf8");
   const boundary = readFileSync(new URL("app/ai-marketplace/error.tsx", root), "utf8");
-  assert.match(experience, /Catalog updates are temporarily unavailable/);
-  assert.match(experience, /Retry catalog update/);
+  assert.match(experience, /Marketplace results are temporarily unavailable\. Please try again\./);
+  assert.match(experience, />Try again<\/button>/);
+  assert.match(experience, /requestSequence/);
   assert.doesNotMatch(experience, /cache: "no-store"/);
   assert.match(boundary, /role="alert"/);
-  assert.match(boundary, /Retry catalog view/);
-  assert.match(boundary, /No checkout, entitlement, delivery, or installation action has been attempted/);
+  assert.match(boundary, /This page error did not submit a new purchase/);
+  assert.match(boundary, />Try again<\/button>/);
+  assert.match(boundary, /Return to marketplace/);
 });
 
 test("v1.2 activation is evidence-derived and remains fail-closed for insufficient evidence", () => {
