@@ -947,3 +947,12 @@ All must be observed from the public canonical host:
 - **Canonical proof:** `GET https://www.obserrallc.com/api/health` returned HTTP `200`, `website-liveness-v1`, verified hosting and routing authority, and the exact deployment/SHA above at `2026-08-23T13:04:17.192Z`.
 - **Fail-closed commerce proof:** the exact deployment returned HTTP `503` / `operational:false` for Applications commerce (`durable-commerce-unavailable`) and HTTP `503` / `operational:false` for Academy commerce (payment provider and durable storage unavailable). Payment activation, enrollment, and public LMS readiness are therefore not live. Florida LMS status remains fail-closed pending a new direct readiness probe.
 - **Bootstrap boundary:** this Git/Vercel deployment proof does not itself prove Azure managed-identity creation, Key Vault role readback, Vercel runtime-binding persistence, or guarded bootstrap completion; no such claim is made here. Continue to treat an unavailable or failed runtime phase as a blocker until independently evidenced.
+
+<!-- ops-checkpoint:2026-08-23-runtime-bootstrap-75accf80-key-vault-missing -->
+### 2026-08-23T13:14:00.597Z — runtime bootstrap passed identity convergence and failed at missing Key Vault
+
+- **Exact run:** [Enable canonical Vercel Key Vault identity run 32641114767](https://github.com/jblan2026-hub/obserra-website/actions/runs/32641114767) for canonical main `75accf80bfa68dbc6633689b5525840462f064d3` completed with failure. GitHub OIDC authentication succeeded.
+- **First failing boundary:** the runtime-identity step reached Key Vault lookup and Azure returned `ResourceNotFound`: `kv-obserra-prod-38d660` does not exist in `rg-obserra-prod-eastus`. Downstream Vercel binding and replacement-deployment steps were skipped.
+- **Infrastructure record:** `infra/main.bicep` declares the same canonical Key Vault name with Standard SKU, RBAC authorization, purge protection, public network access, and a 90-day soft-delete retention period; the resource has not been provisioned.
+- **No sensitive transfer:** the failed run read no Key Vault secret value and did not write Vercel runtime bindings. Applications/Academy commerce, payment, enrollment, and Florida LMS readiness remain fail-closed.
+- **Next safe action:** add an idempotent, not-found-gated creation of only this empty, canonical Key Vault with its Bicep-defined security settings; then rerun the existing identity/role/Vercel/bootstrap gates. Any other Azure error remains fail-closed.
