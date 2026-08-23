@@ -8,6 +8,13 @@ test("Homepage directs visitors to the dedicated AI Skills Marketplace", async (
   assert.match(home, /Shop AI Skills Marketplace/);
 });
 
+test("enterprise header exposes a yellow AI Skills Marketplace destination", async () => {
+  const header = await readFile(new URL("../app/components/enterprise/EnterpriseChrome.tsx", import.meta.url), "utf8");
+  assert.match(header, /href="\/ai-marketplace"/);
+  assert.match(header, /AI Skills Marketplace/);
+  assert.match(header, /ent-header__marketplace/);
+});
+
 test("AI Skills Marketplace uses its real product catalog and does not route to Applications", async () => {
   const page = await readFile(new URL("../app/ai-marketplace/page.tsx", import.meta.url), "utf8");
   const catalog = JSON.parse(await readFile(new URL("../app/ai-marketplace/marketplace-products.json", import.meta.url), "utf8"));
