@@ -39,9 +39,19 @@ test("AI Skills Marketplace uses its real product catalog and does not route to 
   const page = await readFile(new URL("../app/ai-marketplace/page.tsx", import.meta.url), "utf8");
   const catalog = JSON.parse(await readFile(new URL("../app/ai-marketplace/marketplace-products.json", import.meta.url), "utf8"));
   assert.match(page, /marketplace-products\.json/);
-  assert.equal(catalog.length, 64);
+  assert.equal(catalog.length, 70);
   assert.ok(catalog.every((product) => product.product_id && product.product_name && product.family));
   assert.doesNotMatch(page, /href="\/apps" className=".*marketplace/);
+});
+
+test("every marketplace offering requires an exact governed payment binding", async () => {
+  const bindings = await readFile(new URL("../lib/ai-marketplace-payment-bindings.ts", import.meta.url), "utf8");
+  const health = await readFile(new URL("../app/api/ai-marketplace/commerce-health/route.ts", import.meta.url), "utf8");
+  assert.match(bindings, /requiredBillingIntervals/);
+  assert.match(bindings, /boundAiMarketplacePrice/);
+  assert.match(bindings, /boundProducts\.length === products\.length/);
+  assert.match(health, /ai-marketplace-commerce-health-v1/);
+  assert.match(health, /coverage\.complete/);
 });
 
 test("skill library route presents the four capability levels and source packages", async () => {
