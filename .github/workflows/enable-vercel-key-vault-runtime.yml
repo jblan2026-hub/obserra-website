@@ -232,7 +232,6 @@ jobs:
           role_assignments="$(az role assignment list \
             --assignee-object-id "${runtime_principal_id}" \
             --scope "${key_vault_id}" \
-            --all \
             --output json)"
           if ! has_exact_key_vault_role <<<"${role_assignments}"; then
             role_assignment_error_file="$(mktemp)"
@@ -258,7 +257,6 @@ jobs:
             role_assignments="$(az role assignment list \
               --assignee-object-id "${runtime_principal_id}" \
               --scope "${key_vault_id}" \
-              --all \
               --output json)"
             if has_exact_key_vault_role <<<"${role_assignments}"; then
               role_ready=true
