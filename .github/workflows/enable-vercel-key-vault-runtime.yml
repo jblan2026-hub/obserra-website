@@ -131,7 +131,38 @@ jobs:
           runtime_client_id="$(jq -er '.clientId | strings' <<<"${runtime_identity}")"
           runtime_principal_id="$(jq -er '.principalId | strings' <<<"${runtime_identity}")"
 
-          key_vault="$(az keyvault show --resource-group "${AZURE_RESOURCE_GROUP}" --name "${KEY_VAULT_NAME}" --output json)"
+          # Create only the Bicep-defined canonical Key Vault when Azure confirms
+          # that it is absent. The vault is empty; no secret is read or transferred.
+          key_vault_file="$(mktemp)"
+          key_vault_error_file="$(mktemp)"
+          if az keyvault show \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --name "${KEY_VAULT_NAME}" \
+            --output json >"${key_vault_file}" 2>"${key_vault_error_file}"; then
+            :
+          else
+            key_vault_error="$(<"${key_vault_error_file}")"
+            if grep -Eqi '(ResourceNotFound|was not found|could not be found)' <<<"${key_vault_error}"; then
+              az keyvault create \
+                --resource-group "${AZURE_RESOURCE_GROUP}" \
+                --name "${KEY_VAULT_NAME}" \
+                --location "${resource_group_location}" \
+                --sku standard \
+                --enable-rbac-authorization true \
+                --enable-purge-protection true \
+                --retention-days 90 \
+                --public-network-access Enabled \
+                --tags workload=obserra-website environment=production "owner=OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" managedBy=bicep-github-oidc \
+                --output json >"${key_vault_file}"
+            else
+              rm -f "${key_vault_file}" "${key_vault_error_file}"
+              echo "::error::Could not read the canonical Key Vault; only an Azure ResourceNotFound result permits creation."
+              exit 1
+            fi
+          fi
+          key_vault="$(<"${key_vault_file}")"
+          rm -f "${key_vault_file}" "${key_vault_error_file}"
+          unset key_vault_error
           key_vault_id="$(jq -er '.id | strings' <<<"${key_vault}")"
           jq -e '
             .properties.enableRbacAuthorization == true and
