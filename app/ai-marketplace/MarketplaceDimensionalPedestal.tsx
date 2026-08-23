@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Edges, Html, OrbitControls } from "@react-three/drei";
-import { Suspense, useEffect, useMemo, useRef, useState, type ElementRef } from "react";
+import { ContactShadows, Edges, Html, Line, OrbitControls } from "@react-three/drei";
+import { Component, Suspense, useEffect, useMemo, useRef, useState, type ElementRef, type ReactNode } from "react";
 import type { Group } from "three";
 import type { MarketplacePublicProductDetail } from "../../lib/marketplace-public-product";
 import styles from "./MarketplaceDimensionalPedestal.module.css";
@@ -30,10 +30,15 @@ function sceneKind(detail: MarketplacePublicProductDetail): SceneKind {
 }
 
 function sceneLabel(kind: SceneKind) {
-  return ({ capability: "Capability engine", agent: "Agent command core", workflow: "Workflow engine", bridge: "Integration bridge", assurance: "Assurance shield", collection: "Capability constellation" })[kind];
+  return ({ capability: "Ready-to-use capability", agent: "AI agent at work", workflow: "Connected workflow", bridge: "Works with your tools", assurance: "Protection and assurance", collection: "Complete capability set" })[kind];
 }
 
-function CapabilityAssembly({ detail, kind, reducedMotion }: { detail: MarketplacePublicProductDetail; kind: SceneKind; reducedMotion: boolean }) {
+function levelLabel(detail: MarketplacePublicProductDetail) { return fact(detail.proficiency ?? detail.category ?? detail.productType); }
+function journey(kind: SceneKind) {
+  return ({ capability: ["Your need", "Ready capability"], agent: ["Your goal", "Action ready"], workflow: ["Work begins", "Work completed"], bridge: ["Your tools", "Connected"], assurance: ["Your work", "Confidence added"], collection: ["Your goal", "Complete set"] })[kind];
+}
+
+function CapabilityAssembly({ detail, kind, reducedMotion, onActivate }: { detail: MarketplacePublicProductDetail; kind: SceneKind; reducedMotion: boolean; onActivate: () => void }) {
   const group = useRef<Group>(null);
   const palette = palettes[hash(`${detail.family}:${detail.positionSeed}`) % palettes.length];
   useFrame(({ clock }, delta) => {
@@ -44,7 +49,7 @@ function CapabilityAssembly({ detail, kind, reducedMotion }: { detail: Marketpla
   const bodyMaterial = { color: palette.primary, emissive: palette.primary, emissiveIntensity: 0.32, metalness: 0.72, roughness: 0.22 };
   const accentMaterial = { color: palette.accent, emissive: palette.accent, emissiveIntensity: 0.46, metalness: 0.68, roughness: 0.18 };
 
-  return <group ref={group} rotation={[0.16, -0.45, 0]}>
+  return <group ref={group} rotation={[0.16, -0.45, 0]} onClick={(event) => { event.stopPropagation(); onActivate(); }} onPointerOver={() => { document.body.style.cursor = "pointer"; }} onPointerOut={() => { document.body.style.cursor = "default"; }}>
     {kind === "agent" && <>
       <mesh><icosahedronGeometry args={[1.12, 2]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} threshold={18} /></mesh>
       <mesh rotation={[Math.PI / 2.6, 0.15, 0]}><torusGeometry args={[1.48, 0.055, 12, 96]} /><meshStandardMaterial {...accentMaterial} /></mesh>
@@ -80,33 +85,55 @@ function CapabilityAssembly({ detail, kind, reducedMotion }: { detail: Marketpla
   </group>;
 }
 
-function SemanticCapabilityObject({ detail, kind, loading = false }: { detail: MarketplacePublicProductDetail; kind: SceneKind; loading?: boolean }) {
+function SemanticCapabilityObject({ detail, kind, loading = false, onRetry }: { detail: MarketplacePublicProductDetail; kind: SceneKind; loading?: boolean; onRetry?: () => void }) {
   return <article className={styles.semanticObject} aria-label={`${sceneLabel(kind)} for ${detail.name}`}>
     <div className={styles.semanticGlyph} data-kind={kind} aria-hidden="true"><i /><i /><b>{detail.productType.slice(0, 2).toUpperCase()}</b></div>
-    <div><span>{loading ? "Preparing interactive view" : "Interactive capability view"}</span><strong>{detail.name}</strong><small>{detail.family}</small></div>
+    <div><span>{loading ? "Preparing your preview" : sceneLabel(kind)}</span><strong>{detail.name}</strong><small>{detail.family} · {levelLabel(detail)}</small><p>{detail.capability ?? detail.mission ?? detail.description}</p><a href="#capability-details">See what this delivers</a>{!loading && onRetry && <button type="button" onClick={onRetry}>Try interactive view</button>}</div>
   </article>;
 }
 
-function ProductScene({ detail, kind, reducedMotion }: { detail: MarketplacePublicProductDetail; kind: SceneKind; reducedMotion: boolean }) {
+function CapabilityJourney({ kind }: { kind: SceneKind }) {
+  const [start, finish] = journey(kind);
+  return <group position={[0, -0.15, 0]}>
+    <Line points={[[-2.55, 0, 0], [-1.18, 0, 0]]} color="#71dff7" lineWidth={1.2} transparent opacity={0.55} />
+    <Line points={[[1.18, 0, 0], [2.55, 0, 0]]} color="#f6bd4c" lineWidth={1.2} transparent opacity={0.65} />
+    <mesh position={[-2.66, 0, 0]}><sphereGeometry args={[0.18, 20, 20]} /><meshStandardMaterial color="#71dff7" emissive="#30d7ff" emissiveIntensity={0.55} /></mesh>
+    <mesh position={[2.66, 0, 0]} rotation={[0, 0, Math.PI / 4]}><octahedronGeometry args={[0.25, 0]} /><meshStandardMaterial color="#f6bd4c" emissive="#f6bd4c" emissiveIntensity={0.62} /></mesh>
+    <Html position={[-2.66, 0.48, 0]} center sprite distanceFactor={8}><span className={styles.journeyLabel}>{start}</span></Html>
+    <Html position={[2.66, 0.48, 0]} center sprite distanceFactor={8}><span className={`${styles.journeyLabel} ${styles.journeyLabelOutcome}`}>{finish}</span></Html>
+  </group>;
+}
+
+function ProductScene({ detail, kind, reducedMotion, onActivate }: { detail: MarketplacePublicProductDetail; kind: SceneKind; reducedMotion: boolean; onActivate: () => void }) {
   return <>
     <ambientLight intensity={0.72} />
     <hemisphereLight color="#d9f7ff" groundColor="#03131f" intensity={1.3} />
     <spotLight position={[4.5, 5.5, 5]} angle={0.5} penumbra={0.9} intensity={110} color="#62dcff" />
     <spotLight position={[-4, 1, 3]} angle={0.6} penumbra={1} intensity={80} color="#f7bd4d" />
-    <CapabilityAssembly detail={detail} kind={kind} reducedMotion={reducedMotion} />
+    <CapabilityJourney kind={kind} />
+    <CapabilityAssembly detail={detail} kind={kind} reducedMotion={reducedMotion} onActivate={onActivate} />
     <ContactShadows position={[0, -1.82, 0]} opacity={0.55} scale={7} blur={2.8} far={4} />
   </>;
 }
 
-function money(amount: number, currency: string) { return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount / 100); }
 function fact(value: string | null) { return value ? value.replace(/[-_]/g, " ") : "Not recorded"; }
+
+class SceneBoundary extends Component<{ children: ReactNode; onFailure: () => void }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onFailure(); }
+  render() { return this.state.failed ? null : this.props.children; }
+}
 
 function ProductObject({ detail }: { detail: MarketplacePublicProductDetail }) {
   const controls = useRef<ElementRef<typeof OrbitControls>>(null);
   const stage = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<"checking" | "loading" | "ready" | "fallback">("checking");
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const kind = useMemo(() => sceneKind(detail), [detail]);
+  const openDetails = () => document.getElementById("capability-details")?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
+  const retry = () => { setAttempt((value) => value + 1); setMode("loading"); };
 
   useEffect(() => {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -129,50 +156,35 @@ function ProductObject({ detail }: { detail: MarketplacePublicProductDetail }) {
 
   return <div className={styles.object}>
     <div ref={stage} className={styles.objectStage} data-mode={mode}>
-      {mode !== "ready" && <SemanticCapabilityObject detail={detail} kind={kind} loading={mode !== "fallback"} />}
+      {mode !== "ready" && <SemanticCapabilityObject detail={detail} kind={kind} loading={mode !== "fallback"} onRetry={retry} />}
       {(mode === "loading" || mode === "ready") && <>
-        <Canvas dpr={[1, 1.75]} camera={{ position: [0, 0.15, 6.4], fov: 42, near: 0.1, far: 60 }} performance={{ min: 0.55 }} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }} onCreated={() => setMode("ready")} role="img" aria-label={`${sceneLabel(kind)} for ${detail.name}. Drag to orbit and use the scroll wheel to zoom.`}>
-          <Suspense fallback={<Html center><span className={styles.sceneLoader}>Building the interactive view</span></Html>}><ProductScene detail={detail} kind={kind} reducedMotion={reducedMotion} /></Suspense>
-          <OrbitControls ref={controls} makeDefault enableDamping dampingFactor={0.08} enablePan={false} minDistance={4.2} maxDistance={9} minPolarAngle={0.42} maxPolarAngle={Math.PI - 0.55} autoRotate={!reducedMotion} autoRotateSpeed={0.45} />
-        </Canvas>
-        <div className={styles.objectIdentity}><span>{sceneLabel(kind)}</span><strong>{detail.name}</strong><small>{detail.family}</small></div>
+        <SceneBoundary key={attempt} onFailure={() => setMode("fallback")}><Canvas dpr={[1, 1.5]} camera={{ position: [0, 0.15, 7.2], fov: 42, near: 0.1, far: 60 }} performance={{ min: 0.6 }} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }} onCreated={() => setMode("ready")} role="img" aria-label={`${sceneLabel(kind)} for ${detail.name}. Drag to orbit, scroll to zoom, or select the object for product details.`}>
+          <Suspense fallback={<Html center><span className={styles.sceneLoader}>Preparing your preview</span></Html>}><ProductScene detail={detail} kind={kind} reducedMotion={reducedMotion} onActivate={openDetails} /></Suspense>
+          <OrbitControls ref={controls} makeDefault enableDamping dampingFactor={0.08} enablePan={false} minDistance={5.2} maxDistance={10} minPolarAngle={0.52} maxPolarAngle={Math.PI - 0.65} />
+        </Canvas></SceneBoundary>
+        <a className={styles.objectIdentity} href="#capability-details"><span>{sceneLabel(kind)}</span><strong>{detail.name}</strong><small>{detail.family} · {levelLabel(detail)}</small><em>{detail.capability ?? detail.deliverable ?? "Explore what this capability delivers"}</em></a>
       </>}
-      <span>{mode === "ready" ? "Drag to explore the capability object; scroll to zoom." : "A labeled capability view remains available while the interactive view loads."}</span>
+      <span>{mode === "ready" ? "Drag to explore · scroll to zoom · select the object for details" : "Product details remain available while the preview loads."}</span>
     </div>
     <button type="button" onClick={() => controls.current?.reset()} disabled={mode !== "ready"}>Reset view</button>
   </div>;
 }
 
-export default function MarketplaceDimensionalPedestal({ detail, checkoutEnabled }: { detail: MarketplacePublicProductDetail; checkoutEnabled: boolean }) {
-  const [selectedOffer, setSelectedOffer] = useState(0);
-  const offer = detail.pricing.offers[selectedOffer] ?? null;
-  const hasOnlineCheckout = checkoutEnabled;
+export default function MarketplaceDimensionalPedestal({ detail }: { detail: MarketplacePublicProductDetail; checkoutEnabled: boolean }) {
   const isSkill = /skill/i.test(`${detail.name} ${detail.family} ${detail.productType}`);
   const isAcademy = /academy|course|training/i.test(`${detail.name} ${detail.family} ${detail.productType}`);
 
   return <section className={styles.pedestal} aria-labelledby="dimensional-product-title">
-    <header className={styles.header}>
-      <div><p>Interactive capability</p><h1 id="dimensional-product-title">{detail.name}</h1><span>{detail.family}</span></div>
-      <div className={styles.action} data-enabled={hasOnlineCheckout ? "true" : "false"}><span>Purchase availability</span><strong>{hasOnlineCheckout ? "Purchase online" : "Contact for purchase"}</strong><small>{hasOnlineCheckout ? "Select an option below to continue." : "Online checkout is not available for this product yet."}</small></div>
-    </header>
+    <header className={styles.header}><div><p>Capability preview</p><h1 id="dimensional-product-title">See {detail.name} in action.</h1><span>{detail.family} · {levelLabel(detail)}</span></div></header>
 
     <div className={styles.layout}>
       <ProductObject detail={detail} />
-      <article className={styles.inspector}>
-        <p className={styles.eyebrow}>About this capability</p><h2>Built for practical outcomes</h2><p>{detail.description}</p>
+      <article className={styles.inspector} id="capability-details">
+        <p className={styles.eyebrow}>What it does for you</p><h2>Built for a practical outcome.</h2><p>{detail.description}</p>
         {detail.mission && <blockquote><span>Purpose</span>{detail.mission}</blockquote>}
-        <dl><div><dt>Created by</dt><dd>{detail.publisher}</dd></div><div><dt>Capability area</dt><dd>{detail.family}</dd></div><div><dt>Format</dt><dd>{fact(detail.productType)}</dd></div><div><dt>What you receive</dt><dd>{detail.deliverable ?? "Product details provided at purchase."}</dd></div></dl>
+        <dl><div><dt>Created by</dt><dd>{detail.publisher}</dd></div><div><dt>Best for</dt><dd>{fact(detail.domain ?? detail.category ?? detail.family)}</dd></div><div><dt>Experience level</dt><dd>{levelLabel(detail)}</dd></div><div><dt>What you receive</dt><dd>{detail.deliverable ?? "A ready-to-use Obserra capability."}</dd></div></dl>
       </article>
     </div>
-
-    <section className={styles.commercial} aria-labelledby="commercial-title">
-      <div><p className={styles.eyebrow}>Purchase options</p><h2 id="commercial-title">Choose how you want to get started.</h2><p>Choose an available option or contact us for tailored licensing.</p></div>
-      {detail.pricing.offers.length ? <fieldset><legend>Available options</legend><div>{detail.pricing.offers.map((entry, index) => <label key={`${entry.kind}-${entry.amount_minor}-${entry.cadence ?? "once"}`}><input type="radio" name={`pedestal-offer-${detail.productId}`} checked={selectedOffer === index} onChange={() => setSelectedOffer(index)} /><span><strong>{money(entry.amount_minor, entry.currency)}{entry.cadence ? ` / ${entry.cadence}` : " one-time"}</strong><small>{fact(entry.kind)}</small></span></label>)}</div><output aria-live="polite">Selected option: {offer ? `${money(offer.amount_minor, offer.currency)}${offer.cadence ? ` / ${offer.cadence}` : " one-time"}` : "No option selected"}</output></fieldset> : <p className={styles.notice}>Contact us for availability and licensing options.</p>}
-      <div className={styles.actionRow}>
-        <span className={styles.unavailable} aria-live="polite">{hasOnlineCheckout ? "Secure checkout is available for this product." : "Online checkout is coming soon for this product."}</span>
-        <Link className={styles.secondaryAction} href={`/contact?interest=ai-marketplace&product=${encodeURIComponent(detail.productId)}`}>Talk to an expert</Link>
-      </div>
-    </section>
 
     <section className={styles.relationships} aria-labelledby="relationship-title">
       <div><p className={styles.eyebrow}>Explore more</p><h2 id="relationship-title">Related capabilities.</h2><p>Continue exploring the capabilities that complement this product.</p></div>

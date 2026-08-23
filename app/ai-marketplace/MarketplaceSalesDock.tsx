@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { MarketplaceV12Card } from "../../lib/marketplace-v12-catalog";
 import styles from "./MarketplaceSalesDock.module.css";
 
@@ -11,45 +11,68 @@ function uniqueProducts(products: MarketplaceV12Card[]) {
   return [...new Map(products.map((product) => [product.product_id, product])).values()];
 }
 
-function offerText(offer: MarketplaceV12Card["pricing"]["offers"][number]) {
-  const amount = new Intl.NumberFormat("en-US", { style: "currency", currency: offer.currency }).format(offer.amount_minor / 100);
-  return `${amount}${offer.cadence === "one-time" || !offer.cadence ? " one-time" : ` / ${offer.cadence}`}`;
+function words(value: string | null | undefined) {
+  return value?.trim().replace(/[-_]/g, " ") || "General";
 }
 
-function offerKind(kind: string) {
-  if (kind === "recurring") return "Subscription";
-  if (kind === "team_license") return "Team license";
-  if (kind === "activation") return "Activation";
-  return "One-time purchase";
+function offerText(offer: MarketplaceV12Card["pricing"]["offers"][number]) {
+  const amount = new Intl.NumberFormat("en-US", { style: "currency", currency: offer.currency }).format(offer.amount_minor / 100);
+  return `${amount}${offer.cadence === "one-time" || !offer.cadence ? " one-time" : ` / ${words(offer.cadence)}`}`;
+}
+
+function priceSummary(product: MarketplaceV12Card) {
+  const offers = product.pricing.offers ?? [];
+  if (product.pricing.model === "quote" || offers.length === 0) return { price: "Custom quote", note: "Talk with Obserra" };
+  const lowest = [...offers].sort((left, right) => left.amount_minor - right.amount_minor)[0];
+  return { price: offerText(lowest), note: offers.length > 1 ? `${offers.length} purchase options` : "Product price" };
+}
+
+function destination(product: MarketplaceV12Card) {
+  const requiresQuote = product.pricing.model === "quote" || product.pricing.offers.length === 0;
+  return {
+    href: requiresQuote ? `/contact?interest=ai-marketplace&product=${encodeURIComponent(product.product_id)}` : `/ai-marketplace/${encodeURIComponent(product.slug)}`,
+    label: requiresQuote ? "Request a quote" : "View product",
+  };
+}
+
+function initials(name: string) {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 }
 
 export default function MarketplaceSalesDock({ products }: Props) {
   const records = useMemo(() => uniqueProducts(products).slice(0, 18), [products]);
-  const [selectedId, setSelectedId] = useState(records[0]?.product_id ?? "");
-  const [offerIndex, setOfferIndex] = useState(0);
-  const selected = records.find((product) => product.product_id === selectedId) ?? records[0];
-  if (!selected) return null;
-  const offers = selected.pricing.offers ?? [], currentOffer = offers[Math.min(offerIndex, Math.max(offers.length - 1, 0))];
-  const requiresQuote = selected.pricing.model === "quote" || offers.length === 0;
-  const destination = requiresQuote
-    ? `/contact?interest=ai-marketplace&product=${encodeURIComponent(selected.product_id)}`
-    : `/ai-marketplace/${encodeURIComponent(selected.slug)}`;
-  const action = requiresQuote ? "Contact sales" : "View purchase options";
+  if (records.length === 0) return null;
 
   return <section className={styles.dock} aria-labelledby="sales-dock-heading">
-    <div className={styles.header}><p>Featured capabilities</p><h2 id="sales-dock-heading">Find the right option for your team.</h2><span>Compare pricing and explore details</span></div>
-    <div className={styles.workspace}>
-      <nav className={styles.selector} aria-label="Select a capability">
-        {records.map((product) => <button type="button" key={product.product_id} aria-current={selected.product_id === product.product_id ? "true" : undefined} onClick={() => { setSelectedId(product.product_id); setOfferIndex(0); }}><span>{product.family}</span><strong>{product.name}</strong><small>{product.product_type.replace(/-/g, " ")}</small></button>)}
-      </nav>
-      <article className={styles.configuration} aria-live="polite">
-        <div className={styles.pedestal} aria-hidden="true"><i /><i /><b>{selected.product_type.split(/[-\s]/).slice(0, 2).map((part) => part[0]).join("").toUpperCase()}</b></div>
-        <div className={styles.copy}><p>{selected.family} · {selected.product_type.replace(/-/g, " ")}</p><h3>{selected.name}</h3><p className={styles.description}>{selected.description}</p>
-          {offers.length > 0 ? <fieldset><legend>Choose a pricing option</legend><div className={styles.offers}>{offers.map((offer, index) => <label key={`${offer.kind}-${offer.amount_minor}-${offer.cadence ?? "once"}`}><input type="radio" name={`sales-dock-offer-${selected.product_id}`} checked={Math.min(offerIndex, offers.length - 1) === index} onChange={() => setOfferIndex(index)} /><span><strong>{offerText(offer)}</strong><small>{offerKind(offer.kind)}</small></span></label>)}</div></fieldset> : <p className={styles.noOffer}>Pricing is available by request.</p>}
-          <div className={styles.readout}><span>Selected option</span><strong>{currentOffer ? offerText(currentOffer) : "Contact us for pricing"}</strong><small>{currentOffer ? "Checkout availability is confirmed on the product page." : "Our team can help you choose the right plan."}</small></div>
-          <Link className={styles.action} href={destination}>{action}<span aria-hidden="true">→</span></Link>
-        </div>
-      </article>
+    <header className={styles.header}>
+      <div><p>Shop Obserra AI capabilities</p><h2 id="sales-dock-heading">Choose a capability you can understand before you buy.</h2></div>
+      <p>Explore practical AI products by outcome, experience level, category, and price. Open any offering to see what it delivers and choose the right next step.</p>
+    </header>
+    <div className={styles.productGrid} aria-label="Featured AI products and skills">
+      {records.map((product, index) => {
+        const price = priceSummary(product);
+        const action = destination(product);
+        const category = words(product.category || product.family);
+        const level = words(product.proficiency);
+        const type = words(product.product_type);
+        return <article className={styles.productCard} data-accent={index % 5} key={product.product_id}>
+          <Link className={styles.cardLink} href={action.href} aria-label={`${action.label}: ${product.name}`}>
+            <div className={styles.productVisual} aria-hidden="true"><i/><i/><b>{initials(product.name)}</b><span>{type}</span></div>
+            <div className={styles.cardBody}>
+              <div className={styles.badges}><span>{level}</span><span>{category}</span></div>
+              <h3>{product.name}</h3>
+              <p>{product.description}</p>
+              <dl>
+                <div><dt>Category</dt><dd>{category}</dd></div>
+                <div><dt>Level</dt><dd>{level}</dd></div>
+                <div className={styles.price}><dt>Price</dt><dd>{price.price}</dd><small>{price.note}</small></div>
+              </dl>
+              <span className={styles.action}>{action.label}<b aria-hidden="true">→</b></span>
+            </div>
+          </Link>
+        </article>;
+      })}
     </div>
+    <footer className={styles.footer}><p>Need a broader solution?</p><Link href="/ai-marketplace/configure">Build a capability bundle</Link><Link href="/ai-marketplace/compare">Compare products</Link></footer>
   </section>;
 }

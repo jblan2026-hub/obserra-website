@@ -4,11 +4,13 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { findAiMarketplaceProduct } from "../../../lib/ai-marketplace-catalog";
 import { marketplaceV12Product, marketplaceV12PublicPath } from "../../../lib/marketplace-v12-catalog";
 import MarketplaceCheckout from "../MarketplaceCheckout";
+import type { MarketplacePublicCheckoutOption } from "../MarketplaceV12Checkout";
 import { marketplaceV12ProductCommerce } from "../../../lib/marketplace-v12-runtime";
 import { marketplaceV12PedestalDetail } from "../../../lib/marketplace-v12-product-pedestal";
 import { marketplacePublicProductDetail } from "../../../lib/marketplace-public-product";
+import { marketplaceV12PurchaseOptions } from "../../../lib/marketplace-v12-bindings";
 import MarketplaceDimensionalPedestal from "../MarketplaceDimensionalPedestal";
-import MarketplaceProductFacts from "../MarketplaceProductFacts";
+import MarketplaceProductSalesHero from "../MarketplaceProductSalesHero";
 import "../marketplace.css";
 
 type PageProps = { params: Promise<{ productId: string }> };
@@ -49,6 +51,7 @@ export default async function MarketplaceProductPage({ params }: PageProps) {
     const commerce = await marketplaceV12ProductCommerce(catalogProduct);
     const detail = marketplaceV12PedestalDetail(catalogProduct);
     const publicDetail = marketplacePublicProductDetail(detail);
+    const purchaseOptions: MarketplacePublicCheckoutOption[] = marketplaceV12PurchaseOptions(catalogProduct).map((option) => ({ option: option.option, amountMinor: option.amountMinor }));
     const canonicalPath = marketplaceV12PublicPath(catalogProduct);
     const canonicalUrl = "https://www.obserrallc.com" + canonicalPath;
     const breadcrumbItems = [
@@ -77,7 +80,7 @@ export default async function MarketplaceProductPage({ params }: PageProps) {
         <Link href="/ai-marketplace">OBSERRA EPI</Link>
         <nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/skill-libraries">Skills</Link><Link href="/academy">Academy</Link><Link href="/contact?interest=ai-marketplace">Talk to an expert</Link></nav>
       </header>
-      <MarketplaceProductFacts detail={publicDetail} />
+      <MarketplaceProductSalesHero detail={publicDetail} options={purchaseOptions} checkoutEnabled={commerce.checkoutEnabled} />
       <MarketplaceDimensionalPedestal detail={publicDetail} checkoutEnabled={commerce.checkoutEnabled} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
     </main>;
