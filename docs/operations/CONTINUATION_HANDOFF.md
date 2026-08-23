@@ -787,3 +787,12 @@ All must be observed from the public canonical host:
 - **Commit checks:** combined status remains unchanged: the canonical-cutover evidence status is successful, while the canonical project's existing Vercel/Clerk context remains failed. This does not prove the authorized Key Vault bootstrap ran.
 - **Mutation state:** no new production environment binding, redeployment, alias movement, payment activation, enrollment, or LMS readiness mutation is evidenced by this check.
 - **Next safe action:** manually dispatch `.github/workflows/enable-vercel-key-vault-runtime.yml` on branch `main`. Its independent Azure OIDC, tenant/subscription, identity, Key Vault/RBAC, Vercel binding, deployment, and direct commerce probes remain mandatory and fail closed.
+
+
+<!-- ops-checkpoint:2026-08-23-authorized-bootstrap-dispatch-reported -->
+### 2026-08-23T12:39:36.974Z — authorized runtime-bootstrap workflow reported dispatched; awaiting independent phase evidence
+
+- **Owner action:** the owner reported completion of the manual dispatch for `.github/workflows/enable-vercel-key-vault-runtime.yml` on the already-authorized `main` SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2`.
+- **Immediate observation:** Vercel deployment enumeration has not yet returned a new bootstrap/redeployment record. The existing canonical Production deployment remains `dpl_AJPPKARXHGqo3QACFwpdmng3KQXV`; this is expected until the workflow's independent Azure OIDC, tenant/subscription, federated-identity, Key Vault/RBAC, and Production-binding checks complete.
+- **No success inference:** no sensitive binding transfer, replacement deployment, alias movement, payment activation, enrollment, or LMS readiness success is recorded from owner dispatch alone.
+- **Monitoring contract:** observe and record the first accessible workflow/deployment evidence; fail closed if any required Azure, Key Vault, Vercel, Applications, Academy, or Florida readiness condition fails.
