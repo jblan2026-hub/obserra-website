@@ -2,6 +2,20 @@
   "workflow": "patch-marketplace-v12-azure-delivery.yml",
   "runs": [
     {
+      "id": 32672512092,
+      "name": "Apply Marketplace v1.2 Azure protected delivery cutover",
+      "display_title": "fix: split Azure runtime and workflow cutover writes",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "failure",
+      "head_branch": "fix/marketplace-v12-azure-protected-delivery-20260823",
+      "head_sha": "9d005f4c2ab70aa6829f5247639061254bd478d8",
+      "run_number": 9,
+      "created_at": "2026-08-23T23:04:17Z",
+      "updated_at": "2026-08-23T23:04:51Z",
+      "html_url": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32672512092"
+    },
+    {
       "id": 32672447381,
       "name": "Apply Marketplace v1.2 Azure protected delivery cutover",
       "display_title": "ops: rerun Azure cutover on current branch head",
