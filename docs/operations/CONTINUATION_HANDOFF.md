@@ -903,3 +903,13 @@ All must be observed from the public canonical host:
 - **Review result:** source verification confirms one not-found-gated identity-create path, one exact Key Vault role-assignment path with ServicePrincipal type and canonical vault scope, mandatory identity/role readbacks, released Node 24 Azure Login v3.0.1, and no Azure Key Vault secret command.
 - **Rolling record automation:** an event-driven handoff writer now watches PR #223 commit/check/review/merge activity and is constrained to append evidence-only entries on `ops/live-handoff`; it has no authority to mutate production resources.
 - **Merge action:** the owner-directed guarded release is being merged using this exact head SHA. The workflow path trigger, rather than a manual substitution, will issue the fresh GitHub OIDC assertion and execute the real Azure/Vercel bootstrap. No live success is inferred before those runtime gates return evidence.
+
+
+<!-- ops-checkpoint:2026-08-23-pr-223-synchronize-nochange-130155 -->
+### 2026-08-23T13:01:55.090Z — PR #223 synchronization delivered with no new source delta
+
+- **Event identity:** the synchronization still resolves to open, mergeable, unmerged PR #223 exact head `707e8f63934cb8818636e1ff4b2c4dad049d1513`; it is the same head recorded in the immediately preceding checkpoint, so no changed work is repeated.
+- **Fresh source/deployment evidence:** Website CI run `32640931726`, Azure IaC Validation run `32640931658`, and CodeQL Advanced run `32640931697` remain completed successfully. Exact-head branch deployment `dpl_3wz7HThpEAUmrJ2pDos4GrREJqSf` remains `CANCELED`, has no production target, and is not live.
+- **Fresh canonical proof:** `GET https://www.obserrallc.com/api/health` returned HTTP `200` at `2026-08-23T13:01:55.090Z` with exact deployment `dpl_AJPPKARXHGqo3QACFwpdmng3KQXV`, exact SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2`, and verified hosting/routing authority. PR #223 is not canonical.
+- **Fresh subsystem results:** Applications commerce HTTP `503`, `operational: false`; Academy commerce HTTP `503`, `operational: false`; Florida LMS liveness HTTP `200` / `live`; Florida LMS readiness HTTP `503` / `not_ready`.
+- **Blocker and next safe action:** no production mutation occurred. The prior checkpoint's boundary remains: use an explicitly authorized signed-main merge for exact PR #223, re-pin bootstrap authorization to the resulting main SHA, then require Azure identity/role readback, replacement-deployment proof, direct operational commerce results, and canonical exact deployment/SHA proof.
