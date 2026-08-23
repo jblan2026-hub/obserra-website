@@ -1,71 +1,236 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Html, Line, OrbitControls } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Component, useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import type { Group } from "three";
 import type { MarketplaceWorkspaceRecord } from "../../lib/marketplace-v12-workspaces";
 import styles from "./MarketplaceSpatialStage.module.css";
 
-type SceneNode = Pick<MarketplaceWorkspaceRecord, "productId" | "name" | "family" | "sceneCluster" | "positionSeed" | "relationshipProductIds" | "objectArchetype">;
-type View = { yaw: number; pitch: number; zoom: number; panX: number; panY: number };
+type SceneNode = Pick<MarketplaceWorkspaceRecord, "productId" | "slug" | "name" | "family" | "productType" | "version" | "category" | "sceneCluster" | "positionSeed" | "relationshipProductIds" | "objectArchetype">;
+type Vector3 = [number, number, number];
+type StagePoint = { node: SceneNode; position: Vector3; color: string };
+type StageCluster = { id: string; position: Vector3; radius: number; color: string; count: number };
+type StageEdge = { id: string; from: Vector3; to: Vector3; color: string };
 
-function hash(value: string) { let valueHash = 2166136261; for (let index = 0; index < value.length; index += 1) valueHash = Math.imul(valueHash ^ value.charCodeAt(index), 16777619); return valueHash >>> 0; }
-function color(value: string) { return [[0.15, 0.78, 0.94], [0.97, 0.72, 0.26], [0.55, 0.52, 0.98], [0.28, 0.88, 0.64], [0.97, 0.38, 0.5]][hash(value) % 5]; }
-function location(node: SceneNode) { const seed = Math.abs(node.positionSeed) || hash(node.productId), cluster = hash(node.sceneCluster), clusterAngle = (cluster % 628) / 100, clusterRadius = 0.18 + ((Math.floor(cluster / 628) % 5) * 0.11), localAngle = (seed % 628) / 100, localRadius = 0.025 + ((Math.floor(seed / 628) % 100) / 1000); return [Math.cos(clusterAngle) * clusterRadius + Math.cos(localAngle) * localRadius, Math.sin(clusterAngle) * clusterRadius + Math.sin(localAngle) * localRadius, ((Math.floor(seed / 97) % 100) / 100) - 0.5] as const; }
+const PALETTE = ["#2ed8f6", "#f5bd53", "#9186ff", "#52e8ab", "#ff7e94", "#76c9ff"] as const;
+
+function hash(value: string) {
+  let result = 2166136261;
+  for (let index = 0; index < value.length; index += 1) result = Math.imul(result ^ value.charCodeAt(index), 16777619);
+  return result >>> 0;
+}
+
+function color(value: string) { return PALETTE[hash(value) % PALETTE.length]; }
+function humanize(value: string) { return value.replace(/[-_]/g, " "); }
+function level(node: SceneNode) { return humanize(node.category ?? node.productType); }
 function initials(value: string) { return value.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase(); }
 
-export default function MarketplaceSpatialStage({ label, nodes, selectedId, onSelect, emptyMessage }: { label: string; nodes: SceneNode[]; selectedId?: string | null; onSelect?: (node: SceneNode) => void; emptyMessage: string }) {
-  const canvas = useRef<HTMLCanvasElement>(null);
-  const redraw = useRef<(() => void) | null>(null);
-  const geometry = useRef<{ node: SceneNode; x: number; y: number; radius: number }[]>([]);
-  const view = useRef<View>({ yaw: -0.35, pitch: 0.18, zoom: 1, panX: 0, panY: 0 });
-  const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
-  const [mode, setMode] = useState<"loading" | "ready" | "fallback">("loading");
-  const visible = useMemo(() => nodes.slice(0, 48), [nodes]);
+function buildStageGraph(nodes: SceneNode[]) {
+  const membersByCluster = new Map<string, SceneNode[]>();
+  for (const node of nodes) membersByCluster.set(node.sceneCluster, [...(membersByCluster.get(node.sceneCluster) ?? []), node]);
+  const groups = [...membersByCluster.entries()].sort(([left], [right]) => left.localeCompare(right));
+  const clusters: StageCluster[] = groups.map(([id, members], index) => {
+    const angle = groups.length === 1 ? 0 : ((index / groups.length) * Math.PI * 2) - Math.PI / 2;
+    const orbit = groups.length === 1 ? 2.9 : 3.3 + Math.floor(index / 8) * 2.4;
+    return { id, count: members.length, position: [Math.cos(angle) * orbit, 0, Math.sin(angle) * orbit], radius: Math.min(1.65, 0.78 + Math.sqrt(members.length) * 0.18), color: color(id) };
+  });
+  const clusterById = new Map(clusters.map((cluster) => [cluster.id, cluster]));
+  const points: StagePoint[] = groups.flatMap(([clusterId, members]) => {
+    const cluster = clusterById.get(clusterId)!;
+    return [...members].sort((left, right) => left.productId.localeCompare(right.productId)).map((node, index) => {
+      const seed = Math.abs(node.positionSeed) || hash(node.productId);
+      const angle = ((seed % 360) / 360) * Math.PI * 2 + index * 0.71;
+      const radius = members.length === 1 ? 0 : 0.38 + ((Math.floor(seed / 31) % 100) / 100) * cluster.radius * 0.72;
+      return { node, color: color(node.family), position: [cluster.position[0] + Math.cos(angle) * radius, -0.22 + ((Math.floor(seed / 97) % 100) / 100) * 1.25, cluster.position[2] + Math.sin(angle) * radius] as Vector3 };
+    });
+  });
+  const pointById = new Map(points.map((point) => [point.node.productId, point]));
+  const seen = new Set<string>(), edges: StageEdge[] = [];
+  for (const source of points) for (const targetId of source.node.relationshipProductIds) {
+    const target = pointById.get(targetId);
+    if (!target) continue;
+    const id = [source.node.productId, targetId].sort().join("::");
+    if (seen.has(id)) continue;
+    seen.add(id);
+    edges.push({ id, from: source.position, to: target.position, color: source.color });
+  }
+  return { clusters, points, edges };
+}
+
+type Form = "agent" | "bundle" | "connector" | "guardrail" | "workflow" | "capability";
+function form(node: SceneNode): Form {
+  const value = `${node.objectArchetype ?? ""} ${node.productType}`.toLocaleLowerCase();
+  if (/(agent|team|octa|pyramid)/.test(value)) return "agent";
+  if (/(bundle|collection|suite|box|cube)/.test(value)) return "bundle";
+  if (/(connector|integration|torus)/.test(value)) return "connector";
+  if (/(guard|assurance|audit|shield|dodeca)/.test(value)) return "guardrail";
+  if (/(workflow|pipeline|cylinder|automation)/.test(value)) return "workflow";
+  return "capability";
+}
+
+function CapabilityGeometry({ kind }: { kind: Form }) {
+  if (kind === "agent") return <octahedronGeometry args={[0.42, 1]} />;
+  if (kind === "bundle") return <boxGeometry args={[0.62, 0.62, 0.62, 2, 2, 2]} />;
+  if (kind === "connector") return <torusKnotGeometry args={[0.27, 0.085, 72, 10, 2, 3]} />;
+  if (kind === "guardrail") return <dodecahedronGeometry args={[0.41, 1]} />;
+  if (kind === "workflow") return <cylinderGeometry args={[0.28, 0.38, 0.72, 16, 2]} />;
+  return <icosahedronGeometry args={[0.41, 2]} />;
+}
+
+function CapabilityObject({ point, selected, onSelect }: { point: StagePoint; selected: boolean; onSelect: (node: SceneNode) => void }) {
+  const [hovered, setHovered] = useState(false), kind = form(point.node), scale = selected ? 1.28 : hovered ? 1.13 : 1;
+  return <group position={point.position}>
+    <mesh position={[0, -0.46, 0]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.46, 0.58, 0.09, 32]} /><meshStandardMaterial color="#061b2d" metalness={0.82} roughness={0.28} /></mesh>
+    <mesh rotation={[Math.PI / 2, hash(point.node.productId) % Math.PI, 0]} scale={selected ? 1.24 : 1}><torusGeometry args={[0.54, selected ? 0.026 : 0.014, 7, 48]} /><meshBasicMaterial color={selected ? "#f5bd53" : point.color} transparent opacity={selected ? 0.92 : 0.46} /></mesh>
+    <mesh
+      scale={scale}
+      castShadow
+      receiveShadow
+      onClick={(event) => { event.stopPropagation(); onSelect(point.node); }}
+      onPointerOver={(event) => { event.stopPropagation(); setHovered(true); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { setHovered(false); document.body.style.cursor = "default"; }}
+    >
+      <CapabilityGeometry kind={kind} />
+      <meshPhysicalMaterial color={selected ? "#f5bd53" : point.color} emissive={selected ? "#f5bd53" : point.color} emissiveIntensity={selected ? 0.74 : hovered ? 0.43 : 0.24} metalness={0.78} roughness={0.2} clearcoat={0.9} clearcoatRoughness={0.18} />
+    </mesh>
+    <Html position={[0, 0.76, 0]} center sprite distanceFactor={10.5} zIndexRange={[4, 0]}>
+      <Link className={`${styles.objectLabel}${selected ? ` ${styles.objectLabelSelected}` : ""}`} href={`/ai-marketplace/${encodeURIComponent(point.node.slug)}`} onClick={() => onSelect(point.node)}>
+        <strong>{point.node.name}</strong><span>{point.node.family}</span><small>Level · {level(point.node)} · v{point.node.version}</small>
+      </Link>
+    </Html>
+  </group>;
+}
+
+function CommandCore({ reducedMotion }: { reducedMotion: boolean }) {
+  const group = useRef<Group>(null);
+  useFrame((_, delta) => { if (!reducedMotion && group.current) group.current.rotation.y += delta * 0.12; });
+  return <group ref={group} position={[0, -0.35, 0]}>
+    <mesh rotation={[Math.PI / 2.8, 0, 0]}><torusGeometry args={[1.05, 0.028, 8, 72]} /><meshBasicMaterial color="#f5bd53" transparent opacity={0.68} /></mesh>
+    <mesh rotation={[-Math.PI / 4, 0.5, 0]}><torusGeometry args={[0.72, 0.016, 8, 64]} /><meshBasicMaterial color="#2ed8f6" transparent opacity={0.6} /></mesh>
+    <mesh><icosahedronGeometry args={[0.28, 2]} /><meshStandardMaterial color="#f5bd53" emissive="#f5bd53" emissiveIntensity={1.5} metalness={0.82} roughness={0.12} /></mesh>
+  </group>;
+}
+
+function ContextMonitor({ onLost, onRestored }: { onLost: () => void; onRestored: () => void }) {
+  const gl = useThree((state) => state.gl);
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const lost = (event: Event) => { event.preventDefault(); onLost(); };
+    canvas.addEventListener("webglcontextlost", lost);
+    canvas.addEventListener("webglcontextrestored", onRestored);
+    return () => { canvas.removeEventListener("webglcontextlost", lost); canvas.removeEventListener("webglcontextrestored", onRestored); };
+  }, [gl, onLost, onRestored]);
+  return null;
+}
+
+function CapabilityScene({ nodes, selectedId, onSelect, reducedMotion, onLost, onRestored }: { nodes: SceneNode[]; selectedId: string | null; onSelect: (node: SceneNode) => void; reducedMotion: boolean; onLost: () => void; onRestored: () => void }) {
+  const graph = useMemo(() => buildStageGraph(nodes), [nodes]);
+  return <>
+    <color attach="background" args={["#020b14"]} /><fog attach="fog" args={["#020b14", 12, 32]} />
+    <ambientLight intensity={0.48} /><directionalLight castShadow position={[5, 9, 6]} intensity={1.8} color="#e7fbff" /><pointLight position={[-5, 2, -4]} intensity={3.8} distance={18} color="#2ed8f6" /><pointLight position={[4, 1, 5]} intensity={3.2} distance={16} color="#f5bd53" />
+    <gridHelper args={[30, 30, "#164e68", "#08283a"]} position={[0, -1.52, 0]} />
+    <mesh position={[0, -1.54, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><circleGeometry args={[14, 64]} /><meshStandardMaterial color="#03111e" metalness={0.34} roughness={0.76} /></mesh>
+    <CommandCore reducedMotion={reducedMotion} />
+    {graph.clusters.map((cluster) => <group key={cluster.id} position={[cluster.position[0], -1.44, cluster.position[2]]}>
+      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[cluster.radius, 0.018, 7, 64]} /><meshBasicMaterial color={cluster.color} transparent opacity={0.54} /></mesh>
+      <Html position={[0, 0.04, cluster.radius + 0.22]} center transform sprite distanceFactor={13}><div className={styles.clusterLabel}><span>{cluster.id}</span><b>{cluster.count}</b></div></Html>
+    </group>)}
+    {graph.edges.map((edge) => <Line key={edge.id} points={[edge.from, edge.to]} color={edge.color} lineWidth={0.85} transparent opacity={0.58} />)}
+    {graph.points.map((point) => <CapabilityObject key={point.node.productId} point={point} selected={point.node.productId === selectedId} onSelect={onSelect} />)}
+    <OrbitControls makeDefault enableDamping dampingFactor={0.075} enablePan enableZoom minDistance={5.4} maxDistance={24} minPolarAngle={0.32} maxPolarAngle={Math.PI * 0.82} target={[0, -0.15, 0]} />
+    <ContextMonitor onLost={onLost} onRestored={onRestored} />
+  </>;
+}
+
+class RendererBoundary extends Component<{ children: ReactNode; onFailure: () => void }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onFailure(); }
+  render() { return this.state.failed ? null : this.props.children; }
+}
+
+function fallbackPosition(node: SceneNode, index: number, count: number) {
+  const clusterAngle = (hash(node.sceneCluster) % 628) / 100;
+  const localAngle = ((Math.abs(node.positionSeed) || hash(node.productId)) % 628) / 100 + index * 0.43;
+  const radius = count === 1 ? 8 : 23 + (hash(node.sceneCluster) % 10);
+  return { x: 50 + Math.cos(clusterAngle) * radius + Math.cos(localAngle) * 7, y: 51 + Math.sin(clusterAngle) * radius * 0.58 + Math.sin(localAngle) * 5, depth: 12 + (hash(node.productId) % 38) };
+}
+
+function SemanticFallback({ nodes, selectedId, onSelect, onRetry }: { nodes: SceneNode[]; selectedId: string | null; onSelect: (node: SceneNode) => void; onRetry: () => void }) {
+  const points = useMemo(() => new Map(nodes.map((node, index) => [node.productId, fallbackPosition(node, index, nodes.length)])), [nodes]);
+  const visible = new Set(nodes.map((node) => node.productId));
+  return <div className={styles.fallback} role="group" aria-label="Semantic 2.5D capability map">
+    <header><div><span>Designed compatibility view</span><strong>The same catalog records remain navigable.</strong></div><button type="button" onClick={onRetry}>Retry 3D</button></header>
+    <div className={styles.fallbackField}>
+      <div className={styles.fallbackArchitecture} aria-hidden="true"><i /><i /><b>OBSERRA<br />EPI</b></div>
+      <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">{nodes.flatMap((node) => node.relationshipProductIds.filter((target) => visible.has(target) && node.productId < target).map((target) => { const from = points.get(node.productId)!, to = points.get(target)!; return <line key={`${node.productId}-${target}`} x1={from.x} y1={from.y} x2={to.x} y2={to.y} />; }))}</svg>
+      {nodes.map((node) => { const point = points.get(node.productId)!; return <Link key={node.productId} href={`/ai-marketplace/${encodeURIComponent(node.slug)}`} className={`${styles.fallbackNode}${selectedId === node.productId ? ` ${styles.fallbackNodeSelected}` : ""}`} style={{ left: `${point.x}%`, top: `${point.y}%`, zIndex: point.depth }} onClick={() => onSelect(node)}><b>{initials(node.name)}</b><span><strong>{node.name}</strong><small>{node.family} · Level {level(node)}</small></span></Link>; })}
+    </div>
+  </div>;
+}
+
+function DesignedEmpty({ message, filtered, onReset }: { message: string; filtered: boolean; onReset: () => void }) {
+  return <div className={styles.empty} role="status"><div className={styles.emptyArchitecture} aria-hidden="true"><i /><i /><i /><b>CAPABILITY<br />DOCK</b></div><div><span>{filtered ? "Filtered spatial view" : "Awaiting governed capability records"}</span><strong>{filtered ? "No objects match both active controls." : "The command deck is ready for verified inventory."}</strong><p>{filtered ? "Reset Family and Cluster to restore this bounded scene." : message}</p>{filtered && <button type="button" onClick={onReset}>Reset spatial controls</button>}</div></div>;
+}
+
+function webglAvailable() {
+  try { const canvas = document.createElement("canvas"); return Boolean(canvas.getContext("webgl2") ?? canvas.getContext("webgl")); } catch { return false; }
+}
+
+export default function MarketplaceSpatialStage({ label, nodes, selectedId = null, onSelect, emptyMessage }: { label: string; nodes: SceneNode[]; selectedId?: string | null; onSelect?: (node: SceneNode) => void; emptyMessage: string }) {
+  const router = useRouter(), uid = useId(), recoveryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [family, setFamily] = useState(""), [cluster, setCluster] = useState(""), [renderer, setRenderer] = useState<"checking" | "loading" | "ready" | "recovering" | "fallback">(() => typeof window === "undefined" ? "checking" : webglAvailable() ? "loading" : "fallback"), [reducedMotion, setReducedMotion] = useState(() => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches), [attempt, setAttempt] = useState(0);
+  const families = useMemo(() => [...new Set(nodes.map((node) => node.family))].sort((left, right) => left.localeCompare(right)), [nodes]);
+  const clusters = useMemo(() => [...new Set(nodes.map((node) => node.sceneCluster))].sort((left, right) => left.localeCompare(right)), [nodes]);
+  const visibleNodes = useMemo(() => nodes.filter((node) => (!family || node.family === family) && (!cluster || node.sceneCluster === cluster)).slice(0, 48), [cluster, family, nodes]);
+  const selectedNode = nodes.find((node) => node.productId === selectedId) ?? null;
+  const select = useCallback((node: SceneNode) => onSelect?.(node), [onSelect]);
+  const reset = useCallback(() => { setFamily(""); setCluster(""); }, []);
+  const retry = useCallback(() => { setRenderer(webglAvailable() ? "loading" : "fallback"); setAttempt((value) => value + 1); }, []);
 
   useEffect(() => {
-    const element = canvas.current;
-    if (!element || visible.length === 0) { setMode("fallback"); return; }
-    const gl = element.getContext("webgl2", { alpha: true, antialias: true }) ?? element.getContext("webgl", { alpha: true, antialias: true });
-    if (!gl) { setMode("fallback"); return; }
-    const compile = (kind: number, source: string) => { const shader = gl.createShader(kind); if (!shader) throw new Error("WebGL shader creation failed"); gl.shaderSource(shader, source); gl.compileShader(shader); return shader; };
-    const program = gl.createProgram();
-    const lineProgram = gl.createProgram();
-    if (!program || !lineProgram) { setMode("fallback"); return; }
-    const vertex = compile(gl.VERTEX_SHADER, "attribute vec3 p;attribute vec3 c;attribute float s;varying vec3 v;void main(){float d=1.0+p.z*.30;gl_Position=vec4(p.xy*d,p.z,1.0);gl_PointSize=s*d;v=c;}");
-    const fragment = compile(gl.FRAGMENT_SHADER, "precision mediump float;varying vec3 v;void main(){vec2 d=gl_PointCoord-vec2(.5);if(dot(d,d)>.25)discard;gl_FragColor=vec4(v,1.0-dot(d,d)*2.0);}");
-    const lineVertex = compile(gl.VERTEX_SHADER, "attribute vec3 p;void main(){float d=1.0+p.z*.30;gl_Position=vec4(p.xy*d,p.z,1.0);}");
-    const lineFragment = compile(gl.FRAGMENT_SHADER, "precision mediump float;void main(){gl_FragColor=vec4(.19,.70,.84,.48);}");
-    gl.attachShader(program, vertex); gl.attachShader(program, fragment); gl.linkProgram(program);
-    gl.attachShader(lineProgram, lineVertex); gl.attachShader(lineProgram, lineFragment); gl.linkProgram(lineProgram);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS) || !gl.getProgramParameter(lineProgram, gl.LINK_STATUS) || !gl.getShaderParameter(vertex, gl.COMPILE_STATUS) || !gl.getShaderParameter(fragment, gl.COMPILE_STATUS) || !gl.getShaderParameter(lineVertex, gl.COMPILE_STATUS) || !gl.getShaderParameter(lineFragment, gl.COMPILE_STATUS)) { setMode("fallback"); return; }
-    const draw = () => {
-      const ratio = Math.min(window.devicePixelRatio || 1, 2), width = Math.max(1, Math.floor(element.clientWidth * ratio)), height = Math.max(1, Math.floor(element.clientHeight * ratio));
-      if (element.width !== width || element.height !== height) { element.width = width; element.height = height; }
-      const camera = view.current, cy = Math.cos(camera.yaw), sy = Math.sin(camera.yaw), cp = Math.cos(camera.pitch), sp = Math.sin(camera.pitch);
-      const positions = visible.map((node) => { const [x, y, z] = location(node), yawX = x * cy - z * sy, yawZ = x * sy + z * cy, pitchY = y * cp - yawZ * sp, pitchZ = y * sp + yawZ * cp; return [yawX * camera.zoom + camera.panX, pitchY * camera.zoom + camera.panY, pitchZ] as const; });
-      const indexes = new Map(visible.map((node, index) => [node.productId, index])); const points: number[] = []; const links: number[] = [];
-      visible.forEach((node, index) => { const [x, y, z] = positions[index], nodeColor = color(node.family); points.push(x, y, z, ...nodeColor, (8 + (hash(node.productId) % 5)) * (node.productId === selectedId ? 1.55 : 1)); node.relationshipProductIds.forEach((targetId) => { const target = indexes.get(targetId); if (target !== undefined && index < target) links.push(...positions[index], ...positions[target]); }); });
-      gl.viewport(0, 0, width, height); gl.clearColor(0.01, 0.05, 0.08, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-      if (links.length) { const lineBuffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(links), gl.STATIC_DRAW); gl.useProgram(lineProgram); const linePosition = gl.getAttribLocation(lineProgram, "p"); gl.enableVertexAttribArray(linePosition); gl.vertexAttribPointer(linePosition, 3, gl.FLOAT, false, 12, 0); gl.drawArrays(gl.LINES, 0, links.length / 3); gl.deleteBuffer(lineBuffer); }
-      const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW); gl.useProgram(program); const pointPosition = gl.getAttribLocation(program, "p"), pointColor = gl.getAttribLocation(program, "c"), pointSize = gl.getAttribLocation(program, "s"); gl.enableVertexAttribArray(pointPosition); gl.enableVertexAttribArray(pointColor); gl.enableVertexAttribArray(pointSize); gl.vertexAttribPointer(pointPosition, 3, gl.FLOAT, false, 28, 0); gl.vertexAttribPointer(pointColor, 3, gl.FLOAT, false, 28, 12); gl.vertexAttribPointer(pointSize, 1, gl.FLOAT, false, 28, 24); gl.drawArrays(gl.POINTS, 0, visible.length); gl.deleteBuffer(buffer);
-      geometry.current = visible.map((node, index) => { const [x, y, z] = positions[index], depth = 1 + z * .3; return { node, x: ((x * depth) + 1) * .5 * element.clientWidth, y: (1 - ((y * depth) + 1) * .5) * element.clientHeight, radius: 14 }; }); setMode("ready");
-    };
-    redraw.current = draw; const observer = new ResizeObserver(draw); observer.observe(element); draw();
-    const contextLost = (event: Event) => { event.preventDefault(); setMode("fallback"); };
-    element.addEventListener("webglcontextlost", contextLost, false);
-    return () => { observer.disconnect(); element.removeEventListener("webglcontextlost", contextLost); gl.deleteProgram(program); gl.deleteProgram(lineProgram); gl.deleteShader(vertex); gl.deleteShader(fragment); gl.deleteShader(lineVertex); gl.deleteShader(lineFragment); };
-  }, [visible, selectedId]);
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)"), update = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
+    media.addEventListener("change", update);
+    return () => { media.removeEventListener("change", update); if (recoveryTimer.current) clearTimeout(recoveryTimer.current); };
+  }, []);
 
-  const pointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => { drag.current = { x: event.clientX, y: event.clientY, moved: false }; event.currentTarget.setPointerCapture(event.pointerId); };
-  const pointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => { if (!drag.current) return; const dx = event.clientX - drag.current.x, dy = event.clientY - drag.current.y; if (Math.abs(dx) + Math.abs(dy) > 2) drag.current.moved = true; view.current.yaw += dx * .009; view.current.pitch = Math.max(-1.1, Math.min(1.1, view.current.pitch + dy * .009)); drag.current.x = event.clientX; drag.current.y = event.clientY; redraw.current?.(); };
-  const pointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => { const moved = drag.current?.moved; drag.current = null; if (moved || !onSelect) return; const box = event.currentTarget.getBoundingClientRect(), x = event.clientX - box.left, y = event.clientY - box.top; const hit = geometry.current.reduce<{ item: typeof geometry.current[number]; distance: number } | null>((nearest, item) => { const distance = Math.hypot(item.x - x, item.y - y); return distance <= item.radius && (!nearest || distance < nearest.distance) ? { item, distance } : nearest; }, null); if (hit) onSelect(hit.item.node); };
-  const wheel = (event: React.WheelEvent<HTMLCanvasElement>) => { event.preventDefault(); view.current.zoom = Math.max(.65, Math.min(1.9, view.current.zoom * (event.deltaY > 0 ? .9 : 1.1))); redraw.current?.(); };
+  const contextLost = useCallback(() => { setRenderer("recovering"); if (recoveryTimer.current) clearTimeout(recoveryTimer.current); recoveryTimer.current = setTimeout(() => setRenderer("fallback"), 1800); }, []);
+  const contextRestored = useCallback(() => { if (recoveryTimer.current) clearTimeout(recoveryTimer.current); recoveryTimer.current = null; setRenderer("ready"); }, []);
+  const keyboard = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!visibleNodes.length) return;
+    const current = visibleNodes.findIndex((node) => node.productId === selectedId);
+    let next = current < 0 ? 0 : current;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (next + 1) % visibleNodes.length;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (next - 1 + visibleNodes.length) % visibleNodes.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = visibleNodes.length - 1;
+    else if (event.key === "Enter" && selectedNode) { event.preventDefault(); router.push(`/ai-marketplace/${encodeURIComponent(selectedNode.slug)}`); return; }
+    else return;
+    event.preventDefault(); select(visibleNodes[next]);
+  }, [router, select, selectedId, selectedNode, visibleNodes]);
 
+  const filtered = Boolean((family || cluster) && nodes.length);
   return <section className={styles.stage} aria-label={label}>
-    <div className={styles.canvasShell} data-mode={mode}>
-      {visible.length > 0 && <canvas ref={canvas} role="application" tabIndex={0} aria-label={`${label}. Drag to orbit, use the scroll wheel to zoom, and select a plotted catalog record.`} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onWheel={wheel} />}
-      {mode !== "ready" && <div className={styles.staticMap} aria-hidden="true"><i /><i /><i /><b>OBSERRA<br />EPI</b></div>}
-      <p className={styles.status}>{visible.length === 0 ? emptyMessage : mode === "ready" ? "Catalog-derived spatial projection. Lines appear only for declared relationships inside this bounded selection." : "A semantic spatial projection remains available while WebGL is unavailable."}</p>
+    <header className={styles.stageHeader}><div><span>Catalog spatial system</span><strong>{label}</strong></div><div className={styles.stageCount}><b>{visibleNodes.length}</b><span>verified object{visibleNodes.length === 1 ? "" : "s"}</span></div></header>
+    <div className={styles.controls} aria-label={`${label} scene controls`}>
+      <label htmlFor={`${uid}-family`}>Family<select id={`${uid}-family`} value={family} onChange={(event) => setFamily(event.target.value)}><option value="">All families</option>{families.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+      <label htmlFor={`${uid}-cluster`}>Cluster<select id={`${uid}-cluster`} value={cluster} onChange={(event) => setCluster(event.target.value)}><option value="">All clusters</option>{clusters.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+      <button type="button" onClick={reset} disabled={!family && !cluster}>Reset</button>
+      <span>Arrows select · Enter opens</span>
     </div>
-    {visible.length > 0 && <div className={styles.index} aria-label={`${label} semantic scene index`}><span>Semantic scene index</span><div>{visible.map((node) => <button type="button" key={node.productId} aria-pressed={node.productId === selectedId} onClick={() => onSelect?.(node)}><b>{initials(node.name)}</b><span>{node.name}</span><small>{node.objectArchetype?.replace(/-/g, " ") ?? node.family}</small></button>)}</div></div>}
+    <div className={styles.viewport} data-renderer={renderer} tabIndex={0} onKeyDown={keyboard} aria-label={`${label}. Use arrow keys to select a capability and Enter to open its stable product route.`}>
+      {visibleNodes.length === 0 ? <DesignedEmpty message={emptyMessage} filtered={filtered} onReset={reset} /> : renderer === "fallback" ? <SemanticFallback nodes={visibleNodes} selectedId={selectedId} onSelect={select} onRetry={retry} /> : <RendererBoundary key={attempt} onFailure={() => setRenderer("fallback")}>
+        <Canvas dpr={reducedMotion ? 1 : [1, 1.65]} camera={{ position: [0, 6.3, 13.5], fov: 48, near: 0.1, far: 70 }} gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }} shadows={!reducedMotion} frameloop={reducedMotion ? "demand" : "always"} onCreated={() => setRenderer("ready")}>
+          <CapabilityScene nodes={visibleNodes} selectedId={selectedId} onSelect={select} reducedMotion={reducedMotion} onLost={contextLost} onRestored={contextRestored} />
+        </Canvas>
+      </RendererBoundary>}
+      {renderer === "loading" && visibleNodes.length > 0 && <div className={styles.loading} role="status"><i /><span>Assembling catalog geometry…</span></div>}
+      {renderer === "recovering" && <div className={styles.loading} role="status"><i /><span>Recovering the graphics context…</span></div>}
+    </div>
+    {visibleNodes.length > 0 && <div className={styles.selection} aria-live="polite">{selectedNode ? <><div><span>Selected capability</span><strong>{selectedNode.name}</strong><small>{selectedNode.family} · Level {level(selectedNode)} · v{selectedNode.version}</small></div><Link href={`/ai-marketplace/${encodeURIComponent(selectedNode.slug)}`}>Open stable record <span aria-hidden="true">→</span></Link></> : <><div><span>Capability focus</span><strong>Select a labelled object.</strong><small>The scene uses only server catalog identity, cluster, form, position, and relationship facts.</small></div><span className={styles.selectionHint}>Arrow keys are available</span></>}</div>}
+    {visibleNodes.length > 0 && <div className={styles.index} aria-label={`${label} semantic scene index`}><span>Semantic navigator</span><div>{visibleNodes.map((node) => <button type="button" key={node.productId} aria-pressed={node.productId === selectedId} onClick={() => select(node)}><b>{initials(node.name)}</b><span><strong>{node.name}</strong><small>{node.family} · Level {level(node)}</small></span></button>)}</div></div>}
   </section>;
 }

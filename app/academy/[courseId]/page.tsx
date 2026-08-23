@@ -82,6 +82,7 @@ export default async function AcademyCoursePage({
   const certificateLabel = publication.certificateIssued
     ? "Governed completion certificate"
     : "Completion record without certificate issuance";
+  const marketplaceQuery = { Cyber: "cybersecurity", Protection: "executive protection", Intelligence: "intelligence", Technologies: "governance" }[course.department];
 
   const courseSchema = {
     "@context": "https://schema.org",
@@ -244,6 +245,18 @@ export default async function AcademyCoursePage({
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="academy-course-certificate" aria-labelledby="course-marketplace-title">
+        <div>
+          <p className="academy-course-kicker">CAPABILITY MARKETPLACE</p>
+          <h2 id="course-marketplace-title">Continue into the factual AI capability catalog.</h2>
+          <p>This link runs a current marketplace search for “{marketplaceQuery}.” It does not claim that a marketplace product is included with this course, compatible with it, or unlocked by course enrollment.</p>
+        </div>
+        <aside>
+          <strong>Catalog deep link</strong>
+          <p><a href={`/ai-marketplace?q=${encodeURIComponent(marketplaceQuery)}`}>Explore catalog records matching “{marketplaceQuery}”</a></p>
+        </aside>
       </section>
 
       <section className="academy-course-certificate">
