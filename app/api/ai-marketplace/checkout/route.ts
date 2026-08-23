@@ -61,7 +61,7 @@ function validV12Price(price: Stripe.Price, input: { productId: string; option: 
 }
 
 async function requireCustomer(subjectId: string, tenantId: string, source: string) {
-  const scope = source === V12_SOURCE ? "marketplace-v12" : "applications" as const;
+  const scope: "applications" | "marketplace-v12" = source === V12_SOURCE ? "marketplace-v12" : "applications";
   const existing = await aiMarketplaceCustomer(subjectId, tenantId, scope);
   if (existing) return existing;
   const created = await getApplicationsStripe().customers.create({
