@@ -1,8 +1,9 @@
 name: Marketplace v1.2 Stripe reconciliation request
 
 on:
-  push:
+  pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened]
     paths:
       - ops/marketplace-v12-stripe-reconcile-request.json
 
@@ -16,6 +17,7 @@ concurrency:
 
 env:
   EXPECTED_CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
+  EXECUTION_BRANCH: ops/execute-marketplace-v12-stripe-reconcile-20260823
   AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
   AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
   AZURE_DELIVERY_CLIENT_ID: b8da232a-713f-4c25-a61e-4fb34d13e229
@@ -24,7 +26,7 @@ env:
 
 jobs:
   reconcile:
-    if: github.ref == 'refs/heads/main'
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'ops/execute-marketplace-v12-stripe-reconcile-20260823'
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     environment: production
@@ -34,17 +36,18 @@ jobs:
       matrix:
         shard: [0, 1, 2, 3]
     steps:
-      - name: Check out exact triggering main revision
+      - name: Check out exact authoritative main revision
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.event.pull_request.base.sha }}
           persist-credentials: false
 
-      - name: Validate governed review-only request
+      - name: Validate governed review-only request and source revision
         shell: bash
         run: |
           set -euo pipefail
-          test "${GITHUB_SHA}" = "$(git rev-parse HEAD)"
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.base.sha }}"
+          test "${{ github.event.pull_request.base.ref }}" = "main"
           jq -e --arg revision "${EXPECTED_CATALOG_REVISION}" '
             .contract == "obserra-marketplace-v12-stripe-reconcile-request-v1"
             and .catalogRevision == $revision
@@ -106,16 +109,16 @@ jobs:
           retention-days: 30
 
   verify:
-    if: github.ref == 'refs/heads/main'
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'ops/execute-marketplace-v12-stripe-reconcile-20260823'
     needs: reconcile
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     environment: production
     steps:
-      - name: Check out exact triggering main revision
+      - name: Check out exact authoritative main revision
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.event.pull_request.base.sha }}
           persist-credentials: false
 
       - name: Authenticate dedicated Marketplace delivery identity
