@@ -67,8 +67,17 @@ jobs:
           grep -Eqi 'Stripe checkout|checkout.stripe.com' /tmp/academy.html
           grep -Eqi 'not a state license|not.*professional certification|not third-party certification' /tmp/academy.html
           grep -Eqi 'Certificate of Training|completion record' /tmp/academy.html
-          grep -Eqi 'action="/api/academy/checkout"' /tmp/academy.html
-          grep -Eqi 'method="post"' /tmp/academy.html
+          if grep -Eqi '<form[^>]*(action="/api/academy/checkout"[^>]*method="post"|method="post"[^>]*action="/api/academy/checkout")' /tmp/academy.html; then
+            echo 'Academy exposes governed POST checkout for an activated course.'
+          else
+            grep -Eqi 'Academy LMS is live; new enrollment is not yet open' /tmp/academy.html
+            grep -Eqi '0[^0-9]+are currently open for purchase' /tmp/academy.html
+            grep -Eqi 'New enrollment and payment stay disabled until the required licensing is complete' /tmp/academy.html
+            if grep -Eqi 'action="/api/academy/checkout"' /tmp/academy.html; then
+              echo 'Academy checkout action is present without a governed POST form.' >&2
+              exit 1
+            fi
+          fi
           if grep -Eqi '/api/academy/checkout\?course=' /tmp/academy.html; then
             echo 'Academy contains a retired GET mutation link.' >&2
             exit 1
