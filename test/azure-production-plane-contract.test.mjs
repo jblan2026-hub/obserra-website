@@ -222,3 +222,23 @@ test("Next.js uses Vercel-native output and preserves Azure App Service standalo
   assert.match(workflow, /test -f \.next\/standalone\/server\.js/);
   assert.match(config, /isProductionRuntime/);
 });
+
+test("Vercel runtime bootstrap converges only a missing governed identity and exact Key Vault role", async () => {
+  const workflow = await read(".github/workflows/enable-vercel-key-vault-runtime.yml");
+
+  assert.match(workflow, /az group show --name "\$\{AZURE_RESOURCE_GROUP\}" --output json/);
+  assert.match(
+    workflow,
+    /az identity create[\s\S]*--resource-group "\$\{AZURE_RESOURCE_GROUP\}"[\s\S]*--name "\$\{AZURE_RUNTIME_IDENTITY\}"[\s\S]*--location "\$\{resource_group_location\}"/,
+  );
+  assert.match(workflow, /ResourceNotFound\|was not found\|could not be found/);
+  assert.match(workflow, /--assignee-principal-type ServicePrincipal/);
+  assert.match(workflow, /--role "\$\{KEY_VAULT_SECRETS_USER_ROLE_ID\}"/);
+  assert.match(workflow, /--scope "\$\{key_vault_id\}"/);
+  assert.match(workflow, /RoleAssignmentExists/);
+  assert.match(
+    workflow,
+    /az role assignment list[\s\S]*--assignee-object-id "\$\{runtime_principal_id\}"[\s\S]*--scope "\$\{key_vault_id\}"/,
+  );
+  assert.doesNotMatch(workflow, /az keyvault secret (show|set|list|download)/);
+});
