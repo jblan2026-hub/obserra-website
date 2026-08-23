@@ -1,16 +1,16 @@
 {
   "contract": "obserra-marketplace-v12-azure-cutover-observation-v1",
-  "runId": 32672295211,
-  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32672295211",
-  "status": "completed",
-  "conclusion": "failure",
-  "headSha": "9348acdfcc84d5803ffc53a32f359f7f14314014",
+  "runId": 32672384881,
+  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32672384881",
+  "status": "in_progress",
+  "conclusion": null,
+  "headSha": "8f7c185c27bba8a4dd90fd91175c0cfaff0b97b7",
   "jobs": [
     {
-      "id": 97274833351,
+      "id": 97275050472,
       "name": "patch",
-      "status": "completed",
-      "conclusion": "failure",
+      "status": "in_progress",
+      "conclusion": null,
       "steps": [
         {
           "name": "Set up job",
@@ -29,38 +29,38 @@
         },
         {
           "name": "Pin Azure Blob SDK",
-          "status": "completed",
-          "conclusion": "success"
+          "status": "in_progress",
+          "conclusion": null
         },
         {
           "name": "Apply provider cutover",
-          "status": "completed",
-          "conclusion": "success"
+          "status": "pending",
+          "conclusion": null
+        },
+        {
+          "name": "Correct Azure metadata syntax",
+          "status": "pending",
+          "conclusion": null
         },
         {
           "name": "Validate generated changes",
-          "status": "completed",
-          "conclusion": "failure"
+          "status": "pending",
+          "conclusion": null
         },
         {
           "name": "Commit provider cutover",
-          "status": "completed",
-          "conclusion": "skipped"
+          "status": "pending",
+          "conclusion": null
         },
         {
           "name": "Post Configure Node.js",
-          "status": "completed",
-          "conclusion": "skipped"
+          "status": "pending",
+          "conclusion": null
         },
         {
           "name": "Post Checkout feature branch",
-          "status": "completed",
-          "conclusion": "success"
-        },
-        {
-          "name": "Complete job",
-          "status": "completed",
-          "conclusion": "success"
+          "status": "pending",
+          "conclusion": null
         }
       ]
     }
