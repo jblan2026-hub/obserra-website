@@ -10,6 +10,7 @@ import {
 } from "../../lib/marketplace-v12-catalog";
 import MarketplaceEditorialCatalog, { type EditorialCatalogCard } from "./MarketplaceEditorialCatalogStyled";
 import MarketplaceSalesDock from "./MarketplaceSalesDock";
+import "./MarketplaceEditorialCatalog.css";
 import "./marketplace.css";
 
 type PageProps = { searchParams: Promise<{ cursor?: string | string[]; q?: string | string[] }> };
@@ -28,7 +29,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const params = await searchParams;
   const cursor = cursorValue(params.cursor);
   const query = queryValue(params.q);
-  const page = cursor ? Math.floor(Number(cursor) / 30) + 1 : 1;
+  const page = cursor ? Math.floor(Number(cursor) / 24) + 1 : 1;
   const suffix = query ? " — " + query : page === 1 ? "" : " — Page " + page;
   const canonical = query
     ? "/ai-marketplace?q=" + encodeURIComponent(query) + (cursor ? "&cursor=" + cursor : "")
@@ -46,7 +47,7 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
   const params = await searchParams;
   const cursor = cursorValue(params.cursor);
   const query = queryValue(params.q);
-  const initial = marketplaceV12Search({ cursor, q: query || undefined, limit: 30 });
+  const initial = marketplaceV12Search({ cursor, q: query || undefined, limit: 24 });
   const catalog = initial.results as EditorialCatalogCard[];
   const familyEntries = Object.entries(summary.family_counts).sort(([left], [right]) => left.localeCompare(right));
   const featuredLevels = ["Beginner", "Intermediate", "Expert", "Advanced"];
@@ -96,7 +97,7 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
     <MarketplaceSalesDock products={dockRecords} />
     <nav className="ai-marketplace__crawl-pagination" aria-label="Marketplace result pages">
       <Link href="/ai-marketplace" aria-current={!cursor && !query ? "page" : undefined}>First results page</Link>
-      {cursor ? <Link href={"/ai-marketplace?" + (query ? "q=" + encodeURIComponent(query) + "&" : "") + "cursor=" + Math.max(0, Number(cursor) - 30)}>Previous results</Link> : null}
+      {cursor ? <Link href={"/ai-marketplace?" + (query ? "q=" + encodeURIComponent(query) + "&" : "") + "cursor=" + Math.max(0, Number(cursor) - 24)}>Previous results</Link> : null}
       {initial.nextCursor ? <Link href={"/ai-marketplace?" + (query ? "q=" + encodeURIComponent(query) + "&" : "") + "cursor=" + initial.nextCursor}>Next results</Link> : null}
     </nav>
     <MarketplaceEditorialCatalog initialCatalog={catalog} initialTotal={initial.total} initialNextCursor={initial.nextCursor} initialQuery={query} familyEntries={familyEntries} featuredPackages={featuredPackages} />
