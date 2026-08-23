@@ -38,7 +38,7 @@ test("Vercel runtime bootstrap binds one production workload and proves the resu
     workflow.match(/az role assignment list[\s\S]*?--output json/g) ?? [];
   assert.equal(scopedRoleReads.length, 2);
   for (const roleRead of scopedRoleReads) {
-    assert.match(roleRead, /--scope "\\$\\{key_vault_id\\}"/);
+    assert.equal(roleRead.includes('--scope "${key_vault_id}"'), true);
     assert.doesNotMatch(roleRead, /--all/);
   }
   assert.match(workflow, /networkAcls\.defaultAction \/\/ "Allow"/);
