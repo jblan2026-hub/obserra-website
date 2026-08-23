@@ -10,6 +10,10 @@ const KEY_VAULT_API_VERSION = "7.4";
 const CACHE_MS = 5 * 60 * 1000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+// Changes to this boundary intentionally invoke the governed production bootstrap,
+// which converges the Vercel workload identity and runtime bindings without
+// persisting secret values in the repository.
+
 type Binding = Readonly<{
   environmentKey: string;
   keyVaultSecretName: string;
