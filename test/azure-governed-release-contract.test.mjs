@@ -16,7 +16,14 @@ test("first Azure release independently proves the governed live baseline", asyn
 
   // IAM/federation and least privilege.
   assert.match(release, /id-obserra-github-prod/);
-  assert.match(release, /repo:jblan2026-hub\/obserra-website:ref:refs\/heads\/main/);
+  assert.match(
+    release,
+    /repo:jblan2026-hub@309821056\/obserra-website@1321156321:ref:refs\/heads\/main/,
+  );
+  assert.doesNotMatch(
+    release,
+    /repo:jblan2026-hub\/obserra-website:ref:refs\/heads\/main/,
+  );
   assert.match(release, /token\.actions\.githubusercontent\.com/);
   assert.match(release, /roleDefinitionName == "Contributor"/);
   assert.match(release, /User Access Administrator/);
