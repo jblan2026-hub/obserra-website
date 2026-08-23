@@ -6,6 +6,7 @@ import vm from "node:vm";
 import ts from "typescript";
 
 const DELIVERY_MODULE = "lib/ai-marketplace-delivery.ts";
+const AZURE_DELIVERY_MODULE = "lib/marketplace-v12-azure-delivery.ts";
 const RUNTIME_MODULE = "lib/production-runtime-secrets.ts";
 const WORKFLOW = ".github/workflows/marketplace-v12-protected-delivery.yml";
 const REVISION = "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2";
@@ -158,15 +159,19 @@ test("v1.2 protected delivery uses the approved private Azure Blob boundary with
   delete process.env.OBSERRA_AI_MARKETPLACE_CLOUDFRONT_KEY_PAIR_ID;
   delete process.env.OBSERRA_AI_MARKETPLACE_CLOUDFRONT_PRIVATE_KEY;
   const delivery = loadDelivery(fixture);
-  const subject = fixture.subjects[0];
-  const release = delivery.marketplaceV12Release(subject.productId, REVISION, subject.artifactSha256);
+  const azureDelivery = fs.readFileSync(AZURE_DELIVERY_MODULE, "utf8");
 
   assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), true);
-  assert.equal(typeof delivery.marketplaceV12AzureBlobUrl, "function");
-  assert.equal(
-    delivery.marketplaceV12AzureBlobUrl(release),
-    `https://${STORAGE_ACCOUNT}.blob.core.windows.net/${RELEASE_CONTAINER}/${release.objectKey.split("/").map(encodeURIComponent).join("/")}`,
-  );
+  assert.match(azureDelivery, new RegExp(`MARKETPLACE_V12_AZURE_STORAGE_ACCOUNT = ["']${STORAGE_ACCOUNT}["']`));
+  assert.match(azureDelivery, new RegExp(`MARKETPLACE_V12_AZURE_RELEASE_CONTAINER = ["']${RELEASE_CONTAINER}["']`));
+  assert.match(azureDelivery, /marketplaceV12SignedAzureReleaseUrl/);
+  assert.match(azureDelivery, /getUserDelegationKey/);
+  assert.match(azureDelivery, /BlobSASPermissions\.parse\(["']r["']\)/);
+  assert.match(azureDelivery, /SASProtocol\.Https/);
+  assert.match(azureDelivery, /metadata\.artifact_sha256/);
+  assert.match(azureDelivery, /metadata\.catalog_revision/);
+  assert.match(azureDelivery, /metadata\.product_id/);
+  assert.doesNotMatch(azureDelivery, /CloudFront|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY/);
 });
 
 test("production runtime exchanges Vercel OIDC for Azure Storage scope without persisting the token", async (t) => {
@@ -194,7 +199,7 @@ test("production runtime exchanges Vercel OIDC for Azure Storage scope without p
     },
   });
 
-  const token = await runtime.azureMarketplaceStorageAccessToken();
+  const token = await runtime.productionAzureStorageAccessToken();
   assert.equal(token, "azure-storage-access-token");
   assert.deepEqual(scopes, ["https://storage.azure.com/.default"]);
   assert.equal(process.env.OBSERRA_AI_MARKETPLACE_STORAGE_ACCESS_TOKEN, undefined);
