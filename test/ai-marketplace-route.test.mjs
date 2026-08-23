@@ -16,3 +16,10 @@ test("AI Skills Marketplace uses its real product catalog and does not route to 
   assert.ok(catalog.every((product) => product.product_id && product.product_name && product.family));
   assert.doesNotMatch(page, /href="\/apps" className=".*marketplace/);
 });
+
+test("skill library route presents the four capability levels and source packages", async () => {
+  const page = await readFile(new URL("../app/ai-marketplace/skill-libraries/page.tsx", import.meta.url), "utf8");
+  for (const level of ["Beginner", "Intermediate", "Expert", "Advanced"]) assert.match(page, new RegExp(level));
+  assert.match(page, /11,320 capability skills/);
+  assert.match(page, /Set 4 Advanced/);
+});
