@@ -796,3 +796,13 @@ All must be observed from the public canonical host:
 - **Immediate observation:** Vercel deployment enumeration has not yet returned a new bootstrap/redeployment record. The existing canonical Production deployment remains `dpl_AJPPKARXHGqo3QACFwpdmng3KQXV`; this is expected until the workflow's independent Azure OIDC, tenant/subscription, federated-identity, Key Vault/RBAC, and Production-binding checks complete.
 - **No success inference:** no sensitive binding transfer, replacement deployment, alias movement, payment activation, enrollment, or LMS readiness success is recorded from owner dispatch alone.
 - **Monitoring contract:** observe and record the first accessible workflow/deployment evidence; fail closed if any required Azure, Key Vault, Vercel, Applications, Academy, or Florida readiness condition fails.
+
+
+<!-- ops-checkpoint:2026-08-23-runtime-identity-missing-run-6 -->
+### 2026-08-23T12:42:39.536Z — runtime-bootstrap run #6 failed closed before Vercel mutation
+
+- **Workflow evidence:** owner-provided GitHub Actions evidence for `Enable Vercel Key Vault runtime identity` run `#6` shows `Authenticate the governed deployment identity` completed successfully.
+- **Exact blocker:** `Bind the canonical Vercel production workload to the runtime identity` failed with Azure `ResourceNotFound`: user-assigned managed identity `id-obserra-runtime-prod` was not found in resource group `rg-obserra-prod-eastus`.
+- **Fail-closed effect:** the production-binding, replacement-deployment, direct Applications/Academy commerce proof, guarded cutover, and canonical verification steps were skipped. No Vercel Production binding, sensitive transfer, deployment, alias, payment activation, enrollment, or LMS readiness change is evidenced.
+- **Separate maintenance warning:** GitHub reported the current `azure/login@v2` action runtime as Node.js 20 being forced to Node.js 24. The warning did not cause this failure; a separate source-only upgrade to Azure Login v3 / Node 24 is required and must not replace the exact authorized recovery run.
+- **Next safe action:** tenant administrator converges the missing runtime identity with the exact Key Vault Secrets User role, read backs the identity and role, then reruns only this failed bootstrap job at the same authorized SHA.
