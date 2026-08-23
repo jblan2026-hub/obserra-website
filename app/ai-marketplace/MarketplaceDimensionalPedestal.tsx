@@ -41,39 +41,39 @@ function CapabilityAssembly({ detail, kind, reducedMotion }: { detail: Marketpla
     group.current.rotation.y += delta * 0.12;
     group.current.position.y = Math.sin(clock.elapsedTime * 0.7) * 0.08;
   });
-  const material = <meshPhysicalMaterial color={palette.primary} emissive={palette.primary} emissiveIntensity={0.14} metalness={0.78} roughness={0.2} clearcoat={1} clearcoatRoughness={0.12} />;
-  const accentMaterial = <meshPhysicalMaterial color={palette.accent} emissive={palette.accent} emissiveIntensity={0.2} metalness={0.72} roughness={0.18} clearcoat={1} />;
+  const bodyMaterial = { color: palette.primary, emissive: palette.primary, emissiveIntensity: 0.32, metalness: 0.72, roughness: 0.22 };
+  const accentMaterial = { color: palette.accent, emissive: palette.accent, emissiveIntensity: 0.46, metalness: 0.68, roughness: 0.18 };
 
   return <group ref={group} rotation={[0.16, -0.45, 0]}>
     {kind === "agent" && <>
-      <mesh>{material}<icosahedronGeometry args={[1.12, 2]} /><Edges color={palette.secondary} threshold={18} /></mesh>
-      <mesh rotation={[Math.PI / 2.6, 0.15, 0]}><torusGeometry args={[1.48, 0.055, 12, 96]} />{accentMaterial}</mesh>
-      {[-1, 1].map((side) => <mesh key={side} position={[side * 1.52, side * 0.2, side * 0.18]} scale={0.24}>{accentMaterial}<octahedronGeometry args={[1, 0]} /></mesh>)}
+      <mesh><icosahedronGeometry args={[1.12, 2]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} threshold={18} /></mesh>
+      <mesh rotation={[Math.PI / 2.6, 0.15, 0]}><torusGeometry args={[1.48, 0.055, 12, 96]} /><meshStandardMaterial {...accentMaterial} /></mesh>
+      {[-1, 1].map((side) => <mesh key={side} position={[side * 1.52, side * 0.2, side * 0.18]} scale={0.24}><octahedronGeometry args={[1, 0]} /><meshStandardMaterial {...accentMaterial} /></mesh>)}
     </>}
     {kind === "workflow" && <>
-      {[-0.78, 0, 0.78].map((y, index) => <mesh key={y} position={[(index - 1) * 0.22, y, 0]} rotation={[0, index * 0.28, 0]}>{index === 1 ? accentMaterial : material}<boxGeometry args={[1.85 - Math.abs(index - 1) * 0.25, 0.42, 0.9]} /><Edges color={palette.secondary} /></mesh>)}
-      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[1.52, 0.055, 10, 80]} />{accentMaterial}</mesh>
+      {[-0.78, 0, 0.78].map((y, index) => <mesh key={y} position={[(index - 1) * 0.22, y, 0]} rotation={[0, index * 0.28, 0]}><boxGeometry args={[1.85 - Math.abs(index - 1) * 0.25, 0.42, 0.9]} /><meshStandardMaterial {...(index === 1 ? accentMaterial : bodyMaterial)} /><Edges color={palette.secondary} /></mesh>)}
+      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[1.52, 0.055, 10, 80]} /><meshStandardMaterial {...accentMaterial} /></mesh>
     </>}
     {kind === "bridge" && <>
-      <mesh position={[-0.86, 0, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.72, 0.22, 20, 72]} />{material}<Edges color={palette.secondary} /></mesh>
-      <mesh position={[0.86, 0, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.72, 0.22, 20, 72]} />{accentMaterial}<Edges color={palette.secondary} /></mesh>
+      <mesh position={[-0.86, 0, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.72, 0.22, 20, 72]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} /></mesh>
+      <mesh position={[0.86, 0, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.72, 0.22, 20, 72]} /><meshStandardMaterial {...accentMaterial} /><Edges color={palette.secondary} /></mesh>
       <mesh rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.16, 0.16, 1.75, 24]} /><meshStandardMaterial color={palette.secondary} emissive={palette.primary} emissiveIntensity={0.22} metalness={0.8} roughness={0.18} /></mesh>
     </>}
     {kind === "assurance" && <>
-      <mesh scale={[1.05, 1.25, 0.58]}>{material}<dodecahedronGeometry args={[1.05, 1]} /><Edges color={palette.secondary} threshold={15} /></mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[1.48, 0.065, 12, 96]} />{accentMaterial}</mesh>
-      <mesh position={[0, 0, 0.68]} scale={0.38}>{accentMaterial}<octahedronGeometry args={[1, 0]} /></mesh>
+      <mesh scale={[1.05, 1.25, 0.58]}><dodecahedronGeometry args={[1.05, 1]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} threshold={15} /></mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[1.48, 0.065, 12, 96]} /><meshStandardMaterial {...accentMaterial} /></mesh>
+      <mesh position={[0, 0, 0.68]} scale={0.38}><octahedronGeometry args={[1, 0]} /><meshStandardMaterial {...accentMaterial} /></mesh>
     </>}
     {kind === "collection" && <>
-      <mesh>{accentMaterial}<icosahedronGeometry args={[0.7, 2]} /><Edges color={palette.secondary} /></mesh>
+      <mesh><icosahedronGeometry args={[0.7, 2]} /><meshStandardMaterial {...accentMaterial} /><Edges color={palette.secondary} /></mesh>
       {[[1.28, .35, .1], [-1.15, .5, -.3], [.38, -1.08, .25], [-.42, 1.16, -.22]].map((position, index) => <group key={position.join(":")} position={position as [number, number, number]}>
-        <mesh scale={0.38 + index * 0.035}>{material}<dodecahedronGeometry args={[1, 1]} /><Edges color={palette.secondary} /></mesh>
+        <mesh scale={0.38 + index * 0.035}><dodecahedronGeometry args={[1, 1]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} /></mesh>
         <mesh rotation={[Math.PI / 2, index * 0.4, 0]}><torusGeometry args={[0.58, 0.025, 8, 48]} /><meshBasicMaterial color={palette.accent} /></mesh>
       </group>)}
     </>}
     {kind === "capability" && <>
-      <mesh>{material}<icosahedronGeometry args={[1.18, 3]} /><Edges color={palette.secondary} threshold={14} /></mesh>
-      <mesh rotation={[Math.PI / 2.7, 0.1, 0.4]}><torusGeometry args={[1.5, 0.06, 12, 96]} />{accentMaterial}</mesh>
+      <mesh><icosahedronGeometry args={[1.18, 3]} /><meshStandardMaterial {...bodyMaterial} /><Edges color={palette.secondary} threshold={14} /></mesh>
+      <mesh rotation={[Math.PI / 2.7, 0.1, 0.4]}><torusGeometry args={[1.5, 0.06, 12, 96]} /><meshStandardMaterial {...accentMaterial} /></mesh>
       <mesh rotation={[-Math.PI / 3.2, 0.2, -0.5]}><torusGeometry args={[1.32, 0.035, 10, 80]} /><meshBasicMaterial color={palette.secondary} /></mesh>
     </>}
     <mesh position={[0, -1.75, 0]} rotation={[-Math.PI / 2, 0, 0]}><torusGeometry args={[1.72, 0.035, 10, 96]} /><meshBasicMaterial color={palette.primary} transparent opacity={0.55} /></mesh>
@@ -129,7 +129,7 @@ function ProductObject({ detail }: { detail: MarketplacePedestalDetail }) {
 
   return <div className={styles.object}>
     <div ref={stage} className={styles.objectStage} data-mode={mode}>
-      {(mode === "checking" || mode === "fallback") && <SemanticCapabilityObject detail={detail} kind={kind} loading={mode === "checking"} />}
+      {mode !== "ready" && <SemanticCapabilityObject detail={detail} kind={kind} loading={mode !== "fallback"} />}
       {(mode === "loading" || mode === "ready") && <>
         <Canvas dpr={[1, 1.75]} camera={{ position: [0, 0.15, 6.4], fov: 42, near: 0.1, far: 60 }} performance={{ min: 0.55 }} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }} onCreated={() => setMode("ready")} role="img" aria-label={`${sceneLabel(kind)} for ${detail.name}. Drag to orbit and use the scroll wheel to zoom.`}>
           <Suspense fallback={<Html center><span className={styles.sceneLoader}>Building the interactive view</span></Html>}><ProductScene detail={detail} kind={kind} reducedMotion={reducedMotion} /></Suspense>
@@ -143,7 +143,7 @@ function ProductObject({ detail }: { detail: MarketplacePedestalDetail }) {
   </div>;
 }
 
-export default function MarketplaceDimensionalPedestal({ detail, checkoutEnabled }: { detail: MarketplacePedestalDetail; checkoutEnabled: boolean; runtimeReason: string }) {
+export default function MarketplaceDimensionalPedestal({ detail, checkoutEnabled }: { detail: MarketplacePedestalDetail; checkoutEnabled: boolean }) {
   const [selectedOffer, setSelectedOffer] = useState(0);
   const offer = detail.pricing.offers[selectedOffer] ?? null;
   const hasOnlineCheckout = checkoutEnabled && detail.action.enabled;

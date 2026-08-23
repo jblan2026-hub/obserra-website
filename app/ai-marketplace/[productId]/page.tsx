@@ -76,7 +76,7 @@ export default async function MarketplaceProductPage({ params }: PageProps) {
         <nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/skill-libraries">Skills</Link><Link href="/academy">Academy</Link><Link href="/contact?interest=ai-marketplace">Talk to an expert</Link></nav>
       </header>
       <MarketplaceProductFacts detail={detail} />
-      <MarketplaceDimensionalPedestal detail={detail} checkoutEnabled={commerce.checkoutEnabled} runtimeReason={commerce.reason} />
+      <MarketplaceDimensionalPedestal detail={detail} checkoutEnabled={commerce.checkoutEnabled} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
     </main>;
   }
