@@ -978,3 +978,13 @@ All must be observed from the public canonical host:
 - **Non-production Vercel context:** the PR-linked `obserra-website-live` deployment was canceled and is not production evidence.
 - **Safe action now authorized:** merge this exact guarded source; its main-path runtime workflow may create the empty Bicep-defined Key Vault only after Azure not-found, then must complete identity/role/Vercel/deployment gates before any readiness claim.
 - **Fail-closed state:** no runtime Key Vault, role, Vercel-binding, payment, enrollment, Applications/Academy commerce, or Florida LMS readiness success is inferred from these source checks.
+
+
+<!-- ops-checkpoint:2026-08-23T13-20-00-075Z-pr-224-merged-canonical -->
+### 2026-08-23T13:20:00.075Z — PR #224 merged; exact canonical release proven, governed readiness remains fail-closed
+
+- **Merge proof:** GitHub merged [PR #224](https://github.com/jblan2026-hub/obserra-website/pull/224) as canonical main commit [`326619b667af88c15e6604cb87885c36a99bb805`](https://github.com/jblan2026-hub/obserra-website/commit/326619b667af88c15e6604cb87885c36a99bb805).
+- **Cutover proof:** [canonical cutover run 32641916087](https://github.com/jblan2026-hub/obserra-website/actions/runs/32641916087) completed successfully for that exact SHA; all cutover control steps completed and rollback was skipped.
+- **Canonical public proof:** at 2026-08-23T13:18:45.424Z, `GET https://www.obserrallc.com/api/health` returned HTTP `200`, verified routing/hosting authority, deployment `dpl_4ZXpKLDtMAHkPSHFcgo2fKuSi3CL`, and exact SHA `326619b667af88c15e6604cb87885c36a99bb805` in canonical project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC`.
+- **Direct fail-closed proofs:** Applications commerce returned HTTP `503` / `operational:false` / `durable-commerce-unavailable`; Academy commerce returned HTTP `503` / `operational:false` with payment provider and durable storage unavailable; Florida LMS readiness returned HTTP `503` / `not_ready`.
+- **Runtime-bootstrap boundary:** the canonical cutover and website deployment do not prove Key Vault creation, vault-role readback, or Vercel runtime-binding persistence. The separate Key Vault bootstrap run has not yet been identified from the available GitHub run evidence; no sensitive-transfer success is claimed.
