@@ -1,0 +1,8 @@
+{
+  "contract": "obserra-marketplace-supabase-keyvault-migration-v1",
+  "httpStatus": "200",
+  "migrated": true,
+  "state": "created",
+  "source": "SUPABASE_SECRET_KEYS.default",
+  "code": null
+}
