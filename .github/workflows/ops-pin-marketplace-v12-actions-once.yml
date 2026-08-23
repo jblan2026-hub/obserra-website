@@ -1,3 +1,4 @@
+# Second branch commit intentionally triggers this already-registered one-time workflow.
 name: Pin Marketplace v1.2 actions once
 
 on:
