@@ -1,0 +1,158 @@
+name: Marketplace v1.2 Stripe binding reconciliation
+run-name: Marketplace v1.2 Stripe binding reconciliation for ${{ inputs.expected_commit }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        description: Exact main commit approved for reconciliation
+        required: true
+        type: string
+      approved_catalog_revision:
+        description: Exact approved Marketplace v1.2 catalog revision
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: marketplace-v12-stripe-binding-reconciliation
+  cancel-in-progress: false
+
+env:
+  EXPECTED_CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
+  AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
+  AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
+  AZURE_DELIVERY_CLIENT_ID: b8da232a-713f-4c25-a61e-4fb34d13e229
+  AZURE_KEY_VAULT_NAME: kv-obserra-prod-38d660
+  OBSERRA_APPLICATIONS_SUPABASE_URL: https://ykmrlcfitsubqajgfnye.supabase.co
+
+jobs:
+  reconcile:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    environment: production
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - name: Check out exact approved main revision
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.expected_commit }}
+          persist-credentials: false
+
+      - name: Pin governed reconciliation identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_SHA}" = "${{ inputs.expected_commit }}" || { echo "::error::Workflow dispatch SHA differs from approval."; exit 1; }
+          test "$(git rev-parse HEAD)" = "${{ inputs.expected_commit }}" || { echo "::error::Repository HEAD differs from approval."; exit 1; }
+          test "${{ inputs.approved_catalog_revision }}" = "${EXPECTED_CATALOG_REVISION}" || { echo "::error::Catalog revision differs from approved v1.2 revision."; exit 1; }
+          node scripts/marketplace-catalog-delivery-gate.mjs
+
+      - name: Authenticate dedicated Marketplace delivery identity
+        uses: azure/login@v3.0.1
+        with:
+          client-id: ${{ env.AZURE_DELIVERY_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Reconcile one deterministic catalog shard
+        shell: bash
+        run: |
+          set -euo pipefail
+          read_secret() {
+            local name="$1" value
+            value="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${name}" --query value -o tsv --only-show-errors)"
+            test -n "${value:-}" || { echo "::error::Required Marketplace binding authority is unavailable: ${name}."; exit 1; }
+            echo "::add-mask::${value}"
+            printf '%s' "${value}"
+          }
+          service_role_key="$(read_secret applications-supabase-service-role-key)"
+          stripe_key="$(read_secret applications-stripe-secret-key)"
+          hash_secret="$(read_secret applications-commerce-hash-secret)"
+          export OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY="${service_role_key}"
+          export APPLICATIONS_STRIPE_SECRET_KEY="${stripe_key}"
+          export OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET="${hash_secret}"
+          export OBSERRA_MARKETPLACE_V12_RECONCILIATION_RUN=review
+          output="${RUNNER_TEMP}/marketplace-v12-binding-shard-${{ matrix.shard }}.json"
+          node scripts/reconcile-marketplace-v12-stripe-bindings.mjs \
+            --shard-index "${{ matrix.shard }}" \
+            --shard-count 4 \
+            --concurrency 2 >"${output}"
+          jq -e '.contract == "obserra-marketplace-v12-bulk-binding-reconcile-v1" and .failureCount == 0 and .processedProducts == .assignedProducts and .reviewedOfferBindings == .requiredOfferBindings and .activationChanged == false and .checkoutActivated == false' "${output}" >/dev/null
+          unset OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY APPLICATIONS_STRIPE_SECRET_KEY OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET service_role_key stripe_key hash_secret
+
+      - name: Retain non-sensitive shard evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: marketplace-v12-binding-shard-${{ matrix.shard }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/marketplace-v12-binding-shard-${{ matrix.shard }}.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+  verify:
+    if: github.ref == 'refs/heads/main'
+    needs: reconcile
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    environment: production
+    steps:
+      - name: Check out exact approved main revision
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.expected_commit }}
+          persist-credentials: false
+
+      - name: Pin final review identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_SHA}" = "${{ inputs.expected_commit }}"
+          test "$(git rev-parse HEAD)" = "${{ inputs.expected_commit }}"
+          test "${{ inputs.approved_catalog_revision }}" = "${EXPECTED_CATALOG_REVISION}"
+
+      - name: Authenticate dedicated Marketplace delivery identity
+        uses: azure/login@v3.0.1
+        with:
+          client-id: ${{ env.AZURE_DELIVERY_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify catalog-wide live Stripe binding evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          read_secret() {
+            local name="$1" value
+            value="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${name}" --query value -o tsv --only-show-errors)"
+            test -n "${value:-}" || { echo "::error::Required Marketplace verification authority is unavailable: ${name}."; exit 1; }
+            echo "::add-mask::${value}"
+            printf '%s' "${value}"
+          }
+          service_role_key="$(read_secret applications-supabase-service-role-key)"
+          stripe_key="$(read_secret applications-stripe-secret-key)"
+          export OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY="${service_role_key}"
+          export APPLICATIONS_STRIPE_SECRET_KEY="${stripe_key}"
+          export OBSERRA_MARKETPLACE_V12_EVIDENCE_RUN=review
+          export OBSERRA_ALLOW_LIVE_STRIPE_OUTSIDE_PRODUCTION=true
+          output="${RUNNER_TEMP}/marketplace-v12-stripe-evidence.json"
+          node scripts/verify-marketplace-v12-stripe-evidence.mjs >"${output}"
+          jq -e '.contract == "obserra-marketplace-v12-stripe-evidence-review-v1" and .reviewOnly == true and .activationChanged == false and .verified == true and .failureCount == 0 and .requiredProductCards == 11390 and .reviewedProductCards == 11390 and .verifiedOfferBindings == .requiredOfferBindings and .stripeAccountChargesEnabled == true and .bindingReceipt.contract == "obserra-marketplace-v12-runtime-binding-receipt-v1"' "${output}" >/dev/null
+          unset OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY APPLICATIONS_STRIPE_SECRET_KEY service_role_key stripe_key
+
+      - name: Retain non-sensitive catalog-wide verification
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: marketplace-v12-stripe-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/marketplace-v12-stripe-evidence.json
+          if-no-files-found: ignore
+          retention-days: 30
