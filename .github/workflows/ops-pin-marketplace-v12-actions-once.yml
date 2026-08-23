@@ -1,4 +1,4 @@
-# Second branch commit intentionally triggers this already-registered one-time workflow.
+# Registered on main by PR #284; this branch push executes it once and it self-deletes from this branch.
 name: Pin Marketplace v1.2 actions once
 
 on:
