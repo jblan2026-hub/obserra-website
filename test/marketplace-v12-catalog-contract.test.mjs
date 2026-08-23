@@ -99,6 +99,8 @@ test("capability universe is sourced from the bounded scene endpoint with an equ
   assert.match(experience, /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/);
   assert.match(experience, /Capability universe scene index/);
   assert.match(experience, /Open catalog record/);
+  assert.match(experience, /sceneFromCards/);
+  assert.match(experience, /scene_cluster/);
   assert.match(sceneRoute, /limit: Number\(params\.get\("limit"\) \?\? 48\)/);
 });
 
