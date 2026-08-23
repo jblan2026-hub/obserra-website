@@ -816,3 +816,12 @@ All must be observed from the public canonical host:
 - **Source proof:** the branch is two commits ahead of and zero commits behind exact `main` SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2`; comparison reports only the two expected one-line file changes.
 - **Release isolation:** PR #223 is not merged and must not supersede the existing authorized recovery run. Runtime identity creation/role readback followed by a rerun of bootstrap run #6 remains the shortest path to Vercel binding and canonical verification.
 - **Mutation state:** no Production environment binding, deployment, alias, payment, enrollment, or LMS state changed by opening this source-review PR.
+
+
+<!-- ops-checkpoint:2026-08-23-node24-pr-223-contract-correction -->
+### 2026-08-23T12:45:20.004Z — PR #223 Node 24 contract corrected and re-gated
+
+- **Initial source-gate result:** Azure IaC Validation run `32640228406` failed only because `test/azure-production-plane-contract.test.mjs` still asserted `azure/login@v2` after the intended upgrade.
+- **Correction:** the test now requires exact `azure/login@v3.0.1` in both the Azure-production and Vercel-Key-Vault runtime workflows, and explicitly rejects `azure/login@v2` in each. This strengthens the requested Node 24 contract; it does not bypass or remove a guardrail.
+- **Scope after correction:** PR #223 now contains three source files: the two intended workflow substitutions and the matching contract-test update. No Azure or Vercel runtime mutation was made.
+- **Next evidence:** wait for new PR #223 validation runs. Do not merge the Node 24 source update ahead of the exact-SHA runtime identity recovery.
