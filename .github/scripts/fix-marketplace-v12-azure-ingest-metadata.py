@@ -8,8 +8,12 @@ replacements = {
     "metadata?..product_id": "metadata?.product_id",
 }
 for old, new in replacements.items():
-    count = text.count(old)
-    if count != 1:
-        raise SystemExit(f"Expected one {old!r}, found {count}")
-    text = text.replace(old, new, 1)
+    old_count = text.count(old)
+    new_count = text.count(new)
+    if old_count == 1:
+        text = text.replace(old, new, 1)
+    elif old_count == 0 and new_count == 1:
+        continue
+    else:
+        raise SystemExit(f"Metadata repair invariant failed for {old!r}: old={old_count}, new={new_count}")
 path.write_text(text)
