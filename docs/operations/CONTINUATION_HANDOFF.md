@@ -737,3 +737,12 @@ All must be observed from the public canonical host:
 - **Non-production noise:** project metadata also reported newer deployment `dpl_FrnRnhAG7uV2AVXeN8TvhQztQhuU` as `CANCELED` with no production target. It is not canonical evidence and did not alter the proven production release.
 - **Mutation state:** readback only; no environment binding, deployment, alias, payment, or LMS setting was changed.
 - **Remaining gates:** exact tenant-side `github-main` convergence/readback and explicit owner authorization for the production-sensitive Key Vault-to-Vercel bootstrap dispatch.
+
+
+<!-- ops-checkpoint:2026-08-23-production-studio-handoff-scan -->
+### 2026-08-23T12:16:xxZ — Production Studio handoff scan completed
+
+- **Repository checked:** `jblan2026-hub/obserra-academy-production-studio` current `main` plus operational branches `ops/fix-postmerge-ha-evidence`, `ops/10x-cross-project-production-gate`, `ops/20x-enterprise-production-gate`, `ops/40x-enterprise-production-gate`, `ops/40x-postmerge-production-evidence`, and `ops/50x-enterprise-production-gate`.
+- **Result:** no separate continuation handoff or checkpoint file exists in the inspected branch roots or `docs` trees. No competing runtime authority was found.
+- **Operational authority:** this website `ops/live-handoff` record remains the single rolling record for canonical website, Applications commerce, Academy/Production Studio integration, payment, and Florida LMS runtime evidence.
+- **Mutation state:** repository readback only; no Production Studio source, branch, deployment, payment, or LMS setting was changed.
