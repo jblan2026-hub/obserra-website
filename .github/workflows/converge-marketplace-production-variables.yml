@@ -1,0 +1,130 @@
+name: Converge Marketplace production variables
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/converge-marketplace-production-variables.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: marketplace-production-variable-convergence
+  cancel-in-progress: false
+
+env:
+  ENVIRONMENT_NAME: production
+  OBSERVATION_BRANCH: ops/marketplace-v12-ingest-dispatch-20260823
+  AZURE_TENANT_ID_VALUE: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
+  DELIVERY_CLIENT_ID_VALUE: b8da232a-713f-4c25-a61e-4fb34d13e229
+  SOURCE_STORAGE_ACCOUNT_VALUE: stobserramktv1238d660
+  SOURCE_CONTAINER_VALUE: marketplace-v12-source
+
+jobs:
+  converge:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Converge authoritative non-secret environment variables
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, urllib.error, urllib.parse, urllib.request
+          repo = 'jblan2026-hub/obserra-website'
+          environment = os.environ['ENVIRONMENT_NAME']
+          token = os.environ['GH_TOKEN']
+          desired = {
+              'AZURE_TENANT_ID': os.environ['AZURE_TENANT_ID_VALUE'],
+              'OBSERRA_MARKETPLACE_DELIVERY_CLIENT_ID': os.environ['DELIVERY_CLIENT_ID_VALUE'],
+              'OBSERRA_MARKETPLACE_SOURCE_STORAGE_ACCOUNT': os.environ['SOURCE_STORAGE_ACCOUNT_VALUE'],
+              'OBSERRA_MARKETPLACE_SOURCE_CONTAINER': os.environ['SOURCE_CONTAINER_VALUE'],
+          }
+          headers = {
+              'Accept': 'application/vnd.github+json',
+              'Authorization': f'Bearer {token}',
+              'X-GitHub-Api-Version': '2022-11-28',
+              'User-Agent': 'obserra-marketplace-variable-convergence',
+              'Content-Type': 'application/json',
+          }
+          base = f'https://api.github.com/repos/{repo}/environments/{urllib.parse.quote(environment, safe="")}/variables'
+          for name, value in desired.items():
+              item_url = f'{base}/{urllib.parse.quote(name, safe="")}'
+              request = urllib.request.Request(item_url, headers=headers)
+              exists = False
+              try:
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      current = json.load(response)
+                      exists = True
+                      if current.get('value') == value:
+                          continue
+              except urllib.error.HTTPError as error:
+                  if error.code != 404:
+                      raise
+              body = json.dumps({'name': name, 'value': value}).encode()
+              if exists:
+                  request = urllib.request.Request(item_url, data=body, method='PATCH', headers=headers)
+              else:
+                  request = urllib.request.Request(base, data=body, method='POST', headers=headers)
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  if response.status not in (201, 204):
+                      raise SystemExit(f'variable convergence failed for {name}: {response.status}')
+          PY
+
+      - name: Verify variable names and expected values
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' >"${RUNNER_TEMP}/marketplace-production-variable-receipt.json"
+          import json, os, urllib.parse, urllib.request
+          repo='jblan2026-hub/obserra-website'; environment=os.environ['ENVIRONMENT_NAME']; token=os.environ['GH_TOKEN']
+          expected={
+              'AZURE_TENANT_ID': os.environ['AZURE_TENANT_ID_VALUE'],
+              'OBSERRA_MARKETPLACE_DELIVERY_CLIENT_ID': os.environ['DELIVERY_CLIENT_ID_VALUE'],
+              'OBSERRA_MARKETPLACE_SOURCE_STORAGE_ACCOUNT': os.environ['SOURCE_STORAGE_ACCOUNT_VALUE'],
+              'OBSERRA_MARKETPLACE_SOURCE_CONTAINER': os.environ['SOURCE_CONTAINER_VALUE'],
+          }
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','X-GitHub-Api-Version':'2022-11-28','User-Agent':'obserra-marketplace-variable-convergence'}
+          req=urllib.request.Request(f'https://api.github.com/repos/{repo}/environments/{urllib.parse.quote(environment,safe="")}/variables?per_page=100',headers=headers)
+          with urllib.request.urlopen(req,timeout=30) as response: payload=json.load(response)
+          actual={item.get('name'):item.get('value') for item in payload.get('variables',[])}
+          mismatched=[name for name,value in expected.items() if actual.get(name)!=value]
+          if mismatched: raise SystemExit('Marketplace environment variable readback mismatch: '+','.join(mismatched))
+          print(json.dumps({
+              'contract':'obserra-marketplace-production-variable-convergence-v1',
+              'environment':environment,
+              'converged':sorted(expected),
+              'awsRegionVariablePresent':bool(actual.get('OBSERRA_MARKETPLACE_RELEASE_AWS_REGION')),
+          }, indent=2))
+          PY
+
+      - name: Publish non-sensitive convergence receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, json, os, urllib.error, urllib.parse, urllib.request
+          source=os.path.join(os.environ['RUNNER_TEMP'],'marketplace-production-variable-receipt.json')
+          content=open(source,'rb').read(); repo='jblan2026-hub/obserra-website'; path='ops/marketplace-v12-production-variables.json'; branch=os.environ['OBSERVATION_BRANCH']; token=os.environ['GH_TOKEN']
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','X-GitHub-Api-Version':'2022-11-28','User-Agent':'obserra-marketplace-variable-convergence','Content-Type':'application/json'}
+          encoded=urllib.parse.quote(path,safe='/')
+          get=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}?ref={urllib.parse.quote(branch,safe="")}',headers=headers); sha=None
+          try:
+            with urllib.request.urlopen(get,timeout=30) as response: sha=json.load(response).get('sha')
+          except urllib.error.HTTPError as error:
+            if error.code != 404: raise
+          body={'message':'ops: record Marketplace production variable convergence','content':base64.b64encode(content).decode(),'branch':branch}
+          if sha: body['sha']=sha
+          put=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}',data=json.dumps(body).encode(),method='PUT',headers=headers)
+          with urllib.request.urlopen(put,timeout=30) as response:
+            if response.status not in (200,201): raise SystemExit(response.status)
+          PY
