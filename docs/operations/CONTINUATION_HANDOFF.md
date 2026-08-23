@@ -728,3 +728,12 @@ All must be observed from the public canonical host:
 - **Florida LMS:** liveness returned HTTP `200` / `live`; readiness returned HTTP `503` / `not_ready` with `Retry-After: 60`.
 - **Interpretation:** the website release remains canonical and verified; Applications, Academy payment, and regulated Florida LMS readiness remain fail-closed. No production mutation or sensitive transfer occurred.
 - **Next safe action:** inspect the exact current-main runtime-bootstrap run evidence, then converge/read back the tenant-side `github-main` federated identity before any authorized production bootstrap dispatch.
+
+
+<!-- ops-checkpoint:2026-08-23T12-15-vercel-target-readback -->
+### 2026-08-23T12:15:xxZ — exact Vercel target readback
+
+- **Canonical production target:** Vercel returned deployment `dpl_AJPPKARXHGqo3QACFwpdmng3KQXV` as `READY`, target `production`, project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC` / `obserra-website-live`, GitHub ref `main`, exact SHA `5de3910bc104db9f41de48f816dde5bdf82dd6e2`, and commit verification `verified`.
+- **Non-production noise:** project metadata also reported newer deployment `dpl_FrnRnhAG7uV2AVXeN8TvhQztQhuU` as `CANCELED` with no production target. It is not canonical evidence and did not alter the proven production release.
+- **Mutation state:** readback only; no environment binding, deployment, alias, payment, or LMS setting was changed.
+- **Remaining gates:** exact tenant-side `github-main` convergence/readback and explicit owner authorization for the production-sensitive Key Vault-to-Vercel bootstrap dispatch.
