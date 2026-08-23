@@ -6,6 +6,7 @@ import ts from "typescript";
 
 const ROUTING_MODULE = "lib/auth/provider-routing.ts";
 const PROXY_MODULE = "proxy.ts";
+const PRODUCTION_GATE = ".github/workflows/production-e2e-operational-gate.yml";
 
 function routingModule() {
   const output = ts.transpileModule(fs.readFileSync(ROUTING_MODULE, "utf8"), {
@@ -35,6 +36,24 @@ test("public routes are explicitly identity-independent before provider readines
   );
   assert.match(proxy, /X-Obserra-Identity-Provider", "public"/);
   assert.match(proxy, /X-Obserra-Identity-Status", "not-required"/);
+});
+
+test("production homepage gate verifies the public identity boundary without dropping security headers", () => {
+  const gate = fs.readFileSync(PRODUCTION_GATE, "utf8");
+
+  assert.match(gate, /x-obserra-identity-provider:\[\[:space:\]\]\*public/);
+  assert.match(gate, /x-obserra-identity-status:\[\[:space:\]\]\*not-required/);
+  assert.doesNotMatch(gate, /x-obserra-identity-status:\[\[:space:\]\]\*ready/);
+  assert.doesNotMatch(gate, /x-obserra-identity-environment:\[\[:space:\]\]\*live/);
+
+  for (const header of [
+    "strict-transport-security",
+    "content-security-policy",
+    "x-content-type-options",
+    "x-frame-options",
+  ]) {
+    assert.match(gate, new RegExp(`\\^${header}:`));
+  }
 });
 
 test("Supabase-owned routes fail closed before Clerk fallback when Supabase runtime is disabled or unready", () => {
