@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { marketplaceV12SalesDock, marketplaceV12Search, marketplaceV12Summary } from "../../lib/marketplace-v12-catalog";
+import { marketplaceV12Product, marketplaceV12Search, marketplaceV12Summary } from "../../lib/marketplace-v12-catalog";
 import MarketplaceExperience, { type MarketplaceCard } from "./MarketplaceExperience";
 import MarketplaceSalesDock from "./MarketplaceSalesDock";
 import type { MarketplaceV12Card } from "../../lib/marketplace-v12-catalog";
@@ -17,8 +17,13 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
   const initial = marketplaceV12Search({ cursor, q: query || undefined, limit: 24 });
   const catalog = initial.results as MarketplaceCard[];
   const familyEntries = Object.entries(summary.family_counts).sort(([a], [b]) => a.localeCompare(b));
-  const salesDock = marketplaceV12SalesDock();
-  const dockRecords = [...salesDock.packages, ...catalog] as MarketplaceV12Card[];
+  const featuredLevels = ["Beginner", "Intermediate", "Expert", "Advanced"];
+  const levelRecords = featuredLevels.flatMap((level) => marketplaceV12Search({ q: level, limit: 24 }).results
+    .filter((product) => product.proficiency?.toLowerCase() === level.toLowerCase() && product.product_type !== "collection" && product.product_type !== "bundle" && product.pricing.model !== "quote" && product.pricing.offers.length > 0)
+    .slice(0, 4));
+  const workflowAnchor = marketplaceV12Product("access-review-workflow");
+  const fallbackRecords = (initial.results as MarketplaceV12Card[]).filter((product) => product.product_type !== "collection" && product.product_type !== "bundle" && product.pricing.model !== "quote" && product.pricing.offers.length > 0);
+  const dockRecords = [workflowAnchor, ...levelRecords, ...fallbackRecords].filter((product): product is MarketplaceV12Card => Boolean(product));
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",

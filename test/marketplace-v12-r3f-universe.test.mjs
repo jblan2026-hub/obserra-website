@@ -5,51 +5,61 @@ import { readFile } from "node:fs/promises";
 const root = new URL("..", import.meta.url);
 const read = (path) => readFile(new URL(path, root), "utf8");
 
-test("capability universe primary renderer is real R3F with bounded instanced catalog geometry", async () => {
-  const [experience, packageJson] = await Promise.all([
+test("marketplace browser uses bounded search results instead of the retired catalog scene", async () => {
+  const [experience, page] = await Promise.all([
     read("app/ai-marketplace/MarketplaceExperience.tsx"),
-    read("package.json"),
+    read("app/ai-marketplace/page.tsx"),
   ]);
-  assert.match(packageJson, /"three": "0\.185\.1"/);
-  assert.match(packageJson, /"@react-three\/fiber": "9\.7\.0"/);
-  assert.match(packageJson, /"@react-three\/drei": "10\.7\.8"/);
-  assert.match(experience, /from "@react-three\/fiber"/);
-  assert.match(experience, /<Canvas /);
-  assert.match(experience, /<Instances /);
-  assert.match(experience, /<Instance /);
-  assert.match(experience, /catalogSpatialGraph/);
-  assert.match(experience, /relationship_product_ids/);
-  assert.match(experience, /<OrbitControls enableDamping/);
-  assert.match(experience, /enablePan enableZoom/);
-  assert.match(experience, /maxDistance=\{30\}/);
-  assert.doesNotMatch(experience, /StaticCapabilityMap/);
-  assert.doesNotMatch(experience, /getContext\("webgl/);
+  assert.match(page, /marketplaceV12Search\(\{ cursor, q: query \|\| undefined, limit: 24 \}\)/);
+  assert.match(page, /initialCatalog=\{catalog\}/);
+  assert.match(page, /initialTotal=\{initial\.total\}/);
+  assert.match(page, /familyEntries=\{familyEntries\}/);
+  assert.match(experience, /new URLSearchParams\(\{ limit: "24" \}\)/);
+  assert.match(experience, /params\.set\("q", query\.trim\(\)\)/);
+  assert.match(experience, /params\.set\("family", family\)/);
+  assert.match(experience, /params\.set\("cursor", cursor\)/);
+  assert.match(experience, /fetch\(`\/api\/ai-marketplace\/search\?\$\{params\}`\)/);
+  assert.doesNotMatch(experience, /\/api\/ai-marketplace\/scene/);
+  assert.doesNotMatch(experience, /@react-three\/fiber|<Canvas|relationship_product_ids/);
 });
 
-test("3D nodes expose catalog name, family, level and product-route deep links", async () => {
+test("buyer browser exposes category and outcome search controls with accessible result status", async () => {
   const experience = await read("app/ai-marketplace/MarketplaceExperience.tsx");
-  assert.match(experience, /CatalogNodeLabels/);
-  assert.match(experience, /point\.node\.name/);
-  assert.match(experience, /point\.node\.family/);
-  assert.match(experience, /point\.node\.proficiency/);
-  assert.match(experience, /href={`\/ai-marketplace\/\$\{encodeURIComponent\(point\.node\.slug\)\}`}/);
-  assert.match(experience, /router\.push\(`\/ai-marketplace\/\$\{encodeURIComponent\(node\.slug\)\}`\)/);
-  assert.match(experience, /marketplace-scene-cluster/);
+  assert.match(experience, /Browse every skill and package\./);
+  assert.match(experience, /Choose a category or search by the outcome you need/);
+  assert.match(experience, /aria-label="Filter skills by category"/);
+  assert.match(experience, /aria-pressed=\{family === item\}/);
+  assert.match(experience, /role="search"/);
+  assert.match(experience, /Search skills and packages/);
+  assert.match(experience, /role="status" aria-live="polite"/);
+  assert.match(experience, /aria-busy=\{loading\}/);
+  assert.match(experience, /Show more capabilities/);
 });
 
-test("R3F universe degrades only after a real error and monitors context restoration", async () => {
+test("buyer cards route products directly and packages to collection-aware pages", async () => {
+  const [experience, collectionPage, catalog] = await Promise.all([
+    read("app/ai-marketplace/MarketplaceExperience.tsx"),
+    read("app/ai-marketplace/collections/[collectionId]/page.tsx"),
+    read("lib/marketplace-v12-catalog.ts"),
+  ]);
+  assert.match(experience, /card\.product_type === "collection" \|\| card\.product_type === "bundle"/);
+  assert.match(experience, /`\/ai-marketplace\/collections\/\$\{segment\}`/);
+  assert.match(experience, /`\/ai-marketplace\/\$\{segment\}`/);
+  assert.match(experience, /"Open package" : "View skill"/);
+  assert.match(catalog, /export function marketplaceV12PublicPath/);
+  assert.match(catalog, /export function marketplaceV12CollectionMembers/);
+  assert.match(collectionPage, /marketplaceV12CollectionMembers\(collectionId, \{ cursor, limit: 60 \}\)/);
+  assert.match(collectionPage, /marketplaceV12PublicPath\(entry\)/);
+});
+
+test("browser request races and failed updates preserve a recoverable buyer experience", async () => {
   const experience = await read("app/ai-marketplace/MarketplaceExperience.tsx");
-  assert.match(experience, /CapabilitySceneBoundary/);
-  assert.match(experience, /webglcontextlost/);
-  assert.match(experience, /webglcontextrestored/);
-  assert.match(experience, /setRenderer\("recovering"\)/);
-  assert.match(experience, /setRenderer\("ready"\)/);
-  assert.match(experience, /SemanticSpatialFallback/);
-  assert.match(experience, /semantic 2\.5D catalog map/);
-});
-
-test("scene endpoint keeps catalog archetype and proficiency attached to each rendered node", async () => {
-  const catalog = await read("lib/marketplace-v12-catalog.ts");
-  assert.match(catalog, /proficiency:card\.proficiency/);
-  assert.match(catalog, /object_archetype:card\.visualization\.object_archetype\?\?"orb"/);
+  assert.match(experience, /requestSequence\.current \+ 1/);
+  assert.match(experience, /sequence !== requestSequence\.current/);
+  assert.match(experience, /window\.setTimeout\(\(\) => void request\(\), 220\)/);
+  assert.match(experience, /Marketplace results are temporarily unavailable\. Please try again\./);
+  assert.match(experience, /role="alert"/);
+  assert.match(experience, />Try again<\/button>/);
+  assert.match(experience, /No matching capabilities/);
+  assert.match(experience, /Show all capabilities/);
 });

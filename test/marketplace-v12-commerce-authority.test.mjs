@@ -7,7 +7,8 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf
 test("v1.2 checkout is server-bound to one release, exact price, authenticated tenant, and durable reservation", () => {
   const checkout = read("app/api/ai-marketplace/checkout/route.ts");
   for (const marker of ["sameOrigin", "await auth()", "marketplaceV12ProductCommerce", "reserveMarketplaceV12Checkout", "stripe.prices.retrieve", "validV12Price", "catalogRevision", "artifactSha256", "bindingKey", "payment_intent_data", "subscription_data", "recordMarketplaceV12Checkout"]) assert.match(checkout, new RegExp(marker));
-  assert.match(checkout, /input\.revision !== expectedRevision/);
+  assert.match(checkout, /revision: expectedRevision/);
+  assert.doesNotMatch(checkout, /form\.get\("catalogRevision"\)/);
   assert.match(checkout, /line_items: \[\{ price: priceId, quantity: 1 \}\]/);
   assert.doesNotMatch(checkout, /unit_amount:\s*form/);
   assert.doesNotMatch(checkout, /entitlement.*active/i);
