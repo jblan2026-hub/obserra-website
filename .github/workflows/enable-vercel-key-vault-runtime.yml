@@ -177,22 +177,45 @@ jobs:
             exit 1
           fi
           if ! jq -e '.properties.networkAcls.defaultAction == "Allow"' <<<"${key_vault}" >/dev/null; then
-            key_vault="$(az keyvault update \
+            az keyvault update \
               --resource-group "${AZURE_RESOURCE_GROUP}" \
               --name "${KEY_VAULT_NAME}" \
               --default-action Allow \
-              --output json)"
+              --output none
           fi
 
-          key_vault_id="$(jq -er '.id | strings' <<<"${key_vault}")"
-          jq -e '
-            .properties.enableRbacAuthorization == true and
-            .properties.publicNetworkAccess == "Enabled" and
-            .properties.networkAcls.defaultAction == "Allow"
-          ' <<<"${key_vault}" >/dev/null || {
-            echo "::error::The canonical Key Vault is not configured for reachable RBAC secret access."
+          # Azure network policy updates can take time to reach a fresh readback.
+          # Poll the approved vault only; emit property names/booleans, never data.
+          key_vault_ready=false
+          for attempt in $(seq 1 12); do
+            key_vault="$(az keyvault show \
+              --resource-group "${AZURE_RESOURCE_GROUP}" \
+              --name "${KEY_VAULT_NAME}" \
+              --output json)"
+            if jq -e '
+              .properties.enableRbacAuthorization == true and
+              .properties.publicNetworkAccess == "Enabled" and
+              .properties.networkAcls.defaultAction == "Allow"
+            ' <<<"${key_vault}" >/dev/null; then
+              key_vault_ready=true
+              break
+            fi
+            sleep 5
+          done
+          if [ "${key_vault_ready}" != true ]; then
+            key_vault_posture="$(jq -c '{
+              enableRbacAuthorization: .properties.enableRbacAuthorization,
+              publicNetworkAccess: .properties.publicNetworkAccess,
+              networkDefaultAction: .properties.networkAcls.defaultAction
+            }' <<<"${key_vault}")"
+            echo "::notice::Canonical Key Vault non-secret posture=${key_vault_posture}"
+            unset key_vault_posture
+            echo "::error::The canonical Key Vault did not converge to the reachable RBAC contract after bounded readback."
             exit 1
-          }
+          fi
+          unset key_vault_ready
+
+          key_vault_id="$(jq -er '.id | strings' <<<"${key_vault}")"
 
           normalized_key_vault_id="$(tr '[:upper:]' '[:lower:]' <<<"${key_vault_id%/}")"
           has_exact_key_vault_role() {
