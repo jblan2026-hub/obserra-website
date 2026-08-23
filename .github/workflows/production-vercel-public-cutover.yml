@@ -687,6 +687,207 @@ jobs:
             exit 1
           fi
 
+      - name: Reconcile exact Clerk DNS check after canonical proof
+        id: clerk_dns_check
+        if: steps.quarantine.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        env:
+          CANDIDATE_DEPLOYMENT: ${{ steps.candidate.outputs.deployment_id }}
+        run: |
+          set -euo pipefail
+          before="$(mktemp)"
+          definition="$(mktemp)"
+          rerequest="$(mktemp)"
+          after="$(mktemp)"
+          dns="$(mktemp)"
+          sign_in="$(mktemp)"
+          trap 'rm -f "${before}" "${definition}" "${rerequest}" "${after}" "${dns}" "${sign_in}"' EXIT
+
+          # The integration check is kept enabled. Re-request it only after the
+          # exact deployment is proven on both canonical aliases. The operation
+          # cannot approve the guarded cutover and never prints provider bodies.
+          verify_cname() {
+            local name="$1"
+            local expected="$2"
+            if ! curl --silent --show-error --fail \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${dns}" \
+              "https://dns.google/resolve?name=${name}&type=CNAME"; then
+              return 1
+            fi
+            jq -e --arg expected "${expected}" '
+              .Status == 0 and
+              any(.Answer[]?; .type == 5 and (.data | ascii_downcase) == ($expected | ascii_downcase))
+            ' "${dns}" >/dev/null
+          }
+
+          if ! verify_cname "clerk.obserrallc.com" "frontend-api.clerk.services." \
+            || ! verify_cname "accounts.obserrallc.com" "accounts.clerk.services."; then
+            echo "Vercel Clerk DNS reconciliation preserved the check because public auth CNAME proof failed."
+            exit 0
+          fi
+
+          sign_in_status="$(curl --silent --show-error \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --output "${sign_in}" \
+            --write-out '%{http_code}' \
+            "https://${PRIMARY_DOMAIN}/sign-in")"
+          if [ "${sign_in_status}" != "200" ] \
+            || ! grep -F 'pk_live_' "${sign_in}" >/dev/null \
+            || ! grep -F 'clerk.obserrallc.com' "${sign_in}" >/dev/null \
+            || grep -Eqi 'pk_test_|clerk\.accounts\.dev|clerkstage\.dev' "${sign_in}"; then
+            echo "Vercel Clerk DNS reconciliation preserved the check because canonical production identity proof failed."
+            exit 0
+          fi
+
+          if ! curl --silent --show-error --fail \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --output "${before}" \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v2/deployments/${CANDIDATE_DEPLOYMENT}/check-runs?teamId=${TEAM_ID}"; then
+            echo "Vercel Clerk DNS reconciliation skipped because exact-candidate Check-v2 evidence was unavailable."
+            exit 0
+          fi
+
+          if ! jq -e --arg deployment "${CANDIDATE_DEPLOYMENT}" '
+            (.runs | type) == "array" and
+            all(.runs[]; .deploymentId == $deployment)
+          ' "${before}" >/dev/null; then
+            echo "Vercel Clerk DNS reconciliation skipped because Check-v2 evidence was not exclusive to the exact candidate."
+            exit 0
+          fi
+
+          mapfile -t failed_check_ids < <(jq -r '
+            [
+              .runs[]
+              | select(
+                  .name == "Clerk DNS Configuration" and
+                  .status == "completed" and
+                  .conclusion == "failed" and
+                  .blocks == "deployment-alias" and
+                  .requires == "deployment-url" and
+                  .source.kind == "integration" and
+                  (.checkId // "") != ""
+                )
+              | .checkId
+            ]
+            | unique[]
+          ' "${before}")
+
+          if [ "${#failed_check_ids[@]}" -eq 0 ]; then
+            echo "Vercel Clerk DNS reconciliation found no failed exact-candidate integration check."
+            exit 0
+          fi
+          if [ "${#failed_check_ids[@]}" -ne 1 ]; then
+            echo "Vercel Clerk DNS reconciliation refused an ambiguous failed-check set."
+            exit 0
+          fi
+
+          check_id="${failed_check_ids[0]}"
+          previous_run_id="$(jq -r --arg check_id "${check_id}" '
+            [
+              .runs[]
+              | select(.checkId == $check_id)
+            ]
+            | sort_by(.updatedAt // 0)
+            | last
+            | .id // empty
+          ' "${before}")"
+          previous_updated_at="$(jq -r --arg check_id "${check_id}" '
+            [
+              .runs[]
+              | select(.checkId == $check_id)
+            ]
+            | sort_by(.updatedAt // 0)
+            | last
+            | .updatedAt // 0
+          ' "${before}")"
+
+          if ! curl --silent --show-error --fail \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --output "${definition}" \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v2/projects/${CANONICAL_PROJECT_ID}/checks/${check_id}?teamId=${TEAM_ID}"; then
+            echo "Vercel Clerk DNS reconciliation skipped because the exact check definition was unavailable."
+            exit 0
+          fi
+
+          if ! jq -e \
+            --arg check_id "${check_id}" \
+            --arg project "${CANONICAL_PROJECT_ID}" '
+              .id == $check_id and
+              .projectId == $project and
+              .name == "Clerk DNS Configuration" and
+              .isRerequestable == true and
+              .blocks == "deployment-alias" and
+              .requires == "deployment-url" and
+              (.source.kind // .sourceKind // "") == "integration"
+            ' "${definition}" >/dev/null; then
+            echo "Vercel Clerk DNS reconciliation preserved a nonmatching or non-rerequestable check."
+            exit 0
+          fi
+
+          if ! curl --silent --show-error --fail \
+            --connect-timeout 10 \
+            --max-time 20 \
+            --request POST \
+            --output "${rerequest}" \
+            --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+            "https://api.vercel.com/v1/deployments/${CANDIDATE_DEPLOYMENT}/checks/${check_id}/rerequest?autoUpdate=true&teamId=${TEAM_ID}"; then
+            echo "Vercel Clerk DNS reconciliation could not re-request the exact failed check."
+            exit 0
+          fi
+
+          for attempt in $(seq 1 12); do
+            sleep 5
+            if ! curl --silent --show-error --fail \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "${after}" \
+              --header "Authorization: Bearer ${VERCEL_TOKEN}" \
+              "https://api.vercel.com/v2/deployments/${CANDIDATE_DEPLOYMENT}/check-runs?teamId=${TEAM_ID}"; then
+              echo "Vercel Clerk DNS reconciliation poll ${attempt}/12 was unavailable."
+              continue
+            fi
+            if ! jq -e --arg deployment "${CANDIDATE_DEPLOYMENT}" '
+              (.runs | type) == "array" and
+              all(.runs[]; .deploymentId == $deployment)
+            ' "${after}" >/dev/null; then
+              echo "Vercel Clerk DNS reconciliation rejected a non-exact poll response."
+              continue
+            fi
+
+            latest="$(jq -c --arg check_id "${check_id}" '
+              [
+                .runs[]
+                | select(.checkId == $check_id)
+              ]
+              | sort_by(.updatedAt // 0)
+              | last // {}
+            ' "${after}")"
+            run_id="$(jq -r '.id // empty' <<<"${latest}")"
+            updated_at="$(jq -r '.updatedAt // 0' <<<"${latest}")"
+            status="$(jq -r '.status // empty' <<<"${latest}")"
+            conclusion="$(jq -r '.conclusion // "pending"' <<<"${latest}")"
+            if [ "${run_id}" = "${previous_run_id}" ] && [ "${updated_at}" -le "${previous_updated_at}" ]; then
+              continue
+            fi
+
+            if [ "${status}" = "completed" ]; then
+              printf 'VERCEL_CLERK_DNS_RECONCILIATION {"deploymentId":"%s","checkId":"%s","runId":"%s","status":"%s","conclusion":"%s"}\n' \
+                "${CANDIDATE_DEPLOYMENT}" "${check_id}" "${run_id}" "${status}" "${conclusion}"
+              exit 0
+            fi
+          done
+
+          printf 'VERCEL_CLERK_DNS_RECONCILIATION {"deploymentId":"%s","checkId":"%s","status":"pending"}\n' \
+            "${CANDIDATE_DEPLOYMENT}" "${check_id}"
+
       - name: Roll back canonical domains on failed cutover
         id: recovery
         if: ${{ always() && steps.rollback.outcome == 'success' && steps.rollback.outputs.primary != '' && steps.rollback.outputs.apex != '' && (steps.move.outcome == 'failure' || steps.alias.outcome == 'failure' || steps.smoke.outcome == 'failure') }}
