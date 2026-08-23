@@ -757,3 +757,13 @@ All must be observed from the public canonical host:
 - **Mutation state:** no tenant federated-credential, Vercel environment, deployment, alias, payment, enrollment, or LMS readiness mutation is evidenced from this attempt. No sensitive value was exposed or transferred.
 - **Authorization state:** owner authorization remains recorded and does not need to be repeated. The production bootstrap remains blocked only until the exact Bash tenant convergence returns its terminal verified marker.
 - **Next safe action:** run the Bash-compatible idempotent `github-main` convergence/readback in the active Cloud Shell. On exact verification, trigger the authorized signed-main bootstrap and automatically append all results here.
+
+
+<!-- ops-checkpoint:2026-08-23-github-main-federation-verified -->
+### 2026-08-23T12:23:45Z — tenant-side `github-main` federation converged and read back
+
+- **Owner evidence:** Azure Cloud Shell PowerShell completed the idempotent federated-credential convergence and exact readback without entering the mismatch `throw` path, then emitted `OBSERRA_GITHUB_MAIN_FEDERATION=verified`.
+- **Exact trust contract:** deployment identity `id-obserra-github-prod`, resource group `rg-obserra-prod-eastus`, credential `github-main`, issuer `https://token.actions.githubusercontent.com`, immutable subject `repo:jblan2026-hub@309821056/obserra-website@1321156321:ref:refs/heads/main`, and sole audience `api://AzureADTokenExchange`.
+- **Authorization:** the previously recorded explicit owner authorization for approved production Key Vault runtime bindings into Vercel Production project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC` and guarded bootstrap from exact main `5de3910bc104db9f41de48f816dde5bdf82dd6e2` remains active.
+- **Independent enforcement:** the GitHub workflow's `azure/login`, subscription/tenant checks, identity client-ID check, Key Vault/RBAC checks, and subsequent exact readbacks remain mandatory; this screenshot does not bypass them.
+- **Next safe action:** manually dispatch `enable-vercel-key-vault-runtime.yml` on branch `main` so GitHub issues a fresh OIDC assertion for exact current main. Monitor every job phase, fail closed on any mismatch, and append results automatically.
