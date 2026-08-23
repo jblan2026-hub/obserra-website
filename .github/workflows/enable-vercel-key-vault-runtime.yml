@@ -152,6 +152,7 @@ jobs:
                 --enable-purge-protection true \
                 --retention-days 90 \
                 --public-network-access Enabled \
+                --default-action Allow \
                 --tags workload=obserra-website environment=production "owner=OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" managedBy=bicep-github-oidc \
                 --output json >"${key_vault_file}"
             else
@@ -160,6 +161,18 @@ jobs:
               exit 1
             fi
           fi
+          # Converge the existing or just-created vault to the Bicep-defined
+          # reachability contract before role assignment. This mutates only the
+          # approved canonical vault and reads no secret material.
+          az keyvault update \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --name "${KEY_VAULT_NAME}" \
+            --enable-rbac-authorization true \
+            --enable-purge-protection true \
+            --retention-days 90 \
+            --public-network-access Enabled \
+            --default-action Allow \
+            --output json >"${key_vault_file}"
           key_vault="$(<"${key_vault_file}")"
           rm -f "${key_vault_file}" "${key_vault_error_file}"
           unset key_vault_error
