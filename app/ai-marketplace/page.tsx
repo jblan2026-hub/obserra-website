@@ -32,23 +32,23 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
     name: "Obserra EPI AI Marketplace",
     description: "Explore AI capabilities for teams and organizations.",
     isPartOf: { "@id": "https://www.obserrallc.com/#website" },
-    mainEntity: { "@type": "ItemList", numberOfItems: initial.total, itemListElement: catalog.map((card, index) => ({ "@type": "ListItem", position: Number(cursor ?? 0) + index + 1, name: card.name, url: `https://www.obserrallc.com/ai-marketplace/${card.slug}` })) },
+    mainEntity: { "@type": "ItemList", numberOfItems: initial.total, itemListElement: catalog.map((card, index) => ({ "@type": "ListItem", position: Number(cursor ?? 0) + index + 1, name: card.name, url: `https://www.obserrallc.com${card.product_type === "collection" || card.product_type === "bundle" ? `/ai-marketplace/collections/${encodeURIComponent(card.slug)}` : `/ai-marketplace/${encodeURIComponent(card.slug)}`}` })) },
   };
 
   return (
     <main className="ai-marketplace">
       <header className="ai-marketplace__nav">
         <Link href="/" aria-label="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC home">OBSERRA EPI</Link>
-        <nav aria-label="AI Marketplace navigation"><Link href="/">Home</Link><Link href="/ai-marketplace/compare">Compare</Link><Link href="/ai-marketplace/configure">Configure</Link><Link href="/ai-marketplace/hangar">Customer Hangar</Link><Link href="/ai-marketplace/skill-libraries">Skill libraries</Link><Link href="/apps">Applications</Link><Link href="/academy">Academy</Link><Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link></nav>
+        <nav aria-label="AI Marketplace navigation"><Link href="/">Home</Link><Link href="/ai-marketplace/compare">Compare</Link><Link href="/ai-marketplace/configure">Build a bundle</Link><Link href="/ai-marketplace/hangar">My products</Link><Link href="/ai-marketplace/skill-libraries">Skill libraries</Link><Link href="/apps">Applications</Link><Link href="/academy">Academy</Link><Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link></nav>
       </header>
       <section className="ai-marketplace__hero" aria-labelledby="marketplace-heading">
         <p>OBSERRA EPI AI CAPABILITY MARKETPLACE</p><h1 id="marketplace-heading">AI capability for real-world work.</h1>
         <p className="ai-marketplace__hero-lede">Explore capabilities by category, level, and price to find the right fit for your team.</p>
-        <div><span>{summary.total_cards.toLocaleString()} capabilities</span><span>{familyEntries.length} product families</span><span>Pricing shown where available</span></div>
+        <div><span>{summary.total_cards.toLocaleString()} capabilities</span><span>{familyEntries.length} categories</span><span>Pricing shown where available</span></div>
         <p className="ai-marketplace__notice">Online purchase availability varies by capability. If checkout is unavailable, contact our team for help with purchase options.</p>
       </section>
       <MarketplaceSalesDock products={dockRecords} />
-      <nav className="ai-marketplace__crawl-pagination" aria-label="Catalog page navigation"><Link href="/ai-marketplace" aria-current={!cursor && !query ? "page" : undefined}>First catalog page</Link>{cursor && <Link href={`/ai-marketplace?${query ? `q=${encodeURIComponent(query)}&` : ""}cursor=${Math.max(0, Number(cursor) - 24)}`}>Previous catalog page</Link>}{initial.nextCursor && <Link href={`/ai-marketplace?${query ? `q=${encodeURIComponent(query)}&` : ""}cursor=${initial.nextCursor}`}>Next catalog page</Link>}</nav>
+      <nav className="ai-marketplace__crawl-pagination" aria-label="Marketplace result pages"><Link href="/ai-marketplace" aria-current={!cursor && !query ? "page" : undefined}>First results page</Link>{cursor && <Link href={`/ai-marketplace?${query ? `q=${encodeURIComponent(query)}&` : ""}cursor=${Math.max(0, Number(cursor) - 24)}`}>Previous results</Link>}{initial.nextCursor && <Link href={`/ai-marketplace?${query ? `q=${encodeURIComponent(query)}&` : ""}cursor=${initial.nextCursor}`}>Next results</Link>}</nav>
       <MarketplaceExperience initialCatalog={catalog} initialTotal={initial.total} initialNextCursor={initial.nextCursor} initialQuery={query} familyEntries={familyEntries} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
     </main>

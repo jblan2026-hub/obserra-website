@@ -119,7 +119,10 @@ test("buyer catalog is category-filtered, searchable, accessible, and collection
   assert.match(experience, /role="status" aria-live="polite"/);
   assert.match(experience, /card\.product_type === "collection" \|\| card\.product_type === "bundle"/);
   assert.match(experience, /`\/ai-marketplace\/collections\/\$\{segment\}`/);
-  assert.match(experience, /"Open package" : "View skill"/);
+  assert.match(experience, /className="ai-marketplace__product-card-link" href=\{href\}/);
+  assert.match(experience, /\? "Open package"/);
+  assert.match(experience, /\? "View skill"/);
+  assert.match(experience, /: "View product"/);
   assert.doesNotMatch(experience, /\/api\/ai-marketplace\/scene|relationship_product_ids|StaticCapabilityMap/);
 });
 
@@ -130,7 +133,7 @@ test("catalog discovery uses bounded crawl pages and sharded product sitemaps", 
   const loader = readFileSync(new URL("lib/marketplace-v12-catalog.ts", root), "utf8");
   assert.match(catalog, /searchParams/);
   assert.match(catalog, /limit: 24/);
-  assert.match(catalog, /Next catalog page/);
+  assert.match(catalog, /Next results/);
   assert.match(catalog, /generateMetadata/);
   assert.match(sitemap, /generateSitemaps/);
   assert.match(sitemap, /pageSize = 500/);

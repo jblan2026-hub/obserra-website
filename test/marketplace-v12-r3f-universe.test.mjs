@@ -45,7 +45,10 @@ test("buyer cards route products directly and packages to collection-aware pages
   assert.match(experience, /card\.product_type === "collection" \|\| card\.product_type === "bundle"/);
   assert.match(experience, /`\/ai-marketplace\/collections\/\$\{segment\}`/);
   assert.match(experience, /`\/ai-marketplace\/\$\{segment\}`/);
-  assert.match(experience, /"Open package" : "View skill"/);
+  assert.match(experience, /className="ai-marketplace__product-card-link" href=\{href\}/);
+  assert.match(experience, /\? "Open package"/);
+  assert.match(experience, /\? "View skill"/);
+  assert.match(experience, /: "View product"/);
   assert.match(catalog, /export function marketplaceV12PublicPath/);
   assert.match(catalog, /export function marketplaceV12CollectionMembers/);
   assert.match(collectionPage, /marketplaceV12CollectionMembers\(collectionId, \{ cursor, limit: 60 \}\)/);

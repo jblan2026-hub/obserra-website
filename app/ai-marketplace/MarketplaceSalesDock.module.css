@@ -25,7 +25,8 @@
 .skillPicker li { display: flex; min-width: 0; min-height: 190px; flex-direction: column; padding: 14px; border-right: 1px solid rgba(103, 193, 221, .2); border-bottom: 1px solid rgba(103, 193, 221, .2); background: rgba(4, 23, 36, .76); }
 .skillPicker li[data-selected="true"] { background: rgba(22, 49, 52, .9); box-shadow: inset 3px 0 #f4ba55; }
 .skillPicker li > div:first-child { display: flex; align-items: start; justify-content: space-between; gap: 9px; }
-.skillPicker li > div:first-child strong { overflow: hidden; color: #f0faff; font-size: .78rem; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.skillName { overflow: hidden; color: #f0faff; font-size: .78rem; font-weight: 850; line-height: 1.25; text-overflow: ellipsis; text-decoration: none; white-space: nowrap; }
+.skillName:hover, .skillName:focus-visible { color: #ffdc96; outline: none; text-decoration: underline; }
 .skillPicker li > div:first-child small { flex: 0 0 auto; color: #f5cf81; font-size: .54rem; font-weight: 850; text-transform: capitalize; }
 .skillPicker li > p { display: -webkit-box; min-height: 2.7em; overflow: hidden; margin: 10px 0; color: #a9c8d3; font-size: .65rem; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .skillTags { display: flex; flex-wrap: wrap; gap: 5px; }
