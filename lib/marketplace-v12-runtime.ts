@@ -29,7 +29,7 @@ export async function marketplaceV12RuntimeCommerce(): Promise<MarketplaceV12Run
     if (!configured || live !== true) return { operational: false, reason: "configuration_unavailable", checkoutEnabled: false, installEnabled: false };
     const stripe = getApplicationsStripe();
     const account = await stripe.accounts.retrieve(null);
-    const ledger = await aiMarketplaceLedgerHealth();
+    const ledger = await aiMarketplaceLedgerHealth("marketplace-v12");
     const evidence = marketplaceV12ReleaseEvidence({ revision: coverage.revision, requiredSubjects: coverage.requiredProductCards, stripeAccountId: account.id });
     const pricesVerified = coverage.stripeVerified && evidence.verified && account.charges_enabled === true;
     const activation = marketplaceV12ActivationGate({
