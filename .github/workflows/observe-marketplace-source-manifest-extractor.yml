@@ -1,4 +1,5 @@
 name: Observe Marketplace source manifest extractor
+# refresh: corrected canonical-loader run
 
 on:
   push:
