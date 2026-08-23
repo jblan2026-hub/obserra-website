@@ -1,0 +1,67 @@
+name: Discover Marketplace v1.2 Azure metadata once
+
+on:
+  push:
+    branches:
+      - ops/marketplace-v12-ingest-dispatch-20260823
+    paths:
+      - .github/workflows/discover-marketplace-v12-azure-metadata-once.yml
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  AZURE_CLIENT_ID: dc3ff3e1-ea35-4879-afa9-fa3eee49df85
+  AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
+  AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
+  AZURE_RESOURCE_GROUP: rg-obserra-prod-eastus
+
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      - name: Authenticate existing governed Azure deployment identity
+        uses: azure/login@v3.0.1
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Discover non-secret Marketplace delivery metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ops/marketplace-v12-ingest-dispatch-20260823
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp="${RUNNER_TEMP}/azure-marketplace-metadata.json"
+          identities="$(az identity list --resource-group "${AZURE_RESOURCE_GROUP}" --query '[].{name:name,clientId:clientId,principalId:principalId,tenantId:tenantId,id:id}' -o json)"
+          storage="$(az storage account list --resource-group "${AZURE_RESOURCE_GROUP}" --query '[].{name:name,kind:kind,location:primaryLocation,id:id}' -o json)"
+          python - <<'PY' "${identities}" "${storage}" >"${tmp}"
+          import json, sys
+          identities=json.loads(sys.argv[1]); storage=json.loads(sys.argv[2])
+          print(json.dumps({"identities":identities,"storageAccounts":storage}, indent=2))
+          PY
+          # Append blob container names only when Azure RBAC permits login-mode listing.
+          python - <<'PY' "${tmp}"
+          import json, subprocess, sys
+          path=sys.argv[1]
+          data=json.load(open(path))
+          for acct in data.get('storageAccounts',[]):
+              p=subprocess.run(['az','storage','container','list','--auth-mode','login','--account-name',acct['name'],'--query','[].name','-o','json','--only-show-errors'],capture_output=True,text=True)
+              acct['containers']=json.loads(p.stdout) if p.returncode==0 and p.stdout.strip() else []
+              acct['containerListAuthorized']=p.returncode==0
+          open(path,'w').write(json.dumps(data,indent=2)+'\n')
+          PY
+          python - <<'PY' "${tmp}"
+          import base64, json, os, urllib.request, sys
+          content=open(sys.argv[1],'rb').read()
+          repo='jblan2026-hub/obserra-website'; path='ops/marketplace-v12-azure-metadata.json'; branch=os.environ['BRANCH']; token=os.environ['GH_TOKEN']
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','X-GitHub-Api-Version':'2022-11-28','User-Agent':'obserra-azure-metadata','Content-Type':'application/json'}
+          body={'message':'ops: record marketplace azure metadata','content':base64.b64encode(content).decode(),'branch':branch}
+          req=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{path}',data=json.dumps(body).encode(),method='PUT',headers=headers)
+          with urllib.request.urlopen(req,timeout=30) as response:
+              if response.status not in (200,201): raise SystemExit(response.status)
+          PY
