@@ -1028,3 +1028,14 @@ All must be observed from the public canonical host:
 - **Blocker:** the website release is canonical, but Applications, Academy, and regulated-LMS readiness remain fail-closed. This evidence window does not prove that the post-merge runtime bootstrap completed its Key Vault readback, Vercel Production binding, replacement deployment, or subsystem operational checks.
 - **Next safe action:** inspect or run the guarded runtime bootstrap pinned to exact main SHA `ba9cfad270f99fc1661c0bdd9e8027082aad3f5e`. Require Key Vault ACL/RBAC/public-network readback, exact identity/role and Vercel-binding readbacks, a replacement deployment tied to the exact SHA, direct Applications and Academy HTTP `200` with `operational: true`, Florida readiness HTTP `200`, and canonical exact deployment/SHA proof before claiming the remaining runtime operational.
 
+
+
+<!-- ops-checkpoint:2026-08-23T13-30-14-724Z-pr-225-merged-acl -->
+### 2026-08-23T13:30:14.724Z — PR #225 merged; Key Vault ACL convergence released under existing guards
+
+- **Expert-confirmed blocker:** runtime bootstrap run [32641916139](https://github.com/jblan2026-hub/obserra-website/actions/runs/32641916139) authenticated successfully and stopped at the non-secret Key Vault reachable-RBAC configuration readback; identity role, Vercel binding, and replacement deployment were not reached.
+- **Exact guarded repair:** GitHub merged [PR #225](https://github.com/jblan2026-hub/obserra-website/pull/225) as canonical main [`ba9cfad270f99fc1661c0bdd9e8027082aad3f5e`](https://github.com/jblan2026-hub/obserra-website/commit/ba9cfad270f99fc1661c0bdd9e8027082aad3f5e). The merged source declares the Bicep ACL default action, creates a missing vault with that action, and, for the existing approved vault only, updates that action only after RBAC and public-network settings read back correctly. No secret command is added.
+- **Source gates:** Website CI [32642206234](https://github.com/jblan2026-hub/obserra-website/actions/runs/32642206234), Azure IaC Validation [32642206249](https://github.com/jblan2026-hub/obserra-website/actions/runs/32642206249), and CodeQL Advanced [32642206242](https://github.com/jblan2026-hub/obserra-website/actions/runs/32642206242) succeeded on exact head `1bc4351c6a10b9c0ce63df1fa01abc26aaf59164`.
+- **Current website evidence:** Vercel deployment `dpl_DmEA1W6NtsXCVhRBnBqfy3dPjaUe` is READY / production for exact main `ba9cfad270f99fc1661c0bdd9e8027082aad3f5e`; canonical cutover run [32642346911](https://github.com/jblan2026-hub/obserra-website/actions/runs/32642346911) succeeded.
+- **Unproven runtime boundary:** Key Vault readback convergence, identity/role readback, Vercel runtime-binding persistence, and the post-binding deployment remain under direct verification; no sensitive-transfer success is claimed.
+- **Fail-closed state:** Applications and Academy commerce, payment, enrollment, and Florida LMS readiness remain fail-closed pending new direct HTTP proof.
