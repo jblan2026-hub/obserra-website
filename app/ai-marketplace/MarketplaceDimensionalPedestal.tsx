@@ -1,50 +1,190 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { ContactShadows, Edges, Html, OrbitControls } from "@react-three/drei";
+import { Suspense, useEffect, useMemo, useRef, useState, type ElementRef } from "react";
+import type { Group } from "three";
 import type { MarketplacePedestalDetail } from "../../lib/marketplace-v12-product-pedestal";
 import styles from "./MarketplaceDimensionalPedestal.module.css";
 
-type View = { yaw: number; pitch: number; zoom: number };
-type Geometry = { positions: number[]; colors: number[] };
-
 function hash(value: string) { let output = 2166136261; for (let index = 0; index < value.length; index += 1) output = Math.imul(output ^ value.charCodeAt(index), 16777619); return output >>> 0; }
-function tint(value: string) { return [[.18, .82, .96], [.97, .72, .26], [.56, .52, .98], [.29, .88, .64], [.97, .4, .52]][hash(value) % 5]; }
-function geometry(detail: MarketplacePedestalDetail): Geometry {
-  const kind = hash(`${detail.family}:${detail.objectArchetype ?? "catalog"}`) % 3, color = tint(detail.family), positions: number[] = [], colors: number[] = [];
-  const triangle = (a: number[], b: number[], c: number[]) => { positions.push(...a, ...b, ...c); for (let i = 0; i < 3; i += 1) colors.push(...color); };
-  if (kind === 0) {
-    const vertices = [[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1]];
-    [[0,1,2,3],[1,5,6,2],[5,4,7,6],[4,0,3,7],[3,2,6,7],[4,5,1,0]].forEach(([a,b,c,d]) => { triangle(vertices[a], vertices[b], vertices[c]); triangle(vertices[a], vertices[c], vertices[d]); });
-  } else if (kind === 1) {
-    const top=[0,1.3,0], bottom=[0,-1.3,0], ring=[[1,0,0],[0,0,1],[-1,0,0],[0,0,-1]]; for(let index=0;index<ring.length;index+=1){const next=ring[(index+1)%ring.length];triangle(top,ring[index],next);triangle(bottom,next,ring[index]);}
-  } else {
-    const ring = (radius:number, y:number) => Array.from({ length: 18 }, (_, index) => [Math.cos((index / 18) * Math.PI * 2) * radius, y, Math.sin((index / 18) * Math.PI * 2) * radius]);
-    const top=ring(.55,.85), middle=ring(1,0), bottom=ring(.55,-.85); for (const [upper, lower] of [[top,middle],[middle,bottom]] as const) for(let index=0;index<18;index+=1){const next=(index+1)%18;triangle(upper[index],lower[index],lower[next]);triangle(upper[index],lower[next],upper[next]);}
-  }
-  return { positions, colors };
+type SceneKind = "capability" | "agent" | "workflow" | "bridge" | "assurance" | "collection";
+
+const palettes = [
+  { primary: "#30d7ff", secondary: "#8bf0ff", accent: "#f6bd4c" },
+  { primary: "#8b7cff", secondary: "#c9c2ff", accent: "#33d9ff" },
+  { primary: "#35de9e", secondary: "#a1f6d2", accent: "#f7bd4d" },
+  { primary: "#f9bd4b", secondary: "#ffe3a1", accent: "#33d4f4" },
+  { primary: "#ff6680", secondary: "#ffb2be", accent: "#39d8ff" },
+] as const;
+
+function sceneKind(detail: MarketplacePedestalDetail): SceneKind {
+  const identity = `${detail.productType} ${detail.family} ${detail.objectArchetype ?? ""}`.toLowerCase();
+  if (/collection|bundle|suite|repository/.test(identity)) return "collection";
+  if (/assurance|validator|guard|governance|evidence|security/.test(identity)) return "assurance";
+  if (/connector|plugin|integration|bridge|mcp/.test(identity)) return "bridge";
+  if (/workflow|playbook|automation|orchestration/.test(identity)) return "workflow";
+  if (/agent|team/.test(identity)) return "agent";
+  return "capability";
 }
+
+function sceneLabel(kind: SceneKind) {
+  return ({ capability: "Capability engine", agent: "Agent command core", workflow: "Workflow engine", bridge: "Integration bridge", assurance: "Assurance shield", collection: "Capability constellation" })[kind];
+}
+
+function CapabilityAssembly({ detail, kind, reducedMotion }: { detail: MarketplacePedestalDetail; kind: SceneKind; reducedMotion: boolean }) {
+  const group = useRef<Group>(null);
+  const palette = palettes[hash(`${detail.family}:${detail.positionSeed}`) % palettes.length];
+  useFrame(({ clock }, delta) => {
+    if (!group.current || reducedMotion) return;
+    group.current.rotation.y += delta * 0.12;
+    group.current.position.y = Math.sin(clock.elapsedTime * 0.7) * 0.08;
+  });
+  const material = <meshPhysicalMaterial color={palette.primary} emissive={palette.primary} emissiveIntensity={0.14} metalness={0.78} roughness={0.2} clearcoat={1} clearcoatRoughness={0.12} />;
+  const accentMaterial = <meshPhysicalMaterial color={palette.accent} emissive={palette.accent} emissiveIntensity={0.2} metalness={0.72} roughness={0.18} clearcoat={1} />;
+
+  return <group ref={group} rotation={[0.16, -0.45, 0]}>
+    {kind === "agent" && <>
+      <mesh>{material}<icosahedronGeometry args={[1.12, 2]} /><Edges color={palette.secondary} threshold={18} /></mesh>
+      <mesh rotation={[Math.PI / 2.6, 0.15, 0]}><torusGeometry args={[1.48, 0.055, 12, 96]} />{accentMaterial}</mesh>
+      {[-1, 1].map((side) => <mesh key={side} position={[side * 1.52, side * 0.2, side * 0.18]} scale={0.24}>{accentMaterial}<octahedronGeometry args={[1, 0]} /></mesh>)}
+    </>}
+    {kind === "workflow" && <>
+      {[-0.78, 0, 0.78].map((y, index) => <mesh key={y} position={[(index - 1) * 0.22, y, 0]} rotation={[0, index * 0.28, 0]}>{index === 1 ? accentMaterial : material}<boxGeometry args={[1.85 - Math.abs(index - 1) * 0.25, 0.42, 0.9]} /><Edges color={palette.secondary} /></mesh>)}
+      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[1.52, 0.055, 10, 80]} />{accentMaterial}</mesh>
+    </>}
+    {kind === "bridge" && <>
+      <mesh position={[-0.86, 0, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.72, 0.22, 20, 72]} />{material}<Edges color={palette.secondary} /></mesh>
+      <mesh position={[0.86, 0, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.72, 0.22, 20, 72]} />{accentMaterial}<Edges color={palette.secondary} /></mesh>
+      <mesh rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.16, 0.16, 1.75, 24]} /><meshStandardMaterial color={palette.secondary} emissive={palette.primary} emissiveIntensity={0.22} metalness={0.8} roughness={0.18} /></mesh>
+    </>}
+    {kind === "assurance" && <>
+      <mesh scale={[1.05, 1.25, 0.58]}>{material}<dodecahedronGeometry args={[1.05, 1]} /><Edges color={palette.secondary} threshold={15} /></mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[1.48, 0.065, 12, 96]} />{accentMaterial}</mesh>
+      <mesh position={[0, 0, 0.68]} scale={0.38}>{accentMaterial}<octahedronGeometry args={[1, 0]} /></mesh>
+    </>}
+    {kind === "collection" && <>
+      <mesh>{accentMaterial}<icosahedronGeometry args={[0.7, 2]} /><Edges color={palette.secondary} /></mesh>
+      {[[1.28, .35, .1], [-1.15, .5, -.3], [.38, -1.08, .25], [-.42, 1.16, -.22]].map((position, index) => <group key={position.join(":")} position={position as [number, number, number]}>
+        <mesh scale={0.38 + index * 0.035}>{material}<dodecahedronGeometry args={[1, 1]} /><Edges color={palette.secondary} /></mesh>
+        <mesh rotation={[Math.PI / 2, index * 0.4, 0]}><torusGeometry args={[0.58, 0.025, 8, 48]} /><meshBasicMaterial color={palette.accent} /></mesh>
+      </group>)}
+    </>}
+    {kind === "capability" && <>
+      <mesh>{material}<icosahedronGeometry args={[1.18, 3]} /><Edges color={palette.secondary} threshold={14} /></mesh>
+      <mesh rotation={[Math.PI / 2.7, 0.1, 0.4]}><torusGeometry args={[1.5, 0.06, 12, 96]} />{accentMaterial}</mesh>
+      <mesh rotation={[-Math.PI / 3.2, 0.2, -0.5]}><torusGeometry args={[1.32, 0.035, 10, 80]} /><meshBasicMaterial color={palette.secondary} /></mesh>
+    </>}
+    <mesh position={[0, -1.75, 0]} rotation={[-Math.PI / 2, 0, 0]}><torusGeometry args={[1.72, 0.035, 10, 96]} /><meshBasicMaterial color={palette.primary} transparent opacity={0.55} /></mesh>
+  </group>;
+}
+
+function SemanticCapabilityObject({ detail, kind, loading = false }: { detail: MarketplacePedestalDetail; kind: SceneKind; loading?: boolean }) {
+  return <article className={styles.semanticObject} aria-label={`${sceneLabel(kind)} for ${detail.name}`}>
+    <div className={styles.semanticGlyph} data-kind={kind} aria-hidden="true"><i /><i /><b>{detail.productType.slice(0, 2).toUpperCase()}</b></div>
+    <div><span>{loading ? "Preparing interactive view" : "Interactive capability view"}</span><strong>{detail.name}</strong><small>{detail.family}</small></div>
+  </article>;
+}
+
+function ProductScene({ detail, kind, reducedMotion }: { detail: MarketplacePedestalDetail; kind: SceneKind; reducedMotion: boolean }) {
+  return <>
+    <ambientLight intensity={0.72} />
+    <hemisphereLight color="#d9f7ff" groundColor="#03131f" intensity={1.3} />
+    <spotLight position={[4.5, 5.5, 5]} angle={0.5} penumbra={0.9} intensity={110} color="#62dcff" />
+    <spotLight position={[-4, 1, 3]} angle={0.6} penumbra={1} intensity={80} color="#f7bd4d" />
+    <CapabilityAssembly detail={detail} kind={kind} reducedMotion={reducedMotion} />
+    <ContactShadows position={[0, -1.82, 0]} opacity={0.55} scale={7} blur={2.8} far={4} />
+  </>;
+}
+
 function money(amount: number, currency: string) { return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount / 100); }
 function fact(value: string | null) { return value ? value.replace(/[-_]/g, " ") : "Not recorded"; }
-function bytes(value: number | null) { return value === null ? "Not recorded" : new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value / 1024) + " KiB"; }
 
 function ProductObject({ detail }: { detail: MarketplacePedestalDetail }) {
-  const canvas = useRef<HTMLCanvasElement>(null), redraw = useRef<(() => void) | null>(null), view = useRef<View>({ yaw: -.42, pitch: .2, zoom: 1 }), drag = useRef<{x:number;y:number}|null>(null); const [mode, setMode] = useState<"loading"|"ready"|"fallback">("loading");
-  const mesh = useMemo(() => geometry(detail), [detail]);
+  const controls = useRef<ElementRef<typeof OrbitControls>>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const [mode, setMode] = useState<"checking" | "loading" | "ready" | "fallback">("checking");
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const kind = useMemo(() => sceneKind(detail), [detail]);
+
   useEffect(() => {
-    const element=canvas.current; if(!element)return; const gl=element.getContext("webgl2",{alpha:true,antialias:true})??element.getContext("webgl",{alpha:true,antialias:true}); if(!gl){setMode("fallback");return;}
-    const compile=(type:number,source:string)=>{const shader=gl.createShader(type);if(!shader)throw new Error("WebGL shader creation failed");gl.shaderSource(shader,source);gl.compileShader(shader);return shader;},vertex=compile(gl.VERTEX_SHADER,"attribute vec3 p;attribute vec3 c;varying vec3 v;void main(){float d=1.0+p.z*.18;gl_Position=vec4(p.xy*d,p.z,1.0);v=c;}"),fragment=compile(gl.FRAGMENT_SHADER,"precision mediump float;varying vec3 v;void main(){gl_FragColor=vec4(v,1.0);}"),program=gl.createProgram(); if(!program){setMode("fallback");return;}gl.attachShader(program,vertex);gl.attachShader(program,fragment);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS)||!gl.getShaderParameter(vertex,gl.COMPILE_STATUS)||!gl.getShaderParameter(fragment,gl.COMPILE_STATUS)){setMode("fallback");return;}
-    const draw=()=>{const ratio=Math.min(window.devicePixelRatio||1,2),width=Math.max(1,Math.floor(element.clientWidth*ratio)),height=Math.max(1,Math.floor(element.clientHeight*ratio));if(element.width!==width||element.height!==height){element.width=width;element.height=height;}const camera=view.current,cy=Math.cos(camera.yaw),sy=Math.sin(camera.yaw),cp=Math.cos(camera.pitch),sp=Math.sin(camera.pitch),points:number[]=[];for(let index=0;index<mesh.positions.length;index+=3){const x=mesh.positions[index],y=mesh.positions[index+1],z=mesh.positions[index+2],yawX=x*cy-z*sy,yawZ=x*sy+z*cy,pitchY=y*cp-yawZ*sp,pitchZ=y*sp+yawZ*cp;points.push(yawX*camera.zoom,pitchY*camera.zoom,pitchZ,...mesh.colors.slice(index,index+3));}gl.viewport(0,0,width,height);gl.clearColor(.01,.05,.08,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.useProgram(program);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(points),gl.STATIC_DRAW);const p=gl.getAttribLocation(program,"p"),c=gl.getAttribLocation(program,"c");gl.enableVertexAttribArray(p);gl.enableVertexAttribArray(c);gl.vertexAttribPointer(p,3,gl.FLOAT,false,24,0);gl.vertexAttribPointer(c,3,gl.FLOAT,false,24,12);gl.drawArrays(gl.TRIANGLES,0,points.length/6);gl.deleteBuffer(buffer);setMode("ready");};redraw.current=draw;const observer=new ResizeObserver(draw);observer.observe(element);draw();const lost=(event:Event)=>{event.preventDefault();setMode("fallback");};element.addEventListener("webglcontextlost",lost,false);return()=>{observer.disconnect();element.removeEventListener("webglcontextlost",lost);gl.deleteProgram(program);gl.deleteShader(vertex);gl.deleteShader(fragment);};
-  },[mesh]);
-  const down=(event:React.PointerEvent<HTMLCanvasElement>)=>{drag.current={x:event.clientX,y:event.clientY};event.currentTarget.setPointerCapture(event.pointerId);};
-  const move=(event:React.PointerEvent<HTMLCanvasElement>)=>{if(!drag.current)return;view.current.yaw+=(event.clientX-drag.current.x)*.01;view.current.pitch=Math.max(-1.1,Math.min(1.1,view.current.pitch+(event.clientY-drag.current.y)*.01));drag.current={x:event.clientX,y:event.clientY};redraw.current?.();};
-  const wheel=(event:React.WheelEvent<HTMLCanvasElement>)=>{event.preventDefault();view.current.zoom=Math.max(.62,Math.min(1.4,view.current.zoom*(event.deltaY>0?.9:1.1)));redraw.current?.();};
-  return <div className={styles.object}><div className={styles.objectStage} data-mode={mode}><canvas ref={canvas} role="application" tabIndex={0} aria-label={`Dimensional product model for ${detail.name}. Drag to rotate and use the scroll wheel to zoom.`} onPointerDown={down} onPointerMove={move} onPointerUp={()=>{drag.current=null;}} onWheel={wheel}/>{mode!=="ready"&&<div className={styles.fallbackObject} aria-hidden="true"><i/><i/><b>{detail.productType.slice(0,2).toUpperCase()}</b></div>}<span>{mode==="ready"?"Catalog-seeded procedural geometry · drag to rotate · scroll to zoom":"A semantic product specification remains available while WebGL is unavailable."}</span></div><button type="button" onClick={()=>{view.current={yaw:-.42,pitch:.2,zoom:1};redraw.current?.();}}>Reset product view</button></div>;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotion = () => setReducedMotion(motion.matches);
+    motion.addEventListener("change", updateMotion);
+    const probe = document.createElement("canvas");
+    const supported = Boolean(probe.getContext("webgl2") ?? probe.getContext("webgl"));
+    const frame = window.requestAnimationFrame(() => { updateMotion(); setMode(supported ? "loading" : "fallback"); });
+    return () => { window.cancelAnimationFrame(frame); motion.removeEventListener("change", updateMotion); };
+  }, []);
+
+  useEffect(() => {
+    if (mode !== "ready") return;
+    const canvas = stage.current?.querySelector("canvas");
+    if (!canvas) return;
+    const lost = (event: Event) => { event.preventDefault(); setMode("fallback"); };
+    canvas.addEventListener("webglcontextlost", lost);
+    return () => canvas.removeEventListener("webglcontextlost", lost);
+  }, [mode]);
+
+  return <div className={styles.object}>
+    <div ref={stage} className={styles.objectStage} data-mode={mode}>
+      {(mode === "checking" || mode === "fallback") && <SemanticCapabilityObject detail={detail} kind={kind} loading={mode === "checking"} />}
+      {(mode === "loading" || mode === "ready") && <>
+        <Canvas dpr={[1, 1.75]} camera={{ position: [0, 0.15, 6.4], fov: 42, near: 0.1, far: 60 }} performance={{ min: 0.55 }} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }} onCreated={() => setMode("ready")} role="img" aria-label={`${sceneLabel(kind)} for ${detail.name}. Drag to orbit and use the scroll wheel to zoom.`}>
+          <Suspense fallback={<Html center><span className={styles.sceneLoader}>Building the interactive view</span></Html>}><ProductScene detail={detail} kind={kind} reducedMotion={reducedMotion} /></Suspense>
+          <OrbitControls ref={controls} makeDefault enableDamping dampingFactor={0.08} enablePan={false} minDistance={4.2} maxDistance={9} minPolarAngle={0.42} maxPolarAngle={Math.PI - 0.55} autoRotate={!reducedMotion} autoRotateSpeed={0.45} />
+        </Canvas>
+        <div className={styles.objectIdentity}><span>{sceneLabel(kind)}</span><strong>{detail.name}</strong><small>{detail.family}</small></div>
+      </>}
+      <span>{mode === "ready" ? "Drag to explore the capability object; scroll to zoom." : "A labeled capability view remains available while the interactive view loads."}</span>
+    </div>
+    <button type="button" onClick={() => controls.current?.reset()} disabled={mode !== "ready"}>Reset view</button>
+  </div>;
 }
 
-export default function MarketplaceDimensionalPedestal({ detail, checkoutEnabled, runtimeReason }: { detail: MarketplacePedestalDetail; checkoutEnabled: boolean; runtimeReason: string }) {
-  const [selectedOffer, setSelectedOffer] = useState(0); const offer = detail.pricing.offers[selectedOffer] ?? null;
-  const currentAction = checkoutEnabled && detail.action.enabled ? detail.action.label : "Unavailable";
-  const currentReason = checkoutEnabled && detail.action.enabled ? "The current catalog and runtime state permit the configured action." : detail.action.reasonCode ? fact(detail.action.reasonCode) : `Runtime gate: ${fact(runtimeReason)}`;
-  return <section className={styles.pedestal} aria-labelledby="dimensional-product-title"><header className={styles.header}><div><p>Dimensional product pedestal</p><h1 id="dimensional-product-title">{detail.name}</h1><span>{detail.family} · {fact(detail.productType)} · v{detail.version}</span></div><div className={styles.action} data-enabled={checkoutEnabled&&detail.action.enabled ? "true" : "false"}><span>Governed action</span><strong>{currentAction}</strong><small>{currentReason}</small></div></header><div className={styles.layout}><ProductObject detail={detail}/><article className={styles.inspector}><p className={styles.eyebrow}>Catalog inspection</p><h2>Stable record facts</h2><p>{detail.description}</p>{detail.mission&&<blockquote><span>Mission</span>{detail.mission}</blockquote>}<dl><div><dt>Publisher</dt><dd>{detail.publisher}</dd></div><div><dt>Catalog state</dt><dd>{fact(detail.publicationState)}</dd></div><div><dt>Version</dt><dd>v{detail.version}</dd></div><div><dt>Scene cluster</dt><dd>{fact(detail.sceneCluster)}</dd></div><div><dt>Credential mode</dt><dd>{fact(detail.credentialMode)}</dd></div><div><dt>Deliverable</dt><dd>{detail.deliverable??"Not recorded"}</dd></div></dl></article></div><section className={styles.commercial} aria-labelledby="commercial-title"><div><p className={styles.eyebrow}>Server catalog commercial guidance</p><h2 id="commercial-title">Inspect, but do not purchase.</h2><p>{detail.pricingBasis??"No pricing-basis statement is present in the catalog."}</p></div>{detail.pricing.offers.length?<fieldset><legend>Catalog-supplied purchase options</legend><div>{detail.pricing.offers.map((entry,index)=><label key={`${entry.kind}-${entry.amount_minor}-${entry.cadence??"once"}`}><input type="radio" name={`pedestal-offer-${detail.productId}`} checked={selectedOffer===index} onChange={()=>setSelectedOffer(index)}/><span><strong>{money(entry.amount_minor,entry.currency)}{entry.cadence?` / ${entry.cadence}`:" one-time"}</strong><small>{fact(entry.kind)}</small></span></label>)}</div><output aria-live="polite">Selected catalog guidance: {offer?`${money(offer.amount_minor,offer.currency)}${offer.cadence?` / ${offer.cadence}`:" one-time"}`:"No offer selected"}</output></fieldset>:<p className={styles.notice}>This catalog record has no online offer. Enterprise quote policy may apply.</p>}<div className={styles.actionRow}><span className={styles.unavailable} aria-live="polite">{currentAction}: {currentReason}</span><Link className={styles.secondaryAction} href={`/contact?interest=ai-marketplace&product=${encodeURIComponent(detail.productId)}`}>Discuss enterprise licensing</Link></div></section><section className={styles.evidence} aria-labelledby="evidence-title"><div><p className={styles.eyebrow}>Release and evidence</p><h2 id="evidence-title">Verified catalog evidence, scoped to this record.</h2></div><dl><div><dt>Artifact file</dt><dd>{detail.artifact.filename??"Not recorded"}</dd></div><div><dt>Artifact digest</dt><dd>{detail.artifact.sha256??"Not recorded"}</dd></div><div><dt>Artifact size</dt><dd>{bytes(detail.artifact.bytes)}</dd></div><div><dt>Verification method</dt><dd>{detail.artifact.verification??"Not recorded"}</dd></div><div><dt>Source archive</dt><dd>{detail.artifact.sourceArchive??"Not recorded"}</dd></div><div><dt>Install profile</dt><dd>{fact(detail.install.profile)}</dd></div><div><dt>Install bridge</dt><dd>{detail.install.oneClickEnabled?"Catalog indicates an enabled install bridge; live authorization is still required.":detail.install.fallbackLabel??"No verified install bridge is active."}</dd></div><div><dt>Enablement gate</dt><dd>{fact(detail.install.enablementGate)}</dd></div>{detail.includedProductCount!==null&&<div><dt>Included product count</dt><dd>{detail.includedProductCount.toLocaleString()}</dd></div>}</dl><div className={styles.releaseHistory}><h3>Version history</h3>{detail.releases.length?<ol>{detail.releases.map((release,index)=><li key={`${release.version}-${index}`}><strong>v{release.version}</strong><span>{release.role??"Role not recorded"}</span><small>{release.artifactSha256?`Digest ${release.artifactSha256}`:"No release digest recorded"}</small></li>)}</ol>:<p>No release-history records are present for this catalog entry.</p>}</div></section><section className={styles.relationships} aria-labelledby="relationship-title"><div><p className={styles.eyebrow}>Dependency and relationship links</p><h2 id="relationship-title">Only declared catalog connections.</h2><p>Compatibility is not inferred. The current record exposes its install profile and credential mode above; no unrecorded target platform or prerequisite is claimed here.</p></div>{detail.relationships.length?<ul>{detail.relationships.map((entry)=><li key={entry.productId}><span>{entry.family}</span><strong>{entry.name}</strong><small>{fact(entry.productType)}</small><Link href={`/ai-marketplace/${encodeURIComponent(entry.slug)}`}>Inspect declared relationship</Link></li>)}</ul>:<p className={styles.notice}>No resolvable catalog-declared relationships are available for this record.</p>}{detail.unresolvedRelationshipCount>0&&<p className={styles.notice}>{detail.unresolvedRelationshipCount} declared relationship reference{detail.unresolvedRelationshipCount===1?"":"s"} cannot be resolved in the current catalog revision.</p>}{detail.additionalRelationshipCount>0&&<p className={styles.notice}>{detail.additionalRelationshipCount} additional declared relationship reference{detail.additionalRelationshipCount===1?"":"s"} remain bounded outside this product-detail view.</p>}</section><nav className={styles.footerNav} aria-label="Product detail next steps"><Link href={`/ai-marketplace/compare?items=${encodeURIComponent(detail.slug)}`}>Compare this record</Link><Link href={`/ai-marketplace/configure?mission=${encodeURIComponent(detail.mission?detail.slug:"")}&items=${encodeURIComponent(detail.slug)}`}>Configure from this record</Link><Link href="/ai-marketplace/hangar">Open Customer Hangar</Link></nav></section>;
+export default function MarketplaceDimensionalPedestal({ detail, checkoutEnabled }: { detail: MarketplacePedestalDetail; checkoutEnabled: boolean; runtimeReason: string }) {
+  const [selectedOffer, setSelectedOffer] = useState(0);
+  const offer = detail.pricing.offers[selectedOffer] ?? null;
+  const hasOnlineCheckout = checkoutEnabled && detail.action.enabled;
+  const isSkill = /skill/i.test(`${detail.name} ${detail.family} ${detail.productType}`);
+  const isAcademy = /academy|course|training/i.test(`${detail.name} ${detail.family} ${detail.productType}`);
+
+  return <section className={styles.pedestal} aria-labelledby="dimensional-product-title">
+    <header className={styles.header}>
+      <div><p>Interactive capability</p><h1 id="dimensional-product-title">{detail.name}</h1><span>{detail.family}</span></div>
+      <div className={styles.action} data-enabled={hasOnlineCheckout ? "true" : "false"}><span>Purchase availability</span><strong>{hasOnlineCheckout ? "Purchase online" : "Contact for purchase"}</strong><small>{hasOnlineCheckout ? "Select an option below to continue." : "Online checkout is not available for this product yet."}</small></div>
+    </header>
+
+    <div className={styles.layout}>
+      <ProductObject detail={detail} />
+      <article className={styles.inspector}>
+        <p className={styles.eyebrow}>About this capability</p><h2>Built for practical outcomes</h2><p>{detail.description}</p>
+        {detail.mission && <blockquote><span>Purpose</span>{detail.mission}</blockquote>}
+        <dl><div><dt>Created by</dt><dd>{detail.publisher}</dd></div><div><dt>Capability area</dt><dd>{detail.family}</dd></div><div><dt>Format</dt><dd>{fact(detail.productType)}</dd></div><div><dt>What you receive</dt><dd>{detail.deliverable ?? "Product details provided at purchase."}</dd></div></dl>
+      </article>
+    </div>
+
+    <section className={styles.commercial} aria-labelledby="commercial-title">
+      <div><p className={styles.eyebrow}>Purchase options</p><h2 id="commercial-title">Choose how you want to get started.</h2><p>{detail.pricingBasis ?? "Choose an option or contact us for tailored licensing."}</p></div>
+      {detail.pricing.offers.length ? <fieldset><legend>Available options</legend><div>{detail.pricing.offers.map((entry, index) => <label key={`${entry.kind}-${entry.amount_minor}-${entry.cadence ?? "once"}`}><input type="radio" name={`pedestal-offer-${detail.productId}`} checked={selectedOffer === index} onChange={() => setSelectedOffer(index)} /><span><strong>{money(entry.amount_minor, entry.currency)}{entry.cadence ? ` / ${entry.cadence}` : " one-time"}</strong><small>{fact(entry.kind)}</small></span></label>)}</div><output aria-live="polite">Selected option: {offer ? `${money(offer.amount_minor, offer.currency)}${offer.cadence ? ` / ${offer.cadence}` : " one-time"}` : "No option selected"}</output></fieldset> : <p className={styles.notice}>Contact us for availability and licensing options.</p>}
+      <div className={styles.actionRow}>
+        <span className={styles.unavailable} aria-live="polite">{hasOnlineCheckout ? "Secure checkout is available for this product." : "Online checkout is coming soon for this product."}</span>
+        <Link className={styles.secondaryAction} href={`/contact?interest=ai-marketplace&product=${encodeURIComponent(detail.productId)}`}>Talk to an expert</Link>
+      </div>
+    </section>
+
+    <section className={styles.relationships} aria-labelledby="relationship-title">
+      <div><p className={styles.eyebrow}>Explore more</p><h2 id="relationship-title">Related capabilities.</h2><p>Continue exploring the capabilities that complement this product.</p></div>
+      {detail.relationships.length ? <ul>{detail.relationships.map((entry) => <li key={entry.productId}><span>{entry.family}</span><strong>{entry.name}</strong><small>{fact(entry.productType)}</small><Link href={`/ai-marketplace/${encodeURIComponent(entry.slug)}`}>View capability</Link></li>)}</ul> : <p className={styles.notice}>Explore the marketplace to discover related capabilities.</p>}
+    </section>
+
+    <nav className={styles.footerNav} aria-label="Product next steps">
+      <Link href={`/ai-marketplace/compare?items=${encodeURIComponent(detail.slug)}`}>Compare capabilities</Link>
+      <Link href={`/ai-marketplace/configure?mission=${encodeURIComponent(detail.mission ? detail.slug : "")}&items=${encodeURIComponent(detail.slug)}`}>Plan your solution</Link>
+      {isSkill && <Link href="/ai-marketplace/skill-libraries">Explore skills</Link>}
+      {isAcademy && <Link href="/academy">Explore Academy courses</Link>}
+      <Link href="/ai-marketplace/hangar">My library</Link>
+    </nav>
+  </section>;
 }
