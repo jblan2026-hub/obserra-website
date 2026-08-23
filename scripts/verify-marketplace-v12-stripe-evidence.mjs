@@ -122,7 +122,7 @@ await Promise.all(Array.from({ length: 8 }, async () => {
       const price = await stripe.prices.retrieve(binding.priceId, { expand: ["product"] });
       const product = typeof price.product === "string" ? null : price.product;
       const expectedRecurring = binding.purchaseOption === "recurring:month" ? "month" : binding.purchaseOption === "recurring:year" ? "year" : null;
-      const valid = price.id === binding.stripePriceId && price.active && price.livemode === binding.stripeLivemode && price.currency === "usd" && price.unit_amount === binding.offer.amount_minor
+      const valid = price.id === binding.stripePriceId && price.active && price.livemode === binding.stripeLivemode && price.currency === "usd" && price.unit_amount === binding.offer.amount_minor && price.metadata.bindingKey === binding.bindingKey
         && (expectedRecurring ? price.type === "recurring" && price.recurring?.interval === expectedRecurring && price.recurring.interval_count === 1 : price.type === "one_time")
         && product && !product.deleted && product.id === binding.stripeProductId && PRODUCT.test(product.id) && product.active && product.metadata.obserraMarketplaceProduct === binding.productId && product.metadata.artifactSha256 === binding.artifactSha256 && product.metadata.catalogRevision === catalog.catalog_revision && product.metadata.commerceSource === SOURCE;
       // bindingKey identifies an offer, so it is authoritative on Stripe Price.
