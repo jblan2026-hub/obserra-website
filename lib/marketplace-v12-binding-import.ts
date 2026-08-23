@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createHmac } from "node:crypto";
-import { ensureApplicationsRuntimeSecrets } from "./production-runtime-secrets";
+import { ensureApplicationsRuntimeSecrets, ensureMarketplaceV12RuntimeSecrets } from "./production-runtime-secrets";
 
 type BindingReview = {
   principalId: string;
@@ -96,8 +96,10 @@ function bindingReceipt(value: unknown): MarketplaceV12BindingAuthorityReceipt {
   return receipt as MarketplaceV12BindingAuthorityReceipt;
 }
 
-async function bindingRpc<T>(name: string, body: Record<string, unknown>) {
-  await ensureApplicationsRuntimeSecrets();
+type BindingRuntimeScope = "applications" | "marketplace-v12";
+
+async function bindingRpc<T>(name: string, body: Record<string, unknown>, scope: BindingRuntimeScope = "applications") {
+  await (scope === "marketplace-v12" ? ensureMarketplaceV12RuntimeSecrets : ensureApplicationsRuntimeSecrets)();
   const runtime = config();
   const response = await fetch(`${runtime.url}/rest/v1/rpc/${name}`, {
     method: "POST", cache: "no-store", redirect: "error",
@@ -151,13 +153,13 @@ export async function marketplaceV12BindingReviewProgress(catalogRevision: strin
 
 export async function marketplaceV12BindingAuthorityReceipt(catalogRevision: string) {
   if (!SHA256.test(catalogRevision)) throw new Error("Marketplace binding authority identity is invalid.");
-  const value = await bindingRpc<unknown>("obserra_ai_marketplace_v12_binding_authority_receipt", { p_catalog_revision: catalogRevision });
+  const value = await bindingRpc<unknown>("obserra_ai_marketplace_v12_binding_authority_receipt", { p_catalog_revision: catalogRevision }, "marketplace-v12");
   return bindingReceipt(value);
 }
 
 export async function marketplaceV12ProductBindingAuthority(catalogRevision: string, productId: string) {
   if (!SHA256.test(catalogRevision) || !PRODUCT.test(productId)) throw new Error("Marketplace product binding authority identity is invalid.");
-  const value = await bindingRpc<unknown>("obserra_ai_marketplace_v12_product_binding_authority", { p_catalog_revision: catalogRevision, p_product_id: productId });
+  const value = await bindingRpc<unknown>("obserra_ai_marketplace_v12_product_binding_authority", { p_catalog_revision: catalogRevision, p_product_id: productId }, "marketplace-v12");
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Marketplace product binding authority is invalid.");
   const authority = value as Record<string, unknown>;
   if (authority.revision !== catalogRevision || authority.productId !== productId
