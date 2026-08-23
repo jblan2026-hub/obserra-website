@@ -1090,3 +1090,10 @@ All must be observed from the public canonical host:
 - **Blocker:** the website release is canonical, but this evidence window does not prove that the post-merge runtime bootstrap completed Key Vault posture convergence, exact identity/role setup, Vercel Production-binding persistence, or a replacement deployment. Applications, Academy, payments, enrollment, and regulated-LMS readiness remain fail-closed.
 - **Next safe action:** inspect the guarded bootstrap pinned to exact main SHA `f05b999f1b691bcacf04b2586f24f4682d15d74a`. If it is absent or failed, rerun only that guarded bootstrap and use its non-secret posture readback to isolate the next boundary. Require exact identity/role and Vercel-binding readbacks, replacement-deployment proof, Applications and Academy HTTP `200` with `operational: true`, Florida readiness HTTP `200`, and a new canonical exact deployment/SHA proof before claiming the remaining runtime operational.
 
+
+## PR227-MERGE-RUNTIME-32643238538-20260823T135400Z
+
+- **Timestamp:** 2026-08-23T13:54:00Z
+- **Merge/source:** PR #227 merged as `f05b999f1b691bcacf04b2586f24f4682d15d74a`; PR source gates passed (Website CI `32643102689`, Azure IaC `32643102687`, CodeQL `32643102862`).
+- **Direct run evidence:** canonical cutover `32643238504`, production E2E `32643238523`, Azure IaC `32643238510`, Website CI `32643238528`, and CodeQL `32643238520` passed. Runtime bootstrap `32643238538` authenticated successfully but failed before role binding, Vercel Production binding, or replacement deployment; its non-secret Key Vault readback reported RBAC enabled, public access enabled, and unset default network action after the bounded retry.
+- **Follow-up:** PR #228 (`b8e05c58a9d1c9449a8d851e894e4f25bf48bdf3`) is open to recognize Azure's documented firewall-disabled default as effective Allow while retaining the other guarded checks. Applications, Academy, payments, enrollment, and Florida LMS readiness remain fail-closed.
