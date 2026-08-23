@@ -78,3 +78,30 @@ test("release verification consumes bounded durable reviews and never requires a
   assert.doesNotMatch(verifier, /OBSERRA_AI_MARKETPLACE_V12_BINDINGS_JSON/);
   assert.doesNotMatch(workflow, /ai-marketplace-v12-bindings-json|OBSERRA_AI_MARKETPLACE_V12_BINDINGS_JSON/);
 });
+
+test("protected delivery readbacks every exact runtime binding after ingest publication without logging secret values", () => {
+  const workflow = read(".github/workflows/marketplace-v12-protected-delivery.yml");
+  const readback = workflow.indexOf("Read back exact marketplace v1.2 runtime binding metadata");
+  const approval = workflow.indexOf("set_secret_value ai-marketplace-v12-activation-approved-revision");
+  const retention = workflow.indexOf("Retain non-sensitive release evidence");
+
+  assert.ok(readback > approval);
+  assert.ok(retention > readback);
+  assert.match(workflow, /--query id/);
+  assert.match(workflow, /--only-show-errors/);
+  for (const secret of [
+    "applications-supabase-service-role-key",
+    "applications-stripe-secret-key",
+    "applications-stripe-webhook-secret",
+    "ai-marketplace-v12-binding-receipt-json",
+    "ai-marketplace-v12-delivery-catalog-json",
+    "ai-marketplace-v12-release-evidence-json",
+    "ai-marketplace-v12-release-evidence-signature",
+    "ai-marketplace-v12-release-evidence-hmac-key",
+    "ai-marketplace-v12-activation-approved-revision",
+    "ai-marketplace-release-cdn-url",
+    "ai-marketplace-cloudfront-key-pair-id",
+    "ai-marketplace-cloudfront-private-key",
+  ]) assert.match(workflow, new RegExp(secret));
+  assert.doesNotMatch(workflow.slice(readback, retention), /--query value/);
+});
