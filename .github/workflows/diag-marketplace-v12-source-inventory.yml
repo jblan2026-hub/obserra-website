@@ -1,0 +1,76 @@
+name: Inspect Marketplace v1.2 private source inventory
+
+on:
+  push:
+    branches: [ops/marketplace-v12-ingest-dispatch-20260823]
+    paths:
+      - ".github/workflows/diag-marketplace-v12-source-inventory.yml"
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    environment: production
+    env:
+      AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
+      AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
+      AZURE_DELIVERY_CLIENT_ID: b8da232a-713f-4c25-a61e-4fb34d13e229
+      STORAGE_ACCOUNT: stobserramktv1238d660
+      SOURCE_CONTAINER: marketplace-v12-source
+      OBSERVATION_BRANCH: ops/marketplace-v12-ingest-dispatch-20260823
+    steps:
+      - name: Authenticate dedicated Marketplace delivery identity
+        uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca # v3.0.1
+        with:
+          client-id: ${{ env.AZURE_DELIVERY_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Inspect private source container and publish redacted receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          listing="$(az storage blob list \
+            --auth-mode login \
+            --account-name "${STORAGE_ACCOUNT}" \
+            --container-name "${SOURCE_CONTAINER}" \
+            --query '[].{name:name,bytes:properties.contentLength}' \
+            --output json \
+            --only-show-errors)"
+          zip_count="$(jq '[.[] | select(.name | endswith(".zip"))] | length' <<<"${listing}")"
+          manifest_present="$(jq 'any(.[]; .name == "obserra-supplied-archives.json")' <<<"${listing}")"
+          object_count="$(jq 'length' <<<"${listing}")"
+          total_bytes="$(jq '[.[].bytes] | add // 0' <<<"${listing}")"
+          receipt="$(jq -cn \
+            --arg contract 'obserra-marketplace-v12-source-inventory-v1' \
+            --arg storageAccount "${STORAGE_ACCOUNT}" \
+            --arg sourceContainer "${SOURCE_CONTAINER}" \
+            --argjson objectCount "${object_count}" \
+            --argjson zipCount "${zip_count}" \
+            --argjson manifestPresent "${manifest_present}" \
+            --argjson totalBytes "${total_bytes}" \
+            '{contract:$contract,storageAccount:$storageAccount,sourceContainer:$sourceContainer,objectCount:$objectCount,zipCount:$zipCount,manifestPresent:$manifestPresent,totalBytes:$totalBytes,anonymousAccess:false,sharedKeyAccess:false}')"
+          python - <<'PY'
+          import base64, json, os, urllib.error, urllib.parse, urllib.request
+          repo='jblan2026-hub/obserra-website'; branch=os.environ['OBSERVATION_BRANCH']; path='ops/marketplace-v12-source-inventory.json'; token=os.environ['GH_TOKEN']
+          content=(os.environ['RECEIPT']+'\n').encode(); encoded=urllib.parse.quote(path,safe='/')
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','X-GitHub-Api-Version':'2022-11-28','User-Agent':'obserra-marketplace-source-inventory','Content-Type':'application/json'}
+          get=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}?ref={urllib.parse.quote(branch,safe="")}',headers=headers); sha=None
+          try:
+            with urllib.request.urlopen(get,timeout=30) as response: sha=json.load(response).get('sha')
+          except urllib.error.HTTPError as error:
+            if error.code != 404: raise
+          body={'message':'ops: record Marketplace source inventory','content':base64.b64encode(content).decode(),'branch':branch}
+          if sha: body['sha']=sha
+          put=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}',data=json.dumps(body).encode(),method='PUT',headers=headers)
+          with urllib.request.urlopen(put,timeout=30) as response:
+            if response.status not in (200,201): raise SystemExit(response.status)
+          PY
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RECEIPT: ${{ steps.inventory.outputs.receipt }}
