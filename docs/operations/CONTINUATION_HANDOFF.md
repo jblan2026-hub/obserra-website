@@ -767,3 +767,12 @@ All must be observed from the public canonical host:
 - **Authorization:** the previously recorded explicit owner authorization for approved production Key Vault runtime bindings into Vercel Production project `prj_lxTKKDa9sbhht7FaigiaF1PONMiC` and guarded bootstrap from exact main `5de3910bc104db9f41de48f816dde5bdf82dd6e2` remains active.
 - **Independent enforcement:** the GitHub workflow's `azure/login`, subscription/tenant checks, identity client-ID check, Key Vault/RBAC checks, and subsequent exact readbacks remain mandatory; this screenshot does not bypass them.
 - **Next safe action:** manually dispatch `enable-vercel-key-vault-runtime.yml` on branch `main` so GitHub issues a fresh OIDC assertion for exact current main. Monitor every job phase, fail closed on any mismatch, and append results automatically.
+
+
+<!-- ops-checkpoint:2026-08-23-authorized-main-pin-before-dispatch -->
+### 2026-08-23T12:24:29Z — authorized main SHA re-pinned before bootstrap dispatch
+
+- **Fresh GitHub source proof:** repository commit enumeration returned `5de3910bc104db9f41de48f816dde5bdf82dd6e2` as the current latest `main` commit. It exactly matches the owner's authorized bootstrap source; no intervening main commit was observed.
+- **Workflow target:** `.github/workflows/enable-vercel-key-vault-runtime.yml` on `main`; its manual dispatch must issue the fresh GitHub OIDC assertion required to independently prove the corrected tenant federation.
+- **Dispatch boundary:** the connected GitHub tool surface exposes workflow readback/rerun but not a new workflow-dispatch mutation. No trigger commit will be substituted because that would change the explicitly authorized SHA.
+- **Next safe action:** owner clicks `Run workflow` for this workflow on branch `main`. Continue immediately with exact run/job/log evidence, Vercel replacement deployment proof, guarded cutover, canonical probes, and automatic handoff updates.
