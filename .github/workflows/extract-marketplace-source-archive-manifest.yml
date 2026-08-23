@@ -1,0 +1,116 @@
+name: Extract Marketplace source archive manifest
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/extract-marketplace-source-archive-manifest.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: marketplace-v12-source-manifest-extract
+  cancel-in-progress: false
+
+jobs:
+  extract:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    env:
+      OBSERVATION_BRANCH: ops/marketplace-v12-ingest-dispatch-20260823
+      EXPECTED_CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
+    steps:
+      - name: Check out canonical main catalog
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Extract exact non-secret source archive evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' >"${RUNNER_TEMP}/marketplace-v12-required-source-archives.json"
+          import gzip, json, os
+          path = 'data/marketplace/obserra-marketplace-card-catalog.json.gz'
+          with gzip.open(path, 'rt', encoding='utf-8') as handle:
+              catalog = json.load(handle)
+          expected = os.environ['EXPECTED_CATALOG_REVISION']
+          if catalog.get('catalog_revision') != expected:
+              raise SystemExit('catalog revision mismatch')
+          archives = catalog.get('source_archives')
+          if not isinstance(archives, list) or len(archives) != 15:
+              raise SystemExit('expected exactly 15 source archives')
+          safe = []
+          for item in archives:
+              record = {
+                  'filename': item.get('filename'),
+                  'bytes': item.get('bytes'),
+                  'sha256': item.get('sha256'),
+              }
+              if not isinstance(record['filename'], str) or not record['filename'].endswith('.zip'):
+                  raise SystemExit('invalid source archive filename')
+              if not isinstance(record['bytes'], int) or record['bytes'] <= 0:
+                  raise SystemExit('invalid source archive byte length')
+              if not isinstance(record['sha256'], str) or len(record['sha256']) != 64:
+                  raise SystemExit('invalid source archive digest')
+              safe.append(record)
+          safe.sort(key=lambda value: value['filename'])
+          print(json.dumps({
+              'contract': 'obserra-marketplace-v12-source-archive-manifest-v1',
+              'catalogRevision': expected,
+              'archiveCount': len(safe),
+              'archives': safe,
+          }, indent=2))
+          PY
+
+      - name: Publish non-secret manifest to observation branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, json, os, sys, urllib.error, urllib.parse, urllib.request
+          source = os.path.join(os.environ['RUNNER_TEMP'], 'marketplace-v12-required-source-archives.json')
+          content = open(source, 'rb').read()
+          repo = 'jblan2026-hub/obserra-website'
+          path = 'ops/marketplace-v12-required-source-archives.json'
+          branch = os.environ['OBSERVATION_BRANCH']
+          token = os.environ['GH_TOKEN']
+          headers = {
+              'Accept': 'application/vnd.github+json',
+              'Authorization': f'Bearer {token}',
+              'X-GitHub-Api-Version': '2022-11-28',
+              'User-Agent': 'obserra-marketplace-source-manifest',
+              'Content-Type': 'application/json',
+          }
+          encoded_path = urllib.parse.quote(path, safe='/')
+          get = urllib.request.Request(
+              f'https://api.github.com/repos/{repo}/contents/{encoded_path}?ref={urllib.parse.quote(branch, safe="")}',
+              headers=headers,
+          )
+          sha = None
+          try:
+              with urllib.request.urlopen(get, timeout=30) as response:
+                  sha = json.load(response).get('sha')
+          except urllib.error.HTTPError as error:
+              if error.code != 404:
+                  raise
+          body = {
+              'message': 'ops: record exact Marketplace source archive manifest',
+              'content': base64.b64encode(content).decode(),
+              'branch': branch,
+          }
+          if sha:
+              body['sha'] = sha
+          put = urllib.request.Request(
+              f'https://api.github.com/repos/{repo}/contents/{encoded_path}',
+              data=json.dumps(body).encode(),
+              method='PUT',
+              headers=headers,
+          )
+          with urllib.request.urlopen(put, timeout=30) as response:
+              if response.status not in (200, 201):
+                  raise SystemExit(response.status)
+          PY
