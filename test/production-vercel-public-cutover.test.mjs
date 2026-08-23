@@ -18,6 +18,23 @@ test("deployment polling retries bounded transport and response failures", () =>
   assert.match(workflow, /No exact READY canonical deployment appeared/);
 });
 
+test("workflow dispatch can pin cutover to the exact preflighted deployment while push remains SHA-based", () => {
+  assert.match(
+    workflow,
+    /workflow_dispatch:\s*\n\s*inputs:\s*\n\s*expected_deployment_id:/,
+  );
+  assert.match(workflow, /EXPECTED_DEPLOYMENT_ID:\s*\$\{\{ inputs\.expected_deployment_id \|\| '' \}\}/);
+  assert.match(workflow, /--arg expected "\$\{EXPECTED_DEPLOYMENT_ID\}"/);
+  assert.match(
+    workflow,
+    /select\(\(\$expected == ""\) or \(\(\.uid \/\/ \.id \/\/ ""\) == \$expected\)\)/,
+  );
+  assert.match(
+    workflow,
+    /if \[ -n "\$\{EXPECTED_DEPLOYMENT_ID\}" \] && \[ "\$\{candidate\}" != "\$\{EXPECTED_DEPLOYMENT_ID\}" \]/,
+  );
+});
+
 test("cutover records redacted Check-v2 evidence only for the exact candidate without changing release authority", () => {
   const candidateStart = workflow.indexOf("- name: Wait for exact canonical READY deployment");
   const evidenceStart = workflow.indexOf("- name: Record exact Vercel deployment-check evidence");

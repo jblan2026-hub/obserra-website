@@ -19,6 +19,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: read
   id-token: write
 
@@ -52,6 +53,11 @@ jobs:
       VERCEL_CANONICAL_ORIGIN: https://www.obserrallc.com
       AZURE_TOKEN_AUDIENCE: api://AzureADTokenExchange
       FEDERATED_CREDENTIAL_NAME: vercel-obserra-website-live-production
+      # Canonical public runtime metadata. These values are identifiers/URLs, not credentials.
+      OBSERRA_APPLICATIONS_SUPABASE_URL: https://ykmrlcfitsubqajgfnye.supabase.co
+      OBSERRA_ACADEMY_SUPABASE_URL: https://nwxnyqlyzyufgoadtqxs.supabase.co
+      OBSERRA_ACADEMY_SUPABASE_PROJECT_REF: nwxnyqlyzyufgoadtqxs
+      OBSERRA_IDENTITY_RUNTIME_ENABLED: "true"
 
     steps:
       - name: Authenticate the governed deployment identity
@@ -153,17 +159,23 @@ jobs:
           audience="${AZURE_TOKEN_AUDIENCE}"
           existing_credentials="$(az identity federated-credential list --resource-group "${AZURE_RESOURCE_GROUP}" --identity-name "${AZURE_RUNTIME_IDENTITY}" --output json)"
           if jq -e --arg name "${FEDERATED_CREDENTIAL_NAME}" 'any(.[]; .name == $name)' <<<"${existing_credentials}" >/dev/null; then
-            jq -e --arg name "${FEDERATED_CREDENTIAL_NAME}" --arg issuer "${issuer}" --arg subject "${subject}" --arg audience "${audience}" '
+            if ! jq -e --arg name "${FEDERATED_CREDENTIAL_NAME}" --arg issuer "${issuer}" --arg subject "${subject}" --arg audience "${audience}" '
               [.[] | select(.name == $name)] as $credentials |
               ($credentials | length == 1) and
               $credentials[0].issuer == $issuer and
               $credentials[0].subject == $subject and
               ($credentials[0].audiences | length == 1) and
               $credentials[0].audiences[0] == $audience
-            ' <<<"${existing_credentials}" >/dev/null || {
-              echo "::error::Existing Vercel workload binding does not exactly match the canonical production project."
-              exit 1
-            }
+            ' <<<"${existing_credentials}" >/dev/null; then
+              az identity federated-credential update \
+                --resource-group "${AZURE_RESOURCE_GROUP}" \
+                --identity-name "${AZURE_RUNTIME_IDENTITY}" \
+                --name "${FEDERATED_CREDENTIAL_NAME}" \
+                --issuer "${issuer}" \
+                --subject "${subject}" \
+                --audiences "${audience}" \
+                --output none
+            fi
           else
             az identity federated-credential create \
               --resource-group "${AZURE_RESOURCE_GROUP}" \
@@ -202,7 +214,13 @@ jobs:
           }
           unset project_environment_before
 
-          vercel_environment_payload="$(jq -cn --arg tenant_id "${AZURE_TENANT_ID}" --arg client_id "${runtime_client_id}" '
+          vercel_environment_payload="$(jq -cn \
+            --arg tenant_id "${AZURE_TENANT_ID}" \
+            --arg client_id "${runtime_client_id}" \
+            --arg applications_supabase_url "${OBSERRA_APPLICATIONS_SUPABASE_URL}" \
+            --arg academy_supabase_url "${OBSERRA_ACADEMY_SUPABASE_URL}" \
+            --arg academy_supabase_project_ref "${OBSERRA_ACADEMY_SUPABASE_PROJECT_REF}" \
+            --arg identity_runtime_enabled "${OBSERRA_IDENTITY_RUNTIME_ENABLED}" '
             [
               {
                 key: "OBSERRA_KEY_VAULT_TENANT_ID",
@@ -217,6 +235,34 @@ jobs:
                 type: "sensitive",
                 target: ["production"],
                 comment: "Existing Azure runtime managed identity for canonical Vercel Key Vault access"
+              },
+              {
+                key: "OBSERRA_APPLICATIONS_SUPABASE_URL",
+                value: $applications_supabase_url,
+                type: "plain",
+                target: ["production"],
+                comment: "Canonical Applications durable-commerce authority URL"
+              },
+              {
+                key: "OBSERRA_ACADEMY_SUPABASE_URL",
+                value: $academy_supabase_url,
+                type: "plain",
+                target: ["production"],
+                comment: "Canonical Academy durable-commerce authority URL"
+              },
+              {
+                key: "OBSERRA_ACADEMY_SUPABASE_PROJECT_REF",
+                value: $academy_supabase_project_ref,
+                type: "plain",
+                target: ["production"],
+                comment: "Canonical Academy durable-commerce authority project"
+              },
+              {
+                key: "OBSERRA_IDENTITY_RUNTIME_ENABLED",
+                value: $identity_runtime_enabled,
+                type: "plain",
+                target: ["production"],
+                comment: "Explicit canonical production identity activation"
               }
             ]
           ')"
@@ -229,16 +275,34 @@ jobs:
           project_environment_verified="$(curl --silent --show-error --fail-with-body --connect-timeout 10 --max-time 25 \
             --header "Authorization: Bearer ${VERCEL_TOKEN}" \
             "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env?decrypt=false&teamId=${VERCEL_TEAM_ID}")"
-          jq -e '
+          jq -e \
+            --arg applications_supabase_url "${OBSERRA_APPLICATIONS_SUPABASE_URL}" \
+            --arg academy_supabase_url "${OBSERRA_ACADEMY_SUPABASE_URL}" \
+            --arg academy_supabase_project_ref "${OBSERRA_ACADEMY_SUPABASE_PROJECT_REF}" \
+            --arg identity_runtime_enabled "${OBSERRA_IDENTITY_RUNTIME_ENABLED}" '
             . as $project_environment |
             def production_target:
               (.target == "production") or
               (((.target // []) | if type == "array" then index("production") != null else false end));
-            all(["OBSERRA_KEY_VAULT_TENANT_ID", "OBSERRA_KEY_VAULT_CLIENT_ID"][]; . as $key |
-              any($project_environment.envs[]?; .key == $key and production_target and .type == "sensitive")
+            (
+              all(["OBSERRA_KEY_VAULT_TENANT_ID", "OBSERRA_KEY_VAULT_CLIENT_ID"][]; . as $key |
+                any($project_environment.envs[]?; .key == $key and production_target and .type == "sensitive")
+              )
+            ) and (
+              all([
+                {key: "OBSERRA_APPLICATIONS_SUPABASE_URL", value: $applications_supabase_url},
+                {key: "OBSERRA_ACADEMY_SUPABASE_URL", value: $academy_supabase_url},
+                {key: "OBSERRA_ACADEMY_SUPABASE_PROJECT_REF", value: $academy_supabase_project_ref},
+                {key: "OBSERRA_IDENTITY_RUNTIME_ENABLED", value: $identity_runtime_enabled}
+              ][]; . as $binding |
+                any($project_environment.envs[]?;
+                  .key == $binding.key and .value == $binding.value and
+                  production_target and .type == "plain"
+                )
+              )
             )
           ' <<<"${project_environment_verified}" >/dev/null || {
-            echo "::error::The Vercel runtime identity metadata was not persisted with the production target."
+            echo "::error::The exact Vercel production runtime bindings were not persisted."
             exit 1
           }
           unset project_environment_verified runtime_client_id runtime_principal_id runtime_identity key_vault normalized_key_vault_id key_vault_id
@@ -246,6 +310,8 @@ jobs:
 
       - name: Build and prove one exact current-environment production deployment
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
@@ -386,8 +452,38 @@ jobs:
             exit 1
           }
 
+          # Only the existing guarded controller may mutate canonical aliases. Pin
+          # the dispatch to the exact deployment that passed both direct probes;
+          # its workflow owns rollback and independently verifies alias convergence.
+          cutover_payload="$(jq -cn --arg deployment "${replacement_id}" '
+            {ref: "main", inputs: {expected_deployment_id: $deployment}}
+          ')"
+          cutover_response="$(mktemp)"
+          cutover_status="$(curl --silent --show-error --connect-timeout 10 --max-time 25 \
+            --request POST \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer ${GITHUB_TOKEN}" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            --header "Content-Type: application/json" \
+            --data "${cutover_payload}" \
+            --output "${cutover_response}" \
+            --write-out '%{http_code}' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/production-vercel-public-cutover.yml/dispatches")" || {
+              rm -f "${cutover_response}"
+              echo "::error::The guarded canonical cutover dispatch failed before acceptance."
+              exit 1
+            }
+          unset cutover_payload
+          if [ "${cutover_status}" != "204" ]; then
+            rm -f "${cutover_response}"
+            echo "::error::The guarded canonical cutover dispatch was not accepted (HTTP ${cutover_status})."
+            exit 1
+          fi
+          rm -f "${cutover_response}"
+          echo "::notice::Guarded canonical cutover accepted for exact deployment ${replacement_id}."
+
           canonical_ready=false
-          for attempt in $(seq 1 30); do
+          for attempt in $(seq 1 90); do
             if canonical_release_proven "${replacement_id}" && \
               health_is_operational "${VERCEL_CANONICAL_ORIGIN}" "/api/apps/commerce-health" "applications-commerce-health-v1" && \
               health_is_operational "${VERCEL_CANONICAL_ORIGIN}" "/api/academy/commerce-health" "academy-commerce-health-v1"; then
@@ -401,3 +497,4 @@ jobs:
             exit 1
           }
           echo "::notice::Canonical public endpoint proves the exact deployment and both commerce health contracts."
+
