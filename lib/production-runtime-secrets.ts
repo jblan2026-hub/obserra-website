@@ -7,6 +7,7 @@ const KEY_VAULT_URI = "https://kv-obserra-prod-38d660.vault.azure.net";
 const AZURE_TOKEN_AUDIENCE = "api://AzureADTokenExchange";
 const ACADEMY_GATEWAY_AUDIENCE = "https://vercel.com/obserra";
 const AZURE_KEY_VAULT_SCOPE = "https://vault.azure.net/.default";
+const AZURE_STORAGE_SCOPE = "https://storage.azure.com/.default";
 const VERCEL_OIDC_ISSUER = "https://oidc.vercel.com/obserra";
 const VERCEL_PRODUCTION_SUBJECT = "owner:obserra:project:obserra-website-live:environment:production";
 const KEY_VAULT_API_VERSION = "7.4";
@@ -92,18 +93,6 @@ const MARKETPLACE_V12_BINDINGS: readonly Binding[] = [
     environmentKey: "OBSERRA_AI_MARKETPLACE_V12_ACTIVATION_APPROVED_REVISION",
     keyVaultSecretName: "ai-marketplace-v12-activation-approved-revision",
   },
-  {
-    environmentKey: "OBSERRA_AI_MARKETPLACE_RELEASE_CDN_URL",
-    keyVaultSecretName: "ai-marketplace-release-cdn-url",
-  },
-  {
-    environmentKey: "OBSERRA_AI_MARKETPLACE_CLOUDFRONT_KEY_PAIR_ID",
-    keyVaultSecretName: "ai-marketplace-cloudfront-key-pair-id",
-  },
-  {
-    environmentKey: "OBSERRA_AI_MARKETPLACE_CLOUDFRONT_PRIVATE_KEY",
-    keyVaultSecretName: "ai-marketplace-cloudfront-private-key",
-  },
 ];
 
 const ACADEMY_BINDINGS: readonly Binding[] = [
@@ -163,7 +152,7 @@ type CacheEntry = Readonly<{
 
 const secretCache = new Map<string, CacheEntry>();
 const hydrationPromises = new Map<"applications" | "academy" | "marketplace-v12", Promise<ProductionRuntimeSecretsEvidence>>();
-let azureAccessToken: CacheEntry | null = null;
+const azureAccessTokens = new Map<string, CacheEntry>();
 
 function vercelProductionRuntime() {
   return process.env.VERCEL_ENV === "production";
@@ -233,8 +222,8 @@ async function vercelOidcAssertion(audience: string) {
   return assertion;
 }
 
-async function azureKeyVaultAccessToken() {
-  const cached = cachedValue(azureAccessToken);
+async function azureResourceAccessToken(scope: string) {
+  const cached = cachedValue(azureAccessTokens.get(scope));
   if (cached) return cached;
 
   const tenantId = requiredAzureIdentifier("OBSERRA_KEY_VAULT_TENANT_ID");
@@ -243,7 +232,7 @@ async function azureKeyVaultAccessToken() {
 
   const body = new URLSearchParams({
     client_id: clientId,
-    scope: AZURE_KEY_VAULT_SCOPE,
+    scope,
     grant_type: "client_credentials",
     client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
     client_assertion: assertion,
@@ -272,11 +261,20 @@ async function azureKeyVaultAccessToken() {
     throw new ProductionRuntimeSecretsError("azure-token", "AZURE_TOKEN_INVALID_RESPONSE", false);
   }
 
-  azureAccessToken = {
+  azureAccessTokens.set(scope, {
     value,
     expiresAt: Date.now() + Math.max(30_000, (expiresIn - 60) * 1000),
-  };
+  });
   return value;
+}
+
+async function azureKeyVaultAccessToken() {
+  return azureResourceAccessToken(AZURE_KEY_VAULT_SCOPE);
+}
+
+export async function productionAzureStorageAccessToken(): Promise<string | undefined> {
+  if (!vercelProductionRuntime()) return undefined;
+  return azureResourceAccessToken(AZURE_STORAGE_SCOPE);
 }
 
 async function keyVaultSecret(binding: Binding, accessToken: string) {
@@ -316,7 +314,7 @@ async function hydrate(bindings: readonly Binding[]) {
     values = await Promise.all(bindings.map((binding) => keyVaultSecret(binding, accessToken)));
   } catch (error) {
     if (!(error instanceof ProductionRuntimeSecretsError) || error.code !== "KEY_VAULT_AUTHENTICATION_REJECTED") throw error;
-    azureAccessToken = null;
+    azureAccessTokens.delete(AZURE_KEY_VAULT_SCOPE);
     accessToken = await azureKeyVaultAccessToken();
     values = await Promise.all(bindings.map((binding) => keyVaultSecret(binding, accessToken)));
   }

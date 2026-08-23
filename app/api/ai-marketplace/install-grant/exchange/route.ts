@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const release = marketplaceV12Release(grant.productId, grant.catalogRevision, grant.artifactSha256);
     if (!release || release.installProfile !== grant.installProfile) return failure(409);
     const manifest = marketplaceV12InstallManifest({ grantId: body.grantId, ...grant }, release);
-    const artifactUrl = manifest && marketplaceV12BridgeArtifactUrl(release);
+    const artifactUrl = manifest && await marketplaceV12BridgeArtifactUrl(release, grant.productId, grant.catalogRevision);
     if (!manifest || !artifactUrl) return failure(503);
     const receiptCorrelationId = randomUUID();
     await consumeMarketplaceV12InstallGrant({ grantId: body.grantId, bridgeId: bridge.bridgeId, receiptCorrelationId });

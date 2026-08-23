@@ -57,6 +57,7 @@
     "verify:application-release": "npm run sync:apps && npm test && npm run lint && npm run build"
   },
   "dependencies": {
+    "@azure/storage-blob": "12.33.0",
     "@clerk/nextjs": "^7.6.4",
     "@react-three/drei": "10.7.8",
     "@react-three/fiber": "9.7.0",

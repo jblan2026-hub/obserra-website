@@ -100,9 +100,6 @@ test("protected delivery readbacks every exact runtime binding after ingest publ
     "ai-marketplace-v12-release-evidence-signature",
     "ai-marketplace-v12-release-evidence-hmac-key",
     "ai-marketplace-v12-activation-approved-revision",
-    "ai-marketplace-release-cdn-url",
-    "ai-marketplace-cloudfront-key-pair-id",
-    "ai-marketplace-cloudfront-private-key",
   ]) assert.match(workflow, new RegExp(secret));
   const readbackBlock = workflow.slice(readback, retention);
   assert.doesNotMatch(readbackBlock, /--query value/);
@@ -128,13 +125,6 @@ test("protected-delivery preflight verifies every existing ingest prerequisite b
     "applications-stripe-secret-key",
     "applications-stripe-webhook-secret",
     "applications-commerce-hash-secret",
-    "ai-marketplace-release-aws-access-key-id",
-    "ai-marketplace-release-aws-secret-access-key",
-    "ai-marketplace-release-bucket",
-    "ai-marketplace-release-kms-key-id",
-    "ai-marketplace-release-cdn-url",
-    "ai-marketplace-cloudfront-key-pair-id",
-    "ai-marketplace-cloudfront-private-key",
     "ai-marketplace-v12-release-evidence-hmac-key",
   ]) assert.match(preflightBlock, new RegExp(secret));
   for (const generatedBinding of [

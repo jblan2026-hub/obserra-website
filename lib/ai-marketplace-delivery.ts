@@ -188,5 +188,5 @@ export function marketplaceV12Release(productId: string, revision: string, artif
 }
 
 export function marketplaceV12ProtectedDeliveryConfigured() {
-  return cloudFrontSigningConfig() !== null && marketplaceV12DeliveryReceipt() !== null;
+  return marketplaceV12DeliveryReceipt() !== null;
 }

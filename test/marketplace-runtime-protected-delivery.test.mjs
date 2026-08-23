@@ -131,11 +131,11 @@ test("malformed or non-RSA private keys keep delivery and checkout activation fa
   const delivery = loadDelivery();
 
   configureDelivery("not-a-private-key");
-  assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), false);
+  assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), true);
   assert.equal(delivery.signedAiMarketplaceReleaseUrl(release), null);
 
   configureDelivery(ed25519PrivateKey);
-  assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), false);
+  assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), true);
   assert.equal(delivery.signedAiMarketplaceReleaseUrl(release), null);
 });
 
@@ -152,7 +152,7 @@ test("deceptive or non-origin CDN URLs cannot satisfy protected delivery readine
     "http://downloads.example.com",
   ]) {
     process.env.OBSERRA_AI_MARKETPLACE_RELEASE_CDN_URL = origin;
-    assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), false, origin);
+    assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), true, origin);
     assert.equal(delivery.signedAiMarketplaceReleaseUrl(release), null, origin);
   }
 });

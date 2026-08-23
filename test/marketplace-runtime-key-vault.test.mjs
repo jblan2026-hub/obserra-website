@@ -36,9 +36,6 @@ const MARKETPLACE_V12_SECRET_BINDINGS = {
   OBSERRA_AI_MARKETPLACE_V12_RELEASE_EVIDENCE_SIGNATURE: "ai-marketplace-v12-release-evidence-signature",
   OBSERRA_AI_MARKETPLACE_V12_RELEASE_EVIDENCE_HMAC_KEY: "ai-marketplace-v12-release-evidence-hmac-key",
   OBSERRA_AI_MARKETPLACE_V12_ACTIVATION_APPROVED_REVISION: "ai-marketplace-v12-activation-approved-revision",
-  OBSERRA_AI_MARKETPLACE_RELEASE_CDN_URL: "ai-marketplace-release-cdn-url",
-  OBSERRA_AI_MARKETPLACE_CLOUDFRONT_KEY_PAIR_ID: "ai-marketplace-cloudfront-key-pair-id",
-  OBSERRA_AI_MARKETPLACE_CLOUDFRONT_PRIVATE_KEY: "ai-marketplace-cloudfront-private-key",
 };
 const MARKETPLACE_V12_KEYS = Object.keys(MARKETPLACE_V12_SECRET_BINDINGS);
 const TEST_ENVIRONMENT_KEYS = [
@@ -167,7 +164,7 @@ test("marketplace v1.2 hydration atomically loads every exact runtime binding wi
 
   const evidence = await runtime.ensureMarketplaceV12RuntimeSecrets();
 
-  assert.deepEqual({ ...evidence }, { required: true, state: "ready", stage: "environment", bindingCount: 13 });
+  assert.deepEqual({ ...evidence }, { required: true, state: "ready", stage: "environment", bindingCount: 10 });
   const requestedSecretNames = secretRequests.map((path) => decodeURIComponent(path.split("/").at(-1))).sort();
   assert.deepEqual(requestedSecretNames, [
     "applications-commerce-hash-secret",

@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { findAiMarketplaceProduct } from "../../../../lib/ai-marketplace-catalog";
 import { aiMarketplaceEntitlement, aiMarketplaceTenantId, marketplaceV12DeliveryEntitlement, recordMarketplaceV12Download } from "../../../../lib/ai-marketplace-commerce";
 import { aiMarketplaceRelease, marketplaceV12Release, signedAiMarketplaceReleaseUrl } from "../../../../lib/ai-marketplace-delivery";
+import { marketplaceV12SignedAzureReleaseUrl } from "../../../../lib/marketplace-v12-azure-delivery";
 import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
 import { ensureMarketplaceV12RuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
@@ -32,7 +33,7 @@ export async function GET(request: Request) {
       if (!release) return unavailable();
       const decision = await recordMarketplaceV12Download({ subjectId: userId, tenantId, productId: catalog.product_id, revision, artifactSha256: subject.artifactSha256, correlationId: randomUUID() });
       if (!decision.allowed) return NextResponse.json({ error: "Entitlement required" }, { status: 403, headers: { "cache-control": "no-store", "x-robots-tag": "noindex, nofollow" } });
-      const url = signedAiMarketplaceReleaseUrl(release);
+      const url = await marketplaceV12SignedAzureReleaseUrl({ release, productId: catalog.product_id, revision });
       if (!url) return unavailable();
       const response = NextResponse.redirect(url, 303);
       response.headers.set("cache-control", "no-store, private");
