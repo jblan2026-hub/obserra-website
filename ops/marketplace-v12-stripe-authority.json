@@ -3,12 +3,12 @@
   "accountId": "acct_1U0ASDCphHrx5d9o",
   "chargesEnabled": true,
   "webhookEndpointId": "we_1U7k64CphHrx5d9oL5FqUK3b",
-  "webhookReplaced": true,
+  "webhookReplaced": false,
   "requiredEventCount": 11,
   "keyVaultAuthorityReady": true,
   "legacySources": {
     "supabase": "key-vault",
-    "commerceHash": "generated-first-party-hmac",
-    "stripe": "STRIPE_SECRET_KEY"
+    "commerceHash": "key-vault",
+    "stripe": "key-vault"
   }
 }
