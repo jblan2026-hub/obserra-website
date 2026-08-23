@@ -106,7 +106,7 @@ test("protected delivery readbacks every exact runtime binding after ingest publ
   ]) assert.match(workflow, new RegExp(secret));
   const readbackBlock = workflow.slice(readback, retention);
   assert.doesNotMatch(readbackBlock, /--query value/);
-  assert.doesNotMatch(readbackBlock, /\\\\\\\\\n/);
+  assert.equal(readbackBlock.includes(String.fromCharCode(92, 92, 10)), false);
 });
 
 
