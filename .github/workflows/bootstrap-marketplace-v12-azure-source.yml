@@ -1,0 +1,152 @@
+name: Bootstrap Marketplace v1.2 Azure source authority
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/bootstrap-marketplace-v12-azure-source.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: marketplace-v12-azure-source-bootstrap
+  cancel-in-progress: false
+
+env:
+  AZURE_DEPLOY_CLIENT_ID: dc3ff3e1-ea35-4879-afa9-fa3eee49df85
+  AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
+  AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
+  AZURE_RESOURCE_GROUP: rg-obserra-prod-eastus
+  AZURE_LOCATION: eastus
+  AZURE_KEY_VAULT_NAME: kv-obserra-prod-38d660
+  SOURCE_STORAGE_ACCOUNT: stobserramktv1238d660
+  SOURCE_CONTAINER: marketplace-v12-source
+  DELIVERY_IDENTITY: id-obserra-marketplace-delivery-prod
+  FEDERATED_CREDENTIAL: github-production-protected-delivery
+  GITHUB_ENVIRONMENT_SUBJECT: repo:jblan2026-hub@309821056/obserra-website@1321156321:environment:production
+  OIDC_ISSUER: https://token.actions.githubusercontent.com
+  OIDC_AUDIENCE: api://AzureADTokenExchange
+  OBSERVATION_BRANCH: ops/marketplace-v12-ingest-dispatch-20260823
+
+jobs:
+  bootstrap:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Authenticate governed production deployment identity
+        uses: azure/login@v3.0.1
+        with:
+          client-id: ${{ env.AZURE_DEPLOY_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Converge dedicated source storage and delivery identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(az account show --query id -o tsv)" = "${AZURE_SUBSCRIPTION_ID}"
+          test "$(az account show --query tenantId -o tsv)" = "${AZURE_TENANT_ID}"
+          rg_id="$(az group show --name "${AZURE_RESOURCE_GROUP}" --query id -o tsv)"
+          test -n "${rg_id}"
+
+          storage_id="${rg_id}/providers/Microsoft.Storage/storageAccounts/${SOURCE_STORAGE_ACCOUNT}"
+          storage_body="$(jq -cn --arg location "${AZURE_LOCATION}" '{location:$location,sku:{name:"Standard_GRS"},kind:"StorageV2",tags:{workload:"obserra-ai-marketplace-v12",environment:"production",owner:"OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",managedBy:"github-oidc"},properties:{accessTier:"Hot",supportsHttpsTrafficOnly:true,minimumTlsVersion:"TLS1_2",allowBlobPublicAccess:false,allowCrossTenantReplication:false,allowSharedKeyAccess:false,defaultToOAuthAuthentication:true,publicNetworkAccess:"Enabled",networkAcls:{bypass:"AzureServices",defaultAction:"Allow",ipRules:[],virtualNetworkRules:[]}}}')"
+          az rest --method put --url "https://management.azure.com${storage_id}?api-version=2023-05-01" --body "${storage_body}" --output none
+
+          blob_service_id="${storage_id}/blobServices/default"
+          blob_body='{"properties":{"deleteRetentionPolicy":{"enabled":true,"days":30},"containerDeleteRetentionPolicy":{"enabled":true,"days":30},"isVersioningEnabled":true}}'
+          az rest --method put --url "https://management.azure.com${blob_service_id}?api-version=2023-05-01" --body "${blob_body}" --output none
+
+          container_id="${blob_service_id}/containers/${SOURCE_CONTAINER}"
+          container_body='{"properties":{"publicAccess":"None"}}'
+          az rest --method put --url "https://management.azure.com${container_id}?api-version=2023-05-01" --body "${container_body}" --output none
+
+          if ! az identity show --resource-group "${AZURE_RESOURCE_GROUP}" --name "${DELIVERY_IDENTITY}" --output none 2>/dev/null; then
+            az identity create --resource-group "${AZURE_RESOURCE_GROUP}" --name "${DELIVERY_IDENTITY}" --location "${AZURE_LOCATION}" --tags workload=obserra-ai-marketplace-v12 environment=production purpose=protected-delivery --output none
+          fi
+          identity="$(az identity show --resource-group "${AZURE_RESOURCE_GROUP}" --name "${DELIVERY_IDENTITY}" --output json)"
+          delivery_client_id="$(jq -er '.clientId | strings' <<<"${identity}")"
+          delivery_principal_id="$(jq -er '.principalId | strings' <<<"${identity}")"
+          test "$(jq -r '.tenantId' <<<"${identity}")" = "${AZURE_TENANT_ID}"
+
+          if existing="$(az identity federated-credential show --resource-group "${AZURE_RESOURCE_GROUP}" --identity-name "${DELIVERY_IDENTITY}" --name "${FEDERATED_CREDENTIAL}" --output json 2>/dev/null)"; then
+            if ! jq -e --arg issuer "${OIDC_ISSUER}" --arg subject "${GITHUB_ENVIRONMENT_SUBJECT}" --arg audience "${OIDC_AUDIENCE}" '.issuer==$issuer and .subject==$subject and (.audiences|length)==1 and .audiences[0]==$audience' <<<"${existing}" >/dev/null; then
+              az identity federated-credential update --resource-group "${AZURE_RESOURCE_GROUP}" --identity-name "${DELIVERY_IDENTITY}" --name "${FEDERATED_CREDENTIAL}" --issuer "${OIDC_ISSUER}" --subject "${GITHUB_ENVIRONMENT_SUBJECT}" --audiences "${OIDC_AUDIENCE}" --output none
+            fi
+          else
+            az identity federated-credential create --resource-group "${AZURE_RESOURCE_GROUP}" --identity-name "${DELIVERY_IDENTITY}" --name "${FEDERATED_CREDENTIAL}" --issuer "${OIDC_ISSUER}" --subject "${GITHUB_ENVIRONMENT_SUBJECT}" --audiences "${OIDC_AUDIENCE}" --output none
+          fi
+
+          key_vault_id="$(az keyvault show --resource-group "${AZURE_RESOURCE_GROUP}" --name "${AZURE_KEY_VAULT_NAME}" --query id -o tsv)"
+          test -n "${key_vault_id}"
+
+          ensure_role() {
+            local principal="$1" role="$2" scope="$3"
+            if ! az role assignment list --assignee-object-id "${principal}" --scope "${scope}" --query "[?roleDefinitionName=='${role}'] | [0].id" -o tsv | grep -q .; then
+              az role assignment create --assignee-object-id "${principal}" --assignee-principal-type ServicePrincipal --role "${role}" --scope "${scope}" --output none
+            fi
+          }
+          ensure_role "${delivery_principal_id}" "Storage Blob Data Reader" "${container_id}"
+          ensure_role "${delivery_principal_id}" "Key Vault Secrets Officer" "${key_vault_id}"
+          ensure_role "f87823b9-4fc5-4c3e-b8ac-63c91c3f15aa" "Storage Blob Data Contributor" "${container_id}"
+
+          storage="$(az storage account show --resource-group "${AZURE_RESOURCE_GROUP}" --name "${SOURCE_STORAGE_ACCOUNT}" --output json)"
+          jq -e '.kind=="StorageV2" and .sku.name=="Standard_GRS" and .allowBlobPublicAccess==false and .allowSharedKeyAccess==false and .defaultToOAuthAuthentication==true and .minimumTlsVersion=="TLS1_2" and .enableHttpsTrafficOnly==true and .publicNetworkAccess=="Enabled" and .networkRuleSet.defaultAction=="Allow"' <<<"${storage}" >/dev/null
+          container="$(az rest --method get --url "https://management.azure.com${container_id}?api-version=2023-05-01")"
+          jq -e '(.properties.publicAccess // "None") == "None"' <<<"${container}" >/dev/null
+          federation="$(az identity federated-credential show --resource-group "${AZURE_RESOURCE_GROUP}" --identity-name "${DELIVERY_IDENTITY}" --name "${FEDERATED_CREDENTIAL}" --output json)"
+          jq -e --arg issuer "${OIDC_ISSUER}" --arg subject "${GITHUB_ENVIRONMENT_SUBJECT}" --arg audience "${OIDC_AUDIENCE}" '.issuer==$issuer and .subject==$subject and (.audiences|length)==1 and .audiences[0]==$audience' <<<"${federation}" >/dev/null
+
+          role_ready=false
+          for attempt in $(seq 1 12); do
+            source_role="$(az role assignment list --assignee-object-id "${delivery_principal_id}" --scope "${container_id}" --query "[?roleDefinitionName=='Storage Blob Data Reader'] | [0].id" -o tsv)"
+            vault_role="$(az role assignment list --assignee-object-id "${delivery_principal_id}" --scope "${key_vault_id}" --query "[?roleDefinitionName=='Key Vault Secrets Officer'] | [0].id" -o tsv)"
+            upload_role="$(az role assignment list --assignee-object-id "f87823b9-4fc5-4c3e-b8ac-63c91c3f15aa" --scope "${container_id}" --query "[?roleDefinitionName=='Storage Blob Data Contributor'] | [0].id" -o tsv)"
+            if [ -n "${source_role}" ] && [ -n "${vault_role}" ] && [ -n "${upload_role}" ]; then role_ready=true; break; fi
+            sleep 5
+          done
+          [ "${role_ready}" = true ] || { echo "::error::Marketplace source/delivery role assignments did not converge."; exit 1; }
+
+          mkdir -p "${RUNNER_TEMP}/marketplace-v12-bootstrap"
+          jq -cn \
+            --arg contract "obserra-marketplace-v12-azure-source-bootstrap-v1" \
+            --arg tenantId "${AZURE_TENANT_ID}" \
+            --arg subscriptionId "${AZURE_SUBSCRIPTION_ID}" \
+            --arg resourceGroup "${AZURE_RESOURCE_GROUP}" \
+            --arg storageAccount "${SOURCE_STORAGE_ACCOUNT}" \
+            --arg sourceContainer "${SOURCE_CONTAINER}" \
+            --arg sourceContainerId "${container_id}" \
+            --arg deliveryIdentity "${DELIVERY_IDENTITY}" \
+            --arg deliveryClientId "${delivery_client_id}" \
+            --arg deliveryPrincipalId "${delivery_principal_id}" \
+            --arg keyVault "${AZURE_KEY_VAULT_NAME}" \
+            --arg federationSubject "${GITHUB_ENVIRONMENT_SUBJECT}" \
+            '{contract:$contract,tenantId:$tenantId,subscriptionId:$subscriptionId,resourceGroup:$resourceGroup,storageAccount:$storageAccount,sourceContainer:$sourceContainer,sourceContainerId:$sourceContainerId,deliveryIdentity:$deliveryIdentity,deliveryClientId:$deliveryClientId,deliveryPrincipalId:$deliveryPrincipalId,keyVault:$keyVault,federationSubject:$federationSubject,anonymousBlobAccess:false,sharedKeyAccess:false,defaultOAuthAuthentication:true,deliveryRoles:["Storage Blob Data Reader","Key Vault Secrets Officer"],uploadRole:"Storage Blob Data Contributor"}' > "${RUNNER_TEMP}/marketplace-v12-bootstrap/receipt.json"
+
+      - name: Publish non-sensitive bootstrap receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, json, os, urllib.error, urllib.parse, urllib.request
+          source=os.path.join(os.environ['RUNNER_TEMP'],'marketplace-v12-bootstrap','receipt.json')
+          content=open(source,'rb').read(); repo='jblan2026-hub/obserra-website'; path='ops/marketplace-v12-azure-source-bootstrap.json'; branch=os.environ['OBSERVATION_BRANCH']; token=os.environ['GH_TOKEN']
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','X-GitHub-Api-Version':'2022-11-28','User-Agent':'obserra-marketplace-azure-source-bootstrap','Content-Type':'application/json'}
+          encoded=urllib.parse.quote(path,safe='/')
+          get=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}?ref={urllib.parse.quote(branch,safe="")}',headers=headers); sha=None
+          try:
+            with urllib.request.urlopen(get,timeout=30) as response: sha=json.load(response).get('sha')
+          except urllib.error.HTTPError as error:
+            if error.code != 404: raise
+          body={'message':'ops: record Marketplace Azure source bootstrap','content':base64.b64encode(content).decode(),'branch':branch}
+          if sha: body['sha']=sha
+          put=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{encoded}',data=json.dumps(body).encode(),method='PUT',headers=headers)
+          with urllib.request.urlopen(put,timeout=30) as response:
+            if response.status not in (200,201): raise SystemExit(response.status)
+          PY
