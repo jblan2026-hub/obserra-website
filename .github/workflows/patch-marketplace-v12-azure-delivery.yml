@@ -46,6 +46,15 @@ jobs:
           node --check scripts/marketplace-v12-artifact-ingest-azure.mjs
           node --check scripts/marketplace-v12-runtime-evidence.mjs
 
+      - name: Preserve validated workflow proposals
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops/generated-marketplace-v12-azure
+          cp .github/workflows/bootstrap-marketplace-v12-azure-source.yml ops/generated-marketplace-v12-azure/bootstrap-marketplace-v12-azure-source.yml
+          cp .github/workflows/marketplace-v12-protected-delivery.yml ops/generated-marketplace-v12-azure/marketplace-v12-protected-delivery.yml
+          git restore .github/workflows/bootstrap-marketplace-v12-azure-source.yml .github/workflows/marketplace-v12-protected-delivery.yml
+
       - name: Commit runtime provider cutover
         shell: bash
         run: |
@@ -65,7 +74,9 @@ jobs:
             scripts/marketplace-v12-runtime-evidence.mjs \
             test/marketplace-runtime-key-vault.test.mjs \
             test/marketplace-v12-production-commerce-hardening.test.mjs \
-            test/marketplace-runtime-protected-delivery.test.mjs
+            test/marketplace-runtime-protected-delivery.test.mjs \
+            ops/generated-marketplace-v12-azure/bootstrap-marketplace-v12-azure-source.yml \
+            ops/generated-marketplace-v12-azure/marketplace-v12-protected-delivery.yml
           git diff --cached --check
           if git diff --cached --quiet; then
             echo "No runtime provider cutover changes required."
@@ -75,4 +86,4 @@ jobs:
           git pull --rebase origin fix/marketplace-v12-azure-protected-delivery-20260823
           git push origin HEAD:fix/marketplace-v12-azure-protected-delivery-20260823
 
-# workflow-file changes are applied separately through the authenticated repository control plane
+# workflow proposals are applied separately through the authenticated repository control plane
