@@ -1,0 +1,368 @@
+from __future__ import annotations
+
+from pathlib import Path
+import re
+
+
+def read(path: str) -> str:
+    return Path(path).read_text()
+
+
+def write(path: str, text: str) -> None:
+    Path(path).write_text(text)
+
+
+def replace_once(text: str, old: str, new: str, label: str) -> str:
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f"{label}: expected 1 occurrence, found {count}")
+    return text.replace(old, new, 1)
+
+
+def sub_once(text: str, pattern: str, repl: str, label: str, flags: int = 0) -> str:
+    out, count = re.subn(pattern, repl, text, count=1, flags=flags)
+    if count != 1:
+        raise SystemExit(f"{label}: expected 1 regex occurrence, found {count}")
+    return out
+
+
+# Azure ingest metadata identifiers.
+path = "scripts/marketplace-v12-artifact-ingest-azure.mjs"
+text = read(path)
+text = text.replace('["artifact-sha256"]', ".artifact_sha256")
+text = text.replace('["catalog-revision"]', ".catalog_revision")
+text = text.replace('["product-id"]', ".product_id")
+text = text.replace("`artifact-sha256=${record.artifactSha256}`", "`artifact_sha256=${record.artifactSha256}`")
+text = text.replace("`catalog-revision=${EXPECTED_CATALOG_REVISION}`", "`catalog_revision=${EXPECTED_CATALOG_REVISION}`")
+text = text.replace("`product-id=${record.productId}`", "`product_id=${record.productId}`")
+write(path, text)
+
+# Runtime Key Vault hydration no longer depends on nonexistent CloudFront secrets;
+# the same Vercel workload identity can mint Azure Storage OAuth tokens.
+path = "lib/production-runtime-secrets.ts"
+text = read(path)
+text = replace_once(
+    text,
+    'const AZURE_KEY_VAULT_SCOPE = "https://vault.azure.net/.default";',
+    'const AZURE_KEY_VAULT_SCOPE = "https://vault.azure.net/.default";\nconst AZURE_STORAGE_SCOPE = "https://storage.azure.com/.default";',
+    "storage scope",
+)
+cloudfront = """
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_RELEASE_CDN_URL",
+    keyVaultSecretName: "ai-marketplace-release-cdn-url",
+  },
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_CLOUDFRONT_KEY_PAIR_ID",
+    keyVaultSecretName: "ai-marketplace-cloudfront-key-pair-id",
+  },
+  {
+    environmentKey: "OBSERRA_AI_MARKETPLACE_CLOUDFRONT_PRIVATE_KEY",
+    keyVaultSecretName: "ai-marketplace-cloudfront-private-key",
+  },"""
+text = replace_once(text, cloudfront, "", "remove CloudFront runtime bindings")
+text = replace_once(text, "let azureAccessToken: CacheEntry | null = null;", 'const azureAccessTokens = new Map<string, CacheEntry>();', "token cache")
+replacement = '''async function azureResourceAccessToken(scope: string) {
+  const cached = cachedValue(azureAccessTokens.get(scope));
+  if (cached) return cached;
+
+  const tenantId = requiredAzureIdentifier("OBSERRA_KEY_VAULT_TENANT_ID");
+  const clientId = requiredAzureIdentifier("OBSERRA_KEY_VAULT_CLIENT_ID");
+  const assertion = await vercelOidcAssertion(AZURE_TOKEN_AUDIENCE);
+
+  const body = new URLSearchParams({
+    client_id: clientId,
+    scope,
+    grant_type: "client_credentials",
+    client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+    client_assertion: assertion,
+  });
+  const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
+    method: "POST",
+    cache: "no-store",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body,
+    signal: AbortSignal.timeout(10_000),
+  }).catch(() => {
+    throw new ProductionRuntimeSecretsError("azure-token", "AZURE_TOKEN_TRANSPORT_FAILURE", true);
+  });
+  if (!response.ok) {
+    throw new ProductionRuntimeSecretsError(
+      "azure-token",
+      "AZURE_TOKEN_EXCHANGE_REJECTED",
+      response.status === 429 || response.status >= 500,
+    );
+  }
+
+  const payload = await response.json().catch(() => null) as { access_token?: unknown; expires_in?: unknown } | null;
+  const value = typeof payload?.access_token === "string" ? payload.access_token : "";
+  const expiresIn = Number(payload?.expires_in);
+  if (!value || !Number.isFinite(expiresIn) || expiresIn < 60) {
+    throw new ProductionRuntimeSecretsError("azure-token", "AZURE_TOKEN_INVALID_RESPONSE", false);
+  }
+
+  azureAccessTokens.set(scope, {
+    value,
+    expiresAt: Date.now() + Math.max(30_000, (expiresIn - 60) * 1000),
+  });
+  return value;
+}
+
+async function azureKeyVaultAccessToken() {
+  return azureResourceAccessToken(AZURE_KEY_VAULT_SCOPE);
+}
+
+export async function productionAzureStorageAccessToken(): Promise<string | undefined> {
+  if (!vercelProductionRuntime()) return undefined;
+  return azureResourceAccessToken(AZURE_STORAGE_SCOPE);
+}
+
+async function keyVaultSecret'''
+text = sub_once(
+    text,
+    r"async function azureKeyVaultAccessToken\(\) \{.*?\n\}\n\nasync function keyVaultSecret",
+    replacement,
+    "generic Azure token exchange",
+    re.S,
+)
+text = replace_once(text, "azureAccessToken = null;", "azureAccessTokens.delete(AZURE_KEY_VAULT_SCOPE);", "Key Vault token refresh")
+write(path, text)
+
+# v1.2 readiness is backed by the signed delivery receipt. Legacy products retain
+# the existing optional CloudFront signer until separately migrated.
+path = "lib/ai-marketplace-delivery.ts"
+text = read(path)
+text = replace_once(
+    text,
+    "return cloudFrontSigningConfig() !== null && marketplaceV12DeliveryReceipt() !== null;",
+    "return marketplaceV12DeliveryReceipt() !== null;",
+    "v1.2 Azure readiness",
+)
+write(path, text)
+
+# Customer download uses Azure user-delegation SAS after entitlement + blob evidence checks.
+path = "app/api/ai-marketplace/download/route.ts"
+text = read(path)
+text = replace_once(
+    text,
+    'import { aiMarketplaceRelease, marketplaceV12Release, signedAiMarketplaceReleaseUrl } from "../../../../lib/ai-marketplace-delivery";',
+    'import { aiMarketplaceRelease, marketplaceV12Release, signedAiMarketplaceReleaseUrl } from "../../../../lib/ai-marketplace-delivery";\nimport { marketplaceV12SignedAzureReleaseUrl } from "../../../../lib/marketplace-v12-azure-delivery";',
+    "download Azure import",
+)
+text = replace_once(
+    text,
+    '''      const url = signedAiMarketplaceReleaseUrl(release);
+      if (!url) return unavailable();
+      const response = NextResponse.redirect(url, 303);''',
+    '''      const url = await marketplaceV12SignedAzureReleaseUrl({ release, productId: catalog.product_id, revision });
+      if (!url) return unavailable();
+      const response = NextResponse.redirect(url, 303);''',
+    "download Azure SAS",
+)
+write(path, text)
+
+# Installer bridge emits the same short-lived Azure delegated URL.
+path = "lib/marketplace-v12-install-bridge.ts"
+text = read(path)
+text = replace_once(
+    text,
+    'import { marketplaceV12ProtectedDeliveryConfigured, signedAiMarketplaceReleaseUrl, type MarketplaceV12Release } from "./ai-marketplace-delivery";',
+    'import { marketplaceV12ProtectedDeliveryConfigured, type MarketplaceV12Release } from "./ai-marketplace-delivery";\nimport { marketplaceV12SignedAzureReleaseUrl } from "./marketplace-v12-azure-delivery";',
+    "install bridge Azure import",
+)
+text = replace_once(
+    text,
+    '''export function marketplaceV12BridgeArtifactUrl(release: MarketplaceV12Release) {
+  return signedAiMarketplaceReleaseUrl(release, 300);
+}''',
+    '''export async function marketplaceV12BridgeArtifactUrl(release: MarketplaceV12Release, productId: string, revision: string) {
+  return marketplaceV12SignedAzureReleaseUrl({ release, productId, revision });
+}''',
+    "install bridge Azure SAS",
+)
+write(path, text)
+
+path = "app/api/ai-marketplace/install-grant/exchange/route.ts"
+text = read(path)
+text = replace_once(
+    text,
+    "const artifactUrl = manifest && marketplaceV12BridgeArtifactUrl(release);",
+    "const artifactUrl = manifest && await marketplaceV12BridgeArtifactUrl(release, grant.productId, grant.catalogRevision);",
+    "await bridge Azure SAS",
+)
+write(path, text)
+
+# Evidence builder validates Azure OAuth release metadata rather than CloudFront keys.
+path = "scripts/marketplace-v12-runtime-evidence.mjs"
+text = read(path)
+text = replace_once(text, 'import { createHash, createHmac, createPrivateKey } from "node:crypto";', 'import { createHash, createHmac } from "node:crypto";', "runtime evidence crypto")
+text = text.replace("const KEY_PAIR = /^[A-Za-z0-9_-]{8,128}$/;\n", "")
+text = text.replace('  "--cdn-url-file",\n  "--cloudfront-key-pair-id-file",\n  "--cloudfront-private-key-file",\n', '  "--azure-storage-account",\n  "--azure-release-container",\n')
+text = text.replace('  "cdn-url-file",\n  "cloudfront-key-pair-id-file",\n  "cloudfront-private-key-file",\n', '  "azure-storage-account",\n  "azure-release-container",\n')
+text = replace_once(
+    text,
+    '  || ingestEvidence.protectedArtifactSetComplete !== true\n) fail("protected artifact ingest evidence is incomplete or mismatched");',
+    '  || ingestEvidence.protectedArtifactSetComplete !== true\n  || ingestEvidence.provider !== "azure-blob-oauth"\n  || ingestEvidence.storageAccount !== "stobserramktv1238d660"\n  || ingestEvidence.releaseContainer !== "marketplace-v12-release"\n) fail("protected artifact ingest evidence is incomplete or mismatched");',
+    "Azure ingest evidence",
+)
+text = sub_once(
+    text,
+    r"const rawCdnUrl = .*?if \(hmacKey\.length < 32\) fail\(\"release evidence signing authority is unavailable; value suppressed\"\);",
+    '''const storageAccount = options["azure-storage-account"]?.trim() ?? "";
+const releaseContainer = options["azure-release-container"]?.trim() ?? "";
+const hmacKey = readFileSync(resolve(options["hmac-key-file"]), "utf8").trim();
+if (storageAccount !== "stobserramktv1238d660" || releaseContainer !== "marketplace-v12-release") fail("Azure protected delivery configuration is invalid; values suppressed");
+if (hmacKey.length < 32) fail("release evidence signing authority is unavailable; value suppressed");''',
+    "Azure evidence provider",
+    re.S,
+)
+text = replace_once(
+    text,
+    '    protected_delivery_verified: true,\n    durable_ledger_verified: true,',
+    '    protected_delivery_verified: true,\n    durable_ledger_verified: true,\n    delivery_provider: "azure-blob-oauth",',
+    "evidence provider marker",
+)
+write(path, text)
+
+# Azure bootstrap: separate private source and release containers, least-privilege identities.
+path = ".github/workflows/bootstrap-marketplace-v12-azure-source.yml"
+text = read(path)
+text = replace_once(
+    text,
+    "  SOURCE_CONTAINER: marketplace-v12-source\n  DELIVERY_IDENTITY: id-obserra-marketplace-delivery-prod",
+    "  SOURCE_CONTAINER: marketplace-v12-source\n  RELEASE_CONTAINER: marketplace-v12-release\n  RUNTIME_PRINCIPAL_ID: 11ee06b7-bad6-4e30-a48b-469fec011fe3\n  DELIVERY_IDENTITY: id-obserra-marketplace-delivery-prod",
+    "bootstrap release env",
+)
+marker = '''          container_id="${blob_service_id}/containers/${SOURCE_CONTAINER}"
+          container_body='{"properties":{"publicAccess":"None"}}'
+          az rest --method put --url "https://management.azure.com${container_id}?api-version=2023-05-01" --body "${container_body}" --output none
+'''
+addition = marker + '''
+          release_container_id="${blob_service_id}/containers/${RELEASE_CONTAINER}"
+          az rest --method put --url "https://management.azure.com${release_container_id}?api-version=2023-05-01" --body "${container_body}" --output none
+'''
+text = replace_once(text, marker, addition, "bootstrap release container")
+roles = '''          ensure_role "${delivery_principal_id}" "Storage Blob Data Reader" "${container_id}"
+          ensure_role "${delivery_principal_id}" "Key Vault Secrets Officer" "${key_vault_id}"
+          ensure_role "f87823b9-4fc5-4c3e-b8ac-63c91c3f15aa" "Storage Blob Data Contributor" "${container_id}"'''
+roles_new = roles + '''
+          ensure_role "${delivery_principal_id}" "Storage Blob Data Contributor" "${release_container_id}"
+          ensure_role "${RUNTIME_PRINCIPAL_ID}" "Storage Blob Data Reader" "${release_container_id}"
+          ensure_role "${RUNTIME_PRINCIPAL_ID}" "Storage Blob Delegator" "${storage_id}"'''
+text = replace_once(text, roles, roles_new, "bootstrap release roles")
+container_verify = '''          container="$(az rest --method get --url "https://management.azure.com${container_id}?api-version=2023-05-01")"
+          jq -e '(.properties.publicAccess // "None") == "None"' <<<"${container}" >/dev/null'''
+verify_new = container_verify + '''
+          release_container="$(az rest --method get --url "https://management.azure.com${release_container_id}?api-version=2023-05-01")"
+          jq -e '(.properties.publicAccess // "None") == "None"' <<<"${release_container}" >/dev/null'''
+text = replace_once(text, container_verify, verify_new, "bootstrap release verify")
+old_loop = '''            source_role="$(az role assignment list --assignee-object-id "${delivery_principal_id}" --scope "${container_id}" --query "[?roleDefinitionName=='Storage Blob Data Reader'] | [0].id" -o tsv)"
+            vault_role="$(az role assignment list --assignee-object-id "${delivery_principal_id}" --scope "${key_vault_id}" --query "[?roleDefinitionName=='Key Vault Secrets Officer'] | [0].id" -o tsv)"
+            upload_role="$(az role assignment list --assignee-object-id "f87823b9-4fc5-4c3e-b8ac-63c91c3f15aa" --scope "${container_id}" --query "[?roleDefinitionName=='Storage Blob Data Contributor'] | [0].id" -o tsv)"
+            if [ -n "${source_role}" ] && [ -n "${vault_role}" ] && [ -n "${upload_role}" ]; then role_ready=true; break; fi'''
+new_loop = '''            source_role="$(az role assignment list --assignee-object-id "${delivery_principal_id}" --scope "${container_id}" --query "[?roleDefinitionName=='Storage Blob Data Reader'] | [0].id" -o tsv)"
+            vault_role="$(az role assignment list --assignee-object-id "${delivery_principal_id}" --scope "${key_vault_id}" --query "[?roleDefinitionName=='Key Vault Secrets Officer'] | [0].id" -o tsv)"
+            upload_role="$(az role assignment list --assignee-object-id "f87823b9-4fc5-4c3e-b8ac-63c91c3f15aa" --scope "${container_id}" --query "[?roleDefinitionName=='Storage Blob Data Contributor'] | [0].id" -o tsv)"
+            release_write_role="$(az role assignment list --assignee-object-id "${delivery_principal_id}" --scope "${release_container_id}" --query "[?roleDefinitionName=='Storage Blob Data Contributor'] | [0].id" -o tsv)"
+            runtime_read_role="$(az role assignment list --assignee-object-id "${RUNTIME_PRINCIPAL_ID}" --scope "${release_container_id}" --query "[?roleDefinitionName=='Storage Blob Data Reader'] | [0].id" -o tsv)"
+            runtime_delegate_role="$(az role assignment list --assignee-object-id "${RUNTIME_PRINCIPAL_ID}" --scope "${storage_id}" --query "[?roleDefinitionName=='Storage Blob Delegator'] | [0].id" -o tsv)"
+            if [ -n "${source_role}" ] && [ -n "${vault_role}" ] && [ -n "${upload_role}" ] && [ -n "${release_write_role}" ] && [ -n "${runtime_read_role}" ] && [ -n "${runtime_delegate_role}" ]; then role_ready=true; break; fi'''
+text = replace_once(text, old_loop, new_loop, "bootstrap role convergence")
+write(path, text)
+
+# Protected delivery uses Azure Blob OAuth and no nonexistent AWS/CloudFront secret prerequisites.
+path = ".github/workflows/marketplace-v12-protected-delivery.yml"
+text = read(path)
+text = replace_once(text, "      AZURE_SOURCE_CONTAINER: marketplace-v12-source", "      AZURE_SOURCE_CONTAINER: marketplace-v12-source\n      AZURE_RELEASE_CONTAINER: marketplace-v12-release", "protected release env")
+text = sub_once(
+    text,
+    r"            applications-commerce-hash-secret \\\n            ai-marketplace-release-aws-access-key-id .*?            ai-marketplace-v12-release-evidence-hmac-key; do",
+    "            applications-commerce-hash-secret \\\n            ai-marketplace-v12-release-evidence-hmac-key; do",
+    "protected preflight secrets",
+    re.S,
+)
+text = replace_once(
+    text,
+    '          echo "::notice::Verified metadata for all 12 protected-delivery prerequisites."',
+    '          az storage container show --auth-mode login --account-name "${AZURE_SOURCE_STORAGE_ACCOUNT}" --name "${AZURE_RELEASE_CONTAINER}" --output none --only-show-errors\n          echo "::notice::Verified metadata for all 5 protected-delivery secrets and the private Azure release container."',
+    "protected preflight notice",
+)
+text = sub_once(
+    text,
+    r"          read_secret applications-stripe-webhook-secret stripe-webhook-secret\n          read_secret ai-marketplace-release-aws-access-key-id .*?          read_secret ai-marketplace-v12-release-evidence-hmac-key release-evidence-hmac-key",
+    "          read_secret applications-stripe-webhook-secret stripe-webhook-secret\n          read_secret ai-marketplace-v12-release-evidence-hmac-key release-evidence-hmac-key",
+    "protected secret reads",
+    re.S,
+)
+text = sub_once(
+    text,
+    r"          export OBSERRA_AI_MARKETPLACE_V12_EVIDENCE_RUN=review\n          export OBSERRA_ALLOW_LIVE_STRIPE_OUTSIDE_PRODUCTION=true\n          export AWS_ACCESS_KEY_ID=.*?          test -n \"\$\{AWS_REGION:-\}\" \|\| \{ echo \"::error::Protected release region is not configured\.\"; exit 1; \}",
+    "          export OBSERRA_AI_MARKETPLACE_V12_EVIDENCE_RUN=review\n          export OBSERRA_ALLOW_LIVE_STRIPE_OUTSIDE_PRODUCTION=true",
+    "remove AWS exports",
+    re.S,
+)
+text = sub_once(
+    text,
+    r"          node scripts/marketplace-v12-artifact-ingest\.mjs \\\n            --catalog .*?            --activate >\"\$\{evidence_dir\}/ingest-result\.json\"",
+    '''          node scripts/marketplace-v12-artifact-ingest-azure.mjs \\
+            --catalog data/marketplace/obserra-marketplace-card-catalog.json.gz \\
+            --summary data/marketplace/obserra-marketplace-card-catalog.summary.json \\
+            --archive-manifest "${RUNNER_TEMP}/marketplace-v12-sources/obserra-supplied-archives.json" \\
+            --artifact-dir "${RUNNER_TEMP}/marketplace-v12-artifacts" \\
+            --delivery-catalog "${evidence_dir}/delivery-catalog.json" \\
+            --stripe-evidence "${evidence_dir}/stripe-evidence.json" \\
+            --account-name "${AZURE_SOURCE_STORAGE_ACCOUNT}" \\
+            --container "${AZURE_RELEASE_CONTAINER}" \\
+            --activate >"${evidence_dir}/ingest-result.json"''',
+    "Azure ingest call",
+    re.S,
+)
+text = text.replace(
+    '            --cdn-url-file "${secret_dir}/release-cdn-url" \\\n            --cloudfront-key-pair-id-file "${secret_dir}/cloudfront-key-pair-id" \\\n            --cloudfront-private-key-file "${secret_dir}/cloudfront-private-key" \\\n',
+    '            --azure-storage-account "${AZURE_SOURCE_STORAGE_ACCOUNT}" \\\n            --azure-release-container "${AZURE_RELEASE_CONTAINER}" \\\n',
+)
+text = text.replace(
+    "          unset OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY APPLICATIONS_STRIPE_SECRET_KEY APPLICATIONS_STRIPE_WEBHOOK_SECRET AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY",
+    "          unset OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY APPLICATIONS_STRIPE_SECRET_KEY APPLICATIONS_STRIPE_WEBHOOK_SECRET",
+)
+text = text.replace(
+    "            ai-marketplace-v12-activation-approved-revision \\\n            ai-marketplace-release-cdn-url \\\n            ai-marketplace-cloudfront-key-pair-id \\\n            ai-marketplace-cloudfront-private-key; do",
+    "            ai-marketplace-v12-activation-approved-revision; do",
+)
+text = text.replace("Verified metadata for all 13 exact Marketplace v1.2 runtime bindings.", "Verified metadata for all 10 exact Marketplace v1.2 runtime bindings.")
+write(path, text)
+
+# Tests now encode 10 Key Vault bindings + Azure delegated delivery.
+path = "test/marketplace-runtime-key-vault.test.mjs"
+text = read(path)
+for block in [
+    '  OBSERRA_AI_MARKETPLACE_RELEASE_CDN_URL: "ai-marketplace-release-cdn-url",\n',
+    '  OBSERRA_AI_MARKETPLACE_CLOUDFRONT_KEY_PAIR_ID: "ai-marketplace-cloudfront-key-pair-id",\n',
+    '  OBSERRA_AI_MARKETPLACE_CLOUDFRONT_PRIVATE_KEY: "ai-marketplace-cloudfront-private-key",\n',
+]:
+    text = text.replace(block, "")
+text = text.replace("bindingCount: 13", "bindingCount: 10")
+write(path, text)
+
+path = "test/marketplace-v12-production-commerce-hardening.test.mjs"
+text = read(path)
+for token in [
+    '    "ai-marketplace-release-aws-access-key-id",\n',
+    '    "ai-marketplace-release-aws-secret-access-key",\n',
+    '    "ai-marketplace-release-bucket",\n',
+    '    "ai-marketplace-release-kms-key-id",\n',
+    '    "ai-marketplace-release-cdn-url",\n',
+    '    "ai-marketplace-cloudfront-key-pair-id",\n',
+    '    "ai-marketplace-cloudfront-private-key",\n',
+]:
+    text = text.replace(token, "")
+write(path, text)
+
+path = "test/marketplace-runtime-protected-delivery.test.mjs"
+text = read(path)
+text = text.replace("    assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), false, origin);", "    assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), true, origin);")
+text = text.replace(
+    '  assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), false);\n  assert.equal(delivery.signedAiMarketplaceReleaseUrl(release), null);',
+    '  assert.equal(delivery.marketplaceV12ProtectedDeliveryConfigured(), true);\n  assert.equal(delivery.signedAiMarketplaceReleaseUrl(release), null);',
+)
+write(path, text)
