@@ -1,16 +1,16 @@
 {
   "contract": "obserra-marketplace-v12-azure-cutover-observation-v1",
-  "runId": 32672384881,
-  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32672384881",
-  "status": "in_progress",
-  "conclusion": null,
-  "headSha": "8f7c185c27bba8a4dd90fd91175c0cfaff0b97b7",
+  "runId": 32672447381,
+  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32672447381",
+  "status": "completed",
+  "conclusion": "failure",
+  "headSha": "48bc71626c20513e5c2d2b0de61a7ad6ab0e474b",
   "jobs": [
     {
-      "id": 97275050472,
+      "id": 97275201120,
       "name": "patch",
-      "status": "in_progress",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "failure",
       "steps": [
         {
           "name": "Set up job",
@@ -29,38 +29,43 @@
         },
         {
           "name": "Pin Azure Blob SDK",
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "name": "Apply provider cutover",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "name": "Correct Azure metadata syntax",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "name": "Validate generated changes",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "name": "Commit provider cutover",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "failure"
         },
         {
           "name": "Post Configure Node.js",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "skipped"
         },
         {
           "name": "Post Checkout feature branch",
-          "status": "pending",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
         }
       ]
     }
