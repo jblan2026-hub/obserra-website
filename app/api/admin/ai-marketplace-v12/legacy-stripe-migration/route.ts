@@ -16,8 +16,8 @@ const KEY_VAULT_API_VERSION = "7.4";
 const HEADERS = { "cache-control": "no-store", "x-robots-tag": "noindex, nofollow, noarchive" };
 
 type GitHubClaims = Readonly<{ aud?: unknown; exp?: unknown; iss?: unknown; nbf?: unknown; sub?: unknown }>;
-
 type VaultState = "existing" | "created";
+type SourceValue = Readonly<{ key: string; value: string }>;
 
 function failure(status: 403 | 409 | 503, code: string) {
   return NextResponse.json({ migrated: false, code }, { status, headers: HEADERS });
@@ -99,12 +99,24 @@ async function createMissingSecret(name: string, value: string, token: string): 
   return "created";
 }
 
-function firstValue(...keys: string[]) {
+function firstValue(...keys: string[]): SourceValue | null {
   for (const key of keys) {
     const value = process.env[key]?.trim() ?? "";
     if (value) return { key, value };
   }
   return null;
+}
+
+function validSupabaseAuthority(source: SourceValue | null) {
+  return Boolean(source && source.value.length >= 32 && !/\s/.test(source.value));
+}
+
+function validStripeAuthority(source: SourceValue | null) {
+  return Boolean(source && /^(?:sk|rk)_live_[A-Za-z0-9_]+$/.test(source.value));
+}
+
+function validHashAuthority(source: SourceValue | null) {
+  return Boolean(source && source.value.length >= 32 && !/\s/.test(source.value));
 }
 
 export async function POST(request: Request) {
@@ -114,32 +126,40 @@ export async function POST(request: Request) {
   const vaultToken = await exchangeForVaultToken(assertion);
   if (!vaultToken) return failure(403, "azure_federation_rejected");
 
-  const supabase = firstValue("OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY");
-  const stripe = firstValue("APPLICATIONS_STRIPE_SECRET_KEY", "STRIPE_SECRET_KEY");
-  const hash = firstValue("OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET") ?? {
-    key: "generated-first-party-hmac",
-    value: randomBytes(48).toString("base64url"),
-  };
-
-  if (!supabase || supabase.value.length < 32 || /\s/.test(supabase.value)) return failure(503, "legacy_supabase_authority_unavailable");
-  if (!stripe || !/^(?:sk|rk)_live_[A-Za-z0-9_]+$/.test(stripe.value)) return failure(503, "legacy_live_stripe_authority_unavailable");
-  if (hash.value.length < 32 || /\s/.test(hash.value)) return failure(503, "commerce_hash_authority_invalid");
-
   try {
-    const states = {
-      supabase: await createMissingSecret("applications-supabase-service-role-key", supabase.value, vaultToken),
-      commerceHash: await createMissingSecret("applications-commerce-hash-secret", hash.value, vaultToken),
-      stripe: await createMissingSecret("applications-stripe-secret-key", stripe.value, vaultToken),
+    const [supabaseExists, hashExists, stripeExists] = await Promise.all([
+      secretExists("applications-supabase-service-role-key", vaultToken),
+      secretExists("applications-commerce-hash-secret", vaultToken),
+      secretExists("applications-stripe-secret-key", vaultToken),
+    ]);
+
+    const supabase = supabaseExists ? null : firstValue("OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY");
+    const stripe = stripeExists ? null : firstValue("APPLICATIONS_STRIPE_SECRET_KEY", "STRIPE_SECRET_KEY");
+    const hash = hashExists ? null : firstValue("OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET") ?? {
+      key: "generated-first-party-hmac",
+      value: randomBytes(48).toString("base64url"),
     };
+
+    if (!supabaseExists && !validSupabaseAuthority(supabase)) return failure(503, "legacy_supabase_authority_unavailable");
+    if (!stripeExists && !validStripeAuthority(stripe)) return failure(503, "legacy_live_stripe_authority_unavailable");
+    if (!hashExists && !validHashAuthority(hash)) return failure(503, "commerce_hash_authority_invalid");
+
+    const states = {
+      supabase: supabaseExists ? "existing" as const : await createMissingSecret("applications-supabase-service-role-key", supabase!.value, vaultToken),
+      commerceHash: hashExists ? "existing" as const : await createMissingSecret("applications-commerce-hash-secret", hash!.value, vaultToken),
+      stripe: stripeExists ? "existing" as const : await createMissingSecret("applications-stripe-secret-key", stripe!.value, vaultToken),
+    };
+    const sources = {
+      supabase: supabaseExists ? "key-vault" : supabase!.key,
+      commerceHash: hashExists ? "key-vault" : hash!.key,
+      stripe: stripeExists ? "key-vault" : stripe!.key,
+    };
+
     return NextResponse.json({
       migrated: true,
       contract: "obserra-marketplace-v12-legacy-authority-migration-v1",
       states,
-      sources: {
-        supabase: supabase.key,
-        commerceHash: hash.key,
-        stripe: stripe.key,
-      },
+      sources,
       webhookSecretMigrated: false,
     }, { headers: HEADERS });
   } catch {
