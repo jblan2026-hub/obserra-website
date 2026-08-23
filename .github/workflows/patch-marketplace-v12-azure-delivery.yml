@@ -87,3 +87,4 @@ jobs:
           git push origin HEAD:fix/marketplace-v12-azure-protected-delivery-20260823
 
 # workflow proposals are applied separately through the authenticated repository control plane
+# retrigger 2026-08-23T19:06:00-04:00
