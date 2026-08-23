@@ -104,6 +104,7 @@ test("the production workflow is manual, exact-revision guarded, and Key Vault s
   assert.match(workflow, /applications-stripe-webhook-secret/);
   assert.match(workflow, /::add-mask::/);
   assert.match(workflow, /verify-marketplace-v12-stripe-evidence\.mjs/);
-  assert.match(workflow, /marketplace-v12-artifact-ingest\.mjs/);
+  assert.match(workflow, /marketplace-v12-artifact-ingest-azure\.mjs/);
+  assert.doesNotMatch(workflow, /AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|ai-marketplace-release-aws-/);
   assert.match(workflow, /protectedArtifactSetComplete == true/);
 });
