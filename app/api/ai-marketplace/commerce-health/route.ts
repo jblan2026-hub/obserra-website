@@ -50,7 +50,7 @@ export async function GET() {
     paymentProviderReady = configured && account !== null;
 
     stage = "commerce-authority";
-    const ledger = await aiMarketplaceLedgerHealth();
+    const ledger = await aiMarketplaceLedgerHealth("marketplace-v12");
     commerceAuthorityReady = true;
 
     stage = "activation";

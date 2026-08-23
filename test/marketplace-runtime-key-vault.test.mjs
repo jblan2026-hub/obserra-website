@@ -24,6 +24,7 @@ const APPLICATION_KEYS = [
 ];
 const MARKETPLACE_APPLICATION_KEYS = [
   "OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY",
+  "OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET",
   "APPLICATIONS_STRIPE_SECRET_KEY",
   "APPLICATIONS_STRIPE_WEBHOOK_SECRET",
 ];
@@ -166,16 +167,17 @@ test("marketplace v1.2 hydration atomically loads every exact runtime binding wi
 
   const evidence = await runtime.ensureMarketplaceV12RuntimeSecrets();
 
-  assert.deepEqual({ ...evidence }, { required: true, state: "ready", stage: "environment", bindingCount: 12 });
+  assert.deepEqual({ ...evidence }, { required: true, state: "ready", stage: "environment", bindingCount: 13 });
   const requestedSecretNames = secretRequests.map((path) => decodeURIComponent(path.split("/").at(-1))).sort();
   assert.deepEqual(requestedSecretNames, [
+    "applications-commerce-hash-secret",
     "applications-stripe-secret-key",
     "applications-stripe-webhook-secret",
     "applications-supabase-service-role-key",
     ...Object.values(MARKETPLACE_V12_SECRET_BINDINGS),
   ].sort());
   for (const key of [...MARKETPLACE_APPLICATION_KEYS, ...MARKETPLACE_V12_KEYS]) assert.match(process.env[key], /^test-runtime-binding-/);
-  for (const key of ["OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET", "OBSERRA_APPLICATIONS_PRICE_CATALOG_JSON"]) assert.equal(process.env[key], undefined);
+  assert.equal(process.env.OBSERRA_APPLICATIONS_PRICE_CATALOG_JSON, undefined);
 });
 
 test("a missing marketplace v1.2 binding leaves the combined runtime environment untouched", async (t) => {
@@ -322,5 +324,6 @@ test("marketplace checkout, runtime activation, and paid webhook hydrate v1.2 bi
   assert.ok(checkoutAuthentication >= 0);
   assert.ok(checkoutHydration > checkoutAuthentication);
   assert.ok(checkoutCoverage > checkoutHydration);
-  assert.match(webhook, /if \(session\.metadata\?\.commerceSource === V12_SOURCE\) \{\s*await ensureMarketplaceV12RuntimeSecrets\(\);\s*await fulfillV12/);
+  assert.match(webhook, /await ensureMarketplaceV12RuntimeSecrets\(\);\s*const secret = applicationsStripeWebhookSecret/);
+  assert.match(webhook, /await ensureApplicationsRuntimeSecrets\(\);\s*await fulfillLegacy/);
 });

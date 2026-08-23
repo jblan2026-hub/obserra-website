@@ -50,6 +50,13 @@ const MARKETPLACE_V12_COMMERCE_BINDINGS: readonly Binding[] = [
     environmentKey: "OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY",
     keyVaultSecretName: "applications-supabase-service-role-key",
   },
+  // v1.2 reservations and durable binding evidence independently HMAC the
+  // immutable purchase identity. This is commerce-critical, unlike the legacy
+  // Applications price-catalog JSON, so it belongs in the isolated scope.
+  {
+    environmentKey: "OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET",
+    keyVaultSecretName: "applications-commerce-hash-secret",
+  },
   {
     environmentKey: "APPLICATIONS_STRIPE_SECRET_KEY",
     keyVaultSecretName: "applications-stripe-secret-key",

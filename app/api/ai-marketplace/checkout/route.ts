@@ -56,18 +56,19 @@ function validV12Price(price: Stripe.Price, input: { productId: string; option: 
     && product.metadata.obserraMarketplaceProduct === input.productId
     && product.metadata.catalogRevision === input.revision
     && product.metadata.artifactSha256 === input.artifactSha256
-    && product.metadata.bindingKey === input.bindingKey
-    && product.metadata.commerceSource === V12_SOURCE;
+    && product.metadata.commerceSource === V12_SOURCE
+    && price.metadata.bindingKey === input.bindingKey;
 }
 
 async function requireCustomer(subjectId: string, tenantId: string, source: string) {
-  const existing = await aiMarketplaceCustomer(subjectId, tenantId);
+  const scope: "applications" | "marketplace-v12" = source === V12_SOURCE ? "marketplace-v12" : "applications";
+  const existing = await aiMarketplaceCustomer(subjectId, tenantId, scope);
   if (existing) return existing;
   const created = await getApplicationsStripe().customers.create({
     email: await primaryAccountEmail(),
     metadata: { clerkUserId: subjectId, tenantId, commerceSource: source },
   }, { idempotencyKey: aiMarketplaceCustomerKey(subjectId, tenantId) });
-  return bindAiMarketplaceCustomer(subjectId, tenantId, created.id);
+  return bindAiMarketplaceCustomer(subjectId, tenantId, created.id, scope);
 }
 
 async function v12Checkout(request: Request, input: { productId: string; option: string }) {

@@ -145,7 +145,9 @@ async function fulfillLegacy(event: Stripe.Event, session: Stripe.Checkout.Sessi
 
 export async function POST(request: Request) {
   try {
-    await ensureApplicationsRuntimeSecrets();
+    // The v1.2 Stripe credentials are shared with legacy commerce but are
+    // intentionally hydrated from the v1.2 scope before payload verification.
+    await ensureMarketplaceV12RuntimeSecrets();
     const secret = applicationsStripeWebhookSecret();
     const signature = request.headers.get("stripe-signature");
     if (!secret || !signature) return NextResponse.json({ error: "Webhook not configured" }, { status: 503 });
@@ -156,10 +158,10 @@ export async function POST(request: Request) {
     if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.metadata?.commerceSource === V12_SOURCE) {
-        await ensureMarketplaceV12RuntimeSecrets();
         await fulfillV12(event, session, raw, live);
         return NextResponse.json({ received: true });
       }
+      await ensureApplicationsRuntimeSecrets();
       await fulfillLegacy(event, session, raw, live);
       return NextResponse.json({ received: true });
     }
