@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { createHash, createHmac, generateKeyPairSync } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -9,6 +9,8 @@ import test from "node:test";
 const REVISION = "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2";
 const PRODUCT_COUNT = 11_390;
 const VERIFIED_AT = "2026-08-23T20:00:00.000Z";
+const STORAGE_ACCOUNT = "stobserramktv1238d660";
+const RELEASE_CONTAINER = "marketplace-v12-release";
 
 function digest(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -42,9 +44,6 @@ function fixture(root) {
   const stripePath = join(root, "stripe.json");
   const ingestPath = join(root, "ingest.json");
   const ledgerPath = join(root, "ledger.json");
-  const cdnPath = join(root, "cdn");
-  const keyPairPath = join(root, "key-pair");
-  const privateKeyPath = join(root, "private-key");
   const hmacPath = join(root, "hmac");
   const receiptPath = join(root, "receipt.json");
   const evidencePath = join(root, "evidence.json");
@@ -52,13 +51,10 @@ function fixture(root) {
   writeFileSync(bindingReceiptPath, JSON.stringify(bindingReceipt));
   writeFileSync(deliveryPath, delivery);
   writeFileSync(stripePath, JSON.stringify({ contract: "obserra-marketplace-v12-stripe-evidence-review-v1", reviewOnly: true, activationChanged: false, bindingAuthority: "durable-supabase-review-v1", catalogRevision: REVISION, requiredProductCards: PRODUCT_COUNT, requiredOfferBindings: PRODUCT_COUNT, reviewedProductCards: PRODUCT_COUNT, stripeAccountId: "acct_1234567890", stripeAccountChargesEnabled: true, verifiedOfferBindings: PRODUCT_COUNT, failureCount: 0, bindingReceipt, verified: true }));
-  writeFileSync(ingestPath, JSON.stringify({ contract: "obserra-marketplace-v12-protected-artifact-ingest-v1", revision: REVISION, requiredProducts: PRODUCT_COUNT, deliveryCatalogSha256: digest(delivery), protectedArtifactSetComplete: true }));
+  writeFileSync(ingestPath, JSON.stringify({ contract: "obserra-marketplace-v12-protected-artifact-ingest-v1", provider: "azure-blob-oauth", storageAccount: STORAGE_ACCOUNT, releaseContainer: RELEASE_CONTAINER, revision: REVISION, requiredProducts: PRODUCT_COUNT, deliveryCatalogSha256: digest(delivery), protectedArtifactSetComplete: true }));
   writeFileSync(ledgerPath, JSON.stringify({ contract: "obserra-marketplace-v12-ledger-evidence-v1", durableLedgerVerified: true, entitlementAuthority: "ai-marketplace-commerce-ledger-v1" }));
-  writeFileSync(cdnPath, "https://downloads.example.com\n");
-  writeFileSync(keyPairPath, "K123456789ABC\n");
-  writeFileSync(privateKeyPath, generateKeyPairSync("rsa", { modulusLength: 2048 }).privateKey.export({ format: "pem", type: "pkcs8" }));
   writeFileSync(hmacPath, "a-runtime-evidence-hmac-key-that-is-long-enough");
-  return { bindingReceiptPath, deliveryPath, stripePath, ingestPath, ledgerPath, cdnPath, keyPairPath, privateKeyPath, hmacPath, receiptPath, evidencePath, signaturePath };
+  return { bindingReceiptPath, deliveryPath, stripePath, ingestPath, ledgerPath, hmacPath, receiptPath, evidencePath, signaturePath };
 }
 
 function argumentsFor(paths) {
@@ -71,9 +67,8 @@ function argumentsFor(paths) {
     "--stripe-evidence", paths.stripePath,
     "--ingest-evidence", paths.ingestPath,
     "--ledger-evidence", paths.ledgerPath,
-    "--cdn-url-file", paths.cdnPath,
-    "--cloudfront-key-pair-id-file", paths.keyPairPath,
-    "--cloudfront-private-key-file", paths.privateKeyPath,
+    "--azure-storage-account", STORAGE_ACCOUNT,
+    "--azure-release-container", RELEASE_CONTAINER,
     "--hmac-key-file", paths.hmacPath,
     "--receipt-output", paths.receiptPath,
     "--evidence-output", paths.evidencePath,
@@ -104,7 +99,7 @@ test("runtime evidence binds exact catalog, Stripe, ledger, artifact, and delive
   });
   assert.equal(evidence.catalog_revision, REVISION);
   assert.equal(evidence.subject_count, PRODUCT_COUNT);
-  assert.deepEqual(evidence.controls, { charges_enabled: true, protected_delivery_verified: true, durable_ledger_verified: true });
+  assert.deepEqual(evidence.controls, { charges_enabled: true, protected_delivery_verified: true, durable_ledger_verified: true, delivery_provider: "azure-blob-oauth" });
   assert.equal(evidence.binding_receipt_sha256, digest(canonical(JSON.parse(readFileSync(paths.bindingReceiptPath, "utf8")))));
   assert.equal(evidence.delivery_manifest_sha256, digest(canonical(receipt)));
   assert.equal(signature, createHmac("sha256", readFileSync(paths.hmacPath, "utf8").trim()).update(canonical(evidence)).digest("hex"));
