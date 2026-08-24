@@ -81,7 +81,7 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
 
   return <main className="ai-marketplace marketplace-simple">
     <header className="ai-marketplace__nav">
-      <Link className="ai-marketplace__brand-lockup" href="/" aria-label="Obserra home"><Image src="/brand/obserra-logo.png" width={286} height={55} priority alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" /></Link>
+      <Link className="ai-marketplace__brand-lockup" href="/" aria-label="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC home"><Image src="/brand/obserra-logo.png" width={286} height={55} priority alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" /></Link>
       <nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/hangar">My products</Link><Link href="/contact?interest=ai-marketplace">Help choosing</Link></nav>
     </header>
 
