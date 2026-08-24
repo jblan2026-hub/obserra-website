@@ -205,7 +205,7 @@ export default function HomePage() {
           <div className="saas-learning__routes">
             <Link href="/academy"><span><strong>{ACADEMY_BRAND_NAME}</strong><span>Professional courses for individual and enterprise learners.</span></span><b>Explore →</b></Link>
             <Link href="/florida-security-training"><span><strong>Florida Class D Training</strong><span>Dedicated regulated training with offering-specific controls.</span></span><b>Explore →</b></Link>
-            <Link href="/apps"><span><strong>{APPLICATIONS_BRAND_NAME}</strong><span>Put secure software and governed workflows into operation.</span></span><b>Explore →</b></Link>
+            <Link href="/apps"><span><strong>{APPLICATIONS_BRAND_NAME}</strong><span>Secure software with product-specific engagement, deployment, and access controls.</span></span><b>Explore →</b></Link>
           </div>
         </section>
 
