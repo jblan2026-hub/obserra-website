@@ -114,8 +114,9 @@ function CatalogCard({ card }: { card: EditorialCatalogCard }) {
     : priced
       ? "Buy now"
       : "Contact sales";
+  const href = productPath(card) + (priced && !packageCard ? "#purchase-options" : "");
   return <article className="editorial-catalog__card">
-    <Link className="editorial-catalog__card-link" href={productPath(card)} aria-label={"Open " + card.name}>
+    <Link className="editorial-catalog__card-link" href={href} aria-label={(priced && !packageCard ? "Buy " : "Open ") + card.name}>
       <CatalogVisual card={card} />
       <div className="editorial-catalog__card-body">
         <div className="editorial-catalog__card-kicker"><span>{offeringLabel(card)}</span><strong>{price(card)}</strong></div>

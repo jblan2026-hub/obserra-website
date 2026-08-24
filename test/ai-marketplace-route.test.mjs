@@ -64,23 +64,20 @@ test("AI Skills Marketplace is backed by the verified v1.2 catalog, bounded serv
   assert.doesNotMatch(page, /href="\/apps" className=".*marketplace/);
 });
 
-test("v1.2 product page presents buyer outcomes and fail-closed purchase options", async () => {
+test("v1.2 product page presents a simple buyer outcome and purchase path", async () => {
   const detail = await readFile(new URL("../app/ai-marketplace/[productId]/page.tsx", import.meta.url), "utf8");
-  const hero = await readFile(new URL("../app/ai-marketplace/MarketplaceProductSalesHero.tsx", import.meta.url), "utf8");
-  const pedestal = await readFile(new URL("../app/ai-marketplace/MarketplaceDimensionalPedestal.tsx", import.meta.url), "utf8");
+  const productPage = await readFile(new URL("../app/ai-marketplace/MarketplaceSimpleProduct.tsx", import.meta.url), "utf8");
   const hangar = await readFile(new URL("../app/ai-marketplace/hangar/page.tsx", import.meta.url), "utf8");
   const access = await readFile(new URL("../app/api/ai-marketplace/access/route.ts", import.meta.url), "utf8");
   const install = await readFile(new URL("../app/api/ai-marketplace/install-grant/route.ts", import.meta.url), "utf8");
   const v12Checkout = await readFile(new URL("../app/ai-marketplace/MarketplaceV12Checkout.tsx", import.meta.url), "utf8");
-  assert.match(detail, /<MarketplaceProductSalesHero[\s\S]*<MarketplaceDimensionalPedestal/);
+  assert.match(detail, /<MarketplaceSimpleProduct detail=\{salesDetail\} options=\{purchaseOptions\} checkoutEnabled=\{commerce\.checkoutEnabled\}/);
+  assert.doesNotMatch(detail, /MarketplaceDimensionalPedestal|MarketplaceProductSalesHero/);
   assert.match(detail, /const salesDetail = buyerDetail\(publicDetail\)/);
-  assert.match(hero, /Who it&apos;s for/);
-  assert.match(hero, /What&apos;s included/);
-  assert.match(hero, /<MarketplaceV12Checkout productId=\{detail\.productId\} options=\{options\} checkoutEnabled=\{checkoutEnabled\}/);
-  assert.match(pedestal, /From your starting point to a usable outcome\./);
-  assert.match(pedestal, /What you receive/);
-  assert.match(pedestal, /Review pricing and purchase/);
-  assert.match(pedestal, /\/ai-marketplace\/hangar/);
+  assert.match(productPage, /What you get/);
+  assert.match(productPage, /Best for/);
+  assert.match(productPage, /BUY THIS PRODUCT/);
+  assert.match(productPage, /<MarketplaceV12Checkout productId=\{detail\.productId\} options=\{options\} checkoutEnabled=\{checkoutEnabled\}/);
   assert.match(hangar, /marketplaceV12ProtectedDeliveryConfigured/);
   assert.match(hangar, /dynamic = "force-dynamic"/);
   assert.match(hangar, /runtime = "nodejs"/);
@@ -104,6 +101,17 @@ test("v1.2 product page presents buyer outcomes and fail-closed purchase options
   assert.match(v12Checkout, /healthValue\.operational === true/);
   assert.match(v12Checkout, /Contact sales for purchase options/);
   assert.match(v12Checkout, /disabled=\{!canPurchase\}/);
+});
+
+test("marketplace is a simple offering directory with direct customer buy actions", async () => {
+  const page = await readFile(new URL("../app/ai-marketplace/page.tsx", import.meta.url), "utf8");
+  const styles = await readFile(new URL("../app/ai-marketplace/MarketplaceSimple.css", import.meta.url), "utf8");
+  for (const label of ["AI Skills", "Agent Packs", "Workflow Packs", "Connectors", "Guardrails & Assurance", "Industry Editions", "Collections"]) assert.match(page, new RegExp(label.replace("&", "&")));
+  assert.match(page, /resultHref/);
+  assert.match(page, /#purchase-options/);
+  assert.match(page, /Buy now/);
+  assert.doesNotMatch(page, /MarketplaceCommandDeck|MarketplaceSalesDock|MarketplaceCapabilityUniverse|MarketplaceEditorialCatalog/);
+  assert.match(styles, /background: #f8f6f1/);
 });
 
 test("every marketplace offering requires an exact governed payment binding", async () => {
