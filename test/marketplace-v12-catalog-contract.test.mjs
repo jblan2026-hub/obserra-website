@@ -150,7 +150,8 @@ test("offering rail lets buyers choose a category before opening a governed prod
   }
   assert.match(page, /aria-haspopup="dialog"/);
   assert.match(page, /role="dialog" aria-modal="true"/);
-  assert.match(page, /resultHref\(product as MarketplaceV12Card\)/);
+  assert.match(page, /const card = product as MarketplaceV12Card/);
+  assert.match(page, /resultHref\(card\)/);
   assert.match(page, /#purchase-options/);
   assert.match(page, /Buy now/);
   assert.match(page, /marketplaceV12PublicPath\(card\)/);
