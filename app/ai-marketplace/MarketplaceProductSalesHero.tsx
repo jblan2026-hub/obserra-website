@@ -52,7 +52,7 @@ export default function MarketplaceProductSalesHero({ detail, options, checkoutE
   const salesHref = `/contact?interest=ai-marketplace&product=${encodeURIComponent(detail.productId)}`;
   const collectionHref = detail.collection ? `/ai-marketplace/collections/${encodeURIComponent(detail.collection.slug)}` : null;
   const entryOffer = [...detail.pricing.offers].sort((left, right) => left.amount_minor - right.amount_minor)[0];
-  const primaryLabel = entryOffer ? `${checkoutEnabled ? "Get started" : "Review pricing"} · ${money(entryOffer.amount_minor, entryOffer.currency)} ${cadence(entryOffer.cadence)}` : "Request pricing";
+  const primaryLabel = entryOffer ? `Buy now · ${money(entryOffer.amount_minor, entryOffer.currency)} ${cadence(entryOffer.cadence)}` : "Request pricing";
 
   return (
     <section className={styles.hero} aria-labelledby="product-sales-title">

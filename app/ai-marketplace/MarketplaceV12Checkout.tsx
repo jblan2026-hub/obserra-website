@@ -27,7 +27,7 @@ function label(option: MarketplacePublicCheckoutOption) {
 }
 
 function purchaseLabel(option: string) {
-  return option.startsWith("recurring:") ? "Subscribe & download" : "Buy & download";
+  return option.startsWith("recurring:") ? "Subscribe now" : "Buy now";
 }
 
 export default function MarketplaceV12Checkout({ productId, options, checkoutEnabled = null, compact = false, autoDownloadAfterPurchase = true }: Props) {
@@ -130,7 +130,7 @@ export default function MarketplaceV12Checkout({ productId, options, checkoutEna
     <input type="hidden" name="product" value={productId} />
     <label htmlFor={"purchase-" + productId}>Purchase option</label>
     <select id={"purchase-" + productId} name="purchaseOption" aria-describedby={"purchase-status-" + productId} value={selected} onChange={(event) => setSelected(event.target.value)} disabled={!canPurchase}>{sortedOptions.map((option) => <option key={option.option} value={option.option}>{label(option)}</option>)}</select>
-    <button type="submit" disabled={!canPurchase}>{canPurchase ? purchaseLabel(selected) : pendingPurchase ? "Preparing download…" : "Buy & download unavailable"}</button>
+    <button type="submit" disabled={!canPurchase}>{pendingPurchase ? "Preparing download…" : purchaseLabel(selected)}</button>
     <p id={"purchase-status-" + productId} role="status" aria-live="polite">{status}</p>
     {!canPurchase && !pendingPurchase ? <Link href={salesHref}>Contact sales for purchase options</Link> : null}
   </form>;

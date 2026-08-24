@@ -58,7 +58,7 @@ function offer(product: MarketplaceV12Card) {
   const lowest = [...offers].sort((left, right) => left.amount_minor - right.amount_minor)[0];
   const amount = new Intl.NumberFormat("en-US", { style: "currency", currency: lowest.currency }).format(lowest.amount_minor / 100);
   const cadence = lowest.cadence && lowest.cadence !== "one-time" ? ` / ${words(lowest.cadence)}` : " one-time";
-  return { price: `${amount}${cadence}`, note: offers.length > 1 ? `${offers.length} ways to purchase` : "Clear product pricing", href: `/ai-marketplace/${encodeURIComponent(product.slug)}`, action: "View price & purchase options" };
+  return { price: `${amount}${cadence}`, note: offers.length > 1 ? `${offers.length} ways to purchase` : "Clear product pricing", href: `/ai-marketplace/${encodeURIComponent(product.slug)}#purchase-options`, action: "Buy now" };
 }
 
 function inputLabel(kind: ProductForm) { return ({ agent: "Your objective", workflow: "Starting request", connector: "Your tools", protection: "Work to review", collection: "Your mission", capability: "Your need" })[kind]; }
@@ -149,7 +149,7 @@ export default function MarketplaceSalesDock({ products }: Props) {
             <div><strong className={styles.skillName}>{product.name}</strong><small>{level(product)}</small></div>
             <p>{outcome(product)}</p>
             <div className={styles.skillTags}><span>{category(product)}</span><span>{offeringLabel(product)}</span></div>
-            <footer><strong>{productOffer.price}</strong><span className={styles.openProduct}>Open product <b aria-hidden="true">→</b></span><button type="button" aria-pressed={product.product_id === selected.product_id} onClick={() => select(product)}>{product.product_id === selected.product_id ? "Focused" : "Preview here"}</button></footer>
+            <footer><strong>{productOffer.price}</strong><span className={styles.openProduct}>{product.pricing.offers.length ? "Buy now" : "Open product"} <b aria-hidden="true">→</b></span><button type="button" aria-pressed={product.product_id === selected.product_id} onClick={() => select(product)}>{product.product_id === selected.product_id ? "Focused" : "Preview here"}</button></footer>
           </li>;
         })}</ul></div>
       </nav>
