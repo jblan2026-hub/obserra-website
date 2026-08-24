@@ -78,7 +78,7 @@ jobs:
             local name="$1" value
             value="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${name}" --query value -o tsv --only-show-errors)"
             test -n "${value:-}" || { echo "::error::Required Marketplace binding authority is unavailable: ${name}."; exit 1; }
-            echo "::add-mask::${value}"
+            echo "::add-mask::${value}" >&2
             printf '%s' "${value}"
           }
           service_role_key="$(read_secret applications-supabase-service-role-key)"
@@ -144,7 +144,7 @@ jobs:
             local name="$1" value
             value="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${name}" --query value -o tsv --only-show-errors)"
             test -n "${value:-}" || { echo "::error::Required Marketplace verification authority is unavailable: ${name}."; exit 1; }
-            echo "::add-mask::${value}"
+            echo "::add-mask::${value}" >&2
             printf '%s' "${value}"
           }
           service_role_key="$(read_secret applications-supabase-service-role-key)"
