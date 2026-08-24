@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { publicAcademyCatalog } from "../../lib/academy-control";
 import { academyLicensedSalesEnabled } from "../../lib/academy-licensing";
 import AcademyControlledClient from "./AcademyControlledClient";
 import AcademyCommerceNotice from "./AcademyCommerceNotice";
+import AcademyCommerceNoticeBoundary from "./AcademyCommerceNoticeBoundary";
 import { courses as sourceCourses } from "./courseCatalog";
 import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./academy-commercial.css";
@@ -34,10 +36,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function AcademyPage({ searchParams }: { searchParams: Promise<{ enrollment?: string }> }) {
+export default async function AcademyPage() {
   const runtime = await publicAcademyCatalog(sourceCourses);
-  const commerceState = await searchParams;
   const licensedSalesEnabled = academyLicensedSalesEnabled();
+  const noticeFallbackStatus = !licensedSalesEnabled ? "licensing-pending" : undefined;
   const publicCourses = runtime.controlPlane === "operational" ? runtime.courses : [];
   const courseIsPurchasable = (courseId: string) => {
     const control = runtime.controls[courseId];
@@ -90,7 +92,9 @@ export default async function AcademyPage({ searchParams }: { searchParams: Prom
 
   return (
     <>
-      <AcademyCommerceNotice status={commerceState.enrollment ?? (!licensedSalesEnabled ? "licensing-pending" : undefined)} />
+      <Suspense fallback={<AcademyCommerceNotice status={noticeFallbackStatus} />}>
+        <AcademyCommerceNoticeBoundary fallbackStatus={noticeFallbackStatus} />
+      </Suspense>
       <section className="academy-commerce-notice" role="status">
         <strong>Florida Class D LMS platform is live</strong>
         <p>The regulated LMS can be reviewed now. Florida Class D enrollment and payment remain locked until licensing and production activation are complete.</p>
