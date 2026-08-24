@@ -81,7 +81,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
   }, [category, query, status]);
 
   return (
-    <main className="apps-page">
+    <main className="apps-page applications-catalog-page">
       <header className="apps-nav">
         <Link href="/" className="apps-brand" aria-label={LEGAL_ENTITY_NAME}>
           <Image src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
@@ -286,8 +286,6 @@ export function ProductInfoSections({ entry }: { entry: MarketplaceApp }) {
         <div><h2>Implementation assets aligned to {APPLICATIONS_BRAND_NAME} delivery</h2><ul>{entry.documentation.map((item) => <li key={item}>{item}</li>)}</ul></div>
         <div><h2>FAQ</h2>{entry.faq.map((item) => <article key={item.q}><h3>{item.q}</h3><p>{item.a}</p></article>)}</div>
       </section>
-
     </>
   );
 }
-
