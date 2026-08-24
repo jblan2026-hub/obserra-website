@@ -1,0 +1,74 @@
+name: Marketplace v1.2 ingest retry probe once
+
+on:
+  push:
+    branches:
+      - ops/marketplace-v12-ingest-observe-20260824
+    paths:
+      - .github/workflows/marketplace-v12-ingest-probe-retry-once.yml
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      TARGET_SHA: 1349b24734a4926622f2c5b589f25db1a1464550
+      OBSERVATION_BRANCH: ops/marketplace-v12-ingest-observe-20260824
+    steps:
+      - name: Probe retry ingest run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, datetime as dt, json, os, time, urllib.error, urllib.parse, urllib.request
+          repo = "jblan2026-hub/obserra-website"
+          workflow = "marketplace-v12-six-source-protected-delivery.yml"
+          target = os.environ["TARGET_SHA"]
+          branch = os.environ["OBSERVATION_BRANCH"]
+          token = os.environ["GH_TOKEN"]
+          headers = {"Accept":"application/vnd.github+json","Authorization":f"Bearer {token}","X-GitHub-Api-Version":"2022-11-28","User-Agent":"obserra-marketplace-ingest-retry-probe"}
+          def request(url, *, method="GET", body=None, timeout=30):
+              data = None if body is None else json.dumps(body).encode()
+              return urllib.request.urlopen(urllib.request.Request(url, data=data, method=method, headers={**headers, **({"Content-Type":"application/json"} if data else {})}), timeout=timeout)
+          run = None
+          for _ in range(60):
+              with request(f"https://api.github.com/repos/{repo}/actions/workflows/{workflow}/runs?event=workflow_dispatch&branch=main&per_page=50") as r:
+                  runs = json.load(r).get("workflow_runs", [])
+              matches = [x for x in runs if target in str(x.get("display_title") or "") and "ingest" in str(x.get("display_title") or "").lower()]
+              if matches:
+                  run = sorted(matches, key=lambda x: x.get("id",0), reverse=True)[0]
+                  break
+              time.sleep(5)
+          receipt = {
+              "contract":"obserra-marketplace-v12-ingest-retry-probe-v1",
+              "targetSha":target,
+              "found":run is not None,
+              "runId":int(run["id"]) if run else None,
+              "runUrl":run.get("html_url") if run else None,
+              "status":run.get("status") if run else None,
+              "conclusion":run.get("conclusion") if run else None,
+              "createdAt":run.get("created_at") if run else None,
+              "updatedAt":run.get("updated_at") if run else None,
+              "probedAt":dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00","Z")
+          }
+          content=(json.dumps(receipt,indent=2)+"\n").encode()
+          path="ops/marketplace-v12-ingest-retry-probe.json"
+          encoded=urllib.parse.quote(path,safe="/")
+          sha=None
+          try:
+              with request(f"https://api.github.com/repos/{repo}/contents/{encoded}?ref={urllib.parse.quote(branch,safe='')}") as r:
+                  sha=json.load(r).get("sha")
+          except urllib.error.HTTPError as e:
+              if e.code != 404: raise
+          body={"message":"ops: record Marketplace ingest retry probe","content":base64.b64encode(content).decode(),"branch":branch}
+          if sha: body["sha"]=sha
+          with request(f"https://api.github.com/repos/{repo}/contents/{encoded}",method="PUT",body=body) as r:
+              if r.status not in (200,201): raise SystemExit(r.status)
+          print(json.dumps(receipt,sort_keys=True))
+          PY
