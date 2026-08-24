@@ -33,7 +33,7 @@ test("Speaking presents the engagements as completed work and shows the Hall of 
   assert.match(speaking, /CNBC Technology Executive Council TEC Talk/);
   assert.match(speaking, /December 12, 2024/);
   assert.match(speaking, /Cybersecurity ROI: Transforming Security Expenditure into Business Growth in a Time of Economic Uncertainty/);
-  assert.match(speaking, /ISE East Summit &amp; Awards/);
+  assert.match(speaking, /ISE East Summit & Awards/);
   assert.match(speaking, /HMG Strategy Global Leadership Institute Awards/);
   assert.match(speaking, /CEH Hall of Fame 2025 magazine cover/);
   for (const media of requiredMedia) assert.match(speaking, new RegExp(media.replaceAll("/", "\\/")));
