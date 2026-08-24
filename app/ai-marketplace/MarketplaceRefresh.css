@@ -1,0 +1,158 @@
+.ai-marketplace__nav {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  min-height: 76px;
+  padding: 10px max(4vw, 22px);
+  border-bottom: 1px solid rgba(188, 208, 220, .14);
+  background: rgba(2, 12, 23, .9);
+  backdrop-filter: blur(18px) saturate(125%);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .16);
+}
+
+.ai-marketplace__nav > .ai-marketplace__brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  color: inherit;
+  letter-spacing: normal;
+}
+
+.ai-marketplace__brand-lockup img {
+  display: block;
+  width: min(286px, 35vw);
+  height: auto;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.ai-marketplace__nav nav {
+  align-items: center;
+  gap: 5px;
+}
+
+.ai-marketplace__nav nav a {
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  color: #b8cbd7;
+  font-size: 12px;
+  letter-spacing: .015em;
+  transition: border-color .16s ease, color .16s ease, background .16s ease;
+}
+
+.ai-marketplace__nav nav a:hover,
+.ai-marketplace__nav nav a:focus-visible {
+  border-color: rgba(185, 207, 221, .16);
+  background: rgba(239, 244, 248, .035);
+  color: #eff4f8;
+}
+
+.ai-marketplace__nav nav .ai-marketplace__nav-cta {
+  margin-left: 5px;
+  border-color: rgba(216, 173, 90, .52);
+  background: linear-gradient(135deg, rgba(216, 173, 90, .96), rgba(238, 199, 125, .96));
+  color: #07131f;
+}
+
+.ai-marketplace__nav nav .ai-marketplace__nav-cta:hover,
+.ai-marketplace__nav nav .ai-marketplace__nav-cta:focus-visible {
+  border-color: #e9c373;
+  background: linear-gradient(135deg, #e0b965, #f3d18c);
+  color: #07131f;
+}
+
+.ai-marketplace__catalog-anchor {
+  scroll-margin-top: 90px;
+  background:
+    radial-gradient(circle at 86% 0, rgba(216, 173, 90, .08), transparent 20%),
+    linear-gradient(180deg, #020b14, #041625 50%, #020b14);
+}
+
+.ai-marketplace__catalog-intro {
+  width: min(1540px, calc(100% - max(10vw, 48px)));
+  margin: 0 auto;
+  padding: clamp(4.5rem, 7vw, 7rem) 0 1.5rem;
+}
+
+.ai-marketplace__catalog-intro p {
+  margin: 0;
+  color: #d8ad5a;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .17em;
+}
+
+.ai-marketplace__catalog-intro h2 {
+  max-width: 13ch;
+  margin: .7rem 0 .85rem;
+  color: #eff4f8;
+  font-size: clamp(2.6rem, 5.5vw, 5.5rem);
+  line-height: .91;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}
+
+.ai-marketplace__catalog-intro span {
+  display: block;
+  max-width: 64ch;
+  color: #9fb4c1;
+  font-size: clamp(1rem, 1.5vw, 1.18rem);
+  line-height: 1.6;
+}
+
+.ai-marketplace__catalog-anchor .ai-marketplace__crawl-pagination {
+  width: min(1540px, calc(100% - max(10vw, 48px)));
+  margin: 0 auto;
+  padding: 0 0 1.35rem;
+  border: 0;
+  background: transparent;
+}
+
+.ai-marketplace__catalog-anchor .ai-marketplace__crawl-pagination a {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid rgba(155, 183, 199, .15);
+  color: #c7d8e2;
+  text-decoration: none;
+}
+
+.ai-marketplace__catalog-anchor .ai-marketplace__crawl-pagination a[aria-current="page"] {
+  border-color: rgba(216, 173, 90, .42);
+  color: #e7c67f;
+}
+
+@media (max-width: 1080px) {
+  .ai-marketplace__nav {
+    position: relative;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ai-marketplace__nav nav {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 2px;
+  }
+
+  .ai-marketplace__nav nav a {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .ai-marketplace__brand-lockup img {
+    width: min(250px, 78vw);
+  }
+
+  .ai-marketplace__catalog-intro,
+  .ai-marketplace__catalog-anchor .ai-marketplace__crawl-pagination {
+    width: calc(100% - 2rem);
+  }
+
+  .ai-marketplace__catalog-intro {
+    padding-top: 3.5rem;
+  }
+}
