@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ButtonLink } from "./components/ui/ObserraUI";
@@ -10,6 +11,7 @@ import {
 } from "../lib/legal-identity";
 import "./saas-home.css";
 import "./premium-home.css";
+import "./home-executive-office.css";
 
 export const metadata: Metadata = {
   title: `${LEGAL_ENTITY_NAME} | Executive Intelligence, Cybersecurity and Secure Technology`,
@@ -89,30 +91,52 @@ export default function HomePage() {
     <>
       <EnterpriseHeader section="Executive intelligence" />
       <main className="saas-home enterprise-page-main">
-        <section className="saas-hero saas-hero--executive">
-          <div className="saas-hero__copy saas-hero__copy--executive">
-            <p className="saas-eyebrow">EXECUTIVE INTELLIGENCE FOR HIGH-CONSEQUENCE ORGANIZATIONS</p>
-            <h1>See risk earlier. Decide faster. Act with proof.</h1>
-            <p className="saas-hero__lede">
-              Obserra EPI connects executive advisory, cybersecurity, protective intelligence, governance,
-              secure technology, and workforce capability so leaders can move from fragmented signals to
-              accountable action with greater clarity.
-            </p>
-            <div className="saas-hero__actions">
-              <ButtonLink href="/services">Explore Obserra EPI</ButtonLink>
-              <ButtonLink href="/contact?interest=enterprise-consultation" variant="secondary">Start a conversation</ButtonLink>
+        <section className="saas-hero saas-hero--executive executive-office-hero">
+          <div className="executive-office-hero__grid">
+            <div className="saas-hero__copy saas-hero__copy--executive executive-office-hero__copy">
+              <p className="saas-eyebrow">EXECUTIVE INTELLIGENCE FOR HIGH-CONSEQUENCE ORGANIZATIONS</p>
+              <h1>See risk earlier. Decide faster. Act with proof.</h1>
+              <p className="saas-hero__lede">
+                Obserra EPI connects executive advisory, cybersecurity, protective intelligence, governance,
+                secure technology, and workforce capability so leaders can move from fragmented signals to
+                accountable action with greater clarity.
+              </p>
+              <div className="saas-hero__actions">
+                <ButtonLink href="/services">Explore Obserra EPI</ButtonLink>
+                <ButtonLink href="/contact?interest=enterprise-consultation" variant="secondary">Start a conversation</ButtonLink>
+              </div>
+              <div className="saas-hero__utility-row">
+                <Link href="/ai-marketplace">Shop AI Skills Marketplace →</Link>
+                <span>Advisory</span>
+                <span>Cybersecurity</span>
+                <span>Intelligence</span>
+                <span>Technology</span>
+              </div>
             </div>
-            <div className="saas-hero__utility-row">
-              <Link href="/ai-marketplace">Shop AI Skills Marketplace →</Link>
-              <span>Advisory</span>
-              <span>Cybersecurity</span>
-              <span>Intelligence</span>
-              <span>Technology</span>
-            </div>
+
+            <aside className="executive-office-visual" aria-label="Obserra EPI executive office brand environment">
+              <div className="executive-office-visual__ceiling" aria-hidden="true"><i /><i /><i /></div>
+              <div className="executive-office-visual__wall">
+                <div className="executive-office-visual__brand">
+                  <Image src="/brand/obserra-logo.png" width={286} height={55} alt={LEGAL_ENTITY_NAME} priority />
+                  <strong>{LEGAL_ENTITY_NAME}</strong>
+                  <span>Executive intelligence · cybersecurity · protection</span>
+                </div>
+              </div>
+              <div className="executive-office-visual__glass" aria-hidden="true">
+                <span className="executive-office-visual__horizon" />
+                <span className="executive-office-visual__tower executive-office-visual__tower--one" />
+                <span className="executive-office-visual__tower executive-office-visual__tower--two" />
+                <span className="executive-office-visual__tower executive-office-visual__tower--three" />
+              </div>
+              <div className="executive-office-visual__table" aria-hidden="true"><i /><i /><i /></div>
+              <div className="executive-office-visual__chair executive-office-visual__chair--left" aria-hidden="true" />
+              <div className="executive-office-visual__chair executive-office-visual__chair--right" aria-hidden="true" />
+            </aside>
           </div>
         </section>
 
-        <section className="saas-priority-strip" aria-label="Obserra EPI offerings">
+        <section className="saas-priority-strip executive-office-capabilities" aria-label="Obserra EPI offerings">
           {capabilities.map((capability) => (
             <article key={capability.title} className="saas-priority-card">
               <ExecutiveInfoModal {...capability} />
