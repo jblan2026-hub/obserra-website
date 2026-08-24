@@ -7,13 +7,13 @@ import {
   bindAiMarketplaceCustomer,
   recordMarketplaceV12Checkout,
   reserveMarketplaceV12Checkout,
-} from "../../../../../lib/ai-marketplace-commerce";
-import { applicationsCommerceConfigured, applicationsCommerceLivemode, getApplicationsStripe } from "../../../../../lib/applications-stripe";
-import { boundMarketplaceV12Price, marketplaceV12BindingCoverage, marketplaceV12Offer, type MarketplaceV12PurchaseOption } from "../../../../../lib/marketplace-v12-bindings";
-import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary } from "../../../../../lib/marketplace-v12-catalog";
-import { createMarketplaceV12GuestDownloadToken, createMarketplaceV12GuestIdentity } from "../../../../../lib/marketplace-v12-guest-purchase";
-import { marketplaceV12ProductCommerce } from "../../../../../lib/marketplace-v12-runtime";
-import { ensureMarketplaceV12RuntimeSecrets } from "../../../../../lib/production-runtime-secrets";
+} from "../../../../lib/ai-marketplace-commerce";
+import { applicationsCommerceConfigured, applicationsCommerceLivemode, getApplicationsStripe } from "../../../../lib/applications-stripe";
+import { boundMarketplaceV12Price, marketplaceV12BindingCoverage, marketplaceV12Offer, type MarketplaceV12PurchaseOption } from "../../../../lib/marketplace-v12-bindings";
+import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
+import { createMarketplaceV12GuestDownloadToken, createMarketplaceV12GuestIdentity } from "../../../../lib/marketplace-v12-guest-purchase";
+import { marketplaceV12ProductCommerce } from "../../../../lib/marketplace-v12-runtime";
+import { ensureMarketplaceV12RuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
