@@ -200,14 +200,6 @@ export default function ObserraGuide() {
   const excluded = excludedPaths.some((path) => pathname.startsWith(path));
 
   useEffect(() => {
-    if (pathname !== "/" || excluded) return;
-    const dismissed = window.sessionStorage.getItem("obserrian-auto-open-dismissed") === "1";
-    if (dismissed) return;
-    const timer = window.setTimeout(() => setOpen(true), 1100);
-    return () => window.clearTimeout(timer);
-  }, [excluded, pathname]);
-
-  useEffect(() => {
     if (!open) return;
     const container = messagesRef.current;
     if (container) container.scrollTop = container.scrollHeight;
@@ -241,7 +233,6 @@ export default function ObserraGuide() {
 
   function closeGuide() {
     setOpen(false);
-    window.sessionStorage.setItem("obserrian-auto-open-dismissed", "1");
   }
 
   return (
