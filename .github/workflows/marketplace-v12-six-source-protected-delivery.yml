@@ -169,7 +169,7 @@ jobs:
           export OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY="$(<"${secret_dir}/supabase-service-role-key")"
           export APPLICATIONS_STRIPE_SECRET_KEY="$(<"${secret_dir}/stripe-secret-key")"
           export APPLICATIONS_STRIPE_WEBHOOK_SECRET="$(<"${secret_dir}/stripe-webhook-secret")"
-          export OBSERRA_AI_MARKETPLACE_V12_EVIDENCE_RUN=review
+          export OBSERRA_MARKETPLACE_V12_EVIDENCE_RUN=review
           export OBSERRA_ALLOW_LIVE_STRIPE_OUTSIDE_PRODUCTION=true
 
           node scripts/verify-marketplace-v12-stripe-evidence.mjs >"${evidence_dir}/stripe-evidence.json"
