@@ -1,0 +1,74 @@
+/* Final readability and visual treatment layer. Intentionally excludes AI Marketplace by loading only inside .premium-site-scope. */
+.premium-site-scope{
+  --clarity-font:"Aptos","Avenir Next","Segoe UI",system-ui,-apple-system,sans-serif;
+  --clarity-navy:#06213c;
+  --clarity-ink:#17344a;
+  --clarity-body:#405f73;
+  --clarity-muted:#688093;
+  --clarity-gold:#d7aa51;
+  font-family:var(--clarity-font)!important;
+  color:var(--clarity-ink)!important;
+}
+.premium-site-scope :is(button,input,select,textarea){font-family:var(--clarity-font)!important}
+.premium-site-scope :is(h1,h2,h3,h4,h5,h6,strong,b){font-family:var(--clarity-font)!important;font-weight:800!important;letter-spacing:-.02em;text-shadow:none!important}
+.premium-site-scope :is(p,li,dd,dt,label,span,small,a){font-family:var(--clarity-font)!important}
+.premium-site-scope p{font-size:1rem;line-height:1.58}
+
+/* Florida training: light instructional surface, readable text, preserved rails. */
+.premium-site-scope .fl-classd{background:linear-gradient(180deg,#fbfaf6 0%,#f0f4f5 100%)!important;color:var(--clarity-ink)!important}
+.premium-site-scope .fl-classd .fl-classd__hero{
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.99) 0 58%,rgba(255,255,255,.88) 70%,rgba(255,255,255,.22) 100%),
+    url('/brand/visuals/obserra-academy.png') right center/50% cover no-repeat!important;
+}
+.premium-site-scope .fl-classd .fl-classd__hero :is(h1,h2,h3,strong){color:var(--clarity-navy)!important}
+.premium-site-scope .fl-classd .fl-classd__hero :is(p,span,small){color:#38586d!important}
+.premium-site-scope .fl-classd .fl-classd__lead{color:#38586d!important;font-size:1.08rem!important;line-height:1.62!important}
+.premium-site-scope .fl-classd .fl-classd__status{background:#fff!important;color:var(--clarity-navy)!important;border-color:rgba(6,33,60,.18)!important}
+.premium-site-scope .fl-classd .fl-classd__notice{background:#fffaf0!important;color:#5b461e!important}
+.premium-site-scope .fl-classd .fl-classd__notice :is(strong,span,p){color:#5b461e!important}
+.premium-site-scope .fl-classd .fl-classd__metrics article{background:linear-gradient(145deg,#0d3b61,#082844)!important}
+.premium-site-scope .fl-classd .fl-classd__metrics article :is(strong,span,p){color:#fff!important}
+.premium-site-scope .fl-classd .fl-classd__section :is(h2,h3,strong){color:var(--clarity-navy)!important}
+.premium-site-scope .fl-classd .fl-classd__section :is(p,small,span){color:#435f72!important}
+.premium-site-scope .fl-classd .fl-classd__days article{background:#fff!important}
+.premium-site-scope .fl-classd .fl-classd__automation-grid>div{background:linear-gradient(145deg,#0d3b61,#082844)!important}
+.premium-site-scope .fl-classd .fl-classd__automation-grid>div :is(b,strong,span,p){color:#fff!important}
+
+/* Applications: keep scrolling mechanics; fix dark-card text and image clarity only. */
+.premium-site-scope .applications-catalog-page{font-family:var(--clarity-font)!important}
+.premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article){background-color:#0a3152!important}
+.premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) :is(h1,h2,h3,h4,strong,b,p,li,span,small,a){color:#f8fbfd!important;text-shadow:none!important}
+.premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) p{color:#d9e6ee!important;opacity:1!important}
+.premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) li{color:#c9dce8!important;opacity:1!important}
+.premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) a,
+.premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) strong{color:#f0c568!important}
+.premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article){font-size:1rem!important}
+.premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) h2,
+.premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) h3{font-size:clamp(1.35rem,1.7vw,1.7rem)!important;line-height:1.12!important}
+
+/* Trust, EIOS, Academy, Contact: readable light surfaces and controlled dark cards. */
+.premium-site-scope :is(.trust-page,.eios-page,.academy-executive-page,.contact-page){font-family:var(--clarity-font)!important}
+.premium-site-scope :is(.trust-page,.eios-page,.academy-executive-page,.contact-page) :is(h1,h2,h3,h4){color:var(--clarity-navy)!important}
+.premium-site-scope :is(.trust-page,.eios-page,.academy-executive-page,.contact-page) :is(p,li,dd,dt,label,small){color:var(--clarity-body)!important}
+.premium-site-scope :is(.trust-page,.contact-page) :is(.trust-status-panel,.contact-card,.contact-grid article){background-color:#0b3559!important}
+.premium-site-scope :is(.trust-page,.contact-page) :is(.trust-status-panel,.contact-card,.contact-grid article) :is(h2,h3,strong,p,span,li,small,a,label){color:#f7fbfd!important}
+.premium-site-scope :is(.trust-page,.contact-page) :is(.trust-status-panel,.contact-card,.contact-grid article) p{color:#d6e4ec!important}
+.premium-site-scope .eios-page :is(.product-frame,.view-selector button,.eios-executive-capability-card){color:var(--clarity-ink)!important}
+.premium-site-scope .eios-page .product-frame figcaption :is(strong,p,span){color:var(--clarity-ink)!important}
+.premium-site-scope .academy-executive-page .course-card{background:linear-gradient(180deg,#0d3b61,#082844)!important}
+.premium-site-scope .academy-executive-page .course-card :is(h3,strong,b,p,span,em,small){color:#f7fbfd!important}
+.premium-site-scope .academy-executive-page .course-card p{color:#d8e5ed!important}
+
+/* Image correction: keep assets, improve crop/exposure, never modify official logo. */
+.premium-site-scope img:not([src*="obserra-logo"]){filter:brightness(1.08) contrast(1.03) saturate(.96)}
+.premium-site-scope :is(.applications-catalog-page,.trust-page,.eios-page,.academy-executive-page,.contact-page) img:not([src*="obserra-logo"]){object-fit:cover;object-position:center}
+.premium-site-scope .applications-catalog-page :is(.apps-spotlight-card,.apps-grid article){background-blend-mode:normal!important}
+
+/* Accessibility guardrails for any dark navy card left by page-specific styles. */
+.premium-site-scope [class*="card"][style*="background"] :is(h1,h2,h3,strong,p,span,small){text-shadow:none!important}
+
+@media(max-width:820px){
+  .premium-site-scope p{font-size:1rem}
+  .premium-site-scope .fl-classd .fl-classd__hero{background:#fff!important}
+}
