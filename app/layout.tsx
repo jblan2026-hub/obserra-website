@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
-import { prepareClerkRuntime } from "../lib/clerk-runtime-config";
 import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "../lib/legal-identity";
 import ObserraGuide from "./ObserraGuide";
 import CredlyProfileLink from "./CredlyProfileLink";
@@ -44,7 +42,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     ],
   };
 
-  const application = (
+  return (
     <html lang="en">
       <body>
         <a className="obs-skip-link" href="#main-content">Skip to main content</a>
@@ -57,20 +55,5 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </body>
     </html>
-  );
-
-  const clerkRuntime = prepareClerkRuntime();
-  if (!clerkRuntime.ready || !clerkRuntime.publishableKey) return application;
-
-  return (
-    <ClerkProvider
-      publishableKey={clerkRuntime.publishableKey}
-      signInUrl="/sign-in"
-      signUpUrl="/sign-up"
-      signInFallbackRedirectUrl="/portal"
-      signUpFallbackRedirectUrl="/portal"
-    >
-      {application}
-    </ClerkProvider>
   );
 }
