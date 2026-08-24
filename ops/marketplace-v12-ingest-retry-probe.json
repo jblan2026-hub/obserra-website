@@ -1,0 +1,12 @@
+{
+  "contract": "obserra-marketplace-v12-ingest-retry-probe-v1",
+  "targetSha": "1349b24734a4926622f2c5b589f25db1a1464550",
+  "found": true,
+  "runId": 32769463506,
+  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32769463506",
+  "status": "in_progress",
+  "conclusion": null,
+  "createdAt": "2026-08-24T19:40:00Z",
+  "updatedAt": "2026-08-24T19:40:05Z",
+  "probedAt": "2026-08-24T19:40:17.788678Z"
+}
