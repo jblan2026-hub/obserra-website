@@ -1,0 +1,12 @@
+{
+  "contract": "obserra-marketplace-v12-ingest-probe-v1",
+  "targetSha": "3c4e9bc8a7405f2f8e78fcdc27faf847d1d63fe5",
+  "found": true,
+  "runId": 32768955797,
+  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32768955797",
+  "status": "in_progress",
+  "conclusion": null,
+  "createdAt": "2026-08-24T19:34:42Z",
+  "updatedAt": "2026-08-24T19:34:46Z",
+  "probedAt": "2026-08-24T19:35:44.723578Z"
+}
