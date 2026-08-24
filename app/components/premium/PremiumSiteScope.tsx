@@ -7,6 +7,7 @@ import "./premium-eios.css";
 import "./premium-about.css";
 import "./corporate-density.css";
 import "./executive-future.css";
+import "./executive-layout-repair.css";
 
 export default function PremiumSiteScope({ children }: { children: ReactNode }) {
   const pathname = usePathname();
