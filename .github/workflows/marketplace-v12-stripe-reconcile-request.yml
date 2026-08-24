@@ -74,16 +74,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          read_secret() {
-            local name="$1" value
+          read_secret_into() {
+            local name="$1" target="$2" value
             value="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${name}" --query value -o tsv --only-show-errors)"
             test -n "${value:-}" || { echo "::error::Required Marketplace binding authority is unavailable: ${name}."; exit 1; }
             echo "::add-mask::${value}"
-            printf '%s' "${value}"
+            printf -v "${target}" '%s' "${value}"
           }
-          service_role_key="$(read_secret applications-supabase-service-role-key)"
-          stripe_key="$(read_secret applications-stripe-secret-key)"
-          hash_secret="$(read_secret applications-commerce-hash-secret)"
+          read_secret_into applications-supabase-service-role-key service_role_key
+          read_secret_into applications-stripe-secret-key stripe_key
+          read_secret_into applications-commerce-hash-secret hash_secret
           export OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY="${service_role_key}"
           export APPLICATIONS_STRIPE_SECRET_KEY="${stripe_key}"
           export OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET="${hash_secret}"
@@ -140,15 +140,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          read_secret() {
-            local name="$1" value
+          read_secret_into() {
+            local name="$1" target="$2" value
             value="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${name}" --query value -o tsv --only-show-errors)"
             test -n "${value:-}" || { echo "::error::Required Marketplace verification authority is unavailable: ${name}."; exit 1; }
             echo "::add-mask::${value}"
-            printf '%s' "${value}"
+            printf -v "${target}" '%s' "${value}"
           }
-          service_role_key="$(read_secret applications-supabase-service-role-key)"
-          stripe_key="$(read_secret applications-stripe-secret-key)"
+          read_secret_into applications-supabase-service-role-key service_role_key
+          read_secret_into applications-stripe-secret-key stripe_key
           export OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY="${service_role_key}"
           export APPLICATIONS_STRIPE_SECRET_KEY="${stripe_key}"
           export OBSERRA_MARKETPLACE_V12_EVIDENCE_RUN=review
