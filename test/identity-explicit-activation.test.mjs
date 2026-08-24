@@ -7,6 +7,9 @@ const ownerUat = fs.readFileSync("lib/florida-class-d-owner-uat.ts", "utf8");
 const layout = fs.readFileSync("app/layout.tsx", "utf8");
 const signInLayout = fs.readFileSync("app/sign-in/layout.tsx", "utf8");
 const signUpLayout = fs.readFileSync("app/sign-up/layout.tsx", "utf8");
+const authLayout = fs.readFileSync("app/auth/layout.tsx", "utf8");
+const portalLayout = fs.readFileSync("app/portal/layout.tsx", "utf8");
+const portalPage = fs.readFileSync("app/portal/page.tsx", "utf8");
 const proxy = fs.readFileSync("proxy.ts", "utf8");
 const envExample = fs.readFileSync(".env.example", "utf8");
 
@@ -21,12 +24,24 @@ test("identity runtime requires an explicit server-side activation control", () 
   assert.match(envExample, /OBSERRA_IDENTITY_RUNTIME_ENABLED=false/);
 });
 
-test("public root rendering does not load the Clerk browser provider", () => {
+test("public root rendering does not load Clerk browser or auth-only styles", () => {
   assert.doesNotMatch(layout, /@clerk\/nextjs/);
   assert.doesNotMatch(layout, /prepareClerkRuntime/);
   assert.doesNotMatch(layout, /<ClerkProvider/);
+  assert.doesNotMatch(layout, /\.\/auth\.css/);
   assert.match(signInLayout, /<ClerkProvider/);
+  assert.match(signInLayout, /\.\.\/auth\.css/);
   assert.match(signUpLayout, /<ClerkProvider/);
+  assert.match(signUpLayout, /\.\.\/auth\.css/);
+  assert.match(authLayout, /\.\.\/auth\.css/);
+});
+
+test("portal scopes Clerk context above every client-side UserButton", () => {
+  assert.match(portalPage, /<UserButton/);
+  assert.match(portalLayout, /<ClerkProvider/);
+  assert.match(portalLayout, /signInUrl="\/sign-in"/);
+  assert.match(portalLayout, /signInFallbackRedirectUrl="\/portal"/);
+  assert.match(portalLayout, /\.\.\/auth\.css/);
 });
 
 test("protected identity paths remain fail closed while public traffic can degrade safely", () => {
