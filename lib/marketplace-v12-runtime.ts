@@ -50,6 +50,15 @@ export async function marketplaceV12RuntimeCommerce(): Promise<MarketplaceV12Run
 }
 
 export async function marketplaceV12ProductCommerce(product: MarketplaceV12Card): Promise<MarketplaceV12RuntimeCommerce> {
+  try {
+    // Product pages may execute before any other Marketplace route has hydrated the
+    // Key Vault-backed runtime bindings. Hydrate first so the protected-delivery
+    // receipt is available before the exact product release is evaluated.
+    await ensureMarketplaceV12RuntimeSecrets();
+  } catch {
+    return { operational: false, reason: "configuration_unavailable", checkoutEnabled: false, installEnabled: false };
+  }
+
   const subject = marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
   if (!subject) return { operational: false, reason: "catalog_unpublished", checkoutEnabled: false, installEnabled: false };
 
