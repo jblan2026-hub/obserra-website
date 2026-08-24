@@ -43,16 +43,21 @@ export default function MarketplaceV12Checkout({ productId, options, checkoutEna
     let timer: ReturnType<typeof setTimeout> | undefined;
     const query = new URLSearchParams(window.location.search);
     const pending = query.get("purchase") === "pending-fulfillment";
-    setPendingPurchase(pending);
 
     const refresh = async () => {
       attempt.current += 1;
       try {
         const healthResponse = await fetch("/api/ai-marketplace/commerce-health", { cache: "no-store", credentials: "same-origin" });
         const healthValue = await healthResponse.json() as CommerceHealth;
-        if (active) setHealth({ operational: healthValue.operational === true });
+        if (active) {
+          setPendingPurchase(pending);
+          setHealth({ operational: healthValue.operational === true });
+        }
       } catch {
-        if (active) setHealth({ operational: false });
+        if (active) {
+          setPendingPurchase(pending);
+          setHealth({ operational: false });
+        }
       }
 
       try {
@@ -85,7 +90,14 @@ export default function MarketplaceV12Checkout({ productId, options, checkoutEna
   useEffect(() => {
     if (!pendingPurchase || access !== "owned" || !autoDownloadAfterPurchase) return;
     const downloadUrl = `/api/ai-marketplace/download?product=${encodeURIComponent(productId)}`;
-    const timer = window.setTimeout(() => window.location.assign(downloadUrl), 350);
+    const timer = window.setTimeout(() => {
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.rel = "noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }, 350);
     return () => window.clearTimeout(timer);
   }, [access, autoDownloadAfterPurchase, pendingPurchase, productId]);
 
@@ -108,7 +120,7 @@ export default function MarketplaceV12Checkout({ productId, options, checkoutEna
   if (sortedOptions.length === 0) return <section className={className} aria-label="Purchase availability"><p role="status">Pricing for this capability is available by request.</p><Link href={salesHref}>Contact sales</Link></section>;
 
   let status = "Checking purchase and ownership status…";
-  if (pendingPurchase && access !== "owned") status = "Payment received. Waiting for verified fulfillment before releasing the download…";
+  if (pendingPurchase) status = "Payment received. Waiting for verified fulfillment before releasing the download…";
   else if (access === "unavailable") status = "Purchase and ownership authority is temporarily unavailable. No access will be granted until it recovers.";
   else if (!providerReady && health !== null) status = "Buy & download will unlock automatically after protected artifacts, live price bindings, and payment delivery are verified.";
   else if (checkoutEnabled === false) status = "This product is not yet approved for live checkout.";

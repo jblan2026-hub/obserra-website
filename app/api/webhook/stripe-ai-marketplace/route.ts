@@ -158,6 +158,7 @@ export async function POST(request: Request) {
     if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.metadata?.commerceSource === V12_SOURCE) {
+        await ensureMarketplaceV12RuntimeSecrets();
         await fulfillV12(event, session, raw, live);
         return NextResponse.json({ received: true });
       }
