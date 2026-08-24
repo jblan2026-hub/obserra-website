@@ -4,9 +4,14 @@ import test from "node:test";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("Marketplace saleability is governed by exact protected release and runtime commerce rather than stale catalog publication text", async () => {
+test("Marketplace saleability hydrates production bindings before exact protected-release evaluation", async () => {
   const runtime = await read("lib/marketplace-v12-runtime.ts");
-  assert.match(runtime, /marketplaceV12Release\(product\.product_id, marketplaceV12Summary\(\)\.revision, subject\.artifactSha256\)/);
+  const productCommerce = runtime.indexOf("export async function marketplaceV12ProductCommerce");
+  const hydration = runtime.indexOf("await ensureMarketplaceV12RuntimeSecrets()", productCommerce);
+  const release = runtime.indexOf("marketplaceV12Release(product.product_id, marketplaceV12Summary().revision, subject.artifactSha256)", productCommerce);
+  assert.ok(productCommerce >= 0);
+  assert.ok(hydration > productCommerce);
+  assert.ok(release > hydration);
   assert.match(runtime, /return marketplaceV12RuntimeCommerce\(\)/);
   assert.doesNotMatch(runtime, /product\.publication_state !== "available"/);
 });
