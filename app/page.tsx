@@ -79,13 +79,13 @@ export default function HomePage() {
               <h1>See risk earlier. Decide faster. Act with proof.</h1>
               <p className="saas-hero__lede">Obserra EPI connects executive advisory, cybersecurity, protective intelligence, governance, secure technology, and workforce capability so leaders can move from fragmented signals to accountable action with greater clarity.</p>
               <div className="saas-hero__actions">
-                <ButtonLink href="/services">Explore Obserra EPI</ButtonLink>
-                <ButtonLink href="/contact?interest=enterprise-consultation" variant="secondary">Start a conversation</ButtonLink>
+                <ButtonLink href="/contact?interest=executive-briefing">Book an executive briefing</ButtonLink>
+                <ButtonLink href="/services" variant="secondary">Explore solutions</ButtonLink>
               </div>
-              <div className="saas-hero__utility-row">
-                <Link href="/ai-marketplace">Shop AI Skills Marketplace →</Link>
+              <div className="saas-hero__utility-row" aria-label="Obserra product pathways">
                 <Link href="/eios">Explore {EIOS_BRAND_NAME}</Link>
-                <Link href="/florida-security-training">Florida Class D Training</Link>
+                <Link href="/apps">View {APPLICATIONS_BRAND_NAME}</Link>
+                <Link href="/ai-marketplace">Shop AI Marketplace →</Link>
               </div>
             </div>
 
@@ -93,7 +93,7 @@ export default function HomePage() {
               <Image src="/brand/visuals/obserra-core.png" fill sizes="(max-width: 980px) 92vw, 42vw" alt={`${LEGAL_ENTITY_NAME} executive intelligence visual`} priority />
               <div className="executive-brand-visual__identity">
                 <Image src="/brand/obserra-logo.png" width={286} height={55} alt={LEGAL_ENTITY_NAME} />
-                <strong>{LEGAL_ENTITY_NAME}</strong>
+                <strong>Obserra EPI</strong>
                 <span>Executive intelligence · cybersecurity · protection · secure technology</span>
               </div>
             </aside>
@@ -120,9 +120,8 @@ export default function HomePage() {
           <div className="saas-value-bar__cta">
             <p>Bring Obserra EPI into the decision before risk becomes consequence.</p>
             <div className="saas-value-bar__actions">
-              <ButtonLink href="/academy" variant="secondary">Browse {ACADEMY_BRAND_NAME}</ButtonLink>
-              <ButtonLink href="/apps" variant="secondary">Explore {APPLICATIONS_BRAND_NAME}</ButtonLink>
-              <ButtonLink href="/contact?interest=enterprise-consultation">Start a conversation</ButtonLink>
+              <ButtonLink href="/contact?interest=executive-briefing">Book an executive briefing</ButtonLink>
+              <ButtonLink href="/academy" variant="secondary">Explore {ACADEMY_BRAND_NAME}</ButtonLink>
             </div>
             <small>Reviewed nonregulated course baseline. Regulated programs follow separate eligibility and authorization gates. Applications remain subject to product-specific engagement, deployment, and access controls.</small>
           </div>
