@@ -22,6 +22,8 @@ export const metadata: Metadata = {
 const assuranceAreas = [
   {
     title: "Security Architecture",
+    category: "Security",
+    image: "/brand/visuals/obserra-cybersecurity.png",
     summary: "Identity, least privilege, encryption, secure software delivery, monitoring, resilience, and accountable evidence.",
     description: "Review the security objectives that guide software, advisory delivery, intelligence, and professional learning systems.",
     details: ["Identity and least privilege", "Encryption and data protection", "Secure software lifecycle and resilience"],
@@ -29,6 +31,8 @@ const assuranceAreas = [
   },
   {
     title: "Privacy & Data Handling",
+    category: "Privacy",
+    image: "/brand/visuals/obserra-core.png",
     summary: "Published privacy, retention, deletion, data-handling, and subprocessor boundaries for enterprise review.",
     description: "Understand how information is handled, minimized, retained, deleted, and disclosed across the applicable service boundary.",
     details: ["Privacy policy", "Data retention and deletion", "Subprocessor and handling disclosures"],
@@ -36,6 +40,8 @@ const assuranceAreas = [
   },
   {
     title: "Responsible AI & Framework Alignment",
+    category: "Governance",
+    image: "/brand/visuals/obserra-eios-intelligence-hero.png",
     summary: "Human oversight, permissions, explainability, governance, and published framework-alignment metadata.",
     description: `Review responsible AI principles and framework alignment. ${alignmentDisclaimer}`,
     details: ["Human oversight and accountability", "Data-use and permission controls", `${alignmentAuthorities.length} published alignment authorities`],
@@ -43,6 +49,8 @@ const assuranceAreas = [
   },
   {
     title: "Procurement & Buyer Assurance",
+    category: "Assurance",
+    image: "/brand/visuals/obserra-eios.png",
     summary: "Security questionnaires, vendor assurance, architecture briefings, NDA coordination, and verified credentials.",
     description: "Move security, legal, privacy, architecture, and procurement review forward through defined request paths and published evidence.",
     details: ["Security questionnaire support", "Vendor assurance package", "Architecture and procurement coordination"],
@@ -77,7 +85,7 @@ export default function TrustCenterPage() {
           <header className="trust-hero">
             <div>
               <p className="trust-eyebrow">{LEGAL_ENTITY_NAME} ENTERPRISE TRUST CENTER</p>
-              <h1>Clear assurance boundaries without a wall of policy text.</h1>
+              <h1>Enterprise assurance that is easy to review and easy to verify.</h1>
               <p className="trust-lead">Review security, privacy, responsible AI, framework alignment, procurement support, verified credentials, and current status boundaries from one concise enterprise trust surface.</p>
               <div className="trust-hero-actions">
                 <a href={`mailto:info@obserrallc.com?subject=${legalEntityMailName}%20Enterprise%20Trust%20Review`}>Start a trust review</a>
@@ -101,7 +109,7 @@ export default function TrustCenterPage() {
           <section className="services-executive-portfolio trust-executive-portfolio" aria-labelledby="trust-assurance-heading">
             <div className="services-executive-heading">
               <p className="trust-eyebrow">ENTERPRISE ASSURANCE</p>
-              <h2 id="trust-assurance-heading">Open the assurance area you need.</h2>
+              <h2 id="trust-assurance-heading">Choose the assurance area you need.</h2>
               <p>Each card summarizes the review area and links directly to the underlying policy or evidence route.</p>
             </div>
             <div className="services-executive-grid">
@@ -110,6 +118,9 @@ export default function TrustCenterPage() {
                   <ExecutiveInfoModal
                     number={String(index + 1).padStart(2, "0")}
                     title={area.title}
+                    category={area.category}
+                    image={area.image}
+                    imageAlt={`${area.title} assurance visual`}
                     summary={area.summary}
                     description={area.description}
                     details={[...area.details]}
