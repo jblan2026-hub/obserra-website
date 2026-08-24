@@ -21,6 +21,7 @@ const primaryNavigation = [
   ["Applications", "/apps"],
   ["AI Marketplace", "/ai-marketplace", "marketplace"],
   [ACADEMY_BRAND_NAME, "/academy"],
+  ["Speaking", "/speaking"],
   ["Trust", "/trust"],
   ["About", "/about"],
 ] as const;
