@@ -57,3 +57,6 @@ jobs:
           echo "invalid_token_status=${status}"
           test "${status}" = "403"
           test "$(jq -r '.error' "${body}")" = "Protected purchase delivery unavailable"
+
+      - name: Boundary probe complete
+        run: echo 'post_payment_fail_closed=verified'
