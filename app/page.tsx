@@ -10,6 +10,7 @@ import {
   LEGAL_ENTITY_NAME,
 } from "../lib/legal-identity";
 import "./saas-home.css";
+import "./premium-home.css";
 
 export const metadata: Metadata = {
   title: `${LEGAL_ENTITY_NAME} | Executive Intelligence, Cybersecurity and Secure Technology`,
