@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useEffect, useId, useRef, useState } from "react";
@@ -13,6 +14,9 @@ type ExecutiveInfoModalProps = {
   details: string[];
   href: string;
   linkLabel: string;
+  category?: string;
+  image?: string;
+  imageAlt?: string;
 };
 
 const FOCUSABLE_SELECTOR = [
@@ -32,6 +36,9 @@ export default function ExecutiveInfoModal({
   details,
   href,
   linkLabel,
+  category = "Obserra EPI",
+  image,
+  imageAlt,
 }: ExecutiveInfoModalProps) {
   const [open, setOpen] = useState(false);
   const titleId = useId();
@@ -53,25 +60,19 @@ export default function ExecutiveInfoModal({
         setOpen(false);
         return;
       }
-
       if (event.key !== "Tab") return;
-
       const dialog = dialogRef.current;
       if (!dialog) return;
-
       const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
         .filter((element) => !element.hasAttribute("disabled") && element.getAttribute("aria-hidden") !== "true");
-
       if (focusable.length === 0) {
         event.preventDefault();
         dialog.focus();
         return;
       }
-
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       const active = document.activeElement;
-
       if (event.shiftKey && active === first) {
         event.preventDefault();
         last.focus();
@@ -102,21 +103,11 @@ export default function ExecutiveInfoModal({
             tabIndex={-1}
             onMouseDown={(event) => event.stopPropagation()}
           >
-            <button
-              ref={closeRef}
-              type="button"
-              className={styles.close}
-              onClick={() => setOpen(false)}
-              aria-label="Close details"
-            >
-              ×
-            </button>
-            <p className={styles.eyebrow}>OBSERRA CAPABILITY {number}</p>
+            <button ref={closeRef} type="button" className={styles.close} onClick={() => setOpen(false)} aria-label="Close details">×</button>
+            <p className={styles.eyebrow}>{category} · {number}</p>
             <h2 id={titleId}>{title}</h2>
             <p id={descriptionId}>{description}</p>
-            <div className={styles.details}>
-              {details.map((detail) => <span key={detail}>{detail}</span>)}
-            </div>
+            <div className={styles.details}>{details.map((detail) => <span key={detail}>{detail}</span>)}</div>
             <div className={styles.footer}>
               <Link href={href} className={styles.primary} onClick={() => setOpen(false)}>{linkLabel}</Link>
               <button type="button" className={styles.secondary} onClick={() => setOpen(false)}>Close</button>
@@ -132,15 +123,24 @@ export default function ExecutiveInfoModal({
       <button
         ref={triggerRef}
         type="button"
-        className={styles.trigger}
+        className={`${styles.trigger} ${image ? styles.visualTrigger : ""}`}
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
       >
-        <span className={styles.number}>{number}</span>
-        <strong className={styles.title}>{title}</strong>
-        <span className={styles.summary}>{summary}</span>
-        <span className={styles.action}>More info +</span>
+        {image ? (
+          <span className={styles.media} aria-hidden="true">
+            <Image src={image} alt={imageAlt ?? ""} fill sizes="(max-width: 760px) 92vw, 360px" />
+            <span className={styles.mediaShade} />
+            <span className={styles.category}>{category}</span>
+            <span className={styles.mediaNumber}>{number}</span>
+          </span>
+        ) : <span className={styles.number}>{number}</span>}
+        <span className={styles.cardBody}>
+          <strong className={styles.title}>{title}</strong>
+          <span className={styles.summary}>{summary}</span>
+          <span className={styles.action}>Explore details <b aria-hidden="true">→</b></span>
+        </span>
       </button>
       {modal}
     </>

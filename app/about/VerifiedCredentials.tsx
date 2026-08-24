@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import ecCouncilManifest from "../../public/badges/eccouncil/asset-manifest.json";
 
 const credly = [
@@ -16,49 +16,50 @@ const credly = [
   ["Security+", "CompTIA Security+", "CompTIA", "ab52b8b0-62dd-4421-bf3e-cc6b27c02031"],
   ["Project+", "CompTIA Project+", "CompTIA", "8b0ed714-41a3-4f19-82f5-82885617c34c"],
   ["NCDA", "NetApp Certified Data Administrator", "NetApp", "e660531d-2431-4bda-8295-2954cfbdbfa3"],
-];
+] as const;
 
 const licenses = [
-  {
-    type: "Private Investigator",
-    number: "C 3600281",
-    licensedName: "BLANCHARD, JODY W",
-    status: "licensed",
-  },
-  {
-    type: "Security Officer",
-    number: "D 3617216",
-    licensedName: "BLANCHARD, JODY W",
-    status: "licensed",
-  },
-  {
-    type: "Security Officer School Instructor",
-    number: "DI3600107",
-    licensedName: "BLANCHARD, JODY W.",
-    status: "licensed",
-  },
-  {
-    type: "Statewide Firearms License",
-    number: "G 3604219",
-    licensedName: "BLANCHARD, JODY W.",
-    status: "licensed",
-  },
-  {
-    type: "Class A Private Investigative Agency",
-    number: "APPLICATION PENDING",
-    licensedName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
-    status: "pending",
-  },
+  { type: "Private Investigator", number: "C 3600281", licensedName: "BLANCHARD, JODY W", status: "licensed" },
+  { type: "Security Officer", number: "D 3617216", licensedName: "BLANCHARD, JODY W", status: "licensed" },
+  { type: "Security Officer School Instructor", number: "DI3600107", licensedName: "BLANCHARD, JODY W.", status: "licensed" },
+  { type: "Statewide Firearms License", number: "G 3604219", licensedName: "BLANCHARD, JODY W.", status: "licensed" },
+  { type: "Class A Private Investigative Agency", number: "APPLICATION PENDING", licensedName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC", status: "pending" },
 ] as const;
+
+function CredentialRail({ label, className = "", children }: { label: string; className?: string; children: ReactNode }) {
+  const railRef = useRef<HTMLDivElement>(null);
+
+  const move = (direction: -1 | 1) => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const distance = Math.max(260, Math.min(760, rail.clientWidth * 0.78));
+    rail.scrollBy({ left: distance * direction, behavior: "smooth" });
+  };
+
+  return (
+    <div className={`credential-rail-shell ${className}`.trim()}>
+      <div className="credential-rail-controls" aria-label={`${label} navigation`}>
+        <button type="button" onClick={() => move(-1)} aria-label={`Scroll ${label} left`}>←</button>
+        <button type="button" onClick={() => move(1)} aria-label={`Scroll ${label} right`}>→</button>
+      </div>
+      <div ref={railRef} className="verified-credentials-grid" role="region" aria-label={label} tabIndex={0}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function VerifiedCredentials() {
   useEffect(() => {
-    if (document.querySelector('script[data-obserra-credly="true"]')) return;
+    // Credly's official embed processor expects empty badge containers. Re-run it
+    // on each mount so client-side navigation also initializes newly rendered badges.
+    document.querySelectorAll('script[data-obserra-credly="true"]').forEach((node) => node.remove());
     const script = document.createElement("script");
     script.src = "https://cdn.credly.com/assets/utilities/embed.js";
     script.async = true;
     script.dataset.obserraCredly = "true";
     document.body.appendChild(script);
+    return () => script.remove();
   }, []);
 
   return (
@@ -66,23 +67,33 @@ export default function VerifiedCredentials() {
       <div className="verified-credentials-heading">
         <p>VERIFIED EXECUTIVE CREDENTIALS</p>
         <h2 id="verified-credentials-title">Issuer-backed qualifications in cybersecurity, risk, privacy, audit, AI governance, and protective services.</h2>
-        <span>Use each issuer link to verify the credential or professional license at its official source. Pending applications are identified separately and are not represented as issued licenses.</span>
+        <span>Each badge or credential links to its official issuer verification source. Pending applications are identified separately and are not represented as issued licenses.</span>
       </div>
 
       <h3 className="verified-credentials-group-title">Credly verified credentials</h3>
-      <div className="verified-credentials-grid">
+      <CredentialRail label="Credly verified credentials">
         {credly.map(([name, fullName, issuer, badgeId]) => (
           <article className="verified-credential-card" key={badgeId}>
-            <div className="verified-credential-embed" data-iframe-width="150" data-iframe-height="270" data-share-badge-id={badgeId} data-share-badge-host="https://www.credly.com">
-              <div className="credential-loading-mark" aria-hidden="true"><span>{issuer}</span><strong>{name}</strong><small>Verified credential</small></div>
+            <div
+              className="verified-credential-embed"
+              data-iframe-width="150"
+              data-iframe-height="270"
+              data-share-badge-id={badgeId}
+              data-share-badge-host="https://www.credly.com"
+              aria-label={`${name} verified credential badge from ${issuer}`}
+            />
+            <div className="verified-credential-detail">
+              <span>{issuer}</span>
+              <strong>{name}</strong>
+              <p>{fullName}</p>
+              <a className="verified-credential-verify-link" href={`https://www.credly.com/badges/${badgeId}/public_url`} target="_blank" rel="noreferrer">Verify on Credly</a>
             </div>
-            <div className="verified-credential-detail"><span>{issuer}</span><strong>{name}</strong><p>{fullName}</p></div>
           </article>
         ))}
-      </div>
+      </CredentialRail>
 
       <h3 className="verified-credentials-group-title">EC-Council verified credentials</h3>
-      <div className="verified-credentials-grid ec-council-credentials-grid">
+      <CredentialRail label="EC-Council verified credentials" className="ec-council-credential-rail">
         {ecCouncilManifest.credentials.map((credential) => (
           <article className="verified-credential-card ec-council-credential-card" key={credential.id}>
             <a
@@ -112,10 +123,10 @@ export default function VerifiedCredentials() {
             </div>
           </article>
         ))}
-      </div>
+      </CredentialRail>
 
       <h3 className="verified-credentials-group-title">Florida FDACS professional licenses</h3>
-      <div className="verified-credentials-grid florida-license-grid">
+      <CredentialRail label="Florida FDACS professional licenses" className="florida-license-rail">
         {licenses.map(({ type, number, licensedName, status }) => (
           <article className="verified-credential-card florida-license-card" key={`${type}-${number}`}>
             <div className="fdacs-license-mark" aria-label={`Florida Department of Agriculture and Consumer Services ${status === "pending" ? "pending application" : "licensed credential"}`}>
@@ -132,7 +143,7 @@ export default function VerifiedCredentials() {
             </div>
           </article>
         ))}
-      </div>
+      </CredentialRail>
 
       <a className="verified-credentials-profile-link" href="https://www.credly.com/users/jody-blanchard.177e348f" target="_blank" rel="noreferrer">View the complete verified Credly profile</a>
     </section>
