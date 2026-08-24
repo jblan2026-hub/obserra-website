@@ -105,12 +105,15 @@ function CatalogVisual({ card }: { card: EditorialCatalogCard }) {
 
 function CatalogCard({ card }: { card: EditorialCatalogCard }) {
   const packageCard = isPackage(card);
+  const priced = card.pricing.offers.some((offer) => Number.isSafeInteger(offer.amount_minor) && offer.amount_minor >= 0)
+    && card.pricing.model !== "quote"
+    && card.pricing.model !== "enterprise_quote";
   const verification = card.publication_state === "artifact-verified-unpublished" ? "Package artifact verified" : "Governed listing";
   const primaryAction = packageCard
     ? "Explore this capability system"
-    : card.product_type === "ai-skill"
-      ? "Open individual skill"
-      : "View product and options";
+    : priced
+      ? "Buy now"
+      : "Contact sales";
   return <article className="editorial-catalog__card">
     <Link className="editorial-catalog__card-link" href={productPath(card)} aria-label={"Open " + card.name}>
       <CatalogVisual card={card} />
@@ -123,7 +126,7 @@ function CatalogCard({ card }: { card: EditorialCatalogCard }) {
           {card.proficiency ? <span>{card.proficiency}</span> : null}
           {packageCard ? <span>{verification}</span> : null}
         </div>
-        <footer><span>{primaryAction}</span><b aria-hidden="true">↗</b></footer>
+        <footer data-action={priced && !packageCard ? "buy" : "open"}><span>{primaryAction}</span><b aria-hidden="true">→</b></footer>
       </div>
     </Link>
   </article>;
