@@ -1,0 +1,80 @@
+name: Bootstrap CRA Twin SaaS OIDC
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/bootstrap-cra-twin-saas-oidc.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: bootstrap-cra-twin-saas-oidc
+  cancel-in-progress: false
+
+env:
+  AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
+  AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
+  AZURE_CLIENT_ID: dc3ff3e1-ea35-4879-afa9-fa3eee49df85
+  AZURE_RESOURCE_GROUP: rg-obserra-prod-eastus
+  AZURE_DEPLOY_IDENTITY: id-obserra-github-prod
+  FEDERATED_CREDENTIAL_NAME: github-cra-twin-saas-feature
+  TWIN_SUBJECT: repo:jblan2026-hub@309821056/Obserra-EU-CRA-governace-app@1332654162:ref:refs/heads/feature/obserra-advanced-frontends-20260822
+
+jobs:
+  authorize-twin-branch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Authenticate with existing Obserra Azure deployment identity
+        uses: azure/login@v3.0.1
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Add Twin branch federated credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          issuer='https://token.actions.githubusercontent.com'
+          audience='api://AzureADTokenExchange'
+
+          if az identity federated-credential show \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --identity-name "${AZURE_DEPLOY_IDENTITY}" \
+            --name "${FEDERATED_CREDENTIAL_NAME}" \
+            >/tmp/cra-twin-federation.json 2>/dev/null; then
+            az identity federated-credential update \
+              --resource-group "${AZURE_RESOURCE_GROUP}" \
+              --identity-name "${AZURE_DEPLOY_IDENTITY}" \
+              --name "${FEDERATED_CREDENTIAL_NAME}" \
+              --issuer "${issuer}" \
+              --subject "${TWIN_SUBJECT}" \
+              --audiences "${audience}" \
+              --output none
+          else
+            az identity federated-credential create \
+              --resource-group "${AZURE_RESOURCE_GROUP}" \
+              --identity-name "${AZURE_DEPLOY_IDENTITY}" \
+              --name "${FEDERATED_CREDENTIAL_NAME}" \
+              --issuer "${issuer}" \
+              --subject "${TWIN_SUBJECT}" \
+              --audiences "${audience}" \
+              --output none
+          fi
+
+          az identity federated-credential show \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --identity-name "${AZURE_DEPLOY_IDENTITY}" \
+            --name "${FEDERATED_CREDENTIAL_NAME}" \
+            --output json > /tmp/cra-twin-federation.json
+
+          jq -e --arg subject "${TWIN_SUBJECT}" \
+            '.subject == $subject and .issuer == "https://token.actions.githubusercontent.com" and (.audiences | index("api://AzureADTokenExchange")) != null' \
+            /tmp/cra-twin-federation.json >/dev/null
+
+          echo "CRA_TWIN_SAAS_OIDC=authorized" >> "$GITHUB_STEP_SUMMARY"
