@@ -160,7 +160,7 @@ export const productBriefs = [
     deliverables: ["Campaign baseline", "Exception handling runbook", "Certification KPI pack"]
   },
   {
-    name: "Obserra Academy Enterprise Cohort Brief",
+    name: "Obserra EPI Academy Enterprise Cohort Brief",
     purpose: "Build workforce capability with role-aligned cyber and intelligence training.",
     deliverables: ["Cohort curriculum map", "Completion dashboard", "Leadership impact summary"]
   }
