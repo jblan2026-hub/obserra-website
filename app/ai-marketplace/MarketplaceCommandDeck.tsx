@@ -189,7 +189,7 @@ export default function MarketplaceCommandDeck({ totalCards, collectionCount, fa
         </p>
       </div>
 
-      <div className={styles.visual} aria-label="Interactive 3D representation of Obserra marketplace product families">
+      <div className={styles.visual} aria-label="Interactive 3D representation of Obserra EPI AI Marketplace product families">
         <div className={styles.chrome} aria-hidden="true"><span>OBSERRA EPI // MARKETPLACE COMMAND DECK</span><span>GOVERNED CAPABILITY NETWORK</span></div>
         <div className={styles.canvasWrap}>
           <Canvas
