@@ -1,0 +1,69 @@
+name: Marketplace v1.2 source probe once
+
+on:
+  push:
+    branches: [ops/marketplace-v12-source-probe-20260824]
+    paths:
+      - .github/workflows/marketplace-v12-source-probe-once.yml
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  AZURE_CLIENT_ID: b8da232a-713f-4c25-a61e-4fb34d13e229
+  AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
+  AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
+  AZURE_STORAGE_ACCOUNT: stobserramktv1238d660
+  AZURE_SOURCE_CONTAINER: marketplace-v12-source
+  SOURCE_MANIFEST: data/marketplace/obserra-marketplace-v12-sellable-source-manifest.json
+  OBS_BRANCH: ops/marketplace-v12-source-probe-20260824
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+      - name: Probe exact six sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="${RUNNER_TEMP}/source-probe.json"
+          tmp="${RUNNER_TEMP}/items.jsonl"
+          : > "${tmp}"
+          while IFS=$'\t' read -r filename bytes sha; do
+            blob="$(az storage blob show --auth-mode login --account-name "${AZURE_STORAGE_ACCOUNT}" --container-name "${AZURE_SOURCE_CONTAINER}" --name "${filename}" --output json --only-show-errors 2>/dev/null || true)"
+            if [ -z "${blob}" ]; then
+              jq -cn --arg name "${filename}" --argjson bytes "${bytes}" --arg sha "${sha}" '{name:$name,expectedBytes:$bytes,expectedSha256:$sha,present:false,exact:false}' >> "${tmp}"
+            else
+              jq -cn --arg name "${filename}" --argjson bytes "${bytes}" --arg sha "${sha}" --argjson actual "$(jq '.properties.contentLength // 0' <<<"${blob}")" --arg metadataSha "$(jq -r '.metadata.sha256 // ""' <<<"${blob}")" '{name:$name,expectedBytes:$bytes,expectedSha256:$sha,present:true,actualBytes:$actual,metadataSha256:$metadataSha,exact:($actual==$bytes and $metadataSha==$sha)}' >> "${tmp}"
+            fi
+          done < <(jq -r '.archives[] | [.filename, (.bytes|tostring), .sha256] | @tsv' "${SOURCE_MANIFEST}")
+          jq -s '{contract:"obserra-marketplace-v12-source-probe-v1",checkedAt:(now|todate),sourceContainer:"marketplace-v12-source",archiveCount:length,presentCount:([.[]|select(.present)]|length),exactCount:([.[]|select(.exact)]|length),archives:.,ready:([.[]|select(.exact)]|length)==6}' "${tmp}" > "${out}"
+          cat "${out}"
+      - name: Publish non-sensitive source probe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64,json,os,urllib.parse,urllib.request
+          repo='jblan2026-hub/obserra-website'; branch=os.environ['OBS_BRANCH']; path='ops/marketplace-v12-source-probe.json'
+          content=open(os.path.join(os.environ['RUNNER_TEMP'],'source-probe.json'),'rb').read()
+          body={'message':'ops: record Marketplace source probe','content':base64.b64encode(content).decode(),'branch':branch}
+          url=f'https://api.github.com/repos/{repo}/contents/{urllib.parse.quote(path,safe="/")}'
+          headers={'Authorization':f'Bearer {os.environ["GH_TOKEN"]}','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'}
+          req=urllib.request.Request(url,data=json.dumps(body).encode(),method='PUT',headers=headers)
+          with urllib.request.urlopen(req,timeout=30) as r:
+              assert r.status in (200,201)
+          PY
