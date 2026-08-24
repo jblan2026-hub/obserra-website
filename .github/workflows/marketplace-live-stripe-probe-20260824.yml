@@ -14,18 +14,56 @@ jobs:
   probe:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    env:
+      PRODUCT_ID: obserra-epi-beginner-agent-systems-adversarial-review
     steps:
       - name: Diagnose Marketplace production commerce health
         shell: bash
         run: |
           set -euo pipefail
           health="$(mktemp)"
-          health_status="$(curl --silent --show-error --output "${health}" --write-out '%{http_code}' 'https://www.obserrallc.com/api/ai-marketplace/commerce-health')"
+          health_status="$(curl --silent --show-error --fail-with-body --output "${health}" --write-out '%{http_code}' 'https://www.obserrallc.com/api/ai-marketplace/commerce-health')"
           echo "health_status=${health_status}"
           jq -c '{operational,paymentProvider,chargesEnabled,protectedDeliveryConfigured,durableLedger,failure,dependencies,catalog:{revision:.catalog.revision,productCards:.catalog.productCards,publicationState:.catalog.publicationState,priceBindingsVerified:.catalog.priceBindingsVerified}}' "${health}"
+          test "$(jq -r '.operational' "${health}")" = "true"
+
+      - name: Resolve exact default purchase option from verified catalog
+        id: offer
+        shell: bash
+        run: |
+          set -euo pipefail
+          catalog_b64="$(mktemp)"
+          catalog_json="$(mktemp)"
+          base="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/data/marketplace/obserra-marketplace-card-catalog.json.gz.b64.part"
+          for suffix in 000 001 002 003 004; do
+            curl --silent --show-error --fail "${base}-${suffix}" >> "${catalog_b64}"
+          done
+          base64 --decode "${catalog_b64}" | gzip --decompress --stdout > "${catalog_json}"
+          offer="$(jq -c --arg product "${PRODUCT_ID}" '
+            def option:
+              if .kind == "recurring" and .cadence == "month" then "recurring:month"
+              elif .kind == "recurring" and .cadence == "year" then "recurring:year"
+              elif .kind == "one_time" then "one_time:once"
+              elif .kind == "team_license" then "team_license:once"
+              elif .kind == "activation" then "activation:once"
+              else null end;
+            [.cards[] | select(.product_id == $product or .slug == $product) | .pricing.offers[] | {option: option, amountMinor: .amount_minor}]
+            | map(select(.option != null and (.amountMinor | type) == "number" and .amountMinor > 0))
+            | sort_by(.amountMinor, .option)
+            | .[0] // empty
+          ' "${catalog_json}")"
+          test -n "${offer}"
+          option="$(jq -r '.option' <<< "${offer}")"
+          amount="$(jq -r '.amountMinor' <<< "${offer}")"
+          echo "resolved_product=${PRODUCT_ID}"
+          echo "resolved_option=${option}"
+          echo "resolved_amount_minor=${amount}"
+          echo "purchase_option=${option}" >> "${GITHUB_OUTPUT}"
 
       - name: Create live Marketplace Stripe Checkout Session without payment
         shell: bash
+        env:
+          PURCHASE_OPTION: ${{ steps.offer.outputs.purchase_option }}
         run: |
           set -euo pipefail
           headers="$(mktemp)"
@@ -38,19 +76,21 @@ jobs:
             --request POST \
             --header 'Origin: https://www.obserrallc.com' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
-            --data-urlencode 'product=obserra-epi-beginner-agent-systems-adversarial-review' \
-            --data-urlencode 'purchaseOption=one_time:once' \
+            --data-urlencode "product=${PRODUCT_ID}" \
+            --data-urlencode "purchaseOption=${PURCHASE_OPTION}" \
             'https://www.obserrallc.com/api/ai-marketplace/guest-checkout')"
           location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/^[^:]+:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit}' "${headers}")"
           echo "status=${status}"
-          echo "location=${location}"
-          test "${status}" = "303"
           case "${location}" in
-            https://checkout.stripe.com/*) ;;
+            https://checkout.stripe.com/*)
+              echo 'location_class=stripe-hosted-checkout'
+              ;;
             *)
+              echo "location=${location}"
               echo 'Expected Stripe-hosted Checkout redirect.' >&2
               cat "${headers}" >&2
               cat "${body}" >&2
               exit 1
               ;;
           esac
+          test "${status}" = "303"
