@@ -8,7 +8,9 @@ on:
       - data/marketplace/obserra-marketplace-v12-sellable-source-manifest.json
       - scripts/marketplace-v12-sellable-source-materialize.mjs
       - scripts/marketplace-v12-sellable-source-ingest-azure.mjs
+      - scripts/Upload-ObserraMarketplaceSources.ps1
       - .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+      - .github/workflows/marketplace-v12-six-source-ingest-trigger.yml
       - .github/workflows/marketplace-v12-six-source-validation.yml
 
 permissions:
@@ -56,3 +58,29 @@ jobs:
           grep -q 'requiredArchives == 6' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
           grep -q 'marketplace-v12-sellable-source-ingest-azure.mjs' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
           grep -q 'https://www.obserrallc.com/api/ai-marketplace/commerce-health' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+          grep -q 'actions: write' .github/workflows/marketplace-v12-six-source-ingest-trigger.yml
+          grep -q 'expected_commit="${GITHUB_SHA}"' .github/workflows/marketplace-v12-six-source-ingest-trigger.yml
+
+  windows-uploader-parse:
+    runs-on: windows-2022
+    timeout-minutes: 5
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+
+      - name: Parse PowerShell uploader without executing it
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path 'scripts/Upload-ObserraMarketplaceSources.ps1'),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
