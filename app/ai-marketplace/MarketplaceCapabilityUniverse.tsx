@@ -43,37 +43,36 @@ export default function MarketplaceCapabilityUniverse({
     <section className={styles.universe} aria-labelledby="marketplace-universe-title">
       <div className={styles.heading}>
         <div>
-          <p className={styles.eyebrow}>Interactive capability universe</p>
-          <h2 id="marketplace-universe-title">Explore Obserra capabilities as one connected system.</h2>
+          <p className={styles.eyebrow}>Connected capability intelligence</p>
+          <h2 id="marketplace-universe-title">See what works together before you build.</h2>
           <p>
-            Rotate, pan, zoom, and select catalog-derived objects. Each object resolves to the same governed product record used by search,
-            comparison, pricing, and fulfillment.
+            Explore relationships across Obserra skills, agents, workflows, connectors, guardrails, assurance, governance, and industry products. Focus any object to evaluate fit, pricing, delivery, and the next controlled action.
           </p>
         </div>
         <dl className={styles.metrics} aria-label="Marketplace catalog facts">
-          <div><dt>Catalog records</dt><dd>{totalCards.toLocaleString()}</dd></div>
-          <div><dt>Families</dt><dd>{familyCount.toLocaleString()}</dd></div>
-          <div><dt>Visible projection</dt><dd>{records.length.toLocaleString()}</dd></div>
+          <div><dt>Governed catalog</dt><dd>{totalCards.toLocaleString()}</dd></div>
+          <div><dt>Capability families</dt><dd>{familyCount.toLocaleString()}</dd></div>
+          <div><dt>3D projection</dt><dd>{records.length.toLocaleString()}</dd></div>
         </dl>
       </div>
 
       <div className={styles.experience}>
         <div className={styles.stageFrame}>
           <div className={styles.stageChrome} aria-hidden="true">
-            <span>OBSERRA EPI // CAPABILITY UNIVERSE</span>
-            <span>CATALOG-DERIVED // LIVE ROUTES</span>
+            <span>OBSERRA EPI // CAPABILITY INTELLIGENCE FIELD</span>
+            <span>SELECT // COMPARE // CONFIGURE</span>
           </div>
           <MarketplaceSpatialStage
-            label="Obserra EPI Marketplace capability universe"
+            label="Obserra EPI Marketplace connected capability field"
             nodes={records}
             selectedId={selected?.productId ?? null}
             onSelect={(node) => setSelectedId(node.productId)}
-            emptyMessage="No capability records are available in this projection. Use Marketplace search below to load a different catalog view."
+            emptyMessage="No capabilities match this projection. Search the governed Marketplace catalog to load another product set."
           />
         </div>
 
         <aside className={styles.inspector} aria-live="polite">
-          <p className={styles.eyebrow}>Selected capability</p>
+          <p className={styles.eyebrow}>Capability focus</p>
           {selected ? (
             <>
               <div className={styles.identity}>
@@ -85,27 +84,27 @@ export default function MarketplaceCapabilityUniverse({
               <p>{selected.description}</p>
               <dl className={styles.facts}>
                 <div><dt>Price</dt><dd>{offerText(selected)}</dd></div>
-                <div><dt>Publication</dt><dd>{humanize(selected.publicationState)}</dd></div>
+                <div><dt>Availability</dt><dd>{humanize(selected.publicationState)}</dd></div>
                 <div><dt>Delivery</dt><dd>{humanize(selected.deliverable)}</dd></div>
-                <div><dt>Current action</dt><dd>{selected.action.label}</dd></div>
+                <div><dt>Next action</dt><dd>{selected.action.label}</dd></div>
               </dl>
               <div className={styles.actions}>
-                <Link className={styles.primary} href={`/ai-marketplace/${encodeURIComponent(selected.slug)}`}>Open capability</Link>
+                <Link className={styles.primary} href={`/ai-marketplace/${encodeURIComponent(selected.slug)}`}>View product and options</Link>
                 <Link className={styles.secondary} href={`/ai-marketplace/compare?items=${encodeURIComponent(selected.slug)}`}>Compare</Link>
-                <Link className={styles.secondary} href={`/ai-marketplace/configure?items=${encodeURIComponent(selected.slug)}`}>Configure</Link>
+                <Link className={styles.secondary} href={`/ai-marketplace/configure?items=${encodeURIComponent(selected.slug)}`}>Build with this</Link>
               </div>
               {!selected.action.enabled && selected.action.reasonCode ? (
-                <p className={styles.stateNote}>Purchase remains unavailable: {humanize(selected.action.reasonCode)}.</p>
+                <p className={styles.stateNote}>This purchase path remains safely gated: {humanize(selected.action.reasonCode)}.</p>
               ) : null}
             </>
           ) : (
-            <p>Select a capability object to inspect its catalog facts.</p>
+            <p>Select a capability object to inspect fit, delivery, and buying options.</p>
           )}
         </aside>
       </div>
 
       <div className={styles.guidance}>
-        <span>Drag to orbit</span><span>Scroll to zoom</span><span>Select an object for product facts</span><span>Search the full catalog below</span>
+        <span>Orbit the capability field</span><span>Zoom for relationship depth</span><span>Select a product to evaluate fit</span><span>Compare or build a solution</span>
       </div>
     </section>
   );
