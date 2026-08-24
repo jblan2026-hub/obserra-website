@@ -10,6 +10,7 @@ import "./executive-future.css";
 import "./executive-layout-repair.css";
 import "./final-six-pages.css";
 import "./final-six-pages-polish.css";
+import "./global-clarity.css";
 
 export default function PremiumSiteScope({ children }: { children: ReactNode }) {
   const pathname = usePathname();
