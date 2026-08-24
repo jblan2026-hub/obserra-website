@@ -85,7 +85,7 @@ if (process.env.VERCEL_ENV === "production" || process.env.WEBSITE_HOSTNAME) fai
 if (process.env.OBSERRA_MARKETPLACE_V12_EVIDENCE_RUN !== REVIEW_MODE) fail("Set OBSERRA_MARKETPLACE_V12_EVIDENCE_RUN=review to run an evidence review.");
 if (process.env.OBSERRA_ALLOW_LIVE_STRIPE_OUTSIDE_PRODUCTION !== "true") fail("Explicit non-production live Stripe approval is required.");
 const key = process.env.APPLICATIONS_STRIPE_SECRET_KEY?.trim() ?? "";
-if (!/^sk_live_[A-Za-z0-9_]+$/.test(key)) fail("A live Stripe secret key is required; value suppressed.");
+if (!/^(?:sk|rk)_live_[A-Za-z0-9_]+$/.test(key)) fail("A live Stripe secret key is required; value suppressed.");
 const { catalog } = readCatalog({
   catalogPath: "data/marketplace/obserra-marketplace-card-catalog.json.gz",
   summaryPath: "data/marketplace/obserra-marketplace-card-catalog.summary.json",

@@ -49,7 +49,7 @@ function requireProductionAuthority() {
   if (supabaseUrl !== "https://ykmrlcfitsubqajgfnye.supabase.co" || supabaseKey.length < 32) {
     throw new Error("Marketplace v1.2 Azure protected artifact gate: durable commerce authority is unavailable; values suppressed");
   }
-  if (!/^sk_live_[A-Za-z0-9_]+$/.test(stripeKey) || !/^whsec_[A-Za-z0-9_]+$/.test(stripeWebhook)) {
+  if (!/^(?:sk|rk)_live_[A-Za-z0-9_]+$/.test(stripeKey) || !/^whsec_[A-Za-z0-9_]+$/.test(stripeWebhook)) {
     throw new Error("Marketplace v1.2 Azure protected artifact gate: live Stripe authority is unavailable; values suppressed");
   }
   if (!options["stripe-evidence"]) throw new Error("Marketplace v1.2 Azure protected artifact gate: Stripe evidence is required for activation");

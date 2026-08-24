@@ -81,7 +81,7 @@ function runtime() {
   const hashSecret = process.env.OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET?.trim() ?? "";
   const url = process.env.OBSERRA_APPLICATIONS_SUPABASE_URL?.trim().replace(/\/$/, "") ?? "";
   if (process.env.OBSERRA_MARKETPLACE_V12_RECONCILIATION_RUN !== "review") fail("explicit review-only approval is required");
-  if (!/^sk_live_[A-Za-z0-9_]+$/.test(stripeKey)) fail("live Stripe authority is unavailable; value suppressed");
+  if (!/^(?:sk|rk)_live_[A-Za-z0-9_]+$/.test(stripeKey)) fail("live Stripe authority is unavailable; value suppressed");
   if (url !== SUPABASE_ORIGIN || serviceRoleKey.length < 32) fail("durable review authority is unavailable; value suppressed");
   if (hashSecret.length < 32) fail("review integrity authority is unavailable; value suppressed");
   return { stripeKey, serviceRoleKey, hashSecret, url };
