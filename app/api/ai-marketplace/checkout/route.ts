@@ -9,6 +9,7 @@ import {
   aiMarketplaceCustomerKey,
   aiMarketplaceTenantId,
   bindAiMarketplaceCustomer,
+  marketplaceV12DeliveryEntitlement,
   recordAiMarketplaceCheckout,
   recordMarketplaceV12Checkout,
   reserveAiMarketplaceCheckout,
@@ -86,13 +87,20 @@ async function v12Checkout(request: Request, input: { productId: string; option:
     return NextResponse.redirect(signIn, 303);
   }
   await ensureMarketplaceV12RuntimeSecrets();
+  const tenantId = aiMarketplaceTenantId(userId, orgId);
+  const existingEntitlement = await marketplaceV12DeliveryEntitlement(userId, tenantId, product.product_id, expectedRevision, subject.artifactSha256);
+  if (existingEntitlement.allowed) {
+    const download = new URL("/api/ai-marketplace/download", request.url);
+    download.searchParams.set("product", product.product_id);
+    return NextResponse.redirect(download, 303);
+  }
+
   const [priceId, coverage] = await Promise.all([boundMarketplaceV12Price(product, option), marketplaceV12BindingCoverage()]);
   if (!priceId || !coverage.complete) return redirect(request, "catalog-v12-configuration-required", input.productId);
   if (!(await marketplaceV12ProductCommerce(product)).checkoutEnabled) return redirect(request, "catalog-v12-activation-blocked", input.productId);
   const live = applicationsCommerceLivemode();
   if (live !== true || !applicationsCommerceConfigured()) return redirect(request, "catalog-v12-configuration-required", input.productId);
 
-  const tenantId = aiMarketplaceTenantId(userId, orgId);
   const reservation = await reserveMarketplaceV12Checkout({ subjectId: userId, tenantId, productId: product.product_id, option, revision: expectedRevision, artifactSha256: subject.artifactSha256 });
   const stripe = getApplicationsStripe();
   if (reservation.stripeSessionId) {
