@@ -64,7 +64,14 @@ function reduceCatalogToSellableSources(catalog, manifest) {
   return { ...catalog, source_archives: manifest.archives.map((archive) => ({ ...archive })) };
 }
 
-const options = parseArguments(process.argv.slice(2), new Set([
+const rawArguments = process.argv.slice(2);
+const normalizedArguments = rawArguments.flatMap((argument, index) => {
+  if (argument !== "--validate-sources-only") return [argument];
+  const next = rawArguments[index + 1];
+  return !next || next.startsWith("--") ? [argument, "true"] : [argument];
+});
+
+const options = parseArguments(normalizedArguments, new Set([
   "--catalog",
   "--summary",
   "--source-manifest",
