@@ -5,6 +5,7 @@ import { prepareClerkRuntime } from "../lib/clerk-runtime-config";
 import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "../lib/legal-identity";
 import ObserraGuide from "./ObserraGuide";
 import CredlyProfileLink from "./CredlyProfileLink";
+import PremiumSiteScope from "./components/premium/PremiumSiteScope";
 import "./globals.css";
 import "./design-system.css";
 import "./brand-consistency.css";
@@ -46,7 +47,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <a className="obs-skip-link" href="#main-content">Skip to main content</a>
-        <div id="main-content" tabIndex={-1}>{children}</div>
+        <div id="main-content" tabIndex={-1}>
+          <PremiumSiteScope>{children}</PremiumSiteScope>
+        </div>
         <CredlyProfileLink />
         <ObserraGuide />
         <Analytics />
