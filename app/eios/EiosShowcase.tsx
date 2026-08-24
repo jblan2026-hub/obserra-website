@@ -5,6 +5,7 @@ import { useState } from "react";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import ExecutiveInfoModal from "../components/ui/ExecutiveInfoModal";
 import "./eios.css";
+import "./eios-compact.css";
 
 const productViews = [
   { id: "overview", eyebrow: "Executive command view", title: "See the full operating picture in one decision surface.", copy: "A governed command layer for enterprise posture, material risk, accountable execution, and verified outcomes.", image: "/eios/eios-overview-marketing.png", alt: "EIOS executive command visual" },
