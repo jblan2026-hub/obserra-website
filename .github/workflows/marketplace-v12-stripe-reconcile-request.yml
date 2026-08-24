@@ -42,14 +42,26 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
           persist-credentials: false
 
+      - name: Check out governed request from exact PR head
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: .marketplace-request
+          persist-credentials: false
+          sparse-checkout: |
+            ops/marketplace-v12-stripe-reconcile-request.json
+          sparse-checkout-cone-mode: false
+
       - name: Validate governed request and source revision
         id: request
         shell: bash
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.base.sha }}"
+          test "$(git -C .marketplace-request rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
           test "${{ github.event.pull_request.base.ref }}" = "main"
-          mode="$(jq -r '.mode // empty' ops/marketplace-v12-stripe-reconcile-request.json)"
+          request_path=".marketplace-request/ops/marketplace-v12-stripe-reconcile-request.json"
+          mode="$(jq -r '.mode // empty' "${request_path}")"
           case "${mode}" in
             review-only|verify-only) ;;
             *) echo "::error::Marketplace request mode is invalid."; exit 1 ;;
@@ -62,7 +74,7 @@ jobs:
             and .allowCharges == false
             and .allowSubscriptions == false
             and .allowEntitlements == false
-          ' ops/marketplace-v12-stripe-reconcile-request.json >/dev/null
+          ' "${request_path}" >/dev/null
           node scripts/marketplace-catalog-delivery-gate.mjs
           printf 'mode=%s\n' "${mode}" >> "${GITHUB_OUTPUT}"
 
@@ -103,14 +115,7 @@ jobs:
             --shard-index "${{ matrix.shard }}" \
             --shard-count 4 \
             --concurrency 2 >"${output}"
-          jq -e '
-            .contract == "obserra-marketplace-v12-bulk-binding-reconcile-v1"
-            and .failureCount == 0
-            and .processedProducts == .assignedProducts
-            and .reviewedOfferBindings == .requiredOfferBindings
-            and .activationChanged == false
-            and .checkoutActivated == false
-          ' "${output}" >/dev/null
+          jq -e '.contract == "obserra-marketplace-v12-bulk-binding-reconcile-v1" and .failureCount == 0 and .processedProducts == .assignedProducts and .reviewedOfferBindings == .requiredOfferBindings and .activationChanged == false and .checkoutActivated == false' "${output}" >/dev/null
           unset OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY APPLICATIONS_STRIPE_SECRET_KEY OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET service_role_key stripe_key hash_secret
 
       - name: Retain non-sensitive shard evidence
@@ -165,18 +170,7 @@ jobs:
           export OBSERRA_ALLOW_LIVE_STRIPE_OUTSIDE_PRODUCTION=true
           output="${RUNNER_TEMP}/marketplace-v12-stripe-evidence.json"
           node scripts/verify-marketplace-v12-stripe-evidence.mjs >"${output}"
-          jq -e '
-            .contract == "obserra-marketplace-v12-stripe-evidence-review-v1"
-            and .reviewOnly == true
-            and .activationChanged == false
-            and .verified == true
-            and .failureCount == 0
-            and .requiredProductCards == 11390
-            and .reviewedProductCards == 11390
-            and .verifiedOfferBindings == .requiredOfferBindings
-            and .stripeAccountChargesEnabled == true
-            and .bindingReceipt.contract == "obserra-marketplace-v12-runtime-binding-receipt-v1"
-          ' "${output}" >/dev/null
+          jq -e '.contract == "obserra-marketplace-v12-stripe-evidence-review-v1" and .reviewOnly == true and .activationChanged == false and .verified == true and .failureCount == 0 and .requiredProductCards == 11390 and .reviewedProductCards == 11390 and .verifiedOfferBindings == .requiredOfferBindings and .stripeAccountChargesEnabled == true and .bindingReceipt.contract == "obserra-marketplace-v12-runtime-binding-receipt-v1"' "${output}" >/dev/null
           unset OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY APPLICATIONS_STRIPE_SECRET_KEY service_role_key stripe_key
 
       - name: Retain non-sensitive catalog-wide verification
