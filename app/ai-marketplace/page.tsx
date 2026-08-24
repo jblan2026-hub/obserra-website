@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import {
@@ -10,10 +11,12 @@ import {
 } from "../../lib/marketplace-v12-catalog";
 import { marketplaceV12WorkspaceCandidates } from "../../lib/marketplace-v12-workspaces";
 import MarketplaceCapabilityUniverse from "./MarketplaceCapabilityUniverse";
+import MarketplaceCommandDeck from "./MarketplaceCommandDeck";
 import MarketplaceEditorialCatalog, { type EditorialCatalogCard } from "./MarketplaceEditorialCatalogStyled";
 import MarketplaceSalesDock from "./MarketplaceSalesDock";
 import "./MarketplaceEditorialCatalog.css";
 import "./marketplace.css";
+import "./MarketplaceRefresh.css";
 
 type PageProps = { searchParams: Promise<{ cursor?: string | string[]; q?: string | string[] }> };
 
@@ -38,9 +41,14 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     : cursor ? "/ai-marketplace?cursor=" + cursor : "/ai-marketplace";
   return {
     title: "AI Marketplace" + suffix + " | Obserra EPI",
-    description: "Browse Obserra EPI AI capabilities, package-backed skills, agent teams, workflows, connectors, assurance, and industry editions.",
+    description: "Explore governed Obserra EPI AI skills, agent teams, workflow packs, connectors, guardrails, assurance, governance, and industry editions built for controlled real-world execution.",
     alternates: { canonical },
-    openGraph: { title: "AI Marketplace" + suffix, description: "Explore package-backed AI capabilities for real work.", url: canonical, type: "website" },
+    openGraph: {
+      title: "Obserra EPI AI Marketplace" + suffix,
+      description: "Put governed AI capability to work with package-backed products built for controlled execution.",
+      url: canonical,
+      type: "website",
+    },
   };
 }
 
@@ -69,7 +77,7 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
     "@id": "https://www.obserrallc.com/ai-marketplace#catalog",
     url: "https://www.obserrallc.com/ai-marketplace",
     name: "Obserra EPI AI Marketplace",
-    description: "Explore package-backed AI capabilities for teams and organizations.",
+    description: "Explore governed, package-backed AI capabilities built for controlled real-world execution.",
     isPartOf: { "@id": "https://www.obserrallc.com/#website" },
     mainEntity: {
       "@type": "ItemList",
@@ -85,26 +93,41 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
 
   return <main className="ai-marketplace">
     <header className="ai-marketplace__nav">
-      <Link href="/" aria-label="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC home">OBSERRA EPI</Link>
+      <Link className="ai-marketplace__brand-lockup" href="/" aria-label="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC home">
+        <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" />
+      </Link>
       <nav aria-label="AI Marketplace navigation">
-        <Link href="/">Home</Link><Link href="/ai-marketplace/compare">Compare</Link><Link href="/ai-marketplace/configure">Build a bundle</Link><Link href="/ai-marketplace/hangar">My products</Link><Link href="/ai-marketplace/skill-libraries">Skill libraries</Link><Link href="/apps">Applications</Link><Link href="/academy">Academy</Link><Link href="/contact?interest=ai-marketplace">Enterprise licensing</Link>
+        <Link href="#marketplace-catalog">Marketplace</Link>
+        <Link href="/ai-marketplace/compare">Compare</Link>
+        <Link href="/ai-marketplace/configure">Build a solution</Link>
+        <Link href="/ai-marketplace/hangar">My products</Link>
+        <Link href="/ai-marketplace/skill-libraries">Skill libraries</Link>
+        <Link href="/apps">Applications</Link>
+        <Link href="/academy">Academy</Link>
+        <Link className="ai-marketplace__nav-cta" href="/contact?interest=ai-marketplace">Enterprise licensing</Link>
       </nav>
     </header>
-    <section className="ai-marketplace__hero" aria-labelledby="marketplace-heading">
-      <p>OBSERRA EPI AI CAPABILITY MARKETPLACE</p>
-      <h1 id="marketplace-heading">Navigate a governed AI capability universe.</h1>
-      <p className="ai-marketplace__hero-lede">Explore the catalog as a connected spatial system, move from capability families to individual products, and open the same stable product routes used by search, comparison, pricing, and protected fulfillment.</p>
-      <div><span>{summary.total_cards.toLocaleString()} capabilities</span><span>{featuredPackages.length} governed collections</span><span>{familyEntries.length} capability families</span></div>
-      <p className="ai-marketplace__notice">Every visible capability comes from the canonical marketplace catalog. Purchase remains unavailable until the guarded Stripe, entitlement, and protected-delivery evidence is complete.</p>
-    </section>
-    <MarketplaceCapabilityUniverse records={universeRecords} totalCards={summary.total_cards} familyCount={familyEntries.length} />
+
+    <MarketplaceCommandDeck totalCards={summary.total_cards} collectionCount={featuredPackages.length} familyCount={familyEntries.length} />
+
     <MarketplaceSalesDock products={dockRecords} />
-    <nav className="ai-marketplace__crawl-pagination" aria-label="Marketplace result pages">
-      <Link href="/ai-marketplace" aria-current={!cursor && !query ? "page" : undefined}>First results page</Link>
-      {cursor ? <Link href={"/ai-marketplace?" + (query ? "q=" + encodeURIComponent(query) + "&" : "") + "cursor=" + Math.max(0, Number(cursor) - 24)}>Previous results</Link> : null}
-      {initial.nextCursor ? <Link href={"/ai-marketplace?" + (query ? "q=" + encodeURIComponent(query) + "&" : "") + "cursor=" + initial.nextCursor}>Next results</Link> : null}
-    </nav>
-    <MarketplaceEditorialCatalog initialCatalog={catalog} initialTotal={initial.total} initialNextCursor={initial.nextCursor} initialQuery={query} familyEntries={familyEntries} featuredPackages={featuredPackages} />
+
+    <section id="marketplace-catalog" className="ai-marketplace__catalog-anchor" aria-label="Marketplace catalog">
+      <div className="ai-marketplace__catalog-intro">
+        <p>FULL GOVERNED CATALOG</p>
+        <h2>Find the exact capability for the work in front of you.</h2>
+        <span>Search, compare, configure, and open stable product routes across the complete Obserra EPI marketplace.</span>
+      </div>
+      <nav className="ai-marketplace__crawl-pagination" aria-label="Marketplace result pages">
+        <Link href="/ai-marketplace" aria-current={!cursor && !query ? "page" : undefined}>First results page</Link>
+        {cursor ? <Link href={"/ai-marketplace?" + (query ? "q=" + encodeURIComponent(query) + "&" : "") + "cursor=" + Math.max(0, Number(cursor) - 24)}>Previous results</Link> : null}
+        {initial.nextCursor ? <Link href={"/ai-marketplace?" + (query ? "q=" + encodeURIComponent(query) + "&" : "") + "cursor=" + initial.nextCursor}>Next results</Link> : null}
+      </nav>
+      <MarketplaceEditorialCatalog initialCatalog={catalog} initialTotal={initial.total} initialNextCursor={initial.nextCursor} initialQuery={query} familyEntries={familyEntries} featuredPackages={featuredPackages} />
+    </section>
+
+    <MarketplaceCapabilityUniverse records={universeRecords} totalCards={summary.total_cards} familyCount={familyEntries.length} />
+
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
   </main>;
 }
