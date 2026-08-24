@@ -4,11 +4,11 @@ import "./services.css";
 import "./services-executive.css";
 import { serviceCatalog } from "./serviceCatalog";
 import ServicePortfolioGrid from "./ServicePortfolioGrid";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { LEGAL_ENTITY_NAME, PUBLIC_BRAND_NAME } from "@/lib/legal-identity";
 import { EnterpriseFooter, EnterpriseHeader } from "../components/enterprise/EnterpriseChrome";
 
 export const metadata: Metadata = {
-  title: "Enterprise Services | Cybersecurity, Protection, Intelligence, Risk and AI Governance",
+  title: "Enterprise Services | Cybersecurity, Protection & AI Governance",
   description:
     "Executive advisory and scoped delivery across cybersecurity, protection, intelligence, enterprise risk, AI governance, identity, resilience, and secure technology.",
   alternates: { canonical: "/services" },
@@ -22,15 +22,15 @@ export const metadata: Metadata = {
     "digital forensics consulting",
   ],
   openGraph: {
-    title: `${LEGAL_ENTITY_NAME} Enterprise Services`,
+    title: `${PUBLIC_BRAND_NAME} Enterprise Services`,
     description: "Executive-ready advisory and delivery across cybersecurity, protection, intelligence, AI governance, risk, resilience, and professional training.",
     url: "https://www.obserrallc.com/services",
     type: "website",
-    images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: `${LEGAL_ENTITY_NAME} enterprise services` }],
+    images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: `${PUBLIC_BRAND_NAME} enterprise services` }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${LEGAL_ENTITY_NAME} Enterprise Services`,
+    title: `${PUBLIC_BRAND_NAME} Enterprise Services`,
     description: "Cybersecurity, executive protection, intelligence, risk, AI governance, resilience, and training for high-consequence organizations.",
     images: ["/brand/visuals/obserra-cybersecurity.png"],
   },
@@ -72,7 +72,7 @@ export default function ServicesPage() {
             <p className="apps-eyebrow">ENTERPRISE SERVICES</p>
             <h1>Senior expertise for risks that cannot be handled in isolation.</h1>
             <p>
-              {LEGAL_ENTITY_NAME} helps leaders address cyber risk, protection, intelligence,
+              {PUBLIC_BRAND_NAME} helps leaders address cyber risk, protection, intelligence,
               governance, resilience, and transformation with executive judgment, focused analysis,
               and accountable execution.
             </p>
