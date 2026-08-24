@@ -11,6 +11,9 @@ const SHA = /^[a-f0-9]{64}$/;
 const PRODUCT_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,191}$/;
 const PURCHASE_OPTIONS = new Set(["recurring:month", "recurring:year", "one_time:once", "team_license:once", "activation:once"]);
 const SUPABASE_ORIGIN = "https://ykmrlcfitsubqajgfnye.supabase.co";
+const VERIFY_CONCURRENCY = 4;
+const VERIFY_RETRY_ATTEMPTS = 5;
+const VERIFY_PACE_MS = 20;
 
 function fail(message) { throw new Error(message); }
 function digest(value) { return createHash("sha256").update(value).digest("hex"); }
@@ -22,6 +25,30 @@ function optionFor(offer) {
   if (offer.kind === "team_license") return "team_license:once";
   if (offer.kind === "activation") return "activation:once";
   return null;
+}
+function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+function providerFailureClass(error) {
+  const statusCode = Number(error?.statusCode ?? error?.status ?? 0);
+  if (statusCode === 429) return "rate_limit";
+  if (statusCode >= 500 && statusCode <= 599) return "provider_5xx";
+  const type = String(error?.type ?? error?.code ?? "");
+  if (/RateLimit/i.test(type)) return "rate_limit";
+  if (/Connection|Network|Timeout/i.test(type)) return "transport";
+  if (/APIError/i.test(type)) return "provider_api";
+  if (/Authentication|Permission/i.test(type)) return "authorization";
+  return "other";
+}
+async function retryRead(operation, attempts = VERIFY_RETRY_ATTEMPTS) {
+  let lastError;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try { return await operation(); }
+    catch (error) {
+      lastError = error;
+      if (attempt + 1 >= attempts) break;
+      await sleep(350 * (2 ** attempt) + Math.floor(Math.random() * 250));
+    }
+  }
+  throw lastError;
 }
 
 function bindingKey(productId, purchaseOption) { return `${productId}\0${purchaseOption}`; }
@@ -109,17 +136,27 @@ for (const card of subjects) {
   }
 }
 if (bindings.length !== reviews.length) fail("Durable binding reviews contain unexpected product entries.");
-const stripe = new Stripe(key, { apiVersion: "2026-07-29.dahlia", typescript: true });
-const account = await stripe.accounts.retrieve();
+const stripe = new Stripe(key, { apiVersion: "2026-07-29.dahlia", typescript: true, maxNetworkRetries: 4, timeout: 30_000 });
+const account = await retryRead(() => stripe.accounts.retrieve());
 if (!/^acct_[A-Za-z0-9]+$/.test(account.id ?? "")) fail("Stripe account identity is invalid.");
 const failures = [];
 const verifiedRows = [];
+const failureStages = new Map();
+const providerFailureClasses = new Map();
+function recordFailure(binding, stage, error = null) {
+  failures.push(digest(`${binding.productId}:${binding.bindingKey}:${stage}`));
+  failureStages.set(stage, (failureStages.get(stage) ?? 0) + 1);
+  if (error) {
+    const category = providerFailureClass(error);
+    providerFailureClasses.set(category, (providerFailureClasses.get(category) ?? 0) + 1);
+  }
+}
 let cursor = 0;
-await Promise.all(Array.from({ length: 8 }, async () => {
+await Promise.all(Array.from({ length: VERIFY_CONCURRENCY }, async () => {
   while (cursor < bindings.length) {
     const binding = bindings[cursor++];
     try {
-      const price = await stripe.prices.retrieve(binding.priceId, { expand: ["product"] });
+      const price = await retryRead(() => stripe.prices.retrieve(binding.priceId, { expand: ["product"] }));
       const product = typeof price.product === "string" ? null : price.product;
       const expectedRecurring = binding.purchaseOption === "recurring:month" ? "month" : binding.purchaseOption === "recurring:year" ? "year" : null;
       const valid = price.id === binding.stripePriceId && price.active && price.livemode === binding.stripeLivemode && price.currency === "usd" && price.unit_amount === binding.offer.amount_minor && price.metadata.bindingKey === binding.bindingKey
@@ -127,9 +164,12 @@ await Promise.all(Array.from({ length: 8 }, async () => {
         && product && !product.deleted && product.id === binding.stripeProductId && PRODUCT.test(product.id) && product.active && product.metadata.obserraMarketplaceProduct === binding.productId && product.metadata.artifactSha256 === binding.artifactSha256 && product.metadata.catalogRevision === catalog.catalog_revision && product.metadata.commerceSource === SOURCE;
       // bindingKey identifies an offer, so it is authoritative on Stripe Price.
       // A Product can legitimately carry multiple governed Price bindings.
-      if (!valid) failures.push(digest(`${binding.productId}:${binding.bindingKey}:metadata`));
+      if (!valid) recordFailure(binding, "metadata");
       else verifiedRows.push({ productId: binding.productId, purchaseOption: binding.purchaseOption, artifactSha256: binding.artifactSha256, stripeProductId: product.id, stripePriceId: price.id, stripeLivemode: true });
-    } catch { failures.push(digest(`${binding.productId}:${binding.bindingKey}:retrieve`)); }
+    } catch (error) {
+      recordFailure(binding, "retrieve", error);
+    }
+    await sleep(VERIFY_PACE_MS);
   }
 }));
 const verifiedByKey = new Map(verifiedRows.map((row) => [bindingKey(row.productId, row.purchaseOption), row]));
@@ -150,6 +190,28 @@ const bindingReceipt = complete ? await bindingRpc("obserra_ai_marketplace_final
   p_verified_at: verifiedAt,
 }) : null;
 if (bindingReceipt && (bindingReceipt.contract !== "obserra-marketplace-v12-runtime-binding-receipt-v1" || bindingReceipt.revision !== catalog.catalog_revision || bindingReceipt.requiredProducts !== subjects.length || bindingReceipt.requiredOfferBindings !== bindings.length || bindingReceipt.reviewedProductCards !== reviewedProductCards || bindingReceipt.liveReviewedOfferBindings !== orderedVerifiedRows.length || bindingReceipt.bindingSetSha256 !== bindingSetSha256 || bindingReceipt.verifiedAt !== verifiedAt)) fail("The finalized durable binding receipt is invalid.");
-const result = { contract: "obserra-marketplace-v12-stripe-evidence-review-v1", reviewOnly: true, activationChanged: false, bindingAuthority: "durable-supabase-review-v1", catalogRevision: catalog.catalog_revision, requiredProductCards: subjects.length, requiredOfferBindings: bindings.length, reviewedProductCards, stripeAccountId: account.id, stripeAccountChargesEnabled: account.charges_enabled === true, verifiedOfferBindings: orderedVerifiedRows.length, failureCount: failures.length, failureReferencesSha256: failures.sort(), verifiedAt, bindingReceipt, verified: complete && Boolean(bindingReceipt) };
+const result = {
+  contract: "obserra-marketplace-v12-stripe-evidence-review-v1",
+  reviewOnly: true,
+  activationChanged: false,
+  bindingAuthority: "durable-supabase-review-v1",
+  catalogRevision: catalog.catalog_revision,
+  requiredProductCards: subjects.length,
+  requiredOfferBindings: bindings.length,
+  reviewedProductCards,
+  stripeAccountId: account.id,
+  stripeAccountChargesEnabled: account.charges_enabled === true,
+  verifiedOfferBindings: orderedVerifiedRows.length,
+  verifierConcurrency: VERIFY_CONCURRENCY,
+  verifierRetryAttempts: VERIFY_RETRY_ATTEMPTS,
+  verifierPaceMs: VERIFY_PACE_MS,
+  failureCount: failures.length,
+  failureStageCounts: Object.fromEntries([...failureStages].sort(([left], [right]) => left.localeCompare(right))),
+  providerFailureClassCounts: Object.fromEntries([...providerFailureClasses].sort(([left], [right]) => left.localeCompare(right))),
+  failureReferencesSha256: failures.sort(),
+  verifiedAt,
+  bindingReceipt,
+  verified: complete && Boolean(bindingReceipt),
+};
 process.stdout.write(`${JSON.stringify(result)}\n`);
 process.exitCode = result.verified ? 0 : 2;
