@@ -16,11 +16,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
-      TARGET_SHA: 6ab6bff2615853fda31175def8b63c2787404177
+      TARGET_SHA: 21cc8e15c99f519ab113e59499c9cf0cdd870c6d
       CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
       OBSERVATION_BRANCH: ops/marketplace-v12-source-verify-20260823
     steps:
-      - name: Dispatch and observe governed protected-delivery verification only
+      - name: Dispatch and observe governed six-source protected-delivery verification only
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -38,7 +38,7 @@ jobs:
           import urllib.request
 
           repo = "jblan2026-hub/obserra-website"
-          workflow = "marketplace-v12-protected-delivery.yml"
+          workflow = "marketplace-v12-six-source-protected-delivery.yml"
           token = os.environ["GH_TOKEN"]
           target = os.environ["TARGET_SHA"]
           revision = os.environ["CATALOG_REVISION"]
@@ -47,7 +47,7 @@ jobs:
               "Accept": "application/vnd.github+json",
               "Authorization": f"Bearer {token}",
               "X-GitHub-Api-Version": "2022-11-28",
-              "User-Agent": "obserra-marketplace-source-verify-observer",
+              "User-Agent": "obserra-marketplace-six-source-verify-observer",
           }
 
           def request(url, *, method="GET", body=None, timeout=45):
@@ -94,7 +94,7 @@ jobs:
                   run = sorted(candidates, key=lambda item: item.get("id", 0), reverse=True)[0]
                   break
           if run is None:
-              raise SystemExit("protected-delivery verify run was not discoverable")
+              raise SystemExit("six-source protected-delivery verify run was not discoverable")
 
           run_id = int(run["id"])
           run_url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}"
@@ -105,7 +105,7 @@ jobs:
                   break
               time.sleep(10)
           else:
-              raise SystemExit("protected-delivery verify run did not complete inside observer window")
+              raise SystemExit("six-source protected-delivery verify run did not complete inside observer window")
 
           jobs_url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs?per_page=100"
           with request(jobs_url) as response:
@@ -131,9 +131,7 @@ jobs:
                   safe_patterns = [
                       (r"The specified blob does not exist", "SOURCE_BLOB_NOT_FOUND"),
                       (r"BlobNotFound", "SOURCE_BLOB_NOT_FOUND"),
-                      (r"obserra-supplied-archives\.json", "SOURCE_MANIFEST_UNAVAILABLE"),
                       (r"Required protected-delivery binding metadata is unavailable: ([a-z0-9-]+)", "KEY_VAULT_BINDING_UNAVAILABLE"),
-                      (r"Marketplace source/delivery role assignments did not converge", "AZURE_ROLE_ASSIGNMENT_UNAVAILABLE"),
                       (r"AuthorizationPermissionMismatch|AuthorizationFailure", "AZURE_AUTHORIZATION_FAILURE"),
                   ]
                   for pattern, code in safe_patterns:
@@ -144,7 +142,7 @@ jobs:
                   blocker = None
 
           receipt = {
-              "contract": "obserra-marketplace-v12-source-verification-observation-v1",
+              "contract": "obserra-marketplace-v12-six-source-verification-observation-v1",
               "mode": "verify",
               "activationChanged": False,
               "runId": run_id,
@@ -172,7 +170,7 @@ jobs:
                   raise
 
           body = {
-              "message": "ops: record Marketplace source verification observation",
+              "message": "ops: record Marketplace six-source verification observation",
               "content": base64.b64encode(content).decode("ascii"),
               "branch": branch,
           }
