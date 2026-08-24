@@ -27,7 +27,7 @@ function label(option: MarketplacePublicCheckoutOption) {
 }
 
 function purchaseLabel(option: string) {
-  return option.startsWith("recurring:") ? "Subscribe now" : "Buy now";
+  return option.startsWith("recurring:") ? "Subscribe with card" : "Buy with card";
 }
 
 export default function MarketplaceV12Checkout({ productId, options, checkoutEnabled = null, compact = false, autoDownloadAfterPurchase = true }: Props) {
@@ -105,8 +105,7 @@ export default function MarketplaceV12Checkout({ productId, options, checkoutEna
   const downloadHref = "/api/ai-marketplace/download?product=" + encodeURIComponent(productId);
   const providerReady = health?.operational === true;
   const productReady = checkoutEnabled !== false;
-  const accessReady = access === "signed-out" || access === "not-owned";
-  const canPurchase = sortedOptions.length > 0 && providerReady && productReady && accessReady;
+  const canPurchase = sortedOptions.length > 0 && providerReady && productReady;
   const className = compact ? "ai-marketplace__checkout ai-marketplace__checkout--compact" : "ai-marketplace__checkout";
 
   if (access === "owned") {
@@ -119,12 +118,12 @@ export default function MarketplaceV12Checkout({ productId, options, checkoutEna
 
   if (sortedOptions.length === 0) return <section className={className} aria-label="Purchase availability"><p role="status">Pricing for this capability is available by request.</p><Link href={salesHref}>Contact sales</Link></section>;
 
-  let status = "Checking checkout availability…";
+  let status = "Checking Stripe checkout availability…";
   if (pendingPurchase) status = "Payment received. Preparing your download…";
-  else if (access === "unavailable" || (!providerReady && health !== null) || checkoutEnabled === false) status = "Online checkout is temporarily unavailable. Please try again soon or contact us for help.";
-  else if (canPurchase) status = "You will complete payment securely with Stripe. Your download will begin after payment.";
+  else if ((!providerReady && health !== null) || checkoutEnabled === false) status = "Online checkout is temporarily unavailable. Please try again soon or contact us for help.";
+  else if (canPurchase) status = "Pay securely by card with Stripe. Your protected download starts after payment is verified.";
 
-  return <form className={className} action="/api/ai-marketplace/checkout" method="post">
+  return <form className={className} action="/api/ai-marketplace/guest-checkout" method="post">
     <input type="hidden" name="product" value={productId} />
     <label htmlFor={"purchase-" + productId}>Purchase option</label>
     <select id={"purchase-" + productId} name="purchaseOption" aria-describedby={"purchase-status-" + productId} value={selected} onChange={(event) => setSelected(event.target.value)} disabled={!canPurchase}>{sortedOptions.map((option) => <option key={option.option} value={option.option}>{label(option)}</option>)}</select>
