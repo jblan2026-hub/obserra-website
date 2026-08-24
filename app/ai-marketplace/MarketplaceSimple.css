@@ -11,8 +11,8 @@
 .marketplace-simple__rail-heading h2 { margin: 0; font-size: clamp(20px, 2.4vw, 30px); letter-spacing: -.035em; }
 .marketplace-simple__rail-heading span { color: #6c5b3c; font-size: 12px; font-weight: 900; text-transform: uppercase; }
 .marketplace-simple__rail-window { overflow: hidden; padding: 2px 0 20px; }
-.marketplace-simple__rail-track { display: flex; width: max-content; gap: 12px; padding-left: max(5vw, 24px); animation: marketplace-offering-roll 26s linear infinite; will-change: transform; }
-.marketplace-simple__rail-track:hover { animation-play-state: paused; }
+.marketplace-simple__rail-track { display: flex; width: max-content; gap: 12px; padding-left: max(5vw, 24px); animation: marketplace-offering-roll 18s linear infinite; will-change: transform; }
+@media (hover: hover) and (pointer: fine) { .marketplace-simple__rail-track:hover { animation-play-state: paused; } }
 .marketplace-simple__rail-track > a { display: flex; width: clamp(220px, 21vw, 285px); min-height: 152px; flex-direction: column; padding: 17px; border: 1px solid rgba(54,75,82,.18); border-top: 6px solid #d89a2d; border-radius: 15px; background: linear-gradient(145deg, #fffdf7, #f6fbfb); color: #17202a; text-decoration: none; box-shadow: 0 10px 28px rgba(45,65,71,.14); transition: transform .16s ease, box-shadow .16s ease; }
 .marketplace-simple__rail-track > a:nth-child(3n + 2) { border-top-color: #299bb0; }
 .marketplace-simple__rail-track > a:nth-child(3n) { border-top-color: #e66f31; }
