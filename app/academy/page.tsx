@@ -15,7 +15,7 @@ import "./premium-academy.css";
 export const revalidate = 10;
 
 export const metadata: Metadata = {
-  title: `${ACADEMY_BRAND_NAME} | Cybersecurity, Intelligence, Protection and Artificial Intelligence Training`,
+  title: "Academy | Cybersecurity, Intelligence & AI Training",
   description: `Search and evaluate professional ${ACADEMY_BRAND_NAME} courses covering cybersecurity, executive protection, intelligence, artificial intelligence governance, and secure technology leadership.`,
   alternates: { canonical: "/academy" },
   keywords: ["cybersecurity training", "executive protection training", "artificial intelligence governance training", "intelligence training", "Chief Information Security Officer education"],
