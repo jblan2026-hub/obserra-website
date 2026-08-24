@@ -113,18 +113,16 @@ export default function MarketplaceV12Checkout({ productId, options, checkoutEna
     return <section className={className} aria-label="Owned product delivery">
       <strong className="ai-marketplace__checkout-owned">Purchased and ready</strong>
       <a className="ai-marketplace__download-button" href={downloadHref}>Download now</a>
-      <p role="status" aria-live="polite">Your entitlement is active. The download is authorized server-side and delivered through a short-lived protected link.</p>
+      <p role="status" aria-live="polite">Your product is ready to download.</p>
     </section>;
   }
 
   if (sortedOptions.length === 0) return <section className={className} aria-label="Purchase availability"><p role="status">Pricing for this capability is available by request.</p><Link href={salesHref}>Contact sales</Link></section>;
 
-  let status = "Checking purchase and ownership status…";
-  if (pendingPurchase) status = "Payment received. Waiting for verified fulfillment before releasing the download…";
-  else if (access === "unavailable") status = "Purchase and ownership authority is temporarily unavailable. No access will be granted until it recovers.";
-  else if (!providerReady && health !== null) status = "Buy & download will unlock automatically after protected artifacts, live price bindings, and payment delivery are verified.";
-  else if (checkoutEnabled === false) status = "This product is not yet approved for live checkout.";
-  else if (canPurchase) status = "Secure checkout uses the live governed price. After payment is verified, your protected download will start automatically.";
+  let status = "Checking checkout availability…";
+  if (pendingPurchase) status = "Payment received. Preparing your download…";
+  else if (access === "unavailable" || (!providerReady && health !== null) || checkoutEnabled === false) status = "Online checkout is temporarily unavailable. Please try again soon or contact us for help.";
+  else if (canPurchase) status = "You will complete payment securely with Stripe. Your download will begin after payment.";
 
   return <form className={className} action="/api/ai-marketplace/checkout" method="post">
     <input type="hidden" name="product" value={productId} />
