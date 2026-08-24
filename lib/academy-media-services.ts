@@ -68,6 +68,14 @@ function validatedHttpsOrigin(value: unknown, allowedHost: string, label: string
   return url;
 }
 
+function joinProviderUrl(base: URL, path: string): URL {
+  const basePath = base.pathname.endsWith("/") ? base.pathname.slice(0, -1) : base.pathname;
+  const subPath = path.startsWith("/") ? path : `/${path}`;
+  const joined = new URL(base.toString());
+  joined.pathname = `${basePath}${subPath}`;
+  return joined;
+}
+
 function validatedPath(value: unknown, label: string): string {
   const path = normalized(value, 300);
   if (!path.startsWith("/") || path.includes("..") || path.includes("\\")) {
@@ -246,7 +254,7 @@ export async function probeAcademyMediaServices() {
   if (status.heygen.mode === "api" && status.heygen.apiReady) {
     result.heygen.attempted = true;
     try {
-      const url = new URL(configuration.heygen.templatesPath || "/v2/templates", heyGenBaseUrl);
+      const url = joinProviderUrl(heyGenBaseUrl, configuration.heygen.templatesPath || "/v2/templates");
       const response = await fetchWithTimeout(url, {
         accept: "application/json",
         "X-Api-Key": normalized(process.env.HEYGEN_API_KEY, 5000),
@@ -270,7 +278,7 @@ export async function probeAcademyMediaServices() {
   if (status.pollo.mode === "api" && status.pollo.apiReady) {
     result.pollo.attempted = true;
     try {
-      const url = new URL(configuration.pollo.creditBalancePath || "/credit/balance", polloBaseUrl);
+      const url = joinProviderUrl(polloBaseUrl, configuration.pollo.creditBalancePath || "/credit/balance");
       const response = await fetchWithTimeout(url, {
         accept: "application/json",
         "x-api-key": normalized(process.env.POLLO_API_KEY, 5000),
