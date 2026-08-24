@@ -3,6 +3,7 @@ import "server-only";
 import { courses } from "../app/academy/courseData";
 import { studioCoursePublicationMetadataById } from "../app/academy/studioCatalog";
 import type { ObserraAuthorizationRole } from "./auth/claims";
+import { ACADEMY_BRAND_NAME } from "./legal-identity";
 import {
   claimPaidCheckout,
   completeDurableLesson,
@@ -132,7 +133,7 @@ export async function recordAssessment(
   let certificate: SignedCertificateClaim | undefined;
   if (passed && !current.signedCertificate) {
     if (!certificateSigningReady()) {
-      throw new Error("Certificate signing is not configured. Contact Obserra Academy support.");
+      throw new Error(`Certificate signing is not configured. Contact ${ACADEMY_BRAND_NAME} support.`);
     }
     completedAt = current.completedAt ?? new Date().toISOString();
     certificateId = current.certificateId ?? `OBS-${courseId.toUpperCase().replaceAll("-", "")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
@@ -230,7 +231,7 @@ export async function findVerifiedCertificate(certificateId: string) {
       const { legacyClerkLearnerName } = await import("./academy-legacy-clerk");
       learnerName = await legacyClerkLearnerName(durableAcademyPrincipalId(durable));
     }
-    return verifiedCertificateResult(learnerName || "Obserra Academy Learner", durable.course_slug, progress);
+    return verifiedCertificateResult(learnerName || `${ACADEMY_BRAND_NAME} Learner`, durable.course_slug, progress);
   }
 
   const { findLegacyClerkCertificate } = await import("./academy-legacy-clerk");

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { findVerifiedCertificate } from "../../../../../lib/academy";
+import { ACADEMY_BRAND_NAME } from "../../../../../lib/legal-identity";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -106,7 +107,7 @@ export async function GET(request: Request) {
   const certificateId = new URL(request.url).searchParams.get("certificateId")?.trim().toUpperCase() ?? "";
   if (!certificateId || certificateId.length > 180 || !CERTIFICATE_ID_PATTERN.test(certificateId)) {
     return NextResponse.json(
-      { valid: false, error: "A valid Obserra Academy certificate ID is required" },
+      { valid: false, error: `A valid ${ACADEMY_BRAND_NAME} certificate ID is required` },
       {
         status: 400,
         headers: {

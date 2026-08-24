@@ -176,7 +176,7 @@ export const serviceCatalog: ServiceItem[] = [
     id: "training",
     title: "Enterprise Training",
     category: "Workforce Capability",
-    summary: "Outcome-driven professional training through Obserra Academy, executive briefings, and enterprise cohort enablement.",
+    summary: "Outcome-driven professional training through Obserra EPI Academy, executive briefings, and enterprise cohort enablement.",
     detail: "Supports workforce capability in cybersecurity, protection, intelligence, governance, and secure technology through structured training and enterprise programs.",
     icon: "BookOpen",
     outcomes: ["Build role-specific capability linked to operating responsibilities.", "Create measurable cohort completion and learning pathways.", "Improve leadership and workforce readiness for material risks."],

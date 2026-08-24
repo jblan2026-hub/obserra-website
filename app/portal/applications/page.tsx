@@ -5,10 +5,11 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { marketplaceApps } from "../../apps/appsData";
 import { resolveAppEntitlement } from "../../../lib/app-entitlements";
+import { APPLICATIONS_BRAND_NAME, LEGAL_ENTITY_NAME, PUBLIC_BRAND_NAME } from "../../../lib/legal-identity";
 
 export const metadata: Metadata = {
-  title: "My Applications | Obserra Customer Portal",
-  description: "Launch, download, purchase, license, and manage entitled Obserra applications.",
+  title: `My Applications | ${PUBLIC_BRAND_NAME} Customer Portal`,
+  description: `Launch, download, purchase, license, and manage entitled ${APPLICATIONS_BRAND_NAME}.`,
   robots: { index: false, follow: false },
 };
 
@@ -35,7 +36,7 @@ export default async function CustomerApplicationsPage() {
     <main className="min-h-svh bg-[radial-gradient(circle_at_82%_8%,rgba(36,120,181,.24),transparent_30%),linear-gradient(135deg,#020b15,#06182a_58%,#092a45)] font-sans text-[#eef8ff]">
       <header className="sticky top-0 z-20 flex flex-col gap-4 border-b border-[#7ec7ec33] bg-[#020b15eb] px-[max(5vw,24px)] py-4 backdrop-blur-xl md:flex-row md:items-center md:justify-between">
         <Link href="/portal" className="flex items-center gap-3 text-[11px] font-black tracking-[.14em] text-white no-underline">
-          <Image className="h-auto w-[min(250px,68vw)]" src="/brand/obserra-logo.png" alt="Obserra Executive Protection and Intelligence LLC" width={286} height={55} />
+          <Image className="h-auto w-[min(250px,68vw)]" src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />
           <span className="hidden xl:inline">APPLICATION FULFILLMENT</span>
         </Link>
         <nav className="grid grid-cols-3 gap-2 md:flex md:flex-wrap md:items-center md:gap-4">
