@@ -46,7 +46,7 @@ export default function HomePage() {
             </div>
             <Link href="/ai-marketplace" className="saas-hero__marketplace-link">
               <span>AI SKILLS MARKETPLACE</span>
-              <strong>Explore deployable AI capabilities</strong>
+              <strong>Shop AI Skills Marketplace</strong>
               <b aria-hidden="true">↗</b>
             </Link>
             <div className="saas-hero__proof" aria-label={`${LEGAL_ENTITY_NAME} operating assurances`}>
@@ -57,15 +57,18 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="saas-hero__visual-shell">
-            <div className="saas-hero__visual">
-              <Image
-                src="/brand/visuals/obserra-eios-intelligence-hero.png"
-                alt="Obserra enterprise intelligence operating view"
-                fill
-                priority
-                sizes="(max-width: 1040px) 100vw, 48vw"
-              />
+          <div className="saas-hero__visual-shell" aria-label="Executive intelligence signal model">
+            <div className="saas-hero__constellation" aria-hidden="true">
+              <span className="signal-core"><i>O</i></span>
+              <span className="signal-ring signal-ring--one" />
+              <span className="signal-ring signal-ring--two" />
+              <span className="signal-ring signal-ring--three" />
+              <span className="signal-node signal-node--one" />
+              <span className="signal-node signal-node--two" />
+              <span className="signal-node signal-node--three" />
+              <span className="signal-node signal-node--four" />
+              <span className="signal-axis signal-axis--x" />
+              <span className="signal-axis signal-axis--y" />
             </div>
             <div className="saas-hero__signal" aria-label="Obserra operating model">
               <span><small>01</small><strong>Observe</strong><em>Context and exposure</em></span>
@@ -74,8 +77,8 @@ export default function HomePage() {
               <span><small>04</small><strong>Verify</strong><em>Outcome and evidence</em></span>
             </div>
             <div className="saas-hero__disclosure">
-              <strong>Controlled public view</strong>
-              <span>Enterprise capability visual. No customer data, credentials, or protected production architecture is displayed.</span>
+              <strong>Decision architecture</strong>
+              <span>A conceptual signal model for the Obserra operating philosophy. No customer data, credentials, or protected production architecture is displayed.</span>
             </div>
           </div>
         </section>
@@ -85,7 +88,7 @@ export default function HomePage() {
             <span>ONE COMPANY. MULTIPLE WAYS TO ENGAGE.</span>
             <h2 id="direct-sales-heading">From executive advisory to software to workforce capability.</h2>
             <p>
-              Engage Obserra at the level the mission requires. Advisory, applications, intelligence,
+              Engage {LEGAL_ENTITY_NAME} at the level the mission requires. Advisory, applications, intelligence,
               and learning can stand alone or work together around the same evidence-driven operating philosophy.
             </p>
             <div className="saas-actions">
@@ -126,7 +129,7 @@ export default function HomePage() {
               <h2>One enterprise partner across intelligence, technology, protection, and learning.</h2>
             </div>
             <p>
-              Start with the decision or exposure in front of you. Obserra connects the right mix of executive
+              Start with the decision or exposure in front of you. {LEGAL_ENTITY_NAME} brings together the right mix of executive
               judgment, evidence, technology, and implementation support without forcing every problem into the same solution.
             </p>
           </div>
@@ -191,6 +194,7 @@ export default function HomePage() {
               {ACADEMY_BRAND_NAME} combines professional learning with controlled enrollment, protected access,
               assessment, completion records, and enterprise learning options. The focus is practical capability—helping
               people apply cybersecurity, intelligence, protection, governance, and technology concepts in real operating environments.
+              Regulated programs follow separate eligibility and authorization gates.
             </p>
             <div className="saas-actions">
               <ButtonLink href="/academy">Explore Academy</ButtonLink>
@@ -229,7 +233,7 @@ export default function HomePage() {
         <section className="saas-final">
           <div>
             <p className="saas-eyebrow">WHEN THE DECISION MATTERS</p>
-            <h2>Bring Obserra in before uncertainty becomes consequence.</h2>
+            <h2>Bring {LEGAL_ENTITY_NAME} in before uncertainty becomes consequence.</h2>
             <p>
               Start with the decision, exposure, or transformation you need to solve. We will align the right combination
               of advisory, intelligence, secure technology, applications, or learning around the outcome that matters.
