@@ -113,9 +113,9 @@ test("marketplace is a simple offering directory with direct customer buy action
   assert.doesNotMatch(page, /MarketplaceCommandDeck|MarketplaceSalesDock|MarketplaceCapabilityUniverse|MarketplaceEditorialCatalog/);
   assert.match(styles, /background: #eaf1f2/);
   assert.match(styles, /#ffc342, #f47b20/);
-  assert.match(styles, /animation: marketplace-offering-roll 26s linear infinite/);
+  assert.match(styles, /animation: marketplace-offering-roll 18s linear infinite/);
   assert.match(styles, /@keyframes marketplace-offering-roll/);
-  assert.match(styles, /rail-track:hover \{ animation-play-state: paused/);
+  assert.match(styles, /@media \(hover: hover\) and \(pointer: fine\)/);
   assert.match(page, /aria-haspopup="dialog"/);
   assert.match(page, /role="dialog"/);
   assert.match(page, /Choose what you want to buy/);
