@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 concurrency:
@@ -92,3 +92,33 @@ jobs:
           echo "CRA_TWIN_SAAS_BRANCH_OIDC=authorized" >> "$GITHUB_STEP_SUMMARY"
           echo "CRA_TWIN_SAAS_PR_OIDC=authorized" >> "$GITHUB_STEP_SUMMARY"
           echo "CRA_TWIN_SAAS_MAIN_OIDC=authorized" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Record OIDC authorization evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          generated_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          payload="$(jq -cn \
+            --arg generated_at "${generated_at}" \
+            --arg subscription "${AZURE_SUBSCRIPTION_ID}" \
+            --arg tenant "${AZURE_TENANT_ID}" \
+            --arg client "${AZURE_CLIENT_ID}" \
+            --arg branch_subject "${BRANCH_SUBJECT}" \
+            --arg pr_subject "${PR_SUBJECT}" \
+            --arg main_subject "${MAIN_SUBJECT}" \
+            '{status:"authorized",generated_at:$generated_at,subscription_id:$subscription,tenant_id:$tenant,client_id:$client,branch_subject:$branch_subject,pr_subject:$pr_subject,main_subject:$main_subject}')"
+          encoded="$(printf '%s\n' "${payload}" | base64 -w0)"
+          path='ops/cra-twin-saas-oidc-authorized.json'
+          current_sha="$(gh api "repos/${GITHUB_REPOSITORY}/contents/${path}" --jq .sha 2>/dev/null || true)"
+          if [ -n "${current_sha}" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${path}" \
+              -f message='ops(azure): record CRA Twin OIDC authorization' \
+              -f content="${encoded}" \
+              -f sha="${current_sha}" >/dev/null
+          else
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${path}" \
+              -f message='ops(azure): record CRA Twin OIDC authorization' \
+              -f content="${encoded}" >/dev/null
+          fi
