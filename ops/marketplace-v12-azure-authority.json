@@ -13,7 +13,27 @@
       "name": "id-obserra-runtime-prod",
       "principalId": "11ee06b7-bad6-4e30-a48b-469fec011fe3",
       "tenantId": "7d8b7b64-c80c-4c8a-a514-66f6b1cf8607"
+    },
+    {
+      "clientId": "b8da232a-713f-4c25-a61e-4fb34d13e229",
+      "id": "/subscriptions/38d660ff-611e-4f6c-ad29-70f5cf118f52/resourcegroups/rg-obserra-prod-eastus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-obserra-marketplace-delivery-prod",
+      "name": "id-obserra-marketplace-delivery-prod",
+      "principalId": "311cd078-b637-429a-a523-7e2342e09a2c",
+      "tenantId": "7d8b7b64-c80c-4c8a-a514-66f6b1cf8607"
     }
   ],
-  "storageAccounts": []
+  "storageAccounts": [
+    {
+      "id": "/subscriptions/38d660ff-611e-4f6c-ad29-70f5cf118f52/resourceGroups/rg-obserra-prod-eastus/providers/Microsoft.Storage/storageAccounts/stobserramktv1238d660",
+      "kind": "StorageV2",
+      "location": "eastus",
+      "name": "stobserramktv1238d660",
+      "resourceGroup": "rg-obserra-prod-eastus",
+      "containers": [
+        "marketplace-v12-release",
+        "marketplace-v12-source"
+      ],
+      "containerListAuthorized": true
+    }
+  ]
 }
