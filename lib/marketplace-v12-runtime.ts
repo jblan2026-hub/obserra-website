@@ -51,7 +51,13 @@ export async function marketplaceV12RuntimeCommerce(): Promise<MarketplaceV12Run
 
 export async function marketplaceV12ProductCommerce(product: MarketplaceV12Card): Promise<MarketplaceV12RuntimeCommerce> {
   const subject = marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
-  if (!subject || product.publication_state !== "available") return { operational: false, reason: "catalog_unpublished", checkoutEnabled: false, installEnabled: false };
+  if (!subject) return { operational: false, reason: "catalog_unpublished", checkoutEnabled: false, installEnabled: false };
+
+  // The catalog publication_state is part of the immutable approved v1.2 catalog identity.
+  // Runtime saleability is governed by the verified protected release plus the global
+  // Stripe, ledger, binding, and activation conjunction below. This preserves the
+  // approved catalog revision while still failing closed for any product without
+  // an exact released artifact.
   const release = marketplaceV12Release(product.product_id, marketplaceV12Summary().revision, subject.artifactSha256);
   if (!release) return { operational: false, reason: "release_unavailable", checkoutEnabled: false, installEnabled: false };
   return marketplaceV12RuntimeCommerce();

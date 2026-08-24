@@ -11,15 +11,18 @@ import {
   LEGAL_ENTITY_NAME,
   PUBLIC_BRAND_NAME,
 } from "../lib/legal-identity";
+import { marketplaceV12Summary } from "../lib/marketplace-v12-catalog";
 import "./saas-home.css";
 import "./premium-home.css";
 import "./home-executive-visual.css";
+import "./home-marketplace-promo.css";
 
 export const metadata: Metadata = {
   title: { absolute: `${PUBLIC_BRAND_NAME} | Executive Intelligence & Cybersecurity` },
   description:
-    `${PUBLIC_BRAND_NAME} helps high-consequence organizations connect cybersecurity, protective intelligence, governance, secure technology, and executive decision support.`,
+    `${PUBLIC_BRAND_NAME} provides executive intelligence, cybersecurity, protective intelligence, governed technology, professional learning, and a first-party AI Marketplace with products available to purchase online.`,
   alternates: { canonical: "/" },
+  keywords: ["executive intelligence", "cybersecurity", "protective intelligence", "AI marketplace", "AI skills", "AI agent packs", "enterprise AI"],
 };
 
 const capabilities = [
@@ -69,10 +72,27 @@ const companyValue = [
 ];
 
 export default function HomePage() {
+  const marketplaceSummary = marketplaceV12Summary();
+  const marketplaceProductCount = marketplaceSummary.total_cards
+    - (marketplaceSummary.product_type_counts.collection ?? 0)
+    - (marketplaceSummary.product_type_counts.bundle ?? 0);
+
   return (
     <>
       <EnterpriseHeader section="Executive intelligence" />
       <main className="saas-home enterprise-page-main">
+        <section className="home-marketplace-promo" aria-labelledby="home-marketplace-promo-title">
+          <div className="home-marketplace-promo__copy">
+            <p>AI MARKETPLACE · AVAILABLE TO PURCHASE NOW</p>
+            <h2 id="home-marketplace-promo-title">Put new AI capability to work today.</h2>
+            <span>Shop {marketplaceProductCount.toLocaleString()} Obserra EPI AI skills, agent packs, workflows, connectors, guardrails, assurance products, and industry capabilities. Purchase online, then receive entitlement-gated protected delivery after payment confirmation.</span>
+          </div>
+          <div className="home-marketplace-promo__actions">
+            <Link className="home-marketplace-promo__primary" href="/ai-marketplace">Shop AI Marketplace <b aria-hidden="true">→</b></Link>
+            <Link className="home-marketplace-promo__secondary" href="/ai-marketplace?offering=skills">Browse AI skills</Link>
+          </div>
+        </section>
+
         <section className="saas-hero saas-hero--executive executive-brand-hero">
           <div className="executive-brand-hero__grid">
             <div className="saas-hero__copy saas-hero__copy--executive executive-brand-hero__copy">
