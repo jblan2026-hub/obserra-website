@@ -43,7 +43,9 @@ export default function MarketplaceV12Checkout({ productId, options, checkoutEna
     let timer: ReturnType<typeof setTimeout> | undefined;
     const query = new URLSearchParams(window.location.search);
     const pending = query.get("purchase") === "pending-fulfillment";
-    setPendingPurchase(pending);
+    window.queueMicrotask(() => {
+      if (active) setPendingPurchase(pending);
+    });
 
     const refresh = async () => {
       attempt.current += 1;
