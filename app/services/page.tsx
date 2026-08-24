@@ -5,7 +5,7 @@ import "./services-executive.css";
 import { serviceCatalog } from "./serviceCatalog";
 import ServicePortfolioGrid from "./ServicePortfolioGrid";
 import { LEGAL_ENTITY_NAME, PUBLIC_BRAND_NAME } from "@/lib/legal-identity";
-import { EnterpriseFooter, EnterpriseHeader } from "../components/enterprise/EnterpriseChrome";
+import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 
 export const metadata: Metadata = {
   title: "Enterprise Services | Cybersecurity, Protection & AI Governance",
@@ -84,6 +84,7 @@ export default function ServicesPage() {
           </div>
         </section>
 
+        <EnterpriseProofBand />
         <ServicePortfolioGrid />
 
         <section className="services-consultation">
