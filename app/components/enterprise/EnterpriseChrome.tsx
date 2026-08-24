@@ -15,13 +15,13 @@ import "./legal-identity-lockup.css";
 import "./premium-enterprise-chrome.css";
 
 const primaryNavigation = [
-  [ACADEMY_BRAND_NAME, "/academy", "sales"],
-  ["Services", "/services"],
-  ["Industries", "/industries"],
+  ["Solutions", "/services"],
   [EIOS_BRAND_NAME, "/eios"],
-  ["Trust Center", "/trust"],
+  ["Applications", "/apps"],
+  ["AI Marketplace", "/ai-marketplace", "marketplace"],
+  [ACADEMY_BRAND_NAME, "/academy"],
+  ["Trust", "/trust"],
   ["About", "/about"],
-  ["Speaking", "/speaking"],
 ] as const;
 
 export function EnterpriseHeader({ section = "Enterprise" }: { section?: string }) {
@@ -55,7 +55,7 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
         <Link className="ent-header__brand" href="/" aria-label={`${LEGAL_ENTITY_NAME} home`} onClick={close}>
           <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt={LEGAL_ENTITY_NAME} />
           <span className="ent-header__identity">
-            <span className="ent-header__legal-name">{LEGAL_ENTITY_NAME}</span>
+            <span className="ent-header__legal-name">Obserra EPI</span>
             <small>{section}</small>
           </span>
         </Link>
@@ -67,18 +67,15 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
             <Link
               key={href}
               href={href}
-              className={prominence === "sales" ? "ent-header__sales-link" : undefined}
-              data-navigation={prominence === "sales" ? "academy" : undefined}
+              className={prominence === "marketplace" ? "ent-header__sales-link" : undefined}
+              data-navigation={prominence === "marketplace" ? "marketplace" : undefined}
               onClick={close}
               aria-current={pathname === href || pathname.startsWith(`${href}/`) ? "page" : undefined}
             >
               {label}
             </Link>
           ))}
-          <Link href="/ai-marketplace" className="ent-header__marketplace" style={{ justifyContent: "center", padding: "0 16px", border: "1px solid #eeb756", borderRadius: 10, background: "linear-gradient(135deg,#ffd978,#e5a62e)", color: "#071a2b", boxShadow: "0 9px 26px #0006" }} onClick={close} aria-current={pathname === "/ai-marketplace" || pathname.startsWith("/ai-marketplace/") ? "page" : undefined}>AI Skills Marketplace</Link>
-          <Link href="/florida-security-training" className="ent-header__florida" onClick={close} aria-current={pathname === "/florida-security-training" || pathname.startsWith("/florida-security-training/") ? "page" : undefined}>Florida Class D Training</Link>
-          <Link href="/apps" className="ent-header__applications" onClick={close} aria-current={pathname === "/apps" || pathname.startsWith("/apps/") ? "page" : undefined}>Applications</Link>
-          <Link href="/contact?interest=enterprise-consultation" className="ent-header__cta" onClick={close}>Start a conversation</Link>
+          <Link href="/contact?interest=executive-briefing" className="ent-header__cta" onClick={close}>Book an executive briefing</Link>
         </nav>
       </div>
     </header>
@@ -107,10 +104,10 @@ export function EnterpriseFooter() {
         <Image src="/brand/obserra-logo.png" width={286} height={55} alt={LEGAL_ENTITY_NAME} />
         <strong className="ent-footer__legal-name">{LEGAL_ENTITY_NAME}</strong>
         <p>Executive intelligence, cybersecurity, protective intelligence, secure technology, and professional learning for organizations where the quality of the decision matters.</p>
-        <Link href="/contact?interest=enterprise-consultation">Start an executive conversation <span aria-hidden="true">→</span></Link>
+        <Link href="/contact?interest=executive-briefing">Book an executive briefing <span aria-hidden="true">→</span></Link>
       </div>
-      <nav aria-label="Enterprise capabilities"><strong>Capabilities</strong><Link href="/academy">{ACADEMY_BRAND_NAME}</Link><Link href="/services">Enterprise services</Link><Link href="/protection-intelligence">Protection and intelligence</Link><Link href="/eios">{EIOS_BRAND_NAME}</Link></nav>
-      <nav aria-label="Enterprise company links"><strong>Company</strong><Link href="/about">Leadership and credentials</Link><Link href="/speaking">Speaking and briefings</Link><Link href="/industries">Industries</Link><Link href="/resources">Resources</Link></nav>
+      <nav aria-label="Enterprise capabilities"><strong>Capabilities</strong><Link href="/services">Enterprise solutions</Link><Link href="/protection-intelligence">Protection and intelligence</Link><Link href="/eios">{EIOS_BRAND_NAME}</Link><Link href="/apps">Applications</Link><Link href="/ai-marketplace">AI Marketplace</Link></nav>
+      <nav aria-label="Enterprise learning and company links"><strong>Learning & company</strong><Link href="/academy">{ACADEMY_BRAND_NAME}</Link><Link href="/florida-security-training">Florida Class D Training</Link><Link href="/industries">Industries</Link><Link href="/speaking">Speaking and briefings</Link><Link href="/resources">Resources</Link><Link href="/about">Leadership and credentials</Link></nav>
       <nav aria-label="Enterprise assurance links"><strong>Assurance</strong><Link href="/trust">Trust Center</Link><Link href="/trust/privacy-policy">Privacy</Link><Link href="/trust/security-and-responsible-disclosure">Security</Link><Link href="/trust/accessibility-statement">Accessibility</Link></nav>
       <div className="ent-footer__legal"><span>© {new Date().getFullYear()} {LEGAL_ENTITY_NAME}. All rights reserved.</span><span>{EIOS_BRAND_NAME} and {ACADEMY_BRAND_NAME} materials are proprietary products of {LEGAL_ENTITY_NAME}.</span></div>
     </footer>
