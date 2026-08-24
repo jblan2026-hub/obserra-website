@@ -1,12 +1,12 @@
 {
   "contract": "obserra-marketplace-v12-protected-delivery-observation-v1",
-  "runId": 32671496094,
-  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32671496094",
-  "targetSha": "7db2cf78d65c63d35e7db2d848317bb004746c94",
+  "runId": 32693823700,
+  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32693823700",
+  "targetSha": "e59c82f67ec3609717e7314d2612fab9c43ca495",
   "catalogRevision": "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2",
   "status": "completed",
   "conclusion": "failure",
-  "failureStep": "Preflight protected-delivery Key Vault prerequisites",
+  "failureStep": "Pin the governed release identity",
   "blocker": null,
-  "observedAt": "2026-08-23T22:44:34.703387Z"
+  "observedAt": "2026-08-24T05:31:26.297943Z"
 }
