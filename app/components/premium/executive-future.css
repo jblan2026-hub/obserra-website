@@ -1,0 +1,62 @@
+/* Light executive system for every route inside PremiumSiteScope.
+ * /ai-marketplace receives marketplace-design-scope and is intentionally excluded.
+ */
+.premium-site-scope {
+  --corp-navy:#06213c;
+  --corp-ink:#183449;
+  --corp-muted:#5d7382;
+  --corp-steel:#5f7c8f;
+  --corp-line:rgba(6,33,60,.12);
+  --corp-surface:#fff;
+  --corp-soft:#f3f6f8;
+  --corp-alt:#e9f0f4;
+  min-height:100dvh;
+  background:radial-gradient(circle at 8% 4%,rgba(86,124,146,.08),transparent 27rem),linear-gradient(180deg,#fbfcfd,#f3f6f8 48%,#edf2f5);
+  color:var(--corp-ink);
+  font-family:Aptos,"Avenir Next","Segoe UI",sans-serif;
+}
+.premium-site-scope :is(h1,h2,h3){color:var(--corp-navy)!important;font-family:Georgia,"Times New Roman",serif;font-weight:600;letter-spacing:-.035em!important;text-wrap:balance}
+.premium-site-scope :is(p,li,a,button,input,select,textarea,label,small){font-family:Aptos,"Avenir Next","Segoe UI",sans-serif}
+.premium-site-scope :is(.saas-eyebrow,.apps-eyebrow,.eios-eyebrow,.about-kicker,.speaker-kicker,.kicker,.eyebrow,.service-detail-panel-kicker,.commerce-eyebrow){color:var(--corp-steel)!important;font-size:.68rem!important;font-weight:800!important;letter-spacing:.11em!important;text-transform:uppercase}
+
+/* Shared executive hero. */
+.premium-site-scope :is(.saas-hero--executive,.apps-hero,.service-detail-hero,.trust-hero,.industries-hero,.resources-hero,.contact-hero,.portal-hero,.florida-hero,.eios-hero){position:relative;isolation:isolate;overflow:hidden;min-height:0!important;color:var(--corp-ink)!important;background:radial-gradient(circle at 84% 16%,rgba(100,139,162,.15),transparent 23rem),linear-gradient(145deg,#fff 0%,#f5f8fa 62%,#e9eff3 100%)!important;border-bottom:1px solid var(--corp-line)!important}
+.premium-site-scope :is(.saas-hero--executive,.apps-hero,.service-detail-hero,.trust-hero,.industries-hero,.resources-hero,.contact-hero,.portal-hero,.florida-hero,.eios-hero)::before{content:"";position:absolute;left:max(5vw,24px);top:0;width:72px;height:4px;background:var(--corp-navy)!important;opacity:1!important}
+.premium-site-scope :is(.saas-hero--executive,.apps-hero,.service-detail-hero,.trust-hero,.industries-hero,.resources-hero,.contact-hero,.portal-hero,.florida-hero,.eios-hero)::after{content:"";position:absolute;right:-8vw;bottom:-42%;z-index:-1;width:min(44vw,620px);aspect-ratio:1;border-radius:46% 54% 62% 38%;background:rgba(82,119,141,.07);transform:rotate(-9deg);pointer-events:none}
+.premium-site-scope :is(.saas-hero__copy--executive h1,.apps-hero h1,.service-detail-hero h1,.trust-hero h1,.industries-hero h1,.resources-hero h1,.contact-hero h1,.florida-hero h1,.eios-hero h1){max-width:940px;color:var(--corp-navy)!important;font-size:clamp(2.7rem,5vw,5.3rem)!important;line-height:.97!important;text-shadow:none!important}
+.premium-site-scope :is(.saas-hero__lede,.apps-hero>div>p:not(.apps-eyebrow),.service-detail-hero p,.trust-hero p,.industries-hero p,.resources-hero p,.contact-hero p,.florida-hero p,.eios-lede){max-width:760px;color:#526b7b!important;font-size:clamp(1rem,1.25vw,1.13rem)!important;line-height:1.62!important}
+.premium-site-scope :is(.apps-button,.eios-button,.contact-button,.about-button,.speaker-button){border:1px solid var(--corp-navy)!important;border-radius:6px!important;background:var(--corp-navy)!important;color:#fff!important;box-shadow:none!important}
+.premium-site-scope :is(.apps-outline,.eios-outline-button,.contact-outline,.about-outline,.speaker-outline){border:1px solid rgba(6,33,60,.2)!important;border-radius:6px!important;background:#fff!important;color:var(--corp-navy)!important}
+
+/* Corporate cards. */
+.premium-site-scope :is(.apps-grid article,.services-engagement-grid article,.services-industry-grid article,.services-case-grid article,.service-detail-panel,.service-detail-cards article,.trust-card,.resource-card,.industry-card,.contact-card,.portal-card,.admin-card,.outcome-grid article,.capability-card,.course-card,.academy-feature-card){border:1px solid var(--corp-line)!important;border-radius:10px!important;background:rgba(255,255,255,.97)!important;color:var(--corp-ink)!important;box-shadow:0 12px 32px rgba(6,33,60,.06)!important}
+.premium-site-scope :is(.apps-grid article,.services-engagement-grid article,.services-industry-grid article,.services-case-grid article,.service-detail-cards article,.trust-card,.resource-card,.industry-card,.contact-card,.capability-card,.course-card):hover{transform:translateY(-2px)!important;border-color:rgba(6,33,60,.22)!important;box-shadow:0 18px 38px rgba(6,33,60,.09)!important}
+.premium-site-scope :is(.apps-grid article p,.apps-grid article li,.service-detail-panel p,.service-detail-cards article p,.course-card p){color:#607686!important}
+
+/* Shorter section rhythm across public pages. */
+.premium-site-scope :is(.services-engagements,.services-industries,.services-case-study,.services-consultation,.service-detail-proof,.service-detail-split,.service-detail-steps,.service-detail-industries,.service-detail-cta,.trust-section,.resources-section,.industries-section,.contact-section,.catalog,.certificate,.academy-buyer-paths){padding-top:clamp(32px,4vw,50px)!important;padding-bottom:clamp(32px,4vw,50px)!important;border-top:1px solid rgba(6,33,60,.07)}
+.premium-site-scope :is(.services-industries,.services-consultation,.service-detail-cta,.academy-buyer-paths){background:var(--corp-alt)!important}
+.premium-site-scope :is(.services-section-heading,.section-intro,.trust-section-intro,.resources-section-intro){max-width:850px;margin-bottom:22px!important}
+.premium-site-scope :is(.services-section-heading h2,.section-intro h2,.trust-section-intro h2,.resources-section-intro h2){max-width:780px;font-size:clamp(2rem,3.6vw,3.7rem)!important;line-height:1!important}
+@media(min-width:980px){.premium-site-scope :is(.services-page,.apps-page) .apps-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))!important;gap:12px!important}.premium-site-scope :is(.services-page,.apps-page) .apps-grid>*{grid-column:auto!important}}
+
+/* Proof bands become calm corporate summaries. */
+.premium-site-scope :is(.ent-proof,.services-command-bar,.eios-proof,.saas-assurance,.purchase-journey){background:#edf2f5!important;color:var(--corp-ink)!important;border-color:var(--corp-line)!important}
+.premium-site-scope :is(.ent-proof strong,.ent-proof small,.eios-proof strong,.eios-proof span,.eios-proof p,.purchase-journey h2,.purchase-journey p){color:var(--corp-ink)!important}
+
+/* EIOS: enterprise product, not neon tech showroom. */
+.premium-site-scope .eios-orbit{display:none!important}.premium-site-scope .eios-hero h1 em{color:#496b80!important;font-style:normal!important}.premium-site-scope .product-frame{border:1px solid var(--corp-line)!important;border-radius:10px!important;background:#fff!important;box-shadow:0 20px 50px rgba(6,33,60,.11)!important;transform:none!important}.premium-site-scope :is(.eios-outcomes,.eios-capabilities,.eios-showcase,.eios-boundary){background:transparent!important}.premium-site-scope .eios-connect{background:var(--corp-alt)!important;border-top:1px solid var(--corp-line)!important}
+
+/* Academy. */
+.premium-site-scope .masthead+ .hero{position:relative;overflow:hidden;color:var(--corp-ink)!important;background:radial-gradient(circle at 82% 16%,rgba(103,140,162,.14),transparent 22rem),linear-gradient(145deg,#fff,#eef3f6)!important;border-bottom:1px solid var(--corp-line)!important;padding-top:clamp(42px,5vw,64px)!important;padding-bottom:clamp(32px,4vw,46px)!important}
+.premium-site-scope .masthead+ .hero h1{max-width:920px;color:var(--corp-navy)!important;font-family:Georgia,"Times New Roman",serif!important;font-size:clamp(2.7rem,5vw,5rem)!important;line-height:.98!important}.premium-site-scope .masthead+ .hero>p:not(.kicker){max-width:760px;color:#587080!important}.premium-site-scope .masthead+ .hero .certificate-promise{border:1px solid var(--corp-line)!important;background:#fff!important;color:var(--corp-ink)!important;box-shadow:none!important}.premium-site-scope .academy-spotlight,.premium-site-scope .catalog,.premium-site-scope .certificate,.premium-site-scope .academy-purchase-assurance{background:transparent!important}.premium-site-scope .course-grid{gap:12px!important}.premium-site-scope .course-card{padding:18px!important}.premium-site-scope .academy-checkout-button{border:0!important;background:linear-gradient(135deg,#d9ad57,#efca82)!important;color:#071a2b!important;box-shadow:0 9px 22px rgba(181,133,51,.2)!important}
+
+/* Homepage: one executive screen plus two concise bands. */
+.premium-site-scope .saas-hero--executive{padding:0!important}.premium-site-scope .saas-hero__copy--executive{width:min(1180px,90vw);margin:0 auto;padding:clamp(52px,6vw,76px) 0 clamp(38px,4.5vw,54px)!important}.premium-site-scope .saas-hero__copy--executive h1{max-width:820px}.premium-site-scope .saas-priority-strip{width:min(1180px,90vw);margin:24px auto!important;gap:10px!important}.premium-site-scope .saas-priority-card{min-height:0!important;padding:18px!important;border:1px solid var(--corp-line)!important;border-radius:10px!important;background:#fff!important;box-shadow:0 10px 28px rgba(6,33,60,.05)!important}.premium-site-scope .saas-value-bar{width:min(1180px,90vw);margin:0 auto 34px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;border:1px solid var(--corp-line)!important;border-radius:10px!important;overflow:hidden;background:#fff!important}.premium-site-scope .saas-value-bar>div{min-height:118px;padding:20px!important;border-right:1px solid var(--corp-line)!important;background:#fff!important}.premium-site-scope .saas-value-bar>div:nth-child(4){border-right:0!important}.premium-site-scope .saas-value-bar strong,.premium-site-scope .saas-value-bar span{display:block}.premium-site-scope .saas-value-bar strong{color:var(--corp-navy)!important;font-family:Georgia,"Times New Roman",serif;font-size:1.2rem;font-weight:600}.premium-site-scope .saas-value-bar span{margin-top:8px;color:#627887!important;font-size:.82rem;line-height:1.48}.premium-site-scope .saas-value-bar__cta{grid-column:1/-1;min-height:0!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:14px 20px!important;align-items:center;padding:20px!important;border-top:1px solid var(--corp-line)!important;border-right:0!important;background:var(--corp-alt)!important}.premium-site-scope .saas-value-bar__cta p{margin:0;color:var(--corp-navy)!important;font-weight:700}.premium-site-scope .saas-value-bar__actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.premium-site-scope .saas-value-bar__cta small{grid-column:1/-1;color:#667b89}
+
+/* Forms, tables, utility surfaces. */
+.premium-site-scope :is(input,select,textarea){border:1px solid rgba(6,33,60,.17)!important;border-radius:6px!important;background:#fff!important;color:var(--corp-ink)!important;box-shadow:none!important}.premium-site-scope table{border:1px solid var(--corp-line)!important;border-radius:8px!important;background:#fff!important;box-shadow:none!important}
+
+@media(max-width:980px){.premium-site-scope .saas-value-bar{grid-template-columns:repeat(2,1fr)!important}.premium-site-scope .saas-value-bar>div:nth-child(2),.premium-site-scope .saas-value-bar>div:nth-child(4){border-right:0!important}.premium-site-scope .saas-value-bar__cta{grid-template-columns:1fr!important}.premium-site-scope .saas-value-bar__actions{justify-content:flex-start}}
+@media(max-width:700px){.premium-site-scope :is(.saas-hero__copy--executive h1,.apps-hero h1,.service-detail-hero h1,.trust-hero h1,.industries-hero h1,.resources-hero h1,.contact-hero h1,.florida-hero h1,.eios-hero h1){font-size:clamp(2.5rem,12vw,4.2rem)!important}.premium-site-scope .saas-value-bar{width:92vw;grid-template-columns:1fr!important}.premium-site-scope .saas-value-bar>div{min-height:0;border-right:0!important;border-bottom:1px solid var(--corp-line)!important}.premium-site-scope .saas-value-bar__cta{grid-column:auto}.premium-site-scope .saas-value-bar__actions{display:grid;width:100%}}
+@media(prefers-reduced-motion:reduce){.premium-site-scope *{scroll-behavior:auto!important}.premium-site-scope :is(.apps-grid article,.services-engagement-grid article,.services-industry-grid article,.services-case-grid article,.service-detail-cards article,.trust-card,.resource-card,.industry-card,.contact-card,.capability-card,.course-card):hover{transform:none!important}}
