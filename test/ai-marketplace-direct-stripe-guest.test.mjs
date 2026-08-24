@@ -36,6 +36,9 @@ test("guest purchase download requires verified Stripe payment and durable entit
   assert.match(download, /marketplaceV12DeliveryEntitlement/);
   assert.match(download, /recordMarketplaceV12Download/);
   assert.match(download, /marketplaceV12SignedAzureReleaseUrl/);
+  assert.match(download, /http-equiv="refresh" content="2"/);
+  assert.match(download, /retries automatically while your entitlement is finalized/);
+  assert.match(download, /"retry-after": "2"/);
   assert.doesNotMatch(download, /auth\(\)/);
 
   assert.match(token, /createHmac/);
