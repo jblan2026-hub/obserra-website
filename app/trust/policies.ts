@@ -1,4 +1,4 @@
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 export type TrustPolicy = {
   slug: string;
@@ -97,7 +97,7 @@ export const trustPolicies: TrustPolicy[] = [
   {
     slug: "academy-terms",
     title: "Academy Terms",
-    description: "Commercial terms for Obserra Academy purchases and learner access.",
+    description: `Commercial terms for ${ACADEMY_BRAND_NAME} purchases and learner access.`,
     summary: "Academy courses are paid digital products with proprietary content and controlled learner access.",
     sections: [
       { heading: "Enrollment", points: ["Access is granted after successful payment verification.", "Learner access may be restricted to the purchased course and authorized account context."] },
