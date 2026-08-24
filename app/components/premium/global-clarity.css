@@ -72,3 +72,191 @@
   .premium-site-scope p{font-size:1rem}
   .premium-site-scope .fl-classd .fl-classd__hero{background:#fff!important}
 }
+
+/* --------------------------------------------------------------------------
+   HARD ROUTE-SPECIFIC CLARITY FIX
+   #main-content adds enough specificity to beat route-level !important rules
+   even when those route styles are emitted later by Next.js. This section
+   intentionally changes only typography, colors, borders, shadows and imagery.
+   It does NOT change overflow, display, flex-basis, scroll-snap or rail sizing.
+   -------------------------------------------------------------------------- */
+
+#main-content .premium-site-scope :is(h1,h2,h3,h4,h5,h6,strong,b,p,li,dt,dd,label,span,small,a,button,input,select,textarea){
+  font-family:"Aptos","Avenir Next","Segoe UI",system-ui,-apple-system,sans-serif!important;
+  text-shadow:none!important;
+}
+
+/* Florida Class D */
+#main-content .premium-site-scope .fl-classd.fl-classd{
+  background:linear-gradient(180deg,#fbfaf5 0%,#edf2f3 100%)!important;
+  color:#17344a!important;
+}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__hero{
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.995) 0%,rgba(255,255,255,.985) 56%,rgba(255,255,255,.78) 72%,rgba(255,255,255,.20) 100%),
+    url('/brand/visuals/obserra-academy.png') right center/50% cover no-repeat!important;
+  border-color:rgba(6,33,60,.16)!important;
+  box-shadow:0 22px 54px rgba(6,33,60,.11)!important;
+}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__hero :is(h1,h2,h3,strong,b){color:#06213c!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__hero :is(p,span,small){color:#36566b!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__hero h1{font-weight:800!important;letter-spacing:-.045em!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__lead{color:#36566b!important;font-size:1.08rem!important;font-weight:500!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__eyebrow{color:#315f7c!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__status{background:#fff!important;color:#06213c!important;border-color:rgba(6,33,60,.20)!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__notice{background:#fff9ec!important;border-color:rgba(184,132,34,.30)!important;box-shadow:inset 4px 0 0 #d7aa51!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__notice :is(strong,p,span){color:#5a4319!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__metrics article{background:linear-gradient(145deg,#0d3a5e,#082a47)!important;border-color:rgba(255,255,255,.10)!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__metrics article :is(strong,p,span,small){color:#f7fbfd!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__section :is(h2,h3,strong,b){color:#06213c!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__section :is(p,span,small){color:#405f73!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__days article{background:#fff!important;border-color:rgba(6,33,60,.14)!important;box-shadow:0 12px 28px rgba(6,33,60,.07)!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__days header{background:#eaf0f2!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__days :is(h3,strong,b,p,span,small,em){color:#17344a!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__automation-grid>div{background:linear-gradient(145deg,#0d3a5e,#082a47)!important}
+#main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__automation-grid>div :is(h3,strong,b,p,span,small){color:#f7fbfd!important}
+
+/* Applications */
+#main-content .premium-site-scope .applications-catalog-page{
+  background:linear-gradient(180deg,#f7f8f7 0%,#ebf0f1 100%)!important;
+  color:#17344a!important;
+}
+#main-content .premium-site-scope .applications-catalog-page .apps-hero{
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.995) 0%,rgba(255,255,255,.98) 55%,rgba(255,255,255,.72) 70%,rgba(255,255,255,.12) 100%),
+    url('/brand/visuals/obserra-eios-intelligence-hero.png') right center/54% cover no-repeat!important;
+}
+#main-content .premium-site-scope .applications-catalog-page .apps-hero :is(h1,h2,h3,strong){color:#06213c!important}
+#main-content .premium-site-scope .applications-catalog-page .apps-hero :is(p,span,small){color:#3c5b6f!important}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-buyer-paths,.apps-spotlight,.apps-deployment)>.apps-spotlight-heading,
+#main-content .premium-site-scope .applications-catalog-page .apps-deployment>.apps-deployment-heading{
+  background:#ffffff!important;
+  color:#17344a!important;
+  border-color:rgba(6,33,60,.14)!important;
+  box-shadow:0 12px 30px rgba(6,33,60,.07)!important;
+}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-buyer-paths,.apps-spotlight,.apps-deployment)>.apps-spotlight-heading :is(h2,h3,strong),
+#main-content .premium-site-scope .applications-catalog-page .apps-deployment>.apps-deployment-heading :is(h2,h3,strong){color:#06213c!important}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-buyer-paths,.apps-spotlight,.apps-deployment)>.apps-spotlight-heading :is(p,span,small),
+#main-content .premium-site-scope .applications-catalog-page .apps-deployment>.apps-deployment-heading :is(p,span,small){color:#486577!important}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article){
+  background-color:#0a3152!important;
+  border-color:rgba(255,255,255,.12)!important;
+  box-shadow:0 16px 36px rgba(6,33,60,.14)!important;
+}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) :is(h1,h2,h3,h4,strong,b){color:#ffffff!important}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) :is(p,li,span,small){color:#dce9f0!important;opacity:1!important}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) a,
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-buyer-card,.apps-spotlight-card,.apps-grid article) footer strong{color:#f2c66d!important}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-spotlight-card,.apps-grid article){background-position:center top!important;background-repeat:no-repeat!important}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-filter-wrap,.apps-assurance article,.apps-deployment-grid>article){background:#ffffff!important;color:#17344a!important}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-filter-wrap,.apps-assurance article,.apps-deployment-grid>article) :is(h2,h3,strong,b){color:#06213c!important}
+#main-content .premium-site-scope .applications-catalog-page :is(.apps-filter-wrap,.apps-assurance article,.apps-deployment-grid>article) :is(p,li,span,small,label){color:#486577!important}
+#main-content .premium-site-scope .applications-catalog-page :is(input,select,button){color:#17344a!important}
+
+/* Trust Center */
+#main-content .premium-site-scope .trust-page.trust-page{
+  background:linear-gradient(180deg,#f8f9f8 0%,#edf2f3 100%)!important;
+  color:#17344a!important;
+}
+#main-content .premium-site-scope .trust-page.trust-page .trust-hero{
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.995) 0%,rgba(255,255,255,.98) 58%,rgba(255,255,255,.70) 73%,rgba(255,255,255,.18) 100%),
+    url('/brand/visuals/obserra-cybersecurity.png') right center/46% cover no-repeat!important;
+  border-color:rgba(6,33,60,.14)!important;
+  box-shadow:0 18px 42px rgba(6,33,60,.08)!important;
+}
+#main-content .premium-site-scope .trust-page.trust-page .trust-hero :is(h1,h2,h3,strong){color:#06213c!important}
+#main-content .premium-site-scope .trust-page.trust-page .trust-hero :is(p,span,small){color:#405f73!important}
+#main-content .premium-site-scope .trust-page.trust-page .trust-status-panel{background:#082d4b!important;border-color:rgba(255,255,255,.12)!important}
+#main-content .premium-site-scope .trust-page.trust-page .trust-status-panel :is(h2,h3,strong,dt,dd,p,span,small){color:#f7fbfd!important}
+#main-content .premium-site-scope .trust-page.trust-page :is(.services-executive-heading,.trust-policy-shortcuts,.trust-contact){background:#fff!important;color:#17344a!important}
+#main-content .premium-site-scope .trust-page.trust-page :is(.services-executive-heading,.trust-policy-shortcuts,.trust-contact) :is(h2,h3,strong){color:#06213c!important}
+#main-content .premium-site-scope .trust-page.trust-page :is(.services-executive-heading,.trust-policy-shortcuts,.trust-contact) :is(p,span,small,a){color:#405f73!important}
+
+/* EIOS */
+#main-content .premium-site-scope .eios-page.eios-page{background:linear-gradient(180deg,#f7f9f9 0%,#eaf0f2 100%)!important;color:#17344a!important}
+#main-content .premium-site-scope .eios-page.eios-page .eios-nav{background:#06213c!important;border-color:rgba(255,255,255,.10)!important}
+#main-content .premium-site-scope .eios-page.eios-page .eios-nav :is(a,span,b){color:#f7fbfd!important}
+#main-content .premium-site-scope .eios-page.eios-page .eios-hero{background:#ffffff!important;border-color:rgba(6,33,60,.12)!important;box-shadow:0 18px 44px rgba(6,33,60,.08)!important}
+#main-content .premium-site-scope .eios-page.eios-page .eios-hero :is(h1,h2,h3,strong,b){color:#06213c!important}
+#main-content .premium-site-scope .eios-page.eios-page .eios-hero :is(p,span,small){color:#405f73!important}
+#main-content .premium-site-scope .eios-page.eios-page .eios-hero em{color:#a97820!important}
+#main-content .premium-site-scope .eios-page.eios-page .eios-proof{background:#fff!important;border-color:rgba(6,33,60,.12)!important}
+#main-content .premium-site-scope .eios-page.eios-page .eios-proof :is(strong,p,span,small){color:#17344a!important}
+#main-content .premium-site-scope .eios-page.eios-page :is(.eios-capabilities,.eios-showcase){background:transparent!important;color:#17344a!important}
+#main-content .premium-site-scope .eios-page.eios-page :is(.eios-capabilities,.eios-showcase) .section-intro :is(h2,h3,strong){color:#06213c!important}
+#main-content .premium-site-scope .eios-page.eios-page :is(.eios-capabilities,.eios-showcase) .section-intro :is(p,span,small){color:#405f73!important}
+#main-content .premium-site-scope .eios-page.eios-page .view-selector button{background:#fff!important;color:#17344a!important;border-color:rgba(6,33,60,.14)!important}
+#main-content .premium-site-scope .eios-page.eios-page .view-selector button :is(strong,small,span){color:#17344a!important}
+#main-content .premium-site-scope .eios-page.eios-page .view-selector button.active{background:#0a3152!important;color:#fff!important}
+#main-content .premium-site-scope .eios-page.eios-page .view-selector button.active :is(strong,small,span){color:#fff!important}
+#main-content .premium-site-scope .eios-page.eios-page .product-frame{background:#fff!important;border-color:rgba(6,33,60,.14)!important;box-shadow:0 16px 38px rgba(6,33,60,.10)!important}
+#main-content .premium-site-scope .eios-page.eios-page .product-frame figcaption :is(strong,p,span){color:#17344a!important}
+#main-content .premium-site-scope .eios-page.eios-page .eios-connect{background:#06213c!important}
+#main-content .premium-site-scope .eios-page.eios-page .eios-connect :is(h2,h3,strong,p,span,small,a){color:#f7fbfd!important}
+
+/* Academy */
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page{background:linear-gradient(180deg,#f8f9f7 0%,#edf2f3 100%)!important;color:#17344a!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .masthead{background:#06213c!important;border-color:rgba(255,255,255,.10)!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .masthead :is(a,span,strong){color:#f7fbfd!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .hero{
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.995) 0%,rgba(255,255,255,.98) 58%,rgba(255,255,255,.72) 74%,rgba(255,255,255,.16) 100%),
+    url('/brand/visuals/obserra-academy.png') right center/47% cover no-repeat!important;
+  color:#17344a!important;
+}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .hero :is(h1,h2,h3,strong,b){color:#06213c!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .hero :is(p,span,small){color:#405f73!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .certificate-promise{background:#fff8e8!important;border-color:rgba(191,142,47,.26)!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .certificate-promise :is(strong,p,span){color:#5a4319!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .academy-executive-feature{background:#fff!important;color:#17344a!important;border-color:rgba(6,33,60,.14)!important;box-shadow:0 16px 38px rgba(6,33,60,.08)!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .academy-executive-feature :is(h2,h3,strong,b){color:#06213c!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .academy-executive-feature :is(p,span,small){color:#405f73!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .course-card{background:linear-gradient(180deg,#0d3a5e,#082a47)!important;border-color:rgba(255,255,255,.10)!important;box-shadow:0 16px 34px rgba(6,33,60,.13)!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .course-card :is(h2,h3,strong,b){color:#fff!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page .course-card :is(p,span,small,em){color:#dce9f0!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page :is(.academy-commerce-controls,.academy-executive-close,.academy-executive-certificate){background:#fff!important;color:#17344a!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page :is(.academy-commerce-controls,.academy-executive-close,.academy-executive-certificate) :is(h2,h3,strong,b){color:#06213c!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page :is(.academy-commerce-controls,.academy-executive-close,.academy-executive-certificate) :is(p,span,small,label){color:#405f73!important}
+#main-content .premium-site-scope .academy-executive-page.academy-executive-page :is(input,select){background:#fff!important;color:#17344a!important;border-color:rgba(6,33,60,.20)!important}
+
+/* Contact / Start a Conversation */
+#main-content .premium-site-scope .contact-page.contact-page{background:linear-gradient(180deg,#f8f9f8 0%,#edf2f3 100%)!important;color:#17344a!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-hero{
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.995) 0%,rgba(255,255,255,.985) 58%,rgba(255,255,255,.74) 74%,rgba(255,255,255,.16) 100%),
+    url('/brand/visuals/obserra-core.png') right center/46% cover no-repeat!important;
+  border-color:rgba(6,33,60,.14)!important;
+  box-shadow:0 18px 42px rgba(6,33,60,.08)!important;
+}
+#main-content .premium-site-scope .contact-page.contact-page .contact-hero :is(h1,h2,h3,strong,b){color:#06213c!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-hero :is(p,span,small){color:#405f73!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-experience-intro :is(h2,h3,strong){color:#06213c!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-experience-intro :is(p,span,small){color:#405f73!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-card{background:#fff!important;color:#17344a!important;border-color:rgba(6,33,60,.14)!important;box-shadow:0 14px 32px rgba(6,33,60,.07)!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-card :is(h2,h3,strong,b){color:#06213c!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-card :is(p,span,small,label,legend){color:#405f73!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-form-grid :is(input,select,textarea){background:#fff!important;color:#17344a!important;border-color:rgba(6,33,60,.22)!important}
+#main-content .premium-site-scope .contact-page.contact-page .secure-note{background:#fff8e8!important;color:#5a4319!important;border-color:rgba(191,142,47,.28)!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-grid article{background-color:#0a3152!important;border-color:rgba(255,255,255,.10)!important;box-shadow:0 16px 36px rgba(6,33,60,.14)!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-grid article :is(h2,h3,strong,b){color:#fff!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-grid article :is(p,span,small){color:#dce9f0!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-grid article a{color:#f2c66d!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-confidence{background:#fff!important;color:#17344a!important;border-color:rgba(6,33,60,.14)!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-confidence :is(h2,h3,strong,b){color:#06213c!important}
+#main-content .premium-site-scope .contact-page.contact-page .contact-confidence :is(p,li,span,small,a){color:#405f73!important}
+
+/* Branded image exposure / crop. Official logo is explicitly excluded. */
+#main-content .premium-site-scope :is(.trust-page,.eios-page,.academy-executive-page,.contact-page,.applications-catalog-page) img:not([src*="obserra-logo"]){
+  filter:brightness(1.14) contrast(1.02) saturate(1.02)!important;
+  object-position:center!important;
+}
+
+@media(max-width:820px){
+  #main-content .premium-site-scope .fl-classd.fl-classd .fl-classd__hero,
+  #main-content .premium-site-scope .applications-catalog-page .apps-hero,
+  #main-content .premium-site-scope .academy-executive-page.academy-executive-page .hero,
+  #main-content .premium-site-scope .contact-page.contact-page .contact-hero,
+  #main-content .premium-site-scope .trust-page.trust-page .trust-hero{background:#fff!important}
+}
