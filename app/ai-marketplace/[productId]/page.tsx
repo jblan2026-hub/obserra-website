@@ -51,18 +51,39 @@ function price(product: NonNullable<ReturnType<typeof findAiMarketplaceProduct>>
   return "$" + product.monthly_usd + "/month · $" + product.annual_usd + "/year";
 }
 
+function purchaseOptionName(option: MarketplacePublicCheckoutOption["option"]) {
+  if (option === "recurring:month") return "Monthly subscription";
+  if (option === "recurring:year") return "Annual subscription";
+  return "One-time purchase";
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const productId = (await params).productId;
   const catalogProduct = marketplaceV12Product(productId);
   if (catalogProduct) {
     const description = buyerText(catalogProduct.description, `${catalogProduct.name} is a practical capability designed to help move work from a clear starting point to a usable outcome.`);
+    const canonicalPath = marketplaceV12PublicPath(catalogProduct);
+    const canonicalUrl = `https://www.obserrallc.com${canonicalPath}`;
     return {
-    title: catalogProduct.name + " | Obserra EPI AI Marketplace",
-    description,
-    alternates: { canonical: marketplaceV12PublicPath(catalogProduct) },
-    robots: { index: true, follow: true },
-    openGraph: { title: catalogProduct.name, description, url: marketplaceV12PublicPath(catalogProduct), type: "website" },
-  };
+      title: { absolute: catalogProduct.name + " | Obserra EPI AI Marketplace" },
+      description,
+      keywords: [catalogProduct.name, catalogProduct.family, catalogProduct.category, catalogProduct.proficiency, "AI marketplace", "Obserra EPI AI Marketplace"].filter((entry): entry is string => Boolean(entry)),
+      alternates: { canonical: canonicalUrl },
+      robots: { index: true, follow: true },
+      openGraph: {
+        title: catalogProduct.name + " | Obserra EPI AI Marketplace",
+        description,
+        url: canonicalUrl,
+        type: "website",
+        images: [{ url: "/marketplace/ai-marketplace-robot-hero.webp", alt: catalogProduct.name }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: catalogProduct.name + " | Obserra EPI AI Marketplace",
+        description,
+        images: ["/marketplace/ai-marketplace-robot-hero.webp"],
+      },
+    };
   }
   const product = findAiMarketplaceProduct(productId);
   return product ? { title: productTitle(product.product_name) + " | Obserra EPI AI Marketplace", description: buyerText(product.mission, `${productTitle(product.product_name)} is a practical AI capability for real-world work.`), alternates: { canonical: "/ai-marketplace/" + product.product_id } } : {};
@@ -88,6 +109,15 @@ export default async function MarketplaceProductPage({ params }: PageProps) {
       ...(detail.collection ? [{ "@type": "ListItem", position: 2, name: detail.collection.name, item: "https://www.obserrallc.com/ai-marketplace/collections/" + detail.collection.slug }] : []),
       { "@type": "ListItem", position: detail.collection ? 3 : 2, name: detail.name, item: canonicalUrl },
     ];
+    const structuredOffers = commerce.checkoutEnabled ? purchaseOptions.map((option) => ({
+      "@type": "Offer",
+      name: purchaseOptionName(option.option),
+      url: canonicalUrl + "#purchase-options",
+      priceCurrency: "USD",
+      price: (option.amountMinor / 100).toFixed(2),
+      availability: "https://schema.org/InStock",
+      seller: { "@id": "https://www.obserrallc.com/#organization" },
+    })) : [];
     const structuredData = [
       {
         "@context": "https://schema.org",
@@ -96,10 +126,11 @@ export default async function MarketplaceProductPage({ params }: PageProps) {
         url: canonicalUrl,
         name: detail.name,
         description: buyerText(detail.description, `${detail.name} is a practical capability designed to help move work from a clear starting point to a usable outcome.`),
-        brand: { "@type": "Brand", name: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" },
-        manufacturer: { "@type": "Organization", name: detail.publisher, url: "https://www.obserrallc.com" },
+        brand: { "@type": "Brand", name: "Obserra EPI" },
+        manufacturer: { "@id": "https://www.obserrallc.com/#organization" },
         category: detail.category ?? detail.family,
         ...(detail.proficiency ? { audience: { "@type": "Audience", audienceType: detail.proficiency } } : {}),
+        ...(structuredOffers.length ? { offers: structuredOffers } : {}),
       },
       { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: breadcrumbItems },
     ];
