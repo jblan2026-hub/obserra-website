@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
+import "../auth.css";
 
 export const metadata: Metadata = {
   title: "Create Learner Account",
