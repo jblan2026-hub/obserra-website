@@ -1,0 +1,43 @@
+name: Marketplace live Stripe checkout probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Create live Marketplace Stripe Checkout Session without payment
+        shell: bash
+        run: |
+          set -euo pipefail
+          headers="$(mktemp)"
+          body="$(mktemp)"
+          status="$(curl --silent --show-error \
+            --output "${body}" \
+            --dump-header "${headers}" \
+            --write-out '%{http_code}' \
+            --max-redirs 0 \
+            --request POST \
+            --header 'Origin: https://www.obserrallc.com' \
+            --header 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode 'product=obserra-epi-beginner-agent-systems-adversarial-review' \
+            --data-urlencode 'purchaseOption=one_time:once' \
+            'https://www.obserrallc.com/api/ai-marketplace/guest-checkout')"
+          location="$(awk 'BEGIN{IGNORECASE=1} /^location:/ {sub(/^[^:]+:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit}' "${headers}")"
+          echo "status=${status}"
+          echo "location=${location}"
+          test "${status}" = "303"
+          case "${location}" in
+            https://checkout.stripe.com/*) ;;
+            *)
+              echo 'Expected Stripe-hosted Checkout redirect.' >&2
+              cat "${headers}" >&2
+              cat "${body}" >&2
+              exit 1
+              ;;
+          esac
