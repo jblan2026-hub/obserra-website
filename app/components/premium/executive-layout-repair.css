@@ -1,0 +1,237 @@
+/* Final visual repair layer for every public route except /ai-marketplace.
+ * PremiumSiteScope never applies this file to marketplace routes.
+ */
+.premium-site-scope {
+  --repair-navy:#06213c;
+  --repair-ink:#173247;
+  --repair-body:#38566b;
+  --repair-muted:#627b8c;
+  --repair-line:rgba(6,33,60,.14);
+  --repair-gold:#d9ad57;
+  background:
+    linear-gradient(90deg,rgba(6,33,60,.022) 1px,transparent 1px) 0 0/80px 80px,
+    linear-gradient(180deg,#f8faf9 0%,#eef2f2 100%)!important;
+  color:var(--repair-ink)!important;
+  font-family:"Aptos","Avenir Next","Segoe UI",system-ui,sans-serif!important;
+  font-size:17px!important;
+  line-height:1.6;
+}
+
+.premium-site-scope .enterprise-page-main,
+.premium-site-scope :is(.apps-page,.services-page,.trust-page,.industries-page,.resources-page,.contact-page,.eios-page) {
+  min-height:0!important;
+  height:auto!important;
+  background-color:transparent!important;
+}
+
+.premium-site-scope :is(h1,h2,h3,h4) {
+  font-family:"Aptos Display","Aptos","Avenir Next","Segoe UI",system-ui,sans-serif!important;
+  color:var(--repair-navy)!important;
+  font-weight:750!important;
+  text-shadow:none!important;
+}
+
+.premium-site-scope :is(p,li,dd,dt) {
+  color:var(--repair-body)!important;
+  font-size:max(1rem,16px)!important;
+  line-height:1.62!important;
+}
+
+.premium-site-scope :is(.ent-header__nav>a,.apps-nav nav a,.eios-nav nav a) {
+  font-family:"Aptos","Segoe UI",system-ui,sans-serif!important;
+  font-size:.86rem!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+}
+
+.premium-site-scope :is(.ent-header__legal-name,.ent-header__identity small) {
+  font-size:.72rem!important;
+  line-height:1.35!important;
+  letter-spacing:.03em!important;
+}
+
+.premium-site-scope :is(.apps-eyebrow,.eios-eyebrow,.trust-eyebrow,.about-kicker,.speaker-kicker,.saas-eyebrow,.kicker,.eyebrow) {
+  color:#315f7c!important;
+  font-size:.78rem!important;
+  font-weight:800!important;
+  letter-spacing:.085em!important;
+  line-height:1.35!important;
+}
+
+/* Remove the giant empty decorative canvases introduced by earlier theme layers. */
+.premium-site-scope :is(.apps-hero,.services-hero,.service-detail-hero,.trust-hero,.industries-hero,.resources-hero,.contact-hero,.portal-hero,.florida-hero) {
+  box-sizing:border-box!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  padding:clamp(42px,4.5vw,64px) max(5vw,28px)!important;
+  align-items:center!important;
+  background:linear-gradient(115deg,#fff 0%,#f5f7f5 57%,#e7edef 100%)!important;
+  border-bottom:1px solid var(--repair-line)!important;
+  overflow:hidden!important;
+}
+
+.premium-site-scope :is(.apps-hero,.services-hero,.service-detail-hero,.trust-hero,.industries-hero,.resources-hero,.contact-hero,.portal-hero,.florida-hero)::before {
+  content:""!important;
+  position:absolute!important;
+  left:max(5vw,28px)!important;
+  top:0!important;
+  width:88px!important;
+  height:5px!important;
+  inset-inline-end:auto!important;
+  bottom:auto!important;
+  background:var(--repair-gold)!important;
+  opacity:1!important;
+  mask-image:none!important;
+  pointer-events:none!important;
+}
+
+.premium-site-scope :is(.apps-hero,.services-hero,.service-detail-hero,.trust-hero,.industries-hero,.resources-hero,.contact-hero,.portal-hero,.florida-hero)::after {
+  display:none!important;
+  content:none!important;
+}
+
+.premium-site-scope :is(.apps-hero h1,.services-hero h1,.service-detail-hero h1,.trust-hero h1,.industries-hero h1,.resources-hero h1,.contact-hero h1,.florida-hero h1) {
+  max-width:900px!important;
+  margin-top:0!important;
+  color:#041d35!important;
+  font-size:clamp(2.55rem,4.25vw,4.65rem)!important;
+  line-height:1!important;
+  letter-spacing:-.045em!important;
+}
+
+.premium-site-scope :is(.apps-hero>div>p:not(.apps-eyebrow),.services-hero>div>p:not(.apps-eyebrow),.trust-lead,.industries-hero p,.resources-hero p,.contact-hero p,.service-detail-hero p) {
+  max-width:760px!important;
+  color:#36566b!important;
+  font-size:clamp(1.03rem,1.15vw,1.16rem)!important;
+  line-height:1.66!important;
+}
+
+/* Services and Protection: use a real branded image as the visual column instead of an empty pseudo-box. */
+.premium-site-scope .services-hero {
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(320px,.68fr)!important;
+  gap:clamp(28px,4vw,58px)!important;
+}
+
+.premium-site-scope .services-hero>div {
+  width:auto!important;
+  max-width:760px!important;
+}
+
+.premium-site-scope .services-hero::after {
+  content:""!important;
+  display:block!important;
+  position:relative!important;
+  inset:auto!important;
+  grid-column:2!important;
+  grid-row:1!important;
+  width:100%!important;
+  min-height:320px!important;
+  height:100%!important;
+  border:1px solid var(--repair-line)!important;
+  border-radius:12px!important;
+  background:
+    linear-gradient(180deg,rgba(6,33,60,.03),rgba(6,33,60,.08)),
+    url("/brand/visuals/obserra-cybersecurity.png") center/cover no-repeat!important;
+  box-shadow:0 18px 42px rgba(6,33,60,.12)!important;
+}
+
+.premium-site-scope .services-hero aside { display:none!important; }
+
+/* EIOS: compact first screen and keep the real EIOS product view visible. */
+.premium-site-scope .eios-hero {
+  min-height:0!important;
+  height:auto!important;
+  padding:clamp(42px,4.5vw,62px) max(5vw,28px)!important;
+  grid-template-columns:minmax(0,.88fr) minmax(380px,1.12fr)!important;
+  gap:clamp(28px,4vw,54px)!important;
+  align-items:center!important;
+  background:linear-gradient(115deg,#fff 0%,#f6f7f4 54%,#e7edef 100%)!important;
+}
+
+.premium-site-scope .eios-hero::after { display:none!important;content:none!important; }
+.premium-site-scope .eios-hero h1 {
+  max-width:680px!important;
+  font-size:clamp(2.7rem,4.35vw,4.55rem)!important;
+  line-height:.99!important;
+  letter-spacing:-.05em!important;
+}
+.premium-site-scope .eios-lede {
+  font-size:clamp(1.03rem,1.14vw,1.14rem)!important;
+  line-height:1.64!important;
+}
+.premium-site-scope .eios-hero-art { min-width:0!important; }
+.premium-site-scope .eios-hero-art .product-frame { max-width:760px!important;margin-left:auto!important; }
+.premium-site-scope .eios-hero-art .product-image { min-height:300px!important;height:clamp(300px,29vw,400px)!important; }
+
+/* Academy: eliminate the huge dark/empty introduction and keep the catalog close to the first screen. */
+.premium-site-scope .masthead+.hero {
+  min-height:0!important;
+  height:auto!important;
+  padding:clamp(40px,4.5vw,60px) max(5vw,28px)!important;
+  background:linear-gradient(115deg,#fff 0%,#f6f7f4 58%,#e8edef 100%)!important;
+  border-bottom:1px solid var(--repair-line)!important;
+}
+.premium-site-scope .masthead+.hero h1 {
+  max-width:900px!important;
+  font-size:clamp(2.55rem,4.2vw,4.5rem)!important;
+  line-height:1!important;
+}
+
+/* Compact section rhythm so cards appear immediately instead of after empty space. */
+.premium-site-scope :is(.services-executive-portfolio,.apps-results,.trust-assurance,.trust-frameworks,.trust-architecture,.trust-priority,.trust-verification,.trust-procurement,.trust-additional,.trust-contact,.industries-section,.resources-section,.contact-section,.eios-outcomes,.eios-capabilities,.eios-showcase,.eios-boundary,.eios-connect,.catalog,.certificate,.academy-buyer-paths) {
+  margin-top:0!important;
+  padding-top:clamp(28px,3.2vw,44px)!important;
+  padding-bottom:clamp(28px,3.2vw,44px)!important;
+}
+
+.premium-site-scope :is(.services-executive-heading h2,.services-section-heading h2,.trust-section-heading h2,.section-intro h2,.resources-section-intro h2) {
+  font-size:clamp(1.9rem,3vw,3rem)!important;
+  line-height:1.04!important;
+  letter-spacing:-.035em!important;
+}
+
+/* Keep cards readable and visually consistent. */
+.premium-site-scope :is(.services-executive-card,.apps-grid article,.trust-card,.trust-assurance article,.trust-architecture-grid article,.trust-verification-grid>a,.trust-procurement-grid>a,.resource-card,.industry-card,.course-card,.capability-card,.outcome-grid article) {
+  border:1px solid var(--repair-line)!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  color:var(--repair-ink)!important;
+  box-shadow:0 10px 28px rgba(6,33,60,.065)!important;
+}
+
+.premium-site-scope :is(.services-executive-card,.apps-grid article,.trust-card,.resource-card,.industry-card,.course-card,.capability-card):hover,
+.premium-site-scope :is(.services-executive-card,.apps-grid article,.trust-card,.resource-card,.industry-card,.course-card,.capability-card):focus-within {
+  transform:translateY(-2px)!important;
+  border-color:rgba(6,33,60,.24)!important;
+  box-shadow:0 16px 34px rgba(6,33,60,.1)!important;
+}
+
+@media(max-width:980px) {
+  .premium-site-scope .services-hero,
+  .premium-site-scope .eios-hero {
+    grid-template-columns:1fr!important;
+  }
+  .premium-site-scope .services-hero::after {
+    grid-column:1!important;
+    grid-row:2!important;
+    min-height:280px!important;
+  }
+  .premium-site-scope .eios-hero-art .product-frame { margin:0!important; }
+}
+
+@media(max-width:700px) {
+  .premium-site-scope { font-size:16px!important; }
+  .premium-site-scope :is(.apps-hero,.services-hero,.service-detail-hero,.trust-hero,.industries-hero,.resources-hero,.contact-hero,.portal-hero,.florida-hero,.eios-hero,.masthead+.hero) {
+    padding:36px 4vw!important;
+  }
+  .premium-site-scope :is(.apps-hero h1,.services-hero h1,.service-detail-hero h1,.trust-hero h1,.industries-hero h1,.resources-hero h1,.contact-hero h1,.florida-hero h1,.eios-hero h1,.masthead+.hero h1) {
+    font-size:clamp(2.35rem,10.5vw,3.65rem)!important;
+  }
+  .premium-site-scope .services-hero::after { min-height:220px!important; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .premium-site-scope * { scroll-behavior:auto!important; }
+}
