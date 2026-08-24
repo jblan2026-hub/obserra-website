@@ -4,7 +4,7 @@ import test from "node:test";
 
 const read = (path) => fs.readFileSync(path, "utf8");
 
-test("Obserra EPI Academy stays public while Applications remain off public enterprise navigation", () => {
+test("enterprise navigation separates buyer paths without crowding the primary header", () => {
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
   const home = read("app/page.tsx");
   const identity = read("lib/legal-identity.ts");
@@ -12,14 +12,21 @@ test("Obserra EPI Academy stays public while Applications remain off public ente
 
   assert.match(identity, /APPLICATIONS_BRAND_NAME = `\$\{BRAND_PREFIX\} Applications`/);
   assert.match(identity, /ACADEMY_BRAND_NAME = `\$\{BRAND_PREFIX\} Academy`/);
-  assert.doesNotMatch(chrome, /\[APPLICATIONS_BRAND_NAME, "\/apps", "sales"\]/);
-  assert.doesNotMatch(chrome, /<Link href="\/apps">/);
-  assert.match(chrome, /\[ACADEMY_BRAND_NAME, "\/academy", "sales"\]/);
-  assert.match(chrome, /className=\{prominence === "sales" \? "ent-header__sales-link"/);
-  assert.match(chrome, /<Link href="\/academy">\{ACADEMY_BRAND_NAME\}<\/Link>/);
+  assert.match(chrome, /\["Solutions", "\/services"\]/);
+  assert.match(chrome, /\["Applications", "\/apps"\]/);
+  assert.match(chrome, /\["AI Marketplace", "\/ai-marketplace", "marketplace"\]/);
+  assert.match(chrome, /\[ACADEMY_BRAND_NAME, "\/academy"\]/);
+  assert.match(chrome, /\["Trust", "\/trust"\]/);
+  assert.match(chrome, /\["About", "\/about"\]/);
+  assert.doesNotMatch(chrome, /\["Florida Class D Training", "\/florida-security-training"\]/);
+  assert.doesNotMatch(chrome, /\["Speaking", "\/speaking"\]/);
+  assert.match(chrome, /className=\{prominence === "marketplace" \? "ent-header__sales-link"/);
   assert.match(styles, /> a\.ent-header__sales-link/);
-  assert.match(home, /<ButtonLink href="\/academy" variant="secondary">Browse \{ACADEMY_BRAND_NAME\}<\/ButtonLink>/);
-  assert.ok(fs.existsSync("app/apps/page.tsx"), "private Applications implementation must remain present");
+  assert.match(chrome, /Book an executive briefing/);
+  assert.match(chrome, /href="\/florida-security-training">Florida Class D Training/);
+  assert.match(home, /<ButtonLink href="\/contact\?interest=executive-briefing">Book an executive briefing<\/ButtonLink>/);
+  assert.match(home, /<ButtonLink href="\/services" variant="secondary">Explore solutions<\/ButtonLink>/);
+  assert.ok(fs.existsSync("app/apps/page.tsx"), "Applications implementation must remain present");
   assert.ok(fs.existsSync("lib/applications-team-access.ts"), "Applications team authorization must remain present");
 });
 
@@ -125,6 +132,6 @@ test("Homepage contains no illustrative preview, mockup, or unverified purchase 
   assert.doesNotMatch(home, /obserra-eios-intelligence-hero\.png/);
   assert.doesNotMatch(home, /eios-overview-marketing\.png/);
   assert.doesNotMatch(home, /Shop \{APPLICATIONS_BRAND_NAME\}/);
-  assert.match(home, /Explore \{APPLICATIONS_BRAND_NAME\}/);
+  assert.match(home, /View \{APPLICATIONS_BRAND_NAME\}/);
   assert.match(home, /product-specific engagement, deployment, and access controls/);
 });
