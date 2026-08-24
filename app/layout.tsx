@@ -10,7 +10,6 @@ import "./brand-consistency.css";
 import "./credential-issuer-marks.css";
 import "./credly-profile-link.css";
 import "./global-symbols.css";
-import "./auth.css";
 import "./commerce-semantics.css";
 
 export const metadata: Metadata = {
