@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: `${APPLICATIONS_BRAND_NAME} | Enterprise Marketplace`,
+  title: "Applications | Enterprise Software Marketplace",
   description:
     `Explore ${APPLICATIONS_BRAND_NAME} across cybersecurity, executive protection, intelligence, AI governance, and operational command.`,
   alternates: { canonical: "/apps" },
