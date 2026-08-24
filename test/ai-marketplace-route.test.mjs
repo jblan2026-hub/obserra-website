@@ -10,40 +10,40 @@ function marketplaceCatalogBytes() {
   return Buffer.from(encoded, "base64");
 }
 
-test("Homepage directs visitors to the dedicated AI Skills Marketplace", async () => {
+test("Homepage directs visitors to the dedicated AI Marketplace", async () => {
   const home = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(home, /href="\/ai-marketplace"/);
-  assert.match(home, /Shop AI Skills Marketplace/);
-  assert.match(home, /Florida Class D Training/);
+  assert.match(home, /Shop AI Marketplace/);
+  assert.match(home, /href="\/florida-security-training"/);
 });
 
-test("enterprise header exposes a yellow AI Skills Marketplace destination", async () => {
+test("enterprise header exposes the prominent AI Marketplace destination", async () => {
   const header = await readFile(new URL("../app/components/enterprise/EnterpriseChrome.tsx", import.meta.url), "utf8");
   assert.match(header, /href="\/ai-marketplace"/);
-  assert.match(header, /AI Skills Marketplace/);
-  assert.match(header, /ent-header__marketplace/);
+  assert.match(header, /AI Marketplace/);
+  assert.match(header, /ent-header__sales-link/);
+  assert.match(header, /data-navigation=\{prominence === "marketplace" \? "marketplace" : undefined\}/);
 });
 
 test("enterprise header keeps Academy and Florida Training destinations without redundant utility navigation", async () => {
   const header = await readFile(new URL("../app/components/enterprise/EnterpriseChrome.tsx", import.meta.url), "utf8");
-  assert.match(header, /data-navigation=\{prominence === "sales" \? "academy" : undefined\}/);
-  assert.match(header, /Florida Class D Training/);
-  assert.match(header, /href="\/florida-security-training"/);
-  assert.doesNotMatch(header, />Florida training</);
-  assert.match(header, /ent-header__applications/);
-  assert.match(header, /href="\/apps"/);
+  assert.match(header, /\[ACADEMY_BRAND_NAME, "\/academy"\]/);
+  assert.match(header, /\["Applications", "\/apps"\]/);
+  assert.match(header, /<Link href="\/florida-security-training">Florida Class D Training<\/Link>/);
+  assert.match(header, /\["Speaking", "\/speaking"\]/);
+  assert.doesNotMatch(header, /prominence === "sales"/);
   assert.doesNotMatch(header, /ent-header__utility/);
 });
 
-test("yellow header destinations are pinned to their actual pages", async () => {
+test("prominent header destinations are pinned to their actual pages", async () => {
   const header = await readFile(new URL("../app/components/enterprise/EnterpriseChrome.tsx", import.meta.url), "utf8");
-  assert.match(header, /\[ACADEMY_BRAND_NAME, "\/academy", "sales"\]/);
-  assert.match(header, /href="\/ai-marketplace"/);
+  assert.match(header, /\["AI Marketplace", "\/ai-marketplace", "marketplace"\]/);
+  assert.match(header, /\[ACADEMY_BRAND_NAME, "\/academy"\]/);
   assert.match(header, /href="\/florida-security-training"/);
-  assert.match(header, /href="\/apps"/);
+  assert.match(header, /\["Applications", "\/apps"\]/);
 });
 
-test("AI Skills Marketplace is backed by the verified v1.2 catalog, bounded server search, and stable detail routes", async () => {
+test("AI Marketplace is backed by the verified v1.2 catalog, bounded server search, and stable detail routes", async () => {
   const page = await readFile(new URL("../app/ai-marketplace/page.tsx", import.meta.url), "utf8");
   const loader = await readFile(new URL("../lib/marketplace-v12-catalog.ts", import.meta.url), "utf8");
   const search = await readFile(new URL("../app/api/ai-marketplace/search/route.ts", import.meta.url), "utf8");
@@ -100,7 +100,8 @@ test("v1.2 product page presents a simple buyer outcome and purchase path", asyn
   assert.match(v12Checkout, /providerReady && productReady/);
   assert.doesNotMatch(v12Checkout, /providerReady && productReady && accessReady/);
   assert.match(v12Checkout, /action="\/api\/ai-marketplace\/guest-checkout"/);
-  assert.match(v12Checkout, /Pay securely by card with Stripe/);
+  assert.match(v12Checkout, /continue directly to Stripe/);
+  assert.match(v12Checkout, /protected download starts automatically/);
   assert.match(v12Checkout, /healthValue\.operational === true/);
   assert.match(v12Checkout, /Contact sales for purchase options/);
   assert.match(v12Checkout, /disabled=\{!canPurchase\}/);
