@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 
-import { marketplaceV12DeliveryEntitlement, recordMarketplaceV12Download } from "../../../../../lib/ai-marketplace-commerce";
-import { marketplaceV12Release } from "../../../../../lib/ai-marketplace-delivery";
-import { applicationsCommerceLivemode, getApplicationsStripe } from "../../../../../lib/applications-stripe";
-import { marketplaceV12SignedAzureReleaseUrl } from "../../../../../lib/marketplace-v12-azure-delivery";
-import { marketplaceV12CommerceSubjects, marketplaceV12Product } from "../../../../../lib/marketplace-v12-catalog";
-import { verifyMarketplaceV12GuestDownloadToken } from "../../../../../lib/marketplace-v12-guest-purchase";
-import { ensureMarketplaceV12RuntimeSecrets } from "../../../../../lib/production-runtime-secrets";
+import { marketplaceV12DeliveryEntitlement, recordMarketplaceV12Download } from "../../../../lib/ai-marketplace-commerce";
+import { marketplaceV12Release } from "../../../../lib/ai-marketplace-delivery";
+import { applicationsCommerceLivemode, getApplicationsStripe } from "../../../../lib/applications-stripe";
+import { marketplaceV12SignedAzureReleaseUrl } from "../../../../lib/marketplace-v12-azure-delivery";
+import { marketplaceV12CommerceSubjects, marketplaceV12Product } from "../../../../lib/marketplace-v12-catalog";
+import { verifyMarketplaceV12GuestDownloadToken } from "../../../../lib/marketplace-v12-guest-purchase";
+import { ensureMarketplaceV12RuntimeSecrets } from "../../../../lib/production-runtime-secrets";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -32,7 +32,7 @@ function unavailable(status = 503) {
 
 function pending(request: Request) {
   const retryUrl = new URL(request.url);
-  const body = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Preparing download | Obserra EPI</title></head><body style="font-family:Arial,sans-serif;max-width:720px;margin:10vh auto;padding:24px"><h1>Payment verified</h1><p>Stripe confirmed your payment. Your protected download is being finalized.</p><p><a href="${retryUrl.toString().replaceAll("&", "&amp;")}">Retry download</a></p></body></html>`;
+  const body = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Preparing download | Obserra EPI</title></head><body style="font-family:system-ui,sans-serif;max-width:720px;margin:10vh auto;padding:24px"><h1>Payment verified</h1><p>Stripe confirmed your payment. Your protected download is being finalized.</p><p><a href="${retryUrl.toString().replaceAll("&", "&amp;")}">Retry download</a></p></body></html>`;
   return new NextResponse(body, { status: 202, headers: { ...protectedHeaders(), "content-type": "text/html; charset=utf-8", "retry-after": "2" } });
 }
 
