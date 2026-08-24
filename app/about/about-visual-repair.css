@@ -1,0 +1,286 @@
+.about-executive-page .about-proof-section{overflow:hidden!important}
+
+.about-executive-page .about-proof-credentials .verified-credentials-gallery{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+.about-executive-page .about-proof-credentials .verified-credentials-heading{display:none!important}
+
+.about-executive-page .about-proof-credentials .verified-credentials-group-title{
+  margin:22px 0 12px!important;
+  color:#14364f!important;
+  font-family:"Aptos Display","Aptos","Segoe UI",system-ui,sans-serif!important;
+  font-size:1.02rem!important;
+  font-weight:800!important;
+  letter-spacing:0!important;
+}
+
+/* One scrolling model only: every credential owns a full lane. */
+.about-executive-page .about-proof-credentials .verified-credentials-grid{
+  display:flex!important;
+  grid-template-columns:none!important;
+  grid-auto-flow:unset!important;
+  grid-auto-columns:unset!important;
+  flex-wrap:nowrap!important;
+  align-items:stretch!important;
+  gap:16px!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  padding:6px 4px 18px!important;
+  margin:0!important;
+  scroll-snap-type:x mandatory!important;
+  scroll-padding-inline:4px!important;
+  overscroll-behavior-inline:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#7890a0 #e6ecef;
+}
+
+.about-executive-page .about-proof-credentials .verified-credentials-grid::-webkit-scrollbar{height:10px}
+.about-executive-page .about-proof-credentials .verified-credentials-grid::-webkit-scrollbar-track{background:#e6ecef;border-radius:999px}
+.about-executive-page .about-proof-credentials .verified-credentials-grid::-webkit-scrollbar-thumb{background:#7890a0;border-radius:999px}
+
+.about-executive-page .about-proof-credentials .verified-credential-card{
+  position:relative!important;
+  left:auto!important;
+  right:auto!important;
+  top:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+  z-index:auto!important;
+  flex:0 0 248px!important;
+  width:248px!important;
+  min-width:248px!important;
+  max-width:248px!important;
+  min-height:380px!important;
+  margin:0!important;
+  padding:18px 16px 16px!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  scroll-snap-align:start!important;
+  scroll-snap-stop:always!important;
+  border:1px solid rgba(6,33,60,.14)!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  box-shadow:0 10px 24px rgba(6,33,60,.07)!important;
+  overflow:hidden!important;
+}
+
+.about-executive-page .about-proof-credentials .verified-credential-card:hover,
+.about-executive-page .about-proof-credentials .verified-credential-card:focus-within{
+  transform:translateY(-3px)!important;
+  border-color:rgba(217,173,87,.78)!important;
+  box-shadow:0 16px 34px rgba(6,33,60,.12)!important;
+}
+
+.about-executive-page .about-proof-credentials .verified-credential-embed{
+  display:flex!important;
+  width:100%!important;
+  min-width:0!important;
+  height:250px!important;
+  min-height:250px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:hidden!important;
+}
+
+.about-executive-page .about-proof-credentials .verified-credential-embed iframe{
+  display:block!important;
+  width:150px!important;
+  max-width:100%!important;
+  height:270px!important;
+  margin:0 auto!important;
+  border:0!important;
+}
+
+.about-executive-page .about-proof-credentials .credential-loading-mark{
+  display:flex!important;
+  width:170px!important;
+  height:170px!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:2px solid #d9ad57!important;
+  border-radius:50%!important;
+  background:linear-gradient(145deg,#082a47,#041827)!important;
+  color:#fff!important;
+  text-align:center!important;
+  box-shadow:0 14px 28px rgba(6,33,60,.18)!important;
+}
+
+.about-executive-page .about-proof-credentials .credential-loading-mark span,
+.about-executive-page .about-proof-credentials .credential-loading-mark small{
+  color:#e8f1f5!important;
+  font-size:.68rem!important;
+}
+
+.about-executive-page .about-proof-credentials .credential-loading-mark strong{
+  margin:7px 0!important;
+  color:#f2c66d!important;
+  font-size:1.25rem!important;
+}
+
+.about-executive-page .about-proof-credentials .ec-council-badge-artwork{
+  display:flex!important;
+  width:190px!important;
+  height:190px!important;
+  margin:12px auto 20px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:1px solid rgba(217,173,87,.55)!important;
+  border-radius:12px!important;
+  background:#f7f8f6!important;
+  box-shadow:0 10px 24px rgba(6,33,60,.08)!important;
+}
+
+.about-executive-page .about-proof-credentials .ec-council-badge-artwork--certificate{
+  width:210px!important;
+  height:132px!important;
+}
+
+.about-executive-page .about-proof-credentials .ec-council-badge-artwork img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  padding:8px!important;
+}
+
+.about-executive-page .about-proof-credentials .fdacs-license-mark,
+.about-executive-page .about-proof-credentials .fdacs-license-emblem{
+  width:170px!important;
+  height:170px!important;
+  flex:0 0 170px!important;
+  margin:10px auto 18px!important;
+}
+
+.about-executive-page .about-proof-credentials .verified-credential-detail{
+  width:100%!important;
+  min-width:0!important;
+  padding:8px 4px 0!important;
+  text-align:center!important;
+}
+
+.about-executive-page .about-proof-credentials .verified-credential-detail span{
+  color:#315f7c!important;
+  font-size:.72rem!important;
+  font-weight:800!important;
+  letter-spacing:.06em!important;
+}
+
+.about-executive-page .about-proof-credentials .verified-credential-detail strong{
+  color:#14364f!important;
+  font-size:1rem!important;
+  line-height:1.25!important;
+}
+
+.about-executive-page .about-proof-credentials .verified-credential-detail p,
+.about-executive-page .about-proof-credentials .florida-license-name{
+  color:#50697a!important;
+  font-size:.84rem!important;
+  line-height:1.42!important;
+}
+
+.about-executive-page .about-proof-credentials .verified-credential-verify-link{
+  margin-top:12px!important;
+  color:#06213c!important;
+  border-color:rgba(6,33,60,.2)!important;
+  background:#f2f5f6!important;
+}
+
+.about-executive-page .about-proof-credentials .verified-credentials-profile-link{
+  display:inline-flex!important;
+  margin:18px 0 0!important;
+  background:#06213c!important;
+  color:#fff!important;
+}
+
+/* Awards and media use the same stable horizontal evidence rail. */
+.about-executive-page .about-proof-rail{
+  display:flex!important;
+  grid-template-columns:none!important;
+  grid-auto-flow:unset!important;
+  grid-auto-columns:unset!important;
+  flex-wrap:nowrap!important;
+  align-items:stretch!important;
+  gap:16px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  padding:4px 4px 18px!important;
+  scroll-snap-type:x mandatory!important;
+  scroll-padding-inline:4px!important;
+  scrollbar-width:thin;
+  scrollbar-color:#7890a0 #e6ecef;
+}
+
+.about-executive-page .about-proof-card{
+  flex:0 0 292px!important;
+  width:292px!important;
+  min-width:292px!important;
+  max-width:292px!important;
+  min-height:360px!important;
+  margin:0!important;
+  scroll-snap-align:start!important;
+  scroll-snap-stop:always!important;
+  overflow:hidden!important;
+}
+
+.about-executive-page .about-proof-card img{
+  width:100%!important;
+  height:200px!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  background:#f3f5f4!important;
+}
+
+.about-executive-page .about-media-card img{object-fit:cover!important}
+.about-executive-page .about-media-feature img{object-fit:contain!important}
+.about-executive-page .about-award-certificate{flex-basis:330px!important;width:330px!important;min-width:330px!important;max-width:330px!important}
+.about-executive-page .about-award-certificate img{height:220px!important;object-fit:contain!important}
+
+.about-executive-page .about-books-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:18px!important;
+}
+
+.about-executive-page .about-book-card{
+  min-height:300px!important;
+  grid-template-columns:150px minmax(0,1fr)!important;
+  gap:20px!important;
+  align-items:center!important;
+}
+
+.about-executive-page .about-book-card img{
+  width:100%!important;
+  height:240px!important;
+  max-height:none!important;
+  object-fit:contain!important;
+}
+
+@media(max-width:760px){
+  .about-executive-page .about-proof-credentials .verified-credential-card{
+    flex-basis:220px!important;
+    width:220px!important;
+    min-width:220px!important;
+    max-width:220px!important;
+  }
+  .about-executive-page .about-proof-card{
+    flex-basis:250px!important;
+    width:250px!important;
+    min-width:250px!important;
+    max-width:250px!important;
+  }
+  .about-executive-page .about-books-grid{grid-template-columns:1fr!important}
+}
+
+@media(max-width:520px){
+  .about-executive-page .about-book-card{grid-template-columns:105px minmax(0,1fr)!important}
+  .about-executive-page .about-book-card img{height:190px!important}
+}
