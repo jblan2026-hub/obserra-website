@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import "./premium-site-scope.css";
 import "./premium-eios.css";
+import "./premium-about.css";
 
 export default function PremiumSiteScope({ children }: { children: ReactNode }) {
   const pathname = usePathname();
