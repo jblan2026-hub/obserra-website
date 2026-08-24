@@ -21,11 +21,13 @@ env:
   AZURE_CLIENT_ID: dc3ff3e1-ea35-4879-afa9-fa3eee49df85
   AZURE_RESOURCE_GROUP: rg-obserra-prod-eastus
   AZURE_DEPLOY_IDENTITY: id-obserra-github-prod
-  FEDERATED_CREDENTIAL_NAME: github-cra-twin-saas-feature
-  TWIN_SUBJECT: repo:jblan2026-hub@309821056/Obserra-EU-CRA-governace-app@1332654162:ref:refs/heads/feature/obserra-advanced-frontends-20260822
+  BRANCH_CREDENTIAL_NAME: github-cra-twin-saas-feature
+  PR_CREDENTIAL_NAME: github-cra-twin-saas-pr
+  BRANCH_SUBJECT: repo:jblan2026-hub@309821056/Obserra-EU-CRA-governace-app@1332654162:ref:refs/heads/feature/obserra-advanced-frontends-20260822
+  PR_SUBJECT: repo:jblan2026-hub@309821056/Obserra-EU-CRA-governace-app@1332654162:pull_request
 
 jobs:
-  authorize-twin-branch:
+  authorize-twin-deployment:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -36,45 +38,51 @@ jobs:
           tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Add Twin branch federated credential
+      - name: Add Twin branch and PR federated credentials
         shell: bash
         run: |
           set -euo pipefail
           issuer='https://token.actions.githubusercontent.com'
           audience='api://AzureADTokenExchange'
 
-          if az identity federated-credential show \
-            --resource-group "${AZURE_RESOURCE_GROUP}" \
-            --identity-name "${AZURE_DEPLOY_IDENTITY}" \
-            --name "${FEDERATED_CREDENTIAL_NAME}" \
-            >/tmp/cra-twin-federation.json 2>/dev/null; then
-            az identity federated-credential update \
+          upsert_credential() {
+            local name="$1"
+            local subject="$2"
+            if az identity federated-credential show \
               --resource-group "${AZURE_RESOURCE_GROUP}" \
               --identity-name "${AZURE_DEPLOY_IDENTITY}" \
-              --name "${FEDERATED_CREDENTIAL_NAME}" \
-              --issuer "${issuer}" \
-              --subject "${TWIN_SUBJECT}" \
-              --audiences "${audience}" \
-              --output none
-          else
-            az identity federated-credential create \
+              --name "${name}" >/dev/null 2>&1; then
+              az identity federated-credential update \
+                --resource-group "${AZURE_RESOURCE_GROUP}" \
+                --identity-name "${AZURE_DEPLOY_IDENTITY}" \
+                --name "${name}" \
+                --issuer "${issuer}" \
+                --subject "${subject}" \
+                --audiences "${audience}" \
+                --output none
+            else
+              az identity federated-credential create \
+                --resource-group "${AZURE_RESOURCE_GROUP}" \
+                --identity-name "${AZURE_DEPLOY_IDENTITY}" \
+                --name "${name}" \
+                --issuer "${issuer}" \
+                --subject "${subject}" \
+                --audiences "${audience}" \
+                --output none
+            fi
+
+            az identity federated-credential show \
               --resource-group "${AZURE_RESOURCE_GROUP}" \
               --identity-name "${AZURE_DEPLOY_IDENTITY}" \
-              --name "${FEDERATED_CREDENTIAL_NAME}" \
-              --issuer "${issuer}" \
-              --subject "${TWIN_SUBJECT}" \
-              --audiences "${audience}" \
-              --output none
-          fi
+              --name "${name}" \
+              --output json > "/tmp/${name}.json"
+            jq -e --arg subject "${subject}" \
+              '.subject == $subject and .issuer == "https://token.actions.githubusercontent.com" and (.audiences | index("api://AzureADTokenExchange")) != null' \
+              "/tmp/${name}.json" >/dev/null
+          }
 
-          az identity federated-credential show \
-            --resource-group "${AZURE_RESOURCE_GROUP}" \
-            --identity-name "${AZURE_DEPLOY_IDENTITY}" \
-            --name "${FEDERATED_CREDENTIAL_NAME}" \
-            --output json > /tmp/cra-twin-federation.json
+          upsert_credential "${BRANCH_CREDENTIAL_NAME}" "${BRANCH_SUBJECT}"
+          upsert_credential "${PR_CREDENTIAL_NAME}" "${PR_SUBJECT}"
 
-          jq -e --arg subject "${TWIN_SUBJECT}" \
-            '.subject == $subject and .issuer == "https://token.actions.githubusercontent.com" and (.audiences | index("api://AzureADTokenExchange")) != null' \
-            /tmp/cra-twin-federation.json >/dev/null
-
-          echo "CRA_TWIN_SAAS_OIDC=authorized" >> "$GITHUB_STEP_SUMMARY"
+          echo "CRA_TWIN_SAAS_BRANCH_OIDC=authorized" >> "$GITHUB_STEP_SUMMARY"
+          echo "CRA_TWIN_SAAS_PR_OIDC=authorized" >> "$GITHUB_STEP_SUMMARY"
