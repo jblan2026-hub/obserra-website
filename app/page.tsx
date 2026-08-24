@@ -6,7 +6,6 @@ import { EnterpriseFooter, EnterpriseHeader } from "./components/enterprise/Ente
 import {
   ACADEMY_BRAND_NAME,
   APPLICATIONS_BRAND_NAME,
-  EIOS_BRAND_NAME,
   LEGAL_ENTITY_NAME,
 } from "../lib/legal-identity";
 import "./saas-home.css";
@@ -23,66 +22,66 @@ const capabilities = [
   {
     number: "01",
     title: "Executive Advisory",
-    summary: "Turn cyber, governance, resilience, and transformation complexity into clear executive priorities.",
+    summary: "Board-ready cybersecurity, enterprise risk, governance, resilience, and transformation leadership.",
     description:
-      "Obserra EPI helps leadership teams move from fragmented risk signals to clear priorities, accountable ownership, and decisions that can be defended and executed.",
+      "Obserra EPI gives executives and boards senior decision support when cybersecurity, operational risk, governance, and transformation priorities converge.",
     details: [
-      "Executive and board-level decision support",
-      "Cyber, governance, resilience, and transformation strategy",
-      "Business-focused priorities backed by evidence",
+      "Executive and board advisory",
+      "Fractional CISO and security leadership",
+      "Enterprise risk, resilience, and transformation strategy",
     ],
     href: "/services",
-    linkLabel: "Explore Executive Advisory",
+    linkLabel: "More information",
   },
   {
     number: "02",
-    title: "Protection & Intelligence",
-    summary: "Identify exposure earlier and support faster decisions around people, travel, events, and operations.",
+    title: "Cybersecurity, Risk & Governance",
+    summary: "Cyber strategy, control assurance, AI governance, identity, resilience, and evidence-backed risk reduction.",
     description:
-      "Obserra EPI brings protective intelligence and risk context together so organizations can identify relevant exposure earlier and make informed decisions before risk becomes consequence.",
+      "Obserra EPI helps organizations understand material cyber and governance exposure, establish accountable controls, and turn risk decisions into measurable execution.",
     details: [
-      "Executive and organizational exposure assessment",
-      "Protective intelligence and travel-risk support",
-      "Decision-ready intelligence for high-consequence operations",
+      "Cybersecurity strategy and operating models",
+      "Risk, compliance, AI governance, and control assurance",
+      "Identity, resilience, incident readiness, and evidence",
     ],
-    href: "/protection-intelligence",
-    linkLabel: "Explore Protection & Intelligence",
+    href: "/services",
+    linkLabel: "More information",
   },
   {
     number: "03",
-    title: EIOS_BRAND_NAME,
-    summary: "Connect enterprise context, risk, evidence, decisions, and governed action in one executive environment.",
+    title: "Protection & Intelligence",
+    summary: "Protective intelligence, executive exposure, travel risk, investigations, and security planning.",
     description:
-      `${EIOS_BRAND_NAME} is designed to give leaders a clearer operating picture by connecting enterprise signals, controls, evidence, risk, dependencies, and decisions in one governed environment.`,
+      "Obserra EPI combines protective intelligence and executive protection context so leaders can identify relevant exposure earlier and act with better information.",
     details: [
-      "Enterprise health and risk context",
-      "Evidence, controls, dependencies, and decision traceability",
-      "Governed action with measurable outcomes",
+      "Executive exposure and protective intelligence",
+      "Travel, event, and operational risk planning",
+      "Investigative and decision-ready intelligence support",
     ],
-    href: "/eios",
-    linkLabel: "Explore EIOS",
+    href: "/protection-intelligence",
+    linkLabel: "More information",
   },
   {
     number: "04",
-    title: ACADEMY_BRAND_NAME,
-    summary: "Build practical professional capability through structured learning for individuals and teams.",
+    title: "EIOS, Applications & Learning",
+    summary: "Enterprise intelligence, secure applications, governed AI capabilities, and professional workforce development.",
     description:
-      `${ACADEMY_BRAND_NAME} extends Obserra EPI capability into the workforce with structured professional learning, enterprise programs, assessment, and completion controls. Regulated programs follow separate eligibility and authorization gates.`,
+      "Obserra EPI extends advisory and intelligence capability through EIOS, purpose-built applications, governed technology, and structured professional learning. Regulated programs follow separate eligibility and authorization gates.",
     details: [
-      "Professional cybersecurity, intelligence, governance, and protection learning",
-      "Enterprise learning options for teams",
-      "Offering-specific controls for regulated programs",
+      "EIOS enterprise intelligence and governed action",
+      "Secure enterprise applications and governed AI capabilities",
+      "Professional and enterprise learning through Obserra EPI Academy",
     ],
-    href: "/academy",
-    linkLabel: "Browse Academy",
+    href: "/eios",
+    linkLabel: "More information",
   },
 ];
 
 const companyValue = [
-  ["Integrated view", "Connect cyber, intelligence, governance, protection, and business context."],
-  ["Decision clarity", "Prioritize what matters and give leadership a defensible path forward."],
-  ["Governed execution", "Translate decisions into owners, controls, evidence, and measurable action."],
-  ["Enterprise capability", "Combine advisory, software, EIOS, applications, and professional learning."],
+  ["Earlier visibility", "Identify material threats, control gaps, and decision points before they become larger business consequences."],
+  ["Clearer accountability", "Align owners, authority, and next actions so critical work does not stall between functions."],
+  ["Defensible decisions", "Support leadership choices with traceable evidence, business context, and governance."],
+  ["Measurable follow-through", "Verify what changed, what remains exposed, and where leadership should focus next."],
 ];
 
 export default function HomePage() {
@@ -92,28 +91,28 @@ export default function HomePage() {
       <main className="saas-home enterprise-page-main">
         <section className="saas-hero saas-hero--executive">
           <div className="saas-hero__copy saas-hero__copy--executive">
-            <p className="saas-eyebrow">OBSERRA EPI · EXECUTIVE INTELLIGENCE · ENTERPRISE RISK · SECURE TECHNOLOGY</p>
-            <h1>Bring intelligence, governance, and execution together.</h1>
+            <p className="saas-eyebrow">EXECUTIVE INTELLIGENCE FOR HIGH-CONSEQUENCE ORGANIZATIONS</p>
+            <h1>See risk earlier. Decide faster. Act with proof.</h1>
             <p className="saas-hero__lede">
-              Obserra EPI gives high-consequence organizations one operating partner across executive advisory,
-              cybersecurity, protective intelligence, secure applications, enterprise intelligence, and workforce capability—
-              helping leaders see risk more clearly, decide with confidence, and move from decision to controlled action.
+              Obserra EPI connects executive advisory, cybersecurity, protective intelligence, governance,
+              secure technology, and workforce capability so leaders can move from fragmented signals to
+              accountable action with greater clarity.
             </p>
             <div className="saas-hero__actions">
-              <ButtonLink href="/services">Explore what Obserra EPI brings</ButtonLink>
+              <ButtonLink href="/services">Explore Obserra EPI</ButtonLink>
               <ButtonLink href="/contact?interest=enterprise-consultation" variant="secondary">Start a conversation</ButtonLink>
             </div>
             <div className="saas-hero__utility-row">
               <Link href="/ai-marketplace">Shop AI Skills Marketplace →</Link>
               <span>Advisory</span>
+              <span>Cybersecurity</span>
               <span>Intelligence</span>
-              <span>Applications</span>
-              <span>Learning</span>
+              <span>Technology</span>
             </div>
           </div>
         </section>
 
-        <section className="saas-priority-strip" aria-label="Primary Obserra EPI capabilities">
+        <section className="saas-priority-strip" aria-label="Obserra EPI offerings">
           {capabilities.map((capability) => (
             <article key={capability.title} className="saas-priority-card">
               <ExecutiveInfoModal {...capability} />
@@ -121,33 +120,7 @@ export default function HomePage() {
           ))}
         </section>
 
-        <section className="saas-compact-grid">
-          <article className="saas-compact-card saas-compact-card--feature">
-            <p className="saas-eyebrow">{EIOS_BRAND_NAME}</p>
-            <h2>Turn fragmented enterprise signals into a clearer operating picture.</h2>
-            <p>Connect controls, evidence, risk, dependencies, and decision priorities so leaders can govern what happens next.</p>
-            <div className="saas-actions">
-              <ButtonLink href="/eios">Explore EIOS</ButtonLink>
-              <ButtonLink href="/contact?interest=eios-demo" variant="secondary">Request a briefing</ButtonLink>
-            </div>
-          </article>
-
-          <article className="saas-compact-card">
-            <p className="saas-eyebrow">{APPLICATIONS_BRAND_NAME}</p>
-            <h2>Put focused enterprise capabilities to work.</h2>
-            <p>Secure software designed around specific operational, governance, and enterprise outcomes.</p>
-            <Link href="/apps" className="saas-text-action">Explore Applications →</Link>
-          </article>
-
-          <article className="saas-compact-card">
-            <p className="saas-eyebrow">{ACADEMY_BRAND_NAME}</p>
-            <h2>Extend capability into the workforce.</h2>
-            <p>Professional learning for individuals and teams with structured enrollment, assessment, and completion.</p>
-            <Link href="/academy" className="saas-text-action">Browse Academy →</Link>
-          </article>
-        </section>
-
-        <section className="saas-value-bar" aria-label="What Obserra EPI brings">
+        <section className="saas-value-bar" aria-label="Customer value from Obserra EPI">
           {companyValue.map(([title, copy]) => (
             <div key={title}>
               <strong>{title}</strong>
@@ -156,7 +129,12 @@ export default function HomePage() {
           ))}
           <div className="saas-value-bar__cta">
             <p>Bring Obserra EPI into the decision before risk becomes consequence.</p>
-            <ButtonLink href="/contact?interest=enterprise-consultation">Start a conversation</ButtonLink>
+            <div className="saas-value-bar__actions">
+              <ButtonLink href="/academy" variant="secondary">Browse {ACADEMY_BRAND_NAME}</ButtonLink>
+              <ButtonLink href="/apps" variant="secondary">Explore {APPLICATIONS_BRAND_NAME}</ButtonLink>
+              <ButtonLink href="/contact?interest=enterprise-consultation">Start a conversation</ButtonLink>
+            </div>
+            <small>Applications remain subject to product-specific engagement, deployment, and access controls.</small>
           </div>
         </section>
       </main>
