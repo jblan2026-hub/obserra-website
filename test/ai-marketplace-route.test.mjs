@@ -111,7 +111,8 @@ test("marketplace is a simple offering directory with direct customer buy action
   assert.match(page, /#purchase-options/);
   assert.match(page, /Buy now/);
   assert.doesNotMatch(page, /MarketplaceCommandDeck|MarketplaceSalesDock|MarketplaceCapabilityUniverse|MarketplaceEditorialCatalog/);
-  assert.match(styles, /background: #f8f6f1/);
+  assert.match(styles, /background: #eaf1f2/);
+  assert.match(styles, /#ffc342, #f47b20/);
 });
 
 test("every marketplace offering requires an exact governed payment binding", async () => {

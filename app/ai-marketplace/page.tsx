@@ -86,15 +86,19 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
     </header>
 
     <section className="marketplace-simple__hero">
-      <p>OBSERRA EPI AI MARKETPLACE</p>
-      <h1>Choose what you need. See the options. Buy.</h1>
-      <span>Start with one product type. Every product page shows what it does, what you get, and the price.</span>
-    </section>
-
-    <section className="marketplace-simple__offerings" aria-labelledby="offering-heading">
-      <header><p>SHOP BY OFFERING</p><h2 id="offering-heading">What are you looking for?</h2></header>
-      <div className="marketplace-simple__offering-grid">
-        {groups.map((group) => <Link key={group.slug} href={`/ai-marketplace?offering=${group.slug}`} aria-current={selected?.slug === group.slug ? "page" : undefined}><span>{group.count.toLocaleString()} products</span><h3>{group.name}</h3><p>{group.description}</p><strong>View offerings <b aria-hidden="true">→</b></strong></Link>)}
+      <div className="marketplace-simple__hero-copy">
+        <p>OBSERRA EPI AI MARKETPLACE</p>
+        <h1>What do you want your AI to do?</h1>
+        <span>Pick an offering below. See what it does, what you get, and the price.</span>
+      </div>
+      <div className="marketplace-simple__offering-rail" aria-labelledby="offering-heading">
+        <div className="marketplace-simple__rail-heading"><h2 id="offering-heading">Choose an offering</h2><span>Click any card to shop</span></div>
+        <div className="marketplace-simple__rail-window">
+          <div className="marketplace-simple__rail-track">
+            {groups.map((group) => <Link key={group.slug} href={`/ai-marketplace?offering=${group.slug}`} aria-current={selected?.slug === group.slug ? "page" : undefined}><span>{group.count.toLocaleString()} products</span><h3>{group.name}</h3><strong>Shop now <b aria-hidden="true">→</b></strong></Link>)}
+            {groups.map((group) => <Link key={`${group.slug}-repeat`} href={`/ai-marketplace?offering=${group.slug}`} tabIndex={-1} aria-hidden="true"><span>{group.count.toLocaleString()} products</span><h3>{group.name}</h3><strong>Shop now <b aria-hidden="true">→</b></strong></Link>)}
+          </div>
+        </div>
       </div>
     </section>
 
