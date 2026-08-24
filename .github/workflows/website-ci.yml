@@ -49,7 +49,23 @@ jobs:
         run: npm run verify:marketplace-catalog-delivery
 
       - name: Run unit and governed contract tests
-        run: npm test
+        shell: bash
+        run: |
+          set +e
+          log_file="${RUNNER_TEMP}/npm-test.log"
+          npm test >"$log_file" 2>&1
+          status=$?
+          cat "$log_file"
+          exit "$status"
+
+      - name: Upload npm test diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-test-diagnostics
+          path: ${{ runner.temp }}/npm-test.log
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Run lint
         run: npm run lint
