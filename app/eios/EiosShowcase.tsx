@@ -92,21 +92,27 @@ export default function EiosShowcase() {
       </section>
 
       <section className="eios-capabilities eios-capabilities--compact" id="capabilities">
-        <div className="section-intro"><p className="eios-eyebrow">ENTERPRISE CAPABILITY SCOPE</p><h2>Six capability domains. Details only when you need them.</h2><p>Open a card for the capability detail instead of scrolling through eighteen separate technical tiles.</p></div>
+        <div className="section-intro"><p className="eios-eyebrow">ENTERPRISE CAPABILITY SCOPE</p><h2>Six capability domains. Open the detail when you need it.</h2><p>The capability layer stays concise while the detailed scope remains available inside each card.</p></div>
         <div className="eios-executive-capability-grid">
-          {capabilities.map((capability, index) => (
-            <article className="eios-executive-capability-card" key={capability.title}>
-              <ExecutiveInfoModal
-                number={String(index + 1).padStart(2, "0")}
-                title={capability.title}
-                summary={capability.summary}
-                description={capability.description}
-                details={[...capability.details]}
-                href="#showcase"
-                linkLabel="Review related product views"
-              />
-            </article>
-          ))}
+          {capabilities.map((capability, index) => {
+            const visual = productViews[index % productViews.length];
+            return (
+              <article className="eios-executive-capability-card" key={capability.title}>
+                <ExecutiveInfoModal
+                  number={String(index + 1).padStart(2, "0")}
+                  title={capability.title}
+                  category="EIOS Capability"
+                  image={visual.image}
+                  imageAlt={visual.alt}
+                  summary={capability.summary}
+                  description={capability.description}
+                  details={[...capability.details]}
+                  href="#showcase"
+                  linkLabel="Review related product views"
+                />
+              </article>
+            );
+          })}
         </div>
       </section>
 
