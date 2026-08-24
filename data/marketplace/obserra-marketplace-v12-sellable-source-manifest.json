@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "publisher": "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC",
+  "archives": [
+    {
+      "filename": "Obserra_EPI_AI_Agent_Capability_Skills_Repository_v1.0.0(2).zip",
+      "bytes": 36065188,
+      "sha256": "aed67e7e3d268a6e08d25b9f64db3fd8b7a562f3da475eb1d7c72aa837db0cb2"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Agent_Capability_Skills_Repository_Set_2_Addons_v1.0.0(2).zip",
+      "bytes": 37082309,
+      "sha256": "54aa4257f901b421d4746dd34c66c9e736fecfa592a2c2a7b13bfafce849cdf4"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Agent_Capability_Skills_Repository_Set_3_Final_5000_v1.0.0(2).zip",
+      "bytes": 67081573,
+      "sha256": "56254d63f0589e37eef37d1cd4669ca29968b571e927de77d0ee61f68079e049"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Agent_Capability_Skills_Repository_Set_4_Advanced_2000_v1.0.0(2).zip",
+      "bytes": 29266792,
+      "sha256": "b38e0f65034ec44bdab747f580188eb353928eb435b3fa68bf5ad102d655666c"
+    },
+    {
+      "filename": "Obserra_EPI_AI_Marketplace_Suite_v1.0.0 (2)(1).zip",
+      "bytes": 42285741,
+      "sha256": "1a4c3fe2b6113753d346649c5e74786e3be23d34701f0c21398a1e7f316f49e3"
+    },
+    {
+      "filename": "Obserra_EPI_Marketplace_Builder_and_Assurance_Toolkit_v1.0.1(2).zip",
+      "bytes": 6344213,
+      "sha256": "49bea45f6bd38f72e389d1273ecc188f93b5766cc6759563cc7a4768a4fd7450"
+    }
+  ]
+}
