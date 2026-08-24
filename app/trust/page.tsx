@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { alignmentAuthorities, alignmentDisclaimer } from "../../lib/control-alignment";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { LEGAL_ENTITY_NAME, PUBLIC_BRAND_NAME } from "@/lib/legal-identity";
 import "./trust.css";
 import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
 import ExecutiveInfoModal from "../components/ui/ExecutiveInfoModal";
 
 export const metadata: Metadata = {
-  title: "Enterprise Trust Center | Security, Privacy and Procurement Evidence",
-  description: `Review ${LEGAL_ENTITY_NAME} published security and privacy information, responsible AI principles, framework alignment, procurement pathways, credentials, and current assurance boundaries.`,
+  title: "Trust Center | Security, Privacy & Buyer Assurance",
+  description: `Review ${PUBLIC_BRAND_NAME} published security and privacy information, responsible AI principles, framework alignment, procurement pathways, credentials, and current assurance boundaries.`,
   alternates: { canonical: "/trust" },
   openGraph: {
-    title: `${LEGAL_ENTITY_NAME} Enterprise Trust Center`,
+    title: `${PUBLIC_BRAND_NAME} Trust Center`,
     description: "Security architecture, privacy, responsible AI, framework alignment, verified credentials, procurement support, and buyer assurance.",
     url: "https://www.obserrallc.com/trust",
     type: "website",
-    images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: `${LEGAL_ENTITY_NAME} Enterprise Trust Center` }],
+    images: [{ url: "/brand/visuals/obserra-cybersecurity.png", width: 1344, height: 768, alt: `${PUBLIC_BRAND_NAME} Trust Center` }],
   },
 };
 
@@ -72,7 +72,7 @@ export default function TrustCenterPage() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: `${LEGAL_ENTITY_NAME} Enterprise Trust Center`,
+    name: `${PUBLIC_BRAND_NAME} Trust Center`,
     url: "https://www.obserrallc.com/trust",
     description: `Enterprise security, privacy, responsible AI, procurement, framework alignment, verified credentials, and buyer assurance information for ${LEGAL_ENTITY_NAME}.`,
   };
@@ -84,7 +84,7 @@ export default function TrustCenterPage() {
         <div className="trust-wrap">
           <header className="trust-hero">
             <div>
-              <p className="trust-eyebrow">{LEGAL_ENTITY_NAME} ENTERPRISE TRUST CENTER</p>
+              <p className="trust-eyebrow">{PUBLIC_BRAND_NAME.toUpperCase()} TRUST CENTER</p>
               <h1>Enterprise assurance that is easy to review and easy to verify.</h1>
               <p className="trust-lead">Review security, privacy, responsible AI, framework alignment, procurement support, verified credentials, and current status boundaries from one concise enterprise trust surface.</p>
               <div className="trust-hero-actions">
