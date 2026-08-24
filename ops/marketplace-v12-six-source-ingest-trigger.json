@@ -1,0 +1,10 @@
+{
+  "contract": "obserra-marketplace-v12-six-source-ingest-trigger-v1",
+  "mode": "ingest",
+  "approved_catalog_revision": "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2",
+  "source_blob_map_contract": "obserra-marketplace-v12-source-blob-map-v1",
+  "source_set": "six-governed-marketplace-source-archives",
+  "required_products": 11390,
+  "requested_at": "2026-08-24T19:23:00Z",
+  "reason": "Production Azure source upload completed; dispatch guarded six-source protected delivery."
+}
