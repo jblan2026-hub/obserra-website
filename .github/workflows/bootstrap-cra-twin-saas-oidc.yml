@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - .github/workflows/bootstrap-cra-twin-saas-oidc.yml
+  schedule:
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -23,8 +25,10 @@ env:
   AZURE_DEPLOY_IDENTITY: id-obserra-github-prod
   BRANCH_CREDENTIAL_NAME: github-cra-twin-saas-feature
   PR_CREDENTIAL_NAME: github-cra-twin-saas-pr
+  MAIN_CREDENTIAL_NAME: github-cra-twin-saas-main
   BRANCH_SUBJECT: repo:jblan2026-hub@309821056/Obserra-EU-CRA-governace-app@1332654162:ref:refs/heads/feature/obserra-advanced-frontends-20260822
   PR_SUBJECT: repo:jblan2026-hub@309821056/Obserra-EU-CRA-governace-app@1332654162:pull_request
+  MAIN_SUBJECT: repo:jblan2026-hub@309821056/Obserra-EU-CRA-governace-app@1332654162:ref:refs/heads/main
 
 jobs:
   authorize-twin-deployment:
@@ -38,7 +42,7 @@ jobs:
           tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Add Twin branch and PR federated credentials
+      - name: Add Twin branch, PR and main federated credentials
         shell: bash
         run: |
           set -euo pipefail
@@ -83,6 +87,8 @@ jobs:
 
           upsert_credential "${BRANCH_CREDENTIAL_NAME}" "${BRANCH_SUBJECT}"
           upsert_credential "${PR_CREDENTIAL_NAME}" "${PR_SUBJECT}"
+          upsert_credential "${MAIN_CREDENTIAL_NAME}" "${MAIN_SUBJECT}"
 
           echo "CRA_TWIN_SAAS_BRANCH_OIDC=authorized" >> "$GITHUB_STEP_SUMMARY"
           echo "CRA_TWIN_SAAS_PR_OIDC=authorized" >> "$GITHUB_STEP_SUMMARY"
+          echo "CRA_TWIN_SAAS_MAIN_OIDC=authorized" >> "$GITHUB_STEP_SUMMARY"
