@@ -12,6 +12,7 @@ import {
 import "./enterprise-chrome.css";
 import "./enterprise-sales-navigation.css";
 import "./legal-identity-lockup.css";
+import "./premium-enterprise-chrome.css";
 
 const primaryNavigation = [
   [ACADEMY_BRAND_NAME, "/academy", "sales"],
@@ -77,7 +78,7 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
           <Link href="/ai-marketplace" className="ent-header__marketplace" style={{ justifyContent: "center", padding: "0 16px", border: "1px solid #eeb756", borderRadius: 10, background: "linear-gradient(135deg,#ffd978,#e5a62e)", color: "#071a2b", boxShadow: "0 9px 26px #0006" }} onClick={close} aria-current={pathname === "/ai-marketplace" || pathname.startsWith("/ai-marketplace/") ? "page" : undefined}>AI Skills Marketplace</Link>
           <Link href="/florida-security-training" className="ent-header__florida" onClick={close} aria-current={pathname === "/florida-security-training" || pathname.startsWith("/florida-security-training/") ? "page" : undefined}>Florida Class D Training</Link>
           <Link href="/apps" className="ent-header__applications" onClick={close} aria-current={pathname === "/apps" || pathname.startsWith("/apps/") ? "page" : undefined}>Applications</Link>
-          <Link href="/contact?interest=enterprise-consultation" className="ent-header__cta" onClick={close}>Request consultation</Link>
+          <Link href="/contact?interest=enterprise-consultation" className="ent-header__cta" onClick={close}>Start a conversation</Link>
         </nav>
       </div>
     </header>
@@ -105,8 +106,8 @@ export function EnterpriseFooter() {
       <div className="ent-footer__lead">
         <Image src="/brand/obserra-logo.png" width={286} height={55} alt={LEGAL_ENTITY_NAME} />
         <strong className="ent-footer__legal-name">{LEGAL_ENTITY_NAME}</strong>
-        <p>Executive advisory, cybersecurity, protective intelligence, secure technology, and professional learning for organizations facing consequential decisions.</p>
-        <Link href="/contact?interest=enterprise-consultation">Request an executive consultation <span aria-hidden="true">→</span></Link>
+        <p>Executive intelligence, cybersecurity, protective intelligence, secure technology, and professional learning for organizations where the quality of the decision matters.</p>
+        <Link href="/contact?interest=enterprise-consultation">Start an executive conversation <span aria-hidden="true">→</span></Link>
       </div>
       <nav aria-label="Enterprise capabilities"><strong>Capabilities</strong><Link href="/academy">{ACADEMY_BRAND_NAME}</Link><Link href="/services">Enterprise services</Link><Link href="/protection-intelligence">Protection and intelligence</Link><Link href="/eios">{EIOS_BRAND_NAME}</Link></nav>
       <nav aria-label="Enterprise company links"><strong>Company</strong><Link href="/about">Leadership and credentials</Link><Link href="/speaking">Speaking and briefings</Link><Link href="/industries">Industries</Link><Link href="/resources">Resources</Link></nav>

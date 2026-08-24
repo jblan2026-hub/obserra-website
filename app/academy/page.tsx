@@ -10,6 +10,7 @@ import "./academy-commercial.css";
 import "./academy-payment.css";
 import "./academy-sales-status.css";
 import "./academy-world-class.css";
+import "./premium-academy.css";
 
 export const revalidate = 10;
 

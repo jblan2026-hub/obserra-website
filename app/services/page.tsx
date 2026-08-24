@@ -54,10 +54,10 @@ const iconByKey = {
 };
 
 const engagementModels = [
-  ["Executive advisory", "Focused access to senior leadership for strategy, risk decisions, governance, and board-level communication."],
-  ["Program design", "Structured operating models, policies, controls, playbooks, roadmaps, and implementation sequencing."],
-  ["Embedded leadership", "Fractional or interim executive capacity for security, risk, protection, governance, and transformation priorities."],
-  ["Assessment and assurance", "Evidence-based posture review, gap analysis, control evaluation, and prioritized recommendations."],
+  ["Executive advisory", "Put senior leadership directly against the decisions that carry the most risk, scrutiny, and business consequence."],
+  ["Program design", "Turn complex requirements into a practical operating model, roadmap, controls, ownership, and measurable execution."],
+  ["Embedded leadership", "Add experienced executive capacity when the organization needs decisive ownership without waiting for a permanent hire."],
+  ["Assessment and assurance", "See the real posture, expose material gaps, prioritize action, and give leadership evidence they can defend."],
 ];
 
 const industries = [
@@ -70,10 +70,10 @@ const industries = [
 ];
 
 const caseStudyFramework = [
-  ["Situation", "Document the operating context, material risk, business constraint, and leadership decision without exposing confidential customer information."],
-  ["Intervention", "Describe the scoped advisory, assessment, operating model, control design, or implementation support delivered."],
-  ["Evidence", "Present measurable outputs such as governance artifacts, risk reduction actions, control validation, readiness milestones, or capability improvements."],
-  ["Executive value", "Explain how the work improved decision quality, accountability, resilience, assurance, or organizational readiness."],
+  ["Situation", "Define the business context, material exposure, and decision leadership must make."],
+  ["Intervention", "Apply the right advisory, assessment, operating model, control design, or implementation support."],
+  ["Evidence", "Show what changed through measurable outputs, verified controls, milestones, and risk-reduction actions."],
+  ["Executive value", "Connect the work to stronger decisions, clearer accountability, resilience, assurance, and readiness."],
 ];
 
 export default function ServicesPage() {
@@ -110,40 +110,40 @@ export default function ServicesPage() {
       <section className="apps-hero services-hero">
         <div>
           <p className="apps-eyebrow">ENTERPRISE SERVICES</p>
-          <h1>Executive expertise for cyber, protection, intelligence, governance, and enterprise risk.</h1>
+          <h1>Turn high-consequence risk into decisions your organization can execute.</h1>
           <p>
-            OBSERRA EXECUTIVE PROTECTION &amp; INTELLIGENCE LLC helps leadership teams assess complex exposure,
-            design defensible operating models, strengthen resilience, and execute high-consequence priorities.
-            Engagements are scoped around the decision, business outcome, information boundary, accountable owners, and acceptance evidence.
+            {LEGAL_ENTITY_NAME} helps leadership teams cut through cyber, protection, intelligence,
+            governance, and enterprise-risk complexity. We bring senior judgment, disciplined analysis,
+            and implementation focus to the decisions where delay, ambiguity, or weak ownership create real business exposure.
           </p>
           <div className="apps-actions">
-            <a className="apps-button" href="/contact?interest=enterprise-services">Request executive consultation</a>
-            <a className="apps-outline" href="#service-lines">Explore service lines</a>
+            <a className="apps-button" href="/contact?interest=enterprise-services">Start an executive conversation</a>
+            <a className="apps-outline" href="#service-lines">Explore capabilities</a>
             <a className="apps-outline" href="/trust">Review enterprise assurance</a>
           </div>
         </div>
         <aside>
           <p><ShieldCheck size={16} /> Veteran-led executive advisory and protective intelligence</p>
-          <p><Brain size={16} /> Fortune 500 Chief Information Security Officer and enterprise-risk leadership</p>
-          <p><Building2 size={16} /> Structured delivery for regulated and high-consequence operating environments</p>
-          <p><FileCheck2 size={16} /> Evidence, traceability, and executive-ready reporting</p>
+          <p><Brain size={16} /> Fortune 500 CISO-level cybersecurity and enterprise-risk leadership</p>
+          <p><Building2 size={16} /> Built for regulated and high-consequence operating environments</p>
+          <p><FileCheck2 size={16} /> Decisions backed by evidence, ownership, and measurable follow-through</p>
         </aside>
       </section>
 
       <EnterpriseProofBand />
 
       <section className="services-command-bar" aria-label="Enterprise services operating model">
-        <article><strong>01</strong><span>Assess the operating context and material exposure.</span></article>
-        <article><strong>02</strong><span>Prioritize decisions by business impact, urgency, and evidence.</span></article>
-        <article><strong>03</strong><span>Design the operating model, controls, and implementation roadmap.</span></article>
-        <article><strong>04</strong><span>Measure execution, assurance, and realized risk reduction.</span></article>
+        <article><strong>01</strong><span>See the exposure in business context—not as isolated technical noise.</span></article>
+        <article><strong>02</strong><span>Prioritize the decisions that matter most by impact, urgency, and evidence.</span></article>
+        <article><strong>03</strong><span>Turn decisions into an operating model, controls, owners, and executable roadmap.</span></article>
+        <article><strong>04</strong><span>Verify what changed and give leadership defensible evidence of progress.</span></article>
       </section>
 
       <section className="apps-results services-results" id="service-lines">
         <div className="services-section-heading">
           <p className="apps-eyebrow">SERVICE PORTFOLIO</p>
-          <h2>Specialized service lines connected through one executive operating model.</h2>
-          <p>Each engagement has a dedicated detail page covering business outcomes, delivery approach, evidence, and next steps.</p>
+          <h2>Specialized expertise. One standard for executive accountability.</h2>
+          <p>Choose the capability that matches the mission. Each service is structured around business outcomes, accountable ownership, evidence, and a clear path from assessment to action.</p>
         </div>
         <div className="apps-grid">
           {serviceCatalog.map((service) => {
@@ -162,7 +162,7 @@ export default function ServicesPage() {
                 </ul>
                 <footer>
                   <Link href={`/services/${service.id}`}>
-                    Review engagement <ArrowRight size={15} />
+                    See how we help <ArrowRight size={15} />
                   </Link>
                 </footer>
               </article>
@@ -174,7 +174,7 @@ export default function ServicesPage() {
       <section className="services-engagements">
         <div className="services-section-heading">
           <p className="apps-eyebrow">ENGAGEMENT MODELS</p>
-          <h2>Choose the operating model that matches the decision, urgency, and level of ownership required.</h2>
+          <h2>Bring in the level of leadership and ownership the moment requires.</h2>
         </div>
         <div className="services-engagement-grid">
           {engagementModels.map(([title, description], index) => (
@@ -186,21 +186,21 @@ export default function ServicesPage() {
       <section className="services-industries">
         <div className="services-section-heading">
           <p className="apps-eyebrow">INDUSTRY SOLUTIONS</p>
-          <h2>Risk and delivery context tailored to regulated, technology-dependent, and high-consequence sectors.</h2>
-          <p>Industry positioning reflects operating requirements and risk patterns; it does not imply a customer relationship or unsupported engagement history.</p>
+          <h2>Context matters when the operating environment is regulated, connected, and consequential.</h2>
+          <p>Our approach adapts to the risk, regulatory pressure, technology dependency, and leadership realities of each sector.</p>
         </div>
         <div className="services-industry-grid">
           {industries.map(([title, description]) => (
-            <article key={title}><strong>{title}</strong><p>{description}</p><Link href="/industries">Review industry context →</Link></article>
+            <article key={title}><strong>{title}</strong><p>{description}</p><Link href="/industries">Explore industry context →</Link></article>
           ))}
         </div>
       </section>
 
       <section className="services-case-study">
         <div className="services-section-heading">
-          <p className="apps-eyebrow">CASE-STUDY FRAMEWORK</p>
-          <h2>Customer work is documented through a controlled, confidentiality-aware evidence model.</h2>
-          <p>No customer relationship, outcome, scale, or performance metric is represented without permission and supporting evidence.</p>
+          <p className="apps-eyebrow">PROVE THE VALUE</p>
+          <h2>Show the decision, the intervention, the evidence, and the business result.</h2>
+          <p>Customer work is represented only when permission and supporting evidence exist. The standard is credibility over inflated claims.</p>
         </div>
         <div className="services-case-grid">
           {caseStudyFramework.map(([title, description]) => (
@@ -211,12 +211,12 @@ export default function ServicesPage() {
 
       <section className="services-consultation">
         <div>
-          <p className="apps-eyebrow">EXECUTIVE CONSULTATION</p>
-          <h2>Start with the decision, exposure, deadline, and business outcome that matter most.</h2>
-          <p>{LEGAL_ENTITY_NAME} will use the initial inquiry to determine the appropriate service line, engagement model, information requirements, and next commercial step. Pricing is provided only after scope and delivery requirements are understood.</p>
+          <p className="apps-eyebrow">START WITH THE DECISION</p>
+          <h2>Tell us what has to change, what is at risk, and when leadership needs an answer.</h2>
+          <p>We will align the right service line, engagement model, information requirements, and commercial next step around the outcome you need—not force the problem into a generic package.</p>
         </div>
         <div className="services-consultation-actions">
-          <a className="apps-button" href="/contact?interest=enterprise-services">Open consultation workflow</a>
+          <a className="apps-button" href="/contact?interest=enterprise-services">Start the conversation</a>
           <a className="apps-outline" href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`${LEGAL_ENTITY_NAME} Enterprise Services Inquiry`)}`}>Email enterprise services</a>
         </div>
       </section>
