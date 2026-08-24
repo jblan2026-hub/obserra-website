@@ -18,3 +18,13 @@ test("Marketplace request workflow supports exact verify-only execution without 
   assert.match(source, /allowEntitlements == false/);
   assert.doesNotMatch(source, /checkout\.sessions\.create|paymentIntents\.create|charges\.create|subscriptions\.create|refunds\.create/);
 });
+
+test("Marketplace request is read from the exact PR head while executable code stays on base main", () => {
+  assert.match(source, /ref: \$\{\{ github\.event\.pull_request\.base\.sha \}\}/);
+  assert.match(source, /ref: \$\{\{ github\.event\.pull_request\.head\.sha \}\}/);
+  assert.match(source, /path: \.marketplace-request/);
+  assert.match(source, /sparse-checkout:[\s\S]*ops\/marketplace-v12-stripe-reconcile-request\.json/);
+  assert.match(source, /git -C \.marketplace-request rev-parse HEAD/);
+  assert.match(source, /request_path="\.marketplace-request\/ops\/marketplace-v12-stripe-reconcile-request\.json"/);
+  assert.doesNotMatch(source, /mode="\$\(jq -r '\.mode \/\/ empty' ops\/marketplace-v12-stripe-reconcile-request\.json\)"/);
+});
