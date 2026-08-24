@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { CourseProgress } from "./academy";
+import { ACADEMY_BRAND_NAME } from "./legal-identity";
 
 export type AnonymousAcademyState = {
   courses: Record<string, { paymentReference: string; enrolledAt: string }>;
@@ -11,7 +12,7 @@ export type AnonymousAcademyState = {
 };
 
 const cookieName = "obserra_academy_access";
-const emptyState = (): AnonymousAcademyState => ({ courses: {}, progress: {}, learnerName: "Obserra Academy Learner", expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 365 });
+const emptyState = (): AnonymousAcademyState => ({ courses: {}, progress: {}, learnerName: `${ACADEMY_BRAND_NAME} Learner`, expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 365 });
 
 function signingKey() {
   const key = process.env.STRIPE_WEBHOOK_SECRET;
