@@ -40,7 +40,7 @@ function isPackage(card: EditorialCatalogCard) {
 
 function offeringLabel(card: EditorialCatalogCard) {
   if (isPackage(card)) return "Capability collection";
-  if (card.product_type === "ai-skill") return "AI skill";
+  if (card.product_type === "ai-skill") return "Individual skill";
   if (card.product_type === "agent-team") return "Agent team";
   if (card.product_type === "workflow-pack") return "Workflow pack";
   return readable(card.product_type);
@@ -106,6 +106,11 @@ function CatalogVisual({ card }: { card: EditorialCatalogCard }) {
 function CatalogCard({ card }: { card: EditorialCatalogCard }) {
   const packageCard = isPackage(card);
   const verification = card.publication_state === "artifact-verified-unpublished" ? "Package artifact verified" : "Governed listing";
+  const primaryAction = packageCard
+    ? "Explore this capability system"
+    : card.product_type === "ai-skill"
+      ? "Open individual skill"
+      : "View product and options";
   return <article className="editorial-catalog__card">
     <Link className="editorial-catalog__card-link" href={productPath(card)} aria-label={"Open " + card.name}>
       <CatalogVisual card={card} />
@@ -118,7 +123,7 @@ function CatalogCard({ card }: { card: EditorialCatalogCard }) {
           {card.proficiency ? <span>{card.proficiency}</span> : null}
           {packageCard ? <span>{verification}</span> : null}
         </div>
-        <footer><span>{packageCard ? "Explore this capability system" : "View product and options"}</span><b aria-hidden="true">↗</b></footer>
+        <footer><span>{primaryAction}</span><b aria-hidden="true">↗</b></footer>
       </div>
     </Link>
   </article>;
