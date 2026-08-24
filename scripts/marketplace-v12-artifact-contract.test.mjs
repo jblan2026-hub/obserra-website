@@ -18,6 +18,7 @@ import {
 } from "./marketplace-v12-artifact-lib.mjs";
 
 const root = resolve(import.meta.dirname, "..");
+const AZURE_LOGIN_V301_SHA = "f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca";
 
 test("the materializer accepts only the exact v1.2 catalog source", () => {
   const value = readCatalog({
@@ -103,7 +104,8 @@ test("the production workflow is manual, exact-revision guarded, and Key Vault s
   assert.match(workflow, /github\.ref == 'refs\/heads\/main'/);
   assert.match(workflow, /git rev-parse HEAD/);
   assert.match(workflow, new RegExp(EXPECTED_CATALOG_REVISION));
-  assert.match(workflow, /azure\/login@v3\.0\.1/);
+  assert.match(workflow, new RegExp(`azure/login@${AZURE_LOGIN_V301_SHA}`));
+  assert.doesNotMatch(workflow, /azure\/login@v3\.0\.1/);
   assert.match(workflow, /az keyvault secret show/);
   assert.match(workflow, /applications-supabase-service-role-key/);
   assert.match(workflow, /applications-stripe-secret-key/);
