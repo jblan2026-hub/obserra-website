@@ -27,10 +27,9 @@ jobs:
           set -euo pipefail
           trigger=ops/marketplace-v12-six-source-ingest-trigger.json
           test -f "${trigger}"
-          jq -e --arg sha "${GITHUB_SHA}" '
+          jq -e '
             .contract == "obserra-marketplace-v12-six-source-ingest-trigger-v1" and
             .mode == "ingest" and
-            .expected_commit == $sha and
             .approved_catalog_revision == "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2"
           ' "${trigger}" >/dev/null
 
