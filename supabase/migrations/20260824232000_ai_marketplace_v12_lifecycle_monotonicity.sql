@@ -18,8 +18,8 @@ set search_path to 'pg_catalog', 'obserra_ai_marketplace'
 as $function$
 declare
   o obserra_ai_marketplace.v12_orders%rowtype;
-  target_status text;
-  access_status text;
+  next_order_status text;
+  next_access_status text;
   attempt_updated boolean := false;
   transition_applied boolean := false;
 begin
@@ -104,54 +104,54 @@ begin
     if o.order_status = 'payment_failed'
       or (p_event_type = 'charge.dispute.closed' and o.order_status = 'disputed')
     then
-      target_status := 'active';
-      access_status := 'active';
+      next_order_status := 'active';
+      next_access_status := 'active';
     end if;
   elsif p_lifecycle = 'payment_failed' then
     if o.order_status in ('active', 'payment_failed') then
-      target_status := 'payment_failed';
-      access_status := 'suspended';
+      next_order_status := 'payment_failed';
+      next_access_status := 'suspended';
     end if;
   elsif p_lifecycle = 'dispute' then
     if o.order_status in ('active', 'payment_failed', 'disputed') then
-      target_status := 'disputed';
-      access_status := 'suspended';
+      next_order_status := 'disputed';
+      next_access_status := 'suspended';
     end if;
   elsif p_lifecycle = 'refund' then
     if o.order_status <> 'chargeback' then
-      target_status := 'refunded';
-      access_status := 'revoked';
+      next_order_status := 'refunded';
+      next_access_status := 'revoked';
     end if;
   elsif p_lifecycle = 'chargeback' then
-    target_status := 'chargeback';
-    access_status := 'revoked';
+    next_order_status := 'chargeback';
+    next_access_status := 'revoked';
   elsif p_lifecycle = 'subscription_cancelled' then
     if o.order_status not in ('refunded', 'chargeback', 'revoked', 'expired', 'cancelled') then
-      target_status := 'cancelled';
-      access_status := 'revoked';
+      next_order_status := 'cancelled';
+      next_access_status := 'revoked';
     end if;
   elsif p_lifecycle = 'subscription_expired' then
     if o.order_status not in ('refunded', 'chargeback', 'revoked', 'expired', 'cancelled') then
-      target_status := 'expired';
-      access_status := 'expired';
+      next_order_status := 'expired';
+      next_access_status := 'expired';
     end if;
   end if;
 
-  if target_status is not null then
+  if next_order_status is not null then
     update obserra_ai_marketplace.v12_orders
-       set order_status = target_status,
+       set order_status = next_order_status,
            updated_at = now()
      where stripe_checkout_session_id = o.stripe_checkout_session_id;
 
-    update obserra_ai_marketplace.v12_artifact_entitlements
-       set access_status = access_status,
-           revision = revision + 1,
+    update obserra_ai_marketplace.v12_artifact_entitlements as e
+       set access_status = next_access_status,
+           revision = e.revision + 1,
            updated_at = now()
-     where subject_id = o.subject_id
-       and tenant_id = o.tenant_id
-       and product_id = o.product_id
-       and catalog_revision = o.catalog_revision
-       and artifact_sha256 = o.artifact_sha256;
+     where e.subject_id = o.subject_id
+       and e.tenant_id = o.tenant_id
+       and e.product_id = o.product_id
+       and e.catalog_revision = o.catalog_revision
+       and e.artifact_sha256 = o.artifact_sha256;
 
     transition_applied := true;
   end if;
@@ -164,8 +164,8 @@ begin
     jsonb_build_object(
       'checkoutSession', o.stripe_checkout_session_id,
       'previousOrderStatus', o.order_status,
-      'orderStatus', coalesce(target_status, o.order_status),
-      'accessStatus', access_status,
+      'orderStatus', coalesce(next_order_status, o.order_status),
+      'accessStatus', next_access_status,
       'transitionApplied', transition_applied
     )
   );
@@ -174,7 +174,7 @@ begin
     'recorded', true,
     'matched', true,
     'transitionApplied', transition_applied,
-    'orderStatus', coalesce(target_status, o.order_status)
+    'orderStatus', coalesce(next_order_status, o.order_status)
   );
 end
 $function$;
