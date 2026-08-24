@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import ExecutiveDetailModal from "../components/ui/ExecutiveDetailModal";
 import { EnterpriseFooter, EnterpriseHeader } from "../components/enterprise/EnterpriseChrome";
 import { LEGAL_ENTITY_NAME } from "../../lib/legal-identity";
 import "./speaking.css";
@@ -46,25 +45,36 @@ export default function SpeakingPage() {
             <p className="speaker-kicker">EXECUTIVE SPEAKER · BOARD BRIEFINGS · KEYNOTES</p>
             <h1>Dr. Jody Blanchard</h1>
             <p className="speaker-executive-role">Cybersecurity · AI governance · enterprise risk · protective intelligence · leadership</p>
-            <p className="speaker-executive-lede">A two-time Fortune 500 Chief Information Security Officer, retired U.S. Army intelligence officer, Ph.D. in Organizational Leadership, published author, and enterprise advisor who brings practical executive perspective to complex decisions.</p>
-            <p className="speaker-executive-lede">Engagements are tailored to the audience and designed to leave leaders with clearer questions, stronger decision principles, and practical actions they can take back to the organization.</p>
+            <p className="speaker-executive-lede">A two-time Fortune 500 Chief Information Security Officer, retired U.S. Army intelligence officer, Ph.D. in Organizational Leadership, published author, and enterprise advisor who translates complex risk into practical executive decisions.</p>
+            <p className="speaker-executive-lede">Each engagement is tailored to the audience and built to leave leaders with clearer questions, stronger decision principles, and actions they can apply immediately.</p>
             <div className="speaker-actions"><Link href="/contact?interest=speaking" className="speaker-button">Request speaking engagement</Link><Link href="/about" className="speaker-outline">Review executive bio</Link></div>
           </div>
         </section>
 
         <section className="speaker-executive-formats" aria-label="Speaking formats">{formats.map(([title, copy]) => <article key={title}><strong>{title}</strong><span>{copy}</span></article>)}</section>
 
-        <section className="speaker-executive-details" aria-labelledby="speaker-detail-heading">
-          <div className="speaker-executive-heading"><div><p className="speaker-kicker">SPEAKER PROFILE</p><h2 id="speaker-detail-heading">Choose the detail you need.</h2></div><p>Topics, completed engagements, recognition, and books stay available without turning the speaker page into a long scrolling biography.</p></div>
-          <div className="speaker-executive-grid">
-            <ExecutiveDetailModal eyebrow="SIGNATURE TOPICS" title="Speaking topics" summary="Executive content for boards, leadership teams, security organizations, technology leaders, and mission-focused audiences." triggerLabel="View topics" actionHref="/contact?interest=speaking" actionLabel="Request a topic"><div className="speaker-modal-topics">{topics.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div></ExecutiveDetailModal>
-            <ExecutiveDetailModal eyebrow="COMPLETED ENGAGEMENTS" title="Selected appearances" summary="Completed executive panels, fireside discussions, and public leadership engagements." triggerLabel="View engagements"><div className="speaker-modal-gallery">{engagements.map((item) => <article key={item.title}><Image src={item.image} width={720} height={480} alt={item.alt} sizes="(max-width: 700px) 82vw, 330px" /><h3>{item.title}</h3><p>{item.copy}</p></article>)}</div></ExecutiveDetailModal>
-            <ExecutiveDetailModal eyebrow="EXECUTIVE CREDIBILITY" title="Recognition & credentials" summary="Industry recognition and a direct path to the full issuer-backed credential profile." triggerLabel="View recognition" actionHref="/about" actionLabel="Open full credentials"><div className="speaker-modal-recognition"><Image src="/leadership/ceh-hall-of-fame-2025.png" width={680} height={848} alt="Dr. Jody Blanchard CEH Hall of Fame 2025 magazine cover" sizes="(max-width: 700px) 70vw, 340px" /><div><span>CEH HALL OF FAME · TOP 100</span><h3>Recognized executive leadership and cybersecurity impact.</h3><p>EC-Council Hall of Fame recognition is supported by the official badge, certificate, and issuer verification. The About page contains the full credential, license, recognition, and evidence gallery.</p><Link href="/about">Review verified executive profile →</Link></div></div></ExecutiveDetailModal>
-            <ExecutiveDetailModal eyebrow="PUBLISHED AUTHOR" title="Books" summary="Executive writing on cybersecurity leadership, institutional systems, and accountability." triggerLabel="View books"><div className="speaker-modal-books"><article><Image src="/books/cyberbulleys-front.png" width={350} height={520} alt="CyberBulleys book cover" /><div><h3>CyberBulleys: A CISO&apos;s Guide to Doing Cybersecurity</h3><p>By Dr. Jody Blanchard</p><a className="executive-buy-button" href="https://www.amazon.com/CyberBulleys-CISOs-Guide-Doing-Cybersecurity/dp/B0DT7L55JG" target="_blank" rel="noreferrer">Buy now</a></div></article><article><Image src="/books/break-the-system-front.png" width={350} height={520} alt="Break the System book cover" /><div><h3>Break the System</h3><p>By Dr. Jody Blanchard</p><a className="executive-buy-button" href="https://www.amazon.com/Break-System-Jody-Blanchard/dp/B0G2Q1CX8R" target="_blank" rel="noreferrer">Buy now</a></div></article></div></ExecutiveDetailModal>
+        <section className="speaker-proof-section" aria-labelledby="speaker-topics-heading">
+          <div className="speaker-proof-heading"><div><p className="speaker-kicker">SIGNATURE TOPICS</p><h2 id="speaker-topics-heading">Executive content built around decisions leaders actually face.</h2></div><p>Topics are tailored by audience, industry, and event format. Scroll horizontally to review the full topic set without extending the page vertically.</p></div>
+          <div className="speaker-proof-rail speaker-topic-rail">{topics.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div>
+        </section>
+
+        <section className="speaker-proof-section" aria-labelledby="speaker-engagements-heading">
+          <div className="speaker-proof-heading"><div><p className="speaker-kicker">COMPLETED ENGAGEMENTS &amp; RECOGNITION</p><h2 id="speaker-engagements-heading">Public leadership evidence stays visible.</h2></div><p>Completed panels, fireside discussions, executive recognition, and Hall of Fame imagery remain on the page as part of the speaker profile.</p></div>
+          <div className="speaker-proof-rail speaker-media-rail">
+            <article className="speaker-media-card speaker-media-feature"><Image src="/leadership/ceh-hall-of-fame-2025.png" width={680} height={848} alt="Dr. Jody Blanchard CEH Hall of Fame 2025 magazine cover" sizes="(max-width: 700px) 74vw, 300px" /><span>CEH HALL OF FAME · TOP 100</span><h3>CEH Hall of Fame 2025 magazine cover</h3><p>EC-Council recognition for outstanding performance and contribution to ethical hacking.</p><Link href="/about#ceh-hall-of-fame-title">Review verified recognition →</Link></article>
+            {engagements.map((item) => <article key={item.title} className="speaker-media-card"><Image src={item.image} width={720} height={480} alt={item.alt} sizes="(max-width: 700px) 76vw, 320px" /><span>COMPLETED ENGAGEMENT</span><h3>{item.title}</h3><p>{item.copy}</p></article>)}
           </div>
         </section>
 
-        <section className="speaker-executive-booking"><div><p className="speaker-kicker">BOOKING & MEDIA REQUESTS</p><h2>Bring an experienced executive voice to the room.</h2></div><p>Keynotes, board briefings, panels, podcasts, media interviews, workshops, and private leadership sessions are coordinated through {LEGAL_ENTITY_NAME}.</p><Link href="/contact?interest=speaking" className="speaker-button">Start a speaking request</Link></section>
+        <section className="speaker-proof-section speaker-books-section" aria-labelledby="speaker-books-heading">
+          <div className="speaker-proof-heading"><div><p className="speaker-kicker">PUBLISHED AUTHOR</p><h2 id="speaker-books-heading">Books that extend the conversation beyond the stage.</h2></div><p>Executive writing on cybersecurity leadership, institutional systems, and accountability, with direct purchase actions.</p></div>
+          <div className="speaker-books-grid">
+            <article><Image src="/books/cyberbulleys-front.png" width={350} height={520} alt="CyberBulleys book cover" /><div><h3>CyberBulleys: A CISO&apos;s Guide to Doing Cybersecurity</h3><p>By Dr. Jody Blanchard</p><a className="executive-buy-button" href="https://www.amazon.com/CyberBulleys-CISOs-Guide-Doing-Cybersecurity/dp/B0DT7L55JG" target="_blank" rel="noreferrer">Buy now</a></div></article>
+            <article><Image src="/books/break-the-system-front.png" width={350} height={520} alt="Break the System book cover" /><div><h3>Break the System</h3><p>By Dr. Jody Blanchard</p><a className="executive-buy-button" href="https://www.amazon.com/Break-System-Jody-Blanchard/dp/B0G2Q1CX8R" target="_blank" rel="noreferrer">Buy now</a></div></article>
+          </div>
+        </section>
+
+        <section className="speaker-executive-booking"><div><p className="speaker-kicker">BOOKING &amp; MEDIA REQUESTS</p><h2>Bring an experienced executive voice to the room.</h2></div><p>Keynotes, board briefings, panels, podcasts, media interviews, workshops, and private leadership sessions are coordinated through {LEGAL_ENTITY_NAME}.</p><Link href="/contact?interest=speaking" className="speaker-button">Start a speaking request</Link></section>
       </main>
       <EnterpriseFooter />
     </>
