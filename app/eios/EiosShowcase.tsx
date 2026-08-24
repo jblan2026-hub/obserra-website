@@ -51,266 +51,55 @@ export default function EiosShowcase() {
   };
 
   return (
-    <main
-      className="eios-page"
-      onCopy={(event) => event.preventDefault()}
-      onContextMenu={(event) => event.preventDefault()}
-    >
+    <main className="eios-page" onCopy={(event) => event.preventDefault()} onContextMenu={(event) => event.preventDefault()}>
       <header className="eios-nav">
         <a className="eios-brand" href="/">
-          <Image
-            src="/brand/obserra-logo.png"
-            width={250}
-            height={48}
-            alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC"
-          />
-          <span>
-            <b>EIOS</b>
-          </span>
+          <Image src="/brand/obserra-logo.png" width={250} height={48} alt="OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" />
+          <span><b>EIOS</b></span>
         </a>
         <nav aria-label="EIOS page navigation">
-          <a href="/">Home</a>
-          <a href="/services">Services</a>
-          <a href="/apps">Applications</a>
-          <a href="/academy">Academy</a>
-          <a href="/about">About</a>
-          <a href="/contact">Contact</a>
-          <a href="#connect" className="eios-nav-cta">Engage with EIOS</a>
+          <a href="/">Home</a><a href="/services">Services</a><a href="/apps">Applications</a><a href="/academy">Academy</a><a href="/about">About</a><a href="/contact">Contact</a><a href="#connect" className="eios-nav-cta">Engage with EIOS</a>
         </nav>
       </header>
 
       <section className="eios-hero" id="experience">
-        <div className="eios-orbit orbit-one" />
-        <div className="eios-orbit orbit-two" />
         <div className="eios-hero-copy">
           <p className="eios-eyebrow">PROPERTY OF {LEGAL_ENTITY_NAME} · ENTERPRISE INTELLIGENCE OPERATING SYSTEM</p>
-          <h1>
-            From fragmented context in cyber, protection, and risk
-            <br />
-            to <em>commercially accountable execution.</em>
-          </h1>
-          <p className="eios-lede">
-            EIOS is the Enterprise Intelligence Operating System from OBSERRA EXECUTIVE
-            PROTECTION &amp; INTELLIGENCE LLC. It helps leadership teams connect systems,
-            quantify risk and business impact, authorize action, and verify outcome integrity
-            without replacing core enterprise platforms.
-          </p>
-          <div className="eios-actions">
-            <a href="#showcase" className="eios-button">Review EIOS product views</a>
-            <a href="#connect" className="eios-text-link">Request enterprise briefing</a>
-          </div>
-          <p className="eios-restriction">
-            EIOS visuals and product artifacts are proprietary. Public views are controlled
-            representations and do not expose customer data, credentials, or live production
-            architecture.
-          </p>
+          <h1>Connect risk. Govern action. <em>Prove outcomes.</em></h1>
+          <p className="eios-lede">EIOS gives leadership one governed operating picture across cybersecurity, protective intelligence, enterprise risk, and accountable execution. It connects existing systems, clarifies business impact, controls authorized action, and preserves the evidence needed to verify results.</p>
+          <div className="eios-actions"><a href="#showcase" className="eios-button">Review EIOS product views</a><a href="#connect" className="eios-text-link">Request enterprise briefing</a></div>
+          <p className="eios-restriction">Public EIOS views are controlled product representations. They do not expose customer data, credentials, live production architecture, or protected implementation details.</p>
         </div>
-        <div className="eios-hero-art">
-          <ProductFrame view={selected} prominent />
-        </div>
+        <div className="eios-hero-art"><ProductFrame view={selected} prominent /></div>
       </section>
 
-      <section className="eios-proof">
-        <p>THE EIOS ADVANTAGE</p>
-        <div>
-          <span>Connect cyber, protection, and operational context</span>
-          <span>Govern authorized action</span>
-          <span>Verify outcomes independently</span>
-          <span>Measure risk and business value</span>
-        </div>
-      </section>
+      <section className="eios-proof"><p>THE EIOS ADVANTAGE</p><div><span>Connect enterprise context</span><span>Prioritize material decisions</span><span>Govern authorized action</span><span>Verify measurable outcomes</span></div></section>
 
       <section className="eios-outcomes" id="outcomes">
-        <div className="section-intro">
-          <p className="eios-eyebrow">THE EIOS DECISION PATH</p>
-          <h2>
-            Less dashboard noise.
-            <br />
-            More decisions with measurable commercial impact.
-          </h2>
-        </div>
-        <div className="outcome-grid">
-          {outcomes.map(([number, title, copy]) => (
-            <article key={title}>
-              <span>{number}</span>
-              <h3>{title}</h3>
-              <p>{copy}</p>
-            </article>
-          ))}
-        </div>
+        <div className="section-intro"><p className="eios-eyebrow">THE EIOS DECISION PATH</p><h2>From fragmented signals to accountable execution.</h2></div>
+        <div className="outcome-grid">{outcomes.map(([number, title, copy]) => <article key={title}><span>{number}</span><h3>{title}</h3><p>{copy}</p></article>)}</div>
       </section>
 
       <section className="eios-capabilities" id="capabilities">
-        <div className="section-intro">
-          <p className="eios-eyebrow">FULL ENTERPRISE CAPABILITY SCOPE</p>
-          <h2>
-            One operating system.
-            <br />
-            Every critical decision domain.
-          </h2>
-          <p>
-            EIOS is designed as an AI-native, secure-by-default enterprise intelligence
-            platform, not a collection of isolated dashboards. It supports the same domains {LEGAL_ENTITY_NAME}
-            delivers across advisory and operations: cybersecurity, protective intelligence, identity,
-            governance, and enterprise decision accountability.
-          </p>
-        </div>
-
-        <div className="capability-grid">
-          {capabilities.map(([title, copy], index) => (
-            <button
-              key={title}
-              type="button"
-              className={selectedCapabilityIndex === index ? "capability-card active" : "capability-card"}
-              onClick={() => exploreCapability(index)}
-              aria-expanded={selectedCapabilityIndex === index}
-              aria-controls="capability-detail"
-            >
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <h3>{title}</h3>
-              <p>{copy}</p>
-              <em>
-                Explore capability <b>→</b>
-              </em>
-            </button>
-          ))}
-        </div>
-
-        {selectedCapability && (
-          <div className="capability-detail" id="capability-detail" aria-live="polite">
-            <div>
-              <p className="eios-eyebrow">
-                EIOS CAPABILITY {String(selectedCapabilityIndex! + 1).padStart(2, "0")}
-              </p>
-              <h3>{selectedCapability[0]}</h3>
-              <p>{selectedCapability[1]}</p>
-            </div>
-            <div className="capability-detail-actions">
-              <button
-                type="button"
-                className="eios-button"
-                onClick={() => document.getElementById("showcase")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-              >
-                Open related product view
-              </button>
-              <a
-                className="eios-outline-button"
-                href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`EIOS ${selectedCapability[0]} inquiry`)}`}
-              >
-                Discuss this capability
-              </a>
-            </div>
-          </div>
-        )}
+        <div className="section-intro"><p className="eios-eyebrow">ENTERPRISE CAPABILITY SCOPE</p><h2>One governed intelligence layer across critical decision domains.</h2><p>EIOS supports the same enterprise domains {LEGAL_ENTITY_NAME} addresses through advisory and operations: cybersecurity, protective intelligence, identity, governance, resilience, business impact, and executive accountability.</p></div>
+        <div className="capability-grid">{capabilities.map(([title, copy], index) => <button key={title} type="button" className={selectedCapabilityIndex === index ? "capability-card active" : "capability-card"} onClick={() => exploreCapability(index)} aria-expanded={selectedCapabilityIndex === index} aria-controls="capability-detail"><span>{String(index + 1).padStart(2, "0")}</span><h3>{title}</h3><p>{copy}</p><em>Explore capability <b>→</b></em></button>)}</div>
+        {selectedCapability && <div className="capability-detail" id="capability-detail" aria-live="polite"><div><p className="eios-eyebrow">EIOS CAPABILITY {String(selectedCapabilityIndex! + 1).padStart(2, "0")}</p><h3>{selectedCapability[0]}</h3><p>{selectedCapability[1]}</p></div><div className="capability-detail-actions"><button type="button" className="eios-button" onClick={() => document.getElementById("showcase")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Open related product view</button><a className="eios-outline-button" href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`EIOS ${selectedCapability[0]} inquiry`)}`}>Discuss this capability</a></div></div>}
       </section>
 
       <section className="eios-showcase" id="showcase">
-        <div className="section-intro">
-          <p className="eios-eyebrow">PRODUCT SHOWCASE</p>
-          <h2>
-            Enterprise intelligence
-            <br />
-            that leadership can act on.
-          </h2>
-          <p>
-            Review controlled EIOS product views designed to communicate decision flow,
-            accountability, and business impact without exposing customer environments or
-            protected implementation details.
-          </p>
-        </div>
-        <div className="showcase-layout">
-          <div className="view-selector" role="tablist" aria-label="EIOS product views">
-            {productViews.map((view) => (
-              <button
-                key={view.id}
-                role="tab"
-                aria-selected={selected.id === view.id}
-                className={selected.id === view.id ? "active" : ""}
-                onClick={() => setSelected(view)}
-              >
-                <small>{view.eyebrow}</small>
-                <strong>{view.title}</strong>
-                <span>Open product view</span>
-              </button>
-            ))}
-          </div>
-          <ProductFrame view={selected} />
-        </div>
+        <div className="section-intro"><p className="eios-eyebrow">PRODUCT SHOWCASE</p><h2>Decision intelligence leadership can act on.</h2><p>Review controlled EIOS product views that communicate decision flow, accountability, and business impact without exposing customer environments or protected implementation details.</p></div>
+        <div className="showcase-layout"><div className="view-selector" role="tablist" aria-label="EIOS product views">{productViews.map((view) => <button key={view.id} role="tab" aria-selected={selected.id === view.id} className={selected.id === view.id ? "active" : ""} onClick={() => setSelected(view)}><small>{view.eyebrow}</small><strong>{view.title}</strong><span>Open product view</span></button>)}</div><ProductFrame view={selected} /></div>
       </section>
 
-      <section className="eios-boundary">
-        <div>
-          <p className="eios-eyebrow">ENTERPRISE READY. DISCIPLINED BY DESIGN.</p>
-          <h2>The product story without the proprietary blueprint.</h2>
-        </div>
-        <p>
-          The public EIOS experience communicates capability, outcomes, and design principles.
-          It does not expose platform code, architecture, customer data, live connectors,
-          operational credentials, or internal workflows.
-        </p>
-      </section>
+      <section className="eios-boundary"><div><p className="eios-eyebrow">ENTERPRISE READY. DISCIPLINED BY DESIGN.</p><h2>Show the product value without exposing the proprietary blueprint.</h2></div><p>The public EIOS experience communicates capability, outcomes, and design principles. It does not expose platform code, architecture, customer data, live connectors, operational credentials, or internal workflows.</p></section>
 
-      <section className="eios-connect" id="connect">
-        <p className="eios-eyebrow">ENGAGE WITH EIOS</p>
-        <h2>Turn cybersecurity and risk complexity into accountable execution.</h2>
-        <p>
-          Start with an enterprise EIOS briefing to align decision priorities, control
-          boundaries, integration scope, deployment pathway, and measurable business outcomes
-          with your operating model.
-        </p>
-        <div className="eios-engagements">
-          <a href="mailto:info@obserrallc.com?subject=EIOS%20Enterprise%20Scoping%20Session" className="eios-button">
-            Book enterprise scoping session
-          </a>
-          <a href="mailto:info@obserrallc.com?subject=EIOS%20Executive%20Briefing" className="eios-outline-button">
-            Request executive briefing
-          </a>
-        </div>
-        <small>
-          Briefings and scoping sessions are commercial planning engagements for enterprise
-          adoption and do not expose protected implementation assets.
-        </small>
-      </section>
+      <section className="eios-connect" id="connect"><p className="eios-eyebrow">ENGAGE WITH EIOS</p><h2>Bring fragmented risk and operating context into one accountable decision process.</h2><p>Start with an enterprise briefing to align leadership priorities, integration scope, decision authority, deployment boundaries, and measurable business outcomes.</p><div className="eios-engagements"><a href="mailto:info@obserrallc.com?subject=EIOS%20Enterprise%20Scoping%20Session" className="eios-button">Book enterprise scoping session</a><a href="mailto:info@obserrallc.com?subject=EIOS%20Executive%20Briefing" className="eios-outline-button">Request executive briefing</a></div><small>Briefings and scoping sessions are commercial planning engagements for enterprise adoption and do not expose protected implementation assets.</small></section>
 
-      <footer className="eios-footer">
-        <Image
-          src="/brand/obserra-logo.png"
-          width={176}
-          height={34}
-          alt={LEGAL_ENTITY_NAME}
-        />
-        <p>
-          Copyright {LEGAL_ENTITY_NAME}. EIOS and related visual
-          and product materials are proprietary to {LEGAL_ENTITY_NAME}. Unauthorized reproduction,
-          distribution, or use is prohibited.
-        </p>
-      </footer>
+      <footer className="eios-footer"><Image src="/brand/obserra-logo.png" width={176} height={34} alt={LEGAL_ENTITY_NAME} /><p>Copyright {LEGAL_ENTITY_NAME}. EIOS and related visual and product materials are proprietary to {LEGAL_ENTITY_NAME}. Unauthorized reproduction, distribution, or use is prohibited.</p></footer>
     </main>
   );
 }
 
 function ProductFrame({ view, prominent = false }: { view: typeof productViews[number]; prominent?: boolean }) {
-  return (
-    <figure className={`product-frame ${prominent ? "prominent" : ""}`}>
-      <div className="frame-top">
-        <span>OBSERRA EIOS</span>
-        <span>CONTROLLED PRODUCT VIEW</span>
-      </div>
-      <div className="product-image">
-        <Image
-          src={view.image}
-          alt={view.alt}
-          fill
-          sizes={prominent ? "(max-width: 900px) 90vw, 54vw" : "(max-width: 900px) 90vw, 63vw"}
-          priority={view.id === "overview"}
-        />
-        <div className="property-watermark">PROPERTY OF {LEGAL_ENTITY_NAME}</div>
-      </div>
-      <figcaption>
-        <p>{view.eyebrow}</p>
-        <strong>{view.title}</strong>
-        <span>{view.copy}</span>
-      </figcaption>
-    </figure>
-  );
+  return <figure className={`product-frame ${prominent ? "prominent" : ""}`}><div className="frame-top"><span>OBSERRA EIOS</span><span>CONTROLLED PRODUCT VIEW</span></div><div className="product-image"><Image src={view.image} alt={view.alt} fill sizes={prominent ? "(max-width: 900px) 90vw, 54vw" : "(max-width: 900px) 90vw, 63vw"} priority={view.id === "overview"} /><div className="property-watermark">PROPERTY OF {LEGAL_ENTITY_NAME}</div></div><figcaption><p>{view.eyebrow}</p><strong>{view.title}</strong><span>{view.copy}</span></figcaption></figure>;
 }
