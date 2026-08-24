@@ -67,7 +67,7 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
             <Link
               key={href}
               href={href}
-              className={prominence === "marketplace" ? "ent-header__marketplace" : undefined}
+              className={prominence === "marketplace" ? "ent-header__sales-link" : undefined}
               data-navigation={prominence === "marketplace" ? "marketplace" : undefined}
               onClick={close}
               aria-current={pathname === href || pathname.startsWith(`${href}/`) ? "page" : undefined}
