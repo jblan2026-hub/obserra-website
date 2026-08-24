@@ -15,13 +15,17 @@ function routingModule() {
   return module.exports;
 }
 
-test("Applications retain Clerk runtime without a frozen source digest", () => {
+test("Applications retain route-scoped Clerk runtime without a frozen source digest", () => {
   const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
-  const layout = fs.readFileSync("app/layout.tsx", "utf8");
+  const rootLayout = fs.readFileSync("app/layout.tsx", "utf8");
+  const portalLayout = fs.readFileSync("app/portal/layout.tsx", "utf8");
   const detail = fs.readFileSync("app/apps/[slug]/page.tsx", "utf8");
 
   assert.ok(packageJson.dependencies?.["@clerk/nextjs"]);
-  assert.match(layout, /<ClerkProvider/);
+  assert.doesNotMatch(rootLayout, /<ClerkProvider/);
+  assert.match(portalLayout, /<ClerkProvider/);
+  assert.match(portalLayout, /signInUrl="\/sign-in"/);
+  assert.match(portalLayout, /signInFallbackRedirectUrl="\/portal"/);
   assert.doesNotMatch(detail, /liveApplicationUrls/);
   assert.doesNotMatch(detail, /Subscribe & Launch/);
   assert.doesNotMatch(detail, /manage billing in Stripe/);
