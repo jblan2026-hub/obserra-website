@@ -1,0 +1,59 @@
+name: Marketplace v1.2 source verify once
+
+on:
+  push:
+    branches:
+      - ops/marketplace-v12-source-verify-20260823
+    paths:
+      - .github/workflows/marketplace-v12-source-verify-once.yml
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  dispatch-verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      TARGET_SHA: 6ab6bff2615853fda31175def8b63c2787404177
+      CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
+    steps:
+      - name: Dispatch governed protected-delivery verification only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          repo = "jblan2026-hub/obserra-website"
+          workflow = "marketplace-v12-protected-delivery.yml"
+          payload = {
+              "ref": "main",
+              "inputs": {
+                  "mode": "verify",
+                  "expected_commit": os.environ["TARGET_SHA"],
+                  "approved_catalog_revision": os.environ["CATALOG_REVISION"],
+              },
+          }
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{repo}/actions/workflows/{workflow}/dispatches",
+              data=json.dumps(payload).encode("utf-8"),
+              method="POST",
+              headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
+                  "Content-Type": "application/json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "User-Agent": "obserra-marketplace-source-verify",
+              },
+          )
+          with urllib.request.urlopen(req, timeout=30) as response:
+              if response.status != 204:
+                  raise SystemExit(f"unexpected dispatch status {response.status}")
+          print("Dispatched protected-delivery mode=verify for exact approved main revision.")
+          PY
