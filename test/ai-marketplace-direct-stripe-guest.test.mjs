@@ -8,18 +8,22 @@ test("public Marketplace purchase goes directly to Stripe without account access
 
   assert.match(checkoutUi, /action="\/api\/ai-marketplace\/guest-checkout"/);
   assert.match(checkoutUi, /providerReady && productReady/);
-  assert.doesNotMatch(checkoutUi, /providerReady && productReady && accessReady/);
-  assert.match(checkoutUi, /Pay securely by card with Stripe/);
+  assert.doesNotMatch(checkoutUi, /\/api\/ai-marketplace\/access/);
+  assert.doesNotMatch(checkoutUi, /auth\(\)/);
+  assert.match(checkoutUi, /continue directly to Stripe/);
+  assert.match(checkoutUi, /protected download starts automatically/);
 
   assert.doesNotMatch(guestCheckout, /\/sign-in/);
   assert.doesNotMatch(guestCheckout, /auth\(\)/);
   assert.doesNotMatch(guestCheckout, /primaryAccountEmail/);
-  assert.match(guestCheckout, /payment_method_types: \["card"\]/);
+  assert.doesNotMatch(guestCheckout, /consent_collection/);
   assert.match(guestCheckout, /createMarketplaceV12GuestIdentity/);
   assert.match(guestCheckout, /reserveMarketplaceV12Checkout/);
   assert.match(guestCheckout, /recordMarketplaceV12Checkout/);
   assert.match(guestCheckout, /purchase-download/);
   assert.match(guestCheckout, /\{CHECKOUT_SESSION_ID\}/);
+  assert.match(guestCheckout, /stage = "session"/);
+  assert.match(guestCheckout, /stage = "record"/);
 });
 
 test("guest purchase download requires verified Stripe payment and durable entitlement", async () => {
