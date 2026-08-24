@@ -1,0 +1,16 @@
+{
+  "contract": "obserra-marketplace-v12-release-inventory-v1",
+  "storageAccount": "stobserramktv1238d660",
+  "sourceContainer": "marketplace-v12-source",
+  "releaseContainer": "marketplace-v12-release",
+  "catalogRevision": "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2",
+  "releaseBlobCount": 0,
+  "releaseZipCount": 0,
+  "releaseRevisionMatchedCount": 0,
+  "releaseProductMetadataCount": 0,
+  "releaseUniqueProductIds": 0,
+  "sourceBlobCount": 0,
+  "sourceZipCount": 0,
+  "sourceManifestPresent": false,
+  "completeReleaseCandidate": false
+}
