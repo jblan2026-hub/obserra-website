@@ -116,6 +116,7 @@ test("marketplace is a simple offering directory with direct customer buy action
   assert.match(styles, /animation: marketplace-offering-roll 18s linear infinite/);
   assert.match(styles, /@keyframes marketplace-offering-roll/);
   assert.match(styles, /@media \(hover: hover\) and \(pointer: fine\)/);
+  assert.match(styles, /ai-marketplace-robot-hero\.webp/);
   assert.match(page, /aria-haspopup="dialog"/);
   assert.match(page, /role="dialog"/);
   assert.match(page, /Choose what you want to buy/);
