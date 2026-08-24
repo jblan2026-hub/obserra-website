@@ -126,15 +126,16 @@ test("buyer catalog is category-filtered, searchable, accessible, and collection
   assert.doesNotMatch(experience, /\/api\/ai-marketplace\/scene|relationship_product_ids|StaticCapabilityMap/);
 });
 
-test("catalog discovery uses bounded crawl pages and sharded product sitemaps", () => {
+test("catalog discovery uses bounded storefront pages and sharded product sitemaps", () => {
   const catalog = readFileSync(new URL("app/ai-marketplace/page.tsx", root), "utf8");
   const sitemap = readFileSync(new URL("app/ai-marketplace/sitemap.ts", root), "utf8");
   const robots = readFileSync(new URL("app/robots.ts", root), "utf8");
   const loader = readFileSync(new URL("lib/marketplace-v12-catalog.ts", root), "utf8");
   assert.match(catalog, /searchParams/);
-  assert.match(catalog, /limit: 24/);
-  assert.match(catalog, /Next results/);
-  assert.match(catalog, /generateMetadata/);
+  assert.match(catalog, /limit: 48/);
+  assert.match(catalog, /limit: 60/);
+  assert.match(catalog, /More products/);
+  assert.match(catalog, /export const metadata/);
   assert.match(sitemap, /generateSitemaps/);
   assert.match(sitemap, /pageSize = 500/);
   assert.match(sitemap, /marketplaceV12SitemapPage/);
@@ -142,17 +143,17 @@ test("catalog discovery uses bounded crawl pages and sharded product sitemaps", 
   assert.match(loader, /marketplaceV12SitemapPage/);
 });
 
-test("featured sales dock lets buyers choose by level and category before opening a product", () => {
+test("offering rail lets buyers choose a category before opening a governed product", () => {
   const page = readFileSync(new URL("app/ai-marketplace/page.tsx", root), "utf8");
-  const dock = readFileSync(new URL("app/ai-marketplace/MarketplaceSalesDock.tsx", root), "utf8");
-  assert.match(page, /const featuredLevels = \["Beginner", "Intermediate", "Expert", "Advanced"\]/);
-  assert.match(page, /<MarketplaceSalesDock products=\{dockRecords\}/);
-  assert.match(dock, /Choose by outcome, level, and fit\./);
-  assert.match(dock, /aria-label="Featured products by level and category"/);
-  assert.match(dock, /aria-pressed=\{activeLevel === name\}/);
-  assert.match(dock, /setActiveCategory\("All"\)/);
-  assert.match(dock, /href: `\/ai-marketplace\/\$\{encodeURIComponent\(product\.slug\)\}`/);
-  assert.match(dock, /href: `\/contact\?interest=ai-marketplace&product=\$\{encodeURIComponent\(product\.product_id\)\}`/);
+  for (const slug of ["skills", "agent-packs", "workflow-packs", "connectors", "trust-controls", "industry-editions", "collections"]) {
+    assert.match(page, new RegExp(`slug: "${slug}"`));
+  }
+  assert.match(page, /aria-haspopup="dialog"/);
+  assert.match(page, /role="dialog" aria-modal="true"/);
+  assert.match(page, /resultHref\(product as MarketplaceV12Card\)/);
+  assert.match(page, /#purchase-options/);
+  assert.match(page, /Buy now/);
+  assert.match(page, /marketplaceV12PublicPath\(card\)/);
 });
 
 test("marketplace retains verified results and exposes semantic recovery when interactive or route rendering fails", () => {
