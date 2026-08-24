@@ -1,0 +1,14 @@
+{
+  "contract": "obserra-marketplace-sales-validation-v1",
+  "sourcePr": 376,
+  "sourceSha": "ef1cfdfdb0562596a1bd14611a3afa803a5ae9ae",
+  "validationCommit": "e21e758dc6b3a68ade6f75f5f6bb140cf653bece",
+  "lockfileStatus": 0,
+  "catalogContractStatus": 0,
+  "focusedSalesTestStatus": 0,
+  "lintStatus": 0,
+  "buildStatus": 0,
+  "postBuildCatalogTraceStatus": 0,
+  "complete": true,
+  "validatedAt": "2026-08-24T20:11:05Z"
+}
