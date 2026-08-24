@@ -32,7 +32,7 @@ function unavailable(status = 503) {
 
 function pending(request: Request) {
   const retryUrl = new URL(request.url);
-  const body = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Preparing download | Obserra EPI</title></head><body style="font-family:system-ui,sans-serif;max-width:720px;margin:10vh auto;padding:24px"><h1>Payment verified</h1><p>Stripe confirmed your payment. Your protected download is being finalized.</p><p><a href="${retryUrl.toString().replaceAll("&", "&amp;")}">Retry download</a></p></body></html>`;
+  const body = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta http-equiv="refresh" content="2"><title>Preparing download | Obserra EPI</title></head><body style="font-family:system-ui,sans-serif;max-width:720px;margin:10vh auto;padding:24px"><h1>Payment verified</h1><p>Stripe confirmed your payment. Your protected download is being finalized.</p><p>This page retries automatically while your entitlement is finalized.</p><p><a href="${retryUrl.toString().replaceAll("&", "&amp;")}">Retry download</a></p></body></html>`;
   return new NextResponse(body, { status: 202, headers: { ...protectedHeaders(), "content-type": "text/html; charset=utf-8", "retry-after": "2" } });
 }
 
