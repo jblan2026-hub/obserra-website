@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -95,8 +96,7 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
         <div className="marketplace-simple__rail-heading"><h2 id="offering-heading">Choose an offering</h2><span>Click any card to shop</span></div>
         <div className="marketplace-simple__rail-window">
           <div className="marketplace-simple__rail-track">
-            {groups.map((group) => <Link key={group.slug} href={`/ai-marketplace?offering=${group.slug}`} aria-haspopup="dialog" aria-current={selected?.slug === group.slug ? "page" : undefined}><span>{group.count.toLocaleString()} products</span><h3>{group.name}</h3><strong>Shop now <b aria-hidden="true">→</b></strong></Link>)}
-            {groups.map((group) => <Link key={`${group.slug}-repeat`} href={`/ai-marketplace?offering=${group.slug}`} tabIndex={-1} aria-hidden="true"><span>{group.count.toLocaleString()} products</span><h3>{group.name}</h3><strong>Shop now <b aria-hidden="true">→</b></strong></Link>)}
+            {groups.map((group, index) => <Link className="marketplace-simple__orbit-card" style={{ "--card-angle": `${index * (360 / groups.length)}deg`, "--card-angle-negative": `${index * (-360 / groups.length)}deg` } as CSSProperties} key={group.slug} href={`/ai-marketplace?offering=${group.slug}`} aria-haspopup="dialog" aria-current={selected?.slug === group.slug ? "page" : undefined}><span className="marketplace-simple__orbit-face"><small>{group.count.toLocaleString()} products</small><h3>{group.name}</h3><strong>Shop now <b aria-hidden="true">→</b></strong></span></Link>)}
           </div>
         </div>
       </div>
