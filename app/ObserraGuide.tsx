@@ -108,7 +108,7 @@ function response(question: string, pathname: string): Message {
   if (/course|academy|training|learn|recommend/.test(input)) {
     return {
       from: "guide",
-      text: `${ACADEMY_BRAND_NAME}, a learning product from ${LEGAL_ENTITY_NAME}, offers account-based, self-paced professional training across cybersecurity, protection, intelligence, leadership, artificial intelligence, and secure technology. Course pages show the level, duration, outcomes, and price before enrollment.`,
+      text: `${ACAMY_BRAND_NAME}, a learning product from ${LEGAL_ENTITY_NAME}, offers account-based, self-paced professional training across cybersecurity, protection, intelligence, leadership, artificial intelligence, and secure technology. Course pages show the level, duration, outcomes, and price before enrollment.`,
       actions: [
         { href: "/academy#courses", label: `Browse ${ACADEMY_BRAND_NAME}` },
         { href: "/contact?interest=enterprise-training", label: "Discuss team training" },
@@ -200,14 +200,6 @@ export default function ObserraGuide() {
   const excluded = excludedPaths.some((path) => pathname.startsWith(path));
 
   useEffect(() => {
-    if (pathname !== "/" || excluded) return;
-    const dismissed = window.sessionStorage.getItem("obserrian-auto-open-dismissed") === "1";
-    if (dismissed) return;
-    const timer = window.setTimeout(() => setOpen(true), 1100);
-    return () => window.clearTimeout(timer);
-  }, [excluded, pathname]);
-
-  useEffect(() => {
     if (!open) return;
     const container = messagesRef.current;
     if (container) container.scrollTop = container.scrollHeight;
@@ -241,7 +233,6 @@ export default function ObserraGuide() {
 
   function closeGuide() {
     setOpen(false);
-    window.sessionStorage.setItem("obserrian-auto-open-dismissed", "1");
   }
 
   return (
