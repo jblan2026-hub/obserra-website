@@ -7,6 +7,8 @@ on:
     paths:
       - data/marketplace/obserra-marketplace-v12-sellable-source-manifest.json
       - scripts/marketplace-v12-sellable-source-materialize.mjs
+      - scripts/marketplace-v12-sellable-source-ingest-azure.mjs
+      - .github/workflows/marketplace-v12-six-source-protected-delivery.yml
       - .github/workflows/marketplace-v12-six-source-validation.yml
 
 permissions:
@@ -21,6 +23,13 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           persist-credentials: false
+
+      - name: Check six-source scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check scripts/marketplace-v12-sellable-source-materialize.mjs
+          node --check scripts/marketplace-v12-sellable-source-ingest-azure.mjs
 
       - name: Validate six sellable source archives against all product cards
         shell: bash
@@ -37,3 +46,13 @@ jobs:
       - name: Preserve existing artifact contract tests
         shell: bash
         run: node --test scripts/marketplace-v12-artifact-contract.test.mjs
+
+      - name: Verify production workflow contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'workflow_dispatch:' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+          grep -q 'requiredProducts == 11390' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+          grep -q 'requiredArchives == 6' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+          grep -q 'marketplace-v12-sellable-source-ingest-azure.mjs' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+          grep -q 'https://www.obserrallc.com/api/ai-marketplace/commerce-health' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
