@@ -1,0 +1,86 @@
+name: Marketplace v1.2 six-source validation
+
+on:
+  push:
+    branches:
+      - fix/marketplace-v12-six-source-release-20260824
+    paths:
+      - data/marketplace/obserra-marketplace-v12-sellable-source-manifest.json
+      - scripts/marketplace-v12-sellable-source-materialize.mjs
+      - scripts/marketplace-v12-sellable-source-ingest-azure.mjs
+      - scripts/Upload-ObserraMarketplaceSources.ps1
+      - .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+      - .github/workflows/marketplace-v12-six-source-ingest-trigger.yml
+      - .github/workflows/marketplace-v12-six-source-validation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+
+      - name: Check six-source scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check scripts/marketplace-v12-sellable-source-materialize.mjs
+          node --check scripts/marketplace-v12-sellable-source-ingest-azure.mjs
+
+      - name: Validate six sellable source archives against all product cards
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/marketplace-v12-sellable-source-materialize.mjs \
+            --catalog data/marketplace/obserra-marketplace-card-catalog.json.gz \
+            --summary data/marketplace/obserra-marketplace-card-catalog.summary.json \
+            --source-manifest data/marketplace/obserra-marketplace-v12-sellable-source-manifest.json \
+            --validate-sources-only \
+            | tee /tmp/six-source-validation.json
+          jq -e '.complete == true and .requiredProducts == 11390 and .requiredArchives == 6 and .catalogHistoricalSourceArchives == 15 and .activationChanged == false' /tmp/six-source-validation.json >/dev/null
+
+      - name: Preserve existing artifact contract tests
+        shell: bash
+        run: node --test scripts/marketplace-v12-artifact-contract.test.mjs
+
+      - name: Verify production workflow contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'workflow_dispatch:' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+          grep -q 'requiredProducts == 11390' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+          grep -q 'requiredArchives == 6' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+          grep -q 'marketplace-v12-sellable-source-ingest-azure.mjs' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+          grep -q 'https://www.obserrallc.com/api/ai-marketplace/commerce-health' .github/workflows/marketplace-v12-six-source-protected-delivery.yml
+          grep -q 'actions: write' .github/workflows/marketplace-v12-six-source-ingest-trigger.yml
+          grep -q 'expected_commit="${GITHUB_SHA}"' .github/workflows/marketplace-v12-six-source-ingest-trigger.yml
+
+  windows-uploader-parse:
+    runs-on: windows-2022
+    timeout-minutes: 5
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+
+      - name: Parse PowerShell uploader without executing it
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path 'scripts/Upload-ObserraMarketplaceSources.ps1'),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }

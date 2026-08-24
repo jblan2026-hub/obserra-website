@@ -1,0 +1,257 @@
+name: Marketplace v1.2 six-source protected delivery
+run-name: Marketplace v1.2 six-source protected delivery ${{ inputs.mode }} for ${{ inputs.expected_commit }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Verify sources or ingest exact artifacts into protected storage
+        required: true
+        type: choice
+        options: [verify, ingest]
+        default: verify
+      expected_commit:
+        description: Exact main commit approved for this run
+        required: true
+        type: string
+      approved_catalog_revision:
+        description: Exact approved marketplace catalog revision
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: marketplace-v12-six-source-protected-delivery
+  cancel-in-progress: false
+
+env:
+  EXPECTED_CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
+  AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
+  AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
+  AZURE_DELIVERY_CLIENT_ID: b8da232a-713f-4c25-a61e-4fb34d13e229
+  AZURE_KEY_VAULT_NAME: kv-obserra-prod-38d660
+  AZURE_SOURCE_STORAGE_ACCOUNT: stobserramktv1238d660
+  AZURE_SOURCE_CONTAINER: marketplace-v12-source
+  AZURE_RELEASE_CONTAINER: marketplace-v12-release
+  OBSERRA_APPLICATIONS_SUPABASE_URL: https://ykmrlcfitsubqajgfnye.supabase.co
+  OBSERRA_MARKETPLACE_V12_PROTECTED_DELIVERY_APPROVED_REVISION: ${{ inputs.approved_catalog_revision }}
+  SELLABLE_SOURCE_MANIFEST: data/marketplace/obserra-marketplace-v12-sellable-source-manifest.json
+
+jobs:
+  protected-delivery:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    environment: production
+    steps:
+      - name: Check out the exact approved main revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ inputs.expected_commit }}
+          persist-credentials: false
+
+      - name: Pin governed release identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_SHA}" = "${{ inputs.expected_commit }}"
+          test "$(git rev-parse HEAD)" = "${{ inputs.expected_commit }}"
+          test "${{ inputs.approved_catalog_revision }}" = "${EXPECTED_CATALOG_REVISION}"
+          node scripts/marketplace-catalog-delivery-gate.mjs
+          node scripts/marketplace-v12-sellable-source-materialize.mjs \
+            --catalog data/marketplace/obserra-marketplace-card-catalog.json.gz \
+            --summary data/marketplace/obserra-marketplace-card-catalog.summary.json \
+            --source-manifest "${SELLABLE_SOURCE_MANIFEST}" \
+            --validate-sources-only \
+            | tee "${RUNNER_TEMP}/six-source-validation.json"
+          jq -e '.complete == true and .requiredProducts == 11390 and .requiredArchives == 6 and .catalogHistoricalSourceArchives == 15' "${RUNNER_TEMP}/six-source-validation.json" >/dev/null
+
+      - name: Install locked protected-delivery dependencies
+        shell: bash
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Authenticate dedicated protected-delivery identity
+        uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca
+        with:
+          client-id: ${{ env.AZURE_DELIVERY_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Preflight production commerce and delivery authorities
+        if: inputs.mode == 'ingest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(az account show --query id -o tsv)" = "${AZURE_SUBSCRIPTION_ID}"
+          test "$(az account show --query tenantId -o tsv)" = "${AZURE_TENANT_ID}"
+          for secret_name in \
+            applications-supabase-service-role-key \
+            applications-stripe-secret-key \
+            applications-stripe-webhook-secret \
+            applications-commerce-hash-secret \
+            ai-marketplace-v12-release-evidence-hmac-key; do
+            test -n "$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${secret_name}" --query id -o tsv --only-show-errors)"
+          done
+          az storage container show --auth-mode login --account-name "${AZURE_SOURCE_STORAGE_ACCOUNT}" --name "${AZURE_SOURCE_CONTAINER}" --output none --only-show-errors
+          az storage container show --auth-mode login --account-name "${AZURE_SOURCE_STORAGE_ACCOUNT}" --name "${AZURE_RELEASE_CONTAINER}" --output none --only-show-errors
+
+      - name: Download and verify exactly six sellable source archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_dir="${RUNNER_TEMP}/marketplace-v12-sources"
+          mkdir -p "${source_dir}"
+          jq -r '.archives[].filename' "${SELLABLE_SOURCE_MANIFEST}" | while IFS= read -r filename; do
+            az storage blob download \
+              --auth-mode login \
+              --account-name "${AZURE_SOURCE_STORAGE_ACCOUNT}" \
+              --container-name "${AZURE_SOURCE_CONTAINER}" \
+              --name "${filename}" \
+              --file "${source_dir}/${filename}" \
+              --only-show-errors
+          done
+          find "${source_dir}" -type f -name '*.zip' -exec chmod 0400 {} +
+          test "$(find "${source_dir}" -maxdepth 1 -type f -name '*.zip' | wc -l | tr -d ' ')" = "6"
+
+      - name: Materialize and integrity-check all 11,390 product artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_dir="${RUNNER_TEMP}/marketplace-v12-sources"
+          artifact_dir="${RUNNER_TEMP}/marketplace-v12-artifacts"
+          work_dir="${RUNNER_TEMP}/marketplace-v12-work"
+          evidence_dir="${RUNNER_TEMP}/marketplace-v12-evidence"
+          mkdir -p "${artifact_dir}" "${work_dir}" "${evidence_dir}"
+          node scripts/marketplace-v12-sellable-source-materialize.mjs \
+            --catalog data/marketplace/obserra-marketplace-card-catalog.json.gz \
+            --summary data/marketplace/obserra-marketplace-card-catalog.summary.json \
+            --source-manifest "${SELLABLE_SOURCE_MANIFEST}" \
+            --archive-dir "${source_dir}" \
+            --output-dir "${artifact_dir}" \
+            --work-dir "${work_dir}" \
+            --checkpoint "${evidence_dir}/checkpoint.json" \
+            --delivery-catalog "${evidence_dir}/delivery-catalog.json" \
+            --verified-at "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" \
+            >"${evidence_dir}/materialization-result.json"
+          jq -e '.complete == true and .requiredProducts == 11390 and .requiredArchives == 6 and .activationChanged == false' "${evidence_dir}/materialization-result.json" >/dev/null
+
+      - name: Read guarded commerce and delivery bindings from Key Vault
+        if: inputs.mode == 'ingest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          secret_dir="${RUNNER_TEMP}/marketplace-v12-secrets"
+          mkdir -p "${secret_dir}"
+          chmod 0700 "${secret_dir}"
+          read_secret() {
+            local secret_name="$1" output_name="$2" protected_value
+            az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${secret_name}" --query value -o tsv >"${secret_dir}/${output_name}"
+            test -s "${secret_dir}/${output_name}"
+            chmod 0600 "${secret_dir}/${output_name}"
+            protected_value="$(<"${secret_dir}/${output_name}")"
+            echo "::add-mask::${protected_value}"
+          }
+          read_secret applications-supabase-service-role-key supabase-service-role-key
+          read_secret applications-stripe-secret-key stripe-secret-key
+          read_secret applications-stripe-webhook-secret stripe-webhook-secret
+          read_secret ai-marketplace-v12-release-evidence-hmac-key release-evidence-hmac-key
+
+      - name: Verify live Stripe authority, durable ledger, and ingest protected artifacts
+        if: inputs.mode == 'ingest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          secret_dir="${RUNNER_TEMP}/marketplace-v12-secrets"
+          evidence_dir="${RUNNER_TEMP}/marketplace-v12-evidence"
+          export OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY="$(<"${secret_dir}/supabase-service-role-key")"
+          export APPLICATIONS_STRIPE_SECRET_KEY="$(<"${secret_dir}/stripe-secret-key")"
+          export APPLICATIONS_STRIPE_WEBHOOK_SECRET="$(<"${secret_dir}/stripe-webhook-secret")"
+          export OBSERRA_AI_MARKETPLACE_V12_EVIDENCE_RUN=review
+          export OBSERRA_ALLOW_LIVE_STRIPE_OUTSIDE_PRODUCTION=true
+
+          node scripts/verify-marketplace-v12-stripe-evidence.mjs >"${evidence_dir}/stripe-evidence.json"
+          jq -e '.verified == true and .failureCount == 0 and .requiredProductCards == 11390 and .verifiedOfferBindings == .requiredOfferBindings and .bindingReceipt.requiredProducts == 11390 and .stripeAccountChargesEnabled == true' "${evidence_dir}/stripe-evidence.json" >/dev/null
+          jq -c '.bindingReceipt' "${evidence_dir}/stripe-evidence.json" >"${evidence_dir}/runtime-binding-receipt.json"
+          chmod 0600 "${evidence_dir}/runtime-binding-receipt.json"
+
+          node scripts/verify-marketplace-v12-ledger-evidence.mjs >"${evidence_dir}/ledger-evidence.json"
+          jq -e '.durableLedgerVerified == true and .entitlementAuthority == "ai-marketplace-commerce-ledger-v1"' "${evidence_dir}/ledger-evidence.json" >/dev/null
+
+          node scripts/marketplace-v12-sellable-source-ingest-azure.mjs \
+            --catalog data/marketplace/obserra-marketplace-card-catalog.json.gz \
+            --summary data/marketplace/obserra-marketplace-card-catalog.summary.json \
+            --source-manifest "${SELLABLE_SOURCE_MANIFEST}" \
+            --artifact-dir "${RUNNER_TEMP}/marketplace-v12-artifacts" \
+            --delivery-catalog "${evidence_dir}/delivery-catalog.json" \
+            --stripe-evidence "${evidence_dir}/stripe-evidence.json" \
+            --account-name "${AZURE_SOURCE_STORAGE_ACCOUNT}" \
+            --container "${AZURE_RELEASE_CONTAINER}" \
+            --activate >"${evidence_dir}/ingest-result.json"
+          jq -e '.protectedArtifactSetComplete == true and .requiredProducts == 11390' "${evidence_dir}/ingest-result.json" >/dev/null
+
+          node scripts/marketplace-v12-runtime-evidence.mjs \
+            --binding-receipt "${evidence_dir}/runtime-binding-receipt.json" \
+            --delivery-catalog "${evidence_dir}/delivery-catalog.json" \
+            --stripe-evidence "${evidence_dir}/stripe-evidence.json" \
+            --ingest-evidence "${evidence_dir}/ingest-result.json" \
+            --ledger-evidence "${evidence_dir}/ledger-evidence.json" \
+            --azure-storage-account "${AZURE_SOURCE_STORAGE_ACCOUNT}" \
+            --azure-release-container "${AZURE_RELEASE_CONTAINER}" \
+            --hmac-key-file "${secret_dir}/release-evidence-hmac-key" \
+            --receipt-output "${evidence_dir}/runtime-delivery-receipt.json" \
+            --evidence-output "${evidence_dir}/runtime-release-evidence.json" \
+            --signature-output "${evidence_dir}/runtime-release-evidence-signature" \
+            >"${evidence_dir}/runtime-evidence-build.json"
+          jq -e '.complete == true and .requiredProducts == 11390 and .durableLedgerVerified == true and .protectedDeliveryVerified == true' "${evidence_dir}/runtime-evidence-build.json" >/dev/null
+
+          unset OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY APPLICATIONS_STRIPE_SECRET_KEY APPLICATIONS_STRIPE_WEBHOOK_SECRET
+
+      - name: Publish exact Marketplace runtime activation evidence to Key Vault
+        if: inputs.mode == 'ingest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence_dir="${RUNNER_TEMP}/marketplace-v12-evidence"
+          set_secret_file() {
+            local secret_name="$1" source_file="$2"
+            test -s "${source_file}"
+            az keyvault secret set --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${secret_name}" --file "${source_file}" --output none
+          }
+          set_secret_file ai-marketplace-v12-binding-receipt-json "${evidence_dir}/runtime-binding-receipt.json"
+          set_secret_file ai-marketplace-v12-delivery-catalog-json "${evidence_dir}/runtime-delivery-receipt.json"
+          set_secret_file ai-marketplace-v12-release-evidence-json "${evidence_dir}/runtime-release-evidence.json"
+          set_secret_file ai-marketplace-v12-release-evidence-signature "${evidence_dir}/runtime-release-evidence-signature"
+          az keyvault secret set --vault-name "${AZURE_KEY_VAULT_NAME}" --name ai-marketplace-v12-activation-approved-revision --value "${EXPECTED_CATALOG_REVISION}" --output none
+
+      - name: Verify exact protected release inventory
+        if: inputs.mode == 'ingest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          inventory="${RUNNER_TEMP}/release-inventory.json"
+          az storage blob list --auth-mode login --account-name "${AZURE_SOURCE_STORAGE_ACCOUNT}" --container-name "${AZURE_RELEASE_CONTAINER}" --include m --num-results '*' --output json --only-show-errors >"${inventory}"
+          jq -e --arg revision "${EXPECTED_CATALOG_REVISION}" '
+            length == 11390 and
+            ([.[] | select((.metadata.catalog_revision // "") == $revision)] | length) == 11390 and
+            ([.[] | select((.metadata.product_id // "") != "" and (.metadata.artifact_sha256 // "") != "")] | length) == 11390 and
+            ([.[] | .metadata.product_id] | unique | length) == 11390
+          ' "${inventory}" >/dev/null
+
+      - name: Verify canonical production commerce health
+        if: inputs.mode == 'ingest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 24); do
+            code="$(curl -sS --max-time 20 -o "${RUNNER_TEMP}/commerce-health.json" -w '%{http_code}' https://www.obserrallc.com/api/ai-marketplace/commerce-health || true)"
+            if [ "${code}" = "200" ] && jq -e --arg revision "${EXPECTED_CATALOG_REVISION}" '.contract == "ai-marketplace-commerce-health-v1" and .operational == true and .catalog.revision == $revision and .catalog.productCards == 11390 and .catalog.priceBindingsVerified == true and .durableLedger == "ai-marketplace-commerce-ledger-v1" and .protectedDeliveryConfigured == true and .paymentProvider == "stripe" and .chargesEnabled == true and .activationBlocked == false' "${RUNNER_TEMP}/commerce-health.json" >/dev/null; then
+              cat "${RUNNER_TEMP}/commerce-health.json"
+              exit 0
+            fi
+            sleep 15
+          done
+          cat "${RUNNER_TEMP}/commerce-health.json" 2>/dev/null || true
+          exit 1
