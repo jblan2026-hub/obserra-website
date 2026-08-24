@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import CoursePlayer from "../CoursePlayer";
 import { academyStateWithOwnerAccess, courseForId } from "../../../../lib/academy";
 import { safeAcademyIdentity } from "../../../../lib/academy-identity";
+import { ACADEMY_BRAND_NAME } from "../../../../lib/legal-identity";
 import { finalAssessmentQuestions, lessonBrief } from "../../courseExperience";
 
 export default async function LearnCoursePage({ params }: { params: Promise<{ courseId: string }> }) {
@@ -34,7 +35,7 @@ export default async function LearnCoursePage({ params }: { params: Promise<{ co
       initialProgress={state.progress[courseId] ?? { completedLessons: [] }}
       lessons={lessons}
       assessment={finalAssessmentQuestions(course.id)}
-      watermark="PAID OBSERRA ACADEMY ACCESS · OBSERRA ACADEMY PROPRIETARY"
+      watermark={`PAID ${ACADEMY_BRAND_NAME.toUpperCase()} ACCESS · ${ACADEMY_BRAND_NAME.toUpperCase()} PROPRIETARY`}
     />
   );
 }
