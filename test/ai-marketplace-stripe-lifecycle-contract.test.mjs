@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const webhookUrl = new URL("../app/api/webhook/stripe-ai-marketplace/route.ts", import.meta.url);
-const migrationUrl = new URL("../supabase/migrations/20260824232000_ai_marketplace_v12_lifecycle_monotonicity.sql", import.meta.url);
+const migrationUrl = new URL("../supabase/migrations/20260824231857_ai_marketplace_v12_lifecycle_monotonicity.sql", import.meta.url);
 
 test("Marketplace lifecycle attribution survives catalog revisions and current Stripe invoice shape", async () => {
   const webhook = await readFile(webhookUrl, "utf8");
