@@ -1,0 +1,104 @@
+name: Marketplace v1.2 source-ready ingest once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/marketplace-v12-source-ready-ingest-once.yml
+
+permissions:
+  actions: write
+  contents: read
+  id-token: write
+
+concurrency:
+  group: marketplace-v12-source-ready-ingest-once
+  cancel-in-progress: false
+
+jobs:
+  wait-and-dispatch:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    environment: production
+    env:
+      AZURE_CLIENT_ID: b8da232a-713f-4c25-a61e-4fb34d13e229
+      AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
+      AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
+      AZURE_STORAGE_ACCOUNT: stobserramktv1238d660
+      AZURE_SOURCE_CONTAINER: marketplace-v12-source
+      SELLABLE_SOURCE_MANIFEST: data/marketplace/obserra-marketplace-v12-sellable-source-manifest.json
+      CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
+    steps:
+      - name: Check out exact watcher revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Validate six-source release contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(jq '.archives | length' "${SELLABLE_SOURCE_MANIFEST}")" = "6"
+          node scripts/marketplace-v12-sellable-source-materialize.mjs \
+            --catalog data/marketplace/obserra-marketplace-card-catalog.json.gz \
+            --summary data/marketplace/obserra-marketplace-card-catalog.summary.json \
+            --source-manifest "${SELLABLE_SOURCE_MANIFEST}" \
+            --validate-sources-only \
+            > "${RUNNER_TEMP}/six-source-contract.json"
+          jq -e '.complete == true and .requiredProducts == 11390 and .requiredArchives == 6' "${RUNNER_TEMP}/six-source-contract.json" >/dev/null
+
+      - name: Authenticate Marketplace delivery identity
+        uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Wait for the exact six source archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(az account show --query id -o tsv)" = "${AZURE_SUBSCRIPTION_ID}"
+          test "$(az account show --query tenantId -o tsv)" = "${AZURE_TENANT_ID}"
+
+          for attempt in $(seq 1 600); do
+            ready=true
+            while IFS=$'\t' read -r filename bytes sha; do
+              blob="$(az storage blob show \
+                --auth-mode login \
+                --account-name "${AZURE_STORAGE_ACCOUNT}" \
+                --container-name "${AZURE_SOURCE_CONTAINER}" \
+                --name "${filename}" \
+                --output json \
+                --only-show-errors 2>/dev/null || true)"
+              if [ -z "${blob}" ] || ! jq -e --argjson bytes "${bytes}" --arg sha "${sha}" '
+                (.properties.contentLength == $bytes) and ((.metadata.sha256 // "") == $sha)
+              ' <<<"${blob}" >/dev/null; then
+                ready=false
+                break
+              fi
+            done < <(jq -r '.archives[] | [.filename, (.bytes|tostring), .sha256] | @tsv' "${SELLABLE_SOURCE_MANIFEST}")
+
+            if [ "${ready}" = true ]; then
+              echo "::notice::All six exact Marketplace source archives are present in Azure."
+              exit 0
+            fi
+            sleep 30
+          done
+
+          echo "::error::The six exact Marketplace source archives did not become available during this one-shot run."
+          exit 1
+
+      - name: Dispatch guarded six-source protected delivery
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run marketplace-v12-six-source-protected-delivery.yml \
+            --ref main \
+            -f mode=ingest \
+            -f expected_commit="${GITHUB_SHA}" \
+            -f approved_catalog_revision="${CATALOG_REVISION}"
