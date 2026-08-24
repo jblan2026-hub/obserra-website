@@ -1,0 +1,56 @@
+# Registered on main by PR #284; this branch push executes it once and it self-deletes from this branch.
+name: Pin Marketplace v1.2 actions once
+
+on:
+  push:
+    branches:
+      - security/pin-marketplace-v12-actions-20260823
+
+permissions:
+  contents: write
+
+jobs:
+  pin-actions:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          ref: security/pin-marketplace-v12-actions-20260823
+          fetch-depth: 1
+
+      - name: Pin exact Marketplace action SHAs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/marketplace-v12-protected-delivery.yml')
+          text = path.read_text()
+          replacements = {
+              'uses: actions/checkout@v6': 'uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0',
+              'uses: azure/login@v3.0.1': 'uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca # v3.0.1',
+              'uses: actions/upload-artifact@v6': 'uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0',
+          }
+          for old, new in replacements.items():
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'expected exactly one occurrence of {old!r}; found {count}')
+              text = text.replace(old, new)
+          path.write_text(text)
+          PY
+
+          rm -- .github/workflows/ops-pin-marketplace-v12-actions-once.yml
+          git diff --check
+          git diff -- .github/workflows/marketplace-v12-protected-delivery.yml .github/workflows/ops-pin-marketplace-v12-actions-once.yml
+
+      - name: Commit hardened workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .github/workflows/marketplace-v12-protected-delivery.yml .github/workflows/ops-pin-marketplace-v12-actions-once.yml
+          git commit -m 'security: pin Marketplace workflow actions'
+          git push origin HEAD:security/pin-marketplace-v12-actions-20260823
