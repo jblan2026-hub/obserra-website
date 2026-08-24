@@ -97,11 +97,11 @@ test("v1.2 product page presents buyer outcomes and fail-closed purchase options
   assert.match(install, /marketplaceV12InstallBridgeConfigured/);
   assert.match(install, /obserra:\/\/install\?grant=/);
   assert.match(install, /Install bridge unavailable/);
-  assert.match(v12Checkout, /Continue to secure checkout/);
-  assert.match(v12Checkout, /Checkout unavailable/);
-  assert.match(v12Checkout, /Online checkout is not available for this capability right now\./);
+  assert.match(v12Checkout, /Buy & download/);
+  assert.match(v12Checkout, /Buy & download unavailable/);
+  assert.match(v12Checkout, /Buy & download will unlock automatically after protected artifacts, live price bindings, and payment delivery are verified\./);
   assert.match(v12Checkout, /Contact sales for purchase options/);
-  assert.match(v12Checkout, /disabled=\{!checkoutEnabled\}/);
+  assert.match(v12Checkout, /disabled=\{!canPurchase\}/);
 });
 
 test("every marketplace offering requires an exact governed payment binding", async () => {
