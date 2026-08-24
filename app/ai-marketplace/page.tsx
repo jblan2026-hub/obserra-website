@@ -64,10 +64,10 @@ function resultHref(card: MarketplaceV12Card) {
 }
 
 function listing(selected: Offering, query: string, cursor?: string) {
-  if (selected.types.length === 1) return marketplaceV12Search({ type: selected.types[0], q: query || undefined, cursor, limit: 24 });
+  if (selected.types.length === 1) return marketplaceV12Search({ type: selected.types[0], q: query || undefined, cursor, limit: 48 });
   const results = selected.types.flatMap((type) => marketplaceV12Search({ type, q: query || undefined, limit: 60 }).results).sort((left, right) => left.name.localeCompare(right.name));
   const start = Number(cursor ?? 0);
-  return { total: results.length, results: results.slice(start, start + 24), nextCursor: start + 24 < results.length ? String(start + 24) : null };
+  return { total: results.length, results: results.slice(start, start + 48), nextCursor: start + 48 < results.length ? String(start + 48) : null };
 }
 
 export default async function AiMarketplacePage({ searchParams }: PageProps) {
@@ -95,21 +95,23 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
         <div className="marketplace-simple__rail-heading"><h2 id="offering-heading">Choose an offering</h2><span>Click any card to shop</span></div>
         <div className="marketplace-simple__rail-window">
           <div className="marketplace-simple__rail-track">
-            {groups.map((group) => <Link key={group.slug} href={`/ai-marketplace?offering=${group.slug}`} aria-current={selected?.slug === group.slug ? "page" : undefined}><span>{group.count.toLocaleString()} products</span><h3>{group.name}</h3><strong>Shop now <b aria-hidden="true">→</b></strong></Link>)}
+            {groups.map((group) => <Link key={group.slug} href={`/ai-marketplace?offering=${group.slug}`} aria-haspopup="dialog" aria-current={selected?.slug === group.slug ? "page" : undefined}><span>{group.count.toLocaleString()} products</span><h3>{group.name}</h3><strong>Shop now <b aria-hidden="true">→</b></strong></Link>)}
             {groups.map((group) => <Link key={`${group.slug}-repeat`} href={`/ai-marketplace?offering=${group.slug}`} tabIndex={-1} aria-hidden="true"><span>{group.count.toLocaleString()} products</span><h3>{group.name}</h3><strong>Shop now <b aria-hidden="true">→</b></strong></Link>)}
           </div>
         </div>
       </div>
     </section>
 
-    {selected && products ? <section className="marketplace-simple__listing" aria-labelledby="listing-heading">
-      <header><div><Link href="/ai-marketplace">← All offerings</Link><p>{selected.name.toUpperCase()}</p><h2 id="listing-heading">{selected.name}</h2></div><span>{products.total.toLocaleString()} products</span></header>
-      <form role="search" action="/ai-marketplace"><input type="hidden" name="offering" value={selected.slug} /><label htmlFor="marketplace-search">Search {selected.name}</label><div><input id="marketplace-search" name="q" type="search" defaultValue={query} placeholder="What do you need help with?" /><button type="submit">Search</button></div></form>
-      <div className="marketplace-simple__product-list">
-        {products.results.map((product) => <article key={product.product_id}><div><span>{product.proficiency || product.category || selected.name}</span><strong>{money(product as MarketplaceV12Card)}</strong></div><h3><Link href={resultHref(product as MarketplaceV12Card)}>{product.name}</Link></h3><p>{outcome(product as MarketplaceV12Card)}</p><Link className="marketplace-simple__buy" href={resultHref(product as MarketplaceV12Card)}>{product.pricing.offers.length ? "Buy now" : "View product"}<b aria-hidden="true">→</b></Link></article>)}
-      </div>
-      {!products.results.length ? <p className="marketplace-simple__empty">No products match that search. <Link href={`/ai-marketplace?offering=${selected.slug}`}>Clear search</Link></p> : null}
-      <nav className="marketplace-simple__pagination" aria-label="Product pages">{cursor ? <Link href={`/ai-marketplace?offering=${selected.slug}${query ? `&q=${encodeURIComponent(query)}` : ""}`}>First page</Link> : null}{products.nextCursor ? <Link href={`/ai-marketplace?offering=${selected.slug}${query ? `&q=${encodeURIComponent(query)}` : ""}&cursor=${products.nextCursor}`}>More products →</Link> : null}</nav>
-    </section> : null}
+    {selected && products ? <div className="marketplace-simple__modal-layer">
+      <Link className="marketplace-simple__modal-scrim" href="/ai-marketplace" aria-label="Close product list" />
+      <section className="marketplace-simple__listing" role="dialog" aria-modal="true" aria-labelledby="listing-heading">
+        <header><div><p>{selected.name.toUpperCase()}</p><h2 id="listing-heading">Choose what you want to buy</h2></div><div><span>{products.total.toLocaleString()} products</span><Link className="marketplace-simple__close" href="/ai-marketplace" aria-label="Close product list">×</Link></div></header>
+        <div className="marketplace-simple__product-list">
+          {products.results.map((product) => <article key={product.product_id}><div><span>{product.proficiency || product.category || selected.name}</span><strong>{money(product as MarketplaceV12Card)}</strong></div><h3><Link href={resultHref(product as MarketplaceV12Card)}>{product.name}</Link></h3><p>{outcome(product as MarketplaceV12Card)}</p><Link className="marketplace-simple__buy" href={resultHref(product as MarketplaceV12Card)}>{product.pricing.offers.length ? "Buy now" : "View product"}<b aria-hidden="true">→</b></Link></article>)}
+        </div>
+        {!products.results.length ? <p className="marketplace-simple__empty">No products are available in this offering.</p> : null}
+        <nav className="marketplace-simple__pagination" aria-label="Product pages">{cursor ? <Link href={`/ai-marketplace?offering=${selected.slug}`}>First products</Link> : null}{products.nextCursor ? <Link href={`/ai-marketplace?offering=${selected.slug}&cursor=${products.nextCursor}`}>More products →</Link> : null}</nav>
+      </section>
+    </div> : null}
   </main>;
 }
