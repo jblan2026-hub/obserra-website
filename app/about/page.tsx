@@ -2,19 +2,21 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import VerifiedCredentials from "./VerifiedCredentials";
-import { ACADEMY_BRAND_NAME, LEGAL_ENTITY_NAME } from "../../lib/legal-identity";
+import ExecutiveDetailModal from "../components/ui/ExecutiveDetailModal";
+import { LEGAL_ENTITY_NAME } from "../../lib/legal-identity";
 import "./about.css";
 import "./about-extra.css";
-import { EnterpriseFooter, EnterpriseHeader, EnterpriseProofBand } from "../components/enterprise/EnterpriseChrome";
+import "./about-executive.css";
+import { EnterpriseFooter, EnterpriseHeader } from "../components/enterprise/EnterpriseChrome";
 
 export const metadata: Metadata = {
-  title: `About ${LEGAL_ENTITY_NAME} | Executive Leadership for High-Consequence Decisions`,
-  description: `Meet Dr. Jody Blanchard, founder and Chief Executive Officer of ${LEGAL_ENTITY_NAME}, and review the leadership experience behind its cybersecurity, intelligence, governance, protection, and technology work.`,
+  title: `About Dr. Jody Blanchard | ${LEGAL_ENTITY_NAME}`,
+  description: `Executive biography, credentials, recognition, publications, and public leadership for Dr. Jody Blanchard, founder and Chief Executive Officer of ${LEGAL_ENTITY_NAME}.`,
   alternates: { canonical: "/about" },
-  keywords: [`about ${LEGAL_ENTITY_NAME}`, "Dr. Jody Blanchard", "executive cybersecurity advisor", "enterprise risk leadership", "protective intelligence"],
+  keywords: ["Dr. Jody Blanchard", "executive cybersecurity advisor", "enterprise risk leadership", "protective intelligence", LEGAL_ENTITY_NAME],
   openGraph: {
-    title: `About ${LEGAL_ENTITY_NAME} | Executive Leadership for High-Consequence Decisions`,
-    description: `Executive leadership, business judgment, and integrated security expertise behind ${LEGAL_ENTITY_NAME}.`,
+    title: `Dr. Jody Blanchard | Executive Biography`,
+    description: `Executive leadership, cybersecurity, intelligence, governance, and public leadership behind ${LEGAL_ENTITY_NAME}.`,
     url: "https://www.obserrallc.com/about",
     type: "profile",
     images: [{ url: "/leadership/dr-jody-blanchard-about.png", width: 266, height: 466, alt: "Dr. Jody Blanchard" }],
@@ -28,7 +30,7 @@ const recognition = [
   ["GLOBAL CYBER LEADERSHIP", "Top Global CISO in the World, 2025", "/recognition/top-global-ciso-2025.jpg"],
   ["EXECUTIVE COMMUNITY", "A100 Accelerated Winner, 2024", "/recognition/a100-2024.jpg"],
   ["EXECUTIVE COMMUNITY", "A100 Accelerated Winner, 2026", "/recognition/a100-2026.jpg"],
-];
+] as const;
 
 const leadershipMedia = [
   {
@@ -52,21 +54,14 @@ const leadershipMedia = [
     image: "/leadership/global-leadership-award-2025.png",
     alt: "Dr. Jody Blanchard HMG Strategy Global Leadership Institute Awards 2025 winner recognition",
   },
-];
+] as const;
 
-const businessReasons = [
-  ["Enterprise problems cross organizational boundaries", "Cybersecurity, operational risk, executive exposure, governance, and technology decisions are often managed separately even when the business impact is shared."],
-  ["Boards need decision clarity, not additional noise", `${LEGAL_ENTITY_NAME} translates technical, intelligence, regulatory, and operational signals into a defensible executive decision path.`],
-  ["Execution must survive scrutiny", "Recommendations are designed around ownership, evidence, governance, measurable outcomes, and the realities of implementation."],
-  ["Leadership capacity is often the constraint", `${LEGAL_ENTITY_NAME} provides senior judgment and focused execution when organizations need experienced leadership without adding permanent overhead.`],
-];
-
-const expertise = [
-  ["Executive cybersecurity leadership", "Enterprise cyber strategy, risk governance, resilience, incident readiness, investment prioritization, and board communication."],
-  ["Protective and enterprise intelligence", "Decision-ready intelligence for executives, travel, digital exposure, emerging threats, and high-consequence operations."],
-  ["Governance and accountable execution", "Operating models, decision rights, evidence, policy, approvals, and implementation discipline that reduce uncertainty."],
-  ["Secure technology and AI", "Secure-by-design applications, AI governance, governed workflows, and executive intelligence experiences tied to business outcomes."],
-];
+const executiveProfile = [
+  ["Founder and Chief Executive Officer", LEGAL_ENTITY_NAME],
+  ["Executive cybersecurity leadership", "Two-time Fortune 500 Chief Information Security Officer"],
+  ["Military leadership", "Retired U.S. Army intelligence officer with 21 years of service"],
+  ["Education", "Ph.D. in Organizational Leadership"],
+] as const;
 
 export default function AboutPage() {
   const aboutSchema = {
@@ -75,8 +70,8 @@ export default function AboutPage() {
       {
         "@type": "AboutPage",
         url: "https://www.obserrallc.com/about",
-        name: `About ${LEGAL_ENTITY_NAME} | Executive Leadership for High-Consequence Decisions`,
-        description: `Leadership profile and organizational background for ${LEGAL_ENTITY_NAME}.`,
+        name: `About Dr. Jody Blanchard | ${LEGAL_ENTITY_NAME}`,
+        description: `Executive biography and verified professional profile for Dr. Jody Blanchard, founder and Chief Executive Officer of ${LEGAL_ENTITY_NAME}.`,
         isPartOf: { "@id": "https://www.obserrallc.com/#website" },
       },
       {
@@ -99,99 +94,143 @@ export default function AboutPage() {
 
   return (
     <>
-      <EnterpriseHeader section="Leadership and company" />
-      <main className="about-page enterprise-page-main">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }} />
+      <EnterpriseHeader section="Executive leadership" />
+      <main className="about-page about-executive-page enterprise-page-main">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema) }} />
 
-      <section className="about-hero">
-        <div className="about-grid" />
-        <div className="about-hero-copy">
-          <p className="about-kicker">EXECUTIVE LEADERSHIP FOR COMPLEX RISK</p>
-          <h1>{LEGAL_ENTITY_NAME} exists because critical business decisions rarely fit inside one function.</h1>
-          <p>Cybersecurity, intelligence, executive protection, governance, technology, and operational risk converge at the moment leaders must act. {LEGAL_ENTITY_NAME} gives organizations a senior, integrated decision partner that can connect those disciplines, clarify what matters, and move from uncertainty to accountable execution.</p>
-          <div className="about-actions"><Link href="/contact?interest=enterprise-consultation" className="about-button">Start an executive conversation</Link><Link href="/services" className="about-link">Explore how {LEGAL_ENTITY_NAME} helps</Link></div>
-        </div>
-        <aside className="about-signal"><span>WHY {LEGAL_ENTITY_NAME}</span><strong>Senior judgment.<br />Integrated expertise.<br />Accountable outcomes.</strong><p>Built for organizations facing material risk, fragmented ownership, or decisions that cannot wait for another disconnected assessment.</p></aside>
-      </section>
-
-      <EnterpriseProofBand />
-
-      <section className="about-profile">
-        <div className="founder-profile-card">
-          <div className="profile-visual profile-photo-frame"><Image className="profile-photo" src="/leadership/dr-jody-blanchard-about.png" width={266} height={466} quality={95} sizes="(max-width: 800px) 86vw, 360px" priority alt={`Dr. Jody Blanchard, Founder and Chief Executive Officer of ${LEGAL_ENTITY_NAME}`} /></div>
-          <div className="profile-photo-label"><strong className="profile-photo-name">Dr. Jody Blanchard</strong><span className="profile-photo-title">Founder &amp; Chief Executive Officer</span><small className="profile-photo-specialty">Executive Cybersecurity · Intelligence · Governance</small></div>
-        </div>
-        <div>
-          <p className="about-kicker">FOUNDER &amp; BUSINESS EXECUTIVE</p>
-          <h2>Executive experience designed to create business value, not another layer of advice.</h2>
-          <p>Dr. Jody Blanchard is an award-winning business and cybersecurity executive, two-time Fortune 500 Chief Information Security Officer, former military intelligence leader, author, and educator. Across more than 25 years of leadership in complex and regulated environments, he has built, transformed, and governed security and risk programs where business continuity, reputation, regulatory exposure, technology investment, and human safety were directly connected.</p>
-          <p>His value to clients is the ability to see the whole decision. He combines enterprise strategy, cybersecurity, intelligence analysis, governance, financial and operational judgment, executive communication, and disciplined execution to identify what is material, define who must act, and build a path that can withstand board, customer, regulator, and operational scrutiny.</p>
-          <p>{LEGAL_ENTITY_NAME} was created to give organizations access to that integrated capability. The company connects senior advisory, protective intelligence, secure technology, professional learning, and governed implementation support. Each engagement is designed around an explicit decision, defined authority, controlled information boundaries, accountable delivery, and evidence of accepted work.</p>
-          <div className="about-actions"><Link className="about-button" href="/contact?interest=enterprise-consultation">Book an executive consultation</Link><Link className="about-outline" href="/apps">Explore {LEGAL_ENTITY_NAME} applications</Link></div>
-        </div>
-      </section>
-
-      <section className="expertise"><div><p className="about-kicker">THE BUSINESS CASE FOR {LEGAL_ENTITY_NAME}</p><h2>Organizations need integrated leadership when the risk is shared but accountability is fragmented.</h2></div><div className="expertise-grid">{businessReasons.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div></section>
-
-      <section className="expertise"><div><p className="about-kicker">EXECUTIVE CAPABILITIES</p><h2>One leadership model across cybersecurity, intelligence, governance, protection, and secure technology.</h2></div><div className="expertise-grid">{expertise.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div></section>
-
-      <section className="credentials"><VerifiedCredentials /></section>
-
-      <section className="recognition">
-        <div className="recognition-heading"><p className="about-kicker">RECOGNITION &amp; CREDIBILITY</p><h2>Recognized for cybersecurity leadership and industry impact.</h2><p>Independent recognition reinforces the executive judgment, technical depth, and public leadership brought to {LEGAL_ENTITY_NAME} clients.</p></div>
-        <div className="recognition-grid">{recognition.map(([label, award, image], index) => <article key={award}><span>0{index + 1}</span><Image src={image} alt={`${award} recognition badge`} width={420} height={260} sizes="(max-width: 700px) 90vw, 380px" /><p>{label}</p><h3>{award}</h3></article>)}</div>
-        <article className="ceh-hall-of-fame-award" aria-labelledby="ceh-hall-of-fame-title">
-          <div className="ceh-hall-of-fame-award__badge">
-            <Image src="/recognition/ceh-hall-of-fame-2025-badge.jpg" width={223} height={222} alt="Official EC-Council Certified Ethical Hacker Hall of Fame 2025 badge" sizes="(max-width: 700px) 180px, 220px" />
+        <section className="about-executive-hero">
+          <div className="about-executive-portrait">
+            <Image
+              src="/leadership/dr-jody-blanchard-about.png"
+              width={266}
+              height={466}
+              quality={95}
+              sizes="(max-width: 800px) 76vw, 320px"
+              priority
+              alt={`Dr. Jody Blanchard, Founder and Chief Executive Officer of ${LEGAL_ENTITY_NAME}`}
+            />
           </div>
-          <div className="ceh-hall-of-fame-award__copy">
-            <p className="about-kicker">ISSUER-BACKED RECOGNITION</p>
-            <h3 id="ceh-hall-of-fame-title">EC-Council Certified Ethical Hacker Hall of Fame 2025</h3>
-            <p>Presented to Jody Blanchard for outstanding performance and contribution to the field of ethical hacking.</p>
-            <dl>
-              <div><dt>Certificate</dt><dd>HOF-2025-1500089</dd></div>
-              <div><dt>Issue date</dt><dd>July 1, 2025</dd></div>
-            </dl>
-            <a href="https://www.eccouncil.org/ceh-hall-of-fame-2025/" target="_blank" rel="noreferrer">Verify on EC-Council&apos;s official Hall of Fame page</a>
+          <div className="about-executive-copy">
+            <p className="about-kicker">EXECUTIVE BIOGRAPHY</p>
+            <h1>Dr. Jody Blanchard</h1>
+            <p className="about-executive-role">Founder &amp; Chief Executive Officer · {LEGAL_ENTITY_NAME}</p>
+            <p className="about-executive-lede">
+              Executive cybersecurity leader, retired U.S. Army intelligence officer, author, educator, and enterprise advisor with experience leading complex security, risk, governance, and transformation work in regulated and high-consequence environments.
+            </p>
+            <p className="about-executive-lede">
+              His work centers on helping boards and executive teams connect cybersecurity, intelligence, governance, operational risk, technology investment, and accountable execution into clearer business decisions.
+            </p>
+            <div className="about-actions">
+              <Link href="/contact?interest=enterprise-consultation" className="about-button">Request executive consultation</Link>
+              <Link href="/speaking" className="about-outline">View speaker profile</Link>
+            </div>
           </div>
-          <a className="ceh-hall-of-fame-award__certificate" href="https://www.eccouncil.org/ceh-hall-of-fame-2025/" target="_blank" rel="noreferrer" aria-label="Verify Jody Blanchard's 2025 CEH Hall of Fame recognition on EC-Council">
-            <Image src="/recognition/ceh-hall-of-fame-2025-certificate.jpg" width={1750} height={1383} alt="EC-Council CEH Hall of Fame 2025 certificate presented to Jody Blanchard, certificate HOF-2025-1500089" sizes="(max-width: 900px) 92vw, 640px" />
-            <span>Open issuer verification</span>
-          </a>
-        </article>
-      </section>
+        </section>
 
-      <section className="leadership-media">
-        <div className="leadership-media-heading">
-          <p className="about-kicker">LEADERSHIP IN PRACTICE</p>
-          <h2>Hall of Fame recognition. Completed engagements. Public leadership.</h2>
-          <p>Selected recognition and completed appearances demonstrate Dr. Jody Blanchard&apos;s contribution to cybersecurity, technology leadership, workforce readiness, and business-focused risk governance.</p>
-        </div>
-        <div className="leadership-media-grid">
-          <article className="hall-of-fame-feature">
-            <Image src="/leadership/ceh-hall-of-fame-2025.png" alt="Dr. Jody Blanchard CEH Hall of Fame 2025 magazine cover" width={680} height={848} sizes="(max-width: 700px) 90vw, 620px" />
-            <div><span>CEH HALL OF FAME · TOP 100</span><h3>CEH Hall of Fame 2025 magazine cover</h3><p>EC-Council recognition for outstanding performance and contribution to ethical hacking.</p></div>
-          </article>
-          {leadershipMedia.map((item) => <article key={item.title} className="leadership-media-card"><Image src={item.image} alt={item.alt} width={720} height={480} sizes="(max-width: 700px) 90vw, 360px" /><div><span>{item.label}</span><h3>{item.title}</h3><p>{item.summary}</p></div></article>)}
-        </div>
-        <div className="about-actions"><Link className="about-outline" href="/speaking">View speaking profile and completed engagements</Link></div>
-      </section>
+        <section className="about-executive-facts" aria-label="Executive profile highlights">
+          {executiveProfile.map(([label, value]) => (
+            <article key={label}><span>{label}</span><strong>{value}</strong></article>
+          ))}
+        </section>
 
-      <section className="books">
-        <div className="books-heading"><p className="about-kicker">BOOKS BY DR. JODY BLANCHARD</p><h2>Ideas for leaders responsible for making security work.</h2><p>Executive writing on cybersecurity leadership, institutional systems, and the practical realities of accountability.</p></div>
-        <div className="books-grid">
-          <article><div className="book-cover actual-cover"><Image src="/books/cyberbulleys-front.png" fill sizes="(max-width: 650px) 220px, 210px" alt="Cover of CyberBulleys: A CISO's Guide to Doing Cybersecurity" /></div><div><p>CYBERSECURITY LEADERSHIP</p><h3>CyberBulleys: A CISO&apos;s Guide to Doing Cybersecurity</h3><span>By Dr. Jody Blanchard</span><a href="https://www.amazon.com/CyberBulleys-CISOs-Guide-Doing-Cybersecurity/dp/B0DT7L55JG" target="_blank" rel="noreferrer">Buy on Amazon</a></div></article>
-          <article><div className="book-cover actual-cover"><Image src="/books/break-the-system-front.png" fill sizes="(max-width: 650px) 220px, 210px" alt="Cover of Break the System" /></div><div><p>LEADERSHIP &amp; SYSTEMS</p><h3>Break the System</h3><span>By Dr. Jody Blanchard</span><a href="https://www.amazon.com/Break-System-Jody-Blanchard/dp/B0G2Q1CX8R" target="_blank" rel="noreferrer">Buy on Amazon</a></div></article>
-        </div>
-      </section>
+        <section className="about-executive-details" aria-labelledby="about-detail-heading">
+          <div className="about-executive-heading">
+            <p className="about-kicker">VERIFIED PROFILE</p>
+            <h2 id="about-detail-heading">Credentials, recognition, public leadership, and publications.</h2>
+            <p>Select a section for the complete evidence and imagery without turning the page into an endless scroll.</p>
+          </div>
 
-      <section className="speaking" id="speaking">
-        <div className="speaking-visual"><Image src="/brand/visuals/obserra-cybersecurity.png" alt={`${LEGAL_ENTITY_NAME} cybersecurity and intelligence network visual`} width={1200} height={680} sizes="(max-width: 700px) 90vw, 560px" /><div className="speaking-visual-label"><p>EXECUTIVE BRIEFING</p><strong>{LEGAL_ENTITY_NAME}</strong><span>CYBERSECURITY · SECURITY · INTELLIGENCE</span></div></div>
-        <div><p className="about-kicker">SPEAKING &amp; EXECUTIVE BRIEFINGS</p><h2>Bring an experienced executive voice into the room.</h2><p>Dr. Blanchard provides board briefings, leadership offsites, conference keynotes, panels, podcasts, and private learning sessions focused on practical decisions, accountable leadership, and enterprise outcomes.</p><div className="speaking-topics"><span>Enterprise cyber leadership</span><span>AI governance and responsible innovation</span><span>Protective intelligence and executive risk</span><span>Board-ready risk communication</span><span>Security culture and decision accountability</span><span>Veteran leadership and mission-focused teams</span></div><Link className="about-button" href="/contact?interest=speaking">Request a speaking engagement</Link></div>
-      </section>
+          <div className="about-executive-detail-grid">
+            <ExecutiveDetailModal
+              eyebrow="VERIFIED EVIDENCE"
+              title="Credentials & professional licenses"
+              summary="Issuer-backed cybersecurity, risk, privacy, audit, technology, and Florida professional credentials."
+              triggerLabel="Open credentials"
+            >
+              <div className="about-modal-evidence about-modal-credentials"><VerifiedCredentials /></div>
+            </ExecutiveDetailModal>
 
-      <section className="about-cta"><p className="about-kicker">ENGAGE {LEGAL_ENTITY_NAME}</p><h2>Bring integrated executive leadership to the risk, decision, or transformation in front of you.</h2><p>Begin with a confidential consultation, evaluate an application, strengthen the workforce through {ACADEMY_BRAND_NAME}, or engage {LEGAL_ENTITY_NAME} for focused cybersecurity, intelligence, governance, protection, and enterprise-risk support.</p><div><Link className="about-button" href="/contact?interest=enterprise-consultation">Talk with {LEGAL_ENTITY_NAME}</Link><Link className="about-outline" href="/academy">View Academy courses</Link></div></section>
+            <ExecutiveDetailModal
+              eyebrow="RECOGNITION"
+              title="Awards & recognition"
+              summary="Industry recognition, award imagery, Hall of Fame evidence, and issuer verification."
+              triggerLabel="Open recognition"
+            >
+              <div className="about-modal-evidence">
+                <div className="about-modal-recognition-grid">
+                  {recognition.map(([label, award, image]) => (
+                    <article key={award}>
+                      <Image src={image} alt={`${award} recognition badge`} width={420} height={260} sizes="(max-width: 700px) 80vw, 300px" />
+                      <span>{label}</span>
+                      <h3>{award}</h3>
+                    </article>
+                  ))}
+                </div>
+                <article className="about-modal-ceh" id="ceh-hall-of-fame-title">
+                  <Image src="/recognition/ceh-hall-of-fame-2025-badge.jpg" width={223} height={222} alt="Official EC-Council Certified Ethical Hacker Hall of Fame 2025 badge" />
+                  <div>
+                    <p className="about-kicker">ISSUER-BACKED RECOGNITION</p>
+                    <h3>EC-Council Certified Ethical Hacker Hall of Fame 2025</h3>
+                    <p>Presented to Jody Blanchard for outstanding performance and contribution to the field of ethical hacking.</p>
+                    <dl><div><dt>Certificate</dt><dd>HOF-2025-1500089</dd></div><div><dt>Issue date</dt><dd>July 1, 2025</dd></div></dl>
+                    <a href="https://www.eccouncil.org/ceh-hall-of-fame-2025/" target="_blank" rel="noreferrer">Verify on EC-Council</a>
+                  </div>
+                  <a href="https://www.eccouncil.org/ceh-hall-of-fame-2025/" target="_blank" rel="noreferrer" className="about-modal-certificate">
+                    <Image src="/recognition/ceh-hall-of-fame-2025-certificate.jpg" width={1750} height={1383} alt="EC-Council CEH Hall of Fame 2025 certificate presented to Jody Blanchard, certificate HOF-2025-1500089" />
+                  </a>
+                </article>
+              </div>
+            </ExecutiveDetailModal>
 
+            <ExecutiveDetailModal
+              eyebrow="PUBLIC LEADERSHIP"
+              title="Speaking, media & completed engagements"
+              summary="Selected panels, fireside discussions, executive recognition, and public leadership appearances."
+              triggerLabel="Open media"
+              actionHref="/speaking"
+              actionLabel="View speaker profile"
+            >
+              <div className="about-modal-evidence">
+                <article className="about-modal-feature">
+                  <Image src="/leadership/ceh-hall-of-fame-2025.png" alt="Dr. Jody Blanchard CEH Hall of Fame 2025 magazine cover" width={680} height={848} sizes="(max-width: 700px) 74vw, 360px" />
+                  <div><span>CEH HALL OF FAME · TOP 100</span><h3>CEH Hall of Fame 2025 magazine cover</h3><p>EC-Council recognition for outstanding performance and contribution to ethical hacking.</p></div>
+                </article>
+                <div className="about-modal-media-grid">
+                  {leadershipMedia.map((item) => (
+                    <article key={item.title}>
+                      <Image src={item.image} alt={item.alt} width={720} height={480} sizes="(max-width: 700px) 80vw, 320px" />
+                      <span>{item.label}</span><h3>{item.title}</h3><p>{item.summary}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </ExecutiveDetailModal>
+
+            <ExecutiveDetailModal
+              eyebrow="PUBLISHED AUTHOR"
+              title="Books"
+              summary="Executive writing on cybersecurity leadership, institutional systems, and accountability."
+              triggerLabel="Open books"
+            >
+              <div className="about-modal-evidence about-modal-books">
+                <article>
+                  <Image src="/books/cyberbulleys-front.png" width={350} height={520} alt="Cover of CyberBulleys: A CISO's Guide to Doing Cybersecurity" />
+                  <div><span>CYBERSECURITY LEADERSHIP</span><h3>CyberBulleys: A CISO&apos;s Guide to Doing Cybersecurity</h3><p>By Dr. Jody Blanchard</p><a className="executive-buy-button" href="https://www.amazon.com/CyberBulleys-CISOs-Guide-Doing-Cybersecurity/dp/B0DT7L55JG" target="_blank" rel="noreferrer">Buy now</a></div>
+                </article>
+                <article>
+                  <Image src="/books/break-the-system-front.png" width={350} height={520} alt="Cover of Break the System" />
+                  <div><span>LEADERSHIP &amp; SYSTEMS</span><h3>Break the System</h3><p>By Dr. Jody Blanchard</p><a className="executive-buy-button" href="https://www.amazon.com/Break-System-Jody-Blanchard/dp/B0G2Q1CX8R" target="_blank" rel="noreferrer">Buy now</a></div>
+                </article>
+              </div>
+            </ExecutiveDetailModal>
+          </div>
+        </section>
+
+        <section className="about-executive-closing">
+          <div><p className="about-kicker">EXECUTIVE VALUE</p><h2>Experience that connects the decision, the risk, and the execution.</h2></div>
+          <p>{LEGAL_ENTITY_NAME} brings that leadership perspective into cybersecurity, intelligence, governance, protection, secure technology, and enterprise decision support.</p>
+          <Link href="/services">Explore Obserra EPI services →</Link>
+        </section>
       </main>
       <EnterpriseFooter />
     </>
