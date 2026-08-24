@@ -8,52 +8,180 @@ on:
       - .github/workflows/marketplace-v12-source-verify-once.yml
 
 permissions:
-  contents: read
+  contents: write
   actions: write
 
 jobs:
-  dispatch-verify:
+  dispatch-and-observe-verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 45
     env:
       TARGET_SHA: 6ab6bff2615853fda31175def8b63c2787404177
       CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
+      OBSERVATION_BRANCH: ops/marketplace-v12-source-verify-20260823
     steps:
-      - name: Dispatch governed protected-delivery verification only
+      - name: Dispatch and observe governed protected-delivery verification only
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
+          import base64
+          import datetime as dt
           import json
           import os
+          import re
+          import time
+          import urllib.error
+          import urllib.parse
           import urllib.request
 
           repo = "jblan2026-hub/obserra-website"
           workflow = "marketplace-v12-protected-delivery.yml"
+          token = os.environ["GH_TOKEN"]
+          target = os.environ["TARGET_SHA"]
+          revision = os.environ["CATALOG_REVISION"]
+          branch = os.environ["OBSERVATION_BRANCH"]
+          headers = {
+              "Accept": "application/vnd.github+json",
+              "Authorization": f"Bearer {token}",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "User-Agent": "obserra-marketplace-source-verify-observer",
+          }
+
+          def request(url, *, method="GET", body=None, timeout=45):
+              data = None if body is None else json.dumps(body).encode("utf-8")
+              req = urllib.request.Request(
+                  url,
+                  data=data,
+                  method=method,
+                  headers={**headers, **({"Content-Type": "application/json"} if data else {})},
+              )
+              return urllib.request.urlopen(req, timeout=timeout)
+
+          started = dt.datetime.now(dt.timezone.utc)
           payload = {
               "ref": "main",
               "inputs": {
                   "mode": "verify",
-                  "expected_commit": os.environ["TARGET_SHA"],
-                  "approved_catalog_revision": os.environ["CATALOG_REVISION"],
+                  "expected_commit": target,
+                  "approved_catalog_revision": revision,
               },
           }
-          req = urllib.request.Request(
-              f"https://api.github.com/repos/{repo}/actions/workflows/{workflow}/dispatches",
-              data=json.dumps(payload).encode("utf-8"),
-              method="POST",
-              headers={
-                  "Accept": "application/vnd.github+json",
-                  "Authorization": f"Bearer {os.environ['GH_TOKEN']}",
-                  "Content-Type": "application/json",
-                  "X-GitHub-Api-Version": "2022-11-28",
-                  "User-Agent": "obserra-marketplace-source-verify",
-              },
-          )
-          with urllib.request.urlopen(req, timeout=30) as response:
+          dispatch_url = f"https://api.github.com/repos/{repo}/actions/workflows/{workflow}/dispatches"
+          with request(dispatch_url, method="POST", body=payload) as response:
               if response.status != 204:
                   raise SystemExit(f"unexpected dispatch status {response.status}")
-          print("Dispatched protected-delivery mode=verify for exact approved main revision.")
+
+          run = None
+          for _ in range(48):
+              time.sleep(5)
+              runs_url = f"https://api.github.com/repos/{repo}/actions/workflows/{workflow}/runs?event=workflow_dispatch&branch=main&per_page=30"
+              with request(runs_url) as response:
+                  runs = json.load(response).get("workflow_runs", [])
+              candidates = []
+              for item in runs:
+                  title = str(item.get("display_title") or "")
+                  created = item.get("created_at")
+                  try:
+                      created_at = dt.datetime.fromisoformat(created.replace("Z", "+00:00")) if created else started
+                  except Exception:
+                      created_at = started
+                  if target in title and "verify" in title.lower() and created_at >= started - dt.timedelta(seconds=10):
+                      candidates.append(item)
+              if candidates:
+                  run = sorted(candidates, key=lambda item: item.get("id", 0), reverse=True)[0]
+                  break
+          if run is None:
+              raise SystemExit("protected-delivery verify run was not discoverable")
+
+          run_id = int(run["id"])
+          run_url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}"
+          for _ in range(240):
+              with request(run_url) as response:
+                  run = json.load(response)
+              if run.get("status") == "completed":
+                  break
+              time.sleep(10)
+          else:
+              raise SystemExit("protected-delivery verify run did not complete inside observer window")
+
+          jobs_url = f"https://api.github.com/repos/{repo}/actions/runs/{run_id}/jobs?per_page=100"
+          with request(jobs_url) as response:
+              jobs = json.load(response).get("jobs", [])
+
+          failure_step = None
+          blocker = None
+          job_id = None
+          for job in jobs:
+              if job.get("name") == "protected-delivery":
+                  job_id = int(job["id"])
+                  for step in job.get("steps", []):
+                      if step.get("conclusion") == "failure":
+                          failure_step = step.get("name")
+                          break
+                  break
+
+          if job_id is not None and run.get("conclusion") == "failure":
+              logs_url = f"https://api.github.com/repos/{repo}/actions/jobs/{job_id}/logs"
+              try:
+                  with request(logs_url, timeout=90) as response:
+                      text = response.read().decode("utf-8", errors="replace")
+                  safe_patterns = [
+                      (r"The specified blob does not exist", "SOURCE_BLOB_NOT_FOUND"),
+                      (r"BlobNotFound", "SOURCE_BLOB_NOT_FOUND"),
+                      (r"obserra-supplied-archives\.json", "SOURCE_MANIFEST_UNAVAILABLE"),
+                      (r"Required protected-delivery binding metadata is unavailable: ([a-z0-9-]+)", "KEY_VAULT_BINDING_UNAVAILABLE"),
+                      (r"Marketplace source/delivery role assignments did not converge", "AZURE_ROLE_ASSIGNMENT_UNAVAILABLE"),
+                      (r"AuthorizationPermissionMismatch|AuthorizationFailure", "AZURE_AUTHORIZATION_FAILURE"),
+                  ]
+                  for pattern, code in safe_patterns:
+                      if re.search(pattern, text, re.IGNORECASE):
+                          blocker = code
+                          break
+              except Exception:
+                  blocker = None
+
+          receipt = {
+              "contract": "obserra-marketplace-v12-source-verification-observation-v1",
+              "mode": "verify",
+              "activationChanged": False,
+              "runId": run_id,
+              "runUrl": run.get("html_url"),
+              "targetSha": target,
+              "catalogRevision": revision,
+              "status": run.get("status"),
+              "conclusion": run.get("conclusion"),
+              "sourceAndMaterializationVerified": run.get("conclusion") == "success",
+              "failureStep": failure_step,
+              "blocker": blocker,
+              "observedAt": dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z"),
+          }
+
+          content = (json.dumps(receipt, indent=2) + "\n").encode("utf-8")
+          path = "ops/marketplace-v12-source-verify-latest.json"
+          encoded = urllib.parse.quote(path, safe="/")
+          get_url = f"https://api.github.com/repos/{repo}/contents/{encoded}?ref={urllib.parse.quote(branch, safe='')}"
+          sha = None
+          try:
+              with request(get_url) as response:
+                  sha = json.load(response).get("sha")
+          except urllib.error.HTTPError as error:
+              if error.code != 404:
+                  raise
+
+          body = {
+              "message": "ops: record Marketplace source verification observation",
+              "content": base64.b64encode(content).decode("ascii"),
+              "branch": branch,
+          }
+          if sha:
+              body["sha"] = sha
+          put_url = f"https://api.github.com/repos/{repo}/contents/{encoded}"
+          with request(put_url, method="PUT", body=body) as response:
+              if response.status not in (200, 201):
+                  raise SystemExit(f"unexpected receipt write status {response.status}")
+
+          print(json.dumps(receipt, sort_keys=True))
           PY
