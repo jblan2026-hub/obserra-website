@@ -2,14 +2,14 @@
   "contract": "obserra-marketplace-v12-six-source-verification-observation-v1",
   "mode": "verify",
   "activationChanged": false,
-  "runId": 32762009391,
-  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32762009391",
-  "targetSha": "21cc8e15c99f519ab113e59499c9cf0cdd870c6d",
+  "runId": 32762645966,
+  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32762645966",
+  "targetSha": "6e729c4d6dbeef8bdee04f40a76fa3eddd0ec049",
   "catalogRevision": "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2",
   "status": "completed",
   "conclusion": "failure",
   "sourceAndMaterializationVerified": false,
-  "failureStep": "Pin governed release identity",
+  "failureStep": "Download and verify exactly six sellable source archives",
   "blocker": null,
-  "observedAt": "2026-08-24T18:22:33.011989Z"
+  "observedAt": "2026-08-24T18:29:32.788983Z"
 }
