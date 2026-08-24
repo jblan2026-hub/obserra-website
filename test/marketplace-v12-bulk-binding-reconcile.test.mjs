@@ -36,7 +36,10 @@ test("bulk binding workflow is manual, exact-main pinned, production OIDC, and n
   assert.match(workflow, /environment: production/);
   assert.match(workflow, /git rev-parse HEAD/);
   assert.match(workflow, new RegExp(REVISION));
-  assert.match(workflow, /azure\/login@v3\.0\.1/);
+  assert.match(workflow, /actions\/checkout@d23441a48e516b6c34aea4fa41551a30e30af803/);
+  assert.match(workflow, /azure\/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca/);
+  assert.match(workflow, /actions\/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f/);
+  assert.match(workflow, /npm ci --ignore-scripts --no-audit --no-fund/);
   assert.match(workflow, /applications-supabase-service-role-key/);
   assert.match(workflow, /applications-stripe-secret-key/);
   assert.match(workflow, /applications-commerce-hash-secret/);
