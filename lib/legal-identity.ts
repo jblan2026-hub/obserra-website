@@ -1,4 +1,5 @@
 export const LEGAL_ENTITY_NAME = "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC" as const;
+export const PUBLIC_BRAND_NAME = "Obserra EPI LLC" as const;
 export const CANONICAL_PUBLIC_ORIGIN = "https://www.obserrallc.com" as const;
 
 export const BRAND_PREFIX = "Obserra EPI" as const;
