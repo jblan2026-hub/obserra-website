@@ -4,6 +4,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { courses } from "../app/academy/courseData";
 import { studioCoursePublicationMetadataById } from "../app/academy/studioCatalog";
 import { importLegacyAcademyState } from "./academy-persistence";
+import { ACADEMY_BRAND_NAME } from "./legal-identity";
 import {
   type SignedCertificateClaim,
   verifyCertificateClaim,
@@ -78,7 +79,7 @@ async function migrateLegacyCourseState(userId: string, courseId: string, state:
 
 function learnerName(user: { firstName: string | null; lastName: string | null; emailAddresses?: Array<{ emailAddress: string }> }) {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
-  return fullName || user.emailAddresses?.[0]?.emailAddress || "Obserra Academy Learner";
+  return fullName || user.emailAddresses?.[0]?.emailAddress || `${ACADEMY_BRAND_NAME} Learner`;
 }
 
 function verifiedLegacyCertificateResult(
