@@ -6,6 +6,7 @@ import "./apps.css";
 import "./apps-interactions.css";
 import "./apps-commercial.css";
 import "./apps-responsive.css";
+import "./applications-final.css";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
