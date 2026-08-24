@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import EiosShowcase from "./EiosShowcase";
-import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME, PUBLIC_BRAND_NAME } from "@/lib/legal-identity";
 
 export const metadata: Metadata = {
-  title: `EIOS | Governed Enterprise Intelligence and Action | ${LEGAL_ENTITY_NAME}`,
+  title: "EIOS | Governed Enterprise Intelligence & Action",
   description:
     "EIOS connects enterprise context, helps leaders make evidence-backed decisions, governs authorized action, and independently verifies outcomes.",
   alternates: { canonical: "/eios" },
   keywords: ["enterprise intelligence operating system", "governed AI", "decision intelligence", "EIOS"],
   openGraph: {
-    title: "EIOS | Governed Enterprise Intelligence and Action",
+    title: `${EIOS_BRAND_NAME} | Governed Enterprise Intelligence & Action`,
     description: "Connect context, govern decisions, authorize action, and verify enterprise outcomes with EIOS.",
     url: "https://www.obserrallc.com/eios",
     type: "website",
@@ -18,13 +18,13 @@ export const metadata: Metadata = {
         url: "/eios/eios-overview-marketing.png",
         width: 1584,
         height: 889,
-        alt: `${EIOS_BRAND_NAME} overview`
-      }
+        alt: `${EIOS_BRAND_NAME} overview`,
+      },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EIOS | Governed Enterprise Intelligence and Action",
+    title: `${EIOS_BRAND_NAME} | Governed Enterprise Intelligence`,
     description: "Enterprise Intelligence Operating System with accountable, evidence-backed decisions.",
     images: ["/eios/eios-overview-marketing.png"],
   },
@@ -44,13 +44,14 @@ export default function EiosPage() {
         provider: {
           "@type": "Organization",
           name: LEGAL_ENTITY_NAME,
-          url: "https://www.obserrallc.com"
+          alternateName: PUBLIC_BRAND_NAME,
+          url: "https://www.obserrallc.com",
         },
       },
       {
         "@type": "WebPage",
         url: "https://www.obserrallc.com/eios",
-        name: `EIOS | Governed Enterprise Intelligence and Action | ${LEGAL_ENTITY_NAME}`,
+        name: `${EIOS_BRAND_NAME} | Governed Enterprise Intelligence & Action`,
         description: "EIOS connects enterprise context, helps leaders make evidence-backed decisions, governs authorized action, and independently verifies outcomes.",
       },
       {
@@ -61,11 +62,11 @@ export default function EiosPage() {
             "@type": "ListItem",
             position: 2,
             name: "EIOS",
-            item: "https://www.obserrallc.com/eios"
-          }
-        ]
-      }
-    ]
+            item: "https://www.obserrallc.com/eios",
+          },
+        ],
+      },
+    ],
   };
 
   return (

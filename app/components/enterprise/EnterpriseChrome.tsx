@@ -8,6 +8,7 @@ import {
   ACADEMY_BRAND_NAME,
   EIOS_BRAND_NAME,
   LEGAL_ENTITY_NAME,
+  PUBLIC_BRAND_NAME,
 } from "../../../lib/legal-identity";
 import "./enterprise-chrome.css";
 import "./enterprise-sales-navigation.css";
@@ -55,7 +56,7 @@ export function EnterpriseHeader({ section = "Enterprise" }: { section?: string 
         <Link className="ent-header__brand" href="/" aria-label={`${LEGAL_ENTITY_NAME} home`} onClick={close}>
           <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt={LEGAL_ENTITY_NAME} />
           <span className="ent-header__identity">
-            <span className="ent-header__legal-name">Obserra EPI</span>
+            <span className="ent-header__legal-name">{PUBLIC_BRAND_NAME}</span>
             <small>{section}</small>
           </span>
         </Link>

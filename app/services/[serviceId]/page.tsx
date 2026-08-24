@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { serviceCatalog, serviceMap } from "../serviceCatalog";
-import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
+import { LEGAL_ENTITY_NAME, PUBLIC_BRAND_NAME } from "@/lib/legal-identity";
 import "../services.css";
 
 export async function generateStaticParams() {
@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: { params: Promise<{ serviceId
   const service = serviceMap[serviceId];
   if (!service) return {};
   return {
-    title: `${service.title} | ${LEGAL_ENTITY_NAME} Enterprise Services`,
+    title: `${service.title} | Enterprise Services`,
     description: service.summary,
     alternates: { canonical: `/services/${service.id}` },
-    keywords: [service.title, service.category, "enterprise advisory", "executive risk", `${LEGAL_ENTITY_NAME} Services`],
+    keywords: [service.title, service.category, "enterprise advisory", "executive risk", `${PUBLIC_BRAND_NAME} Services`],
     openGraph: {
-      title: `${service.title} | ${LEGAL_ENTITY_NAME} Enterprise Services`,
+      title: `${service.title} | ${PUBLIC_BRAND_NAME} Enterprise Services`,
       description: service.summary,
       url: `https://www.obserrallc.com/services/${service.id}`,
       type: "website",
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ serviceId
     },
     twitter: {
       card: "summary_large_image",
-      title: `${service.title} | ${LEGAL_ENTITY_NAME} Enterprise Services`,
+      title: `${service.title} | ${PUBLIC_BRAND_NAME}`,
       description: service.summary,
       images: ["/brand/visuals/obserra-cybersecurity.png"],
     },
@@ -51,6 +51,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         provider: {
           "@type": "Organization",
           name: LEGAL_ENTITY_NAME,
+          alternateName: PUBLIC_BRAND_NAME,
           url: "https://www.obserrallc.com",
         },
         areaServed: "Global",
@@ -162,7 +163,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           <div>
             <p className="apps-eyebrow">READY TO SCOPE THE WORK</p>
             <h2>Begin with the decision, exposure, deadline, and outcome that matter most.</h2>
-            <p>{LEGAL_ENTITY_NAME} will determine the appropriate service scope, engagement model, information requirements, and next commercial step. Pricing is provided only after scope is understood.</p>
+            <p>{PUBLIC_BRAND_NAME} will determine the appropriate service scope, engagement model, information requirements, and next commercial step. Pricing is provided only after scope is understood.</p>
           </div>
           <div className="service-detail-cta-actions">
             <a className="apps-button" href={consultationHref}>Request consultation</a>
