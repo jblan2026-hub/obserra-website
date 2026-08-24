@@ -1,0 +1,15 @@
+{
+  "contract": "obserra-marketplace-v12-source-verification-observation-v1",
+  "mode": "verify",
+  "activationChanged": false,
+  "runId": 32680946810,
+  "runUrl": "https://github.com/jblan2026-hub/obserra-website/actions/runs/32680946810",
+  "targetSha": "6ab6bff2615853fda31175def8b63c2787404177",
+  "catalogRevision": "487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2",
+  "status": "completed",
+  "conclusion": "failure",
+  "sourceAndMaterializationVerified": false,
+  "failureStep": "Download and verify the exact supplied archive set",
+  "blocker": null,
+  "observedAt": "2026-08-24T01:48:52.959320Z"
+}
