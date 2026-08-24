@@ -1,3 +1,4 @@
+import { ACADEMY_BRAND_NAME } from "@/lib/legal-identity";
 import { curriculumForCourse } from "./courseCurriculum";
 import { courses } from "./courseData";
 import {
@@ -132,7 +133,7 @@ function phaseInstruction({
     },
     {
       heading: "Authoritative basis",
-      body: `${primary.reference}, published by ${primary.publisher}, is directly relevant to this lesson. ${primary.whyItMatters} ${secondary.reference} provides an additional authoritative lens. The course uses these references to explain why the lesson matters and to separate established requirements or recognized guidance from Obserra Academy teaching examples and organizational choices.`,
+      body: `${primary.reference}, published by ${primary.publisher}, is directly relevant to this lesson. ${primary.whyItMatters} ${secondary.reference} provides an additional authoritative lens. The course uses these references to explain why the lesson matters and to separate established requirements or recognized guidance from ${ACADEMY_BRAND_NAME} teaching examples and organizational choices.`,
       application: `In the ${workProduct}, identify the specific requirement, control objective, governance principle, professional expectation, or risk management concept from ${primary.reference} that supports the recommendation. If the source is guidance rather than law, label it accurately instead of presenting it as a legal mandate.`,
     },
     {
@@ -465,7 +466,7 @@ export function lessonBrief(courseId: string, index: number): LessonBrief | null
       "Document the approved decision, implement through the correct authority, verify the result, and feed lessons learned into normal operations.",
     ],
     scenario: `${curriculum.scenario} During this lesson, focus specifically on ${subject.toLowerCase()} and produce the ${workProduct}.`,
-    videoTitle: `${module.title}: Guided Obserra Academy Instruction`,
+    videoTitle: `${module.title}: Guided ${ACADEMY_BRAND_NAME} Instruction`,
     videoDuration: module.duration,
     videoChapters,
     transcript: videoChapters.map((chapter) => `${chapter.timestamp} — ${chapter.title}. ${chapter.narration}`),
