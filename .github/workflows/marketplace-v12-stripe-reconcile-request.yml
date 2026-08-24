@@ -42,28 +42,37 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
           persist-credentials: false
 
-      - name: Validate governed review-only request and source revision
+      - name: Validate governed request and source revision
+        id: request
         shell: bash
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.base.sha }}"
           test "${{ github.event.pull_request.base.ref }}" = "main"
-          jq -e --arg revision "${EXPECTED_CATALOG_REVISION}" '
+          mode="$(jq -r '.mode // empty' ops/marketplace-v12-stripe-reconcile-request.json)"
+          case "${mode}" in
+            review-only|verify-only) ;;
+            *) echo "::error::Marketplace request mode is invalid."; exit 1 ;;
+          esac
+          jq -e --arg revision "${EXPECTED_CATALOG_REVISION}" --arg mode "${mode}" '
             .contract == "obserra-marketplace-v12-stripe-reconcile-request-v1"
             and .catalogRevision == $revision
-            and .mode == "review-only"
+            and .mode == $mode
             and .allowCheckoutActivation == false
             and .allowCharges == false
             and .allowSubscriptions == false
             and .allowEntitlements == false
           ' ops/marketplace-v12-stripe-reconcile-request.json >/dev/null
           node scripts/marketplace-catalog-delivery-gate.mjs
+          printf 'mode=%s\n' "${mode}" >> "${GITHUB_OUTPUT}"
 
-      - name: Install locked review dependencies
+      - name: Install locked reconciliation dependencies
+        if: steps.request.outputs.mode == 'review-only'
         shell: bash
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Authenticate dedicated Marketplace delivery identity
+      - name: Authenticate dedicated Marketplace delivery identity for reconciliation
+        if: steps.request.outputs.mode == 'review-only'
         uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca # v3.0.1
         with:
           client-id: ${{ env.AZURE_DELIVERY_CLIENT_ID }}
@@ -71,6 +80,7 @@ jobs:
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
       - name: Reconcile deterministic live Stripe shard without checkout activation
+        if: steps.request.outputs.mode == 'review-only'
         shell: bash
         run: |
           set -euo pipefail
@@ -104,7 +114,7 @@ jobs:
           unset OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY APPLICATIONS_STRIPE_SECRET_KEY OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET service_role_key stripe_key hash_secret
 
       - name: Retain non-sensitive shard evidence
-        if: always()
+        if: ${{ always() && steps.request.outputs.mode == 'review-only' }}
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: marketplace-v12-binding-shard-${{ matrix.shard }}-${{ github.run_id }}
