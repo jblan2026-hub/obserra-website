@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { marketplaceV12PurchaseOptions } from "../../../../lib/marketplace-v12-bindings";
 import { marketplaceV12CollectionMembers, marketplaceV12Product, marketplaceV12PublicPath } from "../../../../lib/marketplace-v12-catalog";
+import MarketplaceV12Checkout, { type MarketplacePublicCheckoutOption } from "../../MarketplaceV12Checkout";
 import styles from "./collection.module.css";
 import "../../marketplace.css";
 
@@ -61,6 +63,12 @@ function priceOffers(member: Member) {
     const cadence = offer.cadence && offer.cadence !== "one-time" ? ` / ${offer.cadence === "month" ? "mo" : offer.cadence === "year" ? "yr" : plain(offer.cadence)}` : " one-time";
     return `${money(offer.amount_minor, offer.currency)}${cadence}`;
   });
+}
+
+function memberPurchaseOptions(member: Member): MarketplacePublicCheckoutOption[] {
+  const product = marketplaceV12Product(member.product_id);
+  if (!product || product.product_type === "collection" || product.product_type === "bundle") return [];
+  return marketplaceV12PurchaseOptions(product).map((option) => ({ option: option.option, amountMinor: option.amountMinor }));
 }
 
 function memberCadences(member: Member) {
@@ -182,8 +190,9 @@ export default async function MarketplaceCollectionPage({ params, searchParams }
         <header className={styles.resultsHeader}><div><p>Individual products and skills</p><h2 id="package-products-title">{filtered.length.toLocaleString()} matching offering{filtered.length === 1 ? "" : "s"}</h2></div><span>{filtered.length ? `Showing ${offset + 1}–${offset + results.length}` : "Change or clear a filter to continue."}</span></header>
         {results.length ? <ol className={styles.results} start={offset + 1}>{results.map((member) => {
           const offers = priceOffers(member);
+          const purchaseOptions = memberPurchaseOptions(member);
           const outcome = buyerText(member.mission || member.description, `${member.name} helps move ${member.category || member.family} work from a clear request to a usable outcome.`);
-          return <li key={member.product_id}><article><div className={styles.cardTop}><div className={styles.tags}>{member.proficiency ? <span>{member.proficiency}</span> : null}<span>{member.category || member.family}</span><span>{offeringLabel(member.product_type)}</span></div><div className={styles.price}>{offers.map((offer) => <strong key={offer}>{offer}</strong>)}</div></div><h3><Link href={marketplaceV12PublicPath(member)}>{member.name}</Link></h3><p>{outcome}</p><footer><span>Individual capability</span><Link href={marketplaceV12PublicPath(member)}>View price &amp; details <b aria-hidden="true">→</b></Link></footer></article></li>;
+          return <li key={member.product_id}><article><div className={styles.cardTop}><div className={styles.tags}>{member.proficiency ? <span>{member.proficiency}</span> : null}<span>{member.category || member.family}</span><span>{offeringLabel(member.product_type)}</span></div><div className={styles.price}>{offers.map((offer) => <strong key={offer}>{offer}</strong>)}</div></div><h3><Link href={marketplaceV12PublicPath(member)}>{member.name}</Link></h3><p>{outcome}</p><MarketplaceV12Checkout productId={member.product_id} options={purchaseOptions} checkoutEnabled={null} compact autoDownloadAfterPurchase={false}/><footer><span>Buy here or inspect full details</span><Link href={marketplaceV12PublicPath(member)}>View product details <b aria-hidden="true">→</b></Link></footer></article></li>;
         })}</ol> : <div className={styles.empty}><h3>No offerings match those filters.</h3><p>Clear one or more filters to see the individual products and skills included in this package.</p><Link href={path}>View all package offerings</Link></div>}
         <nav className={styles.pagination} aria-label="Package result pages">{offset > 0 ? <Link href={href(path, state, { cursor: Math.max(0, offset - PAGE_SIZE) })}>Previous {PAGE_SIZE}</Link> : <span aria-disabled="true">Previous</span>}<strong>{filtered.length ? `${offset + 1}–${offset + results.length} of ${filtered.length.toLocaleString()}` : "0 results"}</strong>{offset + results.length < filtered.length ? <Link href={href(path, state, { cursor: offset + PAGE_SIZE })}>Next {Math.min(PAGE_SIZE, filtered.length - offset - results.length)}</Link> : <span aria-disabled="true">Next</span>}</nav>
       </div>
