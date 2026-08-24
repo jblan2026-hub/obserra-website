@@ -209,7 +209,9 @@ async function processV12Lifecycle(event: Stripe.Event, raw: string, live: boole
   if (event.type === "charge.dispute.created") return lifecycleFromDispute(event, "dispute", raw, live);
   if (event.type === "charge.dispute.closed") {
     const dispute = event.data.object as Stripe.Dispute;
-    return lifecycleFromDispute(event, dispute.status === "lost" ? "chargeback" : "dispute", raw, live);
+    if (dispute.status === "lost") return lifecycleFromDispute(event, "chargeback", raw, live);
+    if (dispute.status === "won") return lifecycleFromDispute(event, "payment_recovered", raw, live);
+    return false;
   }
   return false;
 }
