@@ -10,10 +10,10 @@ test("marketplace browser uses bounded search results instead of the retired cat
     read("app/ai-marketplace/MarketplaceExperience.tsx"),
     read("app/ai-marketplace/page.tsx"),
   ]);
-  assert.match(page, /marketplaceV12Search\(\{ cursor, q: query \|\| undefined, limit: 24 \}\)/);
-  assert.match(page, /initialCatalog=\{catalog\}/);
-  assert.match(page, /initialTotal=\{initial\.total\}/);
-  assert.match(page, /familyEntries=\{familyEntries\}/);
+  assert.match(page, /marketplaceV12Search\(\{ type: selected\.types\[0\], q: query \|\| undefined, cursor, limit: 48 \}\)/);
+  assert.match(page, /marketplaceV12Search\(\{ type, q: query \|\| undefined, limit: 60 \}\)/);
+  assert.match(page, /results\.slice\(start, start \+ 48\)/);
+  assert.doesNotMatch(page, /initialCatalog=|initialTotal=|familyEntries=/);
   assert.match(experience, /new URLSearchParams\(\{ limit: "24" \}\)/);
   assert.match(experience, /params\.set\("q", query\.trim\(\)\)/);
   assert.match(experience, /params\.set\("family", family\)/);
