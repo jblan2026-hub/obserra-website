@@ -15,7 +15,14 @@ env:
   AZURE_TENANT_ID: 7d8b7b64-c80c-4c8a-a514-66f6b1cf8607
   AZURE_SUBSCRIPTION_ID: 38d660ff-611e-4f6c-ad29-70f5cf118f52
   AZURE_RESOURCE_GROUP: rg-obserra-prod-eastus
+  AZURE_DEPLOY_IDENTITY: id-obserra-github-prod
   OBSERVATION_BRANCH: ops/marketplace-v12-ingest-dispatch-20260823
+  TWIN_BRANCH_CREDENTIAL: github-cra-twin-saas-feature
+  TWIN_PR_CREDENTIAL: github-cra-twin-saas-pr
+  TWIN_BRANCH_SUBJECT: repo:jblan2026-hub@309821056/Obserra-EU-CRA-governace-app@1332654162:ref:refs/heads/feature/obserra-advanced-frontends-20260822
+  TWIN_PR_SUBJECT: repo:jblan2026-hub@309821056/Obserra-EU-CRA-governace-app@1332654162:pull_request
+  OIDC_ISSUER: https://token.actions.githubusercontent.com
+  OIDC_AUDIENCE: api://AzureADTokenExchange
 
 jobs:
   discover:
@@ -27,6 +34,55 @@ jobs:
           client-id: ${{ env.AZURE_CLIENT_ID }}
           tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Authorize CRA Twin SaaS GitHub OIDC subjects
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(az account show --query id -o tsv)" = "${AZURE_SUBSCRIPTION_ID}"
+          test "$(az account show --query tenantId -o tsv)" = "${AZURE_TENANT_ID}"
+
+          upsert_credential() {
+            local name="$1"
+            local subject="$2"
+            if az identity federated-credential show \
+              --resource-group "${AZURE_RESOURCE_GROUP}" \
+              --identity-name "${AZURE_DEPLOY_IDENTITY}" \
+              --name "${name}" >/dev/null 2>&1; then
+              az identity federated-credential update \
+                --resource-group "${AZURE_RESOURCE_GROUP}" \
+                --identity-name "${AZURE_DEPLOY_IDENTITY}" \
+                --name "${name}" \
+                --issuer "${OIDC_ISSUER}" \
+                --subject "${subject}" \
+                --audiences "${OIDC_AUDIENCE}" \
+                --output none
+            else
+              az identity federated-credential create \
+                --resource-group "${AZURE_RESOURCE_GROUP}" \
+                --identity-name "${AZURE_DEPLOY_IDENTITY}" \
+                --name "${name}" \
+                --issuer "${OIDC_ISSUER}" \
+                --subject "${subject}" \
+                --audiences "${OIDC_AUDIENCE}" \
+                --output none
+            fi
+
+            az identity federated-credential show \
+              --resource-group "${AZURE_RESOURCE_GROUP}" \
+              --identity-name "${AZURE_DEPLOY_IDENTITY}" \
+              --name "${name}" \
+              --output json > "/tmp/${name}.json"
+            jq -e \
+              --arg issuer "${OIDC_ISSUER}" \
+              --arg subject "${subject}" \
+              --arg audience "${OIDC_AUDIENCE}" \
+              '.issuer == $issuer and .subject == $subject and (.audiences | length) == 1 and .audiences[0] == $audience' \
+              "/tmp/${name}.json" >/dev/null
+          }
+
+          upsert_credential "${TWIN_BRANCH_CREDENTIAL}" "${TWIN_BRANCH_SUBJECT}"
+          upsert_credential "${TWIN_PR_CREDENTIAL}" "${TWIN_PR_SUBJECT}"
 
       - name: Discover non-secret delivery identity and storage metadata
         env:
@@ -73,5 +129,40 @@ jobs:
           if sha: body['sha']=sha
           put=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{path}',data=json.dumps(body).encode(),method='PUT',headers=headers)
           with urllib.request.urlopen(put,timeout=30) as response:
+              if response.status not in (200,201): raise SystemExit(response.status)
+          PY
+
+      - name: Record CRA Twin SaaS OIDC verification marker
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          marker="${RUNNER_TEMP}/cra-twin-saas-oidc-status.json"
+          jq -n \
+            --arg status "verified" \
+            --arg subscription "${AZURE_SUBSCRIPTION_ID}" \
+            --arg tenant "${AZURE_TENANT_ID}" \
+            --arg identity "${AZURE_DEPLOY_IDENTITY}" \
+            --arg branch_subject "${TWIN_BRANCH_SUBJECT}" \
+            --arg pr_subject "${TWIN_PR_SUBJECT}" \
+            '{status:$status,subscriptionId:$subscription,tenantId:$tenant,identity:$identity,branchSubject:$branch_subject,pullRequestSubject:$pr_subject}' > "${marker}"
+
+          python - <<'PY' "${marker}"
+          import base64, json, os, urllib.request, sys
+          content=open(sys.argv[1],'rb').read()
+          repo='jblan2026-hub/obserra-website'; path='ops/cra-twin-saas-oidc-status.json'; branch=os.environ['OBSERVATION_BRANCH']; token=os.environ['GH_TOKEN']
+          headers={'Accept':'application/vnd.github+json','Authorization':f'Bearer {token}','X-GitHub-Api-Version':'2022-11-28','User-Agent':'obserra-cra-twin-saas-oidc','Content-Type':'application/json'}
+          sha=None
+          try:
+              req=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{path}?ref={branch}',headers=headers)
+              with urllib.request.urlopen(req,timeout=30) as response:
+                  sha=json.load(response).get('sha')
+          except Exception:
+              pass
+          body={'message':'ops: verify CRA Twin SaaS OIDC authorization','content':base64.b64encode(content).decode(),'branch':branch}
+          if sha: body['sha']=sha
+          req=urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/{path}',data=json.dumps(body).encode(),method='PUT',headers=headers)
+          with urllib.request.urlopen(req,timeout=30) as response:
               if response.status not in (200,201): raise SystemExit(response.status)
           PY
