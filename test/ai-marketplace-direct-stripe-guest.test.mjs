@@ -22,6 +22,18 @@ test("public Marketplace purchase goes directly to Stripe without account access
   assert.match(guestCheckout, /\{CHECKOUT_SESSION_ID\}/);
 });
 
+test("guest Stripe Checkout request stays minimal and reports the failing backend stage", async () => {
+  const guestCheckout = await readFile(new URL("../app/api/ai-marketplace/guest-checkout/route.ts", import.meta.url), "utf8");
+
+  assert.match(guestCheckout, /stage = "stripe-session"/);
+  assert.match(guestCheckout, /stage = "durable-record"/);
+  assert.match(guestCheckout, /stripeType/);
+  assert.match(guestCheckout, /stripeCode/);
+  assert.match(guestCheckout, /stripeRequestId/);
+  assert.doesNotMatch(guestCheckout, /consent_collection/);
+  assert.doesNotMatch(guestCheckout, /customer_update/);
+});
+
 test("guest purchase download requires verified Stripe payment and durable entitlement", async () => {
   const download = await readFile(new URL("../app/api/ai-marketplace/purchase-download/route.ts", import.meta.url), "utf8");
   const token = await readFile(new URL("../lib/marketplace-v12-guest-purchase.ts", import.meta.url), "utf8");
