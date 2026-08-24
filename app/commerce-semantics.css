@@ -1,4 +1,4 @@
-/* Sitewide commerce semantics: gold is reserved for a verified purchase, checkout, subscription, enrollment, or protected-download action. */
+/* Sitewide commerce semantics outside the AI Marketplace: gold is reserved for a verified purchase, subscription, enrollment, or direct-shop action. */
 :root {
   --obserra-commerce-gold: #d9ad57;
   --obserra-commerce-gold-hi: #efca82;
@@ -8,25 +8,19 @@
   --obserra-action-text: #e8f6ff;
 }
 
-/* Verified commerce actions. */
-.academy-checkout-button,
-.commerce-options button,
-.ai-marketplace__checkout button:not(:disabled),
-.ai-marketplace__download-button {
+/* Verified commerce actions. The scoped selector is intentional so it wins over premium-site button styling. */
+.premium-site-scope .academy-checkout-button,
+.commerce-options button {
   border: 0 !important;
   background: linear-gradient(135deg, var(--obserra-commerce-gold), var(--obserra-commerce-gold-hi)) !important;
   color: var(--obserra-commerce-ink) !important;
   box-shadow: 0 10px 24px rgba(217, 173, 87, 0.2) !important;
 }
 
-.academy-checkout-button:hover:not(:disabled),
-.academy-checkout-button:focus-visible:not(:disabled),
+.premium-site-scope .academy-checkout-button:hover:not(:disabled),
+.premium-site-scope .academy-checkout-button:focus-visible:not(:disabled),
 .commerce-options button:hover:not(:disabled),
-.commerce-options button:focus-visible:not(:disabled),
-.ai-marketplace__checkout button:hover:not(:disabled),
-.ai-marketplace__checkout button:focus-visible:not(:disabled),
-.ai-marketplace__download-button:hover,
-.ai-marketplace__download-button:focus-visible {
+.commerce-options button:focus-visible:not(:disabled) {
   background: linear-gradient(135deg, #e3b965, #f4d492) !important;
   transform: translateY(-1px);
 }
@@ -72,9 +66,8 @@
 }
 
 /* Disabled commerce must read as unavailable rather than purchasable. */
-.academy-checkout-button:disabled,
-.commerce-options button:disabled,
-.ai-marketplace__checkout button:disabled {
+.premium-site-scope .academy-checkout-button:disabled,
+.commerce-options button:disabled {
   border: 1px solid rgba(126, 199, 236, 0.25) !important;
   background: #18364b !important;
   color: #9fb5c3 !important;
@@ -84,10 +77,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .academy-checkout-button,
+  .premium-site-scope .academy-checkout-button,
   .commerce-options button,
-  .ai-marketplace__checkout button,
-  .ai-marketplace__download-button,
   .saas-hero__utility-row a[href="/ai-marketplace"] {
     transition: none !important;
     transform: none !important;
