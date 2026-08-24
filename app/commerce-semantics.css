@@ -1,0 +1,95 @@
+/* Sitewide commerce semantics: gold is reserved for a verified purchase, checkout, subscription, enrollment, or protected-download action. */
+:root {
+  --obserra-commerce-gold: #d9ad57;
+  --obserra-commerce-gold-hi: #efca82;
+  --obserra-commerce-ink: #071a2b;
+  --obserra-action-navy: #0a2d4b;
+  --obserra-action-line: rgba(137, 213, 240, 0.42);
+  --obserra-action-text: #e8f6ff;
+}
+
+/* Verified commerce actions. */
+.academy-checkout-button,
+.commerce-options button,
+.ai-marketplace__checkout button:not(:disabled),
+.ai-marketplace__download-button {
+  border: 0 !important;
+  background: linear-gradient(135deg, var(--obserra-commerce-gold), var(--obserra-commerce-gold-hi)) !important;
+  color: var(--obserra-commerce-ink) !important;
+  box-shadow: 0 10px 24px rgba(217, 173, 87, 0.2) !important;
+}
+
+.academy-checkout-button:hover:not(:disabled),
+.academy-checkout-button:focus-visible:not(:disabled),
+.commerce-options button:hover:not(:disabled),
+.commerce-options button:focus-visible:not(:disabled),
+.ai-marketplace__checkout button:hover:not(:disabled),
+.ai-marketplace__checkout button:focus-visible:not(:disabled),
+.ai-marketplace__download-button:hover,
+.ai-marketplace__download-button:focus-visible {
+  background: linear-gradient(135deg, #e3b965, #f4d492) !important;
+  transform: translateY(-1px);
+}
+
+/* Direct shop entry from the company homepage. */
+.saas-hero__utility-row a[href="/ai-marketplace"] {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 13px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--obserra-commerce-gold), var(--obserra-commerce-gold-hi));
+  color: var(--obserra-commerce-ink) !important;
+  box-shadow: 0 8px 18px rgba(6, 33, 60, 0.1);
+}
+
+/* Consultation, demo, preview, pricing-request, and assessment actions are not checkout. */
+.apps-button,
+.apps-nav nav .apps-nav-cta,
+.commerce-options > a,
+.commerce-coming a,
+.commerce-support a {
+  border: 1px solid var(--obserra-action-line) !important;
+  background: var(--obserra-action-navy) !important;
+  color: var(--obserra-action-text) !important;
+  box-shadow: none !important;
+}
+
+.apps-button:hover,
+.apps-button:focus-visible,
+.apps-nav nav .apps-nav-cta:hover,
+.apps-nav nav .apps-nav-cta:focus-visible,
+.commerce-options > a:hover,
+.commerce-options > a:focus-visible,
+.commerce-coming a:hover,
+.commerce-coming a:focus-visible,
+.commerce-support a:hover,
+.commerce-support a:focus-visible {
+  border-color: rgba(137, 213, 240, 0.72) !important;
+  background: #0d3657 !important;
+  color: #ffffff !important;
+}
+
+/* Disabled commerce must read as unavailable rather than purchasable. */
+.academy-checkout-button:disabled,
+.commerce-options button:disabled,
+.ai-marketplace__checkout button:disabled {
+  border: 1px solid rgba(126, 199, 236, 0.25) !important;
+  background: #18364b !important;
+  color: #9fb5c3 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .academy-checkout-button,
+  .commerce-options button,
+  .ai-marketplace__checkout button,
+  .ai-marketplace__download-button,
+  .saas-hero__utility-row a[href="/ai-marketplace"] {
+    transition: none !important;
+    transform: none !important;
+  }
+}
