@@ -108,7 +108,7 @@ export default function MarketplaceV12Checkout({ productId, options, checkoutEna
   if (sortedOptions.length === 0) return <section className={className} aria-label="Purchase availability"><p role="status">Pricing for this capability is available by request.</p><Link href={salesHref}>Contact sales</Link></section>;
 
   let status = "Checking purchase and ownership status…";
-  if (pendingPurchase && access !== "owned") status = "Payment received. Waiting for verified fulfillment before releasing the download…";
+  if (pendingPurchase) status = "Payment received. Waiting for verified fulfillment before releasing the download…";
   else if (access === "unavailable") status = "Purchase and ownership authority is temporarily unavailable. No access will be granted until it recovers.";
   else if (!providerReady && health !== null) status = "Buy & download will unlock automatically after protected artifacts, live price bindings, and payment delivery are verified.";
   else if (checkoutEnabled === false) status = "This product is not yet approved for live checkout.";
