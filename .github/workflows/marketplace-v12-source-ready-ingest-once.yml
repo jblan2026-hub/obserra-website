@@ -28,6 +28,7 @@ jobs:
       AZURE_STORAGE_ACCOUNT: stobserramktv1238d660
       AZURE_SOURCE_CONTAINER: marketplace-v12-source
       SELLABLE_SOURCE_MANIFEST: data/marketplace/obserra-marketplace-v12-sellable-source-manifest.json
+      SOURCE_BLOB_MAP: data/marketplace/obserra-marketplace-v12-source-blob-map.json
       CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
     steps:
       - name: Check out exact watcher revision
@@ -41,6 +42,19 @@ jobs:
         run: |
           set -euo pipefail
           test "$(jq '.archives | length' "${SELLABLE_SOURCE_MANIFEST}")" = "6"
+          test "$(jq '.entries | length' "${SOURCE_BLOB_MAP}")" = "6"
+          jq -e --arg revision "${CATALOG_REVISION}" --slurpfile manifest "${SELLABLE_SOURCE_MANIFEST}" '
+            .contract == "obserra-marketplace-v12-source-blob-map-v1" and
+            .catalogRevision == $revision and
+            (.entries | length) == 6 and
+            ([.entries[].catalog_filename] | unique | length) == 6 and
+            ([.entries[].blob_name] | unique | length) == 6 and
+            ([.entries[] as $entry | $manifest[0].archives[] | select(
+              .filename == $entry.catalog_filename and
+              .bytes == $entry.bytes and
+              .sha256 == $entry.sha256
+            )] | length) == 6
+          ' "${SOURCE_BLOB_MAP}" >/dev/null
           node scripts/marketplace-v12-sellable-source-materialize.mjs \
             --catalog data/marketplace/obserra-marketplace-card-catalog.json.gz \
             --summary data/marketplace/obserra-marketplace-card-catalog.summary.json \
@@ -56,7 +70,7 @@ jobs:
           tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Wait for the exact six source archives
+      - name: Wait for the exact six clean source blobs
         shell: bash
         run: |
           set -euo pipefail
@@ -65,12 +79,12 @@ jobs:
 
           for attempt in $(seq 1 600); do
             ready=true
-            while IFS=$'\t' read -r filename bytes sha; do
+            while IFS=$'\t' read -r catalog_filename blob_name bytes sha; do
               blob="$(az storage blob show \
                 --auth-mode login \
                 --account-name "${AZURE_STORAGE_ACCOUNT}" \
                 --container-name "${AZURE_SOURCE_CONTAINER}" \
-                --name "${filename}" \
+                --name "${blob_name}" \
                 --output json \
                 --only-show-errors 2>/dev/null || true)"
               if [ -z "${blob}" ] || ! jq -e --argjson bytes "${bytes}" --arg sha "${sha}" '
@@ -79,16 +93,16 @@ jobs:
                 ready=false
                 break
               fi
-            done < <(jq -r '.archives[] | [.filename, (.bytes|tostring), .sha256] | @tsv' "${SELLABLE_SOURCE_MANIFEST}")
+            done < <(jq -r '.entries[] | [.catalog_filename, .blob_name, (.bytes|tostring), .sha256] | @tsv' "${SOURCE_BLOB_MAP}")
 
             if [ "${ready}" = true ]; then
-              echo "::notice::All six exact Marketplace source archives are present in Azure."
+              echo "::notice::All six clean Marketplace source blobs are present in Azure."
               exit 0
             fi
             sleep 30
           done
 
-          echo "::error::The six exact Marketplace source archives did not become available during this one-shot run."
+          echo "::error::The six clean Marketplace source blobs did not become available during this one-shot run."
           exit 1
 
       - name: Dispatch guarded six-source protected delivery
