@@ -1,0 +1,56 @@
+name: Marketplace sales validation once
+
+on:
+  push:
+    branches:
+      - ops/marketplace-sales-validation-20260824
+    paths:
+      - .github/workflows/marketplace-sales-validation-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate-marketplace-sales:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      CI: "true"
+    steps:
+      - name: Checkout exact sales-fix source
+        uses: actions/checkout@v6
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install supported npm major
+        run: |
+          npm install --global npm@11 --no-audit --no-fund
+          test "$(npm --version | cut -d. -f1)" = "11"
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Verify lockfile remains immutable
+        run: git diff --exit-code -- package-lock.json
+
+      - name: Verify Marketplace catalog delivery contract
+        run: npm run verify:marketplace-catalog-delivery
+
+      - name: Run focused Marketplace sales regression
+        run: node --test test/marketplace-sales-live-contract.test.mjs
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build production application
+        run: npm run build
+
+      - name: Verify Marketplace catalog traced into production build
+        run: npm run verify:marketplace-catalog-delivery -- --build-output .next
