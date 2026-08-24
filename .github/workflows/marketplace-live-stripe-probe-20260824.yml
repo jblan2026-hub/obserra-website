@@ -15,6 +15,15 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
+      - name: Diagnose Marketplace production commerce health
+        shell: bash
+        run: |
+          set -euo pipefail
+          health="$(mktemp)"
+          health_status="$(curl --silent --show-error --output "${health}" --write-out '%{http_code}' 'https://www.obserrallc.com/api/ai-marketplace/commerce-health')"
+          echo "health_status=${health_status}"
+          jq -c '{operational,paymentProvider,chargesEnabled,protectedDeliveryConfigured,durableLedger,failure,dependencies,catalog:{revision:.catalog.revision,productCards:.catalog.productCards,publicationState:.catalog.publicationState,priceBindingsVerified:.catalog.priceBindingsVerified}}' "${health}"
+
       - name: Create live Marketplace Stripe Checkout Session without payment
         shell: bash
         run: |
