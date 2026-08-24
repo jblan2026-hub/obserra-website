@@ -18,6 +18,24 @@ const LEGACY_SOURCE = "obserra-ai-marketplace-v1";
 const V12_SOURCE = "obserra-ai-marketplace-v12";
 const sid = (value: string | { id: string } | null | undefined) => typeof value === "string" ? value : value?.id;
 const ATTEMPT = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const REVISION = /^[a-f0-9]{64}$/;
+const PRODUCT = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,191}$/;
+const SUBJECT = /^user_[A-Za-z0-9_-]{8,}$/;
+const TENANT = /^(?:org_[A-Za-z0-9_-]{8,}|subject:user_[A-Za-z0-9_-]{8,})$/;
+const PURCHASE_OPTIONS = new Set<MarketplaceV12PurchaseOption>(["recurring:month", "recurring:year", "one_time:once", "team_license:once", "activation:once"]);
+const INVOICE = /^in_[A-Za-z0-9]+$/;
+
+type LifecycleMetadata = Readonly<{
+  productId: string;
+  option: MarketplaceV12PurchaseOption;
+  revision: string;
+  artifactSha256: string;
+  attemptId: string;
+  subjectId: string;
+  tenantId: string;
+}>;
+
+type LifecycleReference = Readonly<{ paymentIntentId?: string; subscriptionId?: string }>;
 
 function validV12Price(price: Stripe.Price, productId: string, option: MarketplaceV12PurchaseOption, amount: number, live: boolean, revision: string, artifactSha256: string, bindingKey: string) {
   const product = typeof price.product === "string" ? null : price.product;
@@ -26,14 +44,78 @@ function validV12Price(price: Stripe.Price, productId: string, option: Marketpla
     && !!product && !product.deleted && product.active && product.metadata.obserraMarketplaceProduct === productId && product.metadata.catalogRevision === revision && product.metadata.artifactSha256 === artifactSha256 && product.metadata.commerceSource === V12_SOURCE && price.metadata.bindingKey === bindingKey;
 }
 
-function v12Metadata(metadata: Stripe.Metadata | null | undefined) {
+/** Lifecycle events can arrive long after the catalog advances. Validate their immutable Stripe metadata without requiring today's catalog revision. */
+function v12LifecycleMetadata(metadata: Stripe.Metadata | null | undefined): LifecycleMetadata | null {
   const value = metadata ?? {};
-  const product = marketplaceV12Product(value.productId ?? "");
   const option = value.purchaseOption as MarketplaceV12PurchaseOption;
+  if (value.commerceSource !== V12_SOURCE
+    || !PRODUCT.test(value.productId ?? "")
+    || !PURCHASE_OPTIONS.has(option)
+    || !REVISION.test(value.catalogRevision ?? "")
+    || !REVISION.test(value.artifactSha256 ?? "")
+    || !ATTEMPT.test(value.checkoutAttemptId ?? "")
+    || !SUBJECT.test(value.clerkUserId ?? "")
+    || !TENANT.test(value.tenantId ?? "")) return null;
+  return {
+    productId: value.productId,
+    option,
+    revision: value.catalogRevision,
+    artifactSha256: value.artifactSha256,
+    attemptId: value.checkoutAttemptId,
+    subjectId: value.clerkUserId,
+    tenantId: value.tenantId,
+  };
+}
+
+/** Initial fulfillment remains pinned to the currently verified catalog and price authority. */
+function v12Metadata(metadata: Stripe.Metadata | null | undefined) {
+  const lifecycle = v12LifecycleMetadata(metadata);
+  if (!lifecycle) return null;
+  const product = marketplaceV12Product(lifecycle.productId);
   const subject = product && marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
   const revision = marketplaceV12Summary().revision;
-  if (!product || !subject || value.commerceSource !== V12_SOURCE || value.catalogRevision !== revision || value.artifactSha256 !== subject.artifactSha256 || !ATTEMPT.test(value.checkoutAttemptId ?? "") || !value.clerkUserId || !value.tenantId) return null;
-  return { product, option, subject, revision, attemptId: value.checkoutAttemptId, subjectId: value.clerkUserId, tenantId: value.tenantId };
+  if (!product || !subject || lifecycle.revision !== revision || lifecycle.artifactSha256 !== subject.artifactSha256) return null;
+  return {
+    product,
+    option: lifecycle.option,
+    subject,
+    revision,
+    attemptId: lifecycle.attemptId,
+    subjectId: lifecycle.subjectId,
+    tenantId: lifecycle.tenantId,
+  };
+}
+
+function invoiceSubscriptionId(invoice: Stripe.Invoice) {
+  const parent = invoice.parent as null | undefined | {
+    type?: string;
+    subscription_details?: null | { subscription?: string | { id: string } | null };
+  };
+  const current = parent?.type === "subscription_details" ? sid(parent.subscription_details?.subscription) : undefined;
+  if (current) return current;
+  return sid((invoice as unknown as { subscription?: string | { id: string } | null }).subscription);
+}
+
+async function lifecycleReferenceFromPaymentIntent(paymentIntentId: string, live: boolean): Promise<LifecycleReference | null> {
+  const stripe = getApplicationsStripe();
+  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  if (paymentIntent.livemode !== live) return null;
+  if (v12LifecycleMetadata(paymentIntent.metadata)) return { paymentIntentId };
+
+  const invoicePayments = await stripe.invoicePayments.list({
+    payment: { type: "payment_intent", payment_intent: paymentIntentId },
+    limit: 2,
+  });
+  if (invoicePayments.has_more || invoicePayments.data.length !== 1) return null;
+  const invoiceId = sid(invoicePayments.data[0]?.invoice);
+  if (!invoiceId || !INVOICE.test(invoiceId)) return null;
+  const invoice = await stripe.invoices.retrieve(invoiceId);
+  if (invoice.livemode !== live) return null;
+  const subscriptionId = invoiceSubscriptionId(invoice);
+  if (!subscriptionId) return null;
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  if (subscription.livemode !== live || !v12LifecycleMetadata(subscription.metadata)) return null;
+  return { subscriptionId };
 }
 
 async function fulfillV12(event: Stripe.Event, session: Stripe.Checkout.Session, raw: string, live: boolean) {
@@ -59,25 +141,27 @@ async function fulfillV12(event: Stripe.Event, session: Stripe.Checkout.Session,
 
 async function lifecycleFromSubscription(event: Stripe.Event, lifecycle: MarketplaceV12Lifecycle, raw: string, live: boolean) {
   const subscription = event.data.object as Stripe.Subscription;
-  if (subscription.livemode !== event.livemode || !v12Metadata(subscription.metadata)) return false;
+  if (subscription.livemode !== event.livemode || !v12LifecycleMetadata(subscription.metadata)) return false;
   await recordMarketplaceV12Lifecycle({ eventId: event.id, eventType: event.type, payloadSha256: createHash("sha256").update(raw).digest("hex"), live, lifecycle, subscriptionId: subscription.id });
   return true;
 }
 
 async function lifecycleFromInvoice(event: Stripe.Event, lifecycle: MarketplaceV12Lifecycle, raw: string, live: boolean) {
   const invoice = event.data.object as Stripe.Invoice;
-  const subscriptionId = sid((invoice as unknown as { subscription?: string | { id: string } | null }).subscription);
+  const subscriptionId = invoiceSubscriptionId(invoice);
   if (invoice.livemode !== event.livemode || !subscriptionId) return false;
   const subscription = await getApplicationsStripe().subscriptions.retrieve(subscriptionId);
-  if (subscription.livemode !== event.livemode || !v12Metadata(subscription.metadata)) return false;
+  if (subscription.livemode !== event.livemode || !v12LifecycleMetadata(subscription.metadata)) return false;
   await recordMarketplaceV12Lifecycle({ eventId: event.id, eventType: event.type, payloadSha256: createHash("sha256").update(raw).digest("hex"), live, lifecycle, subscriptionId });
   return true;
 }
 
 async function lifecycleFromPaymentIntent(event: Stripe.Event, lifecycle: MarketplaceV12Lifecycle, raw: string, live: boolean) {
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
-  if (paymentIntent.livemode !== event.livemode || !v12Metadata(paymentIntent.metadata)) return false;
-  await recordMarketplaceV12Lifecycle({ eventId: event.id, eventType: event.type, payloadSha256: createHash("sha256").update(raw).digest("hex"), live, lifecycle, paymentIntentId: paymentIntent.id });
+  if (paymentIntent.livemode !== event.livemode) return false;
+  const reference = await lifecycleReferenceFromPaymentIntent(paymentIntent.id, live);
+  if (!reference) return false;
+  await recordMarketplaceV12Lifecycle({ eventId: event.id, eventType: event.type, payloadSha256: createHash("sha256").update(raw).digest("hex"), live, lifecycle, ...reference });
   return true;
 }
 
@@ -85,9 +169,9 @@ async function lifecycleFromCharge(event: Stripe.Event, lifecycle: MarketplaceV1
   const charge = event.data.object as Stripe.Charge;
   const paymentIntentId = sid(charge.payment_intent);
   if (charge.livemode !== event.livemode || !paymentIntentId) return false;
-  const paymentIntent = await getApplicationsStripe().paymentIntents.retrieve(paymentIntentId);
-  if (paymentIntent.livemode !== event.livemode || !v12Metadata(paymentIntent.metadata)) return false;
-  await recordMarketplaceV12Lifecycle({ eventId: event.id, eventType: event.type, payloadSha256: createHash("sha256").update(raw).digest("hex"), live, lifecycle, paymentIntentId });
+  const reference = await lifecycleReferenceFromPaymentIntent(paymentIntentId, live);
+  if (!reference) return false;
+  await recordMarketplaceV12Lifecycle({ eventId: event.id, eventType: event.type, payloadSha256: createHash("sha256").update(raw).digest("hex"), live, lifecycle, ...reference });
   return true;
 }
 
@@ -97,23 +181,23 @@ async function lifecycleFromDispute(event: Stripe.Event, lifecycle: MarketplaceV
   if (dispute.livemode !== event.livemode || !chargeId) return false;
   const charge = await getApplicationsStripe().charges.retrieve(chargeId);
   const paymentIntentId = sid(charge.payment_intent);
-  if (!paymentIntentId) return false;
-  const paymentIntent = await getApplicationsStripe().paymentIntents.retrieve(paymentIntentId);
-  if (paymentIntent.livemode !== event.livemode || !v12Metadata(paymentIntent.metadata)) return false;
-  await recordMarketplaceV12Lifecycle({ eventId: event.id, eventType: event.type, payloadSha256: createHash("sha256").update(raw).digest("hex"), live, lifecycle, paymentIntentId });
+  if (charge.livemode !== live || !paymentIntentId) return false;
+  const reference = await lifecycleReferenceFromPaymentIntent(paymentIntentId, live);
+  if (!reference) return false;
+  await recordMarketplaceV12Lifecycle({ eventId: event.id, eventType: event.type, payloadSha256: createHash("sha256").update(raw).digest("hex"), live, lifecycle, ...reference });
   return true;
 }
 
 async function processV12Lifecycle(event: Stripe.Event, raw: string, live: boolean) {
   if (event.type === "checkout.session.async_payment_failed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    if (session.livemode !== event.livemode || !v12Metadata(session.metadata)) return false;
+    if (session.livemode !== event.livemode || !v12LifecycleMetadata(session.metadata)) return false;
     await recordMarketplaceV12Lifecycle({ eventId: event.id, eventType: event.type, payloadSha256: createHash("sha256").update(raw).digest("hex"), live, lifecycle: "checkout_failed", sessionId: session.id });
     return true;
   }
   if (event.type === "checkout.session.expired") {
     const session = event.data.object as Stripe.Checkout.Session;
-    if (session.livemode !== event.livemode || !v12Metadata(session.metadata)) return false;
+    if (session.livemode !== event.livemode || !v12LifecycleMetadata(session.metadata)) return false;
     await recordMarketplaceV12Lifecycle({ eventId: event.id, eventType: event.type, payloadSha256: createHash("sha256").update(raw).digest("hex"), live, lifecycle: "checkout_expired", sessionId: session.id });
     return true;
   }
