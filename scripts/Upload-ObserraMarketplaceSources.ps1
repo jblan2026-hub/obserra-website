@@ -58,18 +58,18 @@ az account set --subscription $SubscriptionId
 $account = az account show --output json | ConvertFrom-Json
 if ($account.tenantId -ne $TenantId -or $account.id -ne $SubscriptionId) { throw 'Azure tenant/subscription mismatch.' }
 
-$principalId = (az ad signed-in-user show --query id -o tsv 2>$null).Trim()
+$principalId = ([string](az ad signed-in-user show --query id -o tsv 2>$null)).Trim()
 if (-not $principalId) { throw 'This uploader requires an interactive Azure user session.' }
 
-$existingRoleId = (az role assignment list --assignee-object-id $principalId --scope $Scope --query "[?roleDefinitionName=='Storage Blob Data Contributor'] | [0].id" -o tsv).Trim()
+$existingRoleId = ([string](az role assignment list --assignee-object-id $principalId --scope $Scope --query "[?roleDefinitionName=='Storage Blob Data Contributor'] | [0].id" -o tsv)).Trim()
 $createdRoleId = $null
 if (-not $existingRoleId) {
   Write-Host 'Granting the signed-in owner temporary Blob Data Contributor access to the private source container...'
-  $createdRoleId = (az role assignment create --assignee-object-id $principalId --assignee-principal-type User --role 'Storage Blob Data Contributor' --scope $Scope --query id -o tsv).Trim()
+  $createdRoleId = ([string](az role assignment create --assignee-object-id $principalId --assignee-principal-type User --role 'Storage Blob Data Contributor' --scope $Scope --query id -o tsv)).Trim()
   $ready = $null
   for ($attempt = 0; $attempt -lt 18; $attempt++) {
     Start-Sleep -Seconds 5
-    $ready = (az role assignment list --assignee-object-id $principalId --scope $Scope --query "[?roleDefinitionName=='Storage Blob Data Contributor'] | [0].id" -o tsv).Trim()
+    $ready = ([string](az role assignment list --assignee-object-id $principalId --scope $Scope --query "[?roleDefinitionName=='Storage Blob Data Contributor'] | [0].id" -o tsv)).Trim()
     if ($ready) { break }
   }
   if (-not $ready) { throw 'Azure Blob Data Contributor role did not become effective.' }
