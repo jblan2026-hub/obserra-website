@@ -59,6 +59,10 @@ jobs:
           ' ops/marketplace-v12-stripe-reconcile-request.json >/dev/null
           node scripts/marketplace-catalog-delivery-gate.mjs
 
+      - name: Install locked review dependencies
+        shell: bash
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
       - name: Authenticate dedicated Marketplace delivery identity
         uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca # v3.0.1
         with:
@@ -120,6 +124,10 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           persist-credentials: false
+
+      - name: Install locked review dependencies
+        shell: bash
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Authenticate dedicated Marketplace delivery identity
         uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca # v3.0.1
