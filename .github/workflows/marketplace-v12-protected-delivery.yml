@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Check out the exact approved main revision
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ref: ${{ inputs.expected_commit }}
           persist-credentials: false
@@ -65,8 +65,12 @@ jobs:
           test -n "${AZURE_SOURCE_CONTAINER:-}" || { echo "::error::Protected source container is not configured."; exit 1; }
           node scripts/marketplace-catalog-delivery-gate.mjs
 
+      - name: Install locked protected-delivery dependencies
+        shell: bash
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
       - name: Authenticate the dedicated protected-delivery identity
-        uses: azure/login@v3.0.1
+        uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca # v3.0.1
         with:
           client-id: ${{ env.AZURE_DELIVERY_CLIENT_ID }}
           tenant-id: ${{ env.AZURE_TENANT_ID }}
@@ -279,7 +283,7 @@ jobs:
 
       - name: Retain non-sensitive release evidence
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: marketplace-v12-protected-delivery-${{ github.run_id }}
           path: |
