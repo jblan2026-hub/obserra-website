@@ -72,7 +72,8 @@ test("public conversion paths are functional and claims stay explicit", () => {
   assert.doesNotMatch(home, /Illustrative preview/);
   assert.doesNotMatch(home, /not a live customer environment/);
   assert.doesNotMatch(home, /Representative interface only/);
-  assert.match(home, /Explore \{APPLICATIONS_BRAND_NAME\}/);
+  assert.match(home, /View \{APPLICATIONS_BRAND_NAME\}/);
+  assert.match(home, /href="\/florida-security-training"/);
   assert.match(smoke, /assert\.equal\(response\.status, 405/);
 });
 
