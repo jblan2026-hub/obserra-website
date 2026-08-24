@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
-      TARGET_SHA: 21cc8e15c99f519ab113e59499c9cf0cdd870c6d
+      TARGET_SHA: 6e729c4d6dbeef8bdee04f40a76fa3eddd0ec049
       CATALOG_REVISION: 487043cc23975012e83764a9a0f258f9ff705ab656084be558e76fa64f47faf2
       OBSERVATION_BRANCH: ops/marketplace-v12-source-verify-20260823
     steps:
