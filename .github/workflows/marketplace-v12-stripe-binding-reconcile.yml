@@ -42,7 +42,7 @@ jobs:
         shard: [0, 1, 2, 3]
     steps:
       - name: Check out exact approved main revision
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ref: ${{ inputs.expected_commit }}
           persist-credentials: false
@@ -56,8 +56,12 @@ jobs:
           test "${{ inputs.approved_catalog_revision }}" = "${EXPECTED_CATALOG_REVISION}" || { echo "::error::Catalog revision differs from approved v1.2 revision."; exit 1; }
           node scripts/marketplace-catalog-delivery-gate.mjs
 
+      - name: Install locked review dependencies
+        shell: bash
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
       - name: Authenticate dedicated Marketplace delivery identity
-        uses: azure/login@v3.0.1
+        uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca # v3.0.1
         with:
           client-id: ${{ env.AZURE_DELIVERY_CLIENT_ID }}
           tenant-id: ${{ env.AZURE_TENANT_ID }}
@@ -67,16 +71,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          read_secret() {
-            local name="$1" value
+          read_secret_into() {
+            local name="$1" target="$2" value
             value="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${name}" --query value -o tsv --only-show-errors)"
             test -n "${value:-}" || { echo "::error::Required Marketplace binding authority is unavailable: ${name}."; exit 1; }
             echo "::add-mask::${value}"
-            printf '%s' "${value}"
+            printf -v "${target}" '%s' "${value}"
           }
-          service_role_key="$(read_secret applications-supabase-service-role-key)"
-          stripe_key="$(read_secret applications-stripe-secret-key)"
-          hash_secret="$(read_secret applications-commerce-hash-secret)"
+          read_secret_into applications-supabase-service-role-key service_role_key
+          read_secret_into applications-stripe-secret-key stripe_key
+          read_secret_into applications-commerce-hash-secret hash_secret
           export OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY="${service_role_key}"
           export APPLICATIONS_STRIPE_SECRET_KEY="${stripe_key}"
           export OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET="${hash_secret}"
@@ -91,7 +95,7 @@ jobs:
 
       - name: Retain non-sensitive shard evidence
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: marketplace-v12-binding-shard-${{ matrix.shard }}-${{ github.run_id }}
           path: ${{ runner.temp }}/marketplace-v12-binding-shard-${{ matrix.shard }}.json
@@ -106,7 +110,7 @@ jobs:
     environment: production
     steps:
       - name: Check out exact approved main revision
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           ref: ${{ inputs.expected_commit }}
           persist-credentials: false
@@ -119,8 +123,12 @@ jobs:
           test "$(git rev-parse HEAD)" = "${{ inputs.expected_commit }}"
           test "${{ inputs.approved_catalog_revision }}" = "${EXPECTED_CATALOG_REVISION}"
 
+      - name: Install locked review dependencies
+        shell: bash
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
       - name: Authenticate dedicated Marketplace delivery identity
-        uses: azure/login@v3.0.1
+        uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca # v3.0.1
         with:
           client-id: ${{ env.AZURE_DELIVERY_CLIENT_ID }}
           tenant-id: ${{ env.AZURE_TENANT_ID }}
@@ -130,15 +138,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          read_secret() {
-            local name="$1" value
+          read_secret_into() {
+            local name="$1" target="$2" value
             value="$(az keyvault secret show --vault-name "${AZURE_KEY_VAULT_NAME}" --name "${name}" --query value -o tsv --only-show-errors)"
             test -n "${value:-}" || { echo "::error::Required Marketplace verification authority is unavailable: ${name}."; exit 1; }
             echo "::add-mask::${value}"
-            printf '%s' "${value}"
+            printf -v "${target}" '%s' "${value}"
           }
-          service_role_key="$(read_secret applications-supabase-service-role-key)"
-          stripe_key="$(read_secret applications-stripe-secret-key)"
+          read_secret_into applications-supabase-service-role-key service_role_key
+          read_secret_into applications-stripe-secret-key stripe_key
           export OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY="${service_role_key}"
           export APPLICATIONS_STRIPE_SECRET_KEY="${stripe_key}"
           export OBSERRA_MARKETPLACE_V12_EVIDENCE_RUN=review
@@ -150,7 +158,7 @@ jobs:
 
       - name: Retain non-sensitive catalog-wide verification
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: marketplace-v12-stripe-evidence-${{ github.run_id }}
           path: ${{ runner.temp }}/marketplace-v12-stripe-evidence.json
