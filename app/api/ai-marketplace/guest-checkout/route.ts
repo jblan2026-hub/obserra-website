@@ -21,6 +21,18 @@ export const maxDuration = 60;
 const V12_SOURCE = "obserra-ai-marketplace-v12";
 const sid = (value: string | { id: string } | null | undefined) => typeof value === "string" ? value : value?.id;
 
+type CheckoutStage =
+  | "request"
+  | "runtime-secrets"
+  | "catalog"
+  | "commerce-bindings"
+  | "reservation"
+  | "stripe-price"
+  | "stripe-customer"
+  | "download-token"
+  | "stripe-session"
+  | "durable-record";
+
 function redirect(request: Request, code: string, product = "") {
   const url = new URL("/ai-marketplace", request.url);
   url.searchParams.set("checkout", code);
@@ -59,6 +71,19 @@ async function requireGuestCustomer(subjectId: string, tenantId: string) {
   return bindAiMarketplaceCustomer(subjectId, tenantId, created.id, "marketplace-v12");
 }
 
+function protectedErrorFacts(error: unknown) {
+  const provider = error && typeof error === "object" ? error as Record<string, unknown> : null;
+  const message = error instanceof Error ? error.message.replace(/[\r\n\t]+/g, " ").slice(0, 320) : "unknown";
+  return {
+    name: error instanceof Error ? error.name : "unknown",
+    message,
+    stripeType: typeof provider?.type === "string" ? provider.type : undefined,
+    stripeCode: typeof provider?.code === "string" ? provider.code : undefined,
+    stripeRequestId: typeof provider?.requestId === "string" ? provider.requestId : undefined,
+    statusCode: typeof provider?.statusCode === "number" ? provider.statusCode : undefined,
+  };
+}
+
 export async function POST(request: Request) {
   if (!sameOrigin(request)) return redirect(request, "same-origin-required");
   if (!(request.headers.get("content-type") ?? "").toLowerCase().startsWith("application/x-www-form-urlencoded")) return redirect(request, "unsupported-request");
@@ -66,15 +91,20 @@ export async function POST(request: Request) {
   const form = await request.formData();
   const productId = String(form.get("product") ?? "");
   const option = String(form.get("purchaseOption") ?? "") as MarketplaceV12PurchaseOption;
+  let stage: CheckoutStage = "request";
 
   try {
+    stage = "runtime-secrets";
     await ensureMarketplaceV12RuntimeSecrets();
+
+    stage = "catalog";
     const product = marketplaceV12Product(productId);
     const revision = marketplaceV12Summary().revision;
     const subject = product && marketplaceV12CommerceSubjects().find((candidate) => candidate.productId === product.product_id);
     const offer = product && marketplaceV12Offer(product, option);
     if (!product || !subject || !offer) return redirect(request, "catalog-v12-configuration-required", productId);
 
+    stage = "commerce-bindings";
     const [priceId, coverage, commerce] = await Promise.all([
       boundMarketplaceV12Price(product, option),
       marketplaceV12BindingCoverage(),
@@ -86,6 +116,8 @@ export async function POST(request: Request) {
     if (live !== true || !applicationsCommerceConfigured()) return redirect(request, "catalog-v12-configuration-required", productId);
 
     const { subjectId, tenantId } = createMarketplaceV12GuestIdentity();
+
+    stage = "reservation";
     const reservation = await reserveMarketplaceV12Checkout({
       subjectId,
       tenantId,
@@ -96,12 +128,15 @@ export async function POST(request: Request) {
     });
 
     const stripe = getApplicationsStripe();
+
+    stage = "stripe-price";
     const price = await stripe.prices.retrieve(priceId, { expand: ["product"] });
     const bindingKey = `${offer.kind}:${offer.cadence ?? "once"}:${offer.amount_minor}`;
     if (!validV12Price(price, { productId: product.product_id, option, amountMinor: offer.amount_minor, live, revision, artifactSha256: subject.artifactSha256, bindingKey })) {
       return redirect(request, "catalog-v12-price-governance-failed", productId);
     }
 
+    stage = "stripe-customer";
     const customer = await requireGuestCustomer(subjectId, tenantId);
     const metadata = {
       commerceSource: V12_SOURCE,
@@ -116,6 +151,7 @@ export async function POST(request: Request) {
       buyerType: "guest",
     };
 
+    stage = "download-token";
     const downloadToken = createMarketplaceV12GuestDownloadToken({
       subjectId,
       tenantId,
@@ -130,6 +166,7 @@ export async function POST(request: Request) {
     success.searchParams.set("purchase_token", downloadToken);
     const successUrl = `${success.toString()}&purchase_session={CHECKOUT_SESSION_ID}`;
 
+    stage = "stripe-session";
     const session = await stripe.checkout.sessions.create({
       mode: offer.kind === "recurring" ? "subscription" : "payment",
       payment_method_types: ["card"],
@@ -142,14 +179,13 @@ export async function POST(request: Request) {
       cancel_url: new URL(`/ai-marketplace/${encodeURIComponent(product.slug)}?checkout=cancelled`, request.url).toString(),
       expires_at: reservation.expiresAt,
       billing_address_collection: "required",
-      customer_update: { address: "auto", name: "auto" },
-      consent_collection: { terms_of_service: "required" },
     }, { idempotencyKey: `ai-marketplace-v12-guest-checkout-${reservation.attemptId}` });
 
     if (!session.url || session.livemode !== live || sid(session.customer) !== customer.stripeCustomerId || session.metadata?.checkoutAttemptId !== reservation.attemptId) {
       throw new Error("Marketplace guest checkout creation mismatch");
     }
 
+    stage = "durable-record";
     await recordMarketplaceV12Checkout({
       attemptId: reservation.attemptId,
       customerId: customer.stripeCustomerId,
@@ -160,7 +196,7 @@ export async function POST(request: Request) {
 
     return NextResponse.redirect(session.url, 303);
   } catch (error) {
-    console.error("AI Marketplace guest checkout unavailable", { name: error instanceof Error ? error.name : "unknown", productId });
+    console.error("AI Marketplace guest checkout unavailable", { stage, productId, ...protectedErrorFacts(error) });
     return redirect(request, "catalog-v12-unavailable", productId);
   }
 }
