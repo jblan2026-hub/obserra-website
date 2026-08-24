@@ -94,10 +94,13 @@ test("v1.2 product page presents a simple buyer outcome and purchase path", asyn
   assert.match(install, /marketplaceV12InstallBridgeConfigured/);
   assert.match(install, /obserra:\/\/install\?grant=/);
   assert.match(install, /Install bridge unavailable/);
-  assert.match(v12Checkout, /Subscribe now/);
-  assert.match(v12Checkout, /Buy now/);
+  assert.match(v12Checkout, /Subscribe with card/);
+  assert.match(v12Checkout, /Buy with card/);
   assert.doesNotMatch(v12Checkout, /Buy & download unavailable/);
-  assert.match(v12Checkout, /providerReady && productReady && accessReady/);
+  assert.match(v12Checkout, /providerReady && productReady/);
+  assert.doesNotMatch(v12Checkout, /providerReady && productReady && accessReady/);
+  assert.match(v12Checkout, /action="\/api\/ai-marketplace\/guest-checkout"/);
+  assert.match(v12Checkout, /Pay securely by card with Stripe/);
   assert.match(v12Checkout, /healthValue\.operational === true/);
   assert.match(v12Checkout, /Contact sales for purchase options/);
   assert.match(v12Checkout, /disabled=\{!canPurchase\}/);
