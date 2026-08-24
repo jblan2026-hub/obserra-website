@@ -5,6 +5,6 @@
   "source_blob_map_contract": "obserra-marketplace-v12-source-blob-map-v1",
   "source_set": "six-governed-marketplace-source-archives",
   "required_products": 11390,
-  "requested_at": "2026-08-24T19:23:00Z",
-  "reason": "Production Azure source upload completed; dispatch guarded six-source protected delivery."
+  "requested_at": "2026-08-24T19:39:00Z",
+  "reason": "Retry governed six-source protected delivery after correcting Marketplace Stripe evidence review environment contract."
 }
