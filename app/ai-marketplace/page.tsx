@@ -15,10 +15,30 @@ import "./MarketplaceSimple.css";
 type PageProps = { searchParams: Promise<{ cursor?: string | string[]; q?: string | string[]; offering?: string | string[] }> };
 type Offering = Readonly<{ slug: string; name: string; description: string; types: readonly string[]; count: number }>;
 
+const marketplaceDescription = "Browse Obserra EPI AI skills, agent packs, workflow packs, connectors, guardrails, industry editions, and capability collections.";
+
 export const metadata: Metadata = {
-  title: "AI Marketplace | Obserra EPI",
-  description: "Browse Obserra EPI AI skills, agent packs, workflow packs, connectors, guardrails, industry editions, and capability collections.",
+  title: "AI Marketplace",
+  description: marketplaceDescription,
   alternates: { canonical: "/ai-marketplace" },
+  openGraph: {
+    title: "Obserra EPI AI Marketplace",
+    description: marketplaceDescription,
+    url: "https://www.obserrallc.com/ai-marketplace",
+    type: "website",
+    images: [{
+      url: "/brand/visuals/obserra-core.png",
+      width: 1344,
+      height: 768,
+      alt: "Obserra EPI AI Marketplace",
+    }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Obserra EPI AI Marketplace",
+    description: marketplaceDescription,
+    images: ["/brand/visuals/obserra-core.png"],
+  },
 };
 
 function value(input: string | string[] | undefined, max = 120) {
