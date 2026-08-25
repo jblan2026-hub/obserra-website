@@ -102,7 +102,7 @@ test("v1.2 product page presents a simple buyer outcome and purchase path", asyn
   assert.match(v12Checkout, /action="\/api\/ai-marketplace\/guest-checkout"/);
   assert.match(v12Checkout, /continue directly to Stripe/);
   assert.match(v12Checkout, /protected download starts automatically/);
-  assert.match(v12Checkout, /healthValue\.operational === true/);
+  assert.match(v12Checkout, /response\.ok && value\.operational === true/);
   assert.match(v12Checkout, /Contact sales for purchase options/);
   assert.match(v12Checkout, /disabled=\{!canPurchase\}/);
 });
