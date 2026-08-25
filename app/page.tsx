@@ -143,6 +143,7 @@ export default function HomePage() {
             <div className="saas-value-bar__actions">
               <ButtonLink href="/contact?interest=executive-briefing">Book an executive briefing</ButtonLink>
               <ButtonLink href="/academy" variant="secondary">Explore {ACADEMY_BRAND_NAME}</ButtonLink>
+              <ButtonLink href="/florida-security-training" variant="secondary">Review Florida Class D LMS</ButtonLink>
             </div>
             <small>Reviewed nonregulated course baseline. Regulated programs follow separate eligibility and authorization gates. Applications remain subject to product-specific engagement, deployment, and access controls.</small>
           </div>

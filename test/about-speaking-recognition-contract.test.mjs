@@ -5,6 +5,7 @@ import test from "node:test";
 
 const about = fs.readFileSync("app/about/page.tsx", "utf8");
 const aboutExtraCss = fs.readFileSync("app/about/about-extra.css", "utf8");
+const aboutExecutiveCss = fs.readFileSync("app/about/about-executive.css", "utf8");
 const speaking = fs.readFileSync("app/speaking/page.tsx", "utf8");
 const enterpriseChrome = fs.readFileSync("app/components/enterprise/EnterpriseChrome.tsx", "utf8");
 
@@ -26,13 +27,13 @@ test("About restores completed speaking engagements and recognition media", () =
 });
 
 test("Speaking presents the engagements as completed work and shows the Hall of Fame cover", () => {
-  assert.match(speaking, /DR\. JODY BLANCHARD<\/span>/);
-  assert.doesNotMatch(speaking, /DR\. JODY BLANCHARD, PH\.D\./);
-  assert.match(speaking, /SELECTED COMPLETED ENGAGEMENTS/);
+  assert.match(speaking, /<h1>Dr\. Jody Blanchard<\/h1>/);
+  assert.doesNotMatch(speaking, /<h1>Dr\. Jody Blanchard, Ph\.D\.<\/h1>/);
+  assert.match(speaking, /COMPLETED ENGAGEMENTS &amp; RECOGNITION/);
   assert.match(speaking, /CNBC Technology Executive Council TEC Talk/);
   assert.match(speaking, /December 12, 2024/);
   assert.match(speaking, /Cybersecurity ROI: Transforming Security Expenditure into Business Growth in a Time of Economic Uncertainty/);
-  assert.match(speaking, /ISE East Summit &amp; Awards/);
+  assert.match(speaking, /ISE East Summit & Awards/);
   assert.match(speaking, /HMG Strategy Global Leadership Institute Awards/);
   assert.match(speaking, /CEH Hall of Fame 2025 magazine cover/);
   for (const media of requiredMedia) assert.match(speaking, new RegExp(media.replaceAll("/", "\\/")));
@@ -57,8 +58,8 @@ test("About leadership media cards wrap their own image and content height", () 
 });
 
 test("Founder portrait gives Dr. Jody Blanchard stronger type hierarchy than the title", () => {
-  assert.match(about, /<strong className="profile-photo-name">Dr\. Jody Blanchard<\/strong>/);
-  assert.match(about, /<span className="profile-photo-title">Founder &amp; Chief Executive Officer<\/span>/);
-  assert.match(aboutExtraCss, /\.profile-photo-name \{[^}]*font-size: clamp\(22px, 2\.2vw, 27px\);/);
-  assert.match(aboutExtraCss, /\.profile-photo-title \{[^}]*font-size: 13px;/);
+  assert.match(about, /<h1>Dr\. Jody Blanchard<\/h1>/);
+  assert.match(about, /<p className="about-executive-role">Founder &amp; Chief Executive Officer · \{LEGAL_ENTITY_NAME\}<\/p>/);
+  assert.match(aboutExecutiveCss, /\.about-executive-copy h1\{font-size:clamp\(3rem,5\.8vw,5\.5rem\)!important;/);
+  assert.match(aboutExecutiveCss, /\.about-executive-role\{[^}]*font-size:1\.08rem!important;/);
 });

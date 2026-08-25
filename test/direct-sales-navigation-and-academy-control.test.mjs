@@ -4,7 +4,7 @@ import test from "node:test";
 
 const read = (path) => fs.readFileSync(path, "utf8");
 
-test("enterprise navigation separates buyer paths without crowding the primary header", () => {
+test("enterprise navigation separates buyer paths without crowding regulated training into the primary header", () => {
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
   const home = read("app/page.tsx");
   const identity = read("lib/legal-identity.ts");
@@ -16,10 +16,10 @@ test("enterprise navigation separates buyer paths without crowding the primary h
   assert.match(chrome, /\["Applications", "\/apps"\]/);
   assert.match(chrome, /\["AI Marketplace", "\/ai-marketplace", "marketplace"\]/);
   assert.match(chrome, /\[ACADEMY_BRAND_NAME, "\/academy"\]/);
+  assert.match(chrome, /\["Speaking", "\/speaking"\]/);
   assert.match(chrome, /\["Trust", "\/trust"\]/);
   assert.match(chrome, /\["About", "\/about"\]/);
   assert.doesNotMatch(chrome, /\["Florida Class D Training", "\/florida-security-training"\]/);
-  assert.doesNotMatch(chrome, /\["Speaking", "\/speaking"\]/);
   assert.match(chrome, /className=\{prominence === "marketplace" \? "ent-header__sales-link"/);
   assert.match(styles, /> a\.ent-header__sales-link/);
   assert.match(chrome, /Book an executive briefing/);

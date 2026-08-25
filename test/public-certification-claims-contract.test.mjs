@@ -71,21 +71,26 @@ test("FDACS supplemental output is named as a record and never as the official s
   assert.match(service, /does not establish FDACS approval, professional certification, or a Florida Class D Security Officer license/);
 });
 
-test("the shared enterprise header renders the exact legal site identity visibly", () => {
+test("the shared enterprise header uses the public brand while preserving exact legal identity", () => {
   const chrome = read("app/components/enterprise/EnterpriseChrome.tsx");
   const styles = read("app/components/enterprise/legal-identity-lockup.css");
 
-  assert.match(chrome, /className="ent-header__legal-name">\{LEGAL_ENTITY_NAME\}/);
+  assert.match(chrome, /className="ent-header__legal-name">\{PUBLIC_BRAND_NAME\}/);
+  assert.match(chrome, /aria-label=\{`\$\{LEGAL_ENTITY_NAME\} home`\}/);
+  assert.match(chrome, /className="ent-footer__legal-name">\{LEGAL_ENTITY_NAME\}/);
   assert.match(styles, /\.ent-header__legal-name/);
 });
 
-test("public page titles rely on the root legal-name template exactly once", () => {
+test("public page titles use the public brand template while legal metadata retains the legal entity", () => {
   const rootLayout = read("app/layout.tsx");
   const floridaTraining = read("app/florida-security-training/page.tsx");
   const store = read("app/store/page.tsx");
   const contact = read("app/contact/page.tsx");
 
-  assert.match(rootLayout, /template: `%s \| \$\{LEGAL_ENTITY_NAME\}`/);
+  assert.match(rootLayout, /template: `%s \| \$\{PUBLIC_BRAND_NAME\}`/);
+  assert.match(rootLayout, /authors: \[\{ name: LEGAL_ENTITY_NAME \}\]/);
+  assert.match(rootLayout, /creator: LEGAL_ENTITY_NAME/);
+  assert.match(rootLayout, /publisher: LEGAL_ENTITY_NAME/);
   assert.match(floridaTraining, /title: "Florida Class D Security Officer Training"/);
   assert.match(store, /title: "Store"/);
   assert.match(contact, /title: "Contact"/);

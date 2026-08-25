@@ -72,7 +72,8 @@ test("public conversion paths are functional and claims stay explicit", () => {
   assert.doesNotMatch(home, /Illustrative preview/);
   assert.doesNotMatch(home, /not a live customer environment/);
   assert.doesNotMatch(home, /Representative interface only/);
-  assert.match(home, /Explore \{APPLICATIONS_BRAND_NAME\}/);
+  assert.match(home, /View \{APPLICATIONS_BRAND_NAME\}/);
+  assert.match(home, /href="\/florida-security-training"/);
   assert.match(smoke, /assert\.equal\(response\.status, 405/);
 });
 
@@ -81,7 +82,6 @@ test("primary enterprise surfaces use one responsive executive design system", (
     "app/page.tsx",
     "app/services/page.tsx",
     "app/industries/page.tsx",
-    "app/about/page.tsx",
     "app/trust/page.tsx",
     "app/contact/page.tsx",
   ]) {
@@ -91,6 +91,14 @@ test("primary enterprise surfaces use one responsive executive design system", (
     assert.match(page, /<EnterpriseFooter \/>/, `${path} must use the enterprise footer`);
     assert.match(page, /enterprise-page-main/, `${path} must use the shared focus and layout boundary`);
   }
+
+  const about = fs.readFileSync("app/about/page.tsx", "utf8");
+  assert.match(about, /<EnterpriseHeader /, "About must use the enterprise header");
+  assert.match(about, /about-executive-facts/, "About must expose executive evidence facts");
+  assert.match(about, /about-proof-section/, "About must expose native evidence sections");
+  assert.match(about, /<EnterpriseFooter \/>/, "About must use the enterprise footer");
+  assert.match(about, /enterprise-page-main/, "About must use the shared focus and layout boundary");
+
   assert.match(enterpriseChrome, /aria-controls="enterprise-navigation"/);
   assert.match(enterpriseChrome, /event\.key !== "Escape"/);
   assert.match(enterpriseChrome, /Executive-led/);

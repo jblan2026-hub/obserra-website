@@ -27,9 +27,10 @@ test("commercial discovery routes are explicitly present in the sitemap", () => 
 test("AI Marketplace owns its canonical social metadata", () => {
   const marketplace = read("app/ai-marketplace/page.tsx");
 
-  assert.match(marketplace, /title: "AI Marketplace"/);
+  assert.match(marketplace, /const marketplaceTitle = "Obserra EPI AI Marketplace \| Buy AI Skills & Agent Packs"/);
+  assert.match(marketplace, /title: \{ absolute: marketplaceTitle \}/);
   assert.match(marketplace, /openGraph:/);
-  assert.match(marketplace, /url: "https:\/\/www\.obserrallc\.com\/ai-marketplace"/);
+  assert.match(marketplace, /url: marketplaceUrl/);
   assert.match(marketplace, /twitter:/);
   assert.match(marketplace, /Obserra EPI AI Marketplace/);
 });
