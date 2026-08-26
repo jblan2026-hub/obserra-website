@@ -10,7 +10,7 @@ import {
 } from "../../../../lib/ai-marketplace-commerce";
 import { applicationsCommerceConfigured, applicationsCommerceLivemode, getApplicationsStripe } from "../../../../lib/applications-stripe";
 import { boundMarketplaceV12Price, marketplaceV12BindingCoverage, marketplaceV12Offer, type MarketplaceV12PurchaseOption } from "../../../../lib/marketplace-v12-bindings";
-import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
+import { marketplaceV12CommerceSubjects, marketplaceV12Product, marketplaceV12PublicPath, marketplaceV12Summary } from "../../../../lib/marketplace-v12-catalog";
 import { createMarketplaceV12GuestDownloadToken, createMarketplaceV12GuestIdentity } from "../../../../lib/marketplace-v12-guest-purchase";
 import { marketplaceV12ProductCommerce } from "../../../../lib/marketplace-v12-runtime";
 import { ensureMarketplaceV12RuntimeSecrets } from "../../../../lib/production-runtime-secrets";
@@ -23,7 +23,8 @@ const sid = (value: string | { id: string } | null | undefined) => typeof value 
 type CheckoutStage = "runtime" | "catalog" | "activation" | "reservation" | "price" | "customer" | "session" | "record";
 
 function redirect(request: Request, code: string, product = "") {
-  const url = new URL("/ai-marketplace", request.url);
+  const catalogProduct = product ? marketplaceV12Product(product) : null;
+  const url = new URL(catalogProduct ? marketplaceV12PublicPath(catalogProduct) : "/ai-marketplace", request.url);
   url.searchParams.set("checkout", code);
   if (product) url.searchParams.set("product", product);
   return NextResponse.redirect(url, 303);

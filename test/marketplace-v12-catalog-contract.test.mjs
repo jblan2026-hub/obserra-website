@@ -189,7 +189,7 @@ test("v1.2 activation is evidence-derived and remains fail-closed for insufficie
   assert.doesNotMatch(health, /const operational = false/);
 });
 
-test("v1.2 Stripe evidence is signed, digest-bound, account-bound, and expiring", () => {
+test("v1.2 Stripe evidence is signed, digest-bound, account-bound, and revision-stable", () => {
   const evidence = readFileSync(new URL("lib/marketplace-v12-release-evidence.ts", root), "utf8");
   const bindings = readFileSync(new URL("lib/marketplace-v12-bindings.ts", root), "utf8");
   assert.match(evidence, /createHmac\("sha256"/);
@@ -200,6 +200,9 @@ test("v1.2 Stripe evidence is signed, digest-bound, account-bound, and expiring"
   assert.match(evidence, /stripe_account_id/);
   assert.match(evidence, /expires_at/);
   assert.match(evidence, /expiresAt - verifiedAt <= 7/);
+  assert.match(evidence, /const fresh = validWindow && now < expiresAt/);
+  assert.match(evidence, /&& validWindow\);/);
+  assert.doesNotMatch(evidence, /&& fresh\);/);
   assert.match(bindings, /marketplaceV12ReleaseEvidence/);
   assert.match(bindings, /stripeVerified: structurallyComplete && releaseEvidence\.verified/);
 });

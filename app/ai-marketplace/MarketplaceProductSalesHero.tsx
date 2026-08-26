@@ -108,7 +108,7 @@ export default function MarketplaceProductSalesHero({ detail, options, checkoutE
             {detail.pricing.offers.length > 0 ? <ul className={styles.offerList} aria-label="Available pricing">{detail.pricing.offers.map((offer) => <li key={`${offer.kind}-${offer.amount_minor}-${offer.cadence ?? "once"}`}><span>{offerName(offer.kind)}</span><strong>{money(offer.amount_minor, offer.currency)}</strong><small>{cadence(offer.cadence)}</small></li>)}</ul> : <p className={styles.pricingRequest}>Pricing is available by request.</p>}
 
             <div className={styles.checkout}>
-              <MarketplaceV12Checkout productId={detail.productId} options={options} checkoutEnabled={checkoutEnabled} />
+              <MarketplaceV12Checkout productId={detail.productId} options={options} />
             </div>
 
             <div className={styles.reassurance}>
