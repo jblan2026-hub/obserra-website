@@ -20,7 +20,7 @@ function optionLabel(option: MarketplacePublicCheckoutOption) {
   return `${price} one-time`;
 }
 
-export default function MarketplaceSimpleProduct({ detail, options, checkoutEnabled }: { detail: ProductDetail; options: readonly MarketplacePublicCheckoutOption[]; checkoutEnabled: boolean }) {
+export default function MarketplaceSimpleProduct({ detail, options, checkoutMessage }: { detail: ProductDetail; options: readonly MarketplacePublicCheckoutOption[]; checkoutMessage?: string | null }) {
   const description = clean(detail.mission || detail.description, `${detail.name} helps you complete a specific task and move your work forward.`);
   const included = clean(detail.deliverable, "A ready-to-use capability with simple setup and usage guidance.");
   const salesHref = `/contact?interest=ai-marketplace&product=${encodeURIComponent(detail.productId)}`;
@@ -38,7 +38,8 @@ export default function MarketplaceSimpleProduct({ detail, options, checkoutEnab
       <aside id="purchase-options" className="simple-product__purchase">
         <p>BUY THIS PRODUCT</p><h2>Choose your option</h2>
         {options.length ? <ul>{options.map((option) => <li key={option.option}>{optionLabel(option)}</li>)}</ul> : <p>Contact us for pricing.</p>}
-        <MarketplaceV12Checkout productId={detail.productId} options={options} checkoutEnabled={checkoutEnabled} />
+        {checkoutMessage ? <p className="simple-product__checkout-message" role="status">{checkoutMessage}</p> : null}
+        <MarketplaceV12Checkout productId={detail.productId} options={options} />
         <Link className="simple-product__help" href={salesHref}>Questions? We can help.</Link>
       </aside>
     </div>

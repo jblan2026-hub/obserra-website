@@ -71,13 +71,13 @@ test("v1.2 product page presents a simple buyer outcome and purchase path", asyn
   const access = await readFile(new URL("../app/api/ai-marketplace/access/route.ts", import.meta.url), "utf8");
   const install = await readFile(new URL("../app/api/ai-marketplace/install-grant/route.ts", import.meta.url), "utf8");
   const v12Checkout = await readFile(new URL("../app/ai-marketplace/MarketplaceV12Checkout.tsx", import.meta.url), "utf8");
-  assert.match(detail, /<MarketplaceSimpleProduct detail=\{salesDetail\} options=\{purchaseOptions\} checkoutEnabled=\{commerce\.checkoutEnabled\}/);
+  assert.match(detail, /<MarketplaceSimpleProduct detail=\{salesDetail\} options=\{purchaseOptions\} checkoutMessage=\{checkoutStatus\}/);
   assert.doesNotMatch(detail, /MarketplaceDimensionalPedestal|MarketplaceProductSalesHero/);
   assert.match(detail, /const salesDetail = buyerDetail\(publicDetail\)/);
   assert.match(productPage, /What you get/);
   assert.match(productPage, /Best for/);
   assert.match(productPage, /BUY THIS PRODUCT/);
-  assert.match(productPage, /<MarketplaceV12Checkout productId=\{detail\.productId\} options=\{options\} checkoutEnabled=\{checkoutEnabled\}/);
+  assert.match(productPage, /<MarketplaceV12Checkout productId=\{detail\.productId\} options=\{options\}/);
   assert.match(hangar, /marketplaceV12ProtectedDeliveryConfigured/);
   assert.match(hangar, /dynamic = "force-dynamic"/);
   assert.match(hangar, /runtime = "nodejs"/);
@@ -94,17 +94,13 @@ test("v1.2 product page presents a simple buyer outcome and purchase path", asyn
   assert.match(install, /marketplaceV12InstallBridgeConfigured/);
   assert.match(install, /obserra:\/\/install\?grant=/);
   assert.match(install, /Install bridge unavailable/);
-  assert.match(v12Checkout, /Subscribe with card/);
-  assert.match(v12Checkout, /Buy with card/);
+  assert.match(v12Checkout, />Buy now<\/button>/);
   assert.doesNotMatch(v12Checkout, /Buy & download unavailable/);
-  assert.match(v12Checkout, /providerReady && productReady/);
-  assert.doesNotMatch(v12Checkout, /providerReady && productReady && accessReady/);
+  assert.doesNotMatch(v12Checkout, /providerReady|productReady|commerce-health/);
   assert.match(v12Checkout, /action="\/api\/ai-marketplace\/guest-checkout"/);
-  assert.match(v12Checkout, /continue directly to Stripe/);
-  assert.match(v12Checkout, /protected download starts automatically/);
-  assert.match(v12Checkout, /response\.ok && value\.operational === true/);
-  assert.match(v12Checkout, /Contact sales for purchase options/);
-  assert.match(v12Checkout, /disabled=\{!canPurchase\}/);
+  assert.match(v12Checkout, /Secure checkout by Stripe/);
+  assert.match(v12Checkout, /protected download is available after payment/);
+  assert.doesNotMatch(v12Checkout, /disabled=/);
 });
 
 test("marketplace is a simple offering directory with direct customer buy actions", async () => {

@@ -7,11 +7,12 @@ test("public Marketplace purchase goes directly to Stripe without account access
   const guestCheckout = await readFile(new URL("../app/api/ai-marketplace/guest-checkout/route.ts", import.meta.url), "utf8");
 
   assert.match(checkoutUi, /action="\/api\/ai-marketplace\/guest-checkout"/);
-  assert.match(checkoutUi, /providerReady && productReady/);
+  assert.doesNotMatch(checkoutUi, /commerce-health|providerReady|disabled=\{!canPurchase\}/);
+  assert.match(checkoutUi, />Buy now<\/button>/);
   assert.doesNotMatch(checkoutUi, /\/api\/ai-marketplace\/access/);
   assert.doesNotMatch(checkoutUi, /auth\(\)/);
-  assert.match(checkoutUi, /continue directly to Stripe/);
-  assert.match(checkoutUi, /protected download starts automatically/);
+  assert.match(checkoutUi, /Secure checkout by Stripe/);
+  assert.match(checkoutUi, /protected download is available after payment/);
 
   assert.doesNotMatch(guestCheckout, /\/sign-in/);
   assert.doesNotMatch(guestCheckout, /auth\(\)/);
@@ -24,6 +25,7 @@ test("public Marketplace purchase goes directly to Stripe without account access
   assert.match(guestCheckout, /\{CHECKOUT_SESSION_ID\}/);
   assert.match(guestCheckout, /stage = "session"/);
   assert.match(guestCheckout, /stage = "record"/);
+  assert.match(guestCheckout, /marketplaceV12PublicPath/);
 });
 
 test("guest purchase download requires verified Stripe payment and durable entitlement", async () => {

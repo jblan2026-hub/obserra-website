@@ -35,8 +35,9 @@ function validSignature(payload: string, signature: string, key: string) {
 /**
  * A release verifier signs an exact, canonical snapshot after resolving the
  * full catalog's durable bindings and live Stripe Prices. Runtime recomputes
- * the compact authority digests and rejects stale, unsigned, or mismatched
- * evidence.
+ * the compact authority digests and rejects unsigned or mismatched evidence.
+ * The signed receipt is revision-bound; checkout revalidates the selected
+ * Stripe Price live instead of disabling the whole catalog on a timer.
  */
 export function marketplaceV12ReleaseEvidence(input: { revision: string; requiredSubjects: number; stripeAccountId?: string | null }) {
   const raw = process.env.OBSERRA_AI_MARKETPLACE_V12_RELEASE_EVIDENCE_JSON;
@@ -48,7 +49,8 @@ export function marketplaceV12ReleaseEvidence(input: { revision: string; require
     const evidence = JSON.parse(raw ?? "") as Evidence;
     const payload = canonical(evidence);
     const verifiedAt = Date.parse(evidence.verified_at ?? ""), expiresAt = Date.parse(evidence.expires_at ?? ""), now = Date.now();
-    const fresh = Number.isFinite(verifiedAt) && Number.isFinite(expiresAt) && verifiedAt <= now && now < expiresAt && expiresAt - verifiedAt <= 7 * 24 * 60 * 60 * 1000;
+    const validWindow = Number.isFinite(verifiedAt) && Number.isFinite(expiresAt) && verifiedAt <= now + 5 * 60 * 1000 && expiresAt > verifiedAt && expiresAt - verifiedAt <= 7 * 24 * 60 * 60 * 1000;
+    const fresh = validWindow && now < expiresAt;
     const verified = Boolean(payload && bindingDigest && deliveryDigest && validSignature(payload, signature, key)
       && evidence.catalog_revision === input.revision
       && evidence.binding_receipt_sha256 === bindingDigest
@@ -59,7 +61,7 @@ export function marketplaceV12ReleaseEvidence(input: { revision: string; require
       && evidence.controls?.durable_ledger_verified === true
       && (!input.stripeAccountId || evidence.stripe_account_id === input.stripeAccountId)
       && /^acct_[A-Za-z0-9]+$/.test(evidence.stripe_account_id ?? "")
-      && fresh);
-    return { verified, bindingDigest, deliveryDigest, expiresAt: Number.isFinite(expiresAt) ? new Date(expiresAt).toISOString() : null };
-  } catch { return { verified: false, bindingDigest, deliveryDigest, expiresAt: null }; }
+      && validWindow);
+    return { verified, fresh, bindingDigest, deliveryDigest, verifiedAt: Number.isFinite(verifiedAt) ? new Date(verifiedAt).toISOString() : null, expiresAt: Number.isFinite(expiresAt) ? new Date(expiresAt).toISOString() : null };
+  } catch { return { verified: false, fresh: false, bindingDigest, deliveryDigest, verifiedAt: null, expiresAt: null }; }
 }

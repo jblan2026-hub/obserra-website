@@ -12,7 +12,7 @@ import { marketplaceV12PurchaseOptions } from "../../../lib/marketplace-v12-bind
 import MarketplaceSimpleProduct from "../MarketplaceSimpleProduct";
 import "../marketplace.css";
 
-type PageProps = { params: Promise<{ productId: string }> };
+type PageProps = { params: Promise<{ productId: string }>; searchParams?: Promise<{ checkout?: string | string[] }> };
 type MarketplaceBuyerProductDetail = Omit<ReturnType<typeof marketplacePublicProductDetail>, "publisher" | "productType" | "tags" | "positionSeed" | "objectArchetype">;
 export const dynamic = "force-dynamic";
 
@@ -57,6 +57,15 @@ function purchaseOptionName(option: MarketplacePublicCheckoutOption["option"]) {
   return "One-time purchase";
 }
 
+function checkoutMessage(value: string | string[] | undefined) {
+  const code = Array.isArray(value) ? value[0] : value;
+  if (code === "cancelled") return "Checkout was canceled. You were not charged.";
+  if (code === "catalog-v12-price-governance-failed") return "That purchase option is not available right now. Please choose another option.";
+  if (code === "same-origin-required" || code === "unsupported-request" || code === "post-required") return "Please use the Buy now button below to start checkout.";
+  if (code) return "Stripe checkout could not start. Please try again.";
+  return null;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const productId = (await params).productId;
   const catalogProduct = marketplaceV12Product(productId);
@@ -89,8 +98,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return product ? { title: productTitle(product.product_name) + " | Obserra EPI AI Marketplace", description: buyerText(product.mission, `${productTitle(product.product_name)} is a practical AI capability for real-world work.`), alternates: { canonical: "/ai-marketplace/" + product.product_id } } : {};
 }
 
-export default async function MarketplaceProductPage({ params }: PageProps) {
+export default async function MarketplaceProductPage({ params, searchParams }: PageProps) {
   const productId = (await params).productId;
+  const checkoutStatus = checkoutMessage((await searchParams)?.checkout);
   const catalogProduct = marketplaceV12Product(productId);
   const product = catalogProduct ? null : findAiMarketplaceProduct(productId);
   if (!product && !catalogProduct) notFound();
@@ -140,7 +150,7 @@ export default async function MarketplaceProductPage({ params }: PageProps) {
         <Link href="/ai-marketplace">OBSERRA EPI</Link>
         <nav aria-label="Marketplace navigation"><Link href="/ai-marketplace">Marketplace</Link><Link href="/ai-marketplace/skill-libraries">Skills</Link><Link href="/academy">Academy</Link><Link href="/contact?interest=ai-marketplace">Talk to an expert</Link></nav>
       </header>
-      <MarketplaceSimpleProduct detail={salesDetail} options={purchaseOptions} checkoutEnabled={commerce.checkoutEnabled} />
+      <MarketplaceSimpleProduct detail={salesDetail} options={purchaseOptions} checkoutMessage={checkoutStatus} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
     </main>;
   }
