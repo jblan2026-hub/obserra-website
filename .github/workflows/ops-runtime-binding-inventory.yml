@@ -1,0 +1,215 @@
+name: Ops Runtime Binding Inventory
+
+on:
+  push:
+    branches:
+      - ops/runtime-binding-inventory-20260822
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-binding-names:
+    name: Production binding names only
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/ops/runtime-binding-inventory-20260822')
+      || (github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
+          && github.head_ref == 'ops/runtime-binding-inventory-20260822')
+      || (github.event_name == 'workflow_dispatch'
+          && github.ref == 'refs/heads/ops/runtime-binding-inventory-20260822')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inventory required production binding names without values
+        shell: bash
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ACCESS_TOKEN: ${{ secrets.VERCEL_ACCESS_TOKEN }}
+          VERCEL_TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+          VERCEL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+        run: |
+          set -euo pipefail
+
+          # This is read-only. It never decrypts, prints, persists, or writes values.
+          token="${VERCEL_TOKEN:-${VERCEL_ACCESS_TOKEN:-}}"
+          if [[ -z "${token}" ]]; then
+            echo "::error::No Vercel API credential is available to inventory binding names."
+            exit 1
+          fi
+
+          response_file="$(mktemp)"
+          trap 'rm -f "${response_file}"' EXIT
+
+          curl --silent --show-error --fail \
+            --header "Authorization: Bearer ${token}" \
+            --header "Accept: application/json" \
+            "https://api.vercel.com/v10/projects/${VERCEL_PROJECT_ID}/env?teamId=${VERCEL_TEAM_ID}" \
+            --output "${response_file}"
+
+          jq -e '.envs | type == "array"' "${response_file}" >/dev/null
+
+          production_entry() {
+            local key="$1"
+            jq -r --arg key "${key}" '
+              .envs[]
+              | select(
+                  .key == $key
+                  and (
+                    ((.target | type) == "string" and .target == "production")
+                    or
+                    ((.target | type) == "array" and (.target | index("production") != null))
+                  )
+                )
+              | [
+                  .key,
+                  (
+                    if (.target | type) == "array"
+                    then (.target | join(","))
+                    else (.target | tostring)
+                    end
+                  ),
+                  (.type // "unknown")
+                ]
+              | @tsv
+            ' "${response_file}"
+          }
+
+          missing_labels=()
+
+          requirement() {
+            local label="$1"
+            shift
+            local entries=""
+            local key line
+
+            for key in "$@"; do
+              line="$(production_entry "${key}" || true)"
+              if [[ -n "${line}" ]]; then
+                entries+="${line}"$'\n'
+              fi
+            done
+
+            if [[ -n "${entries}" ]]; then
+              while IFS=$'\t' read -r found_key target type; do
+                [[ -z "${found_key}" ]] && continue
+                printf '| %s | present | %s (%s, %s) |\n' "${label}" "${found_key}" "${target}" "${type}" >> "${GITHUB_STEP_SUMMARY}"
+              done <<< "${entries}"
+            else
+              printf '| %s | missing | — |\n' "${label}" >> "${GITHUB_STEP_SUMMARY}"
+              missing_labels+=("${label}")
+            fi
+          }
+
+          {
+            echo "## Production binding inventory — names only"
+            echo
+            echo "Read-only Vercel inventory for obserra-website-live."
+            echo "No environment value was printed, exported, uploaded, or changed."
+            echo
+            echo "| Requirement | Production status | Matching binding name (target, type) |"
+            echo "| --- | --- | --- |"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          requirement 'Applications durable-store URL' OBSERRA_APPLICATIONS_SUPABASE_URL
+          requirement 'Applications durable-store service role' OBSERRA_APPLICATIONS_SUPABASE_SERVICE_ROLE_KEY
+          requirement 'Applications commerce integrity secret' OBSERRA_APPLICATIONS_COMMERCE_HASH_SECRET
+          requirement 'Applications Stripe secret' APPLICATIONS_STRIPE_SECRET_KEY
+          requirement 'Applications Stripe webhook secret' APPLICATIONS_STRIPE_WEBHOOK_SECRET
+          requirement 'Applications Stripe price catalog' OBSERRA_APPLICATIONS_PRICE_CATALOG_JSON
+          requirement 'Applications identity runtime flag' OBSERRA_IDENTITY_RUNTIME_ENABLED
+          requirement 'Applications Clerk publishable key (one required)' NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY CLERK_PUBLISHABLE_KEY
+          requirement 'Applications Clerk server key' CLERK_SECRET_KEY
+          requirement 'Academy Stripe secret' ACADEMY_STRIPE_SECRET_KEY
+          requirement 'Academy Stripe webhook secret' ACADEMY_STRIPE_WEBHOOK_SECRET
+          requirement 'Academy durable-store URL' OBSERRA_ACADEMY_SUPABASE_URL
+          requirement 'Academy durable-store project reference' OBSERRA_ACADEMY_SUPABASE_PROJECT_REF
+          requirement 'Academy durable-store service role' OBSERRA_ACADEMY_SUPABASE_SERVICE_ROLE_KEY
+          requirement 'Academy email integrity secret' OBSERRA_ACADEMY_EMAIL_HASH_SECRET
+
+          if (( ${#missing_labels[@]} > 0 )); then
+            echo "::notice::Missing production binding categories (names only): ${missing_labels[*]}"
+          else
+            echo "::notice::All required production binding categories are present."
+          fi
+          echo "::notice::Production binding-name inventory completed without logging values."
+
+      - name: Inventory Vercel-managed Applications shared environment aliases
+        shell: bash
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ACCESS_TOKEN: ${{ secrets.VERCEL_ACCESS_TOKEN }}
+          VERCEL_TEAM_ID: team_xpUE1GefY2JHuFFCqbAdnZAj
+          VERCEL_PROJECT_ID: prj_lxTKKDa9sbhht7FaigiaF1PONMiC
+        run: |
+          set -euo pipefail
+
+          # Read-only alias inventory. It requests only shared-env metadata, never
+          # decrypted values. Values are neither printed, exported, nor written.
+          token="${VERCEL_TOKEN:-${VERCEL_ACCESS_TOKEN:-}}"
+          test -n "${token}" || {
+            echo "::error::No Vercel API credential is available for alias inventory."
+            exit 1
+          }
+
+          linked=0
+          unlinked=0
+          absent_or_nonproduction=0
+          for alias in \
+            applications-supabase-service-role-key \
+            applications-commerce-hash-secret \
+            applications-stripe-secret-key \
+            applications-stripe-webhook-secret \
+            applications-stripe-price-catalog-json \
+            clerk-secret-key \
+            clerk-publishable-key; do
+            response_file="$(mktemp)"
+            trap 'rm -f "${response_file}"' EXIT
+            curl --silent --show-error --fail --get \
+              --header "Authorization: Bearer ${token}" \
+              --header "Accept: application/json" \
+              --data-urlencode "search=${alias}" \
+              --data-urlencode "teamId=${VERCEL_TEAM_ID}" \
+              "https://api.vercel.com/v1/env" \
+              --output "${response_file}"
+
+            jq -e '(.data // []) | type == "array"' "${response_file}" >/dev/null
+            entry="$(jq -c --arg alias "${alias}" 'first(.data[]? | select(.key == $alias)) // empty' "${response_file}")"
+            if [[ -z "${entry}" ]] || ! jq -e '(.target | type == "array") and (.target | index("production") != null)' <<<"${entry}" >/dev/null; then
+              absent_or_nonproduction=$((absent_or_nonproduction + 1))
+            elif jq -e --arg project "${VERCEL_PROJECT_ID}" '(.projectId | type == "array") and (.projectId | index($project) != null)' <<<"${entry}" >/dev/null; then
+              linked=$((linked + 1))
+            else
+              unlinked=$((unlinked + 1))
+            fi
+            rm -f "${response_file}"
+            trap - EXIT
+          done
+
+          {
+            echo "## Applications shared-environment alias inventory — names only"
+            echo
+            echo "No environment value was printed, exported, uploaded, or changed."
+            echo
+            echo "| Production-scoped aliases linked | Existing but unlinked | Absent or not production-scoped |"
+            echo "| ---: | ---: | ---: |"
+            printf '| %s | %s | %s |\n' "${linked}" "${unlinked}" "${absent_or_nonproduction}"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          echo "::notice::Applications shared-env metadata counts: linked=${linked}; existing-but-unlinked=${unlinked}; absent-or-not-production-scoped=${absent_or_nonproduction}."
+
+          if (( absent_or_nonproduction > 0 )); then
+            echo "::error::At least one required shared environment alias is absent or not production-scoped."
+            exit 1
+          fi
+          if (( unlinked > 0 )); then
+            echo "::error::Required shared environment aliases exist but are not linked to the canonical project."
+            exit 1
+          fi
+
+          echo "::notice::All required Applications shared environment aliases are linked to the canonical project."
