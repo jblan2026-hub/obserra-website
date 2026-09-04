@@ -94,6 +94,7 @@ export default function AboutPage() {
                 width={541}
                 height={321}
                 sizes="(max-width: 700px) 76vw, 292px"
+                unoptimized
                 alt="Tampa CISO Community collaboration featuring Rosemary Ravinal, Dr. Jody Blanchard, Alfredo Pena, and Rob Patchett"
               />
               <span>UPCOMING SPEAKING ENGAGEMENT</span>
