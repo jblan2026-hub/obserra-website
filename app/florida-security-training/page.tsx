@@ -52,7 +52,7 @@ export default function FloridaSecurityTrainingPage() {
           <article><ShieldCheck /><strong>Check-ins</strong><span>Security challenges and attendance evidence</span></article>
           <article><Clock3 /><strong>All time</strong><span>Instruction, breaks, connection and absences</span></article>
         </div>
-        <div className="fl-classd__automation-grid">{floridaClassDLmsAutomation.map((item, index) => <div key={item}><b>{String(index + 1).padStart(2, "0")}</b><span>{item}</span></div>)}</div>
+        <div className="fl-classd__automation-grid">{floridaClassDLmsAutomation.map((item) => <div key={item}><span>{item}</span></div>)}</div>
       </section>
 
       <section className="fl-classd__section">
@@ -62,10 +62,10 @@ export default function FloridaSecurityTrainingPage() {
           <p>Identity requirements are checked before student sign-in. After licensing and activation, the student journey proceeds through the public no-PII readiness gate, protected account, enrollment, hosted identity verification, instructor attestation, and single-device course-access sequence. Identity images remain with the hosted verification provider and are not copied into the LMS.</p>
         </div>
         <div className="fl-classd__automation-grid" aria-label="Protected Class D student access sequence">
-          <div><b>01</b><span>Before login, confirm government photo-ID readiness, secure browser and camera capability, one-device use, hosted ID/selfie verification, and live instructor-attestation requirements.</span></div>
-          <div><b>02</b><span>After activation, create or sign in to the protected student account and complete the release-bound enrollment record.</span></div>
-          <div><b>03</b><span>Complete hosted government photo-ID and matching-selfie verification, then meet the assigned licensed Class DI instructor for independent identity attestation.</span></div>
-          <div><b>04</b><span>Open only the assigned secure live lesson after enrollment, identity, instructor, schedule, and single-device controls all pass.</span></div>
+          <div><span>Before login, confirm government photo-ID readiness, secure browser and camera capability, one-device use, hosted ID/selfie verification, and live instructor-attestation requirements.</span></div>
+          <div><span>After activation, create or sign in to the protected student account and complete the release-bound enrollment record.</span></div>
+          <div><span>Complete hosted government photo-ID and matching-selfie verification, then meet the assigned licensed Class DI instructor for independent identity attestation.</span></div>
+          <div><span>Open only the assigned secure live lesson after enrollment, identity, instructor, schedule, and single-device controls all pass.</span></div>
         </div>
         <div className="fl-classd__actions"><Link href="/florida-security-training/preflight">Run pre-login ID readiness check</Link><GovernedFloridaClassDLink className="secondary" enabled={publicLearnerControlsEnabled} href="/florida-security-training/access" lockedDescriptionId="fdacs-journey-student-access-locked" lockedLabel="Student access unavailable pending license activation">Student course access</GovernedFloridaClassDLink></div>
       </section>
