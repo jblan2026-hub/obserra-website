@@ -2,9 +2,9 @@
 .ai-marketplace__checkout label { color: #bde8f7; font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .ai-marketplace__checkout select, .ai-marketplace__checkout button, .ai-marketplace__download-button { min-height: 46px; border-radius: 9px; padding: 0 13px; font: inherit; font-weight: 850; }
 .ai-marketplace__checkout select { border: 1px solid #7fcbe466; background: #041727; color: #fff; }
-.ai-marketplace__checkout button, .ai-marketplace__download-button { display: inline-flex; align-items: center; justify-content: center; border: 0; background: linear-gradient(135deg, #d8ad5a, #f0cb83); color: #061829; cursor: pointer; text-decoration: none; box-shadow: 0 12px 28px #d8ad5a1f; }
-.ai-marketplace__checkout button:hover:not(:disabled), .ai-marketplace__checkout button:focus-visible:not(:disabled), .ai-marketplace__download-button:hover, .ai-marketplace__download-button:focus-visible { background: linear-gradient(135deg, #e0b866, #f5d493); transform: translateY(-1px); }
-.ai-marketplace__checkout button:disabled, .ai-marketplace__checkout select:disabled { opacity: .62; cursor: not-allowed; }
+.ai-marketplace__checkout button, .ai-marketplace__download-button { display: inline-flex; align-items: center; justify-content: center; border: 1px solid #d6af00; background: #ffd400; color: #061829; cursor: pointer; text-decoration: none; box-shadow: 0 12px 28px rgba(131,102,0,.2); }
+.ai-marketplace__checkout button:hover:not(:disabled), .ai-marketplace__checkout button:focus-visible:not(:disabled), .ai-marketplace__download-button:hover, .ai-marketplace__download-button:focus-visible { background: #ffe55c; transform: translateY(-1px); }
+.ai-marketplace__checkout button:disabled, .ai-marketplace__checkout select:disabled { border-color: #6f8793; background: #17323e; color: #9ebbc6; opacity: 1; cursor: not-allowed; }
 .ai-marketplace__checkout p { margin: 0; color: #bcd9e6; font-size: 13px; line-height: 1.45; }
 .ai-marketplace__checkout-owned { color: #f0cf8b; font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .ai-marketplace__checkout--compact { max-width: none; margin: 12px 0 0; padding: 12px; gap: 7px; border-radius: 10px; background: #041725; }

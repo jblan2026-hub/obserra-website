@@ -86,7 +86,26 @@ export default function AboutPage() {
         </section>
         <section className="about-proof-section about-proof-media" aria-labelledby="leadership-heading">
           <div className="about-proof-heading"><div><p className="about-kicker">LEADERSHIP IN PRACTICE</p><h2 id="leadership-heading">Selected talks, panels, and professional recognition.</h2></div><p>A look at Dr. Blanchard&apos;s public work and the conversations he brings to executive audiences.</p></div>
-          <div className="about-proof-rail about-media-rail"><article className="about-proof-card about-media-card about-media-feature"><Image src="/leadership/ceh-hall-of-fame-2025.png" alt="Dr. Jody Blanchard CEH Hall of Fame 2025 magazine cover" width={680} height={848} sizes="(max-width: 700px) 74vw, 300px" /><span>CEH HALL OF FAME, TOP 100</span><h3>CEH Hall of Fame 2025 magazine cover</h3><p>EC-Council recognition for outstanding performance and contribution to ethical hacking.</p></article>{leadershipMedia.map((item) => <article key={item.title} className="about-proof-card about-media-card"><Image src={item.image} alt={item.alt} width={720} height={480} sizes="(max-width: 700px) 76vw, 320px" /><span>{item.label}</span><h3>{item.title}</h3><p>{item.summary}</p></article>)}</div>
+          <div className="about-proof-rail about-media-rail">
+            <article className="about-proof-card about-media-card about-linkedin-card">
+              <div className="about-linkedin-embed">
+                <iframe
+                  src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7500897970922504192?compact=1"
+                  width={504}
+                  height={399}
+                  frameBorder="0"
+                  allowFullScreen
+                  loading="lazy"
+                  title="LinkedIn announcement for Dr. Jody Blanchard's upcoming speaking engagement"
+                />
+              </div>
+              <span>UPCOMING SPEAKING ENGAGEMENT</span>
+              <h3>Dr. Blanchard&apos;s upcoming speaking engagement</h3>
+              <p>Read the announcement and follow the event updates on LinkedIn.</p>
+              <a href="https://www.linkedin.com/feed/update/urn:li:ugcPost:7500897970922504192" target="_blank" rel="noopener noreferrer">View the speaking announcement on LinkedIn</a>
+            </article>
+            <article className="about-proof-card about-media-card about-media-feature"><Image src="/leadership/ceh-hall-of-fame-2025.png" alt="Dr. Jody Blanchard CEH Hall of Fame 2025 magazine cover" width={680} height={848} sizes="(max-width: 700px) 74vw, 300px" /><span>CEH HALL OF FAME, TOP 100</span><h3>CEH Hall of Fame 2025 magazine cover</h3><p>EC-Council recognition for outstanding performance and contribution to ethical hacking.</p></article>{leadershipMedia.map((item) => <article key={item.title} className="about-proof-card about-media-card"><Image src={item.image} alt={item.alt} width={720} height={480} sizes="(max-width: 700px) 76vw, 320px" /><span>{item.label}</span><h3>{item.title}</h3><p>{item.summary}</p></article>)}
+          </div>
         </section>
         <section className="about-proof-section about-proof-books" aria-labelledby="books-heading">
           <div className="about-proof-heading"><div><p className="about-kicker">PUBLISHED AUTHOR</p><h2 id="books-heading">Books for leaders facing hard decisions.</h2></div><p>Dr. Blanchard writes about cybersecurity, institutional performance, responsible technology, and the responsibilities leaders cannot hand off.</p></div>

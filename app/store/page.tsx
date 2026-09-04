@@ -64,7 +64,7 @@ const commerceControls = [
   ["Customer fulfillment", "Purchases route to the protected portal or entitled download flow for launch, licensing, downloads, billing, and support."],
 ];
 
-const commerceButton = "inline-flex min-h-12 items-center justify-center rounded-lg bg-[linear-gradient(135deg,#d9ad57,#efca82)] px-4 py-3 text-center text-sm font-black text-[#071a2b] no-underline shadow-[0_10px_24px_rgba(217,173,87,.20)] transition hover:-translate-y-px hover:bg-[linear-gradient(135deg,#e3b965,#f4d492)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d9ad57] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03101d]";
+const commerceButton = "inline-flex min-h-12 items-center justify-center rounded-lg border border-[#d6af00] bg-[#ffd400] px-4 py-3 text-center text-sm font-black text-[#071a2b] no-underline shadow-[0_10px_24px_rgba(131,102,0,.24)] transition hover:-translate-y-px hover:bg-[#ffe55c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd400] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03101d]";
 const secondaryButton = "inline-flex min-h-12 items-center justify-center rounded-lg border border-[#8bd8fa55] bg-[#0a2d4b] px-4 py-3 text-center text-sm font-black text-[#e9f8ff] no-underline transition hover:border-[#8bd8fa99] hover:bg-[#0d3657] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8bd8fa] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03101d]";
 const eyebrow = "m-0 text-[11px] font-black tracking-[0.12em] text-[#d9ad57]";
 

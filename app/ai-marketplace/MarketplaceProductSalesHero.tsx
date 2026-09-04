@@ -75,7 +75,7 @@ export default function MarketplaceProductSalesHero({ detail, options, checkoutE
             <p className={styles.lede}>{intendedOutcome}</p>
 
             <div className={styles.actions}>
-              <a className={styles.primaryAction} href="#purchase-options">{primaryLabel}</a>
+              <a className={`${styles.primaryAction}${entryOffer ? ` ${styles.purchaseAction}` : ""}`} href="#purchase-options">{primaryLabel}</a>
               <Link className={styles.secondaryAction} href={salesHref}>Talk to an expert</Link>
             </div>
 

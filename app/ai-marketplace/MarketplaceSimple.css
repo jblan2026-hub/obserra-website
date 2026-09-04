@@ -44,8 +44,10 @@
 .marketplace-simple__product-list h3 { margin: 18px 0 9px; font-size: 21px; line-height: 1.18; }
 .marketplace-simple__product-list h3 a { color: #17202a; text-decoration: none; }
 .marketplace-simple__product-list p { display: -webkit-box; overflow: hidden; margin: 0; color: #626970; line-height: 1.55; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }
-.marketplace-simple__buy { display: flex; min-height: 50px; align-items: center; justify-content: space-between; margin-top: auto; padding: 12px 16px; border: 1px solid #d66413; border-radius: 9px; background: linear-gradient(135deg, #ffc342, #f47b20); color: #17202a; font-size: 15px; font-weight: 950; text-decoration: none; box-shadow: 0 10px 24px rgba(232,120,27,.3); }
-.marketplace-simple__buy:hover { background: linear-gradient(135deg, #ffd264, #ff943c); box-shadow: 0 14px 30px rgba(232,120,27,.4); transform: translateY(-1px); }
+.marketplace-simple__buy { display: flex; min-height: 50px; align-items: center; justify-content: space-between; margin-top: auto; padding: 12px 16px; border: 1px solid #2d7899; border-radius: 9px; background: #103d52; color: #fff; font-size: 15px; font-weight: 950; text-decoration: none; box-shadow: 0 10px 24px rgba(16,61,82,.2); }
+.marketplace-simple__buy--purchase { border-color: #d6af00; background: #ffd400; color: #071a2b; box-shadow: 0 10px 24px rgba(131,102,0,.24); }
+.marketplace-simple__buy:hover { background: #18546d; box-shadow: 0 14px 30px rgba(16,61,82,.28); transform: translateY(-1px); }
+.marketplace-simple__buy--purchase:hover { background: #ffe55c; box-shadow: 0 14px 30px rgba(131,102,0,.3); }
 .marketplace-simple__empty { padding: 40px; border: 1px dashed #b7babd; text-align: center; }
 .marketplace-simple__pagination { display: flex; justify-content: center; gap: 12px; margin-top: 28px; }
 .marketplace-simple__pagination a { padding: 11px 15px; border: 1px solid #17202a; border-radius: 7px; color: #17202a; font-weight: 850; text-decoration: none; }

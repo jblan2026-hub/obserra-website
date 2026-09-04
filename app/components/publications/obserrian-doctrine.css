@@ -176,10 +176,10 @@
   justify-content: center;
   gap: 9px;
   padding: 0 18px;
-  border: 1px solid #061321;
+  border: 1px solid #d6af00;
   border-radius: 4px;
-  background: #061321;
-  color: #fff !important;
+  background: #ffd400;
+  color: #071a2b !important;
   font-size: .86rem !important;
   font-weight: 800 !important;
   text-decoration: none;
@@ -193,6 +193,13 @@
 
 #main-content .premium-site-scope.public-marketing-scope :is(.about-books-grid, .speaker-books-grid) > .doctrine-book .doctrine-book__actions a:hover,
 #main-content .premium-site-scope.public-marketing-scope :is(.about-books-grid, .speaker-books-grid) > .doctrine-book .doctrine-book__actions a:focus-visible {
+  border-color: #b99300;
+  background: #ffe55c;
+  color: #071a2b !important;
+}
+
+#main-content .premium-site-scope.public-marketing-scope :is(.about-books-grid, .speaker-books-grid) > .doctrine-book .doctrine-book__actions a + a:hover,
+#main-content .premium-site-scope.public-marketing-scope :is(.about-books-grid, .speaker-books-grid) > .doctrine-book .doctrine-book__actions a + a:focus-visible {
   border-color: #55d6e8;
   background: #55d6e8;
   color: #030b18 !important;

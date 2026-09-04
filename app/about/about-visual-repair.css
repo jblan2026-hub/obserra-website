@@ -245,6 +245,30 @@
 .about-executive-page .about-award-certificate{flex-basis:330px!important;width:330px!important;min-width:330px!important;max-width:330px!important}
 .about-executive-page .about-award-certificate img{height:220px!important;object-fit:contain!important}
 
+.about-executive-page .about-linkedin-embed{
+  width:100%;
+  aspect-ratio:504/399;
+  overflow:hidden;
+  border:1px solid rgba(6,33,60,.12);
+  border-radius:7px;
+  background:#fff;
+}
+
+.about-executive-page .about-linkedin-embed iframe{
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+  background:#fff;
+}
+
+.about-executive-page .about-linkedin-card>a{
+  color:#075e8a!important;
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:4px;
+}
+
 .about-executive-page .about-books-grid{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   gap:18px!important;

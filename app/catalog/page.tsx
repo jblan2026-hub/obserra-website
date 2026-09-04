@@ -191,7 +191,7 @@ export default function CatalogPage() {
                 {licensedSalesEnabled ? (
                   <AcademyCheckoutForm courseId={course.id} label="Buy now" source="course-card" className="academy-course-buy-button" />
                 ) : (
-                  <a className="academy-course-buy-button" href={`/academy/${course.id}`}>Preview course</a>
+                  <a className="academy-course-preview-button" href={`/academy/${course.id}`}>Preview course</a>
                 )}
               </footer>
               <a className="section-link" href={`/academy/${course.id}`}>Course details</a>
@@ -213,7 +213,7 @@ export default function CatalogPage() {
                 {licensedSalesEnabled ? (
                   <AcademyCheckoutForm courseId={course.id} label={`${course.title}, ${money.format(course.price)}`} source="course-card" className="academy-flagship-buy-button" />
                 ) : (
-                  <a href={`/academy/${course.id}`} className="academy-flagship-buy-button">{course.title}, {money.format(course.price)}, preview</a>
+                  <a href={`/academy/${course.id}`} className="academy-flagship-preview-button">{course.title}, {money.format(course.price)}, preview</a>
                 )}
               </li>
             ))}

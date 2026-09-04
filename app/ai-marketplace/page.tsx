@@ -181,7 +181,7 @@ export default async function AiMarketplacePage({ searchParams }: PageProps) {
             const card = product as MarketplaceV12Card;
             const href = resultHref(card);
             const forSale = card.pricing.offers.length > 0 && !/quote/.test(card.pricing.model);
-            return <article key={card.product_id}><Link className="marketplace-simple__product-card-link" href={href} aria-label={`${forSale ? "Buy" : "View"} ${card.name}`}><div><span>{card.proficiency || card.category || selected.name}</span><strong>{money(card)}</strong></div><h3>{card.name}</h3><p>{outcome(card)}</p><span className="marketplace-simple__buy">{forSale ? "Buy now" : "View product"}<b aria-hidden="true">→</b></span></Link></article>;
+            return <article key={card.product_id}><Link className="marketplace-simple__product-card-link" href={href} aria-label={`${forSale ? "Buy" : "View"} ${card.name}`}><div><span>{card.proficiency || card.category || selected.name}</span><strong>{money(card)}</strong></div><h3>{card.name}</h3><p>{outcome(card)}</p><span className={`marketplace-simple__buy${forSale ? " marketplace-simple__buy--purchase" : " marketplace-simple__buy--details"}`}>{forSale ? "Buy now" : "View product"}<b aria-hidden="true">→</b></span></Link></article>;
           })}
         </div>
         {!products.results.length ? <p className="marketplace-simple__empty">No products are available in this offering.</p> : null}
