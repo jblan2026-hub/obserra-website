@@ -49,7 +49,7 @@ const csp = [
   `connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.credly.com https://cdn.credly.com https://vitals.vercel-insights.com ${clerkIdentitySources} ${identityConnectSources} ${fdacsOwnerCoursewareSources}`,
   "media-src 'self' https: blob:",
   "worker-src 'self' blob:",
-  `frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.credly.com https://www.linkedin.com https://challenges.cloudflare.com https://*.protect.clerk.com https://*.daily.co ${fdacsOwnerCoursewareSources}`,
+  `frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.credly.com https://challenges.cloudflare.com https://*.protect.clerk.com https://*.daily.co ${fdacsOwnerCoursewareSources}`,
   "frame-ancestors 'none'",
   "form-action 'self' https://checkout.stripe.com https://buy.stripe.com",
   "upgrade-insecure-requests"
