@@ -15,6 +15,9 @@ const marketplace = read("app/ai-marketplace/MarketplaceSimple.css");
 const marketplaceProduct = read("app/ai-marketplace/MarketplaceSimpleProduct.css");
 const store = read("app/store/page.tsx");
 const product = read("app/products/[slug]/page.tsx");
+const floridaTraining = read("app/florida-security-training/page.tsx");
+const dimensionalPedestal = read("app/ai-marketplace/MarketplaceDimensionalPedestal.tsx");
+const marketplaceSalesDock = read("app/ai-marketplace/MarketplaceSalesDock.tsx");
 
 function rules(source) {
   return [...source.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((match) => ({
@@ -256,4 +259,11 @@ test("the clarity layer cannot alter scrolling-card mechanics", () => {
     ".speaker-media-rail",
     ".speaker-media-card",
   ]) assert.ok(!clarity.includes(selector), `clarity layer must not override protected rail selector ${selector}`);
+});
+
+test("public marketing visuals do not render decorative zero-padded step numbers", () => {
+  for (const source of [floridaTraining, dimensionalPedestal, marketplaceSalesDock]) {
+    assert.doesNotMatch(source, />\s*0[1-4]\s*</);
+    assert.doesNotMatch(source, /String\(index \+ 1\)\.padStart\(2, "0"\)/);
+  }
 });

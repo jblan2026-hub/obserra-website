@@ -97,7 +97,7 @@ class SceneBoundary extends Component<{ children: ReactNode; onFailure: () => vo
 }
 
 function TouchDemo({ selected }: { selected: MarketplaceV12Card }) {
-  return <div className={styles.touchDemo} aria-label={`How ${selected.name} works`}>{demoSteps(selected).map((step, index) => <article key={step.label}><header><span>{step.label}</span><b>{String(index + 1).padStart(2, "0")}</b></header><h4>{step.title}</h4><p>{step.body}</p><div>{step.tags.map((tag) => <small key={tag}>{tag}</small>)}</div></article>)}</div>;
+  return <div className={styles.touchDemo} aria-label={`How ${selected.name} works`}>{demoSteps(selected).map((step) => <article key={step.label}><header><span>{step.label}</span></header><h4>{step.title}</h4><p>{step.body}</p><div>{step.tags.map((tag) => <small key={tag}>{tag}</small>)}</div></article>)}</div>;
 }
 
 function SpatialStage({ products, selected, onSelect }: { products: MarketplaceV12Card[]; selected: MarketplaceV12Card; onSelect: (product: MarketplaceV12Card) => void }) {

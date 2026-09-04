@@ -71,7 +71,7 @@ function CapabilityDemoScene({ detail, onLost }: { detail: MarketplaceBuyerProdu
     <Line points={positions} color="#43d5ef" lineWidth={1.25} transparent opacity={.58} />
     {steps.map((step, index) => <Html key={step.label} transform position={positions[index]} rotation={rotations[index]} distanceFactor={5.15} zIndexRange={[6 - index, 0]}>
       <article className={styles.demoPanel} data-step={index + 1}>
-        <header><span>{step.label}</span><b>{String(index + 1).padStart(2, "0")}</b></header>
+        <header><span>{step.label}</span></header>
         <h3>{step.title}</h3>
         <p>{step.body}</p>
         <div>{step.tags.slice(0, 2).map((tag) => <small key={tag}>{tag}</small>)}</div>
@@ -86,7 +86,7 @@ function CapabilityDemoScene({ detail, onLost }: { detail: MarketplaceBuyerProdu
 function SemanticDemo({ detail, loading = false }: { detail: MarketplaceBuyerProductDetail; loading?: boolean }) {
   return <div className={styles.semanticDemo} aria-label={`How ${detail.name} works`}>
     {demoSteps(detail).map((step, index) => <article key={step.label} data-step={index + 1}>
-      <header><span>{step.label}</span><b>{String(index + 1).padStart(2, "0")}</b></header>
+      <header><span>{step.label}</span></header>
       <h3>{step.title}</h3>
       <p>{step.body}</p>
       <div>{step.tags.slice(0, 2).map((tag) => <small key={tag}>{tag}</small>)}</div>
