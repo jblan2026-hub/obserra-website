@@ -21,7 +21,7 @@ const resources = [
 export default function ResourcesPage() {
   return <main className="commercial-page"><div className="commercial-shell">
     <section className="commercial-hero"><p className="commercial-eyebrow">EXECUTIVE RESOURCES</p><h1>Practical guidance for decisions that carry enterprise consequences.</h1><p>Use {LEGAL_ENTITY_NAME} resources to evaluate risk, strengthen governance, develop leaders, and identify the right service, application, or training path for your organization.</p></section>
-    <section className="commercial-grid">{resources.map(([title, copy, href]) => <article className="commercial-card" key={title}><span>{LEGAL_ENTITY_NAME} insight</span><h2>{title}</h2><p>{copy}</p><Link href={href}>Explore this resource →</Link></article>)}</section>
+    <section className="commercial-grid">{resources.map(([title, copy, href]) => <article className="commercial-card" key={title}><span>{LEGAL_ENTITY_NAME} insight</span><h2>{title}</h2><p>{copy}</p><Link href={href}>Explore this resource</Link></article>)}</section>
     <section className="commercial-cta"><div><h2>Need guidance tailored to your organization?</h2><p>Obserrian can help you navigate the site, or you can begin a confidential enterprise conversation.</p></div><Link href="/contact?interest=enterprise-consultation">Contact {LEGAL_ENTITY_NAME}</Link></section>
   </div></main>;
 }

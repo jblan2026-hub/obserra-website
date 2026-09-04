@@ -24,8 +24,8 @@ test("enterprise navigation separates buyer paths without crowding regulated tra
   assert.match(styles, /> a\.ent-header__sales-link/);
   assert.match(chrome, /Book an executive briefing/);
   assert.match(chrome, /href="\/florida-security-training">Florida Class D Training/);
-  assert.match(home, /<ButtonLink href="\/contact\?interest=executive-briefing">Book an executive briefing<\/ButtonLink>/);
-  assert.match(home, /<ButtonLink href="\/services" variant="secondary">Explore solutions<\/ButtonLink>/);
+  assert.match(home, /<ButtonLink href="\/contact\?interest=executive-briefing">Start a conversation<\/ButtonLink>/);
+  assert.match(home, /<ButtonLink href="\/services" variant="secondary">See what we do<\/ButtonLink>/);
   assert.ok(fs.existsSync("app/apps/page.tsx"), "Applications implementation must remain present");
   assert.ok(fs.existsSync("lib/applications-team-access.ts"), "Applications team authorization must remain present");
 });

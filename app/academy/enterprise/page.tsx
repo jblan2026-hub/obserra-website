@@ -187,10 +187,10 @@ export default function AcademyEnterprisePage() {
           <h2>From enrollment through evidence of completion.</h2>
         </div>
         <ol>
-          <li><b>01</b><span><strong>Discover</strong> Identify roles, capability gaps, desired outcomes, and constraints.</span></li>
-          <li><b>02</b><span><strong>Design</strong> Select courses, learning paths, cohorts, facilitation, and reporting.</span></li>
-          <li><b>03</b><span><strong>Deliver</strong> Provide secure access, progress tracking, assessments, and support.</span></li>
-          <li><b>04</b><span><strong>Demonstrate</strong> Report course completion, assessment results, completion records, and next actions.</span></li>
+          <li><span><strong>Discover</strong> Identify roles, capability gaps, desired outcomes, and constraints.</span></li>
+          <li><span><strong>Design</strong> Select courses, learning paths, cohorts, facilitation, and reporting.</span></li>
+          <li><span><strong>Deliver</strong> Provide secure access, progress tracking, assessments, and support.</span></li>
+          <li><span><strong>Demonstrate</strong> Report course completion, assessment results, completion records, and next actions.</span></li>
         </ol>
       </section>
 

@@ -7,7 +7,6 @@ import { useEffect, useId, useRef, useState } from "react";
 import styles from "./ExecutiveInfoModal.module.css";
 
 type ExecutiveInfoModalProps = {
-  number: string;
   title: string;
   summary: string;
   description: string;
@@ -29,7 +28,6 @@ const FOCUSABLE_SELECTOR = [
 ].join(",");
 
 export default function ExecutiveInfoModal({
-  number,
   title,
   summary,
   description,
@@ -50,6 +48,7 @@ export default function ExecutiveInfoModal({
   useEffect(() => {
     if (!open) return;
 
+    const trigger = triggerRef.current;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
@@ -86,7 +85,7 @@ export default function ExecutiveInfoModal({
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
-      triggerRef.current?.focus();
+      trigger?.focus();
     };
   }, [open]);
 
@@ -104,7 +103,7 @@ export default function ExecutiveInfoModal({
             onMouseDown={(event) => event.stopPropagation()}
           >
             <button ref={closeRef} type="button" className={styles.close} onClick={() => setOpen(false)} aria-label="Close details">×</button>
-            <p className={styles.eyebrow}>{category} · {number}</p>
+            <p className={styles.eyebrow}>{category}</p>
             <h2 id={titleId}>{title}</h2>
             <p id={descriptionId}>{description}</p>
             <div className={styles.details}>{details.map((detail) => <span key={detail}>{detail}</span>)}</div>
@@ -123,7 +122,7 @@ export default function ExecutiveInfoModal({
       <button
         ref={triggerRef}
         type="button"
-        className={`${styles.trigger} ${image ? styles.visualTrigger : ""}`}
+        className={`${styles.trigger} ${image ? styles.visualTrigger : styles.textTrigger}`}
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -133,13 +132,12 @@ export default function ExecutiveInfoModal({
             <Image src={image} alt={imageAlt ?? ""} fill sizes="(max-width: 760px) 92vw, 360px" />
             <span className={styles.mediaShade} />
             <span className={styles.category}>{category}</span>
-            <span className={styles.mediaNumber}>{number}</span>
           </span>
-        ) : <span className={styles.number}>{number}</span>}
+        ) : null}
         <span className={styles.cardBody}>
           <strong className={styles.title}>{title}</strong>
           <span className={styles.summary}>{summary}</span>
-          <span className={styles.action}>Explore details <b aria-hidden="true">→</b></span>
+          <span className={styles.action}>View details</span>
         </span>
       </button>
       {modal}

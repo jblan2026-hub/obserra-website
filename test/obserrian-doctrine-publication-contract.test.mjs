@@ -36,9 +36,24 @@ test("About and Speaking both render the shared publication feature", () => {
   assert.match(about, /"@type": "Book"/);
 });
 
-test("Class A Private Investigative Agency application is shown as approved, not licensed", () => {
-  assert.match(credentials, /Class A Private Investigative Agency", number: "APPLICATION APPROVED"/);
-  assert.match(credentials, /status: "approved"/);
+test("Class A Private Investigative Agency is shown with its issued license number", () => {
+  assert.match(credentials, /Class A Private Investigative Agency", number: "A 3600146"/);
+  assert.match(credentials, /status: "licensed"/);
   assert.doesNotMatch(credentials, /Class A Private Investigative Agency", number: "APPLICATION PENDING"/);
-  assert.match(credentials, /status === "approved" \? "APPROVED" : "LICENSED"/);
+  assert.doesNotMatch(credentials, /Class A Private Investigative Agency", number: "APPLICATION APPROVED"/);
+});
+
+test("the supplied book description and reader outcomes are rendered beside the cover", () => {
+  assert.match(data, /artificial intelligence can act before leaders fully understand/);
+  assert.match(data, /human-centered way to use powerful systems/);
+  assert.match(data, /Obserra EPI Digital Twin at a leadership level/);
+  assert.match(data, /Technology can recommend\. Systems can predict\. Leaders remain accountable\./);
+  assert.match(feature, /OBSERRIAN_DOCTRINE\.readerOutcomes\.map/);
+  assert.match(feature, /doctrine-book__outcomes/);
+});
+
+test("the public book feature uses direct language without decorative AI symbols", () => {
+  assert.match(feature, />NEW BOOK</);
+  assert.match(feature, />Buy on Amazon</);
+  assert.doesNotMatch(feature, /[→↗•·✦✧★☆✨]/);
 });

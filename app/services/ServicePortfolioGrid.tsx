@@ -10,10 +10,9 @@ export default function ServicePortfolioGrid() {
         <p>Every engagement is aligned to business outcomes, accountable ownership, evidence, and a clear path to action.</p>
       </div>
       <div className="services-executive-grid">
-        {serviceCatalog.map((service, index) => (
+        {serviceCatalog.map((service) => (
           <article className="services-executive-card" key={service.id}>
             <ExecutiveInfoModal
-              number={String(index + 1).padStart(2, "0")}
               title={service.title}
               summary={service.summary}
               description={service.detail}

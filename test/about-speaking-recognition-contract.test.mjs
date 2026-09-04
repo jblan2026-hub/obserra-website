@@ -29,7 +29,7 @@ test("About restores completed speaking engagements and recognition media", () =
 test("Speaking presents the engagements as completed work and shows the Hall of Fame cover", () => {
   assert.match(speaking, /<h1>Dr\. Jody Blanchard<\/h1>/);
   assert.doesNotMatch(speaking, /<h1>Dr\. Jody Blanchard, Ph\.D\.<\/h1>/);
-  assert.match(speaking, /COMPLETED ENGAGEMENTS &amp; RECOGNITION/);
+  assert.match(speaking, /SELECTED ENGAGEMENTS AND RECOGNITION/);
   assert.match(speaking, /CNBC Technology Executive Council TEC Talk/);
   assert.match(speaking, /December 12, 2024/);
   assert.match(speaking, /Cybersecurity ROI: Transforming Security Expenditure into Business Growth in a Time of Economic Uncertainty/);
@@ -59,7 +59,8 @@ test("About leadership media cards wrap their own image and content height", () 
 
 test("Founder portrait gives Dr. Jody Blanchard stronger type hierarchy than the title", () => {
   assert.match(about, /<h1>Dr\. Jody Blanchard<\/h1>/);
-  assert.match(about, /<p className="about-executive-role">Founder &amp; Chief Executive Officer · \{LEGAL_ENTITY_NAME\}<\/p>/);
+  assert.match(about, /<p className="about-executive-role">Founder and Owner, \{LEGAL_ENTITY_NAME\}<\/p>/);
+  assert.doesNotMatch(about, /Founder (?:&amp;|and) (?:Chief Executive Officer|CEO)/);
   assert.match(aboutExecutiveCss, /\.about-executive-copy h1\{font-size:clamp\(3rem,5\.8vw,5\.5rem\)!important;/);
   assert.match(aboutExecutiveCss, /\.about-executive-role\{[^}]*font-size:1\.08rem!important;/);
 });

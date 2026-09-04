@@ -4,10 +4,6 @@ import { OBSERRIAN_DOCTRINE } from "../../../lib/publications";
 import "./obserrian-doctrine.css";
 
 export default function ObserrianDoctrineFeature({ context }: { context: "about" | "speaking" }) {
-  const supportingCopy = context === "speaking"
-    ? "A leadership framework for executives responsible for trust, governance, accountability, and institutional consequence—extending the conversation from the stage to the decisions that follow."
-    : "An executive leadership title centered on stewardship and institutional trust, with themes of bias mitigation, accountability and governance, and ethical communication and transparency.";
-
   return (
     <article className="doctrine-book" aria-labelledby={`doctrine-title-${context}`}>
       <div className="doctrine-book__cover-crop">
@@ -21,17 +17,25 @@ export default function ObserrianDoctrineFeature({ context }: { context: "about"
         />
       </div>
       <div className="doctrine-book__copy">
-        <p className="doctrine-book__label">NEW BOOK · EXECUTIVE STEWARDSHIP</p>
+        <p className="doctrine-book__label">NEW BOOK</p>
         <h3 id={`doctrine-title-${context}`}>{OBSERRIAN_DOCTRINE.title}</h3>
         <p className="doctrine-book__subtitle">{OBSERRIAN_DOCTRINE.subtitle}</p>
-        <p className="doctrine-book__description">{supportingCopy}</p>
+        <p className="doctrine-book__hook">{OBSERRIAN_DOCTRINE.hook}</p>
+        {OBSERRIAN_DOCTRINE.overview.map((paragraph) => <p className="doctrine-book__description" key={paragraph}>{paragraph}</p>)}
+        <div className="doctrine-book__outcomes">
+          <strong>Inside the book</strong>
+          <ul>{OBSERRIAN_DOCTRINE.readerOutcomes.map((outcome) => <li key={outcome}>{outcome}</li>)}</ul>
+        </div>
+        <p className="doctrine-book__description">{OBSERRIAN_DOCTRINE.digitalTwinDescription}</p>
+        <p className="doctrine-book__description">{OBSERRIAN_DOCTRINE.futureStatement}</p>
+        <p className="doctrine-book__closing">{OBSERRIAN_DOCTRINE.accountabilityStatement}</p>
         <dl className="doctrine-book__details">
           <div><dt>Author</dt><dd>{OBSERRIAN_DOCTRINE.author}</dd></div>
           <div><dt>ISBN</dt><dd>{OBSERRIAN_DOCTRINE.isbn}</dd></div>
         </dl>
         <div className="doctrine-book__actions">
-          <a href={OBSERRIAN_DOCTRINE.amazonUrl} target="_blank" rel="noopener noreferrer" aria-label="View The Obserrian Doctrine on Amazon (opens in a new tab)">View The Obserrian Doctrine on Amazon <span aria-hidden="true">↗</span></a>
-          {context === "speaking" ? <Link href="/contact?interest=speaking">Request a leadership engagement</Link> : null}
+          <a href={OBSERRIAN_DOCTRINE.amazonUrl} target="_blank" rel="noopener noreferrer" aria-label="Buy The Obserrian Doctrine on Amazon (opens in a new tab)">Buy on Amazon</a>
+          {context === "speaking" ? <Link href="/contact?interest=speaking">Invite Dr. Blanchard to speak</Link> : null}
         </div>
       </div>
     </article>

@@ -87,7 +87,7 @@ export default function CertificateView({
           <div className="certificate-signature">
             <span className="signature-mark">Dr. Jody Blanchard</span>
             <b>DR. JODY BLANCHARD</b>
-            <small>Founder and CEO. This completion record is digitally signed by Dr. Jody Blanchard and issued by {LEGAL_NAME}.</small>
+            <small>Founder and Owner. This completion record is digitally signed by Dr. Jody Blanchard and issued by {LEGAL_NAME}.</small>
           </div>
         </div>
 

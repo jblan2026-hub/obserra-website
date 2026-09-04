@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Building2, Brain, GraduationCap, ShieldCheck } from "lucide-react";
+import { Building2, Brain, GraduationCap, ShieldCheck } from "lucide-react";
 import { industrySolutions } from "./industryData";
 import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "./industries.css";
@@ -83,7 +83,7 @@ export default function IndustriesPage() {
                 <small>{industry.regulatoryContext.length} regulatory contexts</small>
                 <small>{industry.serviceSlugs.length} aligned services</small>
               </div>
-              <Link href={`/industries/${industry.slug}`}>Open industry solution <ArrowRight size={15} /></Link>
+              <Link href={`/industries/${industry.slug}`}>Open industry solution</Link>
             </article>
           ))}
         </div>

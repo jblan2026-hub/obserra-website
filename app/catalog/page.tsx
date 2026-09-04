@@ -173,7 +173,7 @@ export default function CatalogPage() {
               }}
             >
               <div className="course-offering-top">
-                <span>{course.department} · {course.level}</span>
+                <span>{course.department}, {course.level}</span>
                 <b>{course.duration}</b>
               </div>
               <h3>{course.title}</h3>
@@ -211,9 +211,9 @@ export default function CatalogPage() {
             {academyFlagshipCourses.map((course) => (
               <li key={course.id}>
                 {licensedSalesEnabled ? (
-                  <AcademyCheckoutForm courseId={course.id} label={`${course.title} · ${money.format(course.price)}`} source="course-card" className="academy-flagship-buy-button" />
+                  <AcademyCheckoutForm courseId={course.id} label={`${course.title}, ${money.format(course.price)}`} source="course-card" className="academy-flagship-buy-button" />
                 ) : (
-                  <a href={`/academy/${course.id}`} className="academy-flagship-buy-button">{course.title} · {money.format(course.price)} · Preview</a>
+                  <a href={`/academy/${course.id}`} className="academy-flagship-buy-button">{course.title}, {money.format(course.price)}, preview</a>
                 )}
               </li>
             ))}

@@ -16,9 +16,34 @@ import "./institutional-redesign.css";
 export default function PremiumSiteScope({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const marketplaceRoute = pathname === "/ai-marketplace" || pathname.startsWith("/ai-marketplace/");
+  const publicMarketingRoutes = new Set([
+    "/",
+    "/about",
+    "/speaking",
+    "/services",
+    "/protection-intelligence",
+    "/industries",
+    "/resources",
+    "/contact",
+    "/trust",
+    "/eios",
+    "/apps",
+    "/marketplace",
+    "/academy",
+    "/academy/enterprise",
+    "/certifications",
+    "/catalog",
+    "/florida-security-training",
+  ]);
+  const publicDetailRoute = /^\/(services|industries|trust|eios|apps)\/[^/]+$/.test(pathname)
+    || (/^\/academy\/[^/]+$/.test(pathname) && pathname !== "/academy/success");
+  const publicMarketingRoute = publicMarketingRoutes.has(pathname) || publicDetailRoute;
+  const scopeClassName = marketplaceRoute
+    ? "marketplace-design-scope"
+    : `premium-site-scope${publicMarketingRoute ? " public-marketing-scope" : ""}`;
 
   return (
-    <div className={marketplaceRoute ? "marketplace-design-scope" : "premium-site-scope"}>
+    <div className={scopeClassName}>
       {children}
     </div>
   );

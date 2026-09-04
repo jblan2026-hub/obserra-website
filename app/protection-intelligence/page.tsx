@@ -70,7 +70,7 @@ export default function ProtectionIntelligencePage() {
 
         <section className="apps-hero services-hero protection-hero">
           <div>
-            <p className="apps-eyebrow">PROTECTION · INTELLIGENCE · EXECUTIVE RISK</p>
+            <p className="apps-eyebrow">PROTECTION, INTELLIGENCE, AND EXECUTIVE RISK</p>
             <h1>Know the exposure early enough to change the outcome.</h1>
             <p>{LEGAL_ENTITY_NAME} gives leaders decision-ready protective intelligence across executive exposure, travel, public activity, digital footprint, and changing threat conditions.</p>
             <div className="apps-actions">
@@ -87,10 +87,9 @@ export default function ProtectionIntelligencePage() {
             <p>Select a capability for scope, outcomes, and the next step. Details stay available without forcing visitors through a long page.</p>
           </div>
           <div className="services-executive-grid">
-            {offers.map((offer, index) => (
+            {offers.map((offer) => (
               <article className="services-executive-card" key={offer.title}>
                 <ExecutiveInfoModal
-                  number={String(index + 1).padStart(2, "0")}
                   title={offer.title}
                   summary={`${offer.summary} ${offer.duration}.`}
                   description={offer.description}
