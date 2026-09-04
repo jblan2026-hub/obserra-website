@@ -220,7 +220,7 @@ test("the upcoming speaking card uses the supplied still image with an accessibl
   assert.match(card, /alt="Tampa CISO Community collaboration featuring Rosemary Ravinal, Dr\. Jody Blanchard, Alfredo Pena, and Rob Patchett"/);
   assert.match(card, /href="https:\/\/www\.linkedin\.com\/feed\/update\/urn:li:ugcPost:\d+"/);
   assert.match(card, /target="_blank" rel="noopener noreferrer"/);
-  assert.match(aboutVisualRepair, /\.about-media-card \.about-linkedin-image\{[\s\S]*?width:100%!important;[\s\S]*?height:auto!important;[\s\S]*?aspect-ratio:541\/321!important;[\s\S]*?object-fit:cover!important;/);
+  assert.match(aboutVisualRepair, /\.about-media-card \.about-linkedin-image\{[\s\S]*?width:100%!important;[\s\S]*?height:auto!important;[\s\S]*?aspect-ratio:541\/321!important;[\s\S]*?object-fit:cover!important;[\s\S]*?filter:brightness\(1\.22\) saturate\(1\.3\) contrast\(1\.04\)!important;/);
   assert.doesNotMatch(card, /<iframe|linkedin\.com\/embed/);
 
   const image = fs.readFileSync("public/leadership/tampa-ciso-community-speaking-engagement.png");
