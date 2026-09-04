@@ -123,12 +123,18 @@ export default function HomePage() {
 
         <EnterpriseProofBand />
 
-        <section className="saas-priority-strip executive-brand-capabilities" aria-label={`${PUBLIC_BRAND_NAME} capabilities`}>
-          {capabilities.map((capability) => (
-            <article key={capability.title} className="saas-priority-card">
-              <ExecutiveInfoModal {...capability} />
-            </article>
-          ))}
+        <section className="home-capability-ledger" aria-labelledby="home-capabilities-title">
+          <div className="home-capability-ledger__heading">
+            <div><p>INTEGRATED ENTERPRISE CAPABILITY</p><h2 id="home-capabilities-title">One operating view across risk, protection, technology, and leadership.</h2></div>
+            <p>Senior judgment and disciplined execution for organizations where fragmented information creates material exposure.</p>
+          </div>
+          <div className="saas-priority-strip executive-brand-capabilities" aria-label={`${PUBLIC_BRAND_NAME} capabilities`}>
+            {capabilities.map((capability) => (
+              <article key={capability.title} className="saas-priority-card">
+                <ExecutiveInfoModal {...capability} />
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className="saas-value-bar" aria-label={`Customer value from ${PUBLIC_BRAND_NAME}`}>
