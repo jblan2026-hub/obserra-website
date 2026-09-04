@@ -5,6 +5,7 @@ import VerifiedCredentials from "../about/VerifiedCredentials";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 import "../about/about.css";
 import "../about/about-extra.css";
+import "./certifications.css";
 
 export const metadata: Metadata = {
   title: `Certifications and Professional Credentials | ${LEGAL_ENTITY_NAME}`,
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function CertificationsPage() {
   return (
-    <main className="about-page">
+    <main className="about-page certifications-page">
       <header className="about-nav">
         <Link href="/" className="about-brand">
           <Image src="/brand/obserra-logo.png" width={286} height={55} priority alt={LEGAL_ENTITY_NAME} />

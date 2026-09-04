@@ -65,12 +65,12 @@ const commerceControls = [
 ];
 
 const commerceButton = "inline-flex min-h-12 items-center justify-center rounded-lg border border-[#d6af00] bg-[#ffd400] px-4 py-3 text-center text-sm font-black text-[#071a2b] no-underline shadow-[0_10px_24px_rgba(131,102,0,.24)] transition hover:-translate-y-px hover:bg-[#ffe55c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ffd400] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03101d]";
-const secondaryButton = "inline-flex min-h-12 items-center justify-center rounded-lg border border-[#8bd8fa55] bg-[#0a2d4b] px-4 py-3 text-center text-sm font-black text-[#e9f8ff] no-underline transition hover:border-[#8bd8fa99] hover:bg-[#0d3657] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8bd8fa] focus-visible:ring-offset-2 focus-visible:ring-offset-[#03101d]";
-const eyebrow = "m-0 text-[11px] font-black tracking-[0.12em] text-[#d9ad57]";
+const secondaryButton = "inline-flex min-h-12 items-center justify-center rounded-lg border border-[#075e8a] bg-white px-4 py-3 text-center text-sm font-black text-[#075e8a] no-underline transition hover:bg-[#e8f3f7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#075e8a] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f9fc]";
+const eyebrow = "store-eyebrow m-0 text-[11px] font-black tracking-[0.12em] text-[#075e8a]";
 
 export default function StorePage() {
   return (
-    <main className="min-h-svh bg-[linear-gradient(180deg,#03101d,#061b2d)] font-[Sora,'Avenir_Next',sans-serif] text-[#edf8ff]">
+    <main className="store-page min-h-svh bg-[#f4f9fc] font-[Sora,'Avenir_Next',sans-serif] text-[#0a2438]">
       <header className="relative z-20 grid gap-4 border-b border-[#6db8d833] bg-[#03101de8] px-4 py-4 backdrop-blur-md md:sticky md:top-0 md:flex md:items-center md:justify-between md:px-[max(5vw,24px)]">
         <Link href="/" className="flex items-center gap-3 text-[11px] font-black tracking-[0.13em] text-white no-underline" aria-label={`${LEGAL_ENTITY_NAME} home`}>
           <Image className="h-auto w-[min(220px,70vw)] md:w-[260px]" src="/brand/obserra-logo.png" alt={LEGAL_ENTITY_NAME} width={286} height={55} />

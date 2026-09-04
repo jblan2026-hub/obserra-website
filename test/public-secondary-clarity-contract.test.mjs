@@ -16,6 +16,8 @@ const marketplace = read("app/ai-marketplace/MarketplaceSimple.css");
 const marketplaceProduct = read("app/ai-marketplace/MarketplaceSimpleProduct.css");
 const store = read("app/store/page.tsx");
 const product = read("app/products/[slug]/page.tsx");
+const certifications = read("app/certifications/page.tsx");
+const certificationsCss = read("app/certifications/certifications.css");
 const floridaTraining = read("app/florida-security-training/page.tsx");
 const dimensionalPedestal = read("app/ai-marketplace/MarketplaceDimensionalPedestal.tsx");
 const marketplaceSalesDock = read("app/ai-marketplace/MarketplaceSalesDock.tsx");
@@ -191,6 +193,28 @@ test("reported Applications, Services, and EIOS visual defects have explicit rep
   assert.match(clarity, /\.services-executive-card > button > span:last-child > span:last-child \{[\s\S]*?background: #55d6e8 !important;[\s\S]*?color: #030b18 !important;/);
 });
 
+test("remaining deep-route dark-on-dark collisions have explicit light-surface owners", () => {
+  assert.match(clarity, /\.trust-page \.trust-executive-portfolio \.services-executive-card > button,[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.service-detail-page \.service-detail-panel-stats article \{[\s\S]*?background: #e8f3f7 !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.catalog-page \.catalog-hero-panel \.catalog-route-card \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.academy-enterprise \.ae-hero > aside > span \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #29495d !important;/);
+  assert.match(clarity, /\.industry-page :is\([\s\S]*?\.industry-hero aside article,[\s\S]*?\.industry-detail-summary article[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.academy-course-page \.academy-course-pills span \{[\s\S]*?background: #e8f3f7 !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.academy-course-page \.academy-course-assurance div \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+
+  assert.match(store, /<main className="store-page [^"]*bg-\[#f4f9fc\][^"]*text-\[#0a2438\]"/);
+  assert.match(store, /const secondaryButton = "[^"]*bg-white[^"]*text-\[#075e8a\]/);
+  assert.match(product, /<main className="product-detail-page [^"]*bg-\[#f4f9fc\][^"]*text-\[#0a2438\]"/);
+  assert.match(product, /className="product-detail-feature [^"]*bg-\[#e8f3f7\][^"]*text-\[#29495d\]"/);
+  assert.match(product, /className="product-detail-related [^"]*bg-white/);
+
+  assert.match(certifications, /import "\.\/certifications\.css";/);
+  assert.match(certifications, /<main className="about-page certifications-page">/);
+  assert.match(certificationsCss, /\.certifications-page \.credentials \{[\s\S]*?background: #e6f2f7 !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(certificationsCss, /\.certifications-page \.verified-credential-card \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(certificationsCss, /\.verified-credential-detail p,[\s\S]*?color: #29495d !important;/);
+});
+
 test("desktop and compact navigation retain the larger, high-contrast type contract", () => {
   const navRule = rules(clarity).find(({ selector, body }) =>
     selector.includes(".apps-nav") && body.includes("font-size: .95rem !important"));
@@ -284,6 +308,8 @@ test("the clarity layer cannot alter scrolling-card mechanics", () => {
   const forbiddenDeclarations = /\b(?:overflow(?:-x|-y)?|overscroll-behavior(?:-inline|-block|-x|-y)?|scroll-snap-(?:type|align|stop)|scroll-padding(?:-inline|-block|-x|-y)?|scrollbar-(?:width|color)|grid-auto-(?:flow|columns)|flex-basis|-webkit-overflow-scrolling)\s*:/i;
   assert.doesNotMatch(clarity, forbiddenDeclarations);
   assert.doesNotMatch(clarity, /\bflex\s*:\s*0\s+0(?:\s|;)/i);
+  assert.doesNotMatch(certificationsCss, forbiddenDeclarations);
+  assert.doesNotMatch(certificationsCss, /\bflex\s*:\s*0\s+0(?:\s|;)/i);
 
   for (const selector of [
     ".about-proof-rail",
