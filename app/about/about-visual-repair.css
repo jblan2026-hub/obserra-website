@@ -252,9 +252,10 @@
   aspect-ratio:541/321!important;
   object-fit:cover!important;
   object-position:center!important;
+  filter:brightness(1.22) saturate(1.3) contrast(1.04)!important;
   border:0!important;
   border-radius:7px!important;
-  background:#eef3f6!important;
+  background:#fff!important;
 }
 
 .about-executive-page .about-linkedin-card>a{

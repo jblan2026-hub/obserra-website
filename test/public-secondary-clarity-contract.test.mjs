@@ -179,12 +179,16 @@ test("reported Applications, Services, and EIOS visual defects have explicit rep
   assert.match(clarity, /\.applications-catalog-page \.apps-filters button \{[\s\S]*?background: #edf5f8 !important;[\s\S]*?color: #0a2438 !important;/);
   assert.match(clarity, /\.applications-catalog-page \.apps-filters button\.active \{[\s\S]*?background: #ffd400 !important;[\s\S]*?color: #071a2b !important;/);
   assert.match(clarity, /\.applications-catalog-page \.apps-hero > aside p \{[\s\S]*?background: #e8f3f7 !important;[\s\S]*?color: #29495d !important;/);
+  assert.match(clarity, /\.contact-page \.contact-confidence > ul \{[\s\S]*?background: #e8f3f7 !important;[\s\S]*?box-shadow: inset 4px 0 0 #f2b84b !important;/);
+  assert.match(clarity, /\.contact-page \.contact-confidence > ul :is\(li, a\) \{[\s\S]*?color: #29495d !important;[\s\S]*?opacity: 1 !important;/);
   assert.match(clarity, /\.services-page > \.ent-proof \{[\s\S]*?width: 100% !important;[\s\S]*?max-width: 100% !important;[\s\S]*?padding-inline: max\(4\.5vw, 24px\) !important;/);
   assert.match(clarity, /\.eios-executive-capability-card > button \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
   assert.match(clarity, /\.eios-executive-capability-card > button > span:last-child > span:last-child \{[\s\S]*?background: #55d6e8 !important;[\s\S]*?color: #030b18 !important;/);
   assert.match(clarity, /\.eios-page \.product-image::before \{[\s\S]*?background: rgba\(3, 11, 24, \.18\) !important;/);
   assert.match(clarity, /\.eios-page \.product-frame figcaption \{[\s\S]*?background: #ffffff !important;/);
   assert.match(clarity, /\.eios-page \.product-frame figcaption :is\(p, strong, span\) \{[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.services-executive-card > button \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.services-executive-card > button > span:last-child > span:last-child \{[\s\S]*?background: #55d6e8 !important;[\s\S]*?color: #030b18 !important;/);
 });
 
 test("desktop and compact navigation retain the larger, high-contrast type contract", () => {
@@ -220,7 +224,7 @@ test("the upcoming speaking card uses the supplied still image with an accessibl
   assert.match(card, /alt="Tampa CISO Community collaboration featuring Rosemary Ravinal, Dr\. Jody Blanchard, Alfredo Pena, and Rob Patchett"/);
   assert.match(card, /href="https:\/\/www\.linkedin\.com\/feed\/update\/urn:li:ugcPost:\d+"/);
   assert.match(card, /target="_blank" rel="noopener noreferrer"/);
-  assert.match(aboutVisualRepair, /\.about-media-card \.about-linkedin-image\{[\s\S]*?width:100%!important;[\s\S]*?height:auto!important;[\s\S]*?aspect-ratio:541\/321!important;[\s\S]*?object-fit:cover!important;/);
+  assert.match(aboutVisualRepair, /\.about-media-card \.about-linkedin-image\{[\s\S]*?width:100%!important;[\s\S]*?height:auto!important;[\s\S]*?aspect-ratio:541\/321!important;[\s\S]*?object-fit:cover!important;[\s\S]*?filter:brightness\(1\.22\) saturate\(1\.3\) contrast\(1\.04\)!important;/);
   assert.doesNotMatch(card, /<iframe|linkedin\.com\/embed/);
 
   const image = fs.readFileSync("public/leadership/tampa-ciso-community-speaking-engagement.png");
