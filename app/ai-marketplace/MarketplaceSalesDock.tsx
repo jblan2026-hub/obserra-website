@@ -54,20 +54,20 @@ function CategoryIcon({ name }: { name: string }) {
 }
 function offer(product: MarketplaceV12Card) {
   const offers = product.pricing.offers ?? [];
-  if (!offers.length || product.pricing.model === "quote") return { price: "Tailored pricing", note: "Built around your requirements", href: `/contact?interest=ai-marketplace&product=${encodeURIComponent(product.product_id)}`, action: "Talk to an expert" };
+  if (!offers.length || product.pricing.model === "quote") return { price: "Tailored pricing", note: "Built around your requirements", href: `/contact?interest=ai-marketplace&product=${encodeURIComponent(product.product_id)}`, action: "Talk to an expert", purchase: false };
   const lowest = [...offers].sort((left, right) => left.amount_minor - right.amount_minor)[0];
   const amount = new Intl.NumberFormat("en-US", { style: "currency", currency: lowest.currency }).format(lowest.amount_minor / 100);
   const cadence = lowest.cadence && lowest.cadence !== "one-time" ? ` / ${words(lowest.cadence)}` : " one-time";
-  return { price: `${amount}${cadence}`, note: offers.length > 1 ? `${offers.length} ways to purchase` : "Clear product pricing", href: `/ai-marketplace/${encodeURIComponent(product.slug)}#purchase-options`, action: "Buy now" };
+  return { price: `${amount}${cadence}`, note: offers.length > 1 ? `${offers.length} ways to purchase` : "Clear product pricing", href: `/ai-marketplace/${encodeURIComponent(product.slug)}#purchase-options`, action: "Buy now", purchase: true };
 }
 
 function inputLabel(kind: ProductForm) { return ({ agent: "Your objective", workflow: "Starting request", connector: "Your tools", protection: "Work to review", collection: "Your mission", capability: "Your need" })[kind]; }
 function resultText(product: MarketplaceV12Card) { return outcome(product); }
 function demoSteps(product: MarketplaceV12Card) {
   return [
-    { label: "Step 1 · Input", title: inputLabel(form(product)), body: `Bring the goal, context, and requirements for your ${category(product)} work.`, tags: [category(product), level(product)] },
-    { label: "Step 2 · Capability in use", title: product.name, body: buyerText(product, product.description), tags: [product.family, offeringLabel(product)] },
-    { label: "Step 3 · Outcome", title: "Work ready to move forward", body: resultText(product), tags: ["Buyer outcome", level(product)] },
+    { label: "Your input", title: inputLabel(form(product)), body: `Bring the goal, context, and requirements for your ${category(product)} work.`, tags: [category(product), level(product)] },
+    { label: "Capability at work", title: product.name, body: buyerText(product, product.description), tags: [product.family, offeringLabel(product)] },
+    { label: "What you receive", title: "Work ready to move forward", body: resultText(product), tags: ["Buyer outcome", level(product)] },
   ] as const;
 }
 
@@ -83,7 +83,7 @@ function StorefrontScene({ selected, onLost }: { selected: MarketplaceV12Card; o
   return <>
     <color attach="background" args={["#020b14"]} /><fog attach="fog" args={["#020b14", 9, 19]} />
     <Line points={[positions[0], positions[1], positions[2]]} color="#43d5ef" lineWidth={1.2} transparent opacity={0.58} />
-    {steps.map((step, index) => <Html key={step.label} transform position={positions[index]} rotation={rotations[index]} distanceFactor={5.2} zIndexRange={[5 - index, 0]}><article className={styles.demoPanel} data-step={index + 1}><header><span>{step.label}</span><b>{String(index + 1).padStart(2, "0")}</b></header><h4>{step.title}</h4><p>{step.body}</p><div>{step.tags.map((tag) => <small key={tag}>{tag}</small>)}</div>{index === 1 && <footer><i /><span>Applying selected capability</span></footer>}</article></Html>)}
+    {steps.map((step, index) => <Html key={step.label} transform position={positions[index]} rotation={rotations[index]} distanceFactor={5.2} zIndexRange={[5 - index, 0]}><article className={styles.demoPanel} data-step={index + 1}><header><span>{step.label}</span></header><h4>{step.title}</h4><p>{step.body}</p><div>{step.tags.map((tag) => <small key={tag}>{tag}</small>)}</div>{index === 1 && <footer><i /><span>Applying selected capability</span></footer>}</article></Html>)}
     <OrbitControls makeDefault enableDamping dampingFactor={0.08} enablePan={false} minDistance={7.4} maxDistance={10.5} minPolarAngle={1.02} maxPolarAngle={1.5} minAzimuthAngle={-0.32} maxAzimuthAngle={0.32} target={[0, 0.1, 0]} />
     <ContextMonitor onLost={onLost} />
   </>;
@@ -137,7 +137,7 @@ export default function MarketplaceSalesDock({ products }: Props) {
     <header className={styles.header}><div><p>Featured Obserra capabilities</p><h2 id="sales-dock-heading">Choose by outcome, level, and fit.</h2></div><p>Explore a connected selection of practical AI products. Focus one capability to see what it helps you achieve and the clearest next step.</p></header>
     <div className={styles.storefront}>
       <SpatialStage products={visibleRecords.length ? visibleRecords : records} selected={selected} onSelect={select} />
-      <article className={styles.focus} aria-live="polite"><p>Focused capability</p><span className={styles.focusMeta}>{level(selected)} · {category(selected)}</span><h3>{selected.name}</h3><p className={styles.outcome}>{outcome(selected)}</p><dl><div><dt>Best fit</dt><dd>{category(selected)}</dd></div><div><dt>Experience level</dt><dd>{level(selected)}</dd></div><div><dt>Price</dt><dd>{selectedOffer.price}</dd><small>{selectedOffer.note}</small></div></dl><Link href={selectedOffer.href}>{selectedOffer.action}<span aria-hidden="true">→</span></Link></article>
+      <article className={styles.focus} aria-live="polite"><p>Focused capability</p><span className={styles.focusMeta}>{level(selected)} · {category(selected)}</span><h3>{selected.name}</h3><p className={styles.outcome}>{outcome(selected)}</p><dl><div><dt>Best fit</dt><dd>{category(selected)}</dd></div><div><dt>Experience level</dt><dd>{level(selected)}</dd></div><div><dt>Price</dt><dd>{selectedOffer.price}</dd><small>{selectedOffer.note}</small></div></dl><Link data-commerce={selectedOffer.purchase ? "purchase" : "inquiry"} href={selectedOffer.href}>{selectedOffer.action}<span aria-hidden="true">→</span></Link></article>
       <nav className={styles.navigator} aria-label="Featured products by level and category">
         <header><div><span>Explore by fit</span><strong>Levels and categories</strong></div><div className={styles.levelChips}>{["All", ...availableLevels].map((name) => <button type="button" key={name} aria-pressed={activeLevel === name} onClick={() => chooseLevel(name)}>{name}</button>)}</div></header>
         <div className={styles.categoryTiles}><button type="button" className={activeCategory === "All" ? styles.categorySelected : undefined} onClick={() => chooseCategory("All", levelRecords)}><i><Boxes size={19} strokeWidth={1.8} aria-hidden="true" /></i><span><strong>All categories</strong><small>{levelRecords.length} individual capabilities</small></span></button>{categories.map(([name, entries]) => <button type="button" className={activeCategory === name ? styles.categorySelected : undefined} key={name} onClick={() => chooseCategory(name, entries)}><i><CategoryIcon name={name} /></i><span><strong>{name}</strong><small>{outcome(entries[0])}</small></span></button>)}</div>

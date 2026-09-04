@@ -102,6 +102,8 @@
 }
 
 .primaryAction { border: 1px solid #f3bd50; color: #1c1303; background: linear-gradient(135deg, #ffd77f, #e9a92e); box-shadow: 0 14px 35px rgba(237, 170, 39, .18); }
+.purchaseAction { border-color: #d6af00; background: #ffd400; color: #071a2b; box-shadow: 0 14px 35px rgba(131, 102, 0, .24); }
+.purchaseAction:hover, .purchaseAction:focus-visible { background: #ffe55c; }
 .secondaryAction { border: 1px solid rgba(111, 205, 233, .52); color: #e7f9ff; background: rgba(6, 41, 59, .76); }
 
 .primaryAction:hover, .primaryAction:focus-visible, .secondaryAction:hover, .secondaryAction:focus-visible, .nextSteps a:hover, .nextSteps a:focus-visible, .reassurance a:hover, .reassurance a:focus-visible {
@@ -180,10 +182,10 @@
 .checkout :global(.ai-marketplace__checkout button) {
   min-height: 50px;
   padding: 11px 15px;
-  border: 1px solid #f0b743;
+  border: 1px solid #d6af00;
   border-radius: 11px;
   color: #1c1303;
-  background: linear-gradient(135deg, #ffda86, #e6a326);
+  background: #ffd400;
   font: inherit;
   font-weight: 950;
   cursor: pointer;

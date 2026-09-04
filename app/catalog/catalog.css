@@ -496,6 +496,20 @@
   font-family: inherit;
 }
 
+.course-offering-card footer .academy-course-preview-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 15px;
+  border: 1px solid #075e8a;
+  border-radius: 9px;
+  background: #fff;
+  color: #075e8a;
+  font-weight: 900;
+  text-decoration: none;
+}
+
 .course-offering-card footer a:hover,
 .course-offering-card footer a:focus-visible,
 .course-offering-card footer .academy-course-buy-button:hover,
@@ -596,6 +610,20 @@
   width: 100%;
   font: inherit;
   cursor: pointer;
+}
+
+.academy-flagship-list li .academy-flagship-preview-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 13px;
+  border: 1px solid #075e8a;
+  border-radius: 8px;
+  background: #fff;
+  color: #075e8a;
+  font-weight: 900;
+  text-decoration: none;
 }
 
 .academy-flagship-list li a:hover,

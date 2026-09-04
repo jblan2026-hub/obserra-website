@@ -112,7 +112,8 @@ test("marketplace is a simple offering directory with direct customer buy action
   assert.match(page, /Buy now/);
   assert.doesNotMatch(page, /MarketplaceCommandDeck|MarketplaceSalesDock|MarketplaceCapabilityUniverse|MarketplaceEditorialCatalog/);
   assert.match(styles, /background: #eaf1f2/);
-  assert.match(styles, /#ffc342, #f47b20/);
+  assert.match(styles, /marketplace-simple__buy--purchase/);
+  assert.match(styles, /background: #ffd400; color: #071a2b/);
   assert.match(styles, /animation: marketplace-offering-orbit 24s linear infinite/);
   assert.match(styles, /@keyframes marketplace-offering-orbit/);
   assert.match(styles, /@keyframes marketplace-offering-counter-orbit/);

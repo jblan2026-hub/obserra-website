@@ -23,7 +23,7 @@ export default function ObserrianDoctrineFeature({ context }: { context: "about"
         <p className="doctrine-book__hook">{OBSERRIAN_DOCTRINE.hook}</p>
         {OBSERRIAN_DOCTRINE.overview.map((paragraph) => <p className="doctrine-book__description" key={paragraph}>{paragraph}</p>)}
         <div className="doctrine-book__outcomes">
-          <strong>Inside the book</strong>
+          <strong>What you&apos;ll learn</strong>
           <ul>{OBSERRIAN_DOCTRINE.readerOutcomes.map((outcome) => <li key={outcome}>{outcome}</li>)}</ul>
         </div>
         <p className="doctrine-book__description">{OBSERRIAN_DOCTRINE.digitalTwinDescription}</p>

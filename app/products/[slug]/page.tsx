@@ -96,7 +96,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <h1 className="max-w-5xl text-4xl font-semibold leading-tight sm:text-5xl lg:text-7xl">{headline}</h1>
             <p className="mt-7 max-w-3xl text-lg leading-8 text-slate-300">{summary}</p>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
-              <Link className="rounded-md bg-amber-400 px-6 py-3 text-center font-semibold text-slate-950 transition hover:bg-amber-300" href={`/apps/${product.slug}/subscribe`}>
+              <Link className="rounded-md border border-[#d6af00] bg-[#ffd400] px-6 py-3 text-center font-semibold text-[#071a2b] shadow-[0_10px_24px_rgba(131,102,0,.24)] transition hover:bg-[#ffe55c]" href={`/apps/${product.slug}/subscribe`}>
                 {primaryCta}
               </Link>
               <Link className="rounded-md border border-cyan-200/30 px-6 py-3 text-center font-semibold text-cyan-100 transition hover:bg-cyan-200/10" href={`/contact?product=${encodeURIComponent(product.slug)}`}>
