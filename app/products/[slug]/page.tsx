@@ -80,13 +80,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-[#04111f] text-white">
+    <main className="product-detail-page min-h-screen bg-[#f4f9fc] text-[#0a2438]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
 
       <section className="border-b border-cyan-200/10 bg-[radial-gradient(circle_at_top_right,rgba(43,164,214,0.18),transparent_36%),linear-gradient(180deg,#071b2f_0%,#04111f_100%)] px-6 py-20 lg:px-12">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
           <div>
-            <div className="mb-5 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
+            <div className="product-detail-meta mb-5 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#075e8a]">
               <span>{product.category}</span>
               <span className="text-white/35">•</span>
               <span>Version {product.version}</span>
@@ -99,7 +99,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <Link className="rounded-md border border-[#d6af00] bg-[#ffd400] px-6 py-3 text-center font-semibold text-[#071a2b] shadow-[0_10px_24px_rgba(131,102,0,.24)] transition hover:bg-[#ffe55c]" href={`/apps/${product.slug}/subscribe`}>
                 {primaryCta}
               </Link>
-              <Link className="rounded-md border border-cyan-200/30 px-6 py-3 text-center font-semibold text-cyan-100 transition hover:bg-cyan-200/10" href={`/contact?product=${encodeURIComponent(product.slug)}`}>
+              <Link className="product-detail-secondary rounded-md border border-[#075e8a] bg-white px-6 py-3 text-center font-semibold text-[#075e8a] transition hover:bg-[#e8f3f7]" href={`/contact?product=${encodeURIComponent(product.slug)}`}>
                 {secondaryCta}
               </Link>
             </div>
@@ -123,7 +123,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <h2 className="mt-3 text-3xl font-semibold">What the platform delivers</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {(product.features.length ? product.features : ["Subscription-controlled access", "Secure customer delivery", `Published release ${product.version}`]).map((feature) => (
-              <div key={feature} className="rounded-lg border border-white/10 bg-slate-950/45 p-5 text-slate-200">{feature}</div>
+              <div key={feature} className="product-detail-feature rounded-lg border border-[#c8d8e2] bg-[#e8f3f7] p-5 text-[#29495d]">{feature}</div>
             ))}
           </div>
         </article>
@@ -162,7 +162,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <h2 className="mt-3 text-3xl font-semibold">Extend the operating environment</h2>
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               {related.map((entry) => (
-                <Link key={entry.slug} href={`/products/${entry.slug}`} className="rounded-xl border border-white/10 bg-white/[0.035] p-6 transition hover:border-cyan-200/35 hover:bg-cyan-200/[0.06]">
+                <Link key={entry.slug} href={`/products/${entry.slug}`} className="product-detail-related rounded-xl border border-[#b6cad7] bg-white p-6 transition hover:border-[#075e8a] hover:bg-[#e8f3f7]">
                   <span className="text-xs uppercase tracking-[0.18em] text-cyan-200">{entry.category}</span>
                   <h3 className="mt-3 text-xl font-semibold">{entry.name}</h3>
                   <p className="mt-3 text-sm leading-6 text-slate-400">{entry.marketing?.shortDescription || entry.description}</p>
