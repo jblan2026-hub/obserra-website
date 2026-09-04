@@ -1,0 +1,121 @@
+.doctrine-book {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(230px, 340px) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 76px);
+  align-items: center;
+  min-height: 520px;
+  padding: clamp(28px, 4vw, 58px) clamp(24px, 5vw, 70px);
+  border: 1px solid rgba(197, 151, 61, .36) !important;
+  border-radius: 2px !important;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 112px 100%,
+    linear-gradient(135deg, #06192b 0%, #092a46 66%, #071827 100%) !important;
+  box-shadow: 0 24px 64px rgba(2, 18, 32, .18) !important;
+  color: #f6f3ea;
+}
+
+.doctrine-book__cover-crop {
+  position: relative;
+  width: min(100%, 322px);
+  aspect-ratio: 860 / 1253;
+  justify-self: center;
+  overflow: hidden;
+  border: 1px solid rgba(238, 187, 83, .48);
+  background: #03090f;
+  box-shadow: 18px 22px 42px rgba(0, 0, 0, .38);
+}
+
+.doctrine-book__cover {
+  position: absolute;
+  inset: 0 auto 0 -8.95%;
+  width: 108.95% !important;
+  max-width: none !important;
+  height: 100% !important;
+  object-fit: fill !important;
+  filter: none !important;
+}
+
+.doctrine-book__copy { max-width: 710px; }
+
+.doctrine-book__label {
+  margin: 0 0 20px !important;
+  color: #e7b952 !important;
+  font-size: .72rem !important;
+  font-weight: 850 !important;
+  letter-spacing: .15em !important;
+  text-transform: uppercase;
+}
+
+.doctrine-book h3 {
+  max-width: 720px;
+  margin: 0 !important;
+  color: #fff !important;
+  font-size: clamp(2.65rem, 5.2vw, 5.4rem) !important;
+  font-weight: 720 !important;
+  line-height: .92 !important;
+  letter-spacing: -.055em !important;
+}
+
+.doctrine-book__subtitle {
+  max-width: 620px;
+  margin: 20px 0 0 !important;
+  color: #f0c76f !important;
+  font-size: clamp(1.08rem, 1.65vw, 1.42rem) !important;
+  font-weight: 650 !important;
+  line-height: 1.35 !important;
+}
+
+.doctrine-book__description {
+  max-width: 660px;
+  margin: 22px 0 0 !important;
+  color: #d5e1e8 !important;
+  font-size: 1rem !important;
+  line-height: 1.7 !important;
+}
+
+.doctrine-book__details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 30px 0 0;
+  border-top: 1px solid rgba(203, 221, 232, .22);
+  border-bottom: 1px solid rgba(203, 221, 232, .22);
+}
+
+.doctrine-book__details div { padding: 14px 20px 14px 0; }
+.doctrine-book__details div + div { padding-left: 20px; border-left: 1px solid rgba(203, 221, 232, .22); }
+.doctrine-book__details dt { color: #8faabd !important; font-size: .65rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.doctrine-book__details dd { margin: 5px 0 0; color: #fff !important; font-size: .9rem; font-weight: 700; line-height: 1.35; }
+
+.doctrine-book__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.doctrine-book__actions a {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 18px;
+  border: 1px solid #e5b34f;
+  border-radius: 2px;
+  background: #e5b34f;
+  color: #071a2b !important;
+  font-size: .82rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+.doctrine-book__actions a + a { border-color: rgba(255,255,255,.34); background: transparent; color: #fff !important; }
+.doctrine-book__actions a:hover, .doctrine-book__actions a:focus-visible { background: #f2ca72; color: #06192b !important; }
+
+@media (max-width: 760px) {
+  .doctrine-book { grid-template-columns: 1fr; min-height: 0; }
+  .doctrine-book__cover-crop { width: min(100%, 300px); }
+  .doctrine-book h3 { font-size: clamp(2.55rem, 13vw, 4.4rem) !important; }
+}
+
+@media (max-width: 470px) {
+  .doctrine-book { padding: 22px 18px; }
+  .doctrine-book__details { grid-template-columns: 1fr; }
+  .doctrine-book__details div + div { padding-left: 0; border-top: 1px solid rgba(203,221,232,.22); border-left: 0; }
+  .doctrine-book__actions { display: grid; }
+}

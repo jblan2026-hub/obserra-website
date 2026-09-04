@@ -3,12 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { EnterpriseFooter, EnterpriseHeader } from "../components/enterprise/EnterpriseChrome";
 import { LEGAL_ENTITY_NAME } from "../../lib/legal-identity";
+import ObserrianDoctrineFeature from "../components/publications/ObserrianDoctrineFeature";
 import "./speaking.css";
 import "./speaker-executive.css";
 
 export const metadata: Metadata = {
   title: "Speaking | Dr. Jody Blanchard",
-  description: "Book Dr. Jody Blanchard for keynotes, board briefings, panels, podcasts, and executive sessions on cybersecurity, AI governance, enterprise risk, protective intelligence, and leadership.",
+  description: "Book Dr. Jody Blanchard, author of The Obserrian Doctrine, for keynotes, board briefings, panels, podcasts, and executive sessions on cybersecurity, AI governance, enterprise risk, protective intelligence, and leadership.",
   alternates: { canonical: "/speaking" },
 };
 
@@ -22,9 +23,9 @@ const topics = [
 ] as const;
 
 const engagements = [
-  { title: "CNBC Technology Executive Council TEC Talk", copy: "Completed December 12, 2024, on upskilling the workforce in the age of artificial intelligence.", image: "/leadership/technology-talks-no-employer.png", alt: "Dr. Jody Blanchard at the CNBC Technology Executive Council TEC Talk on December 12, 2024" },
-  { title: "Cybersecurity ROI: Transforming Security Expenditure into Business Growth in a Time of Economic Uncertainty", copy: "Completed ISE East Summit & Awards fireside discussion on measurable security value.", image: "/leadership/fireside-chat-neutral.png", alt: "Dr. Jody Blanchard at the ISE East Summit and Awards cybersecurity return on investment fireside chat" },
-  { title: "HMG Strategy Global Leadership Institute Awards, 2025", copy: "Named a 2025 winner for executive leadership in cybersecurity and enterprise risk governance.", image: "/leadership/global-leadership-award-2025.png", alt: "Dr. Jody Blanchard HMG Strategy Global Leadership Institute Awards 2025 winner recognition" },
+  { title: "CNBC Technology Executive Council TEC Talk", copy: "Completed December 12, 2024, on upskilling the workforce in the age of artificial intelligence.", label: "COMPLETED ENGAGEMENT", image: "/leadership/technology-talks-no-employer.png", alt: "Dr. Jody Blanchard at the CNBC Technology Executive Council TEC Talk on December 12, 2024" },
+  { title: "Cybersecurity ROI: Transforming Security Expenditure into Business Growth in a Time of Economic Uncertainty", copy: "Completed ISE East Summit & Awards fireside discussion on measurable security value.", label: "COMPLETED ENGAGEMENT", image: "/leadership/fireside-chat-neutral.png", alt: "Dr. Jody Blanchard at the ISE East Summit and Awards cybersecurity return on investment fireside chat" },
+  { title: "HMG Strategy Global Leadership Institute Awards, 2025", copy: "Named a 2025 winner for executive leadership in cybersecurity and enterprise risk governance.", label: "EXECUTIVE RECOGNITION", image: "/leadership/global-leadership-award-2025.png", alt: "Dr. Jody Blanchard HMG Strategy Global Leadership Institute Awards 2025 winner recognition" },
 ] as const;
 
 const formats = [
@@ -54,23 +55,24 @@ export default function SpeakingPage() {
         <section className="speaker-executive-formats" aria-label="Speaking formats">{formats.map(([title, copy]) => <article key={title}><strong>{title}</strong><span>{copy}</span></article>)}</section>
 
         <section className="speaker-proof-section" aria-labelledby="speaker-topics-heading">
-          <div className="speaker-proof-heading"><div><p className="speaker-kicker">SIGNATURE TOPICS</p><h2 id="speaker-topics-heading">Executive content built around decisions leaders actually face.</h2></div><p>Topics are tailored by audience, industry, and event format. Scroll horizontally to review the full topic set without extending the page vertically.</p></div>
+          <div className="speaker-proof-heading"><div><p className="speaker-kicker">SIGNATURE TOPICS</p><h2 id="speaker-topics-heading">Executive content built around decisions leaders actually face.</h2></div><p>Each topic is tailored to the audience, sector, and format, with a focus on practical executive decisions.</p></div>
           <div className="speaker-proof-rail speaker-topic-rail">{topics.map(([title, copy]) => <article key={title}><h3>{title}</h3><p>{copy}</p></article>)}</div>
         </section>
 
         <section className="speaker-proof-section" aria-labelledby="speaker-engagements-heading">
-          <div className="speaker-proof-heading"><div><p className="speaker-kicker">COMPLETED ENGAGEMENTS &amp; RECOGNITION</p><h2 id="speaker-engagements-heading">Public leadership evidence stays visible.</h2></div><p>Completed panels, fireside discussions, executive recognition, and Hall of Fame imagery remain on the page as part of the speaker profile.</p></div>
+          <div className="speaker-proof-heading"><div><p className="speaker-kicker">COMPLETED ENGAGEMENTS &amp; RECOGNITION</p><h2 id="speaker-engagements-heading">Selected appearances and professional recognition.</h2></div><p>Panels, fireside discussions, and recognized leadership experience inform every engagement.</p></div>
           <div className="speaker-proof-rail speaker-media-rail">
             <article className="speaker-media-card speaker-media-feature"><Image src="/leadership/ceh-hall-of-fame-2025.png" width={680} height={848} alt="Dr. Jody Blanchard CEH Hall of Fame 2025 magazine cover" sizes="(max-width: 700px) 74vw, 300px" /><span>CEH HALL OF FAME · TOP 100</span><h3>CEH Hall of Fame 2025 magazine cover</h3><p>EC-Council recognition for outstanding performance and contribution to ethical hacking.</p><Link href="/about#ceh-hall-of-fame-title">Review verified recognition →</Link></article>
-            {engagements.map((item) => <article key={item.title} className="speaker-media-card"><Image src={item.image} width={720} height={480} alt={item.alt} sizes="(max-width: 700px) 76vw, 320px" /><span>COMPLETED ENGAGEMENT</span><h3>{item.title}</h3><p>{item.copy}</p></article>)}
+            {engagements.map((item) => <article key={item.title} className="speaker-media-card"><Image src={item.image} width={720} height={480} alt={item.alt} sizes="(max-width: 700px) 76vw, 320px" /><span>{item.label}</span><h3>{item.title}</h3><p>{item.copy}</p></article>)}
           </div>
         </section>
 
         <section className="speaker-proof-section speaker-books-section" aria-labelledby="speaker-books-heading">
           <div className="speaker-proof-heading"><div><p className="speaker-kicker">PUBLISHED AUTHOR</p><h2 id="speaker-books-heading">Books that extend the conversation beyond the stage.</h2></div><p>Executive writing on cybersecurity leadership, institutional systems, and accountability, with direct purchase actions.</p></div>
           <div className="speaker-books-grid">
-            <article><Image src="/books/cyberbulleys-front.png" width={350} height={520} alt="CyberBulleys book cover" /><div><h3>CyberBulleys: A CISO&apos;s Guide to Doing Cybersecurity</h3><p>By Dr. Jody Blanchard</p><a className="executive-buy-button" href="https://www.amazon.com/CyberBulleys-CISOs-Guide-Doing-Cybersecurity/dp/B0DT7L55JG" target="_blank" rel="noreferrer">Buy now</a></div></article>
-            <article><Image src="/books/break-the-system-front.png" width={350} height={520} alt="Break the System book cover" /><div><h3>Break the System</h3><p>By Dr. Jody Blanchard</p><a className="executive-buy-button" href="https://www.amazon.com/Break-System-Jody-Blanchard/dp/B0G2Q1CX8R" target="_blank" rel="noreferrer">Buy now</a></div></article>
+            <ObserrianDoctrineFeature context="speaking" />
+            <article><Image src="/books/cyberbulleys-front.png" width={350} height={520} sizes="(max-width: 520px) 105px, 150px" alt="Cover of CyberBulleys: A CISO's Guide to Doing Cybersecurity" /><div><h3>CyberBulleys: A CISO&apos;s Guide to Doing Cybersecurity</h3><p>By Dr. Jody Blanchard</p><a className="executive-buy-button" href="https://www.amazon.com/CyberBulleys-CISOs-Guide-Doing-Cybersecurity/dp/B0DT7L55JG" target="_blank" rel="noopener noreferrer">View CyberBulleys on Amazon</a></div></article>
+            <article><Image src="/books/break-the-system-front.png" width={350} height={520} sizes="(max-width: 520px) 105px, 150px" alt="Cover of Break the System" /><div><h3>Break the System</h3><p>By Dr. Jody Blanchard</p><a className="executive-buy-button" href="https://www.amazon.com/Break-System-Jody-Blanchard/dp/B0G2Q1CX8R" target="_blank" rel="noopener noreferrer">View Break the System on Amazon</a></div></article>
           </div>
         </section>
 

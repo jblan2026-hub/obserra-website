@@ -23,7 +23,7 @@ const licenses = [
   { type: "Security Officer", number: "D 3617216", licensedName: "BLANCHARD, JODY W", status: "licensed" },
   { type: "Security Officer School Instructor", number: "DI3600107", licensedName: "BLANCHARD, JODY W.", status: "licensed" },
   { type: "Statewide Firearms License", number: "G 3604219", licensedName: "BLANCHARD, JODY W.", status: "licensed" },
-  { type: "Class A Private Investigative Agency", number: "APPLICATION PENDING", licensedName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC", status: "pending" },
+  { type: "Class A Private Investigative Agency", number: "APPLICATION APPROVED", licensedName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC", status: "approved" },
 ] as const;
 
 function CredentialRail({ label, className = "", children }: { label: string; className?: string; children: ReactNode }) {
@@ -67,7 +67,7 @@ export default function VerifiedCredentials() {
       <div className="verified-credentials-heading">
         <p>VERIFIED EXECUTIVE CREDENTIALS</p>
         <h2 id="verified-credentials-title">Issuer-backed qualifications in cybersecurity, risk, privacy, audit, AI governance, and protective services.</h2>
-        <span>Each badge or credential links to its official issuer verification source. Pending applications are identified separately and are not represented as issued licenses.</span>
+        <span>Each badge or credential links to its official issuer verification source. Application approvals are identified separately and are not represented as issued licenses.</span>
       </div>
 
       <h3 className="verified-credentials-group-title">Credly verified credentials</h3>
@@ -129,10 +129,10 @@ export default function VerifiedCredentials() {
       <CredentialRail label="Florida FDACS professional licenses" className="florida-license-rail">
         {licenses.map(({ type, number, licensedName, status }) => (
           <article className="verified-credential-card florida-license-card" key={`${type}-${number}`}>
-            <div className="fdacs-license-mark" aria-label={`Florida Department of Agriculture and Consumer Services ${status === "pending" ? "pending application" : "licensed credential"}`}>
+            <div className="fdacs-license-mark" aria-label={`Florida Department of Agriculture and Consumer Services ${status === "approved" ? "approved application" : "licensed credential"}`}>
               <span>FLORIDA</span>
               <strong>FDACS</strong>
-              <small>{status === "pending" ? "PENDING" : "LICENSED"}</small>
+              <small>{status === "approved" ? "APPROVED" : "LICENSED"}</small>
             </div>
             <div className="verified-credential-detail">
               <span>Florida FDACS</span>
