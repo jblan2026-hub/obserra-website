@@ -174,6 +174,19 @@ test("secondary hero typography has a specificity shield against older route sty
   assert.match(clarity, /Two references to the same id are valid CSS/);
 });
 
+test("reported Applications, Services, and EIOS visual defects have explicit repairs", () => {
+  assert.match(clarity, /\.applications-catalog-page :is\(\.apps-search, \.apps-filters\) \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.applications-catalog-page \.apps-filters button \{[\s\S]*?background: #edf5f8 !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.applications-catalog-page \.apps-filters button\.active \{[\s\S]*?background: #ffd400 !important;[\s\S]*?color: #071a2b !important;/);
+  assert.match(clarity, /\.applications-catalog-page \.apps-hero > aside p \{[\s\S]*?background: #e8f3f7 !important;[\s\S]*?color: #29495d !important;/);
+  assert.match(clarity, /\.services-page > \.ent-proof \{[\s\S]*?width: 100% !important;[\s\S]*?max-width: 100% !important;[\s\S]*?padding-inline: max\(4\.5vw, 24px\) !important;/);
+  assert.match(clarity, /\.eios-executive-capability-card > button \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.eios-executive-capability-card > button > span:last-child > span:last-child \{[\s\S]*?background: #55d6e8 !important;[\s\S]*?color: #030b18 !important;/);
+  assert.match(clarity, /\.eios-page \.product-image::before \{[\s\S]*?background: rgba\(3, 11, 24, \.18\) !important;/);
+  assert.match(clarity, /\.eios-page \.product-frame figcaption \{[\s\S]*?background: #ffffff !important;/);
+  assert.match(clarity, /\.eios-page \.product-frame figcaption :is\(p, strong, span\) \{[\s\S]*?color: #0a2438 !important;/);
+});
+
 test("desktop and compact navigation retain the larger, high-contrast type contract", () => {
   const navRule = rules(clarity).find(({ selector, body }) =>
     selector.includes(".apps-nav") && body.includes("font-size: .95rem !important"));
@@ -203,6 +216,7 @@ test("the upcoming speaking card uses the supplied still image with an accessibl
   assert.match(card, /src="\/leadership\/tampa-ciso-community-speaking-engagement\.png"/);
   assert.match(card, /width=\{541\}/);
   assert.match(card, /height=\{321\}/);
+  assert.match(card, /unoptimized/);
   assert.match(card, /alt="Tampa CISO Community collaboration featuring Rosemary Ravinal, Dr\. Jody Blanchard, Alfredo Pena, and Rob Patchett"/);
   assert.match(card, /href="https:\/\/www\.linkedin\.com\/feed\/update\/urn:li:ugcPost:\d+"/);
   assert.match(card, /target="_blank" rel="noopener noreferrer"/);
