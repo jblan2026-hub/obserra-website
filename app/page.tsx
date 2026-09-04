@@ -18,45 +18,41 @@ import "./home-executive-visual.css";
 import "./home-marketplace-promo.css";
 
 export const metadata: Metadata = {
-  title: { absolute: `${PUBLIC_BRAND_NAME} | Executive Intelligence & Cybersecurity` },
+  title: { absolute: `${PUBLIC_BRAND_NAME} | Executive Intelligence, Cybersecurity & Risk` },
   description:
-    `${PUBLIC_BRAND_NAME} provides executive intelligence, cybersecurity, protective intelligence, governed technology, professional learning, and a first-party AI Marketplace with products available to purchase online.`,
+    `${PUBLIC_BRAND_NAME} advises boards and executive teams on cybersecurity, enterprise risk, protective intelligence, and responsible technology.`,
   alternates: { canonical: "/" },
   keywords: ["executive intelligence", "cybersecurity", "protective intelligence", "AI marketplace", "AI skills", "AI agent packs", "enterprise AI"],
 };
 
 const capabilities = [
   {
-    number: "01",
     title: "Executive Advisory",
-    summary: "Board-ready cybersecurity, enterprise risk, governance, resilience, and transformation leadership.",
+    summary: "Practical counsel for boards and executives facing cyber risk, major change, or hard tradeoffs.",
     description: `${PUBLIC_BRAND_NAME} gives executives and boards senior decision support when cybersecurity, operational risk, governance, and transformation priorities converge.`,
     details: ["Executive and board advisory", "Fractional CISO and security leadership", "Enterprise risk, resilience, and transformation strategy"],
     href: "/services",
     linkLabel: "More information",
   },
   {
-    number: "02",
     title: "Cybersecurity, Risk & Governance",
-    summary: "Cyber strategy, control assurance, AI governance, identity, resilience, and evidence-backed risk reduction.",
+    summary: "Find the risks that matter, strengthen the right controls, and give leaders evidence they can use.",
     description: `${PUBLIC_BRAND_NAME} helps organizations understand material cyber and governance exposure, establish accountable controls, and turn risk decisions into measurable execution.`,
     details: ["Cybersecurity strategy and operating models", "Risk, compliance, AI governance, and control assurance", "Identity, resilience, incident readiness, and evidence"],
     href: "/services",
     linkLabel: "More information",
   },
   {
-    number: "03",
     title: "Protection & Intelligence",
-    summary: "Protective intelligence, executive exposure, travel risk, investigations, and security planning.",
+    summary: "Spot threats to leaders, travel, operations, and reputation early enough to respond.",
     description: `${PUBLIC_BRAND_NAME} combines protective intelligence and executive protection context so leaders can identify relevant exposure earlier and act with better information.`,
     details: ["Executive exposure and protective intelligence", "Travel, event, and operational risk planning", "Investigative and decision-ready intelligence support"],
     href: "/protection-intelligence",
     linkLabel: "More information",
   },
   {
-    number: "04",
     title: "EIOS, Applications & Learning",
-    summary: "Enterprise intelligence, secure applications, governed AI capabilities, and professional workforce development.",
+    summary: "Use EIOS, secure applications, and training to help teams work with new technology responsibly.",
     description: `${PUBLIC_BRAND_NAME} extends advisory and intelligence capability through EIOS, purpose-built applications, governed technology, and structured professional learning. Regulated programs follow separate eligibility and authorization gates.`,
     details: ["EIOS enterprise intelligence and governed action", "Secure enterprise applications and governed AI capabilities", "Professional and enterprise learning through Obserra EPI Academy"],
     href: "/eios",
@@ -83,12 +79,12 @@ export default function HomePage() {
       <main className="saas-home enterprise-page-main">
         <section className="home-marketplace-promo" aria-labelledby="home-marketplace-promo-title">
           <div className="home-marketplace-promo__copy">
-            <p>AI MARKETPLACE · AVAILABLE TO PURCHASE NOW</p>
-            <h2 id="home-marketplace-promo-title">Put new AI capability to work today.</h2>
-            <span>Shop {marketplaceProductCount.toLocaleString()} Obserra EPI AI skills, agent packs, workflows, connectors, guardrails, assurance products, and industry capabilities. Purchase online, then receive entitlement-gated protected delivery after payment confirmation.</span>
+            <p>AI TOOLS FOR ENTERPRISE TEAMS</p>
+            <h2 id="home-marketplace-promo-title">Choose AI tools built for serious work.</h2>
+            <span>Browse {marketplaceProductCount.toLocaleString()} AI skills, agent packs, workflows, connectors, guardrails, and assurance tools from Obserra EPI. Buy online and receive secure access after payment is confirmed.</span>
           </div>
           <div className="home-marketplace-promo__actions">
-            <Link className="home-marketplace-promo__primary" href="/ai-marketplace">Shop AI Marketplace <b aria-hidden="true">→</b></Link>
+            <Link className="home-marketplace-promo__primary" href="/ai-marketplace">Explore the AI Marketplace</Link>
             <Link className="home-marketplace-promo__secondary" href="/ai-marketplace?offering=skills">Browse AI skills</Link>
           </div>
         </section>
@@ -96,17 +92,17 @@ export default function HomePage() {
         <section className="saas-hero saas-hero--executive executive-brand-hero">
           <div className="executive-brand-hero__grid">
             <div className="saas-hero__copy saas-hero__copy--executive executive-brand-hero__copy">
-              <p className="saas-eyebrow">EXECUTIVE INTELLIGENCE FOR HIGH-CONSEQUENCE ORGANIZATIONS</p>
-              <h1>See risk earlier. Decide faster. Act with proof.</h1>
-              <p className="saas-hero__lede">{PUBLIC_BRAND_NAME} connects executive advisory, cybersecurity, protective intelligence, governance, secure technology, and workforce capability so leaders can move from fragmented signals to accountable action with greater clarity.</p>
+              <p className="saas-eyebrow">FOR DECISIONS THAT CARRY REAL CONSEQUENCES</p>
+              <h1>Clearer decisions when the stakes are high.</h1>
+              <p className="saas-hero__lede">{PUBLIC_BRAND_NAME} helps boards and executives make sense of cyber risk, operational threats, and new technology. We bring the right information together, make ownership clear, and help the work move forward.</p>
               <div className="saas-hero__actions">
-                <ButtonLink href="/contact?interest=executive-briefing">Book an executive briefing</ButtonLink>
-                <ButtonLink href="/services" variant="secondary">Explore solutions</ButtonLink>
+                <ButtonLink href="/contact?interest=executive-briefing">Start a conversation</ButtonLink>
+                <ButtonLink href="/services" variant="secondary">See what we do</ButtonLink>
               </div>
               <div className="saas-hero__utility-row" aria-label={`${PUBLIC_BRAND_NAME} product pathways`}>
                 <Link href="/eios">Explore {EIOS_BRAND_NAME}</Link>
                 <Link href="/apps">View {APPLICATIONS_BRAND_NAME}</Link>
-                <Link href="/ai-marketplace">Shop AI Marketplace →</Link>
+                <Link href="/ai-marketplace">Shop AI Marketplace</Link>
               </div>
             </div>
 
@@ -115,7 +111,7 @@ export default function HomePage() {
               <div className="executive-brand-visual__identity">
                 <Image src="/brand/obserra-logo.png" width={286} height={55} alt={LEGAL_ENTITY_NAME} />
                 <strong>{PUBLIC_BRAND_NAME}</strong>
-                <span>Executive intelligence · cybersecurity · protection · secure technology</span>
+                <span>Cybersecurity, intelligence, protection, and technology for executive teams</span>
               </div>
             </aside>
           </div>
@@ -125,8 +121,8 @@ export default function HomePage() {
 
         <section className="home-capability-ledger" aria-labelledby="home-capabilities-title">
           <div className="home-capability-ledger__heading">
-            <div><p>INTEGRATED ENTERPRISE CAPABILITY</p><h2 id="home-capabilities-title">One operating view across risk, protection, technology, and leadership.</h2></div>
-            <p>Senior judgment and disciplined execution for organizations where fragmented information creates material exposure.</p>
+            <div><p>INTEGRATED ENTERPRISE CAPABILITY</p><h2 id="home-capabilities-title">One clear view of the risks that matter.</h2></div>
+            <p>Important information often sits in different teams and systems. We help leaders bring it together, decide what comes first, and keep the work moving.</p>
           </div>
           <div className="saas-priority-strip executive-brand-capabilities" aria-label={`${PUBLIC_BRAND_NAME} capabilities`}>
             {capabilities.map((capability) => (
@@ -145,9 +141,9 @@ export default function HomePage() {
             </div>
           ))}
           <div className="saas-value-bar__cta">
-            <p>Bring {PUBLIC_BRAND_NAME} into the decision before risk becomes consequence.</p>
+            <p>Have a decision you need to get right?</p>
             <div className="saas-value-bar__actions">
-              <ButtonLink href="/contact?interest=executive-briefing">Book an executive briefing</ButtonLink>
+              <ButtonLink href="/contact?interest=executive-briefing">Talk with us</ButtonLink>
               <ButtonLink href="/academy" variant="secondary">Explore {ACADEMY_BRAND_NAME}</ButtonLink>
               <ButtonLink href="/florida-security-training" variant="secondary">Review Florida Class D LMS</ButtonLink>
             </div>

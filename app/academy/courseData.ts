@@ -120,7 +120,7 @@ function createModules(title: string, focus: string, level: CourseLevel): Course
 function createCourse([id, title, level, department, track, focus]: CourseSpec): Course {
   return {
     id, title, level, department, track, price: prices[level], duration: durations[level], audience: audiences[department],
-    description: `An original ${ACADEMY_BRAND_NAME} ${level.toLowerCase()} course focused on ${focus}. It uses practical decision scenarios, knowledge checks, and accountable application—not third-party certification material.`,
+    description: `An original ${ACADEMY_BRAND_NAME} ${level.toLowerCase()} course focused on ${focus}. It uses practical decision scenarios, knowledge checks, and accountable application, not third-party certification material.`,
     outcomes: [`Frame ${focus} in business context`, "Evaluate evidence and uncertainty before acting", "Apply policy, authority, and proportionate escalation", "Document a defensible next action"],
     modules: createModules(title, focus, level),
   };

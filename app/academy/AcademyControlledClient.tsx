@@ -141,7 +141,7 @@ export default function AcademyControlledClient({
             </div>
           </div>
           <aside>
-            <span>{featuredCourse.department} · {levelTag(featuredCourse.level)}</span>
+            <span>{featuredCourse.department}, {levelTag(featuredCourse.level)}</span>
             <strong>{purchaseAvailable(featuredCourse.id) ? money.format(featuredCourse.price) : "Enrollment pending"}</strong>
             <small>{featuredCourse.duration}</small>
             <a href={`/academy/${featuredCourse.id}`}>View course details</a>
@@ -192,7 +192,7 @@ export default function AcademyControlledClient({
         </div>
 
         <div className="catalog-results">
-          <p className="kicker">{departmentLabels[department]} · {selectedCollection.label}</p>
+          <p className="kicker">{departmentLabels[department]}: {selectedCollection.label}</p>
           <strong>{filteredCourses.length} course{filteredCourses.length === 1 ? "" : "s"} found</strong>
         </div>
 
@@ -202,10 +202,10 @@ export default function AcademyControlledClient({
               const canPurchase = purchaseAvailable(course.id);
               return (
                 <article key={course.id} className="course-card">
-                  <span>{course.department} · {levelTag(course.level)}</span>
+                  <span>{course.department}, {levelTag(course.level)}</span>
                   <h3>{course.title}</h3>
                   <p>{course.description}</p>
-                  <footer><b>{canPurchase ? money.format(course.price) : "Enrollment pending"}</b><em>· {course.duration}</em></footer>
+                  <footer><b>{canPurchase ? money.format(course.price) : "Enrollment pending"}</b><em>{course.duration}</em></footer>
                   <div className="course-card-actions">
                     <a href={`/academy/${course.id}`}>View details</a>
                     {canPurchase ? (

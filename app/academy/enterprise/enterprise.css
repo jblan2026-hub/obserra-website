@@ -110,7 +110,7 @@
 }
 
 .ae-operating-model ol { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
-.ae-operating-model li { display: grid; grid-template-columns: 54px 1fr; gap: 18px; align-items: start; padding: 20px; border: 1px solid var(--ae-line); border-radius: 16px; background: var(--ae-surface); }
+.ae-operating-model li { display: grid; grid-template-columns: 1fr; gap: 18px; align-items: start; padding: 20px; border: 1px solid var(--ae-line); border-radius: 16px; background: var(--ae-surface); }
 .ae-operating-model li b { color: var(--ae-gold); font-size: 22px; }
 .ae-operating-model li span { display: grid; gap: 6px; color: var(--ae-muted); line-height: 1.55; }
 .ae-operating-model li strong { color: var(--ae-text); font-size: 18px; }

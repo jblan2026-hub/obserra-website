@@ -113,10 +113,9 @@ export default function TrustCenterPage() {
               <p>Each card summarizes the review area and links directly to the underlying policy or evidence route.</p>
             </div>
             <div className="services-executive-grid">
-              {assuranceAreas.map((area, index) => (
+              {assuranceAreas.map((area) => (
                 <article className="services-executive-card" key={area.title}>
                   <ExecutiveInfoModal
-                    number={String(index + 1).padStart(2, "0")}
                     title={area.title}
                     category={area.category}
                     image={area.image}
@@ -134,7 +133,7 @@ export default function TrustCenterPage() {
 
           <section className="trust-policy-shortcuts" aria-label="Priority trust policies">
             <div><p className="trust-eyebrow">PRIORITY DOCUMENTS</p><h2>Direct policy access.</h2></div>
-            <nav aria-label="Priority trust documents">{policyLinks.map(([label, href]) => <Link key={href} href={href}>{label}<span aria-hidden="true">→</span></Link>)}</nav>
+            <nav aria-label="Priority trust documents">{policyLinks.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}</nav>
           </section>
 
           <section className="trust-contact">

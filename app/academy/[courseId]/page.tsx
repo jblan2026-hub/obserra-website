@@ -129,7 +129,7 @@ export default async function AcademyCoursePage({
           sessionId={commerceState.session_id}
         />
         <div className="academy-course-eyebrow-row">
-          <p>{course.track} · {course.level}</p>
+          <p>{course.track}, {course.level}</p>
           <span>{purchaseAvailable ? "Paid enrollment" : "Enrollment paused"}</span>
         </div>
 
@@ -153,7 +153,7 @@ export default async function AcademyCoursePage({
               {purchaseAvailable ? (
                 <AcademyCheckoutForm
                   courseId={course.id}
-                  label={`Purchase secure enrollment · ${money.format(course.price)}`}
+                  label={`Purchase secure enrollment, ${money.format(course.price)}`}
                   source="course-detail"
                   className="academy-course-checkout"
                 />
@@ -218,9 +218,9 @@ export default async function AcademyCoursePage({
       </section>
 
       <section className="academy-course-proof">
-        <article><span>01</span><h2>What this course teaches</h2><p>The instruction is derived from the published course description and outcomes, then developed into professional concepts, applied methods, scenarios, and decision practices.</p></article>
-        <article><span>02</span><h2>Why the instruction is defensible</h2><p>Lessons identify the relevant authoritative basis and distinguish legal requirements, regulations, standards, recognized guidance, organizational policy, and professional practice.</p></article>
-        <article><span>03</span><h2>How learners apply it</h2><p>Documented public examples, realistic business scenarios, job aids, knowledge checks, and the Obserrian Tutor connect the material to professional use.</p></article>
+        <article><h2>What this course teaches</h2><p>The instruction is derived from the published course description and outcomes, then developed into professional concepts, applied methods, scenarios, and decision practices.</p></article>
+        <article><h2>Why the instruction is defensible</h2><p>Lessons identify the relevant authoritative basis and distinguish legal requirements, regulations, standards, recognized guidance, organizational policy, and professional practice.</p></article>
+        <article><h2>How learners apply it</h2><p>Documented public examples, realistic business scenarios, job aids, knowledge checks, and the Obserrian Tutor connect the material to professional use.</p></article>
       </section>
 
       <section className="academy-course-content" id="curriculum">
@@ -239,7 +239,6 @@ export default async function AcademyCoursePage({
         <ol className="academy-course-modules">
           {course.modules.map((module, index) => (
             <li key={`${index}-${module.title}`}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
               <div><strong>{module.title}</strong><p>{module.description}</p></div>
               <em>{module.format}<br />{module.duration}</em>
             </li>

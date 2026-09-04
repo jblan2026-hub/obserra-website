@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, BadgeCheck, BriefcaseBusiness, Building2, Cloud, Filter, Landmark, LockKeyhole, Search, Server, ShieldCheck, Sparkles } from "lucide-react";
+import { BadgeCheck, BriefcaseBusiness, Building2, Cloud, Filter, Landmark, LockKeyhole, Search, Server, ShieldCheck } from "lucide-react";
 import { ACADEMY_BRAND_NAME, APPLICATIONS_BRAND_NAME, EIOS_BRAND_NAME, LEGAL_ENTITY_NAME } from "../../lib/legal-identity";
 import type { AppCategory, AppStatus, MarketplaceApp } from "./appsData";
 import { appCategories, marketplaceApps, marketplaceEngagementLabel } from "./appsData";
@@ -116,7 +116,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
         </div>
         <aside>
           <p><BadgeCheck size={16} /> Commercial use cases aligned to measurable enterprise outcomes</p>
-          <p><Sparkles size={16} /> Governed AI capabilities aligned to policy, audit, and risk controls</p>
+          <p>Governed AI capabilities aligned to policy, audit, and risk controls</p>
           <p><BriefcaseBusiness size={16} /> Deployment planning designed for regulated and security-conscious organizations</p>
           <p><LockKeyhole size={16} /> SaaS, private cloud, on-premises, and government deployment pathways</p>
         </aside>
@@ -133,7 +133,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
             <Link key={title} href={href} className="apps-buyer-card">
               <span>{title}</span>
               <p>{copy}</p>
-              <strong>Explore solutions <ArrowRight size={15} /></strong>
+              <strong>Explore solutions</strong>
             </Link>
           ))}
         </div>
@@ -152,7 +152,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
                 <span className={`status-pill ${statusToneClass[entry.status]}`}>{marketplaceEngagementLabel[entry.status]}</span>
                 <h3>{entry.name}</h3>
                 <p>{entry.value}</p>
-                <strong>Open product brief <ArrowRight size={15} /></strong>
+                <strong>Open product brief</strong>
               </article>
             </Link>
           ))}
@@ -242,7 +242,7 @@ export default function AppsMarketplaceClient({ initialCategory = "All" }: Props
                   <ul>
                     {entry.features.slice(0, 3).map((feature) => <li key={feature}>{feature}</li>)}
                   </ul>
-                  <footer><strong>Open commercial product brief <ArrowRight size={15} /></strong></footer>
+                  <footer><strong>Open commercial product brief</strong></footer>
                 </article>
               </Link>
             </motion.div>

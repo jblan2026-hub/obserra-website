@@ -77,7 +77,7 @@ export default function EiosShowcase() {
 
       <section className="eios-hero" id="experience">
         <div className="eios-hero-copy">
-          <p className="eios-eyebrow">{LEGAL_ENTITY_NAME} · ENTERPRISE INTELLIGENCE OPERATING SYSTEM</p>
+          <p className="eios-eyebrow">{LEGAL_ENTITY_NAME} ENTERPRISE INTELLIGENCE OPERATING SYSTEM</p>
           <h1>Connect risk. Govern action. <em>Prove outcomes.</em></h1>
           <p className="eios-lede">EIOS gives leadership one governed operating picture across enterprise risk, cybersecurity, intelligence, operations, and accountable execution.</p>
           <div className="eios-actions"><a href="#capabilities" className="eios-button">Explore EIOS capabilities</a><a href="#connect" className="eios-text-link">Request enterprise briefing</a></div>
@@ -99,7 +99,6 @@ export default function EiosShowcase() {
             return (
               <article className="eios-executive-capability-card" key={capability.title}>
                 <ExecutiveInfoModal
-                  number={String(index + 1).padStart(2, "0")}
                   title={capability.title}
                   category="EIOS Capability"
                   image={visual.image}

@@ -43,7 +43,8 @@ test("Home page advertises purchasable Marketplace inventory before the executiv
   const promo = home.indexOf("home-marketplace-promo");
   const hero = home.indexOf("saas-hero saas-hero--executive");
   assert.ok(promo >= 0 && hero >= 0 && promo < hero);
-  assert.match(home, /AI MARKETPLACE · AVAILABLE TO PURCHASE NOW/);
+  assert.match(home, /AI TOOLS FOR ENTERPRISE TEAMS/);
+  assert.match(home, /Buy online and receive secure access after payment is confirmed/);
   assert.match(home, /Shop AI Marketplace/);
   assert.match(home, /marketplaceV12Summary/);
   assert.match(home, /marketplaceProductCount\.toLocaleString\(\)/);

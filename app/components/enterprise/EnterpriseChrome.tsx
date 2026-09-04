@@ -89,10 +89,10 @@ export function EnterpriseProofBand({ children }: { children?: ReactNode }) {
     <section className="ent-proof" aria-label={`${LEGAL_ENTITY_NAME} operating principles`}>
       {children ?? (
         <>
-          <div><span>01</span><strong>Executive-led</strong><small>Senior judgment at the point of decision</small></div>
-          <div><span>02</span><strong>Evidence-backed</strong><small>Traceable analysis, controls, and outcomes</small></div>
-          <div><span>03</span><strong>Security-conscious</strong><small>Controlled information and delivery boundaries</small></div>
-          <div><span>04</span><strong>Mission-focused</strong><small>Clear ownership, action, and verification</small></div>
+          <div><strong>Executive-led</strong><small>Senior judgment at the point of decision</small></div>
+          <div><strong>Evidence-backed</strong><small>Traceable analysis, controls, and outcomes</small></div>
+          <div><strong>Security-conscious</strong><small>Controlled information and delivery boundaries</small></div>
+          <div><strong>Mission-focused</strong><small>Clear ownership, action, and verification</small></div>
         </>
       )}
     </section>
@@ -106,7 +106,7 @@ export function EnterpriseFooter() {
         <Image src="/brand/obserra-logo.png" width={286} height={55} alt={LEGAL_ENTITY_NAME} />
         <strong className="ent-footer__legal-name">{LEGAL_ENTITY_NAME}</strong>
         <p>Executive intelligence, cybersecurity, protective intelligence, secure technology, and professional learning for organizations where the quality of the decision matters.</p>
-        <Link href="/contact?interest=executive-briefing">Book an executive briefing <span aria-hidden="true">→</span></Link>
+        <Link href="/contact?interest=executive-briefing">Book an executive briefing</Link>
       </div>
       <nav aria-label="Enterprise capabilities"><strong>Capabilities</strong><Link href="/services">Enterprise solutions</Link><Link href="/protection-intelligence">Protection and intelligence</Link><Link href="/eios">{EIOS_BRAND_NAME}</Link><Link href="/apps">Applications</Link><Link href="/ai-marketplace">AI Marketplace</Link></nav>
       <nav aria-label="Enterprise learning and company links"><strong>Learning & company</strong><Link href="/academy">{ACADEMY_BRAND_NAME}</Link><Link href="/florida-security-training">Florida Class D Training</Link><Link href="/industries">Industries</Link><Link href="/speaking">Speaking and briefings</Link><Link href="/resources">Resources</Link><Link href="/about">Leadership and credentials</Link></nav>

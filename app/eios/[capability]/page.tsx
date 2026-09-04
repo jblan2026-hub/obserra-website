@@ -99,7 +99,7 @@ export default async function EiosCapabilityPage({ params }: { params: Promise<{
           <h2>Designed to improve executive decisions and measurable enterprise results.</h2>
         </div>
         <div className="eios-outcome-grid">
-          {entry.outcomes.map((item, index) => <article key={item}><span>{String(index + 1).padStart(2, "0")}</span><h3>{item}</h3></article>)}
+          {entry.outcomes.map((item) => <article key={item}><h3>{item}</h3></article>)}
         </div>
       </section>
 
@@ -131,7 +131,7 @@ export default async function EiosCapabilityPage({ params }: { params: Promise<{
             <Link href={`/eios/${item.slug}`} key={item.slug}>
               <span>{item.eyebrow}</span>
               <strong>{item.title}</strong>
-              <small>Explore capability →</small>
+              <small>Explore capability</small>
             </Link>
           ))}
         </div>

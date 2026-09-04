@@ -71,12 +71,12 @@ export default function ControlAlignmentPage() {
             </p>
           </div>
           <div className="trust-architecture-grid">
-            <article><b>01</b><div><strong>Applicability</strong><span>Determine whether the requirement applies to the service, processing activity, jurisdiction, contract, or payment boundary.</span></div></article>
-            <article><b>02</b><div><strong>Implementation</strong><span>Identify the actual safeguard, owner, system boundary, procedure, or operating process.</span></div></article>
-            <article><b>03</b><div><strong>Evidence</strong><span>Retain evidence that is scoped, current, reviewable, and tied to the control being asserted.</span></div></article>
-            <article><b>04</b><div><strong>Validation</strong><span>Separate documented design from implemented, operating, tested, and effective states.</span></div></article>
-            <article><b>05</b><div><strong>Remediation</strong><span>Track deficiencies, exceptions, owners, due dates, residual risk, and verification of corrective action.</span></div></article>
-            <article><b>06</b><div><strong>Executive reporting</strong><span>Roll control records into decision ready summaries without converting alignment into an unsupported compliance claim.</span></div></article>
+            <article><div><strong>Applicability</strong><span>Determine whether the requirement applies to the service, processing activity, jurisdiction, contract, or payment boundary.</span></div></article>
+            <article><div><strong>Implementation</strong><span>Identify the actual safeguard, owner, system boundary, procedure, or operating process.</span></div></article>
+            <article><div><strong>Evidence</strong><span>Retain evidence that is scoped, current, reviewable, and tied to the control being asserted.</span></div></article>
+            <article><div><strong>Validation</strong><span>Separate documented design from implemented, operating, tested, and effective states.</span></div></article>
+            <article><div><strong>Remediation</strong><span>Track deficiencies, exceptions, owners, due dates, residual risk, and verification of corrective action.</span></div></article>
+            <article><div><strong>Executive reporting</strong><span>Roll control records into decision ready summaries without converting alignment into an unsupported compliance claim.</span></div></article>
           </div>
         </section>
       </div>

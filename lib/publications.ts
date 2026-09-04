@@ -10,4 +10,20 @@ export const OBSERRIAN_DOCTRINE = {
   coverWidth: 937,
   coverHeight: 1253,
   coverAlt: "Cover of The Obserrian Doctrine: Executive Stewardship for Institutions Worthy of Trust by Dr. Jody Wayne Blanchard",
+  hook: "What happens when artificial intelligence can act before leaders fully understand the situation, yet organizations remain accountable for every outcome?",
+  overview: [
+    "The Obserrian Doctrine is about leading when technology moves faster than the people accountable for it. It offers a human-centered way to use powerful systems without giving up judgment, responsibility, or control.",
+    "Dr. Jody Blanchard draws on 21 years in U.S. Army intelligence, experience as a Fortune 500 CISO, and doctoral research in organizational leadership. He turns those lessons into practical guidance for recognizing risk, making sound decisions, and building institutions people can trust.",
+  ],
+  readerOutcomes: [
+    "Keep people meaningfully involved as automation speeds up",
+    "Bring ethics, security, compliance, and strategy into the same conversation",
+    "Replace scattered reports with evidence leaders can use",
+    "See bias, hidden dependencies, and risks that spread across the organization",
+    "Make sound decisions when the situation is unclear or changing",
+    "Build a culture where technology supports accountability instead of replacing it",
+  ],
+  digitalTwinDescription: "The book also introduces the Obserra EPI Digital Twin at a leadership level. It is a governed, living view that connects signals from operations, security, risk, and compliance. The book does not reveal proprietary implementation. It shows how traceable evidence, trusted dashboards, and continuous visibility can help leaders compare what they believe is happening with what the evidence shows.",
+  futureStatement: "The future will not belong only to organizations with the most advanced systems. It will belong to leaders who can align intelligence, character, and action.",
+  accountabilityStatement: "Technology can recommend. Systems can predict. Leaders remain accountable.",
 } as const;

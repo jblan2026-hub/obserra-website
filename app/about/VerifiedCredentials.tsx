@@ -23,7 +23,7 @@ const licenses = [
   { type: "Security Officer", number: "D 3617216", licensedName: "BLANCHARD, JODY W", status: "licensed" },
   { type: "Security Officer School Instructor", number: "DI3600107", licensedName: "BLANCHARD, JODY W.", status: "licensed" },
   { type: "Statewide Firearms License", number: "G 3604219", licensedName: "BLANCHARD, JODY W.", status: "licensed" },
-  { type: "Class A Private Investigative Agency", number: "APPLICATION APPROVED", licensedName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC", status: "approved" },
+  { type: "Class A Private Investigative Agency", number: "A 3600146", licensedName: "OBSERRA EXECUTIVE PROTECTION & INTELLIGENCE LLC", status: "licensed" },
 ] as const;
 
 function CredentialRail({ label, className = "", children }: { label: string; className?: string; children: ReactNode }) {
@@ -67,7 +67,7 @@ export default function VerifiedCredentials() {
       <div className="verified-credentials-heading">
         <p>VERIFIED EXECUTIVE CREDENTIALS</p>
         <h2 id="verified-credentials-title">Issuer-backed qualifications in cybersecurity, risk, privacy, audit, AI governance, and protective services.</h2>
-        <span>Each badge or credential links to its official issuer verification source. Application approvals are identified separately and are not represented as issued licenses.</span>
+        <span>Each badge or credential links to its official issuer verification source. Florida licenses are presented under the name and license number issued by FDACS.</span>
       </div>
 
       <h3 className="verified-credentials-group-title">Credly verified credentials</h3>
@@ -125,14 +125,14 @@ export default function VerifiedCredentials() {
         ))}
       </CredentialRail>
 
-      <h3 className="verified-credentials-group-title">Florida FDACS professional licenses</h3>
-      <CredentialRail label="Florida FDACS professional licenses" className="florida-license-rail">
+      <h3 className="verified-credentials-group-title">Florida FDACS individual and agency licenses</h3>
+      <CredentialRail label="Florida FDACS individual and agency licenses" className="florida-license-rail">
         {licenses.map(({ type, number, licensedName, status }) => (
           <article className="verified-credential-card florida-license-card" key={`${type}-${number}`}>
-            <div className="fdacs-license-mark" aria-label={`Florida Department of Agriculture and Consumer Services ${status === "approved" ? "approved application" : "licensed credential"}`}>
+            <div className="fdacs-license-mark" aria-label={`Florida Department of Agriculture and Consumer Services ${status} credential`}>
               <span>FLORIDA</span>
               <strong>FDACS</strong>
-              <small>{status === "approved" ? "APPROVED" : "LICENSED"}</small>
+              <small>{status.toUpperCase()}</small>
             </div>
             <div className="verified-credential-detail">
               <span>Florida FDACS</span>

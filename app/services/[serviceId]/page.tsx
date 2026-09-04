@@ -128,9 +128,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             <h2>Evidence, decisions, and implementation artifacts tailored to the engagement.</h2>
           </div>
           <div className="service-detail-cards">
-            {service.deliverables.map((item, index) => (
+            {service.deliverables.map((item) => (
               <article key={item}>
-                <strong>{String(index + 1).padStart(2, "0")} · {item}</strong>
+                <strong>{item}</strong>
                 <p>Scoped to the organization’s operating context, stakeholders, risk criteria, evidence requirements, and commercial objectives.</p>
               </article>
             ))}
@@ -140,9 +140,8 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         <section className="service-detail-steps">
           <p className="apps-eyebrow">HOW THE ENGAGEMENT STARTS</p>
           <div className="service-detail-steps-grid">
-            {service.engagementSteps.map((step, index) => (
+            {service.engagementSteps.map((step) => (
               <article key={step}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
                 <p>{step}</p>
               </article>
             ))}

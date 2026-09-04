@@ -210,7 +210,7 @@
 
 .trust-architecture-grid article {
   display: grid;
-  grid-template-columns: 52px 1fr;
+  grid-template-columns: 1fr;
   gap: 18px;
   align-items: start;
   padding: 20px;

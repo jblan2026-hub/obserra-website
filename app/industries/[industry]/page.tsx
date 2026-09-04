@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, Brain, GraduationCap, ShieldCheck, Building2, Radar } from "lucide-react";
+import { Brain, GraduationCap, ShieldCheck, Building2, Radar } from "lucide-react";
 import { industryMap, industrySolutions } from "../industryData";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
@@ -95,8 +95,8 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
       <section className="industry-linked-capabilities">
         <div><p className="industry-eyebrow">CONNECTED {LEGAL_ENTITY_NAME} CAPABILITIES</p><h2>Move from industry context to governed action.</h2></div>
         <div className="industry-linked-grid">
-          <article><ShieldCheck size={20} /><strong>Enterprise services</strong><div>{industry.serviceSlugs.map((slug) => <Link key={slug} href={`/services/${slug}`}>{slug.replaceAll("-", " ")} <ArrowRight size={13} /></Link>)}</div></article>
-          <article><Brain size={20} /><strong>EIOS capabilities</strong><div>{industry.eiosCapabilities.map((slug) => <Link key={slug} href={`/eios/${slug}`}>{slug.replaceAll("-", " ")} <ArrowRight size={13} /></Link>)}</div></article>
+          <article><ShieldCheck size={20} /><strong>Enterprise services</strong><div>{industry.serviceSlugs.map((slug) => <Link key={slug} href={`/services/${slug}`}>{slug.replaceAll("-", " ")}</Link>)}</div></article>
+          <article><Brain size={20} /><strong>EIOS capabilities</strong><div>{industry.eiosCapabilities.map((slug) => <Link key={slug} href={`/eios/${slug}`}>{slug.replaceAll("-", " ")}</Link>)}</div></article>
           <article><GraduationCap size={20} /><strong>Academy pathways</strong><ul>{industry.academyPathways.map((item) => <li key={item}>{item}</li>)}</ul><Link href="/academy/enterprise">Build an enterprise learning plan</Link></article>
           <article><Building2 size={20} /><strong>Trust and assurance</strong><p>Review {LEGAL_ENTITY_NAME} security architecture, framework alignment, policies, and procurement pathways.</p><Link href="/trust">Open Trust Center</Link></article>
         </div>
@@ -105,9 +105,9 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
       <section className="industry-case-study">
         <div><p className="industry-eyebrow">CASE-STUDY FRAMEWORK</p><h2>A defensible engagement narrative without unsupported client claims.</h2></div>
         <div className="industry-case-grid">
-          <article><span>01</span><strong>Operating context</strong><p>Document the business model, critical services, regulatory environment, stakeholders, and decision constraints.</p></article>
-          <article><span>02</span><strong>Risk and evidence</strong><p>Correlate cyber, operational, physical, AI, third-party, and governance evidence into one consequence-aware picture.</p></article>
-          <article><span>03</span><strong>Executive action</strong><p>Prioritize accountable actions, implementation sequencing, measurable outcomes, and board-ready reporting.</p></article>
+          <article><strong>Operating context</strong><p>Document the business model, critical services, regulatory environment, stakeholders, and decision constraints.</p></article>
+          <article><strong>Risk and evidence</strong><p>Correlate cyber, operational, physical, AI, third-party, and governance evidence into one consequence-aware picture.</p></article>
+          <article><strong>Executive action</strong><p>Prioritize accountable actions, implementation sequencing, measurable outcomes, and board-ready reporting.</p></article>
         </div>
       </section>
 
