@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import test from "node:test";
 
@@ -159,6 +160,20 @@ test("secondary surfaces use light fields and independently readable dark typogr
   assert.ok(contrastRatio("#075e8a", "#ffffff") >= 4.5, "links must remain readable on cards");
 });
 
+test("secondary hero typography has a specificity shield against older route styles", () => {
+  assert.match(clarity, /#main-content#main-content \.premium-site-scope\.public-secondary-scope/);
+  assert.match(
+    clarity,
+    /#main-content#main-content \.premium-site-scope\.public-secondary-scope \.applications-catalog-page \.apps-hero > div > h1 \{\s*color: #0a2438 !important;/,
+  );
+  assert.match(
+    clarity,
+    /#main-content#main-content \.premium-site-scope\.public-secondary-scope \.applications-catalog-page \.apps-hero > div > p:not\(\.apps-eyebrow\) \{\s*color: #29495d !important;\s*opacity: 1 !important;/,
+  );
+  assert.match(clarity, /\.apps-hero > aside,[\s\S]*?background: rgba\(255, 255, 255, \.96\) !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /Two references to the same id are valid CSS/);
+});
+
 test("desktop and compact navigation retain the larger, high-contrast type contract", () => {
   const navRule = rules(clarity).find(({ selector, body }) =>
     selector.includes(".apps-nav") && body.includes("font-size: .95rem !important"));
@@ -181,22 +196,25 @@ test("desktop and compact navigation retain the larger, high-contrast type contr
   assert.match(clarity, /@media \(max-width: 820px\) \{[\s\S]*?font-size: \.9rem !important;/);
 });
 
-test("the LinkedIn speaking post is accessible, responsive, and permitted by CSP", () => {
+test("the upcoming speaking card uses the supplied still image with an accessible LinkedIn source link", () => {
   const card = about.match(/<article className="about-proof-card about-media-card about-linkedin-card">([\s\S]*?)<\/article>/)?.[1];
-  assert.ok(card, "About must render the LinkedIn evidence card");
-  const iframe = card.match(/<iframe([\s\S]*?)\/>/)?.[1];
-  assert.ok(iframe, "the LinkedIn evidence card must contain an iframe");
-  assert.match(iframe, /src="https:\/\/www\.linkedin\.com\/embed\/feed\/update\/urn:li:ugcPost:\d+\?compact=1"/);
-  assert.match(iframe, /loading="lazy"/);
-  assert.match(iframe, /allowFullScreen/);
-  assert.match(iframe, /title="LinkedIn announcement for Dr\. Jody Blanchard's upcoming speaking engagement"/);
+  assert.ok(card, "About must render the upcoming speaking card");
+  assert.match(card, /className="about-linkedin-image"/);
+  assert.match(card, /src="\/leadership\/tampa-ciso-community-speaking-engagement\.png"/);
+  assert.match(card, /width=\{541\}/);
+  assert.match(card, /height=\{321\}/);
+  assert.match(card, /alt="Tampa CISO Community collaboration featuring Rosemary Ravinal, Dr\. Jody Blanchard, Alfredo Pena, and Rob Patchett"/);
   assert.match(card, /href="https:\/\/www\.linkedin\.com\/feed\/update\/urn:li:ugcPost:\d+"/);
   assert.match(card, /target="_blank" rel="noopener noreferrer"/);
-  assert.match(aboutVisualRepair, /\.about-linkedin-embed iframe\{[\s\S]*?width:100%;[\s\S]*?height:100%;[\s\S]*?border:0;/);
+  assert.match(aboutVisualRepair, /\.about-media-card \.about-linkedin-image\{[\s\S]*?width:100%!important;[\s\S]*?height:auto!important;[\s\S]*?aspect-ratio:541\/321!important;[\s\S]*?object-fit:cover!important;/);
+  assert.doesNotMatch(card, /<iframe|linkedin\.com\/embed/);
+
+  const image = fs.readFileSync("public/leadership/tampa-ciso-community-speaking-engagement.png");
+  assert.equal(createHash("sha256").update(image).digest("hex"), "2d2d573d8791dc28560fd51d0da0b3da803b3a1b4039dac4be149f91a8168f02");
 
   const frameSource = nextConfig.match(/`frame-src[^`]+`/)?.[0];
   assert.ok(frameSource, "CSP must publish a frame-src directive");
-  assert.ok(frameSource.includes("https://www.linkedin.com"), "CSP must permit the exact LinkedIn embed origin");
+  assert.ok(!frameSource.includes("https://www.linkedin.com"), "CSP must not retain a frame exception after removing the embed");
 });
 
 test("purchase controls are bright yellow only when enabled and gray when disabled", () => {

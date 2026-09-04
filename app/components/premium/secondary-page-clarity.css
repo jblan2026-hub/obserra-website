@@ -711,3 +711,358 @@
     font-size: .9rem !important;
   }
 }
+
+/*
+ * Specificity shield for route CSS that is emitted after this shared file.
+ * Two references to the same id are valid CSS and ensure the accessible light
+ * treatment wins without changing any rail, card-width, or scrolling rules.
+ */
+#main-content#main-content .premium-site-scope.public-secondary-scope {
+  background: #f4f9fc !important;
+  color: #0a2438 !important;
+  font-family: "Segoe UI", Aptos, -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .applications-catalog-page,
+  .apps-page,
+  .services-page,
+  .service-detail-page,
+  .industry-page,
+  .commercial-page,
+  .contact-page,
+  .trust-page,
+  .eios-page,
+  .eios-product-page,
+  .catalog-page,
+  .academy-enterprise,
+  .academy-course-page,
+  .academy-executive-page,
+  .app-detail-page,
+  .commerce-page,
+  .about-page,
+  .speaker-page,
+  .fl-classd
+) {
+  background-color: #f4f9fc !important;
+  color: #0a2438 !important;
+  font-family: inherit !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-hero,
+  .services-hero,
+  .service-detail-hero,
+  .trust-hero,
+  .industry-hero,
+  .industry-detail-hero,
+  .contact-hero,
+  .eios-hero,
+  .commercial-hero,
+  .catalog-hero,
+  .ae-hero,
+  .academy-course-hero,
+  .eios-product-hero,
+  .app-detail-hero,
+  .commerce-hero,
+  .about-page .about-hero,
+  .fl-classd__hero
+),
+#main-content#main-content .premium-site-scope.public-secondary-scope .academy-executive-page .hero {
+  border-color: #c8d8e2 !important;
+  background:
+    linear-gradient(90deg, rgba(244, 249, 252, .995) 0%, rgba(244, 249, 252, .98) 56%, rgba(230, 242, 247, .84) 72%, rgba(230, 242, 247, .42) 100%),
+    var(--public-hero-art, var(--secondary-default-art)) right center / 54% cover no-repeat !important;
+  color: #0a2438 !important;
+  text-shadow: none !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-hero > div,
+  .service-detail-hero-copy,
+  .trust-hero > div,
+  .industry-hero > div,
+  .industry-detail-hero > div,
+  .eios-hero-copy,
+  .eios-product-copy,
+  .catalog-hero-copy,
+  .ae-hero > div,
+  .academy-course-copy,
+  .about-hero-copy,
+  .fl-classd__hero
+) :is(h1, h2, h3, strong),
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .contact-hero,
+  .commercial-hero,
+  .ae-hero,
+  .app-detail-hero,
+  .commerce-hero,
+  .academy-executive-page .hero
+) > :is(h1, h2, h3, strong) {
+  color: #0a2438 !important;
+  font-family: "Segoe UI", Aptos, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 800 !important;
+  letter-spacing: -.035em !important;
+  text-shadow: none !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-hero > div,
+  .service-detail-hero-copy,
+  .trust-hero > div,
+  .industry-hero > div,
+  .industry-detail-hero > div,
+  .eios-hero-copy,
+  .eios-product-copy,
+  .catalog-hero-copy,
+  .ae-hero > div,
+  .about-hero-copy,
+  .fl-classd__hero
+) > :is(p, ul, small),
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .contact-hero,
+  .commercial-hero,
+  .ae-hero,
+  .app-detail-hero,
+  .commerce-hero,
+  .academy-executive-page .hero
+) > :is(p, ul, small) {
+  color: #29495d !important;
+  font-family: "Segoe UI", Aptos, -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: clamp(1rem, 1.12vw, 1.12rem) !important;
+  font-weight: 450 !important;
+  line-height: 1.68 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-eyebrow,
+  .trust-eyebrow,
+  .industry-eyebrow,
+  .contact-eyebrow,
+  .eios-eyebrow,
+  .commercial-eyebrow,
+  .academy-course-kicker,
+  .ae-eyebrow,
+  .commerce-eyebrow,
+  .kicker,
+  .eyebrow,
+  .about-kicker,
+  .speaker-kicker,
+  .fl-classd__eyebrow
+) {
+  color: #075e8a !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+/* Hero facts are light cards too, so their copy remains navy and readable. */
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-hero > aside,
+  .service-detail-panel,
+  .trust-status-panel,
+  .catalog-hero-panel,
+  .academy-course-card,
+  .academy-course-copy,
+  .ae-hero > aside,
+  .industry-hero > aside,
+  .industry-detail-summary
+) {
+  border: 1px solid #c8d8e2 !important;
+  background: rgba(255, 255, 255, .96) !important;
+  color: #0a2438 !important;
+  box-shadow: 0 18px 42px rgba(6, 19, 33, .12) !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-hero > aside,
+  .service-detail-panel,
+  .trust-status-panel,
+  .catalog-hero-panel,
+  .academy-course-card,
+  .academy-course-copy,
+  .ae-hero > aside,
+  .industry-hero > aside,
+  .industry-detail-summary
+) :is(h1, h2, h3, h4, strong, b, p, span, small, li, dt, dd) {
+  color: #29495d !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-hero > aside,
+  .service-detail-panel,
+  .trust-status-panel,
+  .catalog-hero-panel,
+  .academy-course-card,
+  .academy-course-copy,
+  .ae-hero > aside,
+  .industry-hero > aside,
+  .industry-detail-summary
+) :is(h1, h2, h3, h4, strong, b, dd) {
+  color: #0a2438 !important;
+}
+
+/* Headings and descriptions that sit on the light reading canvas. */
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-spotlight-heading,
+  .apps-deployment-heading,
+  .services-executive-heading,
+  .service-detail-split > div:first-child,
+  .service-detail-industries > div:first-child,
+  .industry-section-heading,
+  .industry-operating-model > div:first-child,
+  .industry-linked-capabilities > div:first-child,
+  .industry-case-study > div:first-child,
+  .commercial-section-heading,
+  .contact-experience-intro,
+  .contact-confidence,
+  .trust-section-heading,
+  .eios-product-heading,
+  .section-intro,
+  .section-head,
+  .catalog-heading,
+  .ae-section > header,
+  .ae-operating-model > div:first-child,
+  .about-proof-heading,
+  .speaker-proof-heading,
+  .fl-classd__section-heading
+) :is(h1, h2, h3, h4, strong, b) {
+  color: #0a2438 !important;
+  text-shadow: none !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-spotlight-heading,
+  .apps-deployment-heading,
+  .services-executive-heading,
+  .service-detail-split > div:first-child,
+  .service-detail-industries > div:first-child,
+  .industry-section-heading,
+  .industry-operating-model > div:first-child,
+  .industry-linked-capabilities > div:first-child,
+  .industry-case-study > div:first-child,
+  .commercial-section-heading,
+  .contact-experience-intro,
+  .contact-confidence,
+  .trust-section-heading,
+  .eios-product-heading,
+  .section-intro,
+  .section-head,
+  .catalog-heading,
+  .ae-section > header,
+  .ae-operating-model > div:first-child,
+  .about-proof-heading,
+  .speaker-proof-heading,
+  .fl-classd__section-heading
+) :is(p, span, small, li) {
+  color: #29495d !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+/* Preserve strong contrast on intentionally navy cards and closing bands. */
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-buyer-card,
+  .apps-spotlight-card,
+  .apps-grid article,
+  .service-detail-proof article,
+  .industry-grid article,
+  .industry-model-grid article,
+  .industry-linked-grid article,
+  .industry-detail-list,
+  .industry-case-grid article,
+  .trust-assurance article,
+  .trust-framework-grid article,
+  .trust-architecture-grid article,
+  .trust-card,
+  .trust-verification-grid a,
+  .trust-procurement-grid a,
+  .trust-policy section,
+  .eios-outcome-grid article,
+  .eios-detail-grid article,
+  .eios-product-links a,
+  .ae-path-grid article,
+  .ae-capability-grid article,
+  .ae-edition-grid article,
+  .ae-operating-model li,
+  .commerce-plans article,
+  .commerce-workflow li,
+  .app-detail-grid article,
+  .app-docs > div,
+  .app-pricing,
+  .services-consultation,
+  .service-detail-cta,
+  .industry-cta,
+  .commercial-cta,
+  .apps-commercial-cta,
+  .eios-connect,
+  .eios-product-final,
+  .academy-executive-close,
+  .ae-trust,
+  .ae-final,
+  .commerce-support
+) :is(h1, h2, h3, h4, strong, b) {
+  color: #ffffff !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope :is(
+  .apps-buyer-card,
+  .apps-spotlight-card,
+  .apps-grid article,
+  .service-detail-proof article,
+  .industry-grid article,
+  .industry-model-grid article,
+  .industry-linked-grid article,
+  .industry-detail-list,
+  .industry-case-grid article,
+  .trust-assurance article,
+  .trust-framework-grid article,
+  .trust-architecture-grid article,
+  .trust-card,
+  .trust-verification-grid a,
+  .trust-procurement-grid a,
+  .trust-policy section,
+  .eios-outcome-grid article,
+  .eios-detail-grid article,
+  .eios-product-links a,
+  .ae-path-grid article,
+  .ae-capability-grid article,
+  .ae-edition-grid article,
+  .ae-operating-model li,
+  .commerce-plans article,
+  .commerce-workflow li,
+  .app-detail-grid article,
+  .app-docs > div,
+  .app-pricing,
+  .services-consultation,
+  .service-detail-cta,
+  .industry-cta,
+  .commercial-cta,
+  .apps-commercial-cta,
+  .eios-connect,
+  .eios-product-final,
+  .academy-executive-close,
+  .ae-trust,
+  .ae-final,
+  .commerce-support
+) :is(p, span, small, li, dt, dd) {
+  color: #dce9f0 !important;
+  opacity: 1 !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope .applications-catalog-page .apps-hero > div > h1 {
+  color: #0a2438 !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope .applications-catalog-page .apps-hero > div > p:not(.apps-eyebrow) {
+  color: #29495d !important;
+  opacity: 1 !important;
+}
+
+#main-content#main-content .premium-site-scope.public-secondary-scope .applications-catalog-page .apps-hero > aside,
+#main-content#main-content .premium-site-scope.public-secondary-scope .applications-catalog-page .apps-hero > aside p {
+  color: #29495d !important;
+}
