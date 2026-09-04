@@ -187,8 +187,8 @@ test("reported Applications, Services, and EIOS visual defects have explicit rep
   assert.match(clarity, /\.eios-page \.product-image::before \{[\s\S]*?background: rgba\(3, 11, 24, \.18\) !important;/);
   assert.match(clarity, /\.eios-page \.product-frame figcaption \{[\s\S]*?background: #ffffff !important;/);
   assert.match(clarity, /\.eios-page \.product-frame figcaption :is\(p, strong, span\) \{[\s\S]*?color: #0a2438 !important;/);
-  assert.match(clarity, /\.trust-page \.services-executive-card > button \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
-  assert.match(clarity, /\.trust-page \.services-executive-card > button > span:last-child > span:last-child \{[\s\S]*?background: #55d6e8 !important;[\s\S]*?color: #030b18 !important;/);
+  assert.match(clarity, /\.services-executive-card > button \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.services-executive-card > button > span:last-child > span:last-child \{[\s\S]*?background: #55d6e8 !important;[\s\S]*?color: #030b18 !important;/);
 });
 
 test("desktop and compact navigation retain the larger, high-contrast type contract", () => {
