@@ -1262,7 +1262,7 @@
 }
 
 /* Shared service and assurance cards keep the vivid image but use a light, readable body. */
-#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button {
+#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button[data-card-variant="visual"] {
   min-height: 430px !important;
   border: 1px solid #b8ccd8 !important;
   background: #ffffff !important;
@@ -1270,28 +1270,28 @@
   box-shadow: 0 14px 34px rgba(6, 33, 60, .11) !important;
 }
 
-#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button > span:first-child img {
+#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button[data-card-variant="visual"] > span:first-child img {
   filter: saturate(1.18) contrast(1.06) brightness(1.06) !important;
 }
 
-#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button > span:first-child > span:first-of-type {
+#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button[data-card-variant="visual"] > span:first-child > span:first-of-type {
   background: rgba(3, 11, 24, .14) !important;
 }
 
-#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button > span:last-child {
+#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button[data-card-variant="visual"] > span:last-child {
   background: #ffffff !important;
 }
 
-#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button > span:last-child > strong {
+#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button[data-card-variant="visual"] > span:last-child > strong {
   color: #0a2438 !important;
 }
 
-#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button > span:last-child > span {
+#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button[data-card-variant="visual"] > span:last-child > span {
   color: #29495d !important;
   opacity: 1 !important;
 }
 
-#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button > span:last-child > span:last-child {
+#main-content#main-content .premium-site-scope.public-secondary-scope .services-executive-card > button[data-card-variant="visual"] > span:last-child > span:last-child {
   min-height: 40px !important;
   align-items: center !important;
   padding: 0 14px !important;
@@ -1303,18 +1303,18 @@
 }
 
 /* The Trust assurance gallery uses the shared modal card inside a later route stylesheet. */
-#main-content#main-content .premium-site-scope.public-secondary-scope .trust-page .trust-executive-portfolio .services-executive-card > button,
-#main-content#main-content .premium-site-scope.public-secondary-scope .trust-page .trust-executive-portfolio .services-executive-card > button > span:last-child {
+#main-content#main-content .premium-site-scope.public-secondary-scope .trust-page .trust-executive-portfolio .services-executive-card > button[data-card-variant="visual"],
+#main-content#main-content .premium-site-scope.public-secondary-scope .trust-page .trust-executive-portfolio .services-executive-card > button[data-card-variant="visual"] > span:last-child {
   border-color: #b8ccd8 !important;
   background: #ffffff !important;
   color: #0a2438 !important;
 }
 
-#main-content#main-content .premium-site-scope.public-secondary-scope .trust-page .trust-executive-portfolio .services-executive-card > button > span:last-child > strong {
+#main-content#main-content .premium-site-scope.public-secondary-scope .trust-page .trust-executive-portfolio .services-executive-card > button[data-card-variant="visual"] > span:last-child > strong {
   color: #0a2438 !important;
 }
 
-#main-content#main-content .premium-site-scope.public-secondary-scope .trust-page .trust-executive-portfolio .services-executive-card > button > span:last-child > span:not(:last-child) {
+#main-content#main-content .premium-site-scope.public-secondary-scope .trust-page .trust-executive-portfolio .services-executive-card > button[data-card-variant="visual"] > span:last-child > span:not(:last-child) {
   color: #29495d !important;
   opacity: 1 !important;
 }

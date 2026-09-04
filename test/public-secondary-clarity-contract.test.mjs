@@ -21,6 +21,7 @@ const certificationsCss = read("app/certifications/certifications.css");
 const floridaTraining = read("app/florida-security-training/page.tsx");
 const dimensionalPedestal = read("app/ai-marketplace/MarketplaceDimensionalPedestal.tsx");
 const marketplaceSalesDock = read("app/ai-marketplace/MarketplaceSalesDock.tsx");
+const executiveInfoModal = read("app/components/ui/ExecutiveInfoModal.tsx");
 
 function rules(source) {
   return [...source.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((match) => ({
@@ -189,12 +190,14 @@ test("reported Applications, Services, and EIOS visual defects have explicit rep
   assert.match(clarity, /\.eios-page \.product-image::before \{[\s\S]*?background: rgba\(3, 11, 24, \.18\) !important;/);
   assert.match(clarity, /\.eios-page \.product-frame figcaption \{[\s\S]*?background: #ffffff !important;/);
   assert.match(clarity, /\.eios-page \.product-frame figcaption :is\(p, strong, span\) \{[\s\S]*?color: #0a2438 !important;/);
-  assert.match(clarity, /\.services-executive-card > button \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
-  assert.match(clarity, /\.services-executive-card > button > span:last-child > span:last-child \{[\s\S]*?background: #55d6e8 !important;[\s\S]*?color: #030b18 !important;/);
+  assert.match(executiveInfoModal, /data-card-variant=\{image \? "visual" : "text"\}/);
+  assert.match(clarity, /\.services-executive-card > button\[data-card-variant="visual"\] \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.services-executive-card > button\[data-card-variant="visual"\] > span:last-child > span:last-child \{[\s\S]*?background: #55d6e8 !important;[\s\S]*?color: #030b18 !important;/);
+  assert.doesNotMatch(clarity, /\.services-executive-card > button \{/);
 });
 
 test("remaining deep-route dark-on-dark collisions have explicit light-surface owners", () => {
-  assert.match(clarity, /\.trust-page \.trust-executive-portfolio \.services-executive-card > button,[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
+  assert.match(clarity, /\.trust-page \.trust-executive-portfolio \.services-executive-card > button\[data-card-variant="visual"\],[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
   assert.match(clarity, /\.service-detail-page \.service-detail-panel-stats article \{[\s\S]*?background: #e8f3f7 !important;[\s\S]*?color: #0a2438 !important;/);
   assert.match(clarity, /\.catalog-page \.catalog-hero-panel \.catalog-route-card \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #0a2438 !important;/);
   assert.match(clarity, /\.academy-enterprise \.ae-hero > aside > span \{[\s\S]*?background: #ffffff !important;[\s\S]*?color: #29495d !important;/);

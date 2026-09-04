@@ -122,6 +122,7 @@ export default function ExecutiveInfoModal({
       <button
         ref={triggerRef}
         type="button"
+        data-card-variant={image ? "visual" : "text"}
         className={`${styles.trigger} ${image ? styles.visualTrigger : styles.textTrigger}`}
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
