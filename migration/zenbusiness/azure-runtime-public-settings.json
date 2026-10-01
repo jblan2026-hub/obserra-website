@@ -1,0 +1,17 @@
+[
+  { "name": "HOSTNAME", "value": "0.0.0.0", "slotSetting": false },
+  { "name": "NODE_ENV", "value": "production", "slotSetting": false },
+  { "name": "SCM_DO_BUILD_DURING_DEPLOYMENT", "value": "false", "slotSetting": false },
+  { "name": "NEXT_TELEMETRY_DISABLED", "value": "1", "slotSetting": false },
+  { "name": "OBSERRA_HOSTING_PROVIDER", "value": "azure-app-service", "slotSetting": false },
+  { "name": "OBSERRA_RUNTIME_ENVIRONMENT", "value": "production", "slotSetting": false },
+  { "name": "OBSERRA_APPLICATION_ORIGIN", "value": "https://platform.obserrallc.com", "slotSetting": false },
+  { "name": "OBSERRA_FDACS_PUBLIC_ORIGIN", "value": "https://platform.obserrallc.com", "slotSetting": false },
+  { "name": "OBSERRA_IDENTITY_RUNTIME_ENABLED", "value": "false", "slotSetting": false },
+  { "name": "OBSERRA_SUPABASE_AUTH_RUNTIME_ENABLED", "value": "true", "slotSetting": false },
+  { "name": "NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_URL", "value": "https://ftkjhmtfyfkartfsnkjb.supabase.co", "slotSetting": false },
+  { "name": "NEXT_PUBLIC_OBSERRA_AUTH_SUPABASE_PUBLISHABLE_KEY", "value": "sb_publishable_mRE63bML7dsVY_YqaervqA_TUEWsxVB", "slotSetting": false },
+  { "name": "OBSERRA_AUTH_SUPABASE_PROJECT_REF", "value": "ftkjhmtfyfkartfsnkjb", "slotSetting": false },
+  { "name": "OBSERRA_FDACS_RUNTIME_ENVIRONMENT", "value": "production", "slotSetting": false },
+  { "name": "OBSERRA_FDACS_PRODUCTION_ACTIVATION_AUTHORIZED", "value": "disabled", "slotSetting": false }
+]
