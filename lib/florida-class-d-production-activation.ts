@@ -5,10 +5,11 @@ import {
   floridaClassDOwnerUatExecutionAuthorized,
   floridaClassDOwnerUatProfileRequested,
 } from "./florida-class-d-owner-uat";
+import { applicationOrigin } from "./application-origin";
 
 const SHA40 = /^[0-9a-f]{40}$/i;
 const SHA256_HEX = /^[0-9a-f]{64}$/i;
-const CANONICAL_PUBLIC_ORIGIN = "https://www.obserrallc.com";
+// Defaults to https://www.obserrallc.com until the separate approved platform is configured.
 const REQUIRED_DOCUMENT_BUCKET = "fdacs-class-d-completion-documents";
 const REQUIRED_FDACS_SUPABASE_PROJECT_REF = "ggkxgjhsbgbifiqrhavr";
 const NONPRODUCTION_ENVIRONMENTS = new Set(["development", "sandbox", "staging", "uat"]);
@@ -71,7 +72,7 @@ export type FloridaClassDProductionActivationReport = {
 
 export const FLORIDA_CLASS_D_PRODUCTION_ACTIVATION_POLICY = {
   policyVersion: "2026-08-13-gate-31-v1",
-  canonicalPublicOrigin: CANONICAL_PUBLIC_ORIGIN,
+  canonicalPublicOrigin: applicationOrigin(),
   exactReleaseBindingRequired: true,
   exactUatReleaseBindingRequired: true,
   exactDeploymentReleaseBindingRequired: true,
@@ -265,9 +266,9 @@ function coreChecks(): FloridaClassDProductionActivationCheck[] {
     check(
       "canonical_public_origin",
       "Canonical regulated public origin configured",
-      publicOrigin === CANONICAL_PUBLIC_ORIGIN,
-      "Canonical origin matches www.obserrallc.com.",
-      "OBSERRA_FDACS_PUBLIC_ORIGIN must exactly equal https://www.obserrallc.com.",
+      publicOrigin === applicationOrigin(),
+      "Regulated origin matches the configured Obserra application origin.",
+      "OBSERRA_FDACS_PUBLIC_ORIGIN must exactly equal the approved OBSERRA_APPLICATION_ORIGIN (https://www.obserrallc.com by default).",
     ),
     check(
       "clerk_live_publishable",

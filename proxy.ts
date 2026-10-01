@@ -14,8 +14,10 @@ import {
 import { floridaClassDProductionOwnerReviewExecutionAuthorized } from "./lib/florida-class-d-owner-preview";
 import { isPreviewRuntime, isProductionRuntime } from "./lib/runtime-environment";
 import { updateSupabaseAuthSession } from "./lib/supabase/proxy";
+import { applicationOrigin } from "./lib/application-origin";
 
-const CANONICAL_HOST = "www.obserrallc.com";
+const APPLICATION_ORIGIN = applicationOrigin();
+const CANONICAL_HOST = new URL(APPLICATION_ORIGIN).hostname;
 const DEFAULT_OWNER_ORIGIN = "https://owner.obserrallc.com";
 const PREVIEW_NOINDEX = "noindex, nofollow, noarchive, nosnippet";
 const PRIVATE_NOINDEX = "noindex, nofollow, noarchive, nosnippet, noimageindex";
@@ -243,7 +245,7 @@ function redirectOwnerHostToCorrectSurface(request: NextRequest) {
     );
   }
 
-  const destination = new URL(source.pathname + source.search, `https://${CANONICAL_HOST}`);
+  const destination = new URL(source.pathname + source.search, APPLICATION_ORIGIN);
   return NextResponse.redirect(destination, 308);
 }
 
@@ -253,7 +255,7 @@ function canonicalRedirect(request: NextRequest) {
   if (!isProductionRuntime()) return null;
 
   const source = new URL(request.url);
-  const destination = new URL(source.pathname + source.search, `https://${CANONICAL_HOST}`);
+  const destination = new URL(source.pathname + source.search, APPLICATION_ORIGIN);
   return NextResponse.redirect(destination, 308);
 }
 

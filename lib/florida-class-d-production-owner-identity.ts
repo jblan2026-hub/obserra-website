@@ -2,8 +2,8 @@ import "server-only";
 
 import { getStripe } from "./stripe";
 import { requireFloridaClassDOwnerTestPrincipal } from "./florida-class-d-owner-test-session";
+import { applicationOrigin } from "./application-origin";
 
-const CANONICAL_PUBLIC_ORIGIN = "https://www.obserrallc.com";
 const VERIFICATION_SESSION_PATTERN = /^vs_[A-Za-z0-9_]{8,255}$/;
 const SURFACE = "fdacs_production_owner_validation";
 
@@ -43,7 +43,7 @@ export async function createFloridaClassDProductionOwnerIdentityVerification() {
         },
       },
       metadata,
-      return_url: `${CANONICAL_PUBLIC_ORIGIN}/florida-security-training/owner-validation/identity?provider_return=1`,
+      return_url: `${applicationOrigin()}/florida-security-training/owner-validation/identity?provider_return=1`,
     },
     {
       idempotencyKey: `fdacs-owner-idv-v1-${principal.principalId}-${principal.sessionId}-${principal.releaseCommitSha}`,
