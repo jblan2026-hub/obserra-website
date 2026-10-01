@@ -46,7 +46,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https:",
   "font-src 'self' data:",
-  `connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.credly.com https://cdn.credly.com https://vitals.vercel-insights.com ${clerkIdentitySources} ${identityConnectSources} ${fdacsOwnerCoursewareSources}`,
+  `connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.credly.com https://cdn.credly.com ${clerkIdentitySources} ${identityConnectSources} ${fdacsOwnerCoursewareSources}`,
   "media-src 'self' https: blob:",
   "worker-src 'self' blob:",
   `frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.credly.com https://challenges.cloudflare.com https://*.protect.clerk.com https://*.daily.co ${fdacsOwnerCoursewareSources}`,

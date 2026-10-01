@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/next";
 import { EIOS_BRAND_NAME, LEGAL_ENTITY_NAME, PUBLIC_BRAND_NAME } from "../lib/legal-identity";
 import ObserraGuide from "./ObserraGuide";
 import CredlyProfileLink from "./CredlyProfileLink";
@@ -66,7 +65,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </div>
         <CredlyProfileLink />
         <ObserraGuide />
-        <Analytics />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </body>
     </html>

@@ -63,7 +63,6 @@
     "@react-three/fiber": "9.7.0",
     "@supabase/ssr": "0.12.4",
     "@supabase/supabase-js": "2.112.3",
-    "@vercel/analytics": "^2.0.1",
     "@vercel/oidc": "^3.8.5",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.543.0",
