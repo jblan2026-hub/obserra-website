@@ -1,0 +1,111 @@
+/* Public ZenBusiness widgets do not render the Next.js layout's theme wrapper.
+ * Supply explicit foreground/background pairs here instead of inheriting the
+ * original dark-page colors on the imported light surfaces.
+ */
+#dmRoot #obserra-public#obserra-public {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #17344a;
+}
+#dmRoot #obserra-public#obserra-public main {
+  background: #f4f7f9 !important;
+  color: #17344a !important;
+}
+#dmRoot #obserra-public#obserra-public main :is(section, article, aside, header, footer, details, ul, ol) {
+  background: #ffffff !important;
+  color: #17344a !important;
+}
+#dmRoot #obserra-public#obserra-public main :is(h1, h2, h3, h4, h5, h6, strong, b) {
+  color: #06213c !important;
+  text-shadow: none !important;
+}
+#dmRoot #obserra-public#obserra-public main :is(p, li, span, small, dt, dd, label, em) {
+  color: #29495d !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+#dmRoot #obserra-public#obserra-public main p,
+#dmRoot #obserra-public#obserra-public main li {
+  font-size: 17px !important;
+  line-height: 1.65 !important;
+}
+#dmRoot #obserra-public#obserra-public main a {
+  color: #075e8a !important;
+}
+#dmRoot #obserra-public#obserra-public main :is(.apps-eyebrow, .trust-eyebrow, .industry-eyebrow, .contact-eyebrow, .speaker-kicker, .saas-eyebrow, .about-kicker, .kicker, .eyebrow) {
+  color: #315f7c !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+#dmRoot #obserra-public#obserra-public main :is(.apps-button, .apps-nav-cta, .contact-button, .speaker-button, .about-nav-cta, .about-button, .commercial-cta a, .verified-credentials-profile-link, .industry-actions a, .trust-hero-actions a, .trust-contact-actions a, .executive-buy-button, .zen-contact-form-link, .zen-info-details a, .obs-button--primary) {
+  background: #06213c !important;
+  border-color: #06213c !important;
+  color: #ffffff !important;
+}
+#dmRoot #obserra-public#obserra-public main :is(.apps-outline, .contact-outline, .speaker-outline, .obs-button--secondary) {
+  background: #ffffff !important;
+  border-color: #41677f !important;
+  color: #06213c !important;
+}
+#dmRoot #obserra-public#obserra-public main :is(.obs-button, .apps-button, .apps-outline, .contact-button, .contact-outline, .speaker-button, .speaker-outline) :is(span, strong) {
+  color: inherit !important;
+}
+/* Keep the brand's navy promotional bands, with readable light text. */
+#dmRoot #obserra-public#obserra-public main :is(.home-marketplace-promo, .saas-value-bar, .services-consultation, .service-detail-cta, .speaker-executive-booking, .about-executive-closing, .industry-cta) {
+  background: #06213c !important;
+  color: #ffffff !important;
+}
+#dmRoot #obserra-public#obserra-public main :is(.home-marketplace-promo, .saas-value-bar, .services-consultation, .service-detail-cta, .speaker-executive-booking, .about-executive-closing, .industry-cta) :is(h1, h2, h3, h4, strong, b, p, li, span, small, em) {
+  color: #f4f9fc !important;
+}
+#dmRoot #obserra-public#obserra-public main :is(.home-marketplace-promo__primary, .saas-value-bar .obs-button--primary, .services-consultation .apps-button, .service-detail-cta .apps-button, .speaker-executive-booking .speaker-button, .about-executive-closing a, .industry-cta a) {
+  background: #ffd070 !important;
+  border-color: #ffd070 !important;
+  color: #06213c !important;
+}
+#dmRoot #obserra-public#obserra-public main :is(.home-marketplace-promo__secondary, .saas-value-bar .obs-button--secondary, .services-consultation .apps-outline, .service-detail-cta .apps-outline) {
+  background: transparent !important;
+  border-color: #dce9f0 !important;
+  color: #ffffff !important;
+}
+#dmRoot #obserra-public#obserra-public .ent-header__nav a {
+  font-size: 14px !important;
+  color: #f4f9fc !important;
+  font-weight: 600;
+}
+#dmRoot #obserra-public#obserra-public .ent-header__nav {
+  flex-wrap: wrap;
+  row-gap: 0;
+}
+#dmRoot #obserra-public#obserra-public .ent-proof {
+  background: #ffffff !important;
+  color: #17344a !important;
+}
+#dmRoot #obserra-public#obserra-public .ent-proof small {
+  color: #29495d !important;
+  font-size: 14px !important;
+}
+#dmRoot #obserra-public#obserra-public .ent-proof div {
+  display: grid;
+  align-content: center;
+  min-height: 112px;
+  padding: 22px;
+}
+#dmRoot #obserra-public#obserra-public .ent-proof strong,
+#dmRoot #obserra-public#obserra-public .ent-proof small {
+  display: block;
+}
+#dmRoot #obserra-public#obserra-public .ent-footer :is(p, a, span, small) {
+  color: #dce9f0 !important;
+  font-size: 14px;
+}
+#dmRoot #obserra-public#obserra-public :focus-visible {
+  outline: 3px solid #2474a6 !important;
+  outline-offset: 3px;
+}
+@media (max-width: 1100px) {
+  #dmRoot #obserra-public#obserra-public .ent-header__nav { flex-wrap: nowrap; }
+}
+
+/* Small light chips and issuer links also need explicit pairs. */
+#dmRoot #obserra-public#obserra-public main :is(.service-detail-highlights li, .service-detail-proof span, .service-industry-tags span) { background: #ffffff !important; color: #29495d !important; }
+#dmRoot #obserra-public#obserra-public .verified-credential-verify-link { background: #ffffff !important; color: #06213c !important; }

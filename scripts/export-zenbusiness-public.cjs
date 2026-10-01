@@ -149,7 +149,10 @@ const previewPrefix='/site/2d547f80';const prefix=(location.pathname===previewPr
 // Duda retains links to native page IDs when their old slugs are renamed.
 // Direct those migrated links to the replacement public pages instead.
 function normalizeLink(a){const url=new URL(a.href,location.href);if(url.origin!==location.origin)return false;const route=prefix?url.pathname.slice(prefix.length):url.pathname;if(route==='/legacy-contact')url.pathname=prefix+'/contact';else if(route==='/legacy-home'||route==='/home')url.pathname=prefix+'/';else return false;const raw=a.getAttribute('raw_url');if(raw)for(const [key,value]of new URL(raw,location.href).searchParams)url.searchParams.set(key,value);a.href=url.href;a.setAttribute('raw_url',url.href);return true;}
-root.querySelectorAll('a[href]').forEach(normalizeLink);root.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(a&&normalizeLink(a))event.stopPropagation();},true);
+root.querySelectorAll('a[href]').forEach(normalizeLink);
+// Imported HTML links must use their real URLs rather than Duda's native-page
+// click router, which can retain a different page ID after copying widgets.
+root.addEventListener('click',event=>{const a=event.target.closest('a[href]');if(!a||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||a.hasAttribute('download')||(a.target&&a.target!=='_self'))return;normalizeLink(a);const url=new URL(a.href,location.href);if(url.origin!==location.origin)return;const route=prefix&&url.pathname.startsWith(prefix)?url.pathname.slice(prefix.length)||'/':url.pathname;if(!publicRoutes.has(route))return;if(url.pathname===location.pathname&&url.search===location.search&&url.hash)return;event.preventDefault();event.stopImmediatePropagation();window.location.assign(url.href);},true);
 const secureForm=root.querySelector('.zen-contact-form-link');if(secureForm){const url=new URL(secureForm.href);const params=new URLSearchParams(location.search);for(const key of ['interest','industry','service','course'])if(params.has(key))url.searchParams.set(key,params.get(key));secureForm.href=url.href;}
 const panel=document.getElementById('zen-obserrian-panel'),launcher=document.getElementById('zen-obserrian-launcher'),log=document.getElementById('zen-obserrian-messages'),input=document.getElementById('zen-obserrian-question');
 function destination(value){const route=value.split(/[?#]/)[0];return publicRoutes.has(route)?prefix+value:platformOrigin+value;}
@@ -197,6 +200,8 @@ body:has(#obserra-public) .site_content{margin-top:0!important}
 #dmRoot #obserra-public .ent-header__toggle span{display:block!important;width:20px!important;height:2px!important;min-height:2px!important;flex:0 0 2px!important;background:#fff!important;margin:0!important;padding:0!important}
 #dmRoot #obserra-public .about-page.about-executive-page{background:#f4f7f9!important;isolation:isolate}
 #dmRoot #obserra-public .about-page.about-executive-page::before{display:none!important}
+</style><style id="obserra-public-readability">
+${fs.readFileSync(path.join(out,'public-readability.css'),'utf8')}
 </style>`);
   for(const page of pages){
     const widget=`<style>${stylesheet}</style><div id="obserra-public">${page.html}</div><script>${interaction}</script>`;
