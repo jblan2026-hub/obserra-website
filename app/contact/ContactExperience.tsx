@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { track } from "@vercel/analytics";
 import { LEGAL_ENTITY_NAME } from "@/lib/legal-identity";
 
 type InquiryCategory =
@@ -98,13 +97,11 @@ export default function ContactExperience({ initialInterest }: { initialInterest
 
   function submitInquiry(event: FormEvent) {
     event.preventDefault();
-    track("contact_inquiry_submitted", { category, urgency, method, confidential });
     const subject = encodeURIComponent(`${LEGAL_ENTITY_NAME} Inquiry | ${category}`);
     window.location.href = `mailto:info@obserrallc.com?subject=${subject}&body=${buildInquiryBody()}`;
   }
 
   function requestSecurePortal() {
-    track("contact_secure_portal_requested", { category });
     const subject = encodeURIComponent(`${LEGAL_ENTITY_NAME} Secure Exchange Request | ${category}`);
     window.location.href = `mailto:info@obserrallc.com?subject=${subject}&body=${buildInquiryBody(true)}`;
   }
@@ -127,7 +124,6 @@ export default function ContactExperience({ initialInterest }: { initialInterest
           <a
             className="contact-button"
             href={`mailto:info@obserrallc.com?subject=${encodeURIComponent(`${LEGAL_ENTITY_NAME} Executive Consultation Request`)}`}
-            onClick={() => track("contact_schedule_clicked", { source: "contact_page" })}
           >
             Request consultation scheduling
           </a>

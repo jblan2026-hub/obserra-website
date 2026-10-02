@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { track } from "@vercel/analytics";
 
 type CheckoutAttempt = { id: string; issuedAt: number };
 
@@ -83,7 +82,6 @@ export default function AcademyCheckoutForm({
       style={{ display: "contents" }}
       onSubmit={() => {
         setSubmitting(true);
-        track("academy_checkout_started", { course: courseId, source });
       }}
     >
       <input type="hidden" name="course" value={courseId} />
